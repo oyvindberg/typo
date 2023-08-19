@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_ts_config_map
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
   override def delete(compositeId: PgTsConfigMapId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_ts_config_map where mapcfg = ${compositeId.mapcfg} AND maptokentype = ${compositeId.maptokentype} AND mapseqno = ${compositeId.mapseqno}".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_ts_config_map where mapcfg = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND maptokentype = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND mapseqno = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
     DeleteBuilder("pg_catalog.pg_ts_config_map", PgTsConfigMapFields)
   }
   override def insert(unsaved: PgTsConfigMapRow)(implicit c: Connection): PgTsConfigMapRow = {
     SQL"""insert into pg_catalog.pg_ts_config_map(mapcfg, maptokentype, mapseqno, mapdict)
-          values (${unsaved.mapcfg}::oid, ${unsaved.maptokentype}::int4, ${unsaved.mapseqno}::int4, ${unsaved.mapdict}::oid)
+          values (${ParameterValue(unsaved.mapcfg, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.maptokentype, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.mapseqno, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.mapdict, null, ToStatement.longToStatement)}::oid)
           returning mapcfg, maptokentype, mapseqno, mapdict
        """
       .executeInsert(PgTsConfigMapRow.rowParser(1).single)
@@ -40,14 +42,14 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
   override def selectById(compositeId: PgTsConfigMapId)(implicit c: Connection): Option[PgTsConfigMapRow] = {
     SQL"""select mapcfg, maptokentype, mapseqno, mapdict
           from pg_catalog.pg_ts_config_map
-          where mapcfg = ${compositeId.mapcfg} AND maptokentype = ${compositeId.maptokentype} AND mapseqno = ${compositeId.mapseqno}
+          where mapcfg = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND maptokentype = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND mapseqno = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}
        """.as(PgTsConfigMapRow.rowParser(1).singleOpt)
   }
   override def update(row: PgTsConfigMapRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_ts_config_map
-          set mapdict = ${row.mapdict}::oid
-          where mapcfg = ${compositeId.mapcfg} AND maptokentype = ${compositeId.maptokentype} AND mapseqno = ${compositeId.mapseqno}
+          set mapdict = ${ParameterValue(row.mapdict, null, ToStatement.longToStatement)}::oid
+          where mapcfg = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND maptokentype = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND mapseqno = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
@@ -56,10 +58,10 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
   override def upsert(unsaved: PgTsConfigMapRow)(implicit c: Connection): PgTsConfigMapRow = {
     SQL"""insert into pg_catalog.pg_ts_config_map(mapcfg, maptokentype, mapseqno, mapdict)
           values (
-            ${unsaved.mapcfg}::oid,
-            ${unsaved.maptokentype}::int4,
-            ${unsaved.mapseqno}::int4,
-            ${unsaved.mapdict}::oid
+            ${ParameterValue(unsaved.mapcfg, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.maptokentype, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.mapseqno, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.mapdict, null, ToStatement.longToStatement)}::oid
           )
           on conflict (mapcfg, maptokentype, mapseqno)
           do update set

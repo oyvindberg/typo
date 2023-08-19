@@ -9,12 +9,15 @@ package jobcandidate
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
-    SQL"delete from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".executeUpdate() > 0
+    SQL"delete from humanresources.jobcandidate where jobcandidateid = ${ParameterValue(jobcandidateid, null, JobcandidateId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
     DeleteBuilder("humanresources.jobcandidate", JobcandidateFields)
   }
   override def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
-          values (${unsaved.jobcandidateid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.resume}::xml, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.jobcandidateid, null, JobcandidateId.toStatement)}::int4, ${ParameterValue(unsaved.businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.resume, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning jobcandidateid, businessentityid, resume, modifieddate::text
        """
       .executeInsert(JobcandidateRow.rowParser(1).single)
@@ -38,15 +41,15 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
     val namedParameters = List(
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("resume", ParameterValue.from(unsaved.resume)), "::xml")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))), "::int4")),
+      Some((NamedParameter("resume", ParameterValue(unsaved.resume, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))), "::xml")),
       unsaved.jobcandidateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("jobcandidateid", ParameterValue.from[JobcandidateId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("jobcandidateid", ParameterValue(value, null, JobcandidateId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -76,23 +79,23 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def selectById(jobcandidateid: JobcandidateId)(implicit c: Connection): Option[JobcandidateRow] = {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate::text
           from humanresources.jobcandidate
-          where jobcandidateid = $jobcandidateid
+          where jobcandidateid = ${ParameterValue(jobcandidateid, null, JobcandidateId.toStatement)}
        """.as(JobcandidateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): List[JobcandidateRow] = {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate::text
           from humanresources.jobcandidate
-          where jobcandidateid = ANY($jobcandidateids)
+          where jobcandidateid = ANY(${jobcandidateids})
        """.as(JobcandidateRow.rowParser(1).*)
     
   }
   override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
     val jobcandidateid = row.jobcandidateid
     SQL"""update humanresources.jobcandidate
-          set businessentityid = ${row.businessentityid}::int4,
-              resume = ${row.resume}::xml,
-              modifieddate = ${row.modifieddate}::timestamp
-          where jobcandidateid = $jobcandidateid
+          set businessentityid = ${ParameterValue(row.businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+              resume = ${ParameterValue(row.resume, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where jobcandidateid = ${ParameterValue(jobcandidateid, null, JobcandidateId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
@@ -101,10 +104,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
           values (
-            ${unsaved.jobcandidateid}::int4,
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.resume}::xml,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.jobcandidateid, null, JobcandidateId.toStatement)}::int4,
+            ${ParameterValue(unsaved.businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+            ${ParameterValue(unsaved.resume, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (jobcandidateid)
           do update set

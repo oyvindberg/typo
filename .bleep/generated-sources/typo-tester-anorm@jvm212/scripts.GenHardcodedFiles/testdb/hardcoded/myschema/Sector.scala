@@ -40,13 +40,13 @@ object Sector {
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayColumn: Column[Array[Sector]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[Sector]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
-  implicit lazy val column: Column[Sector] = implicitly[Column[String]].mapResult(str => Sector(str).left.map(SqlMappingError.apply))
+  implicit lazy val arrayToStatement: ToStatement[Array[Sector]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
+  implicit lazy val column: Column[Sector] = Column.columnToString.mapResult(str => Sector(str).left.map(SqlMappingError.apply))
   implicit lazy val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
-    override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
+    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
+    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[Sector] = Reads[Sector]{(value: JsValue) => value.validate(Reads.StringReads).flatMap(str => Sector(str).fold(JsError.apply, JsSuccess(_)))}
-  implicit lazy val toStatement: ToStatement[Sector] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit lazy val toStatement: ToStatement[Sector] = ToStatement.stringToStatement.contramap(_.value)
   implicit lazy val writes: Writes[Sector] = Writes[Sector](value => Writes.StringWrites.writes(value.value))
 }

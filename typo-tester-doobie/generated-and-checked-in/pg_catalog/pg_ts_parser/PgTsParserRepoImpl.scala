@@ -42,7 +42,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}".query(PgTsParserRow.read).option
   }
   override def selectByIds(oids: Array[PgTsParserId]): Stream[ConnectionIO, PgTsParserRow] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTsParserId.arrayPut))})".query(PgTsParserRow.read).stream
+    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY(${oids})".query(PgTsParserRow.read).stream
   }
   override def update(row: PgTsParserRow): ConnectionIO[Boolean] = {
     val oid = row.oid

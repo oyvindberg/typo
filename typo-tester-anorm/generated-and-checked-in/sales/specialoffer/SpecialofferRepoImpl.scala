@@ -10,13 +10,14 @@ package specialoffer
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
+import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.specialoffer where specialofferid = $specialofferid".executeUpdate() > 0
+    SQL"delete from sales.specialoffer where specialofferid = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
     DeleteBuilder("sales.specialoffer", SpecialofferFields)
   }
   override def insert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     SQL"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)
-          values (${unsaved.specialofferid}::int4, ${unsaved.description}, ${unsaved.discountpct}::numeric, ${unsaved.`type`}, ${unsaved.category}, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.minqty}::int4, ${unsaved.maxqty}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4, ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.discountpct, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.category, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.minqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.maxqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
        """
       .executeInsert(SpecialofferRow.rowParser(1).single)
@@ -39,31 +40,31 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   }
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow = {
     val namedParameters = List(
-      Some((NamedParameter("description", ParameterValue.from(unsaved.description)), "")),
-      Some((NamedParameter("type", ParameterValue.from(unsaved.`type`)), "")),
-      Some((NamedParameter("category", ParameterValue.from(unsaved.category)), "")),
-      Some((NamedParameter("startdate", ParameterValue.from(unsaved.startdate)), "::timestamp")),
-      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
-      Some((NamedParameter("maxqty", ParameterValue.from(unsaved.maxqty)), "::int4")),
+      Some((NamedParameter("description", ParameterValue(unsaved.description, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("type", ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("category", ParameterValue(unsaved.category, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("startdate", ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("enddate", ParameterValue(unsaved.enddate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("maxqty", ParameterValue(unsaved.maxqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))), "::int4")),
       unsaved.specialofferid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("specialofferid", ParameterValue.from[SpecialofferId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("specialofferid", ParameterValue(value, null, SpecialofferId.toStatement)), "::int4"))
       },
       unsaved.discountpct match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("discountpct", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("discountpct", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.minqty match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("minqty", ParameterValue.from[Int](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("minqty", ParameterValue(value, null, ToStatement.intToStatement)), "::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -93,30 +94,30 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   override def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow] = {
     SQL"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
           from sales.specialoffer
-          where specialofferid = $specialofferid
+          where specialofferid = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}
        """.as(SpecialofferRow.rowParser(1).singleOpt)
   }
   override def selectByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
     SQL"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
           from sales.specialoffer
-          where specialofferid = ANY($specialofferids)
+          where specialofferid = ANY(${specialofferids})
        """.as(SpecialofferRow.rowParser(1).*)
     
   }
   override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
     val specialofferid = row.specialofferid
     SQL"""update sales.specialoffer
-          set description = ${row.description},
-              discountpct = ${row.discountpct}::numeric,
-              "type" = ${row.`type`},
-              category = ${row.category},
-              startdate = ${row.startdate}::timestamp,
-              enddate = ${row.enddate}::timestamp,
-              minqty = ${row.minqty}::int4,
-              maxqty = ${row.maxqty}::int4,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where specialofferid = $specialofferid
+          set description = ${ParameterValue(row.description, null, ToStatement.stringToStatement)},
+              discountpct = ${ParameterValue(row.discountpct, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "type" = ${ParameterValue(row.`type`, null, ToStatement.stringToStatement)},
+              category = ${ParameterValue(row.category, null, ToStatement.stringToStatement)},
+              startdate = ${ParameterValue(row.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              enddate = ${ParameterValue(row.enddate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              minqty = ${ParameterValue(row.minqty, null, ToStatement.intToStatement)}::int4,
+              maxqty = ${ParameterValue(row.maxqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))}::int4,
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where specialofferid = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
@@ -125,17 +126,17 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     SQL"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)
           values (
-            ${unsaved.specialofferid}::int4,
-            ${unsaved.description},
-            ${unsaved.discountpct}::numeric,
-            ${unsaved.`type`},
-            ${unsaved.category},
-            ${unsaved.startdate}::timestamp,
-            ${unsaved.enddate}::timestamp,
-            ${unsaved.minqty}::int4,
-            ${unsaved.maxqty}::int4,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4,
+            ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.discountpct, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.category, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.enddate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.minqty, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.maxqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))}::int4,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (specialofferid)
           do update set

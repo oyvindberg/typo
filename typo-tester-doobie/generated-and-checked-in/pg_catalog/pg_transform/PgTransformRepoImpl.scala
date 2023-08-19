@@ -42,7 +42,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
     sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}".query(PgTransformRow.read).option
   }
   override def selectByIds(oids: Array[PgTransformId]): Stream[ConnectionIO, PgTransformRow] = {
-    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTransformId.arrayPut))})".query(PgTransformRow.read).stream
+    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ANY(${oids})".query(PgTransformRow.read).stream
   }
   override def update(row: PgTransformRow): ConnectionIO[Boolean] = {
     val oid = row.oid

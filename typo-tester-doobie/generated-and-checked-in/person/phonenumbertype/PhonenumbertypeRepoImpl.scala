@@ -71,7 +71,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype where phonenumbertypeid = ${fromWrite(phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".query(PhonenumbertypeRow.read).option
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow] = {
-    sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype where phonenumbertypeid = ANY(${fromWrite(phonenumbertypeids)(Write.fromPut(PhonenumbertypeId.arrayPut))})""".query(PhonenumbertypeRow.read).stream
+    sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype where phonenumbertypeid = ANY(${phonenumbertypeids})""".query(PhonenumbertypeRow.read).stream
   }
   override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
     val phonenumbertypeid = row.phonenumbertypeid

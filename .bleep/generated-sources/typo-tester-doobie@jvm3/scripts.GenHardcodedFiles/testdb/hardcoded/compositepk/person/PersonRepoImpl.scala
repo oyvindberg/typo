@@ -101,7 +101,7 @@ object PersonRepoImpl extends PersonRepo {
       case Some(nonEmpty) =>
         val updates = fragments.set(
           nonEmpty.map {
-            case PersonFieldValue.name(value) => fr""""name" = $value"""
+            case PersonFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
           }
         )
         sql"""update compositepk.person

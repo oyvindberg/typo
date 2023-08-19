@@ -83,7 +83,7 @@ object VendorRepoImpl extends VendorRepo {
     sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from purchasing.vendor where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(VendorRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, VendorRow] = {
-    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from purchasing.vendor where businessentityid = ANY(${fromWrite(businessentityids)(Write.fromPut(BusinessentityId.arrayPut))})""".query(VendorRow.read).stream
+    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from purchasing.vendor where businessentityid = ANY(${businessentityids})""".query(VendorRow.read).stream
   }
   override def update(row: VendorRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid

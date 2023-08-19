@@ -7,7 +7,29 @@ package adventureworks
 package public
 package pgtest
 
+import adventureworks.TypoBox
+import adventureworks.TypoCircle
+import adventureworks.TypoHStore
+import adventureworks.TypoInet
+import adventureworks.TypoInterval
+import adventureworks.TypoJson
+import adventureworks.TypoJsonb
+import adventureworks.TypoLine
+import adventureworks.TypoLineSegment
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
+import adventureworks.TypoMoney
+import adventureworks.TypoOffsetDateTime
+import adventureworks.TypoOffsetTime
+import adventureworks.TypoPath
+import adventureworks.TypoPoint
+import adventureworks.TypoPolygon
+import adventureworks.TypoXml
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -20,7 +42,7 @@ object PgtestRepoImpl extends PgtestRepo {
   }
   override def insert(unsaved: PgtestRow)(implicit c: Connection): PgtestRow = {
     SQL"""insert into "public".pgtest(box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, inet, "timestamp", timestampz, "time", timez, "date", uuid, "numeric", boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets, timestamps, timestampzs, times, timezs, dates, uuids, numerics)
-          values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::money, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.inet}::inet, ${unsaved.timestamp}::timestamp, ${unsaved.timestampz}::timestamptz, ${unsaved.time}::time, ${unsaved.timez}::timetz, ${unsaved.date}::date, ${unsaved.uuid}::uuid, ${unsaved.numeric}::numeric, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::_money, ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore, ${unsaved.inets}::_inet, ${unsaved.timestamps}::_timestamp, ${unsaved.timestampzs}::_timestamptz, ${unsaved.times}::_time, ${unsaved.timezs}::_timetz, ${unsaved.dates}::_date, ${unsaved.uuids}::_uuid, ${unsaved.numerics}::_numeric)
+          values (${ParameterValue(unsaved.box, null, TypoBox.toStatement)}::box, ${ParameterValue(unsaved.circle, null, TypoCircle.toStatement)}::circle, ${ParameterValue(unsaved.line, null, TypoLine.toStatement)}::line, ${ParameterValue(unsaved.lseg, null, TypoLineSegment.toStatement)}::lseg, ${ParameterValue(unsaved.path, null, TypoPath.toStatement)}::path, ${ParameterValue(unsaved.point, null, TypoPoint.toStatement)}::point, ${ParameterValue(unsaved.polygon, null, TypoPolygon.toStatement)}::polygon, ${ParameterValue(unsaved.interval, null, TypoInterval.toStatement)}::interval, ${ParameterValue(unsaved.money, null, TypoMoney.toStatement)}::money, ${ParameterValue(unsaved.xml, null, TypoXml.toStatement)}::xml, ${ParameterValue(unsaved.json, null, TypoJson.toStatement)}::json, ${ParameterValue(unsaved.jsonb, null, TypoJsonb.toStatement)}::jsonb, ${ParameterValue(unsaved.hstore, null, TypoHStore.toStatement)}::hstore, ${ParameterValue(unsaved.inet, null, TypoInet.toStatement)}::inet, ${ParameterValue(unsaved.timestamp, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.timestampz, null, TypoOffsetDateTime.toStatement)}::timestamptz, ${ParameterValue(unsaved.time, null, TypoLocalTime.toStatement)}::time, ${ParameterValue(unsaved.timez, null, TypoOffsetTime.toStatement)}::timetz, ${ParameterValue(unsaved.date, null, TypoLocalDate.toStatement)}::date, ${ParameterValue(unsaved.uuid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.numeric, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.boxes, null, TypoBox.arrayToStatement)}::_box, ${ParameterValue(unsaved.circlees, null, TypoCircle.arrayToStatement)}::_circle, ${ParameterValue(unsaved.linees, null, TypoLine.arrayToStatement)}::_line, ${ParameterValue(unsaved.lseges, null, TypoLineSegment.arrayToStatement)}::_lseg, ${ParameterValue(unsaved.pathes, null, TypoPath.arrayToStatement)}::_path, ${ParameterValue(unsaved.pointes, null, TypoPoint.arrayToStatement)}::_point, ${ParameterValue(unsaved.polygones, null, TypoPolygon.arrayToStatement)}::_polygon, ${ParameterValue(unsaved.intervales, null, TypoInterval.arrayToStatement)}::_interval, ${ParameterValue(unsaved.moneyes, null, TypoMoney.arrayToStatement)}::_money, ${ParameterValue(unsaved.xmles, null, TypoXml.arrayToStatement)}::_xml, ${ParameterValue(unsaved.jsones, null, TypoJson.arrayToStatement)}::_json, ${ParameterValue(unsaved.jsonbes, null, TypoJsonb.arrayToStatement)}::_jsonb, ${ParameterValue(unsaved.hstores, null, TypoHStore.arrayToStatement)}::_hstore, ${ParameterValue(unsaved.inets, null, TypoInet.arrayToStatement)}::_inet, ${ParameterValue(unsaved.timestamps, null, TypoLocalDateTime.arrayToStatement)}::_timestamp, ${ParameterValue(unsaved.timestampzs, null, TypoOffsetDateTime.arrayToStatement)}::_timestamptz, ${ParameterValue(unsaved.times, null, TypoLocalTime.arrayToStatement)}::_time, ${ParameterValue(unsaved.timezs, null, TypoOffsetTime.arrayToStatement)}::_timetz, ${ParameterValue(unsaved.dates, null, TypoLocalDate.arrayToStatement)}::_date, ${ParameterValue(unsaved.uuids, null, ToStatement.arrayToParameter(ParameterMetaData.UUIDParameterMetaData))}::_uuid, ${ParameterValue(unsaved.numerics, null, adventureworks.BigDecimalArrayToStatement)}::_numeric)
           returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, "timestamp"::text, timestampz::text, "time"::text, timez::text, "date"::text, uuid, "numeric", boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets, timestamps::text[], timestampzs::text[], times::text[], timezs::text[], dates::text[], uuids, numerics
        """
       .executeInsert(PgtestRow.rowParser(1).single)

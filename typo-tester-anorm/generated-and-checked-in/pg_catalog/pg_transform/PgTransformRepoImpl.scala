@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_transform
 
+import adventureworks.TypoRegproc
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgTransformRepoImpl extends PgTransformRepo {
   override def delete(oid: PgTransformId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_transform where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_transform where oid = ${ParameterValue(oid, null, PgTransformId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTransformFields, PgTransformRow] = {
     DeleteBuilder("pg_catalog.pg_transform", PgTransformFields)
   }
   override def insert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow = {
     SQL"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)
-          values (${unsaved.oid}::oid, ${unsaved.trftype}::oid, ${unsaved.trflang}::oid, ${unsaved.trffromsql}::regproc, ${unsaved.trftosql}::regproc)
+          values (${ParameterValue(unsaved.oid, null, PgTransformId.toStatement)}::oid, ${ParameterValue(unsaved.trftype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.trflang, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.trffromsql, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.trftosql, null, TypoRegproc.toStatement)}::regproc)
           returning oid, trftype, trflang, trffromsql, trftosql
        """
       .executeInsert(PgTransformRow.rowParser(1).single)
@@ -40,24 +43,24 @@ object PgTransformRepoImpl extends PgTransformRepo {
   override def selectById(oid: PgTransformId)(implicit c: Connection): Option[PgTransformRow] = {
     SQL"""select oid, trftype, trflang, trffromsql, trftosql
           from pg_catalog.pg_transform
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgTransformId.toStatement)}
        """.as(PgTransformRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTransformId])(implicit c: Connection): List[PgTransformRow] = {
     SQL"""select oid, trftype, trflang, trffromsql, trftosql
           from pg_catalog.pg_transform
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgTransformRow.rowParser(1).*)
     
   }
   override def update(row: PgTransformRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_transform
-          set trftype = ${row.trftype}::oid,
-              trflang = ${row.trflang}::oid,
-              trffromsql = ${row.trffromsql}::regproc,
-              trftosql = ${row.trftosql}::regproc
-          where oid = $oid
+          set trftype = ${ParameterValue(row.trftype, null, ToStatement.longToStatement)}::oid,
+              trflang = ${ParameterValue(row.trflang, null, ToStatement.longToStatement)}::oid,
+              trffromsql = ${ParameterValue(row.trffromsql, null, TypoRegproc.toStatement)}::regproc,
+              trftosql = ${ParameterValue(row.trftosql, null, TypoRegproc.toStatement)}::regproc
+          where oid = ${ParameterValue(oid, null, PgTransformId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTransformFields, PgTransformRow] = {
@@ -66,11 +69,11 @@ object PgTransformRepoImpl extends PgTransformRepo {
   override def upsert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow = {
     SQL"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.trftype}::oid,
-            ${unsaved.trflang}::oid,
-            ${unsaved.trffromsql}::regproc,
-            ${unsaved.trftosql}::regproc
+            ${ParameterValue(unsaved.oid, null, PgTransformId.toStatement)}::oid,
+            ${ParameterValue(unsaved.trftype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.trflang, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.trffromsql, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.trftosql, null, TypoRegproc.toStatement)}::regproc
           )
           on conflict (oid)
           do update set

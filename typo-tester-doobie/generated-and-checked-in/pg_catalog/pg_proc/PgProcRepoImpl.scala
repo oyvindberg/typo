@@ -45,7 +45,7 @@ object PgProcRepoImpl extends PgProcRepo {
     sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ${fromWrite(oid)(Write.fromPut(PgProcId.put))}".query(PgProcRow.read).option
   }
   override def selectByIds(oids: Array[PgProcId]): Stream[ConnectionIO, PgProcRow] = {
-    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ANY(${fromWrite(oids)(Write.fromPut(PgProcId.arrayPut))})".query(PgProcRow.read).stream
+    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ANY(${oids})".query(PgProcRow.read).stream
   }
   override def update(row: PgProcRow): ConnectionIO[Boolean] = {
     val oid = row.oid

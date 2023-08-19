@@ -38,8 +38,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       .map(c => maybeQuoted(c.dbName) ++ (if (isRead) sqlCast.fromPgCode(c) else sc.Code.Empty))
       .mkCode(", ")
 
-  def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type): sc.Code =
-    if (inlineImplicits)
+  def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code =
+    if (inlineImplicits && !forbidInline)
       tpe match {
         case sc.Type.Optional(underlying) =>
           code"$${$fromWrite($name)($Write.fromPutOption(${lookupPutFor(underlying)}))}"
@@ -55,9 +55,6 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case composite: IdComputed.Composite =>
         code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
-
-  def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
-    code"${maybeQuoted(x.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
     case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
@@ -136,7 +133,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
 
-        val sql = SQL(code"""select $joinedColNames from $relName where ${matchAnyId(unaryId, idsParam)}""")
+        val sql = SQL(
+          code"""select $joinedColNames from $relName where ${code"${maybeQuoted(unaryId.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
+        )
         code"""$sql.query($rowType.$readName).stream"""
       case RepoMethod.SelectByUnique(params, fieldValue, _) =>
         val args = params.map { param => code"$fieldValue.${param.name}(${param.name})" }.mkCode(", ")
@@ -160,7 +159,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
           cases0.map { col =>
-            val fr = frInterpolate(code"${maybeQuoted(col.dbName)} = $$value${sqlCast.toPgCode(col)}")
+            val fr = frInterpolate(code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}${sqlCast.toPgCode(col)}")
             code"case $fieldValue.${col.name}(value) => $fr"
           }
 
@@ -276,10 +275,10 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"$sql.update.run.map(_ > 0)"
 
       case RepoMethod.SqlFile(sqlScript) =>
-        val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.render { (paramAtIndex: Int) =>
+        val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.renderCode { (paramAtIndex: Int) =>
           val param = sqlScript.nullableParams.find(_.underlying.indices.contains(paramAtIndex)).get
           val cast = sqlCast.toPg(param.underlying).fold("")(udtType => s"::$udtType")
-          s"$$${param.name.value}$cast"
+          code"${runtimeInterpolateValue(param.name, param.tpe)}$cast"
         }
         val ret = for {
           cols <- sqlScript.maybeCols.toOption

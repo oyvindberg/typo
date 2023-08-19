@@ -42,7 +42,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
     sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}".query(PgLanguageRow.read).option
   }
   override def selectByIds(oids: Array[PgLanguageId]): Stream[ConnectionIO, PgLanguageRow] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ANY(${fromWrite(oids)(Write.fromPut(PgLanguageId.arrayPut))})".query(PgLanguageRow.read).stream
+    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ANY(${oids})".query(PgLanguageRow.read).stream
   }
   override def update(row: PgLanguageRow): ConnectionIO[Boolean] = {
     val oid = row.oid

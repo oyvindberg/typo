@@ -9,14 +9,16 @@ package address
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.stateprovince.StateprovinceId
 import anorm.NamedParameter
+import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.address where addressid = $addressid".executeUpdate() > 0
+    SQL"delete from person.address where addressid = ${ParameterValue(addressid, null, AddressId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
     DeleteBuilder("person.address", AddressFields)
   }
   override def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     SQL"""insert into person.address(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)
-          values (${unsaved.addressid}::int4, ${unsaved.addressline1}, ${unsaved.addressline2}, ${unsaved.city}, ${unsaved.stateprovinceid}::int4, ${unsaved.postalcode}, ${unsaved.spatiallocation}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.addressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.addressline1, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.addressline2, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.city, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.postalcode, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.spatiallocation, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
        """
       .executeInsert(AddressRow.rowParser(1).single)
@@ -39,23 +41,23 @@ object AddressRepoImpl extends AddressRepo {
   }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
     val namedParameters = List(
-      Some((NamedParameter("addressline1", ParameterValue.from(unsaved.addressline1)), "")),
-      Some((NamedParameter("addressline2", ParameterValue.from(unsaved.addressline2)), "")),
-      Some((NamedParameter("city", ParameterValue.from(unsaved.city)), "")),
-      Some((NamedParameter("stateprovinceid", ParameterValue.from(unsaved.stateprovinceid)), "::int4")),
-      Some((NamedParameter("postalcode", ParameterValue.from(unsaved.postalcode)), "")),
-      Some((NamedParameter("spatiallocation", ParameterValue.from(unsaved.spatiallocation)), "::bytea")),
+      Some((NamedParameter("addressline1", ParameterValue(unsaved.addressline1, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("addressline2", ParameterValue(unsaved.addressline2, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
+      Some((NamedParameter("city", ParameterValue(unsaved.city, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("stateprovinceid", ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)), "::int4")),
+      Some((NamedParameter("postalcode", ParameterValue(unsaved.postalcode, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("spatiallocation", ParameterValue(unsaved.spatiallocation, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))), "::bytea")),
       unsaved.addressid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("addressid", ParameterValue.from[AddressId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("addressid", ParameterValue(value, null, AddressId.toStatement)), "::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -85,28 +87,28 @@ object AddressRepoImpl extends AddressRepo {
   override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
           from person.address
-          where addressid = $addressid
+          where addressid = ${ParameterValue(addressid, null, AddressId.toStatement)}
        """.as(AddressRow.rowParser(1).singleOpt)
   }
   override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
           from person.address
-          where addressid = ANY($addressids)
+          where addressid = ANY(${addressids})
        """.as(AddressRow.rowParser(1).*)
     
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
     val addressid = row.addressid
     SQL"""update person.address
-          set addressline1 = ${row.addressline1},
-              addressline2 = ${row.addressline2},
-              city = ${row.city},
-              stateprovinceid = ${row.stateprovinceid}::int4,
-              postalcode = ${row.postalcode},
-              spatiallocation = ${row.spatiallocation}::bytea,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where addressid = $addressid
+          set addressline1 = ${ParameterValue(row.addressline1, null, ToStatement.stringToStatement)},
+              addressline2 = ${ParameterValue(row.addressline2, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              city = ${ParameterValue(row.city, null, ToStatement.stringToStatement)},
+              stateprovinceid = ${ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
+              postalcode = ${ParameterValue(row.postalcode, null, ToStatement.stringToStatement)},
+              spatiallocation = ${ParameterValue(row.spatiallocation, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea,
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where addressid = ${ParameterValue(addressid, null, AddressId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
@@ -115,15 +117,15 @@ object AddressRepoImpl extends AddressRepo {
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     SQL"""insert into person.address(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)
           values (
-            ${unsaved.addressid}::int4,
-            ${unsaved.addressline1},
-            ${unsaved.addressline2},
-            ${unsaved.city},
-            ${unsaved.stateprovinceid}::int4,
-            ${unsaved.postalcode},
-            ${unsaved.spatiallocation}::bytea,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.addressid, null, AddressId.toStatement)}::int4,
+            ${ParameterValue(unsaved.addressline1, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.addressline2, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+            ${ParameterValue(unsaved.city, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
+            ${ParameterValue(unsaved.postalcode, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.spatiallocation, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (addressid)
           do update set

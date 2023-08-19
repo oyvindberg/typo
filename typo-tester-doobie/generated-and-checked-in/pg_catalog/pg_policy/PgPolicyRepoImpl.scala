@@ -42,7 +42,7 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
     sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ${fromWrite(oid)(Write.fromPut(PgPolicyId.put))}".query(PgPolicyRow.read).option
   }
   override def selectByIds(oids: Array[PgPolicyId]): Stream[ConnectionIO, PgPolicyRow] = {
-    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY(${fromWrite(oids)(Write.fromPut(PgPolicyId.arrayPut))})".query(PgPolicyRow.read).stream
+    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY(${oids})".query(PgPolicyRow.read).stream
   }
   override def update(row: PgPolicyRow): ConnectionIO[Boolean] = {
     val oid = row.oid

@@ -9,6 +9,9 @@ package productmodelproductdescriptionculture
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.culture.CultureId
+import adventureworks.production.productdescription.ProductdescriptionId
+import adventureworks.production.productmodel.ProductmodelId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductmodelproductdescriptioncultureRepoImpl extends ProductmodelproductdescriptioncultureRepo {
   override def delete(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}".executeUpdate() > 0
+    SQL"delete from production.productmodelproductdescriptionculture where productmodelid = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND productdescriptionid = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND cultureid = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     SQL"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, modifieddate)
-          values (${unsaved.productmodelid}::int4, ${unsaved.productdescriptionid}::int4, ${unsaved.cultureid}::bpchar, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4, ${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productmodelid, productdescriptionid, cultureid, modifieddate::text
        """
       .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser(1).single)
@@ -38,12 +41,12 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     val namedParameters = List(
-      Some((NamedParameter("productmodelid", ParameterValue.from(unsaved.productmodelid)), "::int4")),
-      Some((NamedParameter("productdescriptionid", ParameterValue.from(unsaved.productdescriptionid)), "::int4")),
-      Some((NamedParameter("cultureid", ParameterValue.from(unsaved.cultureid)), "::bpchar")),
+      Some((NamedParameter("productmodelid", ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)), "::int4")),
+      Some((NamedParameter("productdescriptionid", ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)), "::int4")),
+      Some((NamedParameter("cultureid", ParameterValue(unsaved.cultureid, null, CultureId.toStatement)), "::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -73,14 +76,14 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate::text
           from production.productmodelproductdescriptionculture
-          where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
+          where productmodelid = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND productdescriptionid = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND cultureid = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}
        """.as(ProductmodelproductdescriptioncultureRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productmodelproductdescriptionculture
-          set modifieddate = ${row.modifieddate}::timestamp
-          where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
+          set modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productmodelid = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND productdescriptionid = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND cultureid = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
@@ -89,10 +92,10 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     SQL"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, modifieddate)
           values (
-            ${unsaved.productmodelid}::int4,
-            ${unsaved.productdescriptionid}::int4,
-            ${unsaved.cultureid}::bpchar,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4,
+            ${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4,
+            ${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productmodelid, productdescriptionid, cultureid)
           do update set

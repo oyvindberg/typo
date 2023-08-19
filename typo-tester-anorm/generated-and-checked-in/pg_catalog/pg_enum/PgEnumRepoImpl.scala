@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_enum
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgEnumRepoImpl extends PgEnumRepo {
   override def delete(oid: PgEnumId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_enum where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_enum where oid = ${ParameterValue(oid, null, PgEnumId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgEnumFields, PgEnumRow] = {
     DeleteBuilder("pg_catalog.pg_enum", PgEnumFields)
   }
   override def insert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow = {
     SQL"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)
-          values (${unsaved.oid}::oid, ${unsaved.enumtypid}::oid, ${unsaved.enumsortorder}::float4, ${unsaved.enumlabel}::name)
+          values (${ParameterValue(unsaved.oid, null, PgEnumId.toStatement)}::oid, ${ParameterValue(unsaved.enumtypid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.enumsortorder, null, ToStatement.floatToStatement)}::float4, ${ParameterValue(unsaved.enumlabel, null, ToStatement.stringToStatement)}::name)
           returning oid, enumtypid, enumsortorder, enumlabel
        """
       .executeInsert(PgEnumRow.rowParser(1).single)
@@ -40,23 +42,23 @@ object PgEnumRepoImpl extends PgEnumRepo {
   override def selectById(oid: PgEnumId)(implicit c: Connection): Option[PgEnumRow] = {
     SQL"""select oid, enumtypid, enumsortorder, enumlabel
           from pg_catalog.pg_enum
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgEnumId.toStatement)}
        """.as(PgEnumRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgEnumId])(implicit c: Connection): List[PgEnumRow] = {
     SQL"""select oid, enumtypid, enumsortorder, enumlabel
           from pg_catalog.pg_enum
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgEnumRow.rowParser(1).*)
     
   }
   override def update(row: PgEnumRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_enum
-          set enumtypid = ${row.enumtypid}::oid,
-              enumsortorder = ${row.enumsortorder}::float4,
-              enumlabel = ${row.enumlabel}::name
-          where oid = $oid
+          set enumtypid = ${ParameterValue(row.enumtypid, null, ToStatement.longToStatement)}::oid,
+              enumsortorder = ${ParameterValue(row.enumsortorder, null, ToStatement.floatToStatement)}::float4,
+              enumlabel = ${ParameterValue(row.enumlabel, null, ToStatement.stringToStatement)}::name
+          where oid = ${ParameterValue(oid, null, PgEnumId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgEnumFields, PgEnumRow] = {
@@ -65,10 +67,10 @@ object PgEnumRepoImpl extends PgEnumRepo {
   override def upsert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow = {
     SQL"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.enumtypid}::oid,
-            ${unsaved.enumsortorder}::float4,
-            ${unsaved.enumlabel}::name
+            ${ParameterValue(unsaved.oid, null, PgEnumId.toStatement)}::oid,
+            ${ParameterValue(unsaved.enumtypid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.enumsortorder, null, ToStatement.floatToStatement)}::float4,
+            ${ParameterValue(unsaved.enumlabel, null, ToStatement.stringToStatement)}::name
           )
           on conflict (oid)
           do update set

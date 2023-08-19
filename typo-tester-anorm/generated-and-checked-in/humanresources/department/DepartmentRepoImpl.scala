@@ -9,6 +9,7 @@ package department
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +24,14 @@ import typo.dsl.UpdateBuilder
 
 object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
-    SQL"delete from humanresources.department where departmentid = $departmentid".executeUpdate() > 0
+    SQL"delete from humanresources.department where departmentid = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
     DeleteBuilder("humanresources.department", DepartmentFields)
   }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
-          values (${unsaved.departmentid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.groupname}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning departmentid, "name", groupname, modifieddate::text
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
@@ -38,15 +39,15 @@ object DepartmentRepoImpl extends DepartmentRepo {
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
-      Some((NamedParameter("groupname", ParameterValue.from(unsaved.groupname)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("groupname", ParameterValue(unsaved.groupname, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.departmentid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("departmentid", ParameterValue.from[DepartmentId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("departmentid", ParameterValue(value, null, DepartmentId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -76,23 +77,23 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow] = {
     SQL"""select departmentid, "name", groupname, modifieddate::text
           from humanresources.department
-          where departmentid = $departmentid
+          where departmentid = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
        """.as(DepartmentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select departmentid, "name", groupname, modifieddate::text
           from humanresources.department
-          where departmentid = ANY($departmentids)
+          where departmentid = ANY(${departmentids})
        """.as(DepartmentRow.rowParser(1).*)
     
   }
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
     val departmentid = row.departmentid
     SQL"""update humanresources.department
-          set "name" = ${row.name}::"public"."Name",
-              groupname = ${row.groupname}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where departmentid = $departmentid
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              groupname = ${ParameterValue(row.groupname, null, Name.toStatement)}::"public"."Name",
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where departmentid = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
@@ -101,10 +102,10 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
           values (
-            ${unsaved.departmentid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.groupname}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (departmentid)
           do update set

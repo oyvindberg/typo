@@ -1,4 +1,8 @@
-package typo.internal.sqlfiles
+package typo
+package internal
+package sqlfiles
+
+import codegen.CodeOps
 
 case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
   val sqlWithQuestionMarks: String = render(_ => "?")
@@ -13,6 +17,19 @@ case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
         paramNum += 1
         rendered
     }.mkString
+  }
+
+  def renderCode(f: Int => sc.Code): sc.Code = {
+    var paramNum = 0
+    frags
+      .collect {
+        case DecomposedSql.SqlText(text) => sc.Code.Str(text)
+        case _: DecomposedSql.Param =>
+          val rendered = f(paramNum)
+          paramNum += 1
+          rendered
+      }
+      .mkCode(sc.Code.Empty)
   }
 
   val params: List[DecomposedSql.Param] =

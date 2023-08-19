@@ -81,7 +81,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".query(ProductreviewRow.read).option
   }
   override def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ANY(${fromWrite(productreviewids)(Write.fromPut(ProductreviewId.arrayPut))})""".query(ProductreviewRow.read).stream
+    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ANY(${productreviewids})""".query(ProductreviewRow.read).stream
   }
   override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
     val productreviewid = row.productreviewid

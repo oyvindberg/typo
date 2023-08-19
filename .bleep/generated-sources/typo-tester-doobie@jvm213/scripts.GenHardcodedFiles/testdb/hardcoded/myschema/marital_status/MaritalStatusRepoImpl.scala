@@ -42,7 +42,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     sql"""select "id" from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".query(MaritalStatusRow.read).option
   }
   override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status where "id" = ANY(${fromWrite(ids)(Write.fromPut(MaritalStatusId.arrayPut))})""".query(MaritalStatusRow.read).stream
+    sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query(MaritalStatusRow.read).stream
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow] = {
     val where = fragments.whereAndOpt(

@@ -41,7 +41,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
     sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationRelId.put))}".query(PgPublicationRelRow.read).option
   }
   override def selectByIds(oids: Array[PgPublicationRelId]): Stream[ConnectionIO, PgPublicationRelRow] = {
-    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ANY(${fromWrite(oids)(Write.fromPut(PgPublicationRelId.arrayPut))})".query(PgPublicationRelRow.read).stream
+    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ANY(${oids})".query(PgPublicationRelRow.read).stream
   }
   override def update(row: PgPublicationRelRow): ConnectionIO[Boolean] = {
     val oid = row.oid

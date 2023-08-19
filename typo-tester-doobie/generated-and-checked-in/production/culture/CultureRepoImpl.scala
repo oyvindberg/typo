@@ -68,7 +68,7 @@ object CultureRepoImpl extends CultureRepo {
     sql"""select cultureid, "name", modifieddate::text from production.culture where cultureid = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".query(CultureRow.read).option
   }
   override def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow] = {
-    sql"""select cultureid, "name", modifieddate::text from production.culture where cultureid = ANY(${fromWrite(cultureids)(Write.fromPut(CultureId.arrayPut))})""".query(CultureRow.read).stream
+    sql"""select cultureid, "name", modifieddate::text from production.culture where cultureid = ANY(${cultureids})""".query(CultureRow.read).stream
   }
   override def update(row: CultureRow): ConnectionIO[Boolean] = {
     val cultureid = row.cultureid

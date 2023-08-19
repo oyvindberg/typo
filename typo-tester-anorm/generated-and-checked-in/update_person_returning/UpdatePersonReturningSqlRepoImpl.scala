@@ -7,7 +7,10 @@ package adventureworks
 package update_person_returning
 
 import adventureworks.TypoLocalDateTime
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 
 object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
@@ -15,8 +18,8 @@ object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
     val sql =
       SQL"""with row as (
               update person.person
-              set firstname = firstname || '-' || $suffix
-              where modifieddate < $cutoff::timestamp
+              set firstname = firstname || '-' || ${ParameterValue(suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+              where modifieddate < ${ParameterValue(cutoff, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp
               returning firstname, modifieddate
             )
             select row.firstname, row.modifieddate::text

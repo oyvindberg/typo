@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_language
 
+import adventureworks.TypoAclItem
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgLanguageRepoImpl extends PgLanguageRepo {
   override def delete(oid: PgLanguageId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_language where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_language where oid = ${ParameterValue(oid, null, PgLanguageId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgLanguageFields, PgLanguageRow] = {
     DeleteBuilder("pg_catalog.pg_language", PgLanguageFields)
   }
   override def insert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow = {
     SQL"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)
-          values (${unsaved.oid}::oid, ${unsaved.lanname}::name, ${unsaved.lanowner}::oid, ${unsaved.lanispl}, ${unsaved.lanpltrusted}, ${unsaved.lanplcallfoid}::oid, ${unsaved.laninline}::oid, ${unsaved.lanvalidator}::oid, ${unsaved.lanacl}::_aclitem)
+          values (${ParameterValue(unsaved.oid, null, PgLanguageId.toStatement)}::oid, ${ParameterValue(unsaved.lanname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.lanowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.lanispl, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.lanpltrusted, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.lanplcallfoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.laninline, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.lanvalidator, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.lanacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem)
           returning oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
        """
       .executeInsert(PgLanguageRow.rowParser(1).single)
@@ -40,28 +43,28 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
   override def selectById(oid: PgLanguageId)(implicit c: Connection): Option[PgLanguageRow] = {
     SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
           from pg_catalog.pg_language
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgLanguageId.toStatement)}
        """.as(PgLanguageRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgLanguageId])(implicit c: Connection): List[PgLanguageRow] = {
     SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
           from pg_catalog.pg_language
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgLanguageRow.rowParser(1).*)
     
   }
   override def update(row: PgLanguageRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_language
-          set lanname = ${row.lanname}::name,
-              lanowner = ${row.lanowner}::oid,
-              lanispl = ${row.lanispl},
-              lanpltrusted = ${row.lanpltrusted},
-              lanplcallfoid = ${row.lanplcallfoid}::oid,
-              laninline = ${row.laninline}::oid,
-              lanvalidator = ${row.lanvalidator}::oid,
-              lanacl = ${row.lanacl}::_aclitem
-          where oid = $oid
+          set lanname = ${ParameterValue(row.lanname, null, ToStatement.stringToStatement)}::name,
+              lanowner = ${ParameterValue(row.lanowner, null, ToStatement.longToStatement)}::oid,
+              lanispl = ${ParameterValue(row.lanispl, null, ToStatement.booleanToStatement)},
+              lanpltrusted = ${ParameterValue(row.lanpltrusted, null, ToStatement.booleanToStatement)},
+              lanplcallfoid = ${ParameterValue(row.lanplcallfoid, null, ToStatement.longToStatement)}::oid,
+              laninline = ${ParameterValue(row.laninline, null, ToStatement.longToStatement)}::oid,
+              lanvalidator = ${ParameterValue(row.lanvalidator, null, ToStatement.longToStatement)}::oid,
+              lanacl = ${ParameterValue(row.lanacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem
+          where oid = ${ParameterValue(oid, null, PgLanguageId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgLanguageFields, PgLanguageRow] = {
@@ -70,15 +73,15 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
   override def upsert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow = {
     SQL"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.lanname}::name,
-            ${unsaved.lanowner}::oid,
-            ${unsaved.lanispl},
-            ${unsaved.lanpltrusted},
-            ${unsaved.lanplcallfoid}::oid,
-            ${unsaved.laninline}::oid,
-            ${unsaved.lanvalidator}::oid,
-            ${unsaved.lanacl}::_aclitem
+            ${ParameterValue(unsaved.oid, null, PgLanguageId.toStatement)}::oid,
+            ${ParameterValue(unsaved.lanname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.lanowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.lanispl, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.lanpltrusted, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.lanplcallfoid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.laninline, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.lanvalidator, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.lanacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem
           )
           on conflict (oid)
           do update set

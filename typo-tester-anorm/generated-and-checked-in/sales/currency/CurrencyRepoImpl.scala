@@ -9,6 +9,7 @@ package currency
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +24,14 @@ import typo.dsl.UpdateBuilder
 
 object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.currency where currencycode = $currencycode".executeUpdate() > 0
+    SQL"delete from sales.currency where currencycode = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
     DeleteBuilder("sales.currency", CurrencyFields)
   }
   override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency(currencycode, "name", modifieddate)
-          values (${unsaved.currencycode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning currencycode, "name", modifieddate::text
        """
       .executeInsert(CurrencyRow.rowParser(1).single)
@@ -38,11 +39,11 @@ object CurrencyRepoImpl extends CurrencyRepo {
   }
   override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
     val namedParameters = List(
-      Some((NamedParameter("currencycode", ParameterValue.from(unsaved.currencycode)), "::bpchar")),
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("currencycode", ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)), "::bpchar")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -72,22 +73,22 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow] = {
     SQL"""select currencycode, "name", modifieddate::text
           from sales.currency
-          where currencycode = $currencycode
+          where currencycode = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
        """.as(CurrencyRow.rowParser(1).singleOpt)
   }
   override def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
     SQL"""select currencycode, "name", modifieddate::text
           from sales.currency
-          where currencycode = ANY($currencycodes)
+          where currencycode = ANY(${currencycodes})
        """.as(CurrencyRow.rowParser(1).*)
     
   }
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
     val currencycode = row.currencycode
     SQL"""update sales.currency
-          set "name" = ${row.name}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where currencycode = $currencycode
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where currencycode = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
@@ -96,9 +97,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency(currencycode, "name", modifieddate)
           values (
-            ${unsaved.currencycode}::bpchar,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (currencycode)
           do update set

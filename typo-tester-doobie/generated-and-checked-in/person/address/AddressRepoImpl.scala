@@ -82,7 +82,7 @@ object AddressRepoImpl extends AddressRepo {
     sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}".query(AddressRow.read).option
   }
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
-    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ANY(${fromWrite(addressids)(Write.fromPut(AddressId.arrayPut))})".query(AddressRow.read).stream
+    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ANY(${addressids})".query(AddressRow.read).stream
   }
   override def update(row: AddressRow): ConnectionIO[Boolean] = {
     val addressid = row.addressid

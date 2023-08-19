@@ -93,7 +93,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".query(PersonRow.read).option
   }
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person where "id" = ANY(${fromWrite(ids)(Write.fromPut(PersonId.arrayPut))})""".query(PersonRow.read).stream
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person where "id" = ANY(${ids})""".query(PersonRow.read).stream
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
     val where = fragments.whereAndOpt(
@@ -142,17 +142,17 @@ object PersonRepoImpl extends PersonRepo {
       case Some(nonEmpty) =>
         val updates = fragments.set(
           nonEmpty.map {
-            case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = $value"
-            case PersonFieldValue.name(value) => fr""""name" = $value"""
-            case PersonFieldValue.nickName(value) => fr"nick_name = $value"
-            case PersonFieldValue.blogUrl(value) => fr"blog_url = $value"
-            case PersonFieldValue.email(value) => fr"email = $value"
-            case PersonFieldValue.phone(value) => fr"phone = $value"
-            case PersonFieldValue.likesPizza(value) => fr"likes_pizza = $value"
-            case PersonFieldValue.maritalStatusId(value) => fr"marital_status_id = $value"
-            case PersonFieldValue.workEmail(value) => fr"work_email = $value"
-            case PersonFieldValue.sector(value) => fr"sector = $value::myschema.sector"
-            case PersonFieldValue.favoriteNumber(value) => fr"""favorite_number = $value::myschema."number""""
+            case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}"
+            case PersonFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
+            case PersonFieldValue.nickName(value) => fr"nick_name = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
+            case PersonFieldValue.blogUrl(value) => fr"blog_url = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
+            case PersonFieldValue.email(value) => fr"email = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"
+            case PersonFieldValue.phone(value) => fr"phone = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"
+            case PersonFieldValue.likesPizza(value) => fr"likes_pizza = ${fromWrite(value)(Write.fromPut(Meta.BooleanMeta.put))}"
+            case PersonFieldValue.maritalStatusId(value) => fr"marital_status_id = ${fromWrite(value)(Write.fromPut(MaritalStatusId.put))}"
+            case PersonFieldValue.workEmail(value) => fr"work_email = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
+            case PersonFieldValue.sector(value) => fr"sector = ${fromWrite(value)(Write.fromPut(Sector.put))}::myschema.sector"
+            case PersonFieldValue.favoriteNumber(value) => fr"""favorite_number = ${fromWrite(value)(Write.fromPut(Number.put))}::myschema."number""""
           }
         )
         sql"""update myschema.person

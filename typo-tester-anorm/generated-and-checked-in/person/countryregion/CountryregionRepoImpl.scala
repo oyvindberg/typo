@@ -9,6 +9,7 @@ package countryregion
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +24,14 @@ import typo.dsl.UpdateBuilder
 
 object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.countryregion where countryregioncode = $countryregioncode".executeUpdate() > 0
+    SQL"delete from person.countryregion where countryregioncode = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
     DeleteBuilder("person.countryregion", CountryregionFields)
   }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion(countryregioncode, "name", modifieddate)
-          values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning countryregioncode, "name", modifieddate::text
        """
       .executeInsert(CountryregionRow.rowParser(1).single)
@@ -38,11 +39,11 @@ object CountryregionRepoImpl extends CountryregionRepo {
   }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
     val namedParameters = List(
-      Some((NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode)), "")),
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("countryregioncode", ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)), "")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -72,22 +73,22 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow] = {
     SQL"""select countryregioncode, "name", modifieddate::text
           from person.countryregion
-          where countryregioncode = $countryregioncode
+          where countryregioncode = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}
        """.as(CountryregionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
     SQL"""select countryregioncode, "name", modifieddate::text
           from person.countryregion
-          where countryregioncode = ANY($countryregioncodes)
+          where countryregioncode = ANY(${countryregioncodes})
        """.as(CountryregionRow.rowParser(1).*)
     
   }
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
     val countryregioncode = row.countryregioncode
     SQL"""update person.countryregion
-          set "name" = ${row.name}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where countryregioncode = $countryregioncode
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where countryregioncode = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
@@ -96,9 +97,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion(countryregioncode, "name", modifieddate)
           values (
-            ${unsaved.countryregioncode},
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)},
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (countryregioncode)
           do update set

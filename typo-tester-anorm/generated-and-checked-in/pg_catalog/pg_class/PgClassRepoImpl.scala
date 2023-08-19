@@ -7,7 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_class
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoPgNodeTree
+import adventureworks.TypoXid
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +22,14 @@ import typo.dsl.UpdateBuilder
 
 object PgClassRepoImpl extends PgClassRepo {
   override def delete(oid: PgClassId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_class where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_class where oid = ${ParameterValue(oid, null, PgClassId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgClassFields, PgClassRow] = {
     DeleteBuilder("pg_catalog.pg_class", PgClassFields)
   }
   override def insert(unsaved: PgClassRow)(implicit c: Connection): PgClassRow = {
     SQL"""insert into pg_catalog.pg_class(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)
-          values (${unsaved.oid}::oid, ${unsaved.relname}::name, ${unsaved.relnamespace}::oid, ${unsaved.reltype}::oid, ${unsaved.reloftype}::oid, ${unsaved.relowner}::oid, ${unsaved.relam}::oid, ${unsaved.relfilenode}::oid, ${unsaved.reltablespace}::oid, ${unsaved.relpages}::int4, ${unsaved.reltuples}::float4, ${unsaved.relallvisible}::int4, ${unsaved.reltoastrelid}::oid, ${unsaved.relhasindex}, ${unsaved.relisshared}, ${unsaved.relpersistence}::char, ${unsaved.relkind}::char, ${unsaved.relnatts}::int2, ${unsaved.relchecks}::int2, ${unsaved.relhasrules}, ${unsaved.relhastriggers}, ${unsaved.relhassubclass}, ${unsaved.relrowsecurity}, ${unsaved.relforcerowsecurity}, ${unsaved.relispopulated}, ${unsaved.relreplident}::char, ${unsaved.relispartition}, ${unsaved.relrewrite}::oid, ${unsaved.relfrozenxid}::xid, ${unsaved.relminmxid}::xid, ${unsaved.relacl}::_aclitem, ${unsaved.reloptions}::_text, ${unsaved.relpartbound}::pg_node_tree)
+          values (${ParameterValue(unsaved.oid, null, PgClassId.toStatement)}::oid, ${ParameterValue(unsaved.relname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.relnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.reltype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.reloftype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.relowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.relam, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.relfilenode, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.reltablespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.relpages, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.reltuples, null, ToStatement.floatToStatement)}::float4, ${ParameterValue(unsaved.relallvisible, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.reltoastrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.relhasindex, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relisshared, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relpersistence, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.relkind, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.relnatts, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.relchecks, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.relhasrules, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relhastriggers, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relhassubclass, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relrowsecurity, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relforcerowsecurity, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relispopulated, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relreplident, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.relispartition, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.relrewrite, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.relfrozenxid, null, TypoXid.toStatement)}::xid, ${ParameterValue(unsaved.relminmxid, null, TypoXid.toStatement)}::xid, ${ParameterValue(unsaved.relacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem, ${ParameterValue(unsaved.reloptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text, ${ParameterValue(unsaved.relpartbound, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
           returning oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
        """
       .executeInsert(PgClassRow.rowParser(1).single)
@@ -40,52 +46,52 @@ object PgClassRepoImpl extends PgClassRepo {
   override def selectById(oid: PgClassId)(implicit c: Connection): Option[PgClassRow] = {
     SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
           from pg_catalog.pg_class
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgClassId.toStatement)}
        """.as(PgClassRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgClassId])(implicit c: Connection): List[PgClassRow] = {
     SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
           from pg_catalog.pg_class
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgClassRow.rowParser(1).*)
     
   }
   override def update(row: PgClassRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_class
-          set relname = ${row.relname}::name,
-              relnamespace = ${row.relnamespace}::oid,
-              reltype = ${row.reltype}::oid,
-              reloftype = ${row.reloftype}::oid,
-              relowner = ${row.relowner}::oid,
-              relam = ${row.relam}::oid,
-              relfilenode = ${row.relfilenode}::oid,
-              reltablespace = ${row.reltablespace}::oid,
-              relpages = ${row.relpages}::int4,
-              reltuples = ${row.reltuples}::float4,
-              relallvisible = ${row.relallvisible}::int4,
-              reltoastrelid = ${row.reltoastrelid}::oid,
-              relhasindex = ${row.relhasindex},
-              relisshared = ${row.relisshared},
-              relpersistence = ${row.relpersistence}::char,
-              relkind = ${row.relkind}::char,
-              relnatts = ${row.relnatts}::int2,
-              relchecks = ${row.relchecks}::int2,
-              relhasrules = ${row.relhasrules},
-              relhastriggers = ${row.relhastriggers},
-              relhassubclass = ${row.relhassubclass},
-              relrowsecurity = ${row.relrowsecurity},
-              relforcerowsecurity = ${row.relforcerowsecurity},
-              relispopulated = ${row.relispopulated},
-              relreplident = ${row.relreplident}::char,
-              relispartition = ${row.relispartition},
-              relrewrite = ${row.relrewrite}::oid,
-              relfrozenxid = ${row.relfrozenxid}::xid,
-              relminmxid = ${row.relminmxid}::xid,
-              relacl = ${row.relacl}::_aclitem,
-              reloptions = ${row.reloptions}::_text,
-              relpartbound = ${row.relpartbound}::pg_node_tree
-          where oid = $oid
+          set relname = ${ParameterValue(row.relname, null, ToStatement.stringToStatement)}::name,
+              relnamespace = ${ParameterValue(row.relnamespace, null, ToStatement.longToStatement)}::oid,
+              reltype = ${ParameterValue(row.reltype, null, ToStatement.longToStatement)}::oid,
+              reloftype = ${ParameterValue(row.reloftype, null, ToStatement.longToStatement)}::oid,
+              relowner = ${ParameterValue(row.relowner, null, ToStatement.longToStatement)}::oid,
+              relam = ${ParameterValue(row.relam, null, ToStatement.longToStatement)}::oid,
+              relfilenode = ${ParameterValue(row.relfilenode, null, ToStatement.longToStatement)}::oid,
+              reltablespace = ${ParameterValue(row.reltablespace, null, ToStatement.longToStatement)}::oid,
+              relpages = ${ParameterValue(row.relpages, null, ToStatement.intToStatement)}::int4,
+              reltuples = ${ParameterValue(row.reltuples, null, ToStatement.floatToStatement)}::float4,
+              relallvisible = ${ParameterValue(row.relallvisible, null, ToStatement.intToStatement)}::int4,
+              reltoastrelid = ${ParameterValue(row.reltoastrelid, null, ToStatement.longToStatement)}::oid,
+              relhasindex = ${ParameterValue(row.relhasindex, null, ToStatement.booleanToStatement)},
+              relisshared = ${ParameterValue(row.relisshared, null, ToStatement.booleanToStatement)},
+              relpersistence = ${ParameterValue(row.relpersistence, null, ToStatement.stringToStatement)}::char,
+              relkind = ${ParameterValue(row.relkind, null, ToStatement.stringToStatement)}::char,
+              relnatts = ${ParameterValue(row.relnatts, null, ToStatement.intToStatement)}::int2,
+              relchecks = ${ParameterValue(row.relchecks, null, ToStatement.intToStatement)}::int2,
+              relhasrules = ${ParameterValue(row.relhasrules, null, ToStatement.booleanToStatement)},
+              relhastriggers = ${ParameterValue(row.relhastriggers, null, ToStatement.booleanToStatement)},
+              relhassubclass = ${ParameterValue(row.relhassubclass, null, ToStatement.booleanToStatement)},
+              relrowsecurity = ${ParameterValue(row.relrowsecurity, null, ToStatement.booleanToStatement)},
+              relforcerowsecurity = ${ParameterValue(row.relforcerowsecurity, null, ToStatement.booleanToStatement)},
+              relispopulated = ${ParameterValue(row.relispopulated, null, ToStatement.booleanToStatement)},
+              relreplident = ${ParameterValue(row.relreplident, null, ToStatement.stringToStatement)}::char,
+              relispartition = ${ParameterValue(row.relispartition, null, ToStatement.booleanToStatement)},
+              relrewrite = ${ParameterValue(row.relrewrite, null, ToStatement.longToStatement)}::oid,
+              relfrozenxid = ${ParameterValue(row.relfrozenxid, null, TypoXid.toStatement)}::xid,
+              relminmxid = ${ParameterValue(row.relminmxid, null, TypoXid.toStatement)}::xid,
+              relacl = ${ParameterValue(row.relacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem,
+              reloptions = ${ParameterValue(row.reloptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text,
+              relpartbound = ${ParameterValue(row.relpartbound, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
+          where oid = ${ParameterValue(oid, null, PgClassId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgClassFields, PgClassRow] = {
@@ -94,39 +100,39 @@ object PgClassRepoImpl extends PgClassRepo {
   override def upsert(unsaved: PgClassRow)(implicit c: Connection): PgClassRow = {
     SQL"""insert into pg_catalog.pg_class(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.relname}::name,
-            ${unsaved.relnamespace}::oid,
-            ${unsaved.reltype}::oid,
-            ${unsaved.reloftype}::oid,
-            ${unsaved.relowner}::oid,
-            ${unsaved.relam}::oid,
-            ${unsaved.relfilenode}::oid,
-            ${unsaved.reltablespace}::oid,
-            ${unsaved.relpages}::int4,
-            ${unsaved.reltuples}::float4,
-            ${unsaved.relallvisible}::int4,
-            ${unsaved.reltoastrelid}::oid,
-            ${unsaved.relhasindex},
-            ${unsaved.relisshared},
-            ${unsaved.relpersistence}::char,
-            ${unsaved.relkind}::char,
-            ${unsaved.relnatts}::int2,
-            ${unsaved.relchecks}::int2,
-            ${unsaved.relhasrules},
-            ${unsaved.relhastriggers},
-            ${unsaved.relhassubclass},
-            ${unsaved.relrowsecurity},
-            ${unsaved.relforcerowsecurity},
-            ${unsaved.relispopulated},
-            ${unsaved.relreplident}::char,
-            ${unsaved.relispartition},
-            ${unsaved.relrewrite}::oid,
-            ${unsaved.relfrozenxid}::xid,
-            ${unsaved.relminmxid}::xid,
-            ${unsaved.relacl}::_aclitem,
-            ${unsaved.reloptions}::_text,
-            ${unsaved.relpartbound}::pg_node_tree
+            ${ParameterValue(unsaved.oid, null, PgClassId.toStatement)}::oid,
+            ${ParameterValue(unsaved.relname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.relnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.reltype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.reloftype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.relowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.relam, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.relfilenode, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.reltablespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.relpages, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.reltuples, null, ToStatement.floatToStatement)}::float4,
+            ${ParameterValue(unsaved.relallvisible, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.reltoastrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.relhasindex, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relisshared, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relpersistence, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.relkind, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.relnatts, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.relchecks, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.relhasrules, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relhastriggers, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relhassubclass, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relrowsecurity, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relforcerowsecurity, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relispopulated, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relreplident, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.relispartition, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.relrewrite, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.relfrozenxid, null, TypoXid.toStatement)}::xid,
+            ${ParameterValue(unsaved.relminmxid, null, TypoXid.toStatement)}::xid,
+            ${ParameterValue(unsaved.relacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem,
+            ${ParameterValue(unsaved.reloptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text,
+            ${ParameterValue(unsaved.relpartbound, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
           )
           on conflict (oid)
           do update set

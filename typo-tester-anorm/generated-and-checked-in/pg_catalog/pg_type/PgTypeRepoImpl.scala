@@ -7,7 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_type
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoPgNodeTree
+import adventureworks.TypoRegproc
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +22,14 @@ import typo.dsl.UpdateBuilder
 
 object PgTypeRepoImpl extends PgTypeRepo {
   override def delete(oid: PgTypeId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_type where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_type where oid = ${ParameterValue(oid, null, PgTypeId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTypeFields, PgTypeRow] = {
     DeleteBuilder("pg_catalog.pg_type", PgTypeFields)
   }
   override def insert(unsaved: PgTypeRow)(implicit c: Connection): PgTypeRow = {
     SQL"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
-          values (${unsaved.oid}::oid, ${unsaved.typname}::name, ${unsaved.typnamespace}::oid, ${unsaved.typowner}::oid, ${unsaved.typlen}::int2, ${unsaved.typbyval}, ${unsaved.typtype}::char, ${unsaved.typcategory}::char, ${unsaved.typispreferred}, ${unsaved.typisdefined}, ${unsaved.typdelim}::char, ${unsaved.typrelid}::oid, ${unsaved.typsubscript}::regproc, ${unsaved.typelem}::oid, ${unsaved.typarray}::oid, ${unsaved.typinput}::regproc, ${unsaved.typoutput}::regproc, ${unsaved.typreceive}::regproc, ${unsaved.typsend}::regproc, ${unsaved.typmodin}::regproc, ${unsaved.typmodout}::regproc, ${unsaved.typanalyze}::regproc, ${unsaved.typalign}::char, ${unsaved.typstorage}::char, ${unsaved.typnotnull}, ${unsaved.typbasetype}::oid, ${unsaved.typtypmod}::int4, ${unsaved.typndims}::int4, ${unsaved.typcollation}::oid, ${unsaved.typdefaultbin}::pg_node_tree, ${unsaved.typdefault}, ${unsaved.typacl}::_aclitem)
+          values (${ParameterValue(unsaved.oid, null, PgTypeId.toStatement)}::oid, ${ParameterValue(unsaved.typname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.typnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.typowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.typlen, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.typbyval, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.typtype, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.typcategory, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.typispreferred, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.typisdefined, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.typdelim, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.typrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.typsubscript, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.typelem, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.typarray, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.typinput, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.typoutput, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.typreceive, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.typsend, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.typmodin, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.typmodout, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.typanalyze, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.typalign, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.typstorage, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.typnotnull, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.typbasetype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.typtypmod, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.typndims, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.typcollation, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.typdefaultbin, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree, ${ParameterValue(unsaved.typdefault, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.typacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem)
           returning oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
        """
       .executeInsert(PgTypeRow.rowParser(1).single)
@@ -40,51 +46,51 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def selectById(oid: PgTypeId)(implicit c: Connection): Option[PgTypeRow] = {
     SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
           from pg_catalog.pg_type
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgTypeId.toStatement)}
        """.as(PgTypeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTypeId])(implicit c: Connection): List[PgTypeRow] = {
     SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
           from pg_catalog.pg_type
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgTypeRow.rowParser(1).*)
     
   }
   override def update(row: PgTypeRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_type
-          set typname = ${row.typname}::name,
-              typnamespace = ${row.typnamespace}::oid,
-              typowner = ${row.typowner}::oid,
-              typlen = ${row.typlen}::int2,
-              typbyval = ${row.typbyval},
-              typtype = ${row.typtype}::char,
-              typcategory = ${row.typcategory}::char,
-              typispreferred = ${row.typispreferred},
-              typisdefined = ${row.typisdefined},
-              typdelim = ${row.typdelim}::char,
-              typrelid = ${row.typrelid}::oid,
-              typsubscript = ${row.typsubscript}::regproc,
-              typelem = ${row.typelem}::oid,
-              typarray = ${row.typarray}::oid,
-              typinput = ${row.typinput}::regproc,
-              typoutput = ${row.typoutput}::regproc,
-              typreceive = ${row.typreceive}::regproc,
-              typsend = ${row.typsend}::regproc,
-              typmodin = ${row.typmodin}::regproc,
-              typmodout = ${row.typmodout}::regproc,
-              typanalyze = ${row.typanalyze}::regproc,
-              typalign = ${row.typalign}::char,
-              typstorage = ${row.typstorage}::char,
-              typnotnull = ${row.typnotnull},
-              typbasetype = ${row.typbasetype}::oid,
-              typtypmod = ${row.typtypmod}::int4,
-              typndims = ${row.typndims}::int4,
-              typcollation = ${row.typcollation}::oid,
-              typdefaultbin = ${row.typdefaultbin}::pg_node_tree,
-              typdefault = ${row.typdefault},
-              typacl = ${row.typacl}::_aclitem
-          where oid = $oid
+          set typname = ${ParameterValue(row.typname, null, ToStatement.stringToStatement)}::name,
+              typnamespace = ${ParameterValue(row.typnamespace, null, ToStatement.longToStatement)}::oid,
+              typowner = ${ParameterValue(row.typowner, null, ToStatement.longToStatement)}::oid,
+              typlen = ${ParameterValue(row.typlen, null, ToStatement.intToStatement)}::int2,
+              typbyval = ${ParameterValue(row.typbyval, null, ToStatement.booleanToStatement)},
+              typtype = ${ParameterValue(row.typtype, null, ToStatement.stringToStatement)}::char,
+              typcategory = ${ParameterValue(row.typcategory, null, ToStatement.stringToStatement)}::char,
+              typispreferred = ${ParameterValue(row.typispreferred, null, ToStatement.booleanToStatement)},
+              typisdefined = ${ParameterValue(row.typisdefined, null, ToStatement.booleanToStatement)},
+              typdelim = ${ParameterValue(row.typdelim, null, ToStatement.stringToStatement)}::char,
+              typrelid = ${ParameterValue(row.typrelid, null, ToStatement.longToStatement)}::oid,
+              typsubscript = ${ParameterValue(row.typsubscript, null, TypoRegproc.toStatement)}::regproc,
+              typelem = ${ParameterValue(row.typelem, null, ToStatement.longToStatement)}::oid,
+              typarray = ${ParameterValue(row.typarray, null, ToStatement.longToStatement)}::oid,
+              typinput = ${ParameterValue(row.typinput, null, TypoRegproc.toStatement)}::regproc,
+              typoutput = ${ParameterValue(row.typoutput, null, TypoRegproc.toStatement)}::regproc,
+              typreceive = ${ParameterValue(row.typreceive, null, TypoRegproc.toStatement)}::regproc,
+              typsend = ${ParameterValue(row.typsend, null, TypoRegproc.toStatement)}::regproc,
+              typmodin = ${ParameterValue(row.typmodin, null, TypoRegproc.toStatement)}::regproc,
+              typmodout = ${ParameterValue(row.typmodout, null, TypoRegproc.toStatement)}::regproc,
+              typanalyze = ${ParameterValue(row.typanalyze, null, TypoRegproc.toStatement)}::regproc,
+              typalign = ${ParameterValue(row.typalign, null, ToStatement.stringToStatement)}::char,
+              typstorage = ${ParameterValue(row.typstorage, null, ToStatement.stringToStatement)}::char,
+              typnotnull = ${ParameterValue(row.typnotnull, null, ToStatement.booleanToStatement)},
+              typbasetype = ${ParameterValue(row.typbasetype, null, ToStatement.longToStatement)}::oid,
+              typtypmod = ${ParameterValue(row.typtypmod, null, ToStatement.intToStatement)}::int4,
+              typndims = ${ParameterValue(row.typndims, null, ToStatement.intToStatement)}::int4,
+              typcollation = ${ParameterValue(row.typcollation, null, ToStatement.longToStatement)}::oid,
+              typdefaultbin = ${ParameterValue(row.typdefaultbin, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
+              typdefault = ${ParameterValue(row.typdefault, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              typacl = ${ParameterValue(row.typacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem
+          where oid = ${ParameterValue(oid, null, PgTypeId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTypeFields, PgTypeRow] = {
@@ -93,38 +99,38 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def upsert(unsaved: PgTypeRow)(implicit c: Connection): PgTypeRow = {
     SQL"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.typname}::name,
-            ${unsaved.typnamespace}::oid,
-            ${unsaved.typowner}::oid,
-            ${unsaved.typlen}::int2,
-            ${unsaved.typbyval},
-            ${unsaved.typtype}::char,
-            ${unsaved.typcategory}::char,
-            ${unsaved.typispreferred},
-            ${unsaved.typisdefined},
-            ${unsaved.typdelim}::char,
-            ${unsaved.typrelid}::oid,
-            ${unsaved.typsubscript}::regproc,
-            ${unsaved.typelem}::oid,
-            ${unsaved.typarray}::oid,
-            ${unsaved.typinput}::regproc,
-            ${unsaved.typoutput}::regproc,
-            ${unsaved.typreceive}::regproc,
-            ${unsaved.typsend}::regproc,
-            ${unsaved.typmodin}::regproc,
-            ${unsaved.typmodout}::regproc,
-            ${unsaved.typanalyze}::regproc,
-            ${unsaved.typalign}::char,
-            ${unsaved.typstorage}::char,
-            ${unsaved.typnotnull},
-            ${unsaved.typbasetype}::oid,
-            ${unsaved.typtypmod}::int4,
-            ${unsaved.typndims}::int4,
-            ${unsaved.typcollation}::oid,
-            ${unsaved.typdefaultbin}::pg_node_tree,
-            ${unsaved.typdefault},
-            ${unsaved.typacl}::_aclitem
+            ${ParameterValue(unsaved.oid, null, PgTypeId.toStatement)}::oid,
+            ${ParameterValue(unsaved.typname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.typnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.typowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.typlen, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.typbyval, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.typtype, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.typcategory, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.typispreferred, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.typisdefined, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.typdelim, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.typrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.typsubscript, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.typelem, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.typarray, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.typinput, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.typoutput, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.typreceive, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.typsend, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.typmodin, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.typmodout, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.typanalyze, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.typalign, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.typstorage, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.typnotnull, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.typbasetype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.typtypmod, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.typndims, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.typcollation, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.typdefaultbin, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
+            ${ParameterValue(unsaved.typdefault, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+            ${ParameterValue(unsaved.typacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem
           )
           on conflict (oid)
           do update set

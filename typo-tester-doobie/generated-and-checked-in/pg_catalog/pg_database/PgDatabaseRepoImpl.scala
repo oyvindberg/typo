@@ -43,7 +43,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
     sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ${fromWrite(oid)(Write.fromPut(PgDatabaseId.put))}""".query(PgDatabaseRow.read).option
   }
   override def selectByIds(oids: Array[PgDatabaseId]): Stream[ConnectionIO, PgDatabaseRow] = {
-    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ANY(${fromWrite(oids)(Write.fromPut(PgDatabaseId.arrayPut))})""".query(PgDatabaseRow.read).stream
+    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ANY(${oids})""".query(PgDatabaseRow.read).stream
   }
   override def update(row: PgDatabaseRow): ConnectionIO[Boolean] = {
     val oid = row.oid

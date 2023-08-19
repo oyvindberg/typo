@@ -9,12 +9,15 @@ package purchaseorderheader
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
-    SQL"delete from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".executeUpdate() > 0
+    SQL"delete from purchasing.purchaseorderheader where purchaseorderid = ${ParameterValue(purchaseorderid, null, PurchaseorderheaderId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields)
   }
   override def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
-          values (${unsaved.purchaseorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.status}::int2, ${unsaved.employeeid}::int4, ${unsaved.vendorid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.orderdate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.revisionnumber, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.employeeid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.vendorid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.subtotal, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.taxamt, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
        """
       .executeInsert(PurchaseorderheaderRow.rowParser(1).single)
@@ -38,41 +41,41 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
     val namedParameters = List(
-      Some((NamedParameter("employeeid", ParameterValue.from(unsaved.employeeid)), "::int4")),
-      Some((NamedParameter("vendorid", ParameterValue.from(unsaved.vendorid)), "::int4")),
-      Some((NamedParameter("shipmethodid", ParameterValue.from(unsaved.shipmethodid)), "::int4")),
-      Some((NamedParameter("shipdate", ParameterValue.from(unsaved.shipdate)), "::timestamp")),
+      Some((NamedParameter("employeeid", ParameterValue(unsaved.employeeid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("vendorid", ParameterValue(unsaved.vendorid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("shipmethodid", ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)), "::int4")),
+      Some((NamedParameter("shipdate", ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
       unsaved.purchaseorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("purchaseorderid", ParameterValue.from[PurchaseorderheaderId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("purchaseorderid", ParameterValue(value, null, PurchaseorderheaderId.toStatement)), "::int4"))
       },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue.from[Int](value)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
       },
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue.from[Int](value)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("orderdate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("orderdate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       },
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("subtotal", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("subtotal", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.taxamt match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("taxamt", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("taxamt", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.freight match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("freight", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("freight", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -102,31 +105,31 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow] = {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
           from purchasing.purchaseorderheader
-          where purchaseorderid = $purchaseorderid
+          where purchaseorderid = ${ParameterValue(purchaseorderid, null, PurchaseorderheaderId.toStatement)}
        """.as(PurchaseorderheaderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
           from purchasing.purchaseorderheader
-          where purchaseorderid = ANY($purchaseorderids)
+          where purchaseorderid = ANY(${purchaseorderids})
        """.as(PurchaseorderheaderRow.rowParser(1).*)
     
   }
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
     val purchaseorderid = row.purchaseorderid
     SQL"""update purchasing.purchaseorderheader
-          set revisionnumber = ${row.revisionnumber}::int2,
-              status = ${row.status}::int2,
-              employeeid = ${row.employeeid}::int4,
-              vendorid = ${row.vendorid}::int4,
-              shipmethodid = ${row.shipmethodid}::int4,
-              orderdate = ${row.orderdate}::timestamp,
-              shipdate = ${row.shipdate}::timestamp,
-              subtotal = ${row.subtotal}::numeric,
-              taxamt = ${row.taxamt}::numeric,
-              freight = ${row.freight}::numeric,
-              modifieddate = ${row.modifieddate}::timestamp
-          where purchaseorderid = $purchaseorderid
+          set revisionnumber = ${ParameterValue(row.revisionnumber, null, ToStatement.intToStatement)}::int2,
+              status = ${ParameterValue(row.status, null, ToStatement.intToStatement)}::int2,
+              employeeid = ${ParameterValue(row.employeeid, null, BusinessentityId.toStatement)}::int4,
+              vendorid = ${ParameterValue(row.vendorid, null, BusinessentityId.toStatement)}::int4,
+              shipmethodid = ${ParameterValue(row.shipmethodid, null, ShipmethodId.toStatement)}::int4,
+              orderdate = ${ParameterValue(row.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              shipdate = ${ParameterValue(row.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+              subtotal = ${ParameterValue(row.subtotal, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              taxamt = ${ParameterValue(row.taxamt, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              freight = ${ParameterValue(row.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where purchaseorderid = ${ParameterValue(purchaseorderid, null, PurchaseorderheaderId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
@@ -135,18 +138,18 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
           values (
-            ${unsaved.purchaseorderid}::int4,
-            ${unsaved.revisionnumber}::int2,
-            ${unsaved.status}::int2,
-            ${unsaved.employeeid}::int4,
-            ${unsaved.vendorid}::int4,
-            ${unsaved.shipmethodid}::int4,
-            ${unsaved.orderdate}::timestamp,
-            ${unsaved.shipdate}::timestamp,
-            ${unsaved.subtotal}::numeric,
-            ${unsaved.taxamt}::numeric,
-            ${unsaved.freight}::numeric,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4,
+            ${ParameterValue(unsaved.revisionnumber, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.employeeid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.vendorid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4,
+            ${ParameterValue(unsaved.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+            ${ParameterValue(unsaved.subtotal, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.taxamt, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (purchaseorderid)
           do update set

@@ -79,7 +79,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     sql"select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text from production.workorder where workorderid = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}".query(WorkorderRow.read).option
   }
   override def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow] = {
-    sql"select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text from production.workorder where workorderid = ANY(${fromWrite(workorderids)(Write.fromPut(WorkorderId.arrayPut))})".query(WorkorderRow.read).stream
+    sql"select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text from production.workorder where workorderid = ANY(${workorderids})".query(WorkorderRow.read).stream
   }
   override def update(row: WorkorderRow): ConnectionIO[Boolean] = {
     val workorderid = row.workorderid

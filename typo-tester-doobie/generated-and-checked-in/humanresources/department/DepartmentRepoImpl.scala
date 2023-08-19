@@ -72,7 +72,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
     sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".query(DepartmentRow.read).option
   }
   override def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow] = {
-    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ANY(${fromWrite(departmentids)(Write.fromPut(DepartmentId.arrayPut))})""".query(DepartmentRow.read).stream
+    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ANY(${departmentids})""".query(DepartmentRow.read).stream
   }
   override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
     val departmentid = row.departmentid

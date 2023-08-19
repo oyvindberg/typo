@@ -7,7 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_foreign_server
 
+import adventureworks.TypoAclItem
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +20,14 @@ import typo.dsl.UpdateBuilder
 
 object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def delete(oid: PgForeignServerId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_foreign_server where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_foreign_server where oid = ${ParameterValue(oid, null, PgForeignServerId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgForeignServerFields, PgForeignServerRow] = {
     DeleteBuilder("pg_catalog.pg_foreign_server", PgForeignServerFields)
   }
   override def insert(unsaved: PgForeignServerRow)(implicit c: Connection): PgForeignServerRow = {
     SQL"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
-          values (${unsaved.oid}::oid, ${unsaved.srvname}::name, ${unsaved.srvowner}::oid, ${unsaved.srvfdw}::oid, ${unsaved.srvtype}, ${unsaved.srvversion}, ${unsaved.srvacl}::_aclitem, ${unsaved.srvoptions}::_text)
+          values (${ParameterValue(unsaved.oid, null, PgForeignServerId.toStatement)}::oid, ${ParameterValue(unsaved.srvname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.srvowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.srvfdw, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.srvtype, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.srvversion, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.srvacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem, ${ParameterValue(unsaved.srvoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text)
           returning oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
        """
       .executeInsert(PgForeignServerRow.rowParser(1).single)
@@ -40,27 +44,27 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def selectById(oid: PgForeignServerId)(implicit c: Connection): Option[PgForeignServerRow] = {
     SQL"""select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
           from pg_catalog.pg_foreign_server
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgForeignServerId.toStatement)}
        """.as(PgForeignServerRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgForeignServerId])(implicit c: Connection): List[PgForeignServerRow] = {
     SQL"""select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
           from pg_catalog.pg_foreign_server
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgForeignServerRow.rowParser(1).*)
     
   }
   override def update(row: PgForeignServerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_foreign_server
-          set srvname = ${row.srvname}::name,
-              srvowner = ${row.srvowner}::oid,
-              srvfdw = ${row.srvfdw}::oid,
-              srvtype = ${row.srvtype},
-              srvversion = ${row.srvversion},
-              srvacl = ${row.srvacl}::_aclitem,
-              srvoptions = ${row.srvoptions}::_text
-          where oid = $oid
+          set srvname = ${ParameterValue(row.srvname, null, ToStatement.stringToStatement)}::name,
+              srvowner = ${ParameterValue(row.srvowner, null, ToStatement.longToStatement)}::oid,
+              srvfdw = ${ParameterValue(row.srvfdw, null, ToStatement.longToStatement)}::oid,
+              srvtype = ${ParameterValue(row.srvtype, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              srvversion = ${ParameterValue(row.srvversion, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              srvacl = ${ParameterValue(row.srvacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem,
+              srvoptions = ${ParameterValue(row.srvoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
+          where oid = ${ParameterValue(oid, null, PgForeignServerId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgForeignServerFields, PgForeignServerRow] = {
@@ -69,14 +73,14 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def upsert(unsaved: PgForeignServerRow)(implicit c: Connection): PgForeignServerRow = {
     SQL"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.srvname}::name,
-            ${unsaved.srvowner}::oid,
-            ${unsaved.srvfdw}::oid,
-            ${unsaved.srvtype},
-            ${unsaved.srvversion},
-            ${unsaved.srvacl}::_aclitem,
-            ${unsaved.srvoptions}::_text
+            ${ParameterValue(unsaved.oid, null, PgForeignServerId.toStatement)}::oid,
+            ${ParameterValue(unsaved.srvname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.srvowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.srvfdw, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.srvtype, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+            ${ParameterValue(unsaved.srvversion, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+            ${ParameterValue(unsaved.srvacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem,
+            ${ParameterValue(unsaved.srvoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
           )
           on conflict (oid)
           do update set

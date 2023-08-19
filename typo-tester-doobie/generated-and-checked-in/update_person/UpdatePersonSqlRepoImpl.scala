@@ -8,12 +8,15 @@ package update_person
 
 import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 
 object UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
   override def opt(suffix: Option[String], cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int] = {
     sql"""update person.person
-          set firstname = firstname || '-' || $suffix
-          where modifieddate < $cutoff::timestamp""".update.run
+          set firstname = firstname || '-' || ${fromWrite(suffix)(Write.fromPutOption(Meta.StringMeta.put))}
+          where modifieddate < ${fromWrite(cutoff)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp""".update.run
   }
 }

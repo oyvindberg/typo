@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_replication_origin
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def delete(roident: PgReplicationOriginId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_replication_origin where roident = $roident".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_replication_origin where roident = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
     DeleteBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields)
   }
   override def insert(unsaved: PgReplicationOriginRow)(implicit c: Connection): PgReplicationOriginRow = {
     SQL"""insert into pg_catalog.pg_replication_origin(roident, roname)
-          values (${unsaved.roident}::oid, ${unsaved.roname})
+          values (${ParameterValue(unsaved.roident, null, PgReplicationOriginId.toStatement)}::oid, ${ParameterValue(unsaved.roname, null, ToStatement.stringToStatement)})
           returning roident, roname
        """
       .executeInsert(PgReplicationOriginRow.rowParser(1).single)
@@ -40,21 +42,21 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def selectById(roident: PgReplicationOriginId)(implicit c: Connection): Option[PgReplicationOriginRow] = {
     SQL"""select roident, roname
           from pg_catalog.pg_replication_origin
-          where roident = $roident
+          where roident = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}
        """.as(PgReplicationOriginRow.rowParser(1).singleOpt)
   }
   override def selectByIds(roidents: Array[PgReplicationOriginId])(implicit c: Connection): List[PgReplicationOriginRow] = {
     SQL"""select roident, roname
           from pg_catalog.pg_replication_origin
-          where roident = ANY($roidents)
+          where roident = ANY(${roidents})
        """.as(PgReplicationOriginRow.rowParser(1).*)
     
   }
   override def update(row: PgReplicationOriginRow)(implicit c: Connection): Boolean = {
     val roident = row.roident
     SQL"""update pg_catalog.pg_replication_origin
-          set roname = ${row.roname}
-          where roident = $roident
+          set roname = ${ParameterValue(row.roname, null, ToStatement.stringToStatement)}
+          where roident = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
@@ -63,8 +65,8 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def upsert(unsaved: PgReplicationOriginRow)(implicit c: Connection): PgReplicationOriginRow = {
     SQL"""insert into pg_catalog.pg_replication_origin(roident, roname)
           values (
-            ${unsaved.roident}::oid,
-            ${unsaved.roname}
+            ${ParameterValue(unsaved.roident, null, PgReplicationOriginId.toStatement)}::oid,
+            ${ParameterValue(unsaved.roname, null, ToStatement.stringToStatement)}
           )
           on conflict (roident)
           do update set

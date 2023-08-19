@@ -9,6 +9,8 @@ package productmodelillustration
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.illustration.IllustrationId
+import adventureworks.production.productmodel.ProductmodelId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".executeUpdate() > 0
+    SQL"delete from production.productmodelillustration where productmodelid = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND illustrationid = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields)
   }
   override def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
-          values (${unsaved.productmodelid}::int4, ${unsaved.illustrationid}::int4, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productmodelid, illustrationid, modifieddate::text
        """
       .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
@@ -38,11 +40,11 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow = {
     val namedParameters = List(
-      Some((NamedParameter("productmodelid", ParameterValue.from(unsaved.productmodelid)), "::int4")),
-      Some((NamedParameter("illustrationid", ParameterValue.from(unsaved.illustrationid)), "::int4")),
+      Some((NamedParameter("productmodelid", ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)), "::int4")),
+      Some((NamedParameter("illustrationid", ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -72,14 +74,14 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def selectById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Option[ProductmodelillustrationRow] = {
     SQL"""select productmodelid, illustrationid, modifieddate::text
           from production.productmodelillustration
-          where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}
+          where productmodelid = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND illustrationid = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}
        """.as(ProductmodelillustrationRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productmodelillustration
-          set modifieddate = ${row.modifieddate}::timestamp
-          where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}
+          set modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productmodelid = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND illustrationid = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
@@ -88,9 +90,9 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
           values (
-            ${unsaved.productmodelid}::int4,
-            ${unsaved.illustrationid}::int4,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4,
+            ${ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)}::int4,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productmodelid, illustrationid)
           do update set

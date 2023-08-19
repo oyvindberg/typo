@@ -7,7 +7,11 @@ package adventureworks
 package information_schema
 package sql_sizing
 
+import adventureworks.information_schema.CardinalNumber
+import adventureworks.information_schema.CharacterData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -20,7 +24,7 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
   }
   override def insert(unsaved: SqlSizingRow)(implicit c: Connection): SqlSizingRow = {
     SQL"""insert into information_schema.sql_sizing(sizing_id, sizing_name, supported_value, "comments")
-          values (${unsaved.sizingId}::information_schema.cardinal_number, ${unsaved.sizingName}::information_schema.character_data, ${unsaved.supportedValue}::information_schema.cardinal_number, ${unsaved.comments}::information_schema.character_data)
+          values (${ParameterValue(unsaved.sizingId, null, ToStatement.optionToStatement(CardinalNumber.toStatement, CardinalNumber.parameterMetadata))}::information_schema.cardinal_number, ${ParameterValue(unsaved.sizingName, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::information_schema.character_data, ${ParameterValue(unsaved.supportedValue, null, ToStatement.optionToStatement(CardinalNumber.toStatement, CardinalNumber.parameterMetadata))}::information_schema.cardinal_number, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::information_schema.character_data)
           returning sizing_id, sizing_name, supported_value, "comments"
        """
       .executeInsert(SqlSizingRow.rowParser(1).single)

@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_subscription
 
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def delete(oid: PgSubscriptionId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_subscription where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_subscription where oid = ${ParameterValue(oid, null, PgSubscriptionId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
     DeleteBuilder("pg_catalog.pg_subscription", PgSubscriptionFields)
   }
   override def insert(unsaved: PgSubscriptionRow)(implicit c: Connection): PgSubscriptionRow = {
     SQL"""insert into pg_catalog.pg_subscription(oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications)
-          values (${unsaved.oid}::oid, ${unsaved.subdbid}::oid, ${unsaved.subname}::name, ${unsaved.subowner}::oid, ${unsaved.subenabled}, ${unsaved.subbinary}, ${unsaved.substream}, ${unsaved.subconninfo}, ${unsaved.subslotname}::name, ${unsaved.subsynccommit}, ${unsaved.subpublications}::_text)
+          values (${ParameterValue(unsaved.oid, null, PgSubscriptionId.toStatement)}::oid, ${ParameterValue(unsaved.subdbid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.subname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.subowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.subenabled, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.subbinary, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.substream, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.subconninfo, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.subslotname, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name, ${ParameterValue(unsaved.subsynccommit, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.subpublications, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}::_text)
           returning oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
        """
       .executeInsert(PgSubscriptionRow.rowParser(1).single)
@@ -40,30 +43,30 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def selectById(oid: PgSubscriptionId)(implicit c: Connection): Option[PgSubscriptionRow] = {
     SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
           from pg_catalog.pg_subscription
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgSubscriptionId.toStatement)}
        """.as(PgSubscriptionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgSubscriptionId])(implicit c: Connection): List[PgSubscriptionRow] = {
     SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
           from pg_catalog.pg_subscription
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgSubscriptionRow.rowParser(1).*)
     
   }
   override def update(row: PgSubscriptionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_subscription
-          set subdbid = ${row.subdbid}::oid,
-              subname = ${row.subname}::name,
-              subowner = ${row.subowner}::oid,
-              subenabled = ${row.subenabled},
-              subbinary = ${row.subbinary},
-              substream = ${row.substream},
-              subconninfo = ${row.subconninfo},
-              subslotname = ${row.subslotname}::name,
-              subsynccommit = ${row.subsynccommit},
-              subpublications = ${row.subpublications}::_text
-          where oid = $oid
+          set subdbid = ${ParameterValue(row.subdbid, null, ToStatement.longToStatement)}::oid,
+              subname = ${ParameterValue(row.subname, null, ToStatement.stringToStatement)}::name,
+              subowner = ${ParameterValue(row.subowner, null, ToStatement.longToStatement)}::oid,
+              subenabled = ${ParameterValue(row.subenabled, null, ToStatement.booleanToStatement)},
+              subbinary = ${ParameterValue(row.subbinary, null, ToStatement.booleanToStatement)},
+              substream = ${ParameterValue(row.substream, null, ToStatement.booleanToStatement)},
+              subconninfo = ${ParameterValue(row.subconninfo, null, ToStatement.stringToStatement)},
+              subslotname = ${ParameterValue(row.subslotname, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name,
+              subsynccommit = ${ParameterValue(row.subsynccommit, null, ToStatement.stringToStatement)},
+              subpublications = ${ParameterValue(row.subpublications, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}::_text
+          where oid = ${ParameterValue(oid, null, PgSubscriptionId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
@@ -72,17 +75,17 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def upsert(unsaved: PgSubscriptionRow)(implicit c: Connection): PgSubscriptionRow = {
     SQL"""insert into pg_catalog.pg_subscription(oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.subdbid}::oid,
-            ${unsaved.subname}::name,
-            ${unsaved.subowner}::oid,
-            ${unsaved.subenabled},
-            ${unsaved.subbinary},
-            ${unsaved.substream},
-            ${unsaved.subconninfo},
-            ${unsaved.subslotname}::name,
-            ${unsaved.subsynccommit},
-            ${unsaved.subpublications}::_text
+            ${ParameterValue(unsaved.oid, null, PgSubscriptionId.toStatement)}::oid,
+            ${ParameterValue(unsaved.subdbid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.subname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.subowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.subenabled, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.subbinary, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.substream, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.subconninfo, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.subslotname, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name,
+            ${ParameterValue(unsaved.subsynccommit, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.subpublications, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}::_text
           )
           on conflict (oid)
           do update set

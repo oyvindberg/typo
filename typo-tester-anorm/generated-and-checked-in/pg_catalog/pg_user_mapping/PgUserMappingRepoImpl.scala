@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_user_mapping
 
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgUserMappingRepoImpl extends PgUserMappingRepo {
   override def delete(oid: PgUserMappingId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_user_mapping where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_user_mapping where oid = ${ParameterValue(oid, null, PgUserMappingId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgUserMappingFields, PgUserMappingRow] = {
     DeleteBuilder("pg_catalog.pg_user_mapping", PgUserMappingFields)
   }
   override def insert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow = {
     SQL"""insert into pg_catalog.pg_user_mapping(oid, umuser, umserver, umoptions)
-          values (${unsaved.oid}::oid, ${unsaved.umuser}::oid, ${unsaved.umserver}::oid, ${unsaved.umoptions}::_text)
+          values (${ParameterValue(unsaved.oid, null, PgUserMappingId.toStatement)}::oid, ${ParameterValue(unsaved.umuser, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.umserver, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.umoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text)
           returning oid, umuser, umserver, umoptions
        """
       .executeInsert(PgUserMappingRow.rowParser(1).single)
@@ -40,23 +43,23 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
   override def selectById(oid: PgUserMappingId)(implicit c: Connection): Option[PgUserMappingRow] = {
     SQL"""select oid, umuser, umserver, umoptions
           from pg_catalog.pg_user_mapping
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgUserMappingId.toStatement)}
        """.as(PgUserMappingRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgUserMappingId])(implicit c: Connection): List[PgUserMappingRow] = {
     SQL"""select oid, umuser, umserver, umoptions
           from pg_catalog.pg_user_mapping
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgUserMappingRow.rowParser(1).*)
     
   }
   override def update(row: PgUserMappingRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_user_mapping
-          set umuser = ${row.umuser}::oid,
-              umserver = ${row.umserver}::oid,
-              umoptions = ${row.umoptions}::_text
-          where oid = $oid
+          set umuser = ${ParameterValue(row.umuser, null, ToStatement.longToStatement)}::oid,
+              umserver = ${ParameterValue(row.umserver, null, ToStatement.longToStatement)}::oid,
+              umoptions = ${ParameterValue(row.umoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
+          where oid = ${ParameterValue(oid, null, PgUserMappingId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgUserMappingFields, PgUserMappingRow] = {
@@ -65,10 +68,10 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
   override def upsert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow = {
     SQL"""insert into pg_catalog.pg_user_mapping(oid, umuser, umserver, umoptions)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.umuser}::oid,
-            ${unsaved.umserver}::oid,
-            ${unsaved.umoptions}::_text
+            ${ParameterValue(unsaved.oid, null, PgUserMappingId.toStatement)}::oid,
+            ${ParameterValue(unsaved.umuser, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.umserver, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.umoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
           )
           on conflict (oid)
           do update set

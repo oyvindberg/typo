@@ -9,14 +9,16 @@ package productmodel
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productmodel where productmodelid = $productmodelid".executeUpdate() > 0
+    SQL"delete from production.productmodel where productmodelid = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
     DeleteBuilder("production.productmodel", ProductmodelFields)
   }
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
-          values (${unsaved.productmodelid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.catalogdescription}::xml, ${unsaved.instructions}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
        """
       .executeInsert(ProductmodelRow.rowParser(1).single)
@@ -39,20 +41,20 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   }
   override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
-      Some((NamedParameter("catalogdescription", ParameterValue.from(unsaved.catalogdescription)), "::xml")),
-      Some((NamedParameter("instructions", ParameterValue.from(unsaved.instructions)), "::xml")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("catalogdescription", ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))), "::xml")),
+      Some((NamedParameter("instructions", ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))), "::xml")),
       unsaved.productmodelid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("productmodelid", ParameterValue.from[ProductmodelId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("productmodelid", ParameterValue(value, null, ProductmodelId.toStatement)), "::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -82,25 +84,25 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   override def selectById(productmodelid: ProductmodelId)(implicit c: Connection): Option[ProductmodelRow] = {
     SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
           from production.productmodel
-          where productmodelid = $productmodelid
+          where productmodelid = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}
        """.as(ProductmodelRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productmodelids: Array[ProductmodelId])(implicit c: Connection): List[ProductmodelRow] = {
     SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
           from production.productmodel
-          where productmodelid = ANY($productmodelids)
+          where productmodelid = ANY(${productmodelids})
        """.as(ProductmodelRow.rowParser(1).*)
     
   }
   override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
     val productmodelid = row.productmodelid
     SQL"""update production.productmodel
-          set "name" = ${row.name}::"public"."Name",
-              catalogdescription = ${row.catalogdescription}::xml,
-              instructions = ${row.instructions}::xml,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productmodelid = $productmodelid
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              catalogdescription = ${ParameterValue(row.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+              instructions = ${ParameterValue(row.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productmodelid = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
@@ -109,12 +111,12 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   override def upsert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
           values (
-            ${unsaved.productmodelid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.catalogdescription}::xml,
-            ${unsaved.instructions}::xml,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+            ${ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productmodelid)
           do update set

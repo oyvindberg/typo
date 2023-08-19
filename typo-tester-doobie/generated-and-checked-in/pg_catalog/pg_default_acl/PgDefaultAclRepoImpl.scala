@@ -42,7 +42,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
     sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}".query(PgDefaultAclRow.read).option
   }
   override def selectByIds(oids: Array[PgDefaultAclId]): Stream[ConnectionIO, PgDefaultAclRow] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ANY(${fromWrite(oids)(Write.fromPut(PgDefaultAclId.arrayPut))})".query(PgDefaultAclRow.read).stream
+    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ANY(${oids})".query(PgDefaultAclRow.read).stream
   }
   override def update(row: PgDefaultAclRow): ConnectionIO[Boolean] = {
     val oid = row.oid

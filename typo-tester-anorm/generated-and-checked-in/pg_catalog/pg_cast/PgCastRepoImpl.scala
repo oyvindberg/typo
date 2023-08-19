@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_cast
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgCastRepoImpl extends PgCastRepo {
   override def delete(oid: PgCastId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_cast where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_cast where oid = ${ParameterValue(oid, null, PgCastId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgCastFields, PgCastRow] = {
     DeleteBuilder("pg_catalog.pg_cast", PgCastFields)
   }
   override def insert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow = {
     SQL"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)
-          values (${unsaved.oid}::oid, ${unsaved.castsource}::oid, ${unsaved.casttarget}::oid, ${unsaved.castfunc}::oid, ${unsaved.castcontext}::char, ${unsaved.castmethod}::char)
+          values (${ParameterValue(unsaved.oid, null, PgCastId.toStatement)}::oid, ${ParameterValue(unsaved.castsource, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.casttarget, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.castfunc, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.castcontext, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.castmethod, null, ToStatement.stringToStatement)}::char)
           returning oid, castsource, casttarget, castfunc, castcontext, castmethod
        """
       .executeInsert(PgCastRow.rowParser(1).single)
@@ -40,25 +42,25 @@ object PgCastRepoImpl extends PgCastRepo {
   override def selectById(oid: PgCastId)(implicit c: Connection): Option[PgCastRow] = {
     SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod
           from pg_catalog.pg_cast
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgCastId.toStatement)}
        """.as(PgCastRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgCastId])(implicit c: Connection): List[PgCastRow] = {
     SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod
           from pg_catalog.pg_cast
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgCastRow.rowParser(1).*)
     
   }
   override def update(row: PgCastRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_cast
-          set castsource = ${row.castsource}::oid,
-              casttarget = ${row.casttarget}::oid,
-              castfunc = ${row.castfunc}::oid,
-              castcontext = ${row.castcontext}::char,
-              castmethod = ${row.castmethod}::char
-          where oid = $oid
+          set castsource = ${ParameterValue(row.castsource, null, ToStatement.longToStatement)}::oid,
+              casttarget = ${ParameterValue(row.casttarget, null, ToStatement.longToStatement)}::oid,
+              castfunc = ${ParameterValue(row.castfunc, null, ToStatement.longToStatement)}::oid,
+              castcontext = ${ParameterValue(row.castcontext, null, ToStatement.stringToStatement)}::char,
+              castmethod = ${ParameterValue(row.castmethod, null, ToStatement.stringToStatement)}::char
+          where oid = ${ParameterValue(oid, null, PgCastId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgCastFields, PgCastRow] = {
@@ -67,12 +69,12 @@ object PgCastRepoImpl extends PgCastRepo {
   override def upsert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow = {
     SQL"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.castsource}::oid,
-            ${unsaved.casttarget}::oid,
-            ${unsaved.castfunc}::oid,
-            ${unsaved.castcontext}::char,
-            ${unsaved.castmethod}::char
+            ${ParameterValue(unsaved.oid, null, PgCastId.toStatement)}::oid,
+            ${ParameterValue(unsaved.castsource, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.casttarget, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.castfunc, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.castcontext, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.castmethod, null, ToStatement.stringToStatement)}::char
           )
           on conflict (oid)
           do update set

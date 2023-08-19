@@ -71,7 +71,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}""".query(ScrapreasonRow.read).option
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow] = {
-    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ANY(${fromWrite(scrapreasonids)(Write.fromPut(ScrapreasonId.arrayPut))})""".query(ScrapreasonRow.read).stream
+    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ANY(${scrapreasonids})""".query(ScrapreasonRow.read).stream
   }
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     val scrapreasonid = row.scrapreasonid

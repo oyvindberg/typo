@@ -79,7 +79,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}""".query(ProductmodelRow.read).option
   }
   override def selectByIds(productmodelids: Array[ProductmodelId]): Stream[ConnectionIO, ProductmodelRow] = {
-    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ANY(${fromWrite(productmodelids)(Write.fromPut(ProductmodelId.arrayPut))})""".query(ProductmodelRow.read).stream
+    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ANY(${productmodelids})""".query(ProductmodelRow.read).stream
   }
   override def update(row: ProductmodelRow): ConnectionIO[Boolean] = {
     val productmodelid = row.productmodelid

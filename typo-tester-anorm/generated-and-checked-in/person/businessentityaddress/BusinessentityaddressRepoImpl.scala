@@ -9,14 +9,17 @@ package businessentityaddress
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.address.AddressId
+import adventureworks.person.addresstype.AddresstypeId
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +27,14 @@ import typo.dsl.UpdateBuilder
 
 object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def delete(compositeId: BusinessentityaddressId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.businessentityaddress where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}".executeUpdate() > 0
+    SQL"delete from person.businessentityaddress where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND addressid = ${ParameterValue(compositeId.addressid, null, AddressId.toStatement)} AND addresstypeid = ${ParameterValue(compositeId.addresstypeid, null, AddresstypeId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     DeleteBuilder("person.businessentityaddress", BusinessentityaddressFields)
   }
   override def insert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow = {
     SQL"""insert into person.businessentityaddress(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.addressid}::int4, ${unsaved.addresstypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.addressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.addresstypeid, null, AddresstypeId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
        """
       .executeInsert(BusinessentityaddressRow.rowParser(1).single)
@@ -39,16 +42,16 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved)(implicit c: Connection): BusinessentityaddressRow = {
     val namedParameters = List(
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("addressid", ParameterValue.from(unsaved.addressid)), "::int4")),
-      Some((NamedParameter("addresstypeid", ParameterValue.from(unsaved.addresstypeid)), "::int4")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("addressid", ParameterValue(unsaved.addressid, null, AddressId.toStatement)), "::int4")),
+      Some((NamedParameter("addresstypeid", ParameterValue(unsaved.addresstypeid, null, AddresstypeId.toStatement)), "::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -78,15 +81,15 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def selectById(compositeId: BusinessentityaddressId)(implicit c: Connection): Option[BusinessentityaddressRow] = {
     SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
           from person.businessentityaddress
-          where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}
+          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND addressid = ${ParameterValue(compositeId.addressid, null, AddressId.toStatement)} AND addresstypeid = ${ParameterValue(compositeId.addresstypeid, null, AddresstypeId.toStatement)}
        """.as(BusinessentityaddressRow.rowParser(1).singleOpt)
   }
   override def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.businessentityaddress
-          set rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}
+          set rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND addressid = ${ParameterValue(compositeId.addressid, null, AddressId.toStatement)} AND addresstypeid = ${ParameterValue(compositeId.addresstypeid, null, AddresstypeId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
@@ -95,11 +98,11 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def upsert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow = {
     SQL"""insert into person.businessentityaddress(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.addressid}::int4,
-            ${unsaved.addresstypeid}::int4,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.addressid, null, AddressId.toStatement)}::int4,
+            ${ParameterValue(unsaved.addresstypeid, null, AddresstypeId.toStatement)}::int4,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (businessentityid, addressid, addresstypeid)
           do update set

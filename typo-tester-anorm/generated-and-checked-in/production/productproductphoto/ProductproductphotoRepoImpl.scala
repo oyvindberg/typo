@@ -9,6 +9,8 @@ package productproductphoto
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.product.ProductId
+import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -24,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productproductphoto where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}".executeUpdate() > 0
+    SQL"delete from production.productproductphoto where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND productphotoid = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     DeleteBuilder("production.productproductphoto", ProductproductphotoFields)
   }
   override def insert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
-          values (${unsaved.productid}::int4, ${unsaved.productphotoid}::int4, ${unsaved.primary}::"public"."Flag", ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4, ${ParameterValue(unsaved.primary, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productid, productphotoid, "primary", modifieddate::text
        """
       .executeInsert(ProductproductphotoRow.rowParser(1).single)
@@ -39,15 +41,15 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved)(implicit c: Connection): ProductproductphotoRow = {
     val namedParameters = List(
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("productphotoid", ParameterValue.from(unsaved.productphotoid)), "::int4")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
+      Some((NamedParameter("productphotoid", ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)), "::int4")),
       unsaved.primary match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("primary", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("primary", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -77,15 +79,15 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def selectById(compositeId: ProductproductphotoId)(implicit c: Connection): Option[ProductproductphotoRow] = {
     SQL"""select productid, productphotoid, "primary", modifieddate::text
           from production.productproductphoto
-          where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND productphotoid = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}
        """.as(ProductproductphotoRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductproductphotoRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productproductphoto
-          set "primary" = ${row.primary}::"public"."Flag",
-              modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
+          set "primary" = ${ParameterValue(row.primary, null, Flag.toStatement)}::"public"."Flag",
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND productphotoid = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
@@ -94,10 +96,10 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
           values (
-            ${unsaved.productid}::int4,
-            ${unsaved.productphotoid}::int4,
-            ${unsaved.primary}::"public"."Flag",
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
+            ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4,
+            ${ParameterValue(unsaved.primary, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productid, productphotoid)
           do update set

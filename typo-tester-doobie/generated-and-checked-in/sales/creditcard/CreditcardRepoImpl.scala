@@ -74,7 +74,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
     sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ${fromWrite(creditcardid)(Write.fromPut(CreditcardId.put))}".query(CreditcardRow.read).option
   }
   override def selectByIds(creditcardids: Array[CreditcardId]): Stream[ConnectionIO, CreditcardRow] = {
-    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ANY(${fromWrite(creditcardids)(Write.fromPut(CreditcardId.arrayPut))})".query(CreditcardRow.read).stream
+    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ANY(${creditcardids})".query(CreditcardRow.read).stream
   }
   override def update(row: CreditcardRow): ConnectionIO[Boolean] = {
     val creditcardid = row.creditcardid

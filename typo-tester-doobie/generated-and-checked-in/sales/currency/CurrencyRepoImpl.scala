@@ -68,7 +68,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}""".query(CurrencyRow.read).option
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ANY(${fromWrite(currencycodes)(Write.fromPut(CurrencyId.arrayPut))})""".query(CurrencyRow.read).stream
+    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ANY(${currencycodes})""".query(CurrencyRow.read).stream
   }
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     val currencycode = row.currencycode

@@ -84,7 +84,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory where transactionid = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}".query(TransactionhistoryRow.read).option
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
-    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory where transactionid = ANY(${fromWrite(transactionids)(Write.fromPut(TransactionhistoryId.arrayPut))})".query(TransactionhistoryRow.read).stream
+    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory where transactionid = ANY(${transactionids})".query(TransactionhistoryRow.read).stream
   }
   override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid

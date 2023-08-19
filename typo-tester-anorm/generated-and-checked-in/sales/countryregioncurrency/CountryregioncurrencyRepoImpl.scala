@@ -9,6 +9,8 @@ package countryregioncurrency
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.countryregion.CountryregionId
+import adventureworks.sales.currency.CurrencyId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}".executeUpdate() > 0
+    SQL"delete from sales.countryregioncurrency where countryregioncode = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND currencycode = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields)
   }
   override def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
-          values (${unsaved.countryregioncode}, ${unsaved.currencycode}::bpchar, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning countryregioncode, currencycode, modifieddate::text
        """
       .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
@@ -38,11 +40,11 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow = {
     val namedParameters = List(
-      Some((NamedParameter("countryregioncode", ParameterValue.from(unsaved.countryregioncode)), "")),
-      Some((NamedParameter("currencycode", ParameterValue.from(unsaved.currencycode)), "::bpchar")),
+      Some((NamedParameter("countryregioncode", ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)), "")),
+      Some((NamedParameter("currencycode", ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)), "::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -72,14 +74,14 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
     SQL"""select countryregioncode, currencycode, modifieddate::text
           from sales.countryregioncurrency
-          where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
+          where countryregioncode = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND currencycode = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
        """.as(CountryregioncurrencyRow.rowParser(1).singleOpt)
   }
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.countryregioncurrency
-          set modifieddate = ${row.modifieddate}::timestamp
-          where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
+          set modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where countryregioncode = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND currencycode = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
@@ -88,9 +90,9 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
           values (
-            ${unsaved.countryregioncode},
-            ${unsaved.currencycode}::bpchar,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)},
+            ${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (countryregioncode, currencycode)
           do update set

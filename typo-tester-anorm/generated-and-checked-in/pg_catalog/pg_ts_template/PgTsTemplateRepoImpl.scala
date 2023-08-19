@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_ts_template
 
+import adventureworks.TypoRegproc
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def delete(oid: PgTsTemplateId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_ts_template where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_ts_template where oid = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
     DeleteBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields)
   }
   override def insert(unsaved: PgTsTemplateRow)(implicit c: Connection): PgTsTemplateRow = {
     SQL"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
-          values (${unsaved.oid}::oid, ${unsaved.tmplname}::name, ${unsaved.tmplnamespace}::oid, ${unsaved.tmplinit}::regproc, ${unsaved.tmpllexize}::regproc)
+          values (${ParameterValue(unsaved.oid, null, PgTsTemplateId.toStatement)}::oid, ${ParameterValue(unsaved.tmplname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.tmplnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tmplinit, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.tmpllexize, null, TypoRegproc.toStatement)}::regproc)
           returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
        """
       .executeInsert(PgTsTemplateRow.rowParser(1).single)
@@ -40,24 +43,24 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def selectById(oid: PgTsTemplateId)(implicit c: Connection): Option[PgTsTemplateRow] = {
     SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize
           from pg_catalog.pg_ts_template
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}
        """.as(PgTsTemplateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTsTemplateId])(implicit c: Connection): List[PgTsTemplateRow] = {
     SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize
           from pg_catalog.pg_ts_template
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgTsTemplateRow.rowParser(1).*)
     
   }
   override def update(row: PgTsTemplateRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_template
-          set tmplname = ${row.tmplname}::name,
-              tmplnamespace = ${row.tmplnamespace}::oid,
-              tmplinit = ${row.tmplinit}::regproc,
-              tmpllexize = ${row.tmpllexize}::regproc
-          where oid = $oid
+          set tmplname = ${ParameterValue(row.tmplname, null, ToStatement.stringToStatement)}::name,
+              tmplnamespace = ${ParameterValue(row.tmplnamespace, null, ToStatement.longToStatement)}::oid,
+              tmplinit = ${ParameterValue(row.tmplinit, null, TypoRegproc.toStatement)}::regproc,
+              tmpllexize = ${ParameterValue(row.tmpllexize, null, TypoRegproc.toStatement)}::regproc
+          where oid = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
@@ -66,11 +69,11 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def upsert(unsaved: PgTsTemplateRow)(implicit c: Connection): PgTsTemplateRow = {
     SQL"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.tmplname}::name,
-            ${unsaved.tmplnamespace}::oid,
-            ${unsaved.tmplinit}::regproc,
-            ${unsaved.tmpllexize}::regproc
+            ${ParameterValue(unsaved.oid, null, PgTsTemplateId.toStatement)}::oid,
+            ${ParameterValue(unsaved.tmplname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.tmplnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.tmplinit, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.tmpllexize, null, TypoRegproc.toStatement)}::regproc
           )
           on conflict (oid)
           do update set

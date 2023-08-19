@@ -41,7 +41,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
     sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ${fromWrite(oid)(Write.fromPut(PgSubscriptionId.put))}".query(PgSubscriptionRow.read).option
   }
   override def selectByIds(oids: Array[PgSubscriptionId]): Stream[ConnectionIO, PgSubscriptionRow] = {
-    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ANY(${fromWrite(oids)(Write.fromPut(PgSubscriptionId.arrayPut))})".query(PgSubscriptionRow.read).stream
+    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ANY(${oids})".query(PgSubscriptionRow.read).stream
   }
   override def update(row: PgSubscriptionRow): ConnectionIO[Boolean] = {
     val oid = row.oid

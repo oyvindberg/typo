@@ -10,11 +10,13 @@ package productphoto
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
+import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productphoto where productphotoid = $productphotoid".executeUpdate() > 0
+    SQL"delete from production.productphoto where productphotoid = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
     DeleteBuilder("production.productphoto", ProductphotoFields)
   }
   override def insert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
-          values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4, ${ParameterValue(unsaved.thumbnailphoto, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea, ${ParameterValue(unsaved.thumbnailphotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.largephoto, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea, ${ParameterValue(unsaved.largephotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
@@ -38,17 +40,17 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
     val namedParameters = List(
-      Some((NamedParameter("thumbnailphoto", ParameterValue.from(unsaved.thumbnailphoto)), "::bytea")),
-      Some((NamedParameter("thumbnailphotofilename", ParameterValue.from(unsaved.thumbnailphotofilename)), "")),
-      Some((NamedParameter("largephoto", ParameterValue.from(unsaved.largephoto)), "::bytea")),
-      Some((NamedParameter("largephotofilename", ParameterValue.from(unsaved.largephotofilename)), "")),
+      Some((NamedParameter("thumbnailphoto", ParameterValue(unsaved.thumbnailphoto, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))), "::bytea")),
+      Some((NamedParameter("thumbnailphotofilename", ParameterValue(unsaved.thumbnailphotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
+      Some((NamedParameter("largephoto", ParameterValue(unsaved.largephoto, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))), "::bytea")),
+      Some((NamedParameter("largephotofilename", ParameterValue(unsaved.largephotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
       unsaved.productphotoid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("productphotoid", ParameterValue.from[ProductphotoId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("productphotoid", ParameterValue(value, null, ProductphotoId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -78,25 +80,25 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def selectById(productphotoid: ProductphotoId)(implicit c: Connection): Option[ProductphotoRow] = {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
           from production.productphoto
-          where productphotoid = $productphotoid
+          where productphotoid = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}
        """.as(ProductphotoRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
           from production.productphoto
-          where productphotoid = ANY($productphotoids)
+          where productphotoid = ANY(${productphotoids})
        """.as(ProductphotoRow.rowParser(1).*)
     
   }
   override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
     val productphotoid = row.productphotoid
     SQL"""update production.productphoto
-          set thumbnailphoto = ${row.thumbnailphoto}::bytea,
-              thumbnailphotofilename = ${row.thumbnailphotofilename},
-              largephoto = ${row.largephoto}::bytea,
-              largephotofilename = ${row.largephotofilename},
-              modifieddate = ${row.modifieddate}::timestamp
-          where productphotoid = $productphotoid
+          set thumbnailphoto = ${ParameterValue(row.thumbnailphoto, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea,
+              thumbnailphotofilename = ${ParameterValue(row.thumbnailphotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              largephoto = ${ParameterValue(row.largephoto, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea,
+              largephotofilename = ${ParameterValue(row.largephotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productphotoid = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
@@ -105,12 +107,12 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def upsert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
           values (
-            ${unsaved.productphotoid}::int4,
-            ${unsaved.thumbnailphoto}::bytea,
-            ${unsaved.thumbnailphotofilename},
-            ${unsaved.largephoto}::bytea,
-            ${unsaved.largephotofilename},
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4,
+            ${ParameterValue(unsaved.thumbnailphoto, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea,
+            ${ParameterValue(unsaved.thumbnailphotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+            ${ParameterValue(unsaved.largephoto, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea,
+            ${ParameterValue(unsaved.largephotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productphotoid)
           do update set

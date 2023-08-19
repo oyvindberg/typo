@@ -18,15 +18,15 @@ import typo.dsl.Bijection
 case class ProductsubcategoryId(value: Int) extends AnyVal
 object ProductsubcategoryId {
   implicit lazy val arrayColumn: Column[Array[ProductsubcategoryId]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[ProductsubcategoryId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val arrayToStatement: ToStatement[Array[ProductsubcategoryId]] = adventureworks.IntArrayToStatement.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[ProductsubcategoryId, Int] = Bijection[ProductsubcategoryId, Int](_.value)(ProductsubcategoryId.apply)
-  implicit lazy val column: Column[ProductsubcategoryId] = implicitly[Column[Int]].map(ProductsubcategoryId.apply)
+  implicit lazy val column: Column[ProductsubcategoryId] = Column.columnToInt.map(ProductsubcategoryId.apply)
   implicit lazy val ordering: Ordering[ProductsubcategoryId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[ProductsubcategoryId] = new ParameterMetaData[ProductsubcategoryId] {
-    override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
+    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
+    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[ProductsubcategoryId] = Reads.IntReads.map(ProductsubcategoryId.apply)
-  implicit lazy val toStatement: ToStatement[ProductsubcategoryId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val toStatement: ToStatement[ProductsubcategoryId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[ProductsubcategoryId] = Writes.IntWrites.contramap(_.value)
 }

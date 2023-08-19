@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_operator
 
+import adventureworks.TypoRegproc
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgOperatorRepoImpl extends PgOperatorRepo {
   override def delete(oid: PgOperatorId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_operator where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_operator where oid = ${ParameterValue(oid, null, PgOperatorId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgOperatorFields, PgOperatorRow] = {
     DeleteBuilder("pg_catalog.pg_operator", PgOperatorFields)
   }
   override def insert(unsaved: PgOperatorRow)(implicit c: Connection): PgOperatorRow = {
     SQL"""insert into pg_catalog.pg_operator(oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin)
-          values (${unsaved.oid}::oid, ${unsaved.oprname}::name, ${unsaved.oprnamespace}::oid, ${unsaved.oprowner}::oid, ${unsaved.oprkind}::char, ${unsaved.oprcanmerge}, ${unsaved.oprcanhash}, ${unsaved.oprleft}::oid, ${unsaved.oprright}::oid, ${unsaved.oprresult}::oid, ${unsaved.oprcom}::oid, ${unsaved.oprnegate}::oid, ${unsaved.oprcode}::regproc, ${unsaved.oprrest}::regproc, ${unsaved.oprjoin}::regproc)
+          values (${ParameterValue(unsaved.oid, null, PgOperatorId.toStatement)}::oid, ${ParameterValue(unsaved.oprname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.oprnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.oprowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.oprkind, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.oprcanmerge, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.oprcanhash, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.oprleft, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.oprright, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.oprresult, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.oprcom, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.oprnegate, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.oprcode, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.oprrest, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.oprjoin, null, TypoRegproc.toStatement)}::regproc)
           returning oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
        """
       .executeInsert(PgOperatorRow.rowParser(1).single)
@@ -40,34 +43,34 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
   override def selectById(oid: PgOperatorId)(implicit c: Connection): Option[PgOperatorRow] = {
     SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
           from pg_catalog.pg_operator
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgOperatorId.toStatement)}
        """.as(PgOperatorRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgOperatorId])(implicit c: Connection): List[PgOperatorRow] = {
     SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
           from pg_catalog.pg_operator
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgOperatorRow.rowParser(1).*)
     
   }
   override def update(row: PgOperatorRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_operator
-          set oprname = ${row.oprname}::name,
-              oprnamespace = ${row.oprnamespace}::oid,
-              oprowner = ${row.oprowner}::oid,
-              oprkind = ${row.oprkind}::char,
-              oprcanmerge = ${row.oprcanmerge},
-              oprcanhash = ${row.oprcanhash},
-              oprleft = ${row.oprleft}::oid,
-              oprright = ${row.oprright}::oid,
-              oprresult = ${row.oprresult}::oid,
-              oprcom = ${row.oprcom}::oid,
-              oprnegate = ${row.oprnegate}::oid,
-              oprcode = ${row.oprcode}::regproc,
-              oprrest = ${row.oprrest}::regproc,
-              oprjoin = ${row.oprjoin}::regproc
-          where oid = $oid
+          set oprname = ${ParameterValue(row.oprname, null, ToStatement.stringToStatement)}::name,
+              oprnamespace = ${ParameterValue(row.oprnamespace, null, ToStatement.longToStatement)}::oid,
+              oprowner = ${ParameterValue(row.oprowner, null, ToStatement.longToStatement)}::oid,
+              oprkind = ${ParameterValue(row.oprkind, null, ToStatement.stringToStatement)}::char,
+              oprcanmerge = ${ParameterValue(row.oprcanmerge, null, ToStatement.booleanToStatement)},
+              oprcanhash = ${ParameterValue(row.oprcanhash, null, ToStatement.booleanToStatement)},
+              oprleft = ${ParameterValue(row.oprleft, null, ToStatement.longToStatement)}::oid,
+              oprright = ${ParameterValue(row.oprright, null, ToStatement.longToStatement)}::oid,
+              oprresult = ${ParameterValue(row.oprresult, null, ToStatement.longToStatement)}::oid,
+              oprcom = ${ParameterValue(row.oprcom, null, ToStatement.longToStatement)}::oid,
+              oprnegate = ${ParameterValue(row.oprnegate, null, ToStatement.longToStatement)}::oid,
+              oprcode = ${ParameterValue(row.oprcode, null, TypoRegproc.toStatement)}::regproc,
+              oprrest = ${ParameterValue(row.oprrest, null, TypoRegproc.toStatement)}::regproc,
+              oprjoin = ${ParameterValue(row.oprjoin, null, TypoRegproc.toStatement)}::regproc
+          where oid = ${ParameterValue(oid, null, PgOperatorId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgOperatorFields, PgOperatorRow] = {
@@ -76,21 +79,21 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
   override def upsert(unsaved: PgOperatorRow)(implicit c: Connection): PgOperatorRow = {
     SQL"""insert into pg_catalog.pg_operator(oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.oprname}::name,
-            ${unsaved.oprnamespace}::oid,
-            ${unsaved.oprowner}::oid,
-            ${unsaved.oprkind}::char,
-            ${unsaved.oprcanmerge},
-            ${unsaved.oprcanhash},
-            ${unsaved.oprleft}::oid,
-            ${unsaved.oprright}::oid,
-            ${unsaved.oprresult}::oid,
-            ${unsaved.oprcom}::oid,
-            ${unsaved.oprnegate}::oid,
-            ${unsaved.oprcode}::regproc,
-            ${unsaved.oprrest}::regproc,
-            ${unsaved.oprjoin}::regproc
+            ${ParameterValue(unsaved.oid, null, PgOperatorId.toStatement)}::oid,
+            ${ParameterValue(unsaved.oprname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.oprnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.oprowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.oprkind, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.oprcanmerge, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.oprcanhash, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.oprleft, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.oprright, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.oprresult, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.oprcom, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.oprnegate, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.oprcode, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.oprrest, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.oprjoin, null, TypoRegproc.toStatement)}::regproc
           )
           on conflict (oid)
           do update set

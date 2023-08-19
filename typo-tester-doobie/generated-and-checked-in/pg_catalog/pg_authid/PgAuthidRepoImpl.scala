@@ -42,7 +42,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
     sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ${fromWrite(oid)(Write.fromPut(PgAuthidId.put))}".query(PgAuthidRow.read).option
   }
   override def selectByIds(oids: Array[PgAuthidId]): Stream[ConnectionIO, PgAuthidRow] = {
-    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ANY(${fromWrite(oids)(Write.fromPut(PgAuthidId.arrayPut))})".query(PgAuthidRow.read).stream
+    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ANY(${oids})".query(PgAuthidRow.read).stream
   }
   override def update(row: PgAuthidRow): ConnectionIO[Boolean] = {
     val oid = row.oid

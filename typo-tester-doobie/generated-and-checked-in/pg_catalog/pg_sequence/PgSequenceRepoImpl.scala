@@ -41,7 +41,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
     sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ${fromWrite(seqrelid)(Write.fromPut(PgSequenceId.put))}".query(PgSequenceRow.read).option
   }
   override def selectByIds(seqrelids: Array[PgSequenceId]): Stream[ConnectionIO, PgSequenceRow] = {
-    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ANY(${fromWrite(seqrelids)(Write.fromPut(PgSequenceId.arrayPut))})".query(PgSequenceRow.read).stream
+    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ANY(${seqrelids})".query(PgSequenceRow.read).stream
   }
   override def update(row: PgSequenceRow): ConnectionIO[Boolean] = {
     val seqrelid = row.seqrelid

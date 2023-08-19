@@ -41,7 +41,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
     sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ${fromWrite(oid)(Write.fromPut(PgEventTriggerId.put))}".query(PgEventTriggerRow.read).option
   }
   override def selectByIds(oids: Array[PgEventTriggerId]): Stream[ConnectionIO, PgEventTriggerRow] = {
-    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ANY(${fromWrite(oids)(Write.fromPut(PgEventTriggerId.arrayPut))})".query(PgEventTriggerRow.read).stream
+    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ANY(${oids})".query(PgEventTriggerRow.read).stream
   }
   override def update(row: PgEventTriggerRow): ConnectionIO[Boolean] = {
     val oid = row.oid

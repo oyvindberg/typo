@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_ts_dict
 
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgTsDictRepoImpl extends PgTsDictRepo {
   override def delete(oid: PgTsDictId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_ts_dict where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_ts_dict where oid = ${ParameterValue(oid, null, PgTsDictId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTsDictFields, PgTsDictRow] = {
     DeleteBuilder("pg_catalog.pg_ts_dict", PgTsDictFields)
   }
   override def insert(unsaved: PgTsDictRow)(implicit c: Connection): PgTsDictRow = {
     SQL"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
-          values (${unsaved.oid}::oid, ${unsaved.dictname}::name, ${unsaved.dictnamespace}::oid, ${unsaved.dictowner}::oid, ${unsaved.dicttemplate}::oid, ${unsaved.dictinitoption})
+          values (${ParameterValue(unsaved.oid, null, PgTsDictId.toStatement)}::oid, ${ParameterValue(unsaved.dictname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.dictnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.dictowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.dicttemplate, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.dictinitoption, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
           returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
        """
       .executeInsert(PgTsDictRow.rowParser(1).single)
@@ -40,25 +43,25 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
   override def selectById(oid: PgTsDictId)(implicit c: Connection): Option[PgTsDictRow] = {
     SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
           from pg_catalog.pg_ts_dict
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgTsDictId.toStatement)}
        """.as(PgTsDictRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTsDictId])(implicit c: Connection): List[PgTsDictRow] = {
     SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
           from pg_catalog.pg_ts_dict
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgTsDictRow.rowParser(1).*)
     
   }
   override def update(row: PgTsDictRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_dict
-          set dictname = ${row.dictname}::name,
-              dictnamespace = ${row.dictnamespace}::oid,
-              dictowner = ${row.dictowner}::oid,
-              dicttemplate = ${row.dicttemplate}::oid,
-              dictinitoption = ${row.dictinitoption}
-          where oid = $oid
+          set dictname = ${ParameterValue(row.dictname, null, ToStatement.stringToStatement)}::name,
+              dictnamespace = ${ParameterValue(row.dictnamespace, null, ToStatement.longToStatement)}::oid,
+              dictowner = ${ParameterValue(row.dictowner, null, ToStatement.longToStatement)}::oid,
+              dicttemplate = ${ParameterValue(row.dicttemplate, null, ToStatement.longToStatement)}::oid,
+              dictinitoption = ${ParameterValue(row.dictinitoption, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+          where oid = ${ParameterValue(oid, null, PgTsDictId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTsDictFields, PgTsDictRow] = {
@@ -67,12 +70,12 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
   override def upsert(unsaved: PgTsDictRow)(implicit c: Connection): PgTsDictRow = {
     SQL"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.dictname}::name,
-            ${unsaved.dictnamespace}::oid,
-            ${unsaved.dictowner}::oid,
-            ${unsaved.dicttemplate}::oid,
-            ${unsaved.dictinitoption}
+            ${ParameterValue(unsaved.oid, null, PgTsDictId.toStatement)}::oid,
+            ${ParameterValue(unsaved.dictname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.dictnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.dictowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.dicttemplate, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.dictinitoption, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           )
           on conflict (oid)
           do update set

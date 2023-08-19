@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_auth_members
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def delete(compositeId: PgAuthMembersId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}""".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_auth_members where roleid = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
     DeleteBuilder("pg_catalog.pg_auth_members", PgAuthMembersFields)
   }
   override def insert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow = {
     SQL"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
-          values (${unsaved.roleid}::oid, ${unsaved.member}::oid, ${unsaved.grantor}::oid, ${unsaved.adminOption})
+          values (${ParameterValue(unsaved.roleid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.member, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.grantor, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.adminOption, null, ToStatement.booleanToStatement)})
           returning roleid, "member", grantor, admin_option
        """
       .executeInsert(PgAuthMembersRow.rowParser(1).single)
@@ -40,15 +42,15 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def selectById(compositeId: PgAuthMembersId)(implicit c: Connection): Option[PgAuthMembersRow] = {
     SQL"""select roleid, "member", grantor, admin_option
           from pg_catalog.pg_auth_members
-          where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}
+          where roleid = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}
        """.as(PgAuthMembersRow.rowParser(1).singleOpt)
   }
   override def update(row: PgAuthMembersRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_auth_members
-          set grantor = ${row.grantor}::oid,
-              admin_option = ${row.adminOption}
-          where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}
+          set grantor = ${ParameterValue(row.grantor, null, ToStatement.longToStatement)}::oid,
+              admin_option = ${ParameterValue(row.adminOption, null, ToStatement.booleanToStatement)}
+          where roleid = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
@@ -57,10 +59,10 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def upsert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow = {
     SQL"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
           values (
-            ${unsaved.roleid}::oid,
-            ${unsaved.member}::oid,
-            ${unsaved.grantor}::oid,
-            ${unsaved.adminOption}
+            ${ParameterValue(unsaved.roleid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.member, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.grantor, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.adminOption, null, ToStatement.booleanToStatement)}
           )
           on conflict (roleid, "member")
           do update set

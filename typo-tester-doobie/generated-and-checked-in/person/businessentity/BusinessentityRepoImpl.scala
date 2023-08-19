@@ -74,7 +74,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".query(BusinessentityRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
-    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ANY(${fromWrite(businessentityids)(Write.fromPut(BusinessentityId.arrayPut))})".query(BusinessentityRow.read).stream
+    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ANY(${businessentityids})".query(BusinessentityRow.read).stream
   }
   override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid

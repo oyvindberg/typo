@@ -9,6 +9,8 @@ package salesorderheadersalesreason
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.salesreason.SalesreasonId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
   override def delete(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".executeUpdate() > 0
+    SQL"delete from sales.salesorderheadersalesreason where salesorderid = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND salesreasonid = ${ParameterValue(compositeId.salesreasonid, null, SalesreasonId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     SQL"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
-          values (${unsaved.salesorderid}::int4, ${unsaved.salesreasonid}::int4, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning salesorderid, salesreasonid, modifieddate::text
        """
       .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
@@ -38,11 +40,11 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     val namedParameters = List(
-      Some((NamedParameter("salesorderid", ParameterValue.from(unsaved.salesorderid)), "::int4")),
-      Some((NamedParameter("salesreasonid", ParameterValue.from(unsaved.salesreasonid)), "::int4")),
+      Some((NamedParameter("salesorderid", ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)), "::int4")),
+      Some((NamedParameter("salesreasonid", ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -72,14 +74,14 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def selectById(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Option[SalesorderheadersalesreasonRow] = {
     SQL"""select salesorderid, salesreasonid, modifieddate::text
           from sales.salesorderheadersalesreason
-          where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
+          where salesorderid = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND salesreasonid = ${ParameterValue(compositeId.salesreasonid, null, SalesreasonId.toStatement)}
        """.as(SalesorderheadersalesreasonRow.rowParser(1).singleOpt)
   }
   override def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salesorderheadersalesreason
-          set modifieddate = ${row.modifieddate}::timestamp
-          where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
+          set modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where salesorderid = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND salesreasonid = ${ParameterValue(compositeId.salesreasonid, null, SalesreasonId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
@@ -88,9 +90,9 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def upsert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     SQL"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
           values (
-            ${unsaved.salesorderid}::int4,
-            ${unsaved.salesreasonid}::int4,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4,
+            ${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (salesorderid, salesreasonid)
           do update set

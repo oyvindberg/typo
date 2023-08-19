@@ -41,7 +41,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
     sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ${fromWrite(oid)(Write.fromPut(PgCollationId.put))}".query(PgCollationRow.read).option
   }
   override def selectByIds(oids: Array[PgCollationId]): Stream[ConnectionIO, PgCollationRow] = {
-    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY(${fromWrite(oids)(Write.fromPut(PgCollationId.arrayPut))})".query(PgCollationRow.read).stream
+    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY(${oids})".query(PgCollationRow.read).stream
   }
   override def update(row: PgCollationRow): ConnectionIO[Boolean] = {
     val oid = row.oid

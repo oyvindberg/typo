@@ -7,7 +7,12 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
+import adventureworks.TypoInt2Vector
+import adventureworks.TypoPgNodeTree
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +21,14 @@ import typo.dsl.UpdateBuilder
 
 object PgTriggerRepoImpl extends PgTriggerRepo {
   override def delete(oid: PgTriggerId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_trigger where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_trigger where oid = ${ParameterValue(oid, null, PgTriggerId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTriggerFields, PgTriggerRow] = {
     DeleteBuilder("pg_catalog.pg_trigger", PgTriggerFields)
   }
   override def insert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
     SQL"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)
-          values (${unsaved.oid}::oid, ${unsaved.tgrelid}::oid, ${unsaved.tgparentid}::oid, ${unsaved.tgname}::name, ${unsaved.tgfoid}::oid, ${unsaved.tgtype}::int2, ${unsaved.tgenabled}::char, ${unsaved.tgisinternal}, ${unsaved.tgconstrrelid}::oid, ${unsaved.tgconstrindid}::oid, ${unsaved.tgconstraint}::oid, ${unsaved.tgdeferrable}, ${unsaved.tginitdeferred}, ${unsaved.tgnargs}::int2, ${unsaved.tgattr}::int2vector, ${unsaved.tgargs}::bytea, ${unsaved.tgqual}::pg_node_tree, ${unsaved.tgoldtable}::name, ${unsaved.tgnewtable}::name)
+          values (${ParameterValue(unsaved.oid, null, PgTriggerId.toStatement)}::oid, ${ParameterValue(unsaved.tgrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgparentid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.tgfoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgtype, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.tgenabled, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.tgisinternal, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tgconstrrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgconstrindid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgconstraint, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgdeferrable, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tginitdeferred, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tgnargs, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.tgattr, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.tgargs, null, ToStatement.byteArrayToStatement)}::bytea, ${ParameterValue(unsaved.tgqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree, ${ParameterValue(unsaved.tgoldtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name, ${ParameterValue(unsaved.tgnewtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name)
           returning oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
        """
       .executeInsert(PgTriggerRow.rowParser(1).single)
@@ -40,38 +45,38 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
   override def selectById(oid: PgTriggerId)(implicit c: Connection): Option[PgTriggerRow] = {
     SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
           from pg_catalog.pg_trigger
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgTriggerId.toStatement)}
        """.as(PgTriggerRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTriggerId])(implicit c: Connection): List[PgTriggerRow] = {
     SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
           from pg_catalog.pg_trigger
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgTriggerRow.rowParser(1).*)
     
   }
   override def update(row: PgTriggerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_trigger
-          set tgrelid = ${row.tgrelid}::oid,
-              tgparentid = ${row.tgparentid}::oid,
-              tgname = ${row.tgname}::name,
-              tgfoid = ${row.tgfoid}::oid,
-              tgtype = ${row.tgtype}::int2,
-              tgenabled = ${row.tgenabled}::char,
-              tgisinternal = ${row.tgisinternal},
-              tgconstrrelid = ${row.tgconstrrelid}::oid,
-              tgconstrindid = ${row.tgconstrindid}::oid,
-              tgconstraint = ${row.tgconstraint}::oid,
-              tgdeferrable = ${row.tgdeferrable},
-              tginitdeferred = ${row.tginitdeferred},
-              tgnargs = ${row.tgnargs}::int2,
-              tgattr = ${row.tgattr}::int2vector,
-              tgargs = ${row.tgargs}::bytea,
-              tgqual = ${row.tgqual}::pg_node_tree,
-              tgoldtable = ${row.tgoldtable}::name,
-              tgnewtable = ${row.tgnewtable}::name
-          where oid = $oid
+          set tgrelid = ${ParameterValue(row.tgrelid, null, ToStatement.longToStatement)}::oid,
+              tgparentid = ${ParameterValue(row.tgparentid, null, ToStatement.longToStatement)}::oid,
+              tgname = ${ParameterValue(row.tgname, null, ToStatement.stringToStatement)}::name,
+              tgfoid = ${ParameterValue(row.tgfoid, null, ToStatement.longToStatement)}::oid,
+              tgtype = ${ParameterValue(row.tgtype, null, ToStatement.intToStatement)}::int2,
+              tgenabled = ${ParameterValue(row.tgenabled, null, ToStatement.stringToStatement)}::char,
+              tgisinternal = ${ParameterValue(row.tgisinternal, null, ToStatement.booleanToStatement)},
+              tgconstrrelid = ${ParameterValue(row.tgconstrrelid, null, ToStatement.longToStatement)}::oid,
+              tgconstrindid = ${ParameterValue(row.tgconstrindid, null, ToStatement.longToStatement)}::oid,
+              tgconstraint = ${ParameterValue(row.tgconstraint, null, ToStatement.longToStatement)}::oid,
+              tgdeferrable = ${ParameterValue(row.tgdeferrable, null, ToStatement.booleanToStatement)},
+              tginitdeferred = ${ParameterValue(row.tginitdeferred, null, ToStatement.booleanToStatement)},
+              tgnargs = ${ParameterValue(row.tgnargs, null, ToStatement.intToStatement)}::int2,
+              tgattr = ${ParameterValue(row.tgattr, null, TypoInt2Vector.toStatement)}::int2vector,
+              tgargs = ${ParameterValue(row.tgargs, null, ToStatement.byteArrayToStatement)}::bytea,
+              tgqual = ${ParameterValue(row.tgqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
+              tgoldtable = ${ParameterValue(row.tgoldtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name,
+              tgnewtable = ${ParameterValue(row.tgnewtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name
+          where oid = ${ParameterValue(oid, null, PgTriggerId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTriggerFields, PgTriggerRow] = {
@@ -80,25 +85,25 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
   override def upsert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
     SQL"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.tgrelid}::oid,
-            ${unsaved.tgparentid}::oid,
-            ${unsaved.tgname}::name,
-            ${unsaved.tgfoid}::oid,
-            ${unsaved.tgtype}::int2,
-            ${unsaved.tgenabled}::char,
-            ${unsaved.tgisinternal},
-            ${unsaved.tgconstrrelid}::oid,
-            ${unsaved.tgconstrindid}::oid,
-            ${unsaved.tgconstraint}::oid,
-            ${unsaved.tgdeferrable},
-            ${unsaved.tginitdeferred},
-            ${unsaved.tgnargs}::int2,
-            ${unsaved.tgattr}::int2vector,
-            ${unsaved.tgargs}::bytea,
-            ${unsaved.tgqual}::pg_node_tree,
-            ${unsaved.tgoldtable}::name,
-            ${unsaved.tgnewtable}::name
+            ${ParameterValue(unsaved.oid, null, PgTriggerId.toStatement)}::oid,
+            ${ParameterValue(unsaved.tgrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.tgparentid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.tgname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.tgfoid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.tgtype, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.tgenabled, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.tgisinternal, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.tgconstrrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.tgconstrindid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.tgconstraint, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.tgdeferrable, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.tginitdeferred, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.tgnargs, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.tgattr, null, TypoInt2Vector.toStatement)}::int2vector,
+            ${ParameterValue(unsaved.tgargs, null, ToStatement.byteArrayToStatement)}::bytea,
+            ${ParameterValue(unsaved.tgqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
+            ${ParameterValue(unsaved.tgoldtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name,
+            ${ParameterValue(unsaved.tgnewtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name
           )
           on conflict (oid)
           do update set

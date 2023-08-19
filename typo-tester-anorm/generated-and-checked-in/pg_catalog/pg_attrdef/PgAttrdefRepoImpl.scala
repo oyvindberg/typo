@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_attrdef
 
+import adventureworks.TypoPgNodeTree
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def delete(oid: PgAttrdefId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_attrdef where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_attrdef where oid = ${ParameterValue(oid, null, PgAttrdefId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAttrdefFields, PgAttrdefRow] = {
     DeleteBuilder("pg_catalog.pg_attrdef", PgAttrdefFields)
   }
   override def insert(unsaved: PgAttrdefRow)(implicit c: Connection): PgAttrdefRow = {
     SQL"""insert into pg_catalog.pg_attrdef(oid, adrelid, adnum, adbin)
-          values (${unsaved.oid}::oid, ${unsaved.adrelid}::oid, ${unsaved.adnum}::int2, ${unsaved.adbin}::pg_node_tree)
+          values (${ParameterValue(unsaved.oid, null, PgAttrdefId.toStatement)}::oid, ${ParameterValue(unsaved.adrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.adnum, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.adbin, null, TypoPgNodeTree.toStatement)}::pg_node_tree)
           returning oid, adrelid, adnum, adbin
        """
       .executeInsert(PgAttrdefRow.rowParser(1).single)
@@ -40,23 +43,23 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def selectById(oid: PgAttrdefId)(implicit c: Connection): Option[PgAttrdefRow] = {
     SQL"""select oid, adrelid, adnum, adbin
           from pg_catalog.pg_attrdef
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgAttrdefId.toStatement)}
        """.as(PgAttrdefRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgAttrdefId])(implicit c: Connection): List[PgAttrdefRow] = {
     SQL"""select oid, adrelid, adnum, adbin
           from pg_catalog.pg_attrdef
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgAttrdefRow.rowParser(1).*)
     
   }
   override def update(row: PgAttrdefRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_attrdef
-          set adrelid = ${row.adrelid}::oid,
-              adnum = ${row.adnum}::int2,
-              adbin = ${row.adbin}::pg_node_tree
-          where oid = $oid
+          set adrelid = ${ParameterValue(row.adrelid, null, ToStatement.longToStatement)}::oid,
+              adnum = ${ParameterValue(row.adnum, null, ToStatement.intToStatement)}::int2,
+              adbin = ${ParameterValue(row.adbin, null, TypoPgNodeTree.toStatement)}::pg_node_tree
+          where oid = ${ParameterValue(oid, null, PgAttrdefId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAttrdefFields, PgAttrdefRow] = {
@@ -65,10 +68,10 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def upsert(unsaved: PgAttrdefRow)(implicit c: Connection): PgAttrdefRow = {
     SQL"""insert into pg_catalog.pg_attrdef(oid, adrelid, adnum, adbin)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.adrelid}::oid,
-            ${unsaved.adnum}::int2,
-            ${unsaved.adbin}::pg_node_tree
+            ${ParameterValue(unsaved.oid, null, PgAttrdefId.toStatement)}::oid,
+            ${ParameterValue(unsaved.adrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.adnum, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.adbin, null, TypoPgNodeTree.toStatement)}::pg_node_tree
           )
           on conflict (oid)
           do update set

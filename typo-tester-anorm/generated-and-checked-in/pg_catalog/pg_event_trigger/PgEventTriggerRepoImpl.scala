@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_event_trigger
 
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def delete(oid: PgEventTriggerId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_event_trigger where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_event_trigger where oid = ${ParameterValue(oid, null, PgEventTriggerId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
     DeleteBuilder("pg_catalog.pg_event_trigger", PgEventTriggerFields)
   }
   override def insert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow = {
     SQL"""insert into pg_catalog.pg_event_trigger(oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags)
-          values (${unsaved.oid}::oid, ${unsaved.evtname}::name, ${unsaved.evtevent}::name, ${unsaved.evtowner}::oid, ${unsaved.evtfoid}::oid, ${unsaved.evtenabled}::char, ${unsaved.evttags}::_text)
+          values (${ParameterValue(unsaved.oid, null, PgEventTriggerId.toStatement)}::oid, ${ParameterValue(unsaved.evtname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.evtevent, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.evtowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.evtfoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.evtenabled, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.evttags, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text)
           returning oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
        """
       .executeInsert(PgEventTriggerRow.rowParser(1).single)
@@ -40,26 +43,26 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def selectById(oid: PgEventTriggerId)(implicit c: Connection): Option[PgEventTriggerRow] = {
     SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
           from pg_catalog.pg_event_trigger
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgEventTriggerId.toStatement)}
        """.as(PgEventTriggerRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgEventTriggerId])(implicit c: Connection): List[PgEventTriggerRow] = {
     SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
           from pg_catalog.pg_event_trigger
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgEventTriggerRow.rowParser(1).*)
     
   }
   override def update(row: PgEventTriggerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_event_trigger
-          set evtname = ${row.evtname}::name,
-              evtevent = ${row.evtevent}::name,
-              evtowner = ${row.evtowner}::oid,
-              evtfoid = ${row.evtfoid}::oid,
-              evtenabled = ${row.evtenabled}::char,
-              evttags = ${row.evttags}::_text
-          where oid = $oid
+          set evtname = ${ParameterValue(row.evtname, null, ToStatement.stringToStatement)}::name,
+              evtevent = ${ParameterValue(row.evtevent, null, ToStatement.stringToStatement)}::name,
+              evtowner = ${ParameterValue(row.evtowner, null, ToStatement.longToStatement)}::oid,
+              evtfoid = ${ParameterValue(row.evtfoid, null, ToStatement.longToStatement)}::oid,
+              evtenabled = ${ParameterValue(row.evtenabled, null, ToStatement.stringToStatement)}::char,
+              evttags = ${ParameterValue(row.evttags, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
+          where oid = ${ParameterValue(oid, null, PgEventTriggerId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
@@ -68,13 +71,13 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def upsert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow = {
     SQL"""insert into pg_catalog.pg_event_trigger(oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.evtname}::name,
-            ${unsaved.evtevent}::name,
-            ${unsaved.evtowner}::oid,
-            ${unsaved.evtfoid}::oid,
-            ${unsaved.evtenabled}::char,
-            ${unsaved.evttags}::_text
+            ${ParameterValue(unsaved.oid, null, PgEventTriggerId.toStatement)}::oid,
+            ${ParameterValue(unsaved.evtname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.evtevent, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.evtowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.evtfoid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.evtenabled, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.evttags, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
           )
           on conflict (oid)
           do update set

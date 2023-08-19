@@ -96,7 +96,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.put))}""".query(SalesterritoryRow.read).option
   }
   override def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow] = {
-    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ANY(${fromWrite(territoryids)(Write.fromPut(SalesterritoryId.arrayPut))})""".query(SalesterritoryRow.read).stream
+    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ANY(${territoryids})""".query(SalesterritoryRow.read).stream
   }
   override def update(row: SalesterritoryRow): ConnectionIO[Boolean] = {
     val territoryid = row.territoryid

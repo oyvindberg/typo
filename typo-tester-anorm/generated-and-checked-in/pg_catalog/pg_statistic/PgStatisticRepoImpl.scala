@@ -7,7 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_statistic
 
+import adventureworks.TypoAnyArray
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +20,14 @@ import typo.dsl.UpdateBuilder
 
 object PgStatisticRepoImpl extends PgStatisticRepo {
   override def delete(compositeId: PgStatisticId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_statistic where starelid = ${compositeId.starelid} AND staattnum = ${compositeId.staattnum} AND stainherit = ${compositeId.stainherit}".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_statistic where starelid = ${ParameterValue(compositeId.starelid, null, ToStatement.longToStatement)} AND staattnum = ${ParameterValue(compositeId.staattnum, null, ToStatement.intToStatement)} AND stainherit = ${ParameterValue(compositeId.stainherit, null, ToStatement.booleanToStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgStatisticFields, PgStatisticRow] = {
     DeleteBuilder("pg_catalog.pg_statistic", PgStatisticFields)
   }
   override def insert(unsaved: PgStatisticRow)(implicit c: Connection): PgStatisticRow = {
     SQL"""insert into pg_catalog.pg_statistic(starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5)
-          values (${unsaved.starelid}::oid, ${unsaved.staattnum}::int2, ${unsaved.stainherit}, ${unsaved.stanullfrac}::float4, ${unsaved.stawidth}::int4, ${unsaved.stadistinct}::float4, ${unsaved.stakind1}::int2, ${unsaved.stakind2}::int2, ${unsaved.stakind3}::int2, ${unsaved.stakind4}::int2, ${unsaved.stakind5}::int2, ${unsaved.staop1}::oid, ${unsaved.staop2}::oid, ${unsaved.staop3}::oid, ${unsaved.staop4}::oid, ${unsaved.staop5}::oid, ${unsaved.stacoll1}::oid, ${unsaved.stacoll2}::oid, ${unsaved.stacoll3}::oid, ${unsaved.stacoll4}::oid, ${unsaved.stacoll5}::oid, ${unsaved.stanumbers1}::_float4, ${unsaved.stanumbers2}::_float4, ${unsaved.stanumbers3}::_float4, ${unsaved.stanumbers4}::_float4, ${unsaved.stanumbers5}::_float4, ${unsaved.stavalues1}::anyarray, ${unsaved.stavalues2}::anyarray, ${unsaved.stavalues3}::anyarray, ${unsaved.stavalues4}::anyarray, ${unsaved.stavalues5}::anyarray)
+          values (${ParameterValue(unsaved.starelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.staattnum, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.stainherit, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.stanullfrac, null, ToStatement.floatToStatement)}::float4, ${ParameterValue(unsaved.stawidth, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.stadistinct, null, ToStatement.floatToStatement)}::float4, ${ParameterValue(unsaved.stakind1, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.stakind2, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.stakind3, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.stakind4, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.stakind5, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.staop1, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.staop2, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.staop3, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.staop4, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.staop5, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stacoll1, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stacoll2, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stacoll3, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stacoll4, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stacoll5, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stanumbers1, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4, ${ParameterValue(unsaved.stanumbers2, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4, ${ParameterValue(unsaved.stanumbers3, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4, ${ParameterValue(unsaved.stanumbers4, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4, ${ParameterValue(unsaved.stanumbers5, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4, ${ParameterValue(unsaved.stavalues1, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray, ${ParameterValue(unsaved.stavalues2, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray, ${ParameterValue(unsaved.stavalues3, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray, ${ParameterValue(unsaved.stavalues4, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray, ${ParameterValue(unsaved.stavalues5, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray)
           returning starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
        """
       .executeInsert(PgStatisticRow.rowParser(1).single)
@@ -40,41 +44,41 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
   override def selectById(compositeId: PgStatisticId)(implicit c: Connection): Option[PgStatisticRow] = {
     SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
           from pg_catalog.pg_statistic
-          where starelid = ${compositeId.starelid} AND staattnum = ${compositeId.staattnum} AND stainherit = ${compositeId.stainherit}
+          where starelid = ${ParameterValue(compositeId.starelid, null, ToStatement.longToStatement)} AND staattnum = ${ParameterValue(compositeId.staattnum, null, ToStatement.intToStatement)} AND stainherit = ${ParameterValue(compositeId.stainherit, null, ToStatement.booleanToStatement)}
        """.as(PgStatisticRow.rowParser(1).singleOpt)
   }
   override def update(row: PgStatisticRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_statistic
-          set stanullfrac = ${row.stanullfrac}::float4,
-              stawidth = ${row.stawidth}::int4,
-              stadistinct = ${row.stadistinct}::float4,
-              stakind1 = ${row.stakind1}::int2,
-              stakind2 = ${row.stakind2}::int2,
-              stakind3 = ${row.stakind3}::int2,
-              stakind4 = ${row.stakind4}::int2,
-              stakind5 = ${row.stakind5}::int2,
-              staop1 = ${row.staop1}::oid,
-              staop2 = ${row.staop2}::oid,
-              staop3 = ${row.staop3}::oid,
-              staop4 = ${row.staop4}::oid,
-              staop5 = ${row.staop5}::oid,
-              stacoll1 = ${row.stacoll1}::oid,
-              stacoll2 = ${row.stacoll2}::oid,
-              stacoll3 = ${row.stacoll3}::oid,
-              stacoll4 = ${row.stacoll4}::oid,
-              stacoll5 = ${row.stacoll5}::oid,
-              stanumbers1 = ${row.stanumbers1}::_float4,
-              stanumbers2 = ${row.stanumbers2}::_float4,
-              stanumbers3 = ${row.stanumbers3}::_float4,
-              stanumbers4 = ${row.stanumbers4}::_float4,
-              stanumbers5 = ${row.stanumbers5}::_float4,
-              stavalues1 = ${row.stavalues1}::anyarray,
-              stavalues2 = ${row.stavalues2}::anyarray,
-              stavalues3 = ${row.stavalues3}::anyarray,
-              stavalues4 = ${row.stavalues4}::anyarray,
-              stavalues5 = ${row.stavalues5}::anyarray
-          where starelid = ${compositeId.starelid} AND staattnum = ${compositeId.staattnum} AND stainherit = ${compositeId.stainherit}
+          set stanullfrac = ${ParameterValue(row.stanullfrac, null, ToStatement.floatToStatement)}::float4,
+              stawidth = ${ParameterValue(row.stawidth, null, ToStatement.intToStatement)}::int4,
+              stadistinct = ${ParameterValue(row.stadistinct, null, ToStatement.floatToStatement)}::float4,
+              stakind1 = ${ParameterValue(row.stakind1, null, ToStatement.intToStatement)}::int2,
+              stakind2 = ${ParameterValue(row.stakind2, null, ToStatement.intToStatement)}::int2,
+              stakind3 = ${ParameterValue(row.stakind3, null, ToStatement.intToStatement)}::int2,
+              stakind4 = ${ParameterValue(row.stakind4, null, ToStatement.intToStatement)}::int2,
+              stakind5 = ${ParameterValue(row.stakind5, null, ToStatement.intToStatement)}::int2,
+              staop1 = ${ParameterValue(row.staop1, null, ToStatement.longToStatement)}::oid,
+              staop2 = ${ParameterValue(row.staop2, null, ToStatement.longToStatement)}::oid,
+              staop3 = ${ParameterValue(row.staop3, null, ToStatement.longToStatement)}::oid,
+              staop4 = ${ParameterValue(row.staop4, null, ToStatement.longToStatement)}::oid,
+              staop5 = ${ParameterValue(row.staop5, null, ToStatement.longToStatement)}::oid,
+              stacoll1 = ${ParameterValue(row.stacoll1, null, ToStatement.longToStatement)}::oid,
+              stacoll2 = ${ParameterValue(row.stacoll2, null, ToStatement.longToStatement)}::oid,
+              stacoll3 = ${ParameterValue(row.stacoll3, null, ToStatement.longToStatement)}::oid,
+              stacoll4 = ${ParameterValue(row.stacoll4, null, ToStatement.longToStatement)}::oid,
+              stacoll5 = ${ParameterValue(row.stacoll5, null, ToStatement.longToStatement)}::oid,
+              stanumbers1 = ${ParameterValue(row.stanumbers1, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+              stanumbers2 = ${ParameterValue(row.stanumbers2, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+              stanumbers3 = ${ParameterValue(row.stanumbers3, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+              stanumbers4 = ${ParameterValue(row.stanumbers4, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+              stanumbers5 = ${ParameterValue(row.stanumbers5, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+              stavalues1 = ${ParameterValue(row.stavalues1, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray,
+              stavalues2 = ${ParameterValue(row.stavalues2, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray,
+              stavalues3 = ${ParameterValue(row.stavalues3, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray,
+              stavalues4 = ${ParameterValue(row.stavalues4, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray,
+              stavalues5 = ${ParameterValue(row.stavalues5, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray
+          where starelid = ${ParameterValue(compositeId.starelid, null, ToStatement.longToStatement)} AND staattnum = ${ParameterValue(compositeId.staattnum, null, ToStatement.intToStatement)} AND stainherit = ${ParameterValue(compositeId.stainherit, null, ToStatement.booleanToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgStatisticFields, PgStatisticRow] = {
@@ -83,37 +87,37 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
   override def upsert(unsaved: PgStatisticRow)(implicit c: Connection): PgStatisticRow = {
     SQL"""insert into pg_catalog.pg_statistic(starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5)
           values (
-            ${unsaved.starelid}::oid,
-            ${unsaved.staattnum}::int2,
-            ${unsaved.stainherit},
-            ${unsaved.stanullfrac}::float4,
-            ${unsaved.stawidth}::int4,
-            ${unsaved.stadistinct}::float4,
-            ${unsaved.stakind1}::int2,
-            ${unsaved.stakind2}::int2,
-            ${unsaved.stakind3}::int2,
-            ${unsaved.stakind4}::int2,
-            ${unsaved.stakind5}::int2,
-            ${unsaved.staop1}::oid,
-            ${unsaved.staop2}::oid,
-            ${unsaved.staop3}::oid,
-            ${unsaved.staop4}::oid,
-            ${unsaved.staop5}::oid,
-            ${unsaved.stacoll1}::oid,
-            ${unsaved.stacoll2}::oid,
-            ${unsaved.stacoll3}::oid,
-            ${unsaved.stacoll4}::oid,
-            ${unsaved.stacoll5}::oid,
-            ${unsaved.stanumbers1}::_float4,
-            ${unsaved.stanumbers2}::_float4,
-            ${unsaved.stanumbers3}::_float4,
-            ${unsaved.stanumbers4}::_float4,
-            ${unsaved.stanumbers5}::_float4,
-            ${unsaved.stavalues1}::anyarray,
-            ${unsaved.stavalues2}::anyarray,
-            ${unsaved.stavalues3}::anyarray,
-            ${unsaved.stavalues4}::anyarray,
-            ${unsaved.stavalues5}::anyarray
+            ${ParameterValue(unsaved.starelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.staattnum, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.stainherit, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.stanullfrac, null, ToStatement.floatToStatement)}::float4,
+            ${ParameterValue(unsaved.stawidth, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.stadistinct, null, ToStatement.floatToStatement)}::float4,
+            ${ParameterValue(unsaved.stakind1, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.stakind2, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.stakind3, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.stakind4, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.stakind5, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.staop1, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.staop2, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.staop3, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.staop4, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.staop5, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.stacoll1, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.stacoll2, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.stacoll3, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.stacoll4, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.stacoll5, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.stanumbers1, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+            ${ParameterValue(unsaved.stanumbers2, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+            ${ParameterValue(unsaved.stanumbers3, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+            ${ParameterValue(unsaved.stanumbers4, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+            ${ParameterValue(unsaved.stanumbers5, null, ToStatement.optionToStatement(adventureworks.FloatArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.FloatParameterMetaData)))}::_float4,
+            ${ParameterValue(unsaved.stavalues1, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray,
+            ${ParameterValue(unsaved.stavalues2, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray,
+            ${ParameterValue(unsaved.stavalues3, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray,
+            ${ParameterValue(unsaved.stavalues4, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray,
+            ${ParameterValue(unsaved.stavalues5, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray
           )
           on conflict (starelid, staattnum, stainherit)
           do update set

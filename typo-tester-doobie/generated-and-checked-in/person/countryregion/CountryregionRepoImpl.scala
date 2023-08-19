@@ -68,7 +68,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".query(CountryregionRow.read).option
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ANY(${fromWrite(countryregioncodes)(Write.fromPut(CountryregionId.arrayPut))})""".query(CountryregionRow.read).stream
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ANY(${countryregioncodes})""".query(CountryregionRow.read).stream
   }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode

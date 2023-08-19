@@ -89,7 +89,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     sql"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text from sales.specialoffer where specialofferid = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}""".query(SpecialofferRow.read).option
   }
   override def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow] = {
-    sql"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text from sales.specialoffer where specialofferid = ANY(${fromWrite(specialofferids)(Write.fromPut(SpecialofferId.arrayPut))})""".query(SpecialofferRow.read).stream
+    sql"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text from sales.specialoffer where specialofferid = ANY(${specialofferids})""".query(SpecialofferRow.read).stream
   }
   override def update(row: SpecialofferRow): ConnectionIO[Boolean] = {
     val specialofferid = row.specialofferid

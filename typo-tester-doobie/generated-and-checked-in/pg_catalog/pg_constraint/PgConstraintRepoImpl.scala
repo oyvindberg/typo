@@ -42,7 +42,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
     sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ${fromWrite(oid)(Write.fromPut(PgConstraintId.put))}".query(PgConstraintRow.read).option
   }
   override def selectByIds(oids: Array[PgConstraintId]): Stream[ConnectionIO, PgConstraintRow] = {
-    sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ANY(${fromWrite(oids)(Write.fromPut(PgConstraintId.arrayPut))})".query(PgConstraintRow.read).stream
+    sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ANY(${oids})".query(PgConstraintRow.read).stream
   }
   override def update(row: PgConstraintRow): ConnectionIO[Boolean] = {
     val oid = row.oid

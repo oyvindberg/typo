@@ -75,7 +75,7 @@ object PasswordRepoImpl extends PasswordRepo {
     sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(PasswordRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
-    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ANY(${fromWrite(businessentityids)(Write.fromPut(BusinessentityId.arrayPut))})""".query(PasswordRow.read).stream
+    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ANY(${businessentityids})""".query(PasswordRow.read).stream
   }
   override def update(row: PasswordRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid

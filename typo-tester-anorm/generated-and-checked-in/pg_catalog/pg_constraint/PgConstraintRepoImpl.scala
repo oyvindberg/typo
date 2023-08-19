@@ -7,7 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_constraint
 
+import adventureworks.TypoPgNodeTree
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +20,14 @@ import typo.dsl.UpdateBuilder
 
 object PgConstraintRepoImpl extends PgConstraintRepo {
   override def delete(oid: PgConstraintId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_constraint where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_constraint where oid = ${ParameterValue(oid, null, PgConstraintId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgConstraintFields, PgConstraintRow] = {
     DeleteBuilder("pg_catalog.pg_constraint", PgConstraintFields)
   }
   override def insert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow = {
     SQL"""insert into pg_catalog.pg_constraint(oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin)
-          values (${unsaved.oid}::oid, ${unsaved.conname}::name, ${unsaved.connamespace}::oid, ${unsaved.contype}::char, ${unsaved.condeferrable}, ${unsaved.condeferred}, ${unsaved.convalidated}, ${unsaved.conrelid}::oid, ${unsaved.contypid}::oid, ${unsaved.conindid}::oid, ${unsaved.conparentid}::oid, ${unsaved.confrelid}::oid, ${unsaved.confupdtype}::char, ${unsaved.confdeltype}::char, ${unsaved.confmatchtype}::char, ${unsaved.conislocal}, ${unsaved.coninhcount}::int4, ${unsaved.connoinherit}, ${unsaved.conkey}::_int2, ${unsaved.confkey}::_int2, ${unsaved.conpfeqop}::_oid, ${unsaved.conppeqop}::_oid, ${unsaved.conffeqop}::_oid, ${unsaved.conexclop}::_oid, ${unsaved.conbin}::pg_node_tree)
+          values (${ParameterValue(unsaved.oid, null, PgConstraintId.toStatement)}::oid, ${ParameterValue(unsaved.conname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.connamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.contype, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.condeferrable, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.condeferred, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.convalidated, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.conrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.contypid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.conindid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.conparentid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.confrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.confupdtype, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.confdeltype, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.confmatchtype, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.conislocal, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.coninhcount, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.connoinherit, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.conkey, null, ToStatement.optionToStatement(adventureworks.IntArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.IntParameterMetaData)))}::_int2, ${ParameterValue(unsaved.confkey, null, ToStatement.optionToStatement(adventureworks.IntArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.IntParameterMetaData)))}::_int2, ${ParameterValue(unsaved.conpfeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid, ${ParameterValue(unsaved.conppeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid, ${ParameterValue(unsaved.conffeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid, ${ParameterValue(unsaved.conexclop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid, ${ParameterValue(unsaved.conbin, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
           returning oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
        """
       .executeInsert(PgConstraintRow.rowParser(1).single)
@@ -40,44 +44,44 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow] = {
     SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
           from pg_catalog.pg_constraint
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgConstraintId.toStatement)}
        """.as(PgConstraintRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgConstraintId])(implicit c: Connection): List[PgConstraintRow] = {
     SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
           from pg_catalog.pg_constraint
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgConstraintRow.rowParser(1).*)
     
   }
   override def update(row: PgConstraintRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_constraint
-          set conname = ${row.conname}::name,
-              connamespace = ${row.connamespace}::oid,
-              contype = ${row.contype}::char,
-              condeferrable = ${row.condeferrable},
-              condeferred = ${row.condeferred},
-              convalidated = ${row.convalidated},
-              conrelid = ${row.conrelid}::oid,
-              contypid = ${row.contypid}::oid,
-              conindid = ${row.conindid}::oid,
-              conparentid = ${row.conparentid}::oid,
-              confrelid = ${row.confrelid}::oid,
-              confupdtype = ${row.confupdtype}::char,
-              confdeltype = ${row.confdeltype}::char,
-              confmatchtype = ${row.confmatchtype}::char,
-              conislocal = ${row.conislocal},
-              coninhcount = ${row.coninhcount}::int4,
-              connoinherit = ${row.connoinherit},
-              conkey = ${row.conkey}::_int2,
-              confkey = ${row.confkey}::_int2,
-              conpfeqop = ${row.conpfeqop}::_oid,
-              conppeqop = ${row.conppeqop}::_oid,
-              conffeqop = ${row.conffeqop}::_oid,
-              conexclop = ${row.conexclop}::_oid,
-              conbin = ${row.conbin}::pg_node_tree
-          where oid = $oid
+          set conname = ${ParameterValue(row.conname, null, ToStatement.stringToStatement)}::name,
+              connamespace = ${ParameterValue(row.connamespace, null, ToStatement.longToStatement)}::oid,
+              contype = ${ParameterValue(row.contype, null, ToStatement.stringToStatement)}::char,
+              condeferrable = ${ParameterValue(row.condeferrable, null, ToStatement.booleanToStatement)},
+              condeferred = ${ParameterValue(row.condeferred, null, ToStatement.booleanToStatement)},
+              convalidated = ${ParameterValue(row.convalidated, null, ToStatement.booleanToStatement)},
+              conrelid = ${ParameterValue(row.conrelid, null, ToStatement.longToStatement)}::oid,
+              contypid = ${ParameterValue(row.contypid, null, ToStatement.longToStatement)}::oid,
+              conindid = ${ParameterValue(row.conindid, null, ToStatement.longToStatement)}::oid,
+              conparentid = ${ParameterValue(row.conparentid, null, ToStatement.longToStatement)}::oid,
+              confrelid = ${ParameterValue(row.confrelid, null, ToStatement.longToStatement)}::oid,
+              confupdtype = ${ParameterValue(row.confupdtype, null, ToStatement.stringToStatement)}::char,
+              confdeltype = ${ParameterValue(row.confdeltype, null, ToStatement.stringToStatement)}::char,
+              confmatchtype = ${ParameterValue(row.confmatchtype, null, ToStatement.stringToStatement)}::char,
+              conislocal = ${ParameterValue(row.conislocal, null, ToStatement.booleanToStatement)},
+              coninhcount = ${ParameterValue(row.coninhcount, null, ToStatement.intToStatement)}::int4,
+              connoinherit = ${ParameterValue(row.connoinherit, null, ToStatement.booleanToStatement)},
+              conkey = ${ParameterValue(row.conkey, null, ToStatement.optionToStatement(adventureworks.IntArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.IntParameterMetaData)))}::_int2,
+              confkey = ${ParameterValue(row.confkey, null, ToStatement.optionToStatement(adventureworks.IntArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.IntParameterMetaData)))}::_int2,
+              conpfeqop = ${ParameterValue(row.conpfeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+              conppeqop = ${ParameterValue(row.conppeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+              conffeqop = ${ParameterValue(row.conffeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+              conexclop = ${ParameterValue(row.conexclop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+              conbin = ${ParameterValue(row.conbin, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
+          where oid = ${ParameterValue(oid, null, PgConstraintId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgConstraintFields, PgConstraintRow] = {
@@ -86,31 +90,31 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def upsert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow = {
     SQL"""insert into pg_catalog.pg_constraint(oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.conname}::name,
-            ${unsaved.connamespace}::oid,
-            ${unsaved.contype}::char,
-            ${unsaved.condeferrable},
-            ${unsaved.condeferred},
-            ${unsaved.convalidated},
-            ${unsaved.conrelid}::oid,
-            ${unsaved.contypid}::oid,
-            ${unsaved.conindid}::oid,
-            ${unsaved.conparentid}::oid,
-            ${unsaved.confrelid}::oid,
-            ${unsaved.confupdtype}::char,
-            ${unsaved.confdeltype}::char,
-            ${unsaved.confmatchtype}::char,
-            ${unsaved.conislocal},
-            ${unsaved.coninhcount}::int4,
-            ${unsaved.connoinherit},
-            ${unsaved.conkey}::_int2,
-            ${unsaved.confkey}::_int2,
-            ${unsaved.conpfeqop}::_oid,
-            ${unsaved.conppeqop}::_oid,
-            ${unsaved.conffeqop}::_oid,
-            ${unsaved.conexclop}::_oid,
-            ${unsaved.conbin}::pg_node_tree
+            ${ParameterValue(unsaved.oid, null, PgConstraintId.toStatement)}::oid,
+            ${ParameterValue(unsaved.conname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.connamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.contype, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.condeferrable, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.condeferred, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.convalidated, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.conrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.contypid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.conindid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.conparentid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.confrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.confupdtype, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.confdeltype, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.confmatchtype, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.conislocal, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.coninhcount, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.connoinherit, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.conkey, null, ToStatement.optionToStatement(adventureworks.IntArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.IntParameterMetaData)))}::_int2,
+            ${ParameterValue(unsaved.confkey, null, ToStatement.optionToStatement(adventureworks.IntArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.IntParameterMetaData)))}::_int2,
+            ${ParameterValue(unsaved.conpfeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+            ${ParameterValue(unsaved.conppeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+            ${ParameterValue(unsaved.conffeqop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+            ${ParameterValue(unsaved.conexclop, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+            ${ParameterValue(unsaved.conbin, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
           )
           on conflict (oid)
           do update set

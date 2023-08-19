@@ -43,7 +43,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
     sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}".query(PgTriggerRow.read).option
   }
   override def selectByIds(oids: Array[PgTriggerId]): Stream[ConnectionIO, PgTriggerRow] = {
-    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTriggerId.arrayPut))})".query(PgTriggerRow.read).stream
+    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ANY(${oids})".query(PgTriggerRow.read).stream
   }
   override def update(row: PgTriggerRow): ConnectionIO[Boolean] = {
     val oid = row.oid

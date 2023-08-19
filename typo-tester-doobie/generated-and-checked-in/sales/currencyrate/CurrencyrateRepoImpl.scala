@@ -76,7 +76,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sales.currencyrate where currencyrateid = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}".query(CurrencyrateRow.read).option
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId]): Stream[ConnectionIO, CurrencyrateRow] = {
-    sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sales.currencyrate where currencyrateid = ANY(${fromWrite(currencyrateids)(Write.fromPut(CurrencyrateId.arrayPut))})".query(CurrencyrateRow.read).stream
+    sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sales.currencyrate where currencyrateid = ANY(${currencyrateids})".query(CurrencyrateRow.read).stream
   }
   override def update(row: CurrencyrateRow): ConnectionIO[Boolean] = {
     val currencyrateid = row.currencyrateid

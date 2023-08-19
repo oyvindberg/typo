@@ -9,14 +9,15 @@ package shipmethod
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
-    SQL"delete from purchasing.shipmethod where shipmethodid = $shipmethodid".executeUpdate() > 0
+    SQL"delete from purchasing.shipmethod where shipmethodid = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
     DeleteBuilder("purchasing.shipmethod", ShipmethodFields)
   }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
-          values (${unsaved.shipmethodid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
@@ -39,26 +40,26 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.shipmethodid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("shipmethodid", ParameterValue.from[ShipmethodId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("shipmethodid", ParameterValue(value, null, ShipmethodId.toStatement)), "::int4"))
       },
       unsaved.shipbase match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("shipbase", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("shipbase", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.shiprate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("shiprate", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("shiprate", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -88,25 +89,25 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
           from purchasing.shipmethod
-          where shipmethodid = $shipmethodid
+          where shipmethodid = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}
        """.as(ShipmethodRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
           from purchasing.shipmethod
-          where shipmethodid = ANY($shipmethodids)
+          where shipmethodid = ANY(${shipmethodids})
        """.as(ShipmethodRow.rowParser(1).*)
     
   }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
     val shipmethodid = row.shipmethodid
     SQL"""update purchasing.shipmethod
-          set "name" = ${row.name}::"public"."Name",
-              shipbase = ${row.shipbase}::numeric,
-              shiprate = ${row.shiprate}::numeric,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where shipmethodid = $shipmethodid
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              shipbase = ${ParameterValue(row.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              shiprate = ${ParameterValue(row.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where shipmethodid = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
@@ -115,12 +116,12 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
           values (
-            ${unsaved.shipmethodid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.shipbase}::numeric,
-            ${unsaved.shiprate}::numeric,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (shipmethodid)
           do update set

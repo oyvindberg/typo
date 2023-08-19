@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_inherits
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgInheritsRepoImpl extends PgInheritsRepo {
   override def delete(compositeId: PgInheritsId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_inherits where inhrelid = ${compositeId.inhrelid} AND inhseqno = ${compositeId.inhseqno}".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_inherits where inhrelid = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND inhseqno = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgInheritsFields, PgInheritsRow] = {
     DeleteBuilder("pg_catalog.pg_inherits", PgInheritsFields)
   }
   override def insert(unsaved: PgInheritsRow)(implicit c: Connection): PgInheritsRow = {
     SQL"""insert into pg_catalog.pg_inherits(inhrelid, inhparent, inhseqno, inhdetachpending)
-          values (${unsaved.inhrelid}::oid, ${unsaved.inhparent}::oid, ${unsaved.inhseqno}::int4, ${unsaved.inhdetachpending})
+          values (${ParameterValue(unsaved.inhrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.inhparent, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.inhseqno, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.inhdetachpending, null, ToStatement.booleanToStatement)})
           returning inhrelid, inhparent, inhseqno, inhdetachpending
        """
       .executeInsert(PgInheritsRow.rowParser(1).single)
@@ -40,15 +42,15 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
   override def selectById(compositeId: PgInheritsId)(implicit c: Connection): Option[PgInheritsRow] = {
     SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending
           from pg_catalog.pg_inherits
-          where inhrelid = ${compositeId.inhrelid} AND inhseqno = ${compositeId.inhseqno}
+          where inhrelid = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND inhseqno = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}
        """.as(PgInheritsRow.rowParser(1).singleOpt)
   }
   override def update(row: PgInheritsRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_inherits
-          set inhparent = ${row.inhparent}::oid,
-              inhdetachpending = ${row.inhdetachpending}
-          where inhrelid = ${compositeId.inhrelid} AND inhseqno = ${compositeId.inhseqno}
+          set inhparent = ${ParameterValue(row.inhparent, null, ToStatement.longToStatement)}::oid,
+              inhdetachpending = ${ParameterValue(row.inhdetachpending, null, ToStatement.booleanToStatement)}
+          where inhrelid = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND inhseqno = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgInheritsFields, PgInheritsRow] = {
@@ -57,10 +59,10 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
   override def upsert(unsaved: PgInheritsRow)(implicit c: Connection): PgInheritsRow = {
     SQL"""insert into pg_catalog.pg_inherits(inhrelid, inhparent, inhseqno, inhdetachpending)
           values (
-            ${unsaved.inhrelid}::oid,
-            ${unsaved.inhparent}::oid,
-            ${unsaved.inhseqno}::int4,
-            ${unsaved.inhdetachpending}
+            ${ParameterValue(unsaved.inhrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.inhparent, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.inhseqno, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.inhdetachpending, null, ToStatement.booleanToStatement)}
           )
           on conflict (inhrelid, inhseqno)
           do update set

@@ -9,6 +9,7 @@ package unitmeasure
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +24,14 @@ import typo.dsl.UpdateBuilder
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.unitmeasure where unitmeasurecode = $unitmeasurecode".executeUpdate() > 0
+    SQL"delete from production.unitmeasure where unitmeasurecode = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
     DeleteBuilder("production.unitmeasure", UnitmeasureFields)
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
-          values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning unitmeasurecode, "name", modifieddate::text
        """
       .executeInsert(UnitmeasureRow.rowParser(1).single)
@@ -38,11 +39,11 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   }
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
     val namedParameters = List(
-      Some((NamedParameter("unitmeasurecode", ParameterValue.from(unsaved.unitmeasurecode)), "::bpchar")),
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("unitmeasurecode", ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)), "::bpchar")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -72,22 +73,22 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow] = {
     SQL"""select unitmeasurecode, "name", modifieddate::text
           from production.unitmeasure
-          where unitmeasurecode = $unitmeasurecode
+          where unitmeasurecode = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}
        """.as(UnitmeasureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
     SQL"""select unitmeasurecode, "name", modifieddate::text
           from production.unitmeasure
-          where unitmeasurecode = ANY($unitmeasurecodes)
+          where unitmeasurecode = ANY(${unitmeasurecodes})
        """.as(UnitmeasureRow.rowParser(1).*)
     
   }
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
     val unitmeasurecode = row.unitmeasurecode
     SQL"""update production.unitmeasure
-          set "name" = ${row.name}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where unitmeasurecode = $unitmeasurecode
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where unitmeasurecode = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
@@ -96,9 +97,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
           values (
-            ${unsaved.unitmeasurecode}::bpchar,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (unitmeasurecode)
           do update set

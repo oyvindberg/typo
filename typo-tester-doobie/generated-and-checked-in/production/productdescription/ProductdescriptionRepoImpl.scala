@@ -76,7 +76,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription where productdescriptionid = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}".query(ProductdescriptionRow.read).option
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId]): Stream[ConnectionIO, ProductdescriptionRow] = {
-    sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription where productdescriptionid = ANY(${fromWrite(productdescriptionids)(Write.fromPut(ProductdescriptionId.arrayPut))})".query(ProductdescriptionRow.read).stream
+    sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription where productdescriptionid = ANY(${productdescriptionids})".query(ProductdescriptionRow.read).stream
   }
   override def update(row: ProductdescriptionRow): ConnectionIO[Boolean] = {
     val productdescriptionid = row.productdescriptionid

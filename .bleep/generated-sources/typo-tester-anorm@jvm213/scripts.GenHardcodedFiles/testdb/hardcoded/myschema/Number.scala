@@ -40,13 +40,13 @@ object Number {
   val ByName: Map[String, Number] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayColumn: Column[Array[Number]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[Number]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
-  implicit lazy val column: Column[Number] = implicitly[Column[String]].mapResult(str => Number(str).left.map(SqlMappingError.apply))
+  implicit lazy val arrayToStatement: ToStatement[Array[Number]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
+  implicit lazy val column: Column[Number] = Column.columnToString.mapResult(str => Number(str).left.map(SqlMappingError.apply))
   implicit lazy val parameterMetadata: ParameterMetaData[Number] = new ParameterMetaData[Number] {
-    override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
+    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
+    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[Number] = Reads[Number]{(value: JsValue) => value.validate(Reads.StringReads).flatMap(str => Number(str).fold(JsError.apply, JsSuccess(_)))}
-  implicit lazy val toStatement: ToStatement[Number] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit lazy val toStatement: ToStatement[Number] = ToStatement.stringToStatement.contramap(_.value)
   implicit lazy val writes: Writes[Number] = Writes[Number](value => Writes.StringWrites.writes(value.value))
 }

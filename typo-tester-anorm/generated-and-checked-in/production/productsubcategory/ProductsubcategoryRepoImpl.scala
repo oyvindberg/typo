@@ -9,14 +9,16 @@ package productsubcategory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.productcategory.ProductcategoryId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productsubcategory where productsubcategoryid = $productsubcategoryid".executeUpdate() > 0
+    SQL"delete from production.productsubcategory where productsubcategoryid = ${ParameterValue(productsubcategoryid, null, ProductsubcategoryId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     DeleteBuilder("production.productsubcategory", ProductsubcategoryFields)
   }
   override def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
-          values (${unsaved.productsubcategoryid}::int4, ${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productsubcategoryid, null, ProductsubcategoryId.toStatement)}::int4, ${ParameterValue(unsaved.productcategoryid, null, ProductcategoryId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
        """
       .executeInsert(ProductsubcategoryRow.rowParser(1).single)
@@ -39,19 +41,19 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryRow = {
     val namedParameters = List(
-      Some((NamedParameter("productcategoryid", ParameterValue.from(unsaved.productcategoryid)), "::int4")),
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("productcategoryid", ParameterValue(unsaved.productcategoryid, null, ProductcategoryId.toStatement)), "::int4")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.productsubcategoryid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("productsubcategoryid", ParameterValue.from[ProductsubcategoryId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("productsubcategoryid", ParameterValue(value, null, ProductsubcategoryId.toStatement)), "::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -81,24 +83,24 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def selectById(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Option[ProductsubcategoryRow] = {
     SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
           from production.productsubcategory
-          where productsubcategoryid = $productsubcategoryid
+          where productsubcategoryid = ${ParameterValue(productsubcategoryid, null, ProductsubcategoryId.toStatement)}
        """.as(ProductsubcategoryRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow] = {
     SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
           from production.productsubcategory
-          where productsubcategoryid = ANY($productsubcategoryids)
+          where productsubcategoryid = ANY(${productsubcategoryids})
        """.as(ProductsubcategoryRow.rowParser(1).*)
     
   }
   override def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {
     val productsubcategoryid = row.productsubcategoryid
     SQL"""update production.productsubcategory
-          set productcategoryid = ${row.productcategoryid}::int4,
-              "name" = ${row.name}::"public"."Name",
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productsubcategoryid = $productsubcategoryid
+          set productcategoryid = ${ParameterValue(row.productcategoryid, null, ProductcategoryId.toStatement)}::int4,
+              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productsubcategoryid = ${ParameterValue(productsubcategoryid, null, ProductsubcategoryId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
@@ -107,11 +109,11 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
           values (
-            ${unsaved.productsubcategoryid}::int4,
-            ${unsaved.productcategoryid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productsubcategoryid, null, ProductsubcategoryId.toStatement)}::int4,
+            ${ParameterValue(unsaved.productcategoryid, null, ProductcategoryId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productsubcategoryid)
           do update set

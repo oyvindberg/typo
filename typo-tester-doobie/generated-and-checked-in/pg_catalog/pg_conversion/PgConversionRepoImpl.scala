@@ -42,7 +42,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
     sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}".query(PgConversionRow.read).option
   }
   override def selectByIds(oids: Array[PgConversionId]): Stream[ConnectionIO, PgConversionRow] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ANY(${fromWrite(oids)(Write.fromPut(PgConversionId.arrayPut))})".query(PgConversionRow.read).stream
+    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ANY(${oids})".query(PgConversionRow.read).stream
   }
   override def update(row: PgConversionRow): ConnectionIO[Boolean] = {
     val oid = row.oid

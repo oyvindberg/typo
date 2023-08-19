@@ -7,7 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_database
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoXid
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +20,14 @@ import typo.dsl.UpdateBuilder
 
 object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def delete(oid: PgDatabaseId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_database where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_database where oid = ${ParameterValue(oid, null, PgDatabaseId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgDatabaseFields, PgDatabaseRow] = {
     DeleteBuilder("pg_catalog.pg_database", PgDatabaseFields)
   }
   override def insert(unsaved: PgDatabaseRow)(implicit c: Connection): PgDatabaseRow = {
     SQL"""insert into pg_catalog.pg_database(oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl)
-          values (${unsaved.oid}::oid, ${unsaved.datname}::name, ${unsaved.datdba}::oid, ${unsaved.encoding}::int4, ${unsaved.datcollate}::name, ${unsaved.datctype}::name, ${unsaved.datistemplate}, ${unsaved.datallowconn}, ${unsaved.datconnlimit}::int4, ${unsaved.datlastsysoid}::oid, ${unsaved.datfrozenxid}::xid, ${unsaved.datminmxid}::xid, ${unsaved.dattablespace}::oid, ${unsaved.datacl}::_aclitem)
+          values (${ParameterValue(unsaved.oid, null, PgDatabaseId.toStatement)}::oid, ${ParameterValue(unsaved.datname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.datdba, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.encoding, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.datcollate, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.datctype, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.datistemplate, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.datallowconn, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.datconnlimit, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.datlastsysoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.datfrozenxid, null, TypoXid.toStatement)}::xid, ${ParameterValue(unsaved.datminmxid, null, TypoXid.toStatement)}::xid, ${ParameterValue(unsaved.dattablespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.datacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem)
           returning oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
        """
       .executeInsert(PgDatabaseRow.rowParser(1).single)
@@ -40,33 +44,33 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def selectById(oid: PgDatabaseId)(implicit c: Connection): Option[PgDatabaseRow] = {
     SQL"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
           from pg_catalog.pg_database
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgDatabaseId.toStatement)}
        """.as(PgDatabaseRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgDatabaseId])(implicit c: Connection): List[PgDatabaseRow] = {
     SQL"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
           from pg_catalog.pg_database
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgDatabaseRow.rowParser(1).*)
     
   }
   override def update(row: PgDatabaseRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_database
-          set datname = ${row.datname}::name,
-              datdba = ${row.datdba}::oid,
-              "encoding" = ${row.encoding}::int4,
-              datcollate = ${row.datcollate}::name,
-              datctype = ${row.datctype}::name,
-              datistemplate = ${row.datistemplate},
-              datallowconn = ${row.datallowconn},
-              datconnlimit = ${row.datconnlimit}::int4,
-              datlastsysoid = ${row.datlastsysoid}::oid,
-              datfrozenxid = ${row.datfrozenxid}::xid,
-              datminmxid = ${row.datminmxid}::xid,
-              dattablespace = ${row.dattablespace}::oid,
-              datacl = ${row.datacl}::_aclitem
-          where oid = $oid
+          set datname = ${ParameterValue(row.datname, null, ToStatement.stringToStatement)}::name,
+              datdba = ${ParameterValue(row.datdba, null, ToStatement.longToStatement)}::oid,
+              "encoding" = ${ParameterValue(row.encoding, null, ToStatement.intToStatement)}::int4,
+              datcollate = ${ParameterValue(row.datcollate, null, ToStatement.stringToStatement)}::name,
+              datctype = ${ParameterValue(row.datctype, null, ToStatement.stringToStatement)}::name,
+              datistemplate = ${ParameterValue(row.datistemplate, null, ToStatement.booleanToStatement)},
+              datallowconn = ${ParameterValue(row.datallowconn, null, ToStatement.booleanToStatement)},
+              datconnlimit = ${ParameterValue(row.datconnlimit, null, ToStatement.intToStatement)}::int4,
+              datlastsysoid = ${ParameterValue(row.datlastsysoid, null, ToStatement.longToStatement)}::oid,
+              datfrozenxid = ${ParameterValue(row.datfrozenxid, null, TypoXid.toStatement)}::xid,
+              datminmxid = ${ParameterValue(row.datminmxid, null, TypoXid.toStatement)}::xid,
+              dattablespace = ${ParameterValue(row.dattablespace, null, ToStatement.longToStatement)}::oid,
+              datacl = ${ParameterValue(row.datacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem
+          where oid = ${ParameterValue(oid, null, PgDatabaseId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgDatabaseFields, PgDatabaseRow] = {
@@ -75,20 +79,20 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def upsert(unsaved: PgDatabaseRow)(implicit c: Connection): PgDatabaseRow = {
     SQL"""insert into pg_catalog.pg_database(oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.datname}::name,
-            ${unsaved.datdba}::oid,
-            ${unsaved.encoding}::int4,
-            ${unsaved.datcollate}::name,
-            ${unsaved.datctype}::name,
-            ${unsaved.datistemplate},
-            ${unsaved.datallowconn},
-            ${unsaved.datconnlimit}::int4,
-            ${unsaved.datlastsysoid}::oid,
-            ${unsaved.datfrozenxid}::xid,
-            ${unsaved.datminmxid}::xid,
-            ${unsaved.dattablespace}::oid,
-            ${unsaved.datacl}::_aclitem
+            ${ParameterValue(unsaved.oid, null, PgDatabaseId.toStatement)}::oid,
+            ${ParameterValue(unsaved.datname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.datdba, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.encoding, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.datcollate, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.datctype, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.datistemplate, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.datallowconn, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.datconnlimit, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.datlastsysoid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.datfrozenxid, null, TypoXid.toStatement)}::xid,
+            ${ParameterValue(unsaved.datminmxid, null, TypoXid.toStatement)}::xid,
+            ${ParameterValue(unsaved.dattablespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.datacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem
           )
           on conflict (oid)
           do update set

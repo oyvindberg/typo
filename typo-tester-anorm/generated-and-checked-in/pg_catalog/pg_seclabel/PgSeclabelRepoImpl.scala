@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_seclabel
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def delete(compositeId: PgSeclabelId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_seclabel where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_seclabel where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)} AND provider = ${ParameterValue(compositeId.provider, null, ToStatement.stringToStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgSeclabelFields, PgSeclabelRow] = {
     DeleteBuilder("pg_catalog.pg_seclabel", PgSeclabelFields)
   }
   override def insert(unsaved: PgSeclabelRow)(implicit c: Connection): PgSeclabelRow = {
     SQL"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")
-          values (${unsaved.objoid}::oid, ${unsaved.classoid}::oid, ${unsaved.objsubid}::int4, ${unsaved.provider}, ${unsaved.label})
+          values (${ParameterValue(unsaved.objoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.classoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.objsubid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.provider, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.label, null, ToStatement.stringToStatement)})
           returning objoid, classoid, objsubid, provider, "label"
        """
       .executeInsert(PgSeclabelRow.rowParser(1).single)
@@ -40,14 +42,14 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def selectById(compositeId: PgSeclabelId)(implicit c: Connection): Option[PgSeclabelRow] = {
     SQL"""select objoid, classoid, objsubid, provider, "label"
           from pg_catalog.pg_seclabel
-          where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}
+          where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)} AND provider = ${ParameterValue(compositeId.provider, null, ToStatement.stringToStatement)}
        """.as(PgSeclabelRow.rowParser(1).singleOpt)
   }
   override def update(row: PgSeclabelRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_seclabel
-          set "label" = ${row.label}
-          where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}
+          set "label" = ${ParameterValue(row.label, null, ToStatement.stringToStatement)}
+          where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)} AND provider = ${ParameterValue(compositeId.provider, null, ToStatement.stringToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgSeclabelFields, PgSeclabelRow] = {
@@ -56,11 +58,11 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def upsert(unsaved: PgSeclabelRow)(implicit c: Connection): PgSeclabelRow = {
     SQL"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")
           values (
-            ${unsaved.objoid}::oid,
-            ${unsaved.classoid}::oid,
-            ${unsaved.objsubid}::int4,
-            ${unsaved.provider},
-            ${unsaved.label}
+            ${ParameterValue(unsaved.objoid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.classoid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.objsubid, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.provider, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.label, null, ToStatement.stringToStatement)}
           )
           on conflict (objoid, classoid, objsubid, provider)
           do update set

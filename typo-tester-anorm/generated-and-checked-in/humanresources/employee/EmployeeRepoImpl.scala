@@ -8,17 +8,19 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDate
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter
+import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -26,14 +28,14 @@ import typo.dsl.UpdateBuilder
 
 object EmployeeRepoImpl extends EmployeeRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"delete from humanresources.employee where businessentityid = $businessentityid".executeUpdate() > 0
+    SQL"delete from humanresources.employee where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
     DeleteBuilder("humanresources.employee", EmployeeFields)
   }
   override def insert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     SQL"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
-          values (${unsaved.businessentityid}::int4, ${unsaved.nationalidnumber}, ${unsaved.loginid}, ${unsaved.jobtitle}, ${unsaved.birthdate}::date, ${unsaved.maritalstatus}::bpchar, ${unsaved.gender}::bpchar, ${unsaved.hiredate}::date, ${unsaved.salariedflag}::"public"."Flag", ${unsaved.vacationhours}::int2, ${unsaved.sickleavehours}::int2, ${unsaved.currentflag}::"public"."Flag", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.organizationnode})
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.nationalidnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.loginid, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.jobtitle, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.birthdate, null, TypoLocalDate.toStatement)}::date, ${ParameterValue(unsaved.maritalstatus, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.gender, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.hiredate, null, TypoLocalDate.toStatement)}::date, ${ParameterValue(unsaved.salariedflag, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.vacationhours, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.sickleavehours, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.currentflag, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.organizationnode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
        """
       .executeInsert(EmployeeRow.rowParser(1).single)
@@ -41,41 +43,41 @@ object EmployeeRepoImpl extends EmployeeRepo {
   }
   override def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
     val namedParameters = List(
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("nationalidnumber", ParameterValue.from(unsaved.nationalidnumber)), "")),
-      Some((NamedParameter("loginid", ParameterValue.from(unsaved.loginid)), "")),
-      Some((NamedParameter("jobtitle", ParameterValue.from(unsaved.jobtitle)), "")),
-      Some((NamedParameter("birthdate", ParameterValue.from(unsaved.birthdate)), "::date")),
-      Some((NamedParameter("maritalstatus", ParameterValue.from(unsaved.maritalstatus)), "::bpchar")),
-      Some((NamedParameter("gender", ParameterValue.from(unsaved.gender)), "::bpchar")),
-      Some((NamedParameter("hiredate", ParameterValue.from(unsaved.hiredate)), "::date")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("nationalidnumber", ParameterValue(unsaved.nationalidnumber, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("loginid", ParameterValue(unsaved.loginid, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("jobtitle", ParameterValue(unsaved.jobtitle, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("birthdate", ParameterValue(unsaved.birthdate, null, TypoLocalDate.toStatement)), "::date")),
+      Some((NamedParameter("maritalstatus", ParameterValue(unsaved.maritalstatus, null, ToStatement.stringToStatement)), "::bpchar")),
+      Some((NamedParameter("gender", ParameterValue(unsaved.gender, null, ToStatement.stringToStatement)), "::bpchar")),
+      Some((NamedParameter("hiredate", ParameterValue(unsaved.hiredate, null, TypoLocalDate.toStatement)), "::date")),
       unsaved.salariedflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("salariedflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("salariedflag", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
       },
       unsaved.vacationhours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("vacationhours", ParameterValue.from[Int](value)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("vacationhours", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
       },
       unsaved.sickleavehours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("sickleavehours", ParameterValue.from[Int](value)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("sickleavehours", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
       },
       unsaved.currentflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("currentflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("currentflag", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       },
       unsaved.organizationnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("organizationnode", ParameterValue.from[Option[String]](value)), ""))
+        case Defaulted.Provided(value) => Some((NamedParameter("organizationnode", ParameterValue(value, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), ""))
       }
     ).flatten
     val quote = '"'.toString
@@ -105,34 +107,34 @@ object EmployeeRepoImpl extends EmployeeRepo {
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
           from humanresources.employee
-          where businessentityid = $businessentityid
+          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(EmployeeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
           from humanresources.employee
-          where businessentityid = ANY($businessentityids)
+          where businessentityid = ANY(${businessentityids})
        """.as(EmployeeRow.rowParser(1).*)
     
   }
   override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update humanresources.employee
-          set nationalidnumber = ${row.nationalidnumber},
-              loginid = ${row.loginid},
-              jobtitle = ${row.jobtitle},
-              birthdate = ${row.birthdate}::date,
-              maritalstatus = ${row.maritalstatus}::bpchar,
-              gender = ${row.gender}::bpchar,
-              hiredate = ${row.hiredate}::date,
-              salariedflag = ${row.salariedflag}::"public"."Flag",
-              vacationhours = ${row.vacationhours}::int2,
-              sickleavehours = ${row.sickleavehours}::int2,
-              currentflag = ${row.currentflag}::"public"."Flag",
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp,
-              organizationnode = ${row.organizationnode}
-          where businessentityid = $businessentityid
+          set nationalidnumber = ${ParameterValue(row.nationalidnumber, null, ToStatement.stringToStatement)},
+              loginid = ${ParameterValue(row.loginid, null, ToStatement.stringToStatement)},
+              jobtitle = ${ParameterValue(row.jobtitle, null, ToStatement.stringToStatement)},
+              birthdate = ${ParameterValue(row.birthdate, null, TypoLocalDate.toStatement)}::date,
+              maritalstatus = ${ParameterValue(row.maritalstatus, null, ToStatement.stringToStatement)}::bpchar,
+              gender = ${ParameterValue(row.gender, null, ToStatement.stringToStatement)}::bpchar,
+              hiredate = ${ParameterValue(row.hiredate, null, TypoLocalDate.toStatement)}::date,
+              salariedflag = ${ParameterValue(row.salariedflag, null, Flag.toStatement)}::"public"."Flag",
+              vacationhours = ${ParameterValue(row.vacationhours, null, ToStatement.intToStatement)}::int2,
+              sickleavehours = ${ParameterValue(row.sickleavehours, null, ToStatement.intToStatement)}::int2,
+              currentflag = ${ParameterValue(row.currentflag, null, Flag.toStatement)}::"public"."Flag",
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              organizationnode = ${ParameterValue(row.organizationnode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
@@ -141,21 +143,21 @@ object EmployeeRepoImpl extends EmployeeRepo {
   override def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     SQL"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.nationalidnumber},
-            ${unsaved.loginid},
-            ${unsaved.jobtitle},
-            ${unsaved.birthdate}::date,
-            ${unsaved.maritalstatus}::bpchar,
-            ${unsaved.gender}::bpchar,
-            ${unsaved.hiredate}::date,
-            ${unsaved.salariedflag}::"public"."Flag",
-            ${unsaved.vacationhours}::int2,
-            ${unsaved.sickleavehours}::int2,
-            ${unsaved.currentflag}::"public"."Flag",
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp,
-            ${unsaved.organizationnode}
+            ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.nationalidnumber, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.loginid, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.jobtitle, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.birthdate, null, TypoLocalDate.toStatement)}::date,
+            ${ParameterValue(unsaved.maritalstatus, null, ToStatement.stringToStatement)}::bpchar,
+            ${ParameterValue(unsaved.gender, null, ToStatement.stringToStatement)}::bpchar,
+            ${ParameterValue(unsaved.hiredate, null, TypoLocalDate.toStatement)}::date,
+            ${ParameterValue(unsaved.salariedflag, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.vacationhours, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.sickleavehours, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.currentflag, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.organizationnode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           )
           on conflict (businessentityid)
           do update set

@@ -41,7 +41,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
     sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}".query(PgOpclassRow.read).option
   }
   override def selectByIds(oids: Array[PgOpclassId]): Stream[ConnectionIO, PgOpclassRow] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${fromWrite(oids)(Write.fromPut(PgOpclassId.arrayPut))})".query(PgOpclassRow.read).stream
+    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${oids})".query(PgOpclassRow.read).stream
   }
   override def update(row: PgOpclassRow): ConnectionIO[Boolean] = {
     val oid = row.oid

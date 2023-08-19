@@ -45,7 +45,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(FootballClubRow.read).option
   }
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".query(FootballClubRow.read).stream
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(FootballClubRow.read).stream
   }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow] = {
     val where = fragments.whereAndOpt(
@@ -74,7 +74,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
       case Some(nonEmpty) =>
         val updates = fragments.set(
           nonEmpty.map {
-            case FootballClubFieldValue.name(value) => fr""""name" = $value"""
+            case FootballClubFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
           }
         )
         sql"""update myschema.football_club

@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_depend
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -20,7 +22,7 @@ object PgDependRepoImpl extends PgDependRepo {
   }
   override def insert(unsaved: PgDependRow)(implicit c: Connection): PgDependRow = {
     SQL"""insert into pg_catalog.pg_depend(classid, objid, objsubid, refclassid, refobjid, refobjsubid, deptype)
-          values (${unsaved.classid}::oid, ${unsaved.objid}::oid, ${unsaved.objsubid}::int4, ${unsaved.refclassid}::oid, ${unsaved.refobjid}::oid, ${unsaved.refobjsubid}::int4, ${unsaved.deptype}::char)
+          values (${ParameterValue(unsaved.classid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.objid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.objsubid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.refclassid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.refobjid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.refobjsubid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.deptype, null, ToStatement.stringToStatement)}::char)
           returning classid, objid, objsubid, refclassid, refobjid, refobjsubid, deptype
        """
       .executeInsert(PgDependRow.rowParser(1).single)

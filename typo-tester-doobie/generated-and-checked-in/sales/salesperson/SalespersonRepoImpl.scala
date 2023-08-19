@@ -92,7 +92,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
     sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sales.salesperson where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".query(SalespersonRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, SalespersonRow] = {
-    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sales.salesperson where businessentityid = ANY(${fromWrite(businessentityids)(Write.fromPut(BusinessentityId.arrayPut))})".query(SalespersonRow.read).stream
+    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sales.salesperson where businessentityid = ANY(${businessentityids})".query(SalespersonRow.read).stream
   }
   override def update(row: SalespersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid

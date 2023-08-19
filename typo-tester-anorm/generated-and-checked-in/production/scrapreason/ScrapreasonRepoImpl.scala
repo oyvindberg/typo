@@ -9,6 +9,7 @@ package scrapreason
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +24,14 @@ import typo.dsl.UpdateBuilder
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.scrapreason where scrapreasonid = $scrapreasonid".executeUpdate() > 0
+    SQL"delete from production.scrapreason where scrapreasonid = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
     DeleteBuilder("production.scrapreason", ScrapreasonFields)
   }
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
-          values (${unsaved.scrapreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.scrapreasonid, null, ScrapreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning scrapreasonid, "name", modifieddate::text
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
@@ -38,14 +39,14 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.scrapreasonid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("scrapreasonid", ParameterValue.from[ScrapreasonId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("scrapreasonid", ParameterValue(value, null, ScrapreasonId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -75,22 +76,22 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
     SQL"""select scrapreasonid, "name", modifieddate::text
           from production.scrapreason
-          where scrapreasonid = $scrapreasonid
+          where scrapreasonid = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
        """.as(ScrapreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
     SQL"""select scrapreasonid, "name", modifieddate::text
           from production.scrapreason
-          where scrapreasonid = ANY($scrapreasonids)
+          where scrapreasonid = ANY(${scrapreasonids})
        """.as(ScrapreasonRow.rowParser(1).*)
     
   }
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
     val scrapreasonid = row.scrapreasonid
     SQL"""update production.scrapreason
-          set "name" = ${row.name}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where scrapreasonid = $scrapreasonid
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where scrapreasonid = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
@@ -99,9 +100,9 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
           values (
-            ${unsaved.scrapreasonid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.scrapreasonid, null, ScrapreasonId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (scrapreasonid)
           do update set

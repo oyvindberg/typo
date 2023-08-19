@@ -9,12 +9,17 @@ package productvendor
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.production.product.ProductId
+import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
+import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +28,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId)(implicit c: Connection): Boolean = {
-    SQL"delete from purchasing.productvendor where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}".executeUpdate() > 0
+    SQL"delete from purchasing.productvendor where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
     DeleteBuilder("purchasing.productvendor", ProductvendorFields)
   }
   override def insert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     SQL"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
-          values (${unsaved.productid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.averageleadtime}::int4, ${unsaved.standardprice}::numeric, ${unsaved.lastreceiptcost}::numeric, ${unsaved.lastreceiptdate}::timestamp, ${unsaved.minorderqty}::int4, ${unsaved.maxorderqty}::int4, ${unsaved.onorderqty}::int4, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.averageleadtime, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.standardprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.lastreceiptcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.lastreceiptdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.minorderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.maxorderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.onorderqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))}::int4, ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
        """
       .executeInsert(ProductvendorRow.rowParser(1).single)
@@ -38,19 +43,19 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   }
   override def insert(unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
     val namedParameters = List(
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("averageleadtime", ParameterValue.from(unsaved.averageleadtime)), "::int4")),
-      Some((NamedParameter("standardprice", ParameterValue.from(unsaved.standardprice)), "::numeric")),
-      Some((NamedParameter("lastreceiptcost", ParameterValue.from(unsaved.lastreceiptcost)), "::numeric")),
-      Some((NamedParameter("lastreceiptdate", ParameterValue.from(unsaved.lastreceiptdate)), "::timestamp")),
-      Some((NamedParameter("minorderqty", ParameterValue.from(unsaved.minorderqty)), "::int4")),
-      Some((NamedParameter("maxorderqty", ParameterValue.from(unsaved.maxorderqty)), "::int4")),
-      Some((NamedParameter("onorderqty", ParameterValue.from(unsaved.onorderqty)), "::int4")),
-      Some((NamedParameter("unitmeasurecode", ParameterValue.from(unsaved.unitmeasurecode)), "::bpchar")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("averageleadtime", ParameterValue(unsaved.averageleadtime, null, ToStatement.intToStatement)), "::int4")),
+      Some((NamedParameter("standardprice", ParameterValue(unsaved.standardprice, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
+      Some((NamedParameter("lastreceiptcost", ParameterValue(unsaved.lastreceiptcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))), "::numeric")),
+      Some((NamedParameter("lastreceiptdate", ParameterValue(unsaved.lastreceiptdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
+      Some((NamedParameter("minorderqty", ParameterValue(unsaved.minorderqty, null, ToStatement.intToStatement)), "::int4")),
+      Some((NamedParameter("maxorderqty", ParameterValue(unsaved.maxorderqty, null, ToStatement.intToStatement)), "::int4")),
+      Some((NamedParameter("onorderqty", ParameterValue(unsaved.onorderqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))), "::int4")),
+      Some((NamedParameter("unitmeasurecode", ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)), "::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -80,22 +85,22 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   override def selectById(compositeId: ProductvendorId)(implicit c: Connection): Option[ProductvendorRow] = {
     SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
           from purchasing.productvendor
-          where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)}
        """.as(ProductvendorRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update purchasing.productvendor
-          set averageleadtime = ${row.averageleadtime}::int4,
-              standardprice = ${row.standardprice}::numeric,
-              lastreceiptcost = ${row.lastreceiptcost}::numeric,
-              lastreceiptdate = ${row.lastreceiptdate}::timestamp,
-              minorderqty = ${row.minorderqty}::int4,
-              maxorderqty = ${row.maxorderqty}::int4,
-              onorderqty = ${row.onorderqty}::int4,
-              unitmeasurecode = ${row.unitmeasurecode}::bpchar,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
+          set averageleadtime = ${ParameterValue(row.averageleadtime, null, ToStatement.intToStatement)}::int4,
+              standardprice = ${ParameterValue(row.standardprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              lastreceiptcost = ${ParameterValue(row.lastreceiptcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
+              lastreceiptdate = ${ParameterValue(row.lastreceiptdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+              minorderqty = ${ParameterValue(row.minorderqty, null, ToStatement.intToStatement)}::int4,
+              maxorderqty = ${ParameterValue(row.maxorderqty, null, ToStatement.intToStatement)}::int4,
+              onorderqty = ${ParameterValue(row.onorderqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))}::int4,
+              unitmeasurecode = ${ParameterValue(row.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
@@ -104,17 +109,17 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   override def upsert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     SQL"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
           values (
-            ${unsaved.productid}::int4,
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.averageleadtime}::int4,
-            ${unsaved.standardprice}::numeric,
-            ${unsaved.lastreceiptcost}::numeric,
-            ${unsaved.lastreceiptdate}::timestamp,
-            ${unsaved.minorderqty}::int4,
-            ${unsaved.maxorderqty}::int4,
-            ${unsaved.onorderqty}::int4,
-            ${unsaved.unitmeasurecode}::bpchar,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
+            ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.averageleadtime, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.standardprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.lastreceiptcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
+            ${ParameterValue(unsaved.lastreceiptdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+            ${ParameterValue(unsaved.minorderqty, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.maxorderqty, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.onorderqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))}::int4,
+            ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productid, businessentityid)
           do update set

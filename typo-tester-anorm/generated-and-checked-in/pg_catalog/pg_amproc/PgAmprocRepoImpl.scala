@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_amproc
 
+import adventureworks.TypoRegproc
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgAmprocRepoImpl extends PgAmprocRepo {
   override def delete(oid: PgAmprocId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_amproc where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_amproc where oid = ${ParameterValue(oid, null, PgAmprocId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAmprocFields, PgAmprocRow] = {
     DeleteBuilder("pg_catalog.pg_amproc", PgAmprocFields)
   }
   override def insert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow = {
     SQL"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
-          values (${unsaved.oid}::oid, ${unsaved.amprocfamily}::oid, ${unsaved.amproclefttype}::oid, ${unsaved.amprocrighttype}::oid, ${unsaved.amprocnum}::int2, ${unsaved.amproc}::regproc)
+          values (${ParameterValue(unsaved.oid, null, PgAmprocId.toStatement)}::oid, ${ParameterValue(unsaved.amprocfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amproclefttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amprocrighttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amprocnum, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.amproc, null, TypoRegproc.toStatement)}::regproc)
           returning oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
        """
       .executeInsert(PgAmprocRow.rowParser(1).single)
@@ -40,25 +43,25 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   override def selectById(oid: PgAmprocId)(implicit c: Connection): Option[PgAmprocRow] = {
     SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
           from pg_catalog.pg_amproc
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgAmprocId.toStatement)}
        """.as(PgAmprocRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgAmprocId])(implicit c: Connection): List[PgAmprocRow] = {
     SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
           from pg_catalog.pg_amproc
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgAmprocRow.rowParser(1).*)
     
   }
   override def update(row: PgAmprocRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_amproc
-          set amprocfamily = ${row.amprocfamily}::oid,
-              amproclefttype = ${row.amproclefttype}::oid,
-              amprocrighttype = ${row.amprocrighttype}::oid,
-              amprocnum = ${row.amprocnum}::int2,
-              amproc = ${row.amproc}::regproc
-          where oid = $oid
+          set amprocfamily = ${ParameterValue(row.amprocfamily, null, ToStatement.longToStatement)}::oid,
+              amproclefttype = ${ParameterValue(row.amproclefttype, null, ToStatement.longToStatement)}::oid,
+              amprocrighttype = ${ParameterValue(row.amprocrighttype, null, ToStatement.longToStatement)}::oid,
+              amprocnum = ${ParameterValue(row.amprocnum, null, ToStatement.intToStatement)}::int2,
+              amproc = ${ParameterValue(row.amproc, null, TypoRegproc.toStatement)}::regproc
+          where oid = ${ParameterValue(oid, null, PgAmprocId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAmprocFields, PgAmprocRow] = {
@@ -67,12 +70,12 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   override def upsert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow = {
     SQL"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.amprocfamily}::oid,
-            ${unsaved.amproclefttype}::oid,
-            ${unsaved.amprocrighttype}::oid,
-            ${unsaved.amprocnum}::int2,
-            ${unsaved.amproc}::regproc
+            ${ParameterValue(unsaved.oid, null, PgAmprocId.toStatement)}::oid,
+            ${ParameterValue(unsaved.amprocfamily, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.amproclefttype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.amprocrighttype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.amprocnum, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.amproc, null, TypoRegproc.toStatement)}::regproc
           )
           on conflict (oid)
           do update set

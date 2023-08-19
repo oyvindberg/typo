@@ -9,12 +9,14 @@ package location
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production."location" where locationid = $locationid""".executeUpdate() > 0
+    SQL"""delete from production."location" where locationid = ${ParameterValue(locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
     DeleteBuilder("production.location", LocationFields)
   }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
-          values (${unsaved.locationid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.costrate}::numeric, ${unsaved.availability}::numeric, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning locationid, "name", costrate, availability, modifieddate::text
        """
       .executeInsert(LocationRow.rowParser(1).single)
@@ -38,22 +40,22 @@ object LocationRepoImpl extends LocationRepo {
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.locationid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("locationid", ParameterValue.from[LocationId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("locationid", ParameterValue(value, null, LocationId.toStatement)), "::int4"))
       },
       unsaved.costrate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("costrate", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("costrate", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.availability match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("availability", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("availability", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -83,24 +85,24 @@ object LocationRepoImpl extends LocationRepo {
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
     SQL"""select locationid, "name", costrate, availability, modifieddate::text
           from production."location"
-          where locationid = $locationid
+          where locationid = ${ParameterValue(locationid, null, LocationId.toStatement)}
        """.as(LocationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow] = {
     SQL"""select locationid, "name", costrate, availability, modifieddate::text
           from production."location"
-          where locationid = ANY($locationids)
+          where locationid = ANY(${locationids})
        """.as(LocationRow.rowParser(1).*)
     
   }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
     val locationid = row.locationid
     SQL"""update production."location"
-          set "name" = ${row.name}::"public"."Name",
-              costrate = ${row.costrate}::numeric,
-              availability = ${row.availability}::numeric,
-              modifieddate = ${row.modifieddate}::timestamp
-          where locationid = $locationid
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              costrate = ${ParameterValue(row.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              availability = ${ParameterValue(row.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where locationid = ${ParameterValue(locationid, null, LocationId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
@@ -109,11 +111,11 @@ object LocationRepoImpl extends LocationRepo {
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
           values (
-            ${unsaved.locationid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.costrate}::numeric,
-            ${unsaved.availability}::numeric,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (locationid)
           do update set

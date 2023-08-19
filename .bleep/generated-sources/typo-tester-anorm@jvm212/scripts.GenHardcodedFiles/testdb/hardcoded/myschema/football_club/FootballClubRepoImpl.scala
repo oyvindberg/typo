@@ -14,6 +14,7 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -22,14 +23,14 @@ import typo.dsl.UpdateBuilder
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
-    SQL"""delete from myschema.football_club where "id" = $id""".executeUpdate() > 0
+    SQL"""delete from myschema.football_club where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
     DeleteBuilder("myschema.football_club", FootballClubFields)
   }
   override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     SQL"""insert into myschema.football_club("id", "name")
-          values (${unsaved.id}::int8, ${unsaved.name})
+          values (${ParameterValue(unsaved.id, null, FootballClubId.toStatement)}::int8, ${ParameterValue(unsaved.name, null, ToStatement.stringToStatement)})
           returning "id", "name"
        """
       .executeInsert(FootballClubRow.rowParser(1).single)
@@ -46,13 +47,13 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
     SQL"""select "id", "name"
           from myschema.football_club
-          where "id" = $id
+          where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}
        """.as(FootballClubRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select "id", "name"
           from myschema.football_club
-          where "id" = ANY($ids)
+          where "id" = ANY(${ids})
        """.as(FootballClubRow.rowParser(1).*)
     
   }
@@ -61,8 +62,8 @@ object FootballClubRepoImpl extends FootballClubRepo {
       case Nil => selectAll
       case nonEmpty =>
         val namedParameters = nonEmpty.map{
-          case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+          case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue(value, null, FootballClubId.toStatement))
+          case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue(value, null, ToStatement.stringToStatement))
         }
         val quote = '"'.toString
         val q = s"""select "id", "name"
@@ -77,8 +78,8 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
     val id = row.id
     SQL"""update myschema.football_club
-          set "name" = ${row.name}
-          where "id" = $id
+          set "name" = ${ParameterValue(row.name, null, ToStatement.stringToStatement)}
+          where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
@@ -89,14 +90,14 @@ object FootballClubRepoImpl extends FootballClubRepo {
       case Nil => false
       case nonEmpty =>
         val namedParameters = nonEmpty.map{
-          case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+          case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue(value, null, ToStatement.stringToStatement))
         }
         val quote = '"'.toString
         val q = s"""update myschema.football_club
                     set ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
                     where "id" = {id}
                  """
-        SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap ++ List(("id", ParameterValue.from(id))), RowParser.successful)
+        SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap ++ List(("id", ParameterValue(id, null, FootballClubId.toStatement))), RowParser.successful)
           .executeUpdate() > 0
     }
     
@@ -104,8 +105,8 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     SQL"""insert into myschema.football_club("id", "name")
           values (
-            ${unsaved.id}::int8,
-            ${unsaved.name}
+            ${ParameterValue(unsaved.id, null, FootballClubId.toStatement)}::int8,
+            ${ParameterValue(unsaved.name, null, ToStatement.stringToStatement)}
           )
           on conflict ("id")
           do update set

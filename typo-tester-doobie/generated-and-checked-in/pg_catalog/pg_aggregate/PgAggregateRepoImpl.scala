@@ -42,7 +42,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
     sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = ${fromWrite(aggfnoid)(Write.fromPut(PgAggregateId.put))}".query(PgAggregateRow.read).option
   }
   override def selectByIds(aggfnoids: Array[PgAggregateId]): Stream[ConnectionIO, PgAggregateRow] = {
-    sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = ANY(${fromWrite(aggfnoids)(Write.fromPut(PgAggregateId.arrayPut))})".query(PgAggregateRow.read).stream
+    sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = ANY(${aggfnoids})".query(PgAggregateRow.read).stream
   }
   override def update(row: PgAggregateRow): ConnectionIO[Boolean] = {
     val aggfnoid = row.aggfnoid

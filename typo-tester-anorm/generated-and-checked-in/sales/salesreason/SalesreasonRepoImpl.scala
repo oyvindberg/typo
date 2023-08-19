@@ -9,6 +9,7 @@ package salesreason
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +24,14 @@ import typo.dsl.UpdateBuilder
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salesreason where salesreasonid = $salesreasonid".executeUpdate() > 0
+    SQL"delete from sales.salesreason where salesreasonid = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
     DeleteBuilder("sales.salesreason", SalesreasonFields)
   }
   override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
-          values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning salesreasonid, "name", reasontype, modifieddate::text
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
@@ -38,15 +39,15 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   }
   override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
-      Some((NamedParameter("reasontype", ParameterValue.from(unsaved.reasontype)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("reasontype", ParameterValue(unsaved.reasontype, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.salesreasonid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("salesreasonid", ParameterValue.from[SalesreasonId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("salesreasonid", ParameterValue(value, null, SalesreasonId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -76,23 +77,23 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
     SQL"""select salesreasonid, "name", reasontype, modifieddate::text
           from sales.salesreason
-          where salesreasonid = $salesreasonid
+          where salesreasonid = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
        """.as(SalesreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
     SQL"""select salesreasonid, "name", reasontype, modifieddate::text
           from sales.salesreason
-          where salesreasonid = ANY($salesreasonids)
+          where salesreasonid = ANY(${salesreasonids})
        """.as(SalesreasonRow.rowParser(1).*)
     
   }
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
     val salesreasonid = row.salesreasonid
     SQL"""update sales.salesreason
-          set "name" = ${row.name}::"public"."Name",
-              reasontype = ${row.reasontype}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where salesreasonid = $salesreasonid
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              reasontype = ${ParameterValue(row.reasontype, null, Name.toStatement)}::"public"."Name",
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where salesreasonid = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
@@ -101,10 +102,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
           values (
-            ${unsaved.salesreasonid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.reasontype}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (salesreasonid)
           do update set

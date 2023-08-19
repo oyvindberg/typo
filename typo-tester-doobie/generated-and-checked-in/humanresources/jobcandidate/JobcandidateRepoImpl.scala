@@ -73,7 +73,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}".query(JobcandidateRow.read).option
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ANY(${fromWrite(jobcandidateids)(Write.fromPut(JobcandidateId.arrayPut))})".query(JobcandidateRow.read).stream
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ANY(${jobcandidateids})".query(JobcandidateRow.read).stream
   }
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     val jobcandidateid = row.jobcandidateid

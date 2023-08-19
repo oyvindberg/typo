@@ -18,15 +18,15 @@ import typo.dsl.Bijection
 case class PgEnumId(value: /* oid */ Long) extends AnyVal
 object PgEnumId {
   implicit lazy val arrayColumn: Column[Array[PgEnumId]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[PgEnumId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val arrayToStatement: ToStatement[Array[PgEnumId]] = adventureworks.LongArrayToStatement.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[PgEnumId, /* oid */ Long] = Bijection[PgEnumId, /* oid */ Long](_.value)(PgEnumId.apply)
-  implicit lazy val column: Column[PgEnumId] = implicitly[Column[/* oid */ Long]].map(PgEnumId.apply)
+  implicit lazy val column: Column[PgEnumId] = Column.columnToLong.map(PgEnumId.apply)
   implicit lazy val ordering: Ordering[PgEnumId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[PgEnumId] = new ParameterMetaData[PgEnumId] {
-    override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
+    override def sqlType: String = ParameterMetaData.LongParameterMetaData.sqlType
+    override def jdbcType: Int = ParameterMetaData.LongParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[PgEnumId] = Reads.LongReads.map(PgEnumId.apply)
-  implicit lazy val toStatement: ToStatement[PgEnumId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val toStatement: ToStatement[PgEnumId] = ToStatement.longToStatement.contramap(_.value)
   implicit lazy val writes: Writes[PgEnumId] = Writes.LongWrites.contramap(_.value)
 }

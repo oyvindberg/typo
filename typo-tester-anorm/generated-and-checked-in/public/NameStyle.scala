@@ -19,15 +19,15 @@ import typo.dsl.Bijection
 case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
   implicit lazy val arrayColumn: Column[Array[NameStyle]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[NameStyle]] = implicitly[ToStatement[Array[Boolean]]].contramap(_.map(_.value))
+  implicit lazy val arrayToStatement: ToStatement[Array[NameStyle]] = adventureworks.BooleanArrayToStatement.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[NameStyle, Boolean] = Bijection[NameStyle, Boolean](_.value)(NameStyle.apply)
-  implicit lazy val column: Column[NameStyle] = implicitly[Column[Boolean]].map(NameStyle.apply)
+  implicit lazy val column: Column[NameStyle] = Column.columnToBoolean.map(NameStyle.apply)
   implicit lazy val ordering: Ordering[NameStyle] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[NameStyle] = new ParameterMetaData[NameStyle] {
-    override def sqlType: String = implicitly[ParameterMetaData[Boolean]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[Boolean]].jdbcType
+    override def sqlType: String = ParameterMetaData.BooleanParameterMetaData.sqlType
+    override def jdbcType: Int = ParameterMetaData.BooleanParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[NameStyle] = Reads.BooleanReads.map(NameStyle.apply)
-  implicit lazy val toStatement: ToStatement[NameStyle] = implicitly[ToStatement[Boolean]].contramap(_.value)
+  implicit lazy val toStatement: ToStatement[NameStyle] = ToStatement.booleanToStatement.contramap(_.value)
   implicit lazy val writes: Writes[NameStyle] = Writes.BooleanWrites.contramap(_.value)
 }

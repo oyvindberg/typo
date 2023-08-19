@@ -9,14 +9,16 @@ package customer
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.customer where customerid = $customerid".executeUpdate() > 0
+    SQL"delete from sales.customer where customerid = ${ParameterValue(customerid, null, CustomerId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
     DeleteBuilder("sales.customer", CustomerFields)
   }
   override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
-          values (${unsaved.customerid}::int4, ${unsaved.personid}::int4, ${unsaved.storeid}::int4, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4, ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
        """
       .executeInsert(CustomerRow.rowParser(1).single)
@@ -39,20 +41,20 @@ object CustomerRepoImpl extends CustomerRepo {
   }
   override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
     val namedParameters = List(
-      Some((NamedParameter("personid", ParameterValue.from(unsaved.personid)), "::int4")),
-      Some((NamedParameter("storeid", ParameterValue.from(unsaved.storeid)), "::int4")),
-      Some((NamedParameter("territoryid", ParameterValue.from(unsaved.territoryid)), "::int4")),
+      Some((NamedParameter("personid", ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))), "::int4")),
+      Some((NamedParameter("storeid", ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))), "::int4")),
+      Some((NamedParameter("territoryid", ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))), "::int4")),
       unsaved.customerid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("customerid", ParameterValue.from[CustomerId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("customerid", ParameterValue(value, null, CustomerId.toStatement)), "::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -82,25 +84,25 @@ object CustomerRepoImpl extends CustomerRepo {
   override def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow] = {
     SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate::text
           from sales.customer
-          where customerid = $customerid
+          where customerid = ${ParameterValue(customerid, null, CustomerId.toStatement)}
        """.as(CustomerRow.rowParser(1).singleOpt)
   }
   override def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow] = {
     SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate::text
           from sales.customer
-          where customerid = ANY($customerids)
+          where customerid = ANY(${customerids})
        """.as(CustomerRow.rowParser(1).*)
     
   }
   override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
     val customerid = row.customerid
     SQL"""update sales.customer
-          set personid = ${row.personid}::int4,
-              storeid = ${row.storeid}::int4,
-              territoryid = ${row.territoryid}::int4,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where customerid = $customerid
+          set personid = ${ParameterValue(row.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+              storeid = ${ParameterValue(row.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+              territoryid = ${ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where customerid = ${ParameterValue(customerid, null, CustomerId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
@@ -109,12 +111,12 @@ object CustomerRepoImpl extends CustomerRepo {
   override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
           values (
-            ${unsaved.customerid}::int4,
-            ${unsaved.personid}::int4,
-            ${unsaved.storeid}::int4,
-            ${unsaved.territoryid}::int4,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4,
+            ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+            ${ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+            ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (customerid)
           do update set

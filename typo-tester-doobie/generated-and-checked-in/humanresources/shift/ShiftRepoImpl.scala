@@ -74,7 +74,7 @@ object ShiftRepoImpl extends ShiftRepo {
     sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".query(ShiftRow.read).option
   }
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
-    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ANY(${fromWrite(shiftids)(Write.fromPut(ShiftId.arrayPut))})""".query(ShiftRow.read).stream
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ANY(${shiftids})""".query(ShiftRow.read).stream
   }
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid

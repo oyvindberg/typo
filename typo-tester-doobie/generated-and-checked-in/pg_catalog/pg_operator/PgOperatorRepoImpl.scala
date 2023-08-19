@@ -42,7 +42,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
     sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ${fromWrite(oid)(Write.fromPut(PgOperatorId.put))}".query(PgOperatorRow.read).option
   }
   override def selectByIds(oids: Array[PgOperatorId]): Stream[ConnectionIO, PgOperatorRow] = {
-    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ANY(${fromWrite(oids)(Write.fromPut(PgOperatorId.arrayPut))})".query(PgOperatorRow.read).stream
+    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ANY(${oids})".query(PgOperatorRow.read).stream
   }
   override def update(row: PgOperatorRow): ConnectionIO[Boolean] = {
     val oid = row.oid

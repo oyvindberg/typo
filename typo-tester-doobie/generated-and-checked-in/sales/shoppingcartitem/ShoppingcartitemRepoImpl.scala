@@ -81,7 +81,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}".query(ShoppingcartitemRow.read).option
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow] = {
-    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ANY(${fromWrite(shoppingcartitemids)(Write.fromPut(ShoppingcartitemId.arrayPut))})".query(ShoppingcartitemRow.read).stream
+    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ANY(${shoppingcartitemids})".query(ShoppingcartitemRow.read).stream
   }
   override def update(row: ShoppingcartitemRow): ConnectionIO[Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid

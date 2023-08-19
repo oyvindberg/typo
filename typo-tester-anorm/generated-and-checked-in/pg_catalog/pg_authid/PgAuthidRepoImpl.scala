@@ -7,7 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
+import adventureworks.TypoOffsetDateTime
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +20,14 @@ import typo.dsl.UpdateBuilder
 
 object PgAuthidRepoImpl extends PgAuthidRepo {
   override def delete(oid: PgAuthidId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_authid where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_authid where oid = ${ParameterValue(oid, null, PgAuthidId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAuthidFields, PgAuthidRow] = {
     DeleteBuilder("pg_catalog.pg_authid", PgAuthidFields)
   }
   override def insert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow = {
     SQL"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)
-          values (${unsaved.oid}::oid, ${unsaved.rolname}::name, ${unsaved.rolsuper}, ${unsaved.rolinherit}, ${unsaved.rolcreaterole}, ${unsaved.rolcreatedb}, ${unsaved.rolcanlogin}, ${unsaved.rolreplication}, ${unsaved.rolbypassrls}, ${unsaved.rolconnlimit}::int4, ${unsaved.rolpassword}, ${unsaved.rolvaliduntil}::timestamptz)
+          values (${ParameterValue(unsaved.oid, null, PgAuthidId.toStatement)}::oid, ${ParameterValue(unsaved.rolname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.rolsuper, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolinherit, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcreaterole, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcreatedb, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcanlogin, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolreplication, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolbypassrls, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolconnlimit, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.rolpassword, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.rolvaliduntil, null, ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata))}::timestamptz)
           returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
        """
       .executeInsert(PgAuthidRow.rowParser(1).single)
@@ -40,31 +44,31 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   override def selectById(oid: PgAuthidId)(implicit c: Connection): Option[PgAuthidRow] = {
     SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
           from pg_catalog.pg_authid
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgAuthidId.toStatement)}
        """.as(PgAuthidRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgAuthidId])(implicit c: Connection): List[PgAuthidRow] = {
     SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
           from pg_catalog.pg_authid
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgAuthidRow.rowParser(1).*)
     
   }
   override def update(row: PgAuthidRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_authid
-          set rolname = ${row.rolname}::name,
-              rolsuper = ${row.rolsuper},
-              rolinherit = ${row.rolinherit},
-              rolcreaterole = ${row.rolcreaterole},
-              rolcreatedb = ${row.rolcreatedb},
-              rolcanlogin = ${row.rolcanlogin},
-              rolreplication = ${row.rolreplication},
-              rolbypassrls = ${row.rolbypassrls},
-              rolconnlimit = ${row.rolconnlimit}::int4,
-              rolpassword = ${row.rolpassword},
-              rolvaliduntil = ${row.rolvaliduntil}::timestamptz
-          where oid = $oid
+          set rolname = ${ParameterValue(row.rolname, null, ToStatement.stringToStatement)}::name,
+              rolsuper = ${ParameterValue(row.rolsuper, null, ToStatement.booleanToStatement)},
+              rolinherit = ${ParameterValue(row.rolinherit, null, ToStatement.booleanToStatement)},
+              rolcreaterole = ${ParameterValue(row.rolcreaterole, null, ToStatement.booleanToStatement)},
+              rolcreatedb = ${ParameterValue(row.rolcreatedb, null, ToStatement.booleanToStatement)},
+              rolcanlogin = ${ParameterValue(row.rolcanlogin, null, ToStatement.booleanToStatement)},
+              rolreplication = ${ParameterValue(row.rolreplication, null, ToStatement.booleanToStatement)},
+              rolbypassrls = ${ParameterValue(row.rolbypassrls, null, ToStatement.booleanToStatement)},
+              rolconnlimit = ${ParameterValue(row.rolconnlimit, null, ToStatement.intToStatement)}::int4,
+              rolpassword = ${ParameterValue(row.rolpassword, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              rolvaliduntil = ${ParameterValue(row.rolvaliduntil, null, ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata))}::timestamptz
+          where oid = ${ParameterValue(oid, null, PgAuthidId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAuthidFields, PgAuthidRow] = {
@@ -73,18 +77,18 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   override def upsert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow = {
     SQL"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.rolname}::name,
-            ${unsaved.rolsuper},
-            ${unsaved.rolinherit},
-            ${unsaved.rolcreaterole},
-            ${unsaved.rolcreatedb},
-            ${unsaved.rolcanlogin},
-            ${unsaved.rolreplication},
-            ${unsaved.rolbypassrls},
-            ${unsaved.rolconnlimit}::int4,
-            ${unsaved.rolpassword},
-            ${unsaved.rolvaliduntil}::timestamptz
+            ${ParameterValue(unsaved.oid, null, PgAuthidId.toStatement)}::oid,
+            ${ParameterValue(unsaved.rolname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.rolsuper, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.rolinherit, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.rolcreaterole, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.rolcreatedb, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.rolcanlogin, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.rolreplication, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.rolbypassrls, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.rolconnlimit, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.rolpassword, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+            ${ParameterValue(unsaved.rolvaliduntil, null, ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata))}::timestamptz
           )
           on conflict (oid)
           do update set

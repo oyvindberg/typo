@@ -9,7 +9,9 @@ package person_detail
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import fs2.Stream
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
@@ -29,8 +31,8 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      JOIN person.person p ON p.businessentityid = s.businessentityid
                      JOIN person.businessentityaddress bea ON bea.businessentityid = s.businessentityid
                      JOIN person.address a ON a.addressid = bea.addressid
-            where s.businessentityid = $businessentityid::int4
-            and p.modifieddate > $modifiedAfter::timestamp"""
+            where s.businessentityid = ${fromWrite(businessentityid)(Write.fromPutOption(/* user-picked */ BusinessentityId.put))}::int4
+            and p.modifieddate > ${fromWrite(modifiedAfter)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp"""
     sql.query(PersonDetailSqlRow.read).stream
   }
 }

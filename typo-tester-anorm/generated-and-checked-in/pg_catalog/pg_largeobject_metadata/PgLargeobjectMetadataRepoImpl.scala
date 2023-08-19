@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_largeobject_metadata
 
+import adventureworks.TypoAclItem
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def delete(oid: PgLargeobjectMetadataId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_largeobject_metadata where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_largeobject_metadata where oid = ${ParameterValue(oid, null, PgLargeobjectMetadataId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
     DeleteBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields)
   }
   override def insert(unsaved: PgLargeobjectMetadataRow)(implicit c: Connection): PgLargeobjectMetadataRow = {
     SQL"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
-          values (${unsaved.oid}::oid, ${unsaved.lomowner}::oid, ${unsaved.lomacl}::_aclitem)
+          values (${ParameterValue(unsaved.oid, null, PgLargeobjectMetadataId.toStatement)}::oid, ${ParameterValue(unsaved.lomowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.lomacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem)
           returning oid, lomowner, lomacl
        """
       .executeInsert(PgLargeobjectMetadataRow.rowParser(1).single)
@@ -40,22 +43,22 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def selectById(oid: PgLargeobjectMetadataId)(implicit c: Connection): Option[PgLargeobjectMetadataRow] = {
     SQL"""select oid, lomowner, lomacl
           from pg_catalog.pg_largeobject_metadata
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgLargeobjectMetadataId.toStatement)}
        """.as(PgLargeobjectMetadataRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgLargeobjectMetadataId])(implicit c: Connection): List[PgLargeobjectMetadataRow] = {
     SQL"""select oid, lomowner, lomacl
           from pg_catalog.pg_largeobject_metadata
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgLargeobjectMetadataRow.rowParser(1).*)
     
   }
   override def update(row: PgLargeobjectMetadataRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_largeobject_metadata
-          set lomowner = ${row.lomowner}::oid,
-              lomacl = ${row.lomacl}::_aclitem
-          where oid = $oid
+          set lomowner = ${ParameterValue(row.lomowner, null, ToStatement.longToStatement)}::oid,
+              lomacl = ${ParameterValue(row.lomacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem
+          where oid = ${ParameterValue(oid, null, PgLargeobjectMetadataId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
@@ -64,9 +67,9 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def upsert(unsaved: PgLargeobjectMetadataRow)(implicit c: Connection): PgLargeobjectMetadataRow = {
     SQL"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.lomowner}::oid,
-            ${unsaved.lomacl}::_aclitem
+            ${ParameterValue(unsaved.oid, null, PgLargeobjectMetadataId.toStatement)}::oid,
+            ${ParameterValue(unsaved.lomowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.lomacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem
           )
           on conflict (oid)
           do update set

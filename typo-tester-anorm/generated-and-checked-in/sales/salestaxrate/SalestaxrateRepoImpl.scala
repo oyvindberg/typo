@@ -9,14 +9,16 @@ package salestaxrate
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salestaxrate where salestaxrateid = $salestaxrateid".executeUpdate() > 0
+    SQL"delete from sales.salestaxrate where salestaxrateid = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
     DeleteBuilder("sales.salestaxrate", SalestaxrateFields)
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
-          values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
@@ -39,24 +41,24 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
     val namedParameters = List(
-      Some((NamedParameter("stateprovinceid", ParameterValue.from(unsaved.stateprovinceid)), "::int4")),
-      Some((NamedParameter("taxtype", ParameterValue.from(unsaved.taxtype)), "::int2")),
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("stateprovinceid", ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)), "::int4")),
+      Some((NamedParameter("taxtype", ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.salestaxrateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("salestaxrateid", ParameterValue.from[SalestaxrateId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("salestaxrateid", ParameterValue(value, null, SalestaxrateId.toStatement)), "::int4"))
       },
       unsaved.taxrate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("taxrate", ParameterValue.from[BigDecimal](value)), "::numeric"))
+        case Defaulted.Provided(value) => Some((NamedParameter("taxrate", ParameterValue(value, null, ToStatement.scalaBigDecimalToStatement)), "::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -86,26 +88,26 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
           from sales.salestaxrate
-          where salestaxrateid = $salestaxrateid
+          where salestaxrateid = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
        """.as(SalestaxrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
           from sales.salestaxrate
-          where salestaxrateid = ANY($salestaxrateids)
+          where salestaxrateid = ANY(${salestaxrateids})
        """.as(SalestaxrateRow.rowParser(1).*)
     
   }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
     val salestaxrateid = row.salestaxrateid
     SQL"""update sales.salestaxrate
-          set stateprovinceid = ${row.stateprovinceid}::int4,
-              taxtype = ${row.taxtype}::int2,
-              taxrate = ${row.taxrate}::numeric,
-              "name" = ${row.name}::"public"."Name",
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where salestaxrateid = $salestaxrateid
+          set stateprovinceid = ${ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
+              taxtype = ${ParameterValue(row.taxtype, null, ToStatement.intToStatement)}::int2,
+              taxrate = ${ParameterValue(row.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where salestaxrateid = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
@@ -114,13 +116,13 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
           values (
-            ${unsaved.salestaxrateid}::int4,
-            ${unsaved.stateprovinceid}::int4,
-            ${unsaved.taxtype}::int2,
-            ${unsaved.taxrate}::numeric,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4,
+            ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
+            ${ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (salestaxrateid)
           do update set

@@ -9,12 +9,14 @@ package illustration
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.illustration where illustrationid = $illustrationid".executeUpdate() > 0
+    SQL"delete from production.illustration where illustrationid = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
     DeleteBuilder("production.illustration", IllustrationFields)
   }
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration(illustrationid, diagram, modifieddate)
-          values (${unsaved.illustrationid}::int4, ${unsaved.diagram}::xml, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)}::int4, ${ParameterValue(unsaved.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning illustrationid, diagram, modifieddate::text
        """
       .executeInsert(IllustrationRow.rowParser(1).single)
@@ -38,14 +40,14 @@ object IllustrationRepoImpl extends IllustrationRepo {
   }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     val namedParameters = List(
-      Some((NamedParameter("diagram", ParameterValue.from(unsaved.diagram)), "::xml")),
+      Some((NamedParameter("diagram", ParameterValue(unsaved.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))), "::xml")),
       unsaved.illustrationid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("illustrationid", ParameterValue.from[IllustrationId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("illustrationid", ParameterValue(value, null, IllustrationId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -75,22 +77,22 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow] = {
     SQL"""select illustrationid, diagram, modifieddate::text
           from production.illustration
-          where illustrationid = $illustrationid
+          where illustrationid = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}
        """.as(IllustrationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
     SQL"""select illustrationid, diagram, modifieddate::text
           from production.illustration
-          where illustrationid = ANY($illustrationids)
+          where illustrationid = ANY(${illustrationids})
        """.as(IllustrationRow.rowParser(1).*)
     
   }
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
     val illustrationid = row.illustrationid
     SQL"""update production.illustration
-          set diagram = ${row.diagram}::xml,
-              modifieddate = ${row.modifieddate}::timestamp
-          where illustrationid = $illustrationid
+          set diagram = ${ParameterValue(row.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where illustrationid = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
@@ -99,9 +101,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration(illustrationid, diagram, modifieddate)
           values (
-            ${unsaved.illustrationid}::int4,
-            ${unsaved.diagram}::xml,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)}::int4,
+            ${ParameterValue(unsaved.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (illustrationid)
           do update set

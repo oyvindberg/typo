@@ -10,13 +10,17 @@ package vendor
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
+import adventureworks.public.Name
 import anorm.NamedParameter
+import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -25,14 +29,14 @@ import typo.dsl.UpdateBuilder
 
 object VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"delete from purchasing.vendor where businessentityid = $businessentityid".executeUpdate() > 0
+    SQL"delete from purchasing.vendor where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
     DeleteBuilder("purchasing.vendor", VendorFields)
   }
   override def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.name}::"public"."Name", ${unsaved.creditrating}::int2, ${unsaved.preferredvendorstatus}::"public"."Flag", ${unsaved.activeflag}::"public"."Flag", ${unsaved.purchasingwebserviceurl}, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::"public".AccountNumber, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.creditrating, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.preferredvendorstatus, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.activeflag, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
        """
       .executeInsert(VendorRow.rowParser(1).single)
@@ -40,22 +44,22 @@ object VendorRepoImpl extends VendorRepo {
   }
   override def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
     val namedParameters = List(
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("accountnumber", ParameterValue.from(unsaved.accountnumber)), """::"public".AccountNumber""")),
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
-      Some((NamedParameter("creditrating", ParameterValue.from(unsaved.creditrating)), "::int2")),
-      Some((NamedParameter("purchasingwebserviceurl", ParameterValue.from(unsaved.purchasingwebserviceurl)), "")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("accountnumber", ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)), """::"public".AccountNumber""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("creditrating", ParameterValue(unsaved.creditrating, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("purchasingwebserviceurl", ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
       unsaved.preferredvendorstatus match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("preferredvendorstatus", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("preferredvendorstatus", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
       },
       unsaved.activeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("activeflag", ParameterValue.from[Flag](value)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("activeflag", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -85,27 +89,27 @@ object VendorRepoImpl extends VendorRepo {
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow] = {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
           from purchasing.vendor
-          where businessentityid = $businessentityid
+          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(VendorRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
           from purchasing.vendor
-          where businessentityid = ANY($businessentityids)
+          where businessentityid = ANY(${businessentityids})
        """.as(VendorRow.rowParser(1).*)
     
   }
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update purchasing.vendor
-          set accountnumber = ${row.accountnumber}::"public".AccountNumber,
-              "name" = ${row.name}::"public"."Name",
-              creditrating = ${row.creditrating}::int2,
-              preferredvendorstatus = ${row.preferredvendorstatus}::"public"."Flag",
-              activeflag = ${row.activeflag}::"public"."Flag",
-              purchasingwebserviceurl = ${row.purchasingwebserviceurl},
-              modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          set accountnumber = ${ParameterValue(row.accountnumber, null, AccountNumber.toStatement)}::"public".AccountNumber,
+              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              creditrating = ${ParameterValue(row.creditrating, null, ToStatement.intToStatement)}::int2,
+              preferredvendorstatus = ${ParameterValue(row.preferredvendorstatus, null, Flag.toStatement)}::"public"."Flag",
+              activeflag = ${ParameterValue(row.activeflag, null, Flag.toStatement)}::"public"."Flag",
+              purchasingwebserviceurl = ${ParameterValue(row.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
@@ -114,14 +118,14 @@ object VendorRepoImpl extends VendorRepo {
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.accountnumber}::"public".AccountNumber,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.creditrating}::int2,
-            ${unsaved.preferredvendorstatus}::"public"."Flag",
-            ${unsaved.activeflag}::"public"."Flag",
-            ${unsaved.purchasingwebserviceurl},
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::"public".AccountNumber,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.creditrating, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.preferredvendorstatus, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.activeflag, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (businessentityid)
           do update set

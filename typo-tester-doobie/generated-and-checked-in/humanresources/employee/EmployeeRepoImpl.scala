@@ -102,7 +102,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
     sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".query(EmployeeRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, EmployeeRow] = {
-    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ANY(${fromWrite(businessentityids)(Write.fromPut(BusinessentityId.arrayPut))})".query(EmployeeRow.read).stream
+    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ANY(${businessentityids})".query(EmployeeRow.read).stream
   }
   override def update(row: EmployeeRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid

@@ -9,14 +9,16 @@ package productinventory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.location.LocationId
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".executeUpdate() > 0
+    SQL"delete from production.productinventory where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND locationid = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
     DeleteBuilder("production.productinventory", ProductinventoryFields)
   }
   override def insert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
-          values (${unsaved.productid}::int4, ${unsaved.locationid}::int2, ${unsaved.shelf}, ${unsaved.bin}::int2, ${unsaved.quantity}::int2, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2, ${ParameterValue(unsaved.shelf, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.bin, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
        """
       .executeInsert(ProductinventoryRow.rowParser(1).single)
@@ -39,21 +41,21 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   }
   override def insert(unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
     val namedParameters = List(
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("locationid", ParameterValue.from(unsaved.locationid)), "::int2")),
-      Some((NamedParameter("shelf", ParameterValue.from(unsaved.shelf)), "")),
-      Some((NamedParameter("bin", ParameterValue.from(unsaved.bin)), "::int2")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
+      Some((NamedParameter("locationid", ParameterValue(unsaved.locationid, null, LocationId.toStatement)), "::int2")),
+      Some((NamedParameter("shelf", ParameterValue(unsaved.shelf, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("bin", ParameterValue(unsaved.bin, null, ToStatement.intToStatement)), "::int2")),
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("quantity", ParameterValue.from[Int](value)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("quantity", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -83,18 +85,18 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def selectById(compositeId: ProductinventoryId)(implicit c: Connection): Option[ProductinventoryRow] = {
     SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
           from production.productinventory
-          where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND locationid = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}
        """.as(ProductinventoryRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductinventoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productinventory
-          set shelf = ${row.shelf},
-              bin = ${row.bin}::int2,
-              quantity = ${row.quantity}::int2,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
+          set shelf = ${ParameterValue(row.shelf, null, ToStatement.stringToStatement)},
+              bin = ${ParameterValue(row.bin, null, ToStatement.intToStatement)}::int2,
+              quantity = ${ParameterValue(row.quantity, null, ToStatement.intToStatement)}::int2,
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND locationid = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
@@ -103,13 +105,13 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def upsert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
           values (
-            ${unsaved.productid}::int4,
-            ${unsaved.locationid}::int2,
-            ${unsaved.shelf},
-            ${unsaved.bin}::int2,
-            ${unsaved.quantity}::int2,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
+            ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2,
+            ${ParameterValue(unsaved.shelf, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.bin, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productid, locationid)
           do update set

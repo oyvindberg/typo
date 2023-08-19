@@ -8,7 +8,10 @@ package update_person_returning
 
 import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
@@ -16,8 +19,8 @@ object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
     val sql =
       sql"""with row as (
               update person.person
-              set firstname = firstname || '-' || $suffix
-              where modifieddate < $cutoff::timestamp
+              set firstname = firstname || '-' || ${fromWrite(suffix)(Write.fromPutOption(Meta.StringMeta.put))}
+              where modifieddate < ${fromWrite(cutoff)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp
               returning firstname, modifieddate
             )
             select row.firstname, row.modifieddate::text

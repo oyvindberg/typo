@@ -9,12 +9,14 @@ package employeepayhistory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".executeUpdate() > 0
+    SQL"delete from humanresources.employeepayhistory where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND ratechangedate = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields)
   }
   override def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
     SQL"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.ratechangedate}::timestamp, ${unsaved.rate}::numeric, ${unsaved.payfrequency}::int2, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.payfrequency, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
        """
       .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
@@ -38,13 +40,13 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow = {
     val namedParameters = List(
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("ratechangedate", ParameterValue.from(unsaved.ratechangedate)), "::timestamp")),
-      Some((NamedParameter("rate", ParameterValue.from(unsaved.rate)), "::numeric")),
-      Some((NamedParameter("payfrequency", ParameterValue.from(unsaved.payfrequency)), "::int2")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("ratechangedate", ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("rate", ParameterValue(unsaved.rate, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
+      Some((NamedParameter("payfrequency", ParameterValue(unsaved.payfrequency, null, ToStatement.intToStatement)), "::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -74,16 +76,16 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow] = {
     SQL"""select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
           from humanresources.employeepayhistory
-          where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}
+          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND ratechangedate = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}
        """.as(EmployeepayhistoryRow.rowParser(1).singleOpt)
   }
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update humanresources.employeepayhistory
-          set rate = ${row.rate}::numeric,
-              payfrequency = ${row.payfrequency}::int2,
-              modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}
+          set rate = ${ParameterValue(row.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              payfrequency = ${ParameterValue(row.payfrequency, null, ToStatement.intToStatement)}::int2,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND ratechangedate = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
@@ -92,11 +94,11 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
     SQL"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.ratechangedate}::timestamp,
-            ${unsaved.rate}::numeric,
-            ${unsaved.payfrequency}::int2,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.payfrequency, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (businessentityid, ratechangedate)
           do update set

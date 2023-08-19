@@ -78,7 +78,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}""".query(ProductsubcategoryRow.read).option
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): Stream[ConnectionIO, ProductsubcategoryRow] = {
-    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ANY(${fromWrite(productsubcategoryids)(Write.fromPut(ProductsubcategoryId.arrayPut))})""".query(ProductsubcategoryRow.read).stream
+    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ANY(${productsubcategoryids})""".query(ProductsubcategoryRow.read).stream
   }
   override def update(row: ProductsubcategoryRow): ConnectionIO[Boolean] = {
     val productsubcategoryid = row.productsubcategoryid

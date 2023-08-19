@@ -42,7 +42,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}".query(PgLargeobjectMetadataRow.read).option
   }
   override def selectByIds(oids: Array[PgLargeobjectMetadataId]): Stream[ConnectionIO, PgLargeobjectMetadataRow] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY(${fromWrite(oids)(Write.fromPut(PgLargeobjectMetadataId.arrayPut))})".query(PgLargeobjectMetadataRow.read).stream
+    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY(${oids})".query(PgLargeobjectMetadataRow.read).stream
   }
   override def update(row: PgLargeobjectMetadataRow): ConnectionIO[Boolean] = {
     val oid = row.oid

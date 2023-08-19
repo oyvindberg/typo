@@ -41,7 +41,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ${fromWrite(roident)(Write.fromPut(PgReplicationOriginId.put))}".query(PgReplicationOriginRow.read).option
   }
   override def selectByIds(roidents: Array[PgReplicationOriginId]): Stream[ConnectionIO, PgReplicationOriginRow] = {
-    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ANY(${fromWrite(roidents)(Write.fromPut(PgReplicationOriginId.arrayPut))})".query(PgReplicationOriginRow.read).stream
+    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ANY(${roidents})".query(PgReplicationOriginRow.read).stream
   }
   override def update(row: PgReplicationOriginRow): ConnectionIO[Boolean] = {
     val roident = row.roident

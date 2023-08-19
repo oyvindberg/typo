@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_conversion
 
+import adventureworks.TypoRegproc
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_conversion where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_conversion where oid = ${ParameterValue(oid, null, PgConversionId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgConversionFields, PgConversionRow] = {
     DeleteBuilder("pg_catalog.pg_conversion", PgConversionFields)
   }
   override def insert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow = {
     SQL"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
-          values (${unsaved.oid}::oid, ${unsaved.conname}::name, ${unsaved.connamespace}::oid, ${unsaved.conowner}::oid, ${unsaved.conforencoding}::int4, ${unsaved.contoencoding}::int4, ${unsaved.conproc}::regproc, ${unsaved.condefault})
+          values (${ParameterValue(unsaved.oid, null, PgConversionId.toStatement)}::oid, ${ParameterValue(unsaved.conname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.connamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.conowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.conforencoding, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.contoencoding, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.conproc, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.condefault, null, ToStatement.booleanToStatement)})
           returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
        """
       .executeInsert(PgConversionRow.rowParser(1).single)
@@ -40,27 +43,27 @@ object PgConversionRepoImpl extends PgConversionRepo {
   override def selectById(oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow] = {
     SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
           from pg_catalog.pg_conversion
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgConversionId.toStatement)}
        """.as(PgConversionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgConversionId])(implicit c: Connection): List[PgConversionRow] = {
     SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
           from pg_catalog.pg_conversion
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgConversionRow.rowParser(1).*)
     
   }
   override def update(row: PgConversionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_conversion
-          set conname = ${row.conname}::name,
-              connamespace = ${row.connamespace}::oid,
-              conowner = ${row.conowner}::oid,
-              conforencoding = ${row.conforencoding}::int4,
-              contoencoding = ${row.contoencoding}::int4,
-              conproc = ${row.conproc}::regproc,
-              condefault = ${row.condefault}
-          where oid = $oid
+          set conname = ${ParameterValue(row.conname, null, ToStatement.stringToStatement)}::name,
+              connamespace = ${ParameterValue(row.connamespace, null, ToStatement.longToStatement)}::oid,
+              conowner = ${ParameterValue(row.conowner, null, ToStatement.longToStatement)}::oid,
+              conforencoding = ${ParameterValue(row.conforencoding, null, ToStatement.intToStatement)}::int4,
+              contoencoding = ${ParameterValue(row.contoencoding, null, ToStatement.intToStatement)}::int4,
+              conproc = ${ParameterValue(row.conproc, null, TypoRegproc.toStatement)}::regproc,
+              condefault = ${ParameterValue(row.condefault, null, ToStatement.booleanToStatement)}
+          where oid = ${ParameterValue(oid, null, PgConversionId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgConversionFields, PgConversionRow] = {
@@ -69,14 +72,14 @@ object PgConversionRepoImpl extends PgConversionRepo {
   override def upsert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow = {
     SQL"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.conname}::name,
-            ${unsaved.connamespace}::oid,
-            ${unsaved.conowner}::oid,
-            ${unsaved.conforencoding}::int4,
-            ${unsaved.contoencoding}::int4,
-            ${unsaved.conproc}::regproc,
-            ${unsaved.condefault}
+            ${ParameterValue(unsaved.oid, null, PgConversionId.toStatement)}::oid,
+            ${ParameterValue(unsaved.conname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.connamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.conowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.conforencoding, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.contoencoding, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.conproc, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.condefault, null, ToStatement.booleanToStatement)}
           )
           on conflict (oid)
           do update set

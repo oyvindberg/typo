@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_collation
 
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_collation where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_collation where oid = ${ParameterValue(oid, null, PgCollationId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgCollationFields, PgCollationRow] = {
     DeleteBuilder("pg_catalog.pg_collation", PgCollationFields)
   }
   override def insert(unsaved: PgCollationRow)(implicit c: Connection): PgCollationRow = {
     SQL"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
-          values (${unsaved.oid}::oid, ${unsaved.collname}::name, ${unsaved.collnamespace}::oid, ${unsaved.collowner}::oid, ${unsaved.collprovider}::char, ${unsaved.collisdeterministic}, ${unsaved.collencoding}::int4, ${unsaved.collcollate}::name, ${unsaved.collctype}::name, ${unsaved.collversion})
+          values (${ParameterValue(unsaved.oid, null, PgCollationId.toStatement)}::oid, ${ParameterValue(unsaved.collname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.collnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.collowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.collprovider, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.collisdeterministic, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.collencoding, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.collcollate, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.collctype, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.collversion, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
           returning oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
        """
       .executeInsert(PgCollationRow.rowParser(1).single)
@@ -40,29 +43,29 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow] = {
     SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
           from pg_catalog.pg_collation
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgCollationId.toStatement)}
        """.as(PgCollationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
     SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
           from pg_catalog.pg_collation
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgCollationRow.rowParser(1).*)
     
   }
   override def update(row: PgCollationRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_collation
-          set collname = ${row.collname}::name,
-              collnamespace = ${row.collnamespace}::oid,
-              collowner = ${row.collowner}::oid,
-              collprovider = ${row.collprovider}::char,
-              collisdeterministic = ${row.collisdeterministic},
-              collencoding = ${row.collencoding}::int4,
-              collcollate = ${row.collcollate}::name,
-              collctype = ${row.collctype}::name,
-              collversion = ${row.collversion}
-          where oid = $oid
+          set collname = ${ParameterValue(row.collname, null, ToStatement.stringToStatement)}::name,
+              collnamespace = ${ParameterValue(row.collnamespace, null, ToStatement.longToStatement)}::oid,
+              collowner = ${ParameterValue(row.collowner, null, ToStatement.longToStatement)}::oid,
+              collprovider = ${ParameterValue(row.collprovider, null, ToStatement.stringToStatement)}::char,
+              collisdeterministic = ${ParameterValue(row.collisdeterministic, null, ToStatement.booleanToStatement)},
+              collencoding = ${ParameterValue(row.collencoding, null, ToStatement.intToStatement)}::int4,
+              collcollate = ${ParameterValue(row.collcollate, null, ToStatement.stringToStatement)}::name,
+              collctype = ${ParameterValue(row.collctype, null, ToStatement.stringToStatement)}::name,
+              collversion = ${ParameterValue(row.collversion, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+          where oid = ${ParameterValue(oid, null, PgCollationId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgCollationFields, PgCollationRow] = {
@@ -71,16 +74,16 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def upsert(unsaved: PgCollationRow)(implicit c: Connection): PgCollationRow = {
     SQL"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.collname}::name,
-            ${unsaved.collnamespace}::oid,
-            ${unsaved.collowner}::oid,
-            ${unsaved.collprovider}::char,
-            ${unsaved.collisdeterministic},
-            ${unsaved.collencoding}::int4,
-            ${unsaved.collcollate}::name,
-            ${unsaved.collctype}::name,
-            ${unsaved.collversion}
+            ${ParameterValue(unsaved.oid, null, PgCollationId.toStatement)}::oid,
+            ${ParameterValue(unsaved.collname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.collnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.collowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.collprovider, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.collisdeterministic, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.collencoding, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.collcollate, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.collctype, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.collversion, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           )
           on conflict (oid)
           do update set

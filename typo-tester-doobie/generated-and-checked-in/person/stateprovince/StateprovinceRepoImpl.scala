@@ -87,7 +87,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince where stateprovinceid = ${fromWrite(stateprovinceid)(Write.fromPut(StateprovinceId.put))}""".query(StateprovinceRow.read).option
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow] = {
-    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince where stateprovinceid = ANY(${fromWrite(stateprovinceids)(Write.fromPut(StateprovinceId.arrayPut))})""".query(StateprovinceRow.read).stream
+    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince where stateprovinceid = ANY(${stateprovinceids})""".query(StateprovinceRow.read).stream
   }
   override def update(row: StateprovinceRow): ConnectionIO[Boolean] = {
     val stateprovinceid = row.stateprovinceid

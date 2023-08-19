@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_default_acl
 
+import adventureworks.TypoAclItem
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_default_acl where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_default_acl where oid = ${ParameterValue(oid, null, PgDefaultAclId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
     DeleteBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields)
   }
   override def insert(unsaved: PgDefaultAclRow)(implicit c: Connection): PgDefaultAclRow = {
     SQL"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)
-          values (${unsaved.oid}::oid, ${unsaved.defaclrole}::oid, ${unsaved.defaclnamespace}::oid, ${unsaved.defaclobjtype}::char, ${unsaved.defaclacl}::_aclitem)
+          values (${ParameterValue(unsaved.oid, null, PgDefaultAclId.toStatement)}::oid, ${ParameterValue(unsaved.defaclrole, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.defaclnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.defaclobjtype, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.defaclacl, null, TypoAclItem.arrayToStatement)}::_aclitem)
           returning oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
        """
       .executeInsert(PgDefaultAclRow.rowParser(1).single)
@@ -40,24 +43,24 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def selectById(oid: PgDefaultAclId)(implicit c: Connection): Option[PgDefaultAclRow] = {
     SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
           from pg_catalog.pg_default_acl
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgDefaultAclId.toStatement)}
        """.as(PgDefaultAclRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgDefaultAclId])(implicit c: Connection): List[PgDefaultAclRow] = {
     SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
           from pg_catalog.pg_default_acl
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgDefaultAclRow.rowParser(1).*)
     
   }
   override def update(row: PgDefaultAclRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_default_acl
-          set defaclrole = ${row.defaclrole}::oid,
-              defaclnamespace = ${row.defaclnamespace}::oid,
-              defaclobjtype = ${row.defaclobjtype}::char,
-              defaclacl = ${row.defaclacl}::_aclitem
-          where oid = $oid
+          set defaclrole = ${ParameterValue(row.defaclrole, null, ToStatement.longToStatement)}::oid,
+              defaclnamespace = ${ParameterValue(row.defaclnamespace, null, ToStatement.longToStatement)}::oid,
+              defaclobjtype = ${ParameterValue(row.defaclobjtype, null, ToStatement.stringToStatement)}::char,
+              defaclacl = ${ParameterValue(row.defaclacl, null, TypoAclItem.arrayToStatement)}::_aclitem
+          where oid = ${ParameterValue(oid, null, PgDefaultAclId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
@@ -66,11 +69,11 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def upsert(unsaved: PgDefaultAclRow)(implicit c: Connection): PgDefaultAclRow = {
     SQL"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.defaclrole}::oid,
-            ${unsaved.defaclnamespace}::oid,
-            ${unsaved.defaclobjtype}::char,
-            ${unsaved.defaclacl}::_aclitem
+            ${ParameterValue(unsaved.oid, null, PgDefaultAclId.toStatement)}::oid,
+            ${ParameterValue(unsaved.defaclrole, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.defaclnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.defaclobjtype, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.defaclacl, null, TypoAclItem.arrayToStatement)}::_aclitem
           )
           on conflict (oid)
           do update set

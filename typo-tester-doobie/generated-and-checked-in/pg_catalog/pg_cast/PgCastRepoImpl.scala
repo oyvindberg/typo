@@ -41,7 +41,7 @@ object PgCastRepoImpl extends PgCastRepo {
     sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ${fromWrite(oid)(Write.fromPut(PgCastId.put))}".query(PgCastRow.read).option
   }
   override def selectByIds(oids: Array[PgCastId]): Stream[ConnectionIO, PgCastRow] = {
-    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ANY(${fromWrite(oids)(Write.fromPut(PgCastId.arrayPut))})".query(PgCastRow.read).stream
+    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ANY(${oids})".query(PgCastRow.read).stream
   }
   override def update(row: PgCastRow): ConnectionIO[Boolean] = {
     val oid = row.oid

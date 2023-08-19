@@ -92,7 +92,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text from person.person where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".query(PersonRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PersonRow] = {
-    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text from person.person where businessentityid = ANY(${fromWrite(businessentityids)(Write.fromPut(BusinessentityId.arrayPut))})".query(PersonRow.read).stream
+    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text from person.person where businessentityid = ANY(${businessentityids})".query(PersonRow.read).stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid

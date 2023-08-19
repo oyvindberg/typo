@@ -31,6 +31,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   val parameterMetadataName: sc.Ident = sc.Ident("parameterMetadata")
   val rowParserName: sc.Ident = sc.Ident("rowParser")
   val toStatementName: sc.Ident = sc.Ident("toStatement")
+  val arrayParameterMetaDataName = sc.Ident("arrayParameterMetaData")
+
+  def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code =
+    if (inlineImplicits && !forbidInline)
+      code"$${$ParameterValue($name, null, ${lookupToStatementFor(tpe)})}"
+    else code"$${$name}"
 
   def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
@@ -40,17 +46,14 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   def matchId(id: IdComputed): sc.Code =
     id match {
       case id: IdComputed.Unary =>
-        code"${maybeQuoted(id.col.dbName)} = $$${id.paramName}"
+        code"${maybeQuoted(id.col.dbName)} = ${runtimeInterpolateValue(id.paramName, id.tpe)}"
       case composite: IdComputed.Composite =>
-        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = $${${composite.paramName}.${cc.name}}").mkCode(" AND ")}"
+        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
-
-  def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
-    code"${maybeQuoted(x.col.dbName)} = ANY($$${idsParam.name})"
 
   /** Resolve known implicits at generation-time instead of at compile-time */
   def lookupColumnFor(tpe: sc.Type): sc.Code =
-    if (!inlineImplicits) Column.of(tpe).code
+    if (!inlineImplicits) sc.Summon(Column.of(tpe)).code
     else
       sc.Type.base(tpe) match {
         case sc.Type.BigDecimal     => code"$Column.columnToScalaBigDecimal"
@@ -76,7 +79,72 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         // fallback array case. implementation looks loco, but I guess it works
         case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$Column.columnToArray[$targ](${lookupColumnFor(targ)}, implicitly)"
         case other =>
+          println(Column.of(other).render)
           sc.Summon(Column.of(other)).code
+      }
+
+  /** Resolve known implicits at generation-time instead of at compile-time */
+  def lookupParameterMetaDataFor(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) sc.Summon(ParameterMetaData.of(tpe)).code
+    else
+      sc.Type.base(tpe) match {
+        case sc.Type.BigDecimal => code"$ParameterMetaData.BigDecimalParameterMetaData"
+        case sc.Type.Boolean    => code"$ParameterMetaData.BooleanParameterMetaData"
+        case sc.Type.Byte       => code"$ParameterMetaData.ByteParameterMetaData"
+        case sc.Type.Double     => code"$ParameterMetaData.DoubleParameterMetaData"
+        case sc.Type.Float      => code"$ParameterMetaData.FloatParameterMetaData"
+        case sc.Type.Int        => code"$ParameterMetaData.IntParameterMetaData"
+        case sc.Type.Long       => code"$ParameterMetaData.LongParameterMetaData"
+        case sc.Type.String     => code"$ParameterMetaData.StringParameterMetaData"
+        case sc.Type.UUID       => code"$ParameterMetaData.UUIDParameterMetaData"
+//        case sc.Type.Optional(targ) => lookupParameterMetaDataFor(targ)
+        // generated type
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
+          code"$tpe.$parameterMetadataName"
+        // customized type mapping
+        case x if missingInstancesByType.contains(ParameterMetaData.of(x)) =>
+          code"${missingInstancesByType(ParameterMetaData.of(x))}"
+        // generated array type
+//        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+//          code"$targ.$arrayColumnName"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$ParameterMetaData.ByteArrayParameterMetaData"
+        // fallback array case.
+        case sc.Type.TApply(sc.Type.Array, List(targ)) => code"${pkg / arrayParameterMetaDataName}(${lookupParameterMetaDataFor(targ)})"
+        case other =>
+          println(ParameterMetaData.of(other).render)
+          sc.Summon(ParameterMetaData.of(other)).code
+      }
+
+  /** Resolve known implicits at generation-time instead of at compile-time */
+  def lookupToStatementFor(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) sc.Summon(ToStatement.of(tpe)).code
+    else
+      sc.Type.base(tpe) match {
+        case sc.Type.BigDecimal     => code"$ToStatement.scalaBigDecimalToStatement"
+        case sc.Type.Boolean        => code"$ToStatement.booleanToStatement"
+        case sc.Type.Byte           => code"$ToStatement.byteToStatement"
+        case sc.Type.Double         => code"$ToStatement.doubleToStatement"
+        case sc.Type.Float          => code"$ToStatement.floatToStatement"
+        case sc.Type.Int            => code"$ToStatement.intToStatement"
+        case sc.Type.Long           => code"$ToStatement.longToStatement"
+        case sc.Type.String         => code"$ToStatement.stringToStatement"
+        case sc.Type.UUID           => code"$ToStatement.uuidToStatement"
+        case sc.Type.Optional(targ) => code"$ToStatement.optionToStatement(${lookupToStatementFor(targ)}, ${lookupParameterMetaDataFor(targ)})"
+        // generated type
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
+          code"$tpe.$toStatementName"
+        // customized type mapping
+        case x if missingInstancesByType.contains(ToStatement.of(x)) =>
+          code"${missingInstancesByType(ToStatement.of(x))}"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$ToStatement.byteArrayToStatement"
+        // generated array type
+        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+          code"$targ.$arrayToStatementName"
+        // fallback array case.
+        case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$ToStatement.arrayToParameter(${lookupParameterMetaDataFor(targ)})"
+        case other =>
+          println(ToStatement.of(other).render)
+          sc.Summon(ToStatement.of(other)).code
       }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
@@ -160,7 +228,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
-                 |where ${matchAnyId(unaryId, idsParam)}
+                 |where ${maybeQuoted(unaryId.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})
                  |""".stripMargin
         }
 
@@ -179,7 +247,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases: NonEmptyList[sc.Code] =
           cols.map { col =>
-            code"case $fieldValue.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
+            code"case $fieldValue.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue(value, null, ${lookupToStatementFor(col.tpe)}))"
           }
 
         val sql = sc.s {
@@ -205,7 +273,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
           cases0.map { col =>
-            code"case $fieldValue.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(value))"
+            code"case $fieldValue.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue(value, null, ${lookupToStatementFor(col.tpe)}))"
           }
         val where: sc.Code =
           id.cols.map { col => code"${maybeQuoted(col.dbName)} = {${col.name}}" }.mkCode(" AND ")
@@ -213,10 +281,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val idCases: NonEmptyList[sc.Code] =
           id match {
             case unary: IdComputed.Unary =>
-              NonEmptyList(code"(${sc.StrLit(unary.col.dbName.value)}, $ParameterValue.from(${id.paramName}))")
+              NonEmptyList(code"(${sc.StrLit(unary.col.dbName.value)}, $ParameterValue(${id.paramName}, null, ${lookupToStatementFor(id.tpe)}))")
             case IdComputed.Composite(cols, _, paramName) =>
               cols.map { col =>
-                code"(${sc.StrLit(col.dbName.value)}, $ParameterValue.from($paramName.${col.name}))"
+                code"(${sc.StrLit(col.dbName.value)}, $ParameterValue($paramName.${col.name}, null, ${lookupToStatementFor(col.tpe)}))"
               }
           }
 
@@ -242,8 +310,11 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |""".stripMargin
       case RepoMethod.Update(relName, _, id, param, colsUnsaved) =>
         val sql = SQL {
+          val setCols = colsUnsaved.map { col =>
+            code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}"
+          }
           code"""|update $relName
-                 |set ${colsUnsaved.map { col => code"${maybeQuoted(col.dbName)} = $${${param.name}.${col.name}}${sqlCast.toPgCode(col)}" }.mkCode(",\n")}
+                 |set ${setCols.mkCode(",\n")}
                  |where ${matchId(id)}
                  |""".stripMargin
         }
@@ -252,7 +323,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
-          code"$${${unsavedParam.name}.${c.name}}${sqlCast.toPgCode(c)}"
+          runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe).code ++ sqlCast.toPgCode(c)
         }
         val sql = SQL {
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
@@ -266,7 +337,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |"""
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
-          code"$${${unsavedParam.name}.${c.name}}${sqlCast.toPgCode(c)}"
+          runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe).code ++ sqlCast.toPgCode(c)
         }
 
         val pickExcludedCols = cols.toList
@@ -292,7 +363,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
           val colCast = sc.StrLit(sqlCast.toPgCode(col).render.asString)
-          code"""Some(($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})), $colCast))"""
+          code"""Some(($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue(${unsavedParam.name}.${col.name}, null, ${lookupToStatementFor(col.tpe)})), $colCast))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, dbCol), origType) =>
           val dbName = sc.StrLit(dbCol.name.value)
@@ -300,7 +371,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
           code"""|${unsavedParam.name}.$ident match {
                    |  case ${default.Defaulted}.${default.UseDefault} => None
-                   |  case ${default.Defaulted}.${default.Provided}(value) => Some(($NamedParameter($dbName, $ParameterValue.from[$origType](value)), $colCast))
+                   |  case ${default.Defaulted}.${default.Provided}(value) => Some(($NamedParameter($dbName, $ParameterValue(value, null, ${lookupToStatementFor(origType)})), $colCast))
                    |}"""
         }
 
@@ -340,10 +411,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"$sql.executeUpdate() > 0"
 
       case RepoMethod.SqlFile(sqlScript) =>
-        val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.render { (paramAtIndex: Int) =>
+        val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.renderCode { (paramAtIndex: Int) =>
           val param = sqlScript.nullableParams.find(_.underlying.indices.contains(paramAtIndex)).get
           val cast = sqlCast.toPg(param.underlying).fold("")(udtType => s"::$udtType")
-          s"$$${param.name.value}$cast"
+          code"${runtimeInterpolateValue(param.name, param.tpe)}$cast"
         }
         val ret = for {
           cols <- sqlScript.maybeCols.toOption
@@ -469,21 +540,21 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = columnName,
         implicitParams = Nil,
         tpe = Column.of(wrapperType),
-        body = code"""${sc.Summon(Column.of(underlying))}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))"""
+        body = code"""${lookupColumnFor(underlying)}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))"""
       ),
       sc.Given(
         tparams = Nil,
         name = toStatementName,
         implicitParams = Nil,
         tpe = ToStatement.of(wrapperType),
-        body = code"${sc.Summon(ToStatement.of(underlying))}.contramap(_.value)"
+        body = code"${lookupToStatementFor(underlying)}.contramap(_.value)"
       ),
       sc.Given(
         tparams = Nil,
         name = arrayToStatementName,
         implicitParams = Nil,
         tpe = ToStatement.of(sc.Type.Array.of(wrapperType)),
-        body = code"${sc.Summon(ToStatement.of(sc.Type.Array.of(underlying)))}.contramap(_.map(_.value))"
+        body = code"${lookupToStatementFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"
       ),
       sc.Given(
         tparams = Nil,
@@ -491,8 +562,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         implicitParams = Nil,
         tpe = ParameterMetaData.of(wrapperType),
         body = code"""|new $ParameterMetaData[$wrapperType] {
-                 |  override def sqlType: ${sc.Type.String} = ${sc.Summon(ParameterMetaData.of(underlying))}.sqlType
-                 |  override def jdbcType: ${sc.Type.Int} = ${sc.Summon(ParameterMetaData.of(underlying))}.jdbcType
+                 |  override def sqlType: ${sc.Type.String} = ${lookupParameterMetaDataFor(underlying)}.sqlType
+                 |  override def jdbcType: ${sc.Type.Int} = ${lookupParameterMetaDataFor(underlying)}.jdbcType
                  |}""".stripMargin
       )
     )
@@ -504,14 +575,14 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = toStatementName,
         implicitParams = Nil,
         tpe = ToStatement.of(wrapperType),
-        body = code"${sc.Summon(ToStatement.of(underlying))}.contramap(_.value)"
+        body = code"${lookupToStatementFor(underlying)}.contramap(_.value)"
       ),
       sc.Given(
         tparams = Nil,
         name = arrayToStatementName,
         implicitParams = Nil,
         tpe = ToStatement.of(sc.Type.Array.of(wrapperType)),
-        body = code"${sc.Summon(ToStatement.of(sc.Type.Array.of(underlying)))}.contramap(_.map(_.value))"
+        body = code"${lookupToStatementFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"
       ),
       sc.Given(
         tparams = Nil,
@@ -525,7 +596,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = columnName,
         implicitParams = Nil,
         tpe = Column.of(wrapperType),
-        body = code"${sc.Summon(Column.of(underlying))}.map($wrapperType.apply)"
+        body = code"${lookupColumnFor(underlying)}.map($wrapperType.apply)"
       ),
       sc.Given(
         tparams = Nil,
@@ -533,9 +604,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         implicitParams = Nil,
         tpe = ParameterMetaData.of(wrapperType),
         body = code"""|new ${ParameterMetaData.of(wrapperType)} {
-                 |  override def sqlType: String = ${sc.Summon(ParameterMetaData.of(underlying))}.sqlType
-                 |  override def jdbcType: Int = ${sc.Summon(ParameterMetaData.of(underlying))}.jdbcType
-                 |}""".stripMargin
+                      |  override def sqlType: String = ${lookupParameterMetaDataFor(underlying)}.sqlType
+                      |  override def jdbcType: Int = ${lookupParameterMetaDataFor(underlying)}.jdbcType
+                      |}""".stripMargin
       )
     )
   override val missingInstances: List[sc.ClassMember] = {
@@ -572,7 +643,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       val T = sc.Type.Abstract(sc.Ident("T"))
       sc.Given(
         List(T),
-        sc.Ident("arrayParameterMetaData"),
+        arrayParameterMetaDataName,
         List(sc.Param(T.value, ParameterMetaData.of(T), None)),
         ParameterMetaData.of(sc.Type.Array.of(T)),
         code"""|new ${ParameterMetaData.of(sc.Type.Array.of(T))} {

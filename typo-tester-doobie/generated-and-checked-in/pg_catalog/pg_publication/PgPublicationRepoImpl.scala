@@ -41,7 +41,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
     sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationId.put))}".query(PgPublicationRow.read).option
   }
   override def selectByIds(oids: Array[PgPublicationId]): Stream[ConnectionIO, PgPublicationRow] = {
-    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ANY(${fromWrite(oids)(Write.fromPut(PgPublicationId.arrayPut))})".query(PgPublicationRow.read).stream
+    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ANY(${oids})".query(PgPublicationRow.read).stream
   }
   override def update(row: PgPublicationRow): ConnectionIO[Boolean] = {
     val oid = row.oid

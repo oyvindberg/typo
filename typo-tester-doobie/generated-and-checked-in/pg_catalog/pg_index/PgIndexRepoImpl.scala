@@ -44,7 +44,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
     sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ${fromWrite(indexrelid)(Write.fromPut(PgIndexId.put))}".query(PgIndexRow.read).option
   }
   override def selectByIds(indexrelids: Array[PgIndexId]): Stream[ConnectionIO, PgIndexRow] = {
-    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ANY(${fromWrite(indexrelids)(Write.fromPut(PgIndexId.arrayPut))})".query(PgIndexRow.read).stream
+    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ANY(${indexrelids})".query(PgIndexRow.read).stream
   }
   override def update(row: PgIndexRow): ConnectionIO[Boolean] = {
     val indexrelid = row.indexrelid

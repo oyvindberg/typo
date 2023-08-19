@@ -9,12 +9,14 @@ package transactionhistory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.transactionhistory where transactionid = $transactionid".executeUpdate() > 0
+    SQL"delete from production.transactionhistory where transactionid = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     DeleteBuilder("production.transactionhistory", TransactionhistoryFields)
   }
   override def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
     SQL"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
-          values (${unsaved.transactionid}::int4, ${unsaved.productid}::int4, ${unsaved.referenceorderid}::int4, ${unsaved.referenceorderlineid}::int4, ${unsaved.transactiondate}::timestamp, ${unsaved.transactiontype}::bpchar, ${unsaved.quantity}::int4, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.transactionid, null, TransactionhistoryId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.referenceorderid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.referenceorderlineid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.transactiondate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.transactiontype, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
        """
       .executeInsert(TransactionhistoryRow.rowParser(1).single)
@@ -38,26 +40,26 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow = {
     val namedParameters = List(
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("referenceorderid", ParameterValue.from(unsaved.referenceorderid)), "::int4")),
-      Some((NamedParameter("transactiontype", ParameterValue.from(unsaved.transactiontype)), "::bpchar")),
-      Some((NamedParameter("quantity", ParameterValue.from(unsaved.quantity)), "::int4")),
-      Some((NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost)), "::numeric")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
+      Some((NamedParameter("referenceorderid", ParameterValue(unsaved.referenceorderid, null, ToStatement.intToStatement)), "::int4")),
+      Some((NamedParameter("transactiontype", ParameterValue(unsaved.transactiontype, null, ToStatement.stringToStatement)), "::bpchar")),
+      Some((NamedParameter("quantity", ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)), "::int4")),
+      Some((NamedParameter("actualcost", ParameterValue(unsaved.actualcost, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
       unsaved.transactionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("transactionid", ParameterValue.from[TransactionhistoryId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("transactionid", ParameterValue(value, null, TransactionhistoryId.toStatement)), "::int4"))
       },
       unsaved.referenceorderlineid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("referenceorderlineid", ParameterValue.from[Int](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("referenceorderlineid", ParameterValue(value, null, ToStatement.intToStatement)), "::int4"))
       },
       unsaved.transactiondate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("transactiondate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("transactiondate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -87,28 +89,28 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
           from production.transactionhistory
-          where transactionid = $transactionid
+          where transactionid = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}
        """.as(TransactionhistoryRow.rowParser(1).singleOpt)
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
           from production.transactionhistory
-          where transactionid = ANY($transactionids)
+          where transactionid = ANY(${transactionids})
        """.as(TransactionhistoryRow.rowParser(1).*)
     
   }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
     val transactionid = row.transactionid
     SQL"""update production.transactionhistory
-          set productid = ${row.productid}::int4,
-              referenceorderid = ${row.referenceorderid}::int4,
-              referenceorderlineid = ${row.referenceorderlineid}::int4,
-              transactiondate = ${row.transactiondate}::timestamp,
-              transactiontype = ${row.transactiontype}::bpchar,
-              quantity = ${row.quantity}::int4,
-              actualcost = ${row.actualcost}::numeric,
-              modifieddate = ${row.modifieddate}::timestamp
-          where transactionid = $transactionid
+          set productid = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
+              referenceorderid = ${ParameterValue(row.referenceorderid, null, ToStatement.intToStatement)}::int4,
+              referenceorderlineid = ${ParameterValue(row.referenceorderlineid, null, ToStatement.intToStatement)}::int4,
+              transactiondate = ${ParameterValue(row.transactiondate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              transactiontype = ${ParameterValue(row.transactiontype, null, ToStatement.stringToStatement)}::bpchar,
+              quantity = ${ParameterValue(row.quantity, null, ToStatement.intToStatement)}::int4,
+              actualcost = ${ParameterValue(row.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where transactionid = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
@@ -117,15 +119,15 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def upsert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
     SQL"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
           values (
-            ${unsaved.transactionid}::int4,
-            ${unsaved.productid}::int4,
-            ${unsaved.referenceorderid}::int4,
-            ${unsaved.referenceorderlineid}::int4,
-            ${unsaved.transactiondate}::timestamp,
-            ${unsaved.transactiontype}::bpchar,
-            ${unsaved.quantity}::int4,
-            ${unsaved.actualcost}::numeric,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.transactionid, null, TransactionhistoryId.toStatement)}::int4,
+            ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
+            ${ParameterValue(unsaved.referenceorderid, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.referenceorderlineid, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.transactiondate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.transactiontype, null, ToStatement.stringToStatement)}::bpchar,
+            ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (transactionid)
           do update set

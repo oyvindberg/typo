@@ -100,7 +100,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}".query(PurchaseorderheaderRow.read).option
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ANY(${fromWrite(purchaseorderids)(Write.fromPut(PurchaseorderheaderId.arrayPut))})".query(PurchaseorderheaderRow.read).stream
+    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ANY(${purchaseorderids})".query(PurchaseorderheaderRow.read).stream
   }
   override def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean] = {
     val purchaseorderid = row.purchaseorderid

@@ -9,12 +9,16 @@ package workorderrouting
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.location.LocationId
+import adventureworks.production.workorder.WorkorderId
 import anorm.NamedParameter
+import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +27,14 @@ import typo.dsl.UpdateBuilder
 
 object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.workorderrouting where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}".executeUpdate() > 0
+    SQL"delete from production.workorderrouting where workorderid = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND productid = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND operationsequence = ${ParameterValue(compositeId.operationsequence, null, ToStatement.intToStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     DeleteBuilder("production.workorderrouting", WorkorderroutingFields)
   }
   override def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
     SQL"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
-          values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.operationsequence}::int2, ${unsaved.locationid}::int2, ${unsaved.scheduledstartdate}::timestamp, ${unsaved.scheduledenddate}::timestamp, ${unsaved.actualstartdate}::timestamp, ${unsaved.actualenddate}::timestamp, ${unsaved.actualresourcehrs}::numeric, ${unsaved.plannedcost}::numeric, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.operationsequence, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2, ${ParameterValue(unsaved.scheduledstartdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.scheduledenddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.actualstartdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.actualenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.actualresourcehrs, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.plannedcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.actualcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text
        """
       .executeInsert(WorkorderroutingRow.rowParser(1).single)
@@ -38,20 +42,20 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
     val namedParameters = List(
-      Some((NamedParameter("workorderid", ParameterValue.from(unsaved.workorderid)), "::int4")),
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("operationsequence", ParameterValue.from(unsaved.operationsequence)), "::int2")),
-      Some((NamedParameter("locationid", ParameterValue.from(unsaved.locationid)), "::int2")),
-      Some((NamedParameter("scheduledstartdate", ParameterValue.from(unsaved.scheduledstartdate)), "::timestamp")),
-      Some((NamedParameter("scheduledenddate", ParameterValue.from(unsaved.scheduledenddate)), "::timestamp")),
-      Some((NamedParameter("actualstartdate", ParameterValue.from(unsaved.actualstartdate)), "::timestamp")),
-      Some((NamedParameter("actualenddate", ParameterValue.from(unsaved.actualenddate)), "::timestamp")),
-      Some((NamedParameter("actualresourcehrs", ParameterValue.from(unsaved.actualresourcehrs)), "::numeric")),
-      Some((NamedParameter("plannedcost", ParameterValue.from(unsaved.plannedcost)), "::numeric")),
-      Some((NamedParameter("actualcost", ParameterValue.from(unsaved.actualcost)), "::numeric")),
+      Some((NamedParameter("workorderid", ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)), "::int4")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ToStatement.intToStatement)), "::int4")),
+      Some((NamedParameter("operationsequence", ParameterValue(unsaved.operationsequence, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("locationid", ParameterValue(unsaved.locationid, null, LocationId.toStatement)), "::int2")),
+      Some((NamedParameter("scheduledstartdate", ParameterValue(unsaved.scheduledstartdate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("scheduledenddate", ParameterValue(unsaved.scheduledenddate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("actualstartdate", ParameterValue(unsaved.actualstartdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
+      Some((NamedParameter("actualenddate", ParameterValue(unsaved.actualenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
+      Some((NamedParameter("actualresourcehrs", ParameterValue(unsaved.actualresourcehrs, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))), "::numeric")),
+      Some((NamedParameter("plannedcost", ParameterValue(unsaved.plannedcost, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
+      Some((NamedParameter("actualcost", ParameterValue(unsaved.actualcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -81,22 +85,22 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text
           from production.workorderrouting
-          where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
+          where workorderid = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND productid = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND operationsequence = ${ParameterValue(compositeId.operationsequence, null, ToStatement.intToStatement)}
        """.as(WorkorderroutingRow.rowParser(1).singleOpt)
   }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.workorderrouting
-          set locationid = ${row.locationid}::int2,
-              scheduledstartdate = ${row.scheduledstartdate}::timestamp,
-              scheduledenddate = ${row.scheduledenddate}::timestamp,
-              actualstartdate = ${row.actualstartdate}::timestamp,
-              actualenddate = ${row.actualenddate}::timestamp,
-              actualresourcehrs = ${row.actualresourcehrs}::numeric,
-              plannedcost = ${row.plannedcost}::numeric,
-              actualcost = ${row.actualcost}::numeric,
-              modifieddate = ${row.modifieddate}::timestamp
-          where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
+          set locationid = ${ParameterValue(row.locationid, null, LocationId.toStatement)}::int2,
+              scheduledstartdate = ${ParameterValue(row.scheduledstartdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              scheduledenddate = ${ParameterValue(row.scheduledenddate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              actualstartdate = ${ParameterValue(row.actualstartdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+              actualenddate = ${ParameterValue(row.actualenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+              actualresourcehrs = ${ParameterValue(row.actualresourcehrs, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
+              plannedcost = ${ParameterValue(row.plannedcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              actualcost = ${ParameterValue(row.actualcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where workorderid = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND productid = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND operationsequence = ${ParameterValue(compositeId.operationsequence, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
@@ -105,18 +109,18 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
     SQL"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
           values (
-            ${unsaved.workorderid}::int4,
-            ${unsaved.productid}::int4,
-            ${unsaved.operationsequence}::int2,
-            ${unsaved.locationid}::int2,
-            ${unsaved.scheduledstartdate}::timestamp,
-            ${unsaved.scheduledenddate}::timestamp,
-            ${unsaved.actualstartdate}::timestamp,
-            ${unsaved.actualenddate}::timestamp,
-            ${unsaved.actualresourcehrs}::numeric,
-            ${unsaved.plannedcost}::numeric,
-            ${unsaved.actualcost}::numeric,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4,
+            ${ParameterValue(unsaved.productid, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.operationsequence, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2,
+            ${ParameterValue(unsaved.scheduledstartdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.scheduledenddate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.actualstartdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+            ${ParameterValue(unsaved.actualenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+            ${ParameterValue(unsaved.actualresourcehrs, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
+            ${ParameterValue(unsaved.plannedcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.actualcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (workorderid, productid, operationsequence)
           do update set

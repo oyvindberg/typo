@@ -8,7 +8,9 @@ package person_detail
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
@@ -28,8 +30,8 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      JOIN person.person p ON p.businessentityid = s.businessentityid
                      JOIN person.businessentityaddress bea ON bea.businessentityid = s.businessentityid
                      JOIN person.address a ON a.addressid = bea.addressid
-            where s.businessentityid = $businessentityid::int4
-            and p.modifieddate > $modifiedAfter::timestamp"""
+            where s.businessentityid = ${ParameterValue(businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4
+            and p.modifieddate > ${ParameterValue(modifiedAfter, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp"""
     sql.as(PersonDetailSqlRow.rowParser(1).*)
   }
 }

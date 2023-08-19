@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgAmopRepoImpl extends PgAmopRepo {
   override def delete(oid: PgAmopId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_amop where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_amop where oid = ${ParameterValue(oid, null, PgAmopId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAmopFields, PgAmopRow] = {
     DeleteBuilder("pg_catalog.pg_amop", PgAmopFields)
   }
   override def insert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow = {
     SQL"""insert into pg_catalog.pg_amop(oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily)
-          values (${unsaved.oid}::oid, ${unsaved.amopfamily}::oid, ${unsaved.amoplefttype}::oid, ${unsaved.amoprighttype}::oid, ${unsaved.amopstrategy}::int2, ${unsaved.amoppurpose}::char, ${unsaved.amopopr}::oid, ${unsaved.amopmethod}::oid, ${unsaved.amopsortfamily}::oid)
+          values (${ParameterValue(unsaved.oid, null, PgAmopId.toStatement)}::oid, ${ParameterValue(unsaved.amopfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amoplefttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amoprighttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopstrategy, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.amoppurpose, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.amopopr, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopmethod, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopsortfamily, null, ToStatement.longToStatement)}::oid)
           returning oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
        """
       .executeInsert(PgAmopRow.rowParser(1).single)
@@ -40,28 +42,28 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def selectById(oid: PgAmopId)(implicit c: Connection): Option[PgAmopRow] = {
     SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
           from pg_catalog.pg_amop
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgAmopId.toStatement)}
        """.as(PgAmopRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgAmopId])(implicit c: Connection): List[PgAmopRow] = {
     SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
           from pg_catalog.pg_amop
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgAmopRow.rowParser(1).*)
     
   }
   override def update(row: PgAmopRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_amop
-          set amopfamily = ${row.amopfamily}::oid,
-              amoplefttype = ${row.amoplefttype}::oid,
-              amoprighttype = ${row.amoprighttype}::oid,
-              amopstrategy = ${row.amopstrategy}::int2,
-              amoppurpose = ${row.amoppurpose}::char,
-              amopopr = ${row.amopopr}::oid,
-              amopmethod = ${row.amopmethod}::oid,
-              amopsortfamily = ${row.amopsortfamily}::oid
-          where oid = $oid
+          set amopfamily = ${ParameterValue(row.amopfamily, null, ToStatement.longToStatement)}::oid,
+              amoplefttype = ${ParameterValue(row.amoplefttype, null, ToStatement.longToStatement)}::oid,
+              amoprighttype = ${ParameterValue(row.amoprighttype, null, ToStatement.longToStatement)}::oid,
+              amopstrategy = ${ParameterValue(row.amopstrategy, null, ToStatement.intToStatement)}::int2,
+              amoppurpose = ${ParameterValue(row.amoppurpose, null, ToStatement.stringToStatement)}::char,
+              amopopr = ${ParameterValue(row.amopopr, null, ToStatement.longToStatement)}::oid,
+              amopmethod = ${ParameterValue(row.amopmethod, null, ToStatement.longToStatement)}::oid,
+              amopsortfamily = ${ParameterValue(row.amopsortfamily, null, ToStatement.longToStatement)}::oid
+          where oid = ${ParameterValue(oid, null, PgAmopId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAmopFields, PgAmopRow] = {
@@ -70,15 +72,15 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def upsert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow = {
     SQL"""insert into pg_catalog.pg_amop(oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.amopfamily}::oid,
-            ${unsaved.amoplefttype}::oid,
-            ${unsaved.amoprighttype}::oid,
-            ${unsaved.amopstrategy}::int2,
-            ${unsaved.amoppurpose}::char,
-            ${unsaved.amopopr}::oid,
-            ${unsaved.amopmethod}::oid,
-            ${unsaved.amopsortfamily}::oid
+            ${ParameterValue(unsaved.oid, null, PgAmopId.toStatement)}::oid,
+            ${ParameterValue(unsaved.amopfamily, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.amoplefttype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.amoprighttype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.amopstrategy, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.amoppurpose, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.amopopr, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.amopmethod, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.amopsortfamily, null, ToStatement.longToStatement)}::oid
           )
           on conflict (oid)
           do update set

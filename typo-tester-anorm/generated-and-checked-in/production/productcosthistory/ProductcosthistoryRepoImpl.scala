@@ -9,12 +9,14 @@ package productcosthistory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productcosthistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".executeUpdate() > 0
+    SQL"delete from production.productcosthistory where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     DeleteBuilder("production.productcosthistory", ProductcosthistoryFields)
   }
   override def insert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
     SQL"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
-          values (${unsaved.productid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.standardcost}::numeric, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
        """
       .executeInsert(ProductcosthistoryRow.rowParser(1).single)
@@ -38,13 +40,13 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow = {
     val namedParameters = List(
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("startdate", ParameterValue.from(unsaved.startdate)), "::timestamp")),
-      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
-      Some((NamedParameter("standardcost", ParameterValue.from(unsaved.standardcost)), "::numeric")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
+      Some((NamedParameter("startdate", ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("enddate", ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
+      Some((NamedParameter("standardcost", ParameterValue(unsaved.standardcost, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -74,16 +76,16 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow] = {
     SQL"""select productid, startdate::text, enddate::text, standardcost, modifieddate::text
           from production.productcosthistory
-          where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
        """.as(ProductcosthistoryRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productcosthistory
-          set enddate = ${row.enddate}::timestamp,
-              standardcost = ${row.standardcost}::numeric,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
+          set enddate = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+              standardcost = ${ParameterValue(row.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
@@ -92,11 +94,11 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
     SQL"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
           values (
-            ${unsaved.productid}::int4,
-            ${unsaved.startdate}::timestamp,
-            ${unsaved.enddate}::timestamp,
-            ${unsaved.standardcost}::numeric,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
+            ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+            ${ParameterValue(unsaved.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productid, startdate)
           do update set

@@ -80,7 +80,7 @@ object LocationRepoImpl extends LocationRepo {
     sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location" where locationid = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".query(LocationRow.read).option
   }
   override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
-    sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location" where locationid = ANY(${fromWrite(locationids)(Write.fromPut(LocationId.arrayPut))})""".query(LocationRow.read).stream
+    sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location" where locationid = ANY(${locationids})""".query(LocationRow.read).stream
   }
   override def update(row: LocationRow): ConnectionIO[Boolean] = {
     val locationid = row.locationid

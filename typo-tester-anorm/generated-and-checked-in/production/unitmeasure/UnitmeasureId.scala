@@ -18,15 +18,15 @@ import typo.dsl.Bijection
 case class UnitmeasureId(value: /* bpchar, max 3 chars */ String) extends AnyVal
 object UnitmeasureId {
   implicit lazy val arrayColumn: Column[Array[UnitmeasureId]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[UnitmeasureId]] = implicitly[ToStatement[Array[/* bpchar, max 3 chars */ String]]].contramap(_.map(_.value))
+  implicit lazy val arrayToStatement: ToStatement[Array[UnitmeasureId]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[UnitmeasureId, /* bpchar, max 3 chars */ String] = Bijection[UnitmeasureId, /* bpchar, max 3 chars */ String](_.value)(UnitmeasureId.apply)
-  implicit lazy val column: Column[UnitmeasureId] = implicitly[Column[/* bpchar, max 3 chars */ String]].map(UnitmeasureId.apply)
+  implicit lazy val column: Column[UnitmeasureId] = Column.columnToString.map(UnitmeasureId.apply)
   implicit lazy val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[UnitmeasureId] = new ParameterMetaData[UnitmeasureId] {
-    override def sqlType: String = implicitly[ParameterMetaData[/* bpchar, max 3 chars */ String]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[/* bpchar, max 3 chars */ String]].jdbcType
+    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
+    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[UnitmeasureId] = Reads.StringReads.map(UnitmeasureId.apply)
-  implicit lazy val toStatement: ToStatement[UnitmeasureId] = implicitly[ToStatement[/* bpchar, max 3 chars */ String]].contramap(_.value)
+  implicit lazy val toStatement: ToStatement[UnitmeasureId] = ToStatement.stringToStatement.contramap(_.value)
   implicit lazy val writes: Writes[UnitmeasureId] = Writes.StringWrites.contramap(_.value)
 }

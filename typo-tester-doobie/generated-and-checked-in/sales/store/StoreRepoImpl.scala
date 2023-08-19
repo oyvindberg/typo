@@ -77,7 +77,7 @@ object StoreRepoImpl extends StoreRepo {
     sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(StoreRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ANY(${fromWrite(businessentityids)(Write.fromPut(BusinessentityId.arrayPut))})""".query(StoreRow.read).stream
+    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ANY(${businessentityids})""".query(StoreRow.read).stream
   }
   override def update(row: StoreRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid

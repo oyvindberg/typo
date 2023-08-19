@@ -9,6 +9,7 @@ package phonenumbertype
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,14 +24,14 @@ import typo.dsl.UpdateBuilder
 
 object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid".executeUpdate() > 0
+    SQL"delete from person.phonenumbertype where phonenumbertypeid = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields)
   }
   override def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
-          values (${unsaved.phonenumbertypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning phonenumbertypeid, "name", modifieddate::text
        """
       .executeInsert(PhonenumbertypeRow.rowParser(1).single)
@@ -38,14 +39,14 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
       unsaved.phonenumbertypeid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("phonenumbertypeid", ParameterValue.from[PhonenumbertypeId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("phonenumbertypeid", ParameterValue(value, null, PhonenumbertypeId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -75,22 +76,22 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow] = {
     SQL"""select phonenumbertypeid, "name", modifieddate::text
           from person.phonenumbertype
-          where phonenumbertypeid = $phonenumbertypeid
+          where phonenumbertypeid = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.as(PhonenumbertypeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow] = {
     SQL"""select phonenumbertypeid, "name", modifieddate::text
           from person.phonenumbertype
-          where phonenumbertypeid = ANY($phonenumbertypeids)
+          where phonenumbertypeid = ANY(${phonenumbertypeids})
        """.as(PhonenumbertypeRow.rowParser(1).*)
     
   }
   override def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
     val phonenumbertypeid = row.phonenumbertypeid
     SQL"""update person.phonenumbertype
-          set "name" = ${row.name}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where phonenumbertypeid = $phonenumbertypeid
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where phonenumbertypeid = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
@@ -99,9 +100,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
           values (
-            ${unsaved.phonenumbertypeid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (phonenumbertypeid)
           do update set

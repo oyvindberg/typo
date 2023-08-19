@@ -42,7 +42,7 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ${fromWrite(oid)(Write.fromPut(PgTsTemplateId.put))}".query(PgTsTemplateRow.read).option
   }
   override def selectByIds(oids: Array[PgTsTemplateId]): Stream[ConnectionIO, PgTsTemplateRow] = {
-    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTsTemplateId.arrayPut))})".query(PgTsTemplateRow.read).stream
+    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY(${oids})".query(PgTsTemplateRow.read).stream
   }
   override def update(row: PgTsTemplateRow): ConnectionIO[Boolean] = {
     val oid = row.oid

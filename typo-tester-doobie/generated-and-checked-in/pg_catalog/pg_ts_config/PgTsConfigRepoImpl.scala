@@ -41,7 +41,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}".query(PgTsConfigRow.read).option
   }
   override def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTsConfigId.arrayPut))})".query(PgTsConfigRow.read).stream
+    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${oids})".query(PgTsConfigRow.read).stream
   }
   override def update(row: PgTsConfigRow): ConnectionIO[Boolean] = {
     val oid = row.oid

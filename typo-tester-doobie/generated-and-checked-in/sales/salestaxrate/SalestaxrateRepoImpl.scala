@@ -84,7 +84,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".query(SalestaxrateRow.read).option
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): Stream[ConnectionIO, SalestaxrateRow] = {
-    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ANY(${fromWrite(salestaxrateids)(Write.fromPut(SalestaxrateId.arrayPut))})""".query(SalestaxrateRow.read).stream
+    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ANY(${salestaxrateids})""".query(SalestaxrateRow.read).stream
   }
   override def update(row: SalestaxrateRow): ConnectionIO[Boolean] = {
     val salestaxrateid = row.salestaxrateid

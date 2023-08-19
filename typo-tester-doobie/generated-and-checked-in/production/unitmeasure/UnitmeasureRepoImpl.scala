@@ -68,7 +68,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}""".query(UnitmeasureRow.read).option
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow] = {
-    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ANY(${fromWrite(unitmeasurecodes)(Write.fromPut(UnitmeasureId.arrayPut))})""".query(UnitmeasureRow.read).stream
+    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ANY(${unitmeasurecodes})""".query(UnitmeasureRow.read).stream
   }
   override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
     val unitmeasurecode = row.unitmeasurecode

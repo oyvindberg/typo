@@ -85,7 +85,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}""".query(ShipmethodRow.read).option
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
-    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ANY(${fromWrite(shipmethodids)(Write.fromPut(ShipmethodId.arrayPut))})""".query(ShipmethodRow.read).stream
+    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ANY(${shipmethodids})""".query(ShipmethodRow.read).stream
   }
   override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
     val shipmethodid = row.shipmethodid

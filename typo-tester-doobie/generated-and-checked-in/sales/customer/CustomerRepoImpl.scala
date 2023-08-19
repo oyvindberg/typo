@@ -79,7 +79,7 @@ object CustomerRepoImpl extends CustomerRepo {
     sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}".query(CustomerRow.read).option
   }
   override def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ANY(${fromWrite(customerids)(Write.fromPut(CustomerId.arrayPut))})".query(CustomerRow.read).stream
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ANY(${customerids})".query(CustomerRow.read).stream
   }
   override def update(row: CustomerRow): ConnectionIO[Boolean] = {
     val customerid = row.customerid

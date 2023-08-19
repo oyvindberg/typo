@@ -15,8 +15,8 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +24,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def delete(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productdescription where productdescriptionid = $productdescriptionid".executeUpdate() > 0
+    SQL"delete from production.productdescription where productdescriptionid = ${ParameterValue(productdescriptionid, null, ProductdescriptionId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
     DeleteBuilder("production.productdescription", ProductdescriptionFields)
   }
   override def insert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
     SQL"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
-          values (${unsaved.productdescriptionid}::int4, ${unsaved.description}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4, ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productdescriptionid, description, rowguid, modifieddate::text
        """
       .executeInsert(ProductdescriptionRow.rowParser(1).single)
@@ -39,18 +39,18 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionRow = {
     val namedParameters = List(
-      Some((NamedParameter("description", ParameterValue.from(unsaved.description)), "")),
+      Some((NamedParameter("description", ParameterValue(unsaved.description, null, ToStatement.stringToStatement)), "")),
       unsaved.productdescriptionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("productdescriptionid", ParameterValue.from[ProductdescriptionId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("productdescriptionid", ParameterValue(value, null, ProductdescriptionId.toStatement)), "::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -80,23 +80,23 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def selectById(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Option[ProductdescriptionRow] = {
     SQL"""select productdescriptionid, description, rowguid, modifieddate::text
           from production.productdescription
-          where productdescriptionid = $productdescriptionid
+          where productdescriptionid = ${ParameterValue(productdescriptionid, null, ProductdescriptionId.toStatement)}
        """.as(ProductdescriptionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId])(implicit c: Connection): List[ProductdescriptionRow] = {
     SQL"""select productdescriptionid, description, rowguid, modifieddate::text
           from production.productdescription
-          where productdescriptionid = ANY($productdescriptionids)
+          where productdescriptionid = ANY(${productdescriptionids})
        """.as(ProductdescriptionRow.rowParser(1).*)
     
   }
   override def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean = {
     val productdescriptionid = row.productdescriptionid
     SQL"""update production.productdescription
-          set description = ${row.description},
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productdescriptionid = $productdescriptionid
+          set description = ${ParameterValue(row.description, null, ToStatement.stringToStatement)},
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productdescriptionid = ${ParameterValue(productdescriptionid, null, ProductdescriptionId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
@@ -105,10 +105,10 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def upsert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
     SQL"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
           values (
-            ${unsaved.productdescriptionid}::int4,
-            ${unsaved.description},
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4,
+            ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productdescriptionid)
           do update set

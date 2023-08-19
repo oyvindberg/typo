@@ -41,7 +41,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
     sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}".query(PgForeignTableRow.read).option
   }
   override def selectByIds(ftrelids: Array[PgForeignTableId]): Stream[ConnectionIO, PgForeignTableRow] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ANY(${fromWrite(ftrelids)(Write.fromPut(PgForeignTableId.arrayPut))})".query(PgForeignTableRow.read).stream
+    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ANY(${ftrelids})".query(PgForeignTableRow.read).stream
   }
   override def update(row: PgForeignTableRow): ConnectionIO[Boolean] = {
     val ftrelid = row.ftrelid

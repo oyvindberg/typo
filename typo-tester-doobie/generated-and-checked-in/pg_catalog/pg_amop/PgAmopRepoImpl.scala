@@ -41,7 +41,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
     sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = ${fromWrite(oid)(Write.fromPut(PgAmopId.put))}".query(PgAmopRow.read).option
   }
   override def selectByIds(oids: Array[PgAmopId]): Stream[ConnectionIO, PgAmopRow] = {
-    sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = ANY(${fromWrite(oids)(Write.fromPut(PgAmopId.arrayPut))})".query(PgAmopRow.read).stream
+    sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = ANY(${oids})".query(PgAmopRow.read).stream
   }
   override def update(row: PgAmopRow): ConnectionIO[Boolean] = {
     val oid = row.oid

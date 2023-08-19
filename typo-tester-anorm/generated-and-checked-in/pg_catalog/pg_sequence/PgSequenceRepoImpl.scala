@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_sequence
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgSequenceRepoImpl extends PgSequenceRepo {
   override def delete(seqrelid: PgSequenceId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_sequence where seqrelid = $seqrelid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_sequence where seqrelid = ${ParameterValue(seqrelid, null, PgSequenceId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgSequenceFields, PgSequenceRow] = {
     DeleteBuilder("pg_catalog.pg_sequence", PgSequenceFields)
   }
   override def insert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow = {
     SQL"""insert into pg_catalog.pg_sequence(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)
-          values (${unsaved.seqrelid}::oid, ${unsaved.seqtypid}::oid, ${unsaved.seqstart}::int8, ${unsaved.seqincrement}::int8, ${unsaved.seqmax}::int8, ${unsaved.seqmin}::int8, ${unsaved.seqcache}::int8, ${unsaved.seqcycle})
+          values (${ParameterValue(unsaved.seqrelid, null, PgSequenceId.toStatement)}::oid, ${ParameterValue(unsaved.seqtypid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.seqstart, null, ToStatement.longToStatement)}::int8, ${ParameterValue(unsaved.seqincrement, null, ToStatement.longToStatement)}::int8, ${ParameterValue(unsaved.seqmax, null, ToStatement.longToStatement)}::int8, ${ParameterValue(unsaved.seqmin, null, ToStatement.longToStatement)}::int8, ${ParameterValue(unsaved.seqcache, null, ToStatement.longToStatement)}::int8, ${ParameterValue(unsaved.seqcycle, null, ToStatement.booleanToStatement)})
           returning seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
        """
       .executeInsert(PgSequenceRow.rowParser(1).single)
@@ -40,27 +42,27 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
   override def selectById(seqrelid: PgSequenceId)(implicit c: Connection): Option[PgSequenceRow] = {
     SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
           from pg_catalog.pg_sequence
-          where seqrelid = $seqrelid
+          where seqrelid = ${ParameterValue(seqrelid, null, PgSequenceId.toStatement)}
        """.as(PgSequenceRow.rowParser(1).singleOpt)
   }
   override def selectByIds(seqrelids: Array[PgSequenceId])(implicit c: Connection): List[PgSequenceRow] = {
     SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
           from pg_catalog.pg_sequence
-          where seqrelid = ANY($seqrelids)
+          where seqrelid = ANY(${seqrelids})
        """.as(PgSequenceRow.rowParser(1).*)
     
   }
   override def update(row: PgSequenceRow)(implicit c: Connection): Boolean = {
     val seqrelid = row.seqrelid
     SQL"""update pg_catalog.pg_sequence
-          set seqtypid = ${row.seqtypid}::oid,
-              seqstart = ${row.seqstart}::int8,
-              seqincrement = ${row.seqincrement}::int8,
-              seqmax = ${row.seqmax}::int8,
-              seqmin = ${row.seqmin}::int8,
-              seqcache = ${row.seqcache}::int8,
-              seqcycle = ${row.seqcycle}
-          where seqrelid = $seqrelid
+          set seqtypid = ${ParameterValue(row.seqtypid, null, ToStatement.longToStatement)}::oid,
+              seqstart = ${ParameterValue(row.seqstart, null, ToStatement.longToStatement)}::int8,
+              seqincrement = ${ParameterValue(row.seqincrement, null, ToStatement.longToStatement)}::int8,
+              seqmax = ${ParameterValue(row.seqmax, null, ToStatement.longToStatement)}::int8,
+              seqmin = ${ParameterValue(row.seqmin, null, ToStatement.longToStatement)}::int8,
+              seqcache = ${ParameterValue(row.seqcache, null, ToStatement.longToStatement)}::int8,
+              seqcycle = ${ParameterValue(row.seqcycle, null, ToStatement.booleanToStatement)}
+          where seqrelid = ${ParameterValue(seqrelid, null, PgSequenceId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgSequenceFields, PgSequenceRow] = {
@@ -69,14 +71,14 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
   override def upsert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow = {
     SQL"""insert into pg_catalog.pg_sequence(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)
           values (
-            ${unsaved.seqrelid}::oid,
-            ${unsaved.seqtypid}::oid,
-            ${unsaved.seqstart}::int8,
-            ${unsaved.seqincrement}::int8,
-            ${unsaved.seqmax}::int8,
-            ${unsaved.seqmin}::int8,
-            ${unsaved.seqcache}::int8,
-            ${unsaved.seqcycle}
+            ${ParameterValue(unsaved.seqrelid, null, PgSequenceId.toStatement)}::oid,
+            ${ParameterValue(unsaved.seqtypid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.seqstart, null, ToStatement.longToStatement)}::int8,
+            ${ParameterValue(unsaved.seqincrement, null, ToStatement.longToStatement)}::int8,
+            ${ParameterValue(unsaved.seqmax, null, ToStatement.longToStatement)}::int8,
+            ${ParameterValue(unsaved.seqmin, null, ToStatement.longToStatement)}::int8,
+            ${ParameterValue(unsaved.seqcache, null, ToStatement.longToStatement)}::int8,
+            ${ParameterValue(unsaved.seqcycle, null, ToStatement.booleanToStatement)}
           )
           on conflict (seqrelid)
           do update set

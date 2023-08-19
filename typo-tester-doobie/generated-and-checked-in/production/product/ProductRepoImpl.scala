@@ -108,7 +108,7 @@ object ProductRepoImpl extends ProductRepo {
     sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product where productid = ${fromWrite(productid)(Write.fromPut(ProductId.put))}""".query(ProductRow.read).option
   }
   override def selectByIds(productids: Array[ProductId]): Stream[ConnectionIO, ProductRow] = {
-    sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product where productid = ANY(${fromWrite(productids)(Write.fromPut(ProductId.arrayPut))})""".query(ProductRow.read).stream
+    sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product where productid = ANY(${productids})""".query(ProductRow.read).stream
   }
   override def update(row: ProductRow): ConnectionIO[Boolean] = {
     val productid = row.productid

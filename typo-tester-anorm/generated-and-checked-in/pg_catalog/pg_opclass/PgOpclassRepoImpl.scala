@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_opclass
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgOpclassRepoImpl extends PgOpclassRepo {
   override def delete(oid: PgOpclassId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_opclass where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_opclass where oid = ${ParameterValue(oid, null, PgOpclassId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgOpclassFields, PgOpclassRow] = {
     DeleteBuilder("pg_catalog.pg_opclass", PgOpclassFields)
   }
   override def insert(unsaved: PgOpclassRow)(implicit c: Connection): PgOpclassRow = {
     SQL"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
-          values (${unsaved.oid}::oid, ${unsaved.opcmethod}::oid, ${unsaved.opcname}::name, ${unsaved.opcnamespace}::oid, ${unsaved.opcowner}::oid, ${unsaved.opcfamily}::oid, ${unsaved.opcintype}::oid, ${unsaved.opcdefault}, ${unsaved.opckeytype}::oid)
+          values (${ParameterValue(unsaved.oid, null, PgOpclassId.toStatement)}::oid, ${ParameterValue(unsaved.opcmethod, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opcname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.opcnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opcowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opcfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opcintype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opcdefault, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.opckeytype, null, ToStatement.longToStatement)}::oid)
           returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
        """
       .executeInsert(PgOpclassRow.rowParser(1).single)
@@ -40,28 +42,28 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
   override def selectById(oid: PgOpclassId)(implicit c: Connection): Option[PgOpclassRow] = {
     SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
           from pg_catalog.pg_opclass
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgOpclassId.toStatement)}
        """.as(PgOpclassRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgOpclassId])(implicit c: Connection): List[PgOpclassRow] = {
     SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
           from pg_catalog.pg_opclass
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgOpclassRow.rowParser(1).*)
     
   }
   override def update(row: PgOpclassRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_opclass
-          set opcmethod = ${row.opcmethod}::oid,
-              opcname = ${row.opcname}::name,
-              opcnamespace = ${row.opcnamespace}::oid,
-              opcowner = ${row.opcowner}::oid,
-              opcfamily = ${row.opcfamily}::oid,
-              opcintype = ${row.opcintype}::oid,
-              opcdefault = ${row.opcdefault},
-              opckeytype = ${row.opckeytype}::oid
-          where oid = $oid
+          set opcmethod = ${ParameterValue(row.opcmethod, null, ToStatement.longToStatement)}::oid,
+              opcname = ${ParameterValue(row.opcname, null, ToStatement.stringToStatement)}::name,
+              opcnamespace = ${ParameterValue(row.opcnamespace, null, ToStatement.longToStatement)}::oid,
+              opcowner = ${ParameterValue(row.opcowner, null, ToStatement.longToStatement)}::oid,
+              opcfamily = ${ParameterValue(row.opcfamily, null, ToStatement.longToStatement)}::oid,
+              opcintype = ${ParameterValue(row.opcintype, null, ToStatement.longToStatement)}::oid,
+              opcdefault = ${ParameterValue(row.opcdefault, null, ToStatement.booleanToStatement)},
+              opckeytype = ${ParameterValue(row.opckeytype, null, ToStatement.longToStatement)}::oid
+          where oid = ${ParameterValue(oid, null, PgOpclassId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgOpclassFields, PgOpclassRow] = {
@@ -70,15 +72,15 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
   override def upsert(unsaved: PgOpclassRow)(implicit c: Connection): PgOpclassRow = {
     SQL"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.opcmethod}::oid,
-            ${unsaved.opcname}::name,
-            ${unsaved.opcnamespace}::oid,
-            ${unsaved.opcowner}::oid,
-            ${unsaved.opcfamily}::oid,
-            ${unsaved.opcintype}::oid,
-            ${unsaved.opcdefault},
-            ${unsaved.opckeytype}::oid
+            ${ParameterValue(unsaved.oid, null, PgOpclassId.toStatement)}::oid,
+            ${ParameterValue(unsaved.opcmethod, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.opcname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.opcnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.opcowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.opcfamily, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.opcintype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.opcdefault, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.opckeytype, null, ToStatement.longToStatement)}::oid
           )
           on conflict (oid)
           do update set

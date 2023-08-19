@@ -74,7 +74,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}".query(ProductphotoRow.read).option
   }
   override def selectByIds(productphotoids: Array[ProductphotoId]): Stream[ConnectionIO, ProductphotoRow] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ANY(${fromWrite(productphotoids)(Write.fromPut(ProductphotoId.arrayPut))})".query(ProductphotoRow.read).stream
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ANY(${productphotoids})".query(ProductphotoRow.read).stream
   }
   override def update(row: ProductphotoRow): ConnectionIO[Boolean] = {
     val productphotoid = row.productphotoid

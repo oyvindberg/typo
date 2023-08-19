@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_policy
 
+import adventureworks.TypoPgNodeTree
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgPolicyRepoImpl extends PgPolicyRepo {
   override def delete(oid: PgPolicyId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_policy where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_policy where oid = ${ParameterValue(oid, null, PgPolicyId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgPolicyFields, PgPolicyRow] = {
     DeleteBuilder("pg_catalog.pg_policy", PgPolicyFields)
   }
   override def insert(unsaved: PgPolicyRow)(implicit c: Connection): PgPolicyRow = {
     SQL"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
-          values (${unsaved.oid}::oid, ${unsaved.polname}::name, ${unsaved.polrelid}::oid, ${unsaved.polcmd}::char, ${unsaved.polpermissive}, ${unsaved.polroles}::_oid, ${unsaved.polqual}::pg_node_tree, ${unsaved.polwithcheck}::pg_node_tree)
+          values (${ParameterValue(unsaved.oid, null, PgPolicyId.toStatement)}::oid, ${ParameterValue(unsaved.polname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.polrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.polcmd, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.polpermissive, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.polroles, null, adventureworks.LongArrayToStatement)}::_oid, ${ParameterValue(unsaved.polqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree, ${ParameterValue(unsaved.polwithcheck, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
           returning oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
        """
       .executeInsert(PgPolicyRow.rowParser(1).single)
@@ -40,27 +43,27 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
   override def selectById(oid: PgPolicyId)(implicit c: Connection): Option[PgPolicyRow] = {
     SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
           from pg_catalog.pg_policy
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgPolicyId.toStatement)}
        """.as(PgPolicyRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgPolicyId])(implicit c: Connection): List[PgPolicyRow] = {
     SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
           from pg_catalog.pg_policy
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgPolicyRow.rowParser(1).*)
     
   }
   override def update(row: PgPolicyRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_policy
-          set polname = ${row.polname}::name,
-              polrelid = ${row.polrelid}::oid,
-              polcmd = ${row.polcmd}::char,
-              polpermissive = ${row.polpermissive},
-              polroles = ${row.polroles}::_oid,
-              polqual = ${row.polqual}::pg_node_tree,
-              polwithcheck = ${row.polwithcheck}::pg_node_tree
-          where oid = $oid
+          set polname = ${ParameterValue(row.polname, null, ToStatement.stringToStatement)}::name,
+              polrelid = ${ParameterValue(row.polrelid, null, ToStatement.longToStatement)}::oid,
+              polcmd = ${ParameterValue(row.polcmd, null, ToStatement.stringToStatement)}::char,
+              polpermissive = ${ParameterValue(row.polpermissive, null, ToStatement.booleanToStatement)},
+              polroles = ${ParameterValue(row.polroles, null, adventureworks.LongArrayToStatement)}::_oid,
+              polqual = ${ParameterValue(row.polqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
+              polwithcheck = ${ParameterValue(row.polwithcheck, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
+          where oid = ${ParameterValue(oid, null, PgPolicyId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgPolicyFields, PgPolicyRow] = {
@@ -69,14 +72,14 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
   override def upsert(unsaved: PgPolicyRow)(implicit c: Connection): PgPolicyRow = {
     SQL"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.polname}::name,
-            ${unsaved.polrelid}::oid,
-            ${unsaved.polcmd}::char,
-            ${unsaved.polpermissive},
-            ${unsaved.polroles}::_oid,
-            ${unsaved.polqual}::pg_node_tree,
-            ${unsaved.polwithcheck}::pg_node_tree
+            ${ParameterValue(unsaved.oid, null, PgPolicyId.toStatement)}::oid,
+            ${ParameterValue(unsaved.polname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.polrelid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.polcmd, null, ToStatement.stringToStatement)}::char,
+            ${ParameterValue(unsaved.polpermissive, null, ToStatement.booleanToStatement)},
+            ${ParameterValue(unsaved.polroles, null, adventureworks.LongArrayToStatement)}::_oid,
+            ${ParameterValue(unsaved.polqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
+            ${ParameterValue(unsaved.polwithcheck, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
           )
           on conflict (oid)
           do update set

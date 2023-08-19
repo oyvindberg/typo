@@ -42,7 +42,7 @@ object PgAmRepoImpl extends PgAmRepo {
     sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}".query(PgAmRow.read).option
   }
   override def selectByIds(oids: Array[PgAmId]): Stream[ConnectionIO, PgAmRow] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ANY(${fromWrite(oids)(Write.fromPut(PgAmId.arrayPut))})".query(PgAmRow.read).stream
+    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ANY(${oids})".query(PgAmRow.read).stream
   }
   override def update(row: PgAmRow): ConnectionIO[Boolean] = {
     val oid = row.oid

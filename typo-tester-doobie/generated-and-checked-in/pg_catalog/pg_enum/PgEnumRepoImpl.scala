@@ -41,7 +41,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
     sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ${fromWrite(oid)(Write.fromPut(PgEnumId.put))}".query(PgEnumRow.read).option
   }
   override def selectByIds(oids: Array[PgEnumId]): Stream[ConnectionIO, PgEnumRow] = {
-    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ANY(${fromWrite(oids)(Write.fromPut(PgEnumId.arrayPut))})".query(PgEnumRow.read).stream
+    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ANY(${oids})".query(PgEnumRow.read).stream
   }
   override def update(row: PgEnumRow): ConnectionIO[Boolean] = {
     val oid = row.oid

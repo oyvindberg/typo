@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_description
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def delete(compositeId: PgDescriptionId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_description where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_description where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgDescriptionFields, PgDescriptionRow] = {
     DeleteBuilder("pg_catalog.pg_description", PgDescriptionFields)
   }
   override def insert(unsaved: PgDescriptionRow)(implicit c: Connection): PgDescriptionRow = {
     SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
-          values (${unsaved.objoid}::oid, ${unsaved.classoid}::oid, ${unsaved.objsubid}::int4, ${unsaved.description})
+          values (${ParameterValue(unsaved.objoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.classoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.objsubid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)})
           returning objoid, classoid, objsubid, description
        """
       .executeInsert(PgDescriptionRow.rowParser(1).single)
@@ -40,14 +42,14 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow] = {
     SQL"""select objoid, classoid, objsubid, description
           from pg_catalog.pg_description
-          where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}
+          where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}
        """.as(PgDescriptionRow.rowParser(1).singleOpt)
   }
   override def update(row: PgDescriptionRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_description
-          set description = ${row.description}
-          where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}
+          set description = ${ParameterValue(row.description, null, ToStatement.stringToStatement)}
+          where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgDescriptionFields, PgDescriptionRow] = {
@@ -56,10 +58,10 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def upsert(unsaved: PgDescriptionRow)(implicit c: Connection): PgDescriptionRow = {
     SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
           values (
-            ${unsaved.objoid}::oid,
-            ${unsaved.classoid}::oid,
-            ${unsaved.objsubid}::int4,
-            ${unsaved.description}
+            ${ParameterValue(unsaved.objoid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.classoid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.objsubid, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)}
           )
           on conflict (objoid, classoid, objsubid)
           do update set

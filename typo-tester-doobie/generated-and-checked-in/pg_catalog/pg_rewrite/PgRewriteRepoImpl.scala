@@ -42,7 +42,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
     sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}".query(PgRewriteRow.read).option
   }
   override def selectByIds(oids: Array[PgRewriteId]): Stream[ConnectionIO, PgRewriteRow] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ANY(${fromWrite(oids)(Write.fromPut(PgRewriteId.arrayPut))})".query(PgRewriteRow.read).stream
+    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ANY(${oids})".query(PgRewriteRow.read).stream
   }
   override def update(row: PgRewriteRow): ConnectionIO[Boolean] = {
     val oid = row.oid

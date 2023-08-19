@@ -76,7 +76,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(AddresstypeRow.read).option
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ANY(${fromWrite(addresstypeids)(Write.fromPut(AddresstypeId.arrayPut))})""".query(AddresstypeRow.read).stream
+    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ANY(${addresstypeids})""".query(AddresstypeRow.read).stream
   }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid

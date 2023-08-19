@@ -42,7 +42,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
     sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ${fromWrite(oid)(Write.fromPut(PgAttrdefId.put))}".query(PgAttrdefRow.read).option
   }
   override def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow] = {
-    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY(${fromWrite(oids)(Write.fromPut(PgAttrdefId.arrayPut))})".query(PgAttrdefRow.read).stream
+    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY(${oids})".query(PgAttrdefRow.read).stream
   }
   override def update(row: PgAttrdefRow): ConnectionIO[Boolean] = {
     val oid = row.oid

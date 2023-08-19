@@ -9,12 +9,14 @@ package productlistpricehistory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def delete(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productlistpricehistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".executeUpdate() > 0
+    SQL"delete from production.productlistpricehistory where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
     DeleteBuilder("production.productlistpricehistory", ProductlistpricehistoryFields)
   }
   override def insert(unsaved: ProductlistpricehistoryRow)(implicit c: Connection): ProductlistpricehistoryRow = {
     SQL"""insert into production.productlistpricehistory(productid, startdate, enddate, listprice, modifieddate)
-          values (${unsaved.productid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.listprice}::numeric, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.listprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productid, startdate::text, enddate::text, listprice, modifieddate::text
        """
       .executeInsert(ProductlistpricehistoryRow.rowParser(1).single)
@@ -38,13 +40,13 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   }
   override def insert(unsaved: ProductlistpricehistoryRowUnsaved)(implicit c: Connection): ProductlistpricehistoryRow = {
     val namedParameters = List(
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("startdate", ParameterValue.from(unsaved.startdate)), "::timestamp")),
-      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
-      Some((NamedParameter("listprice", ParameterValue.from(unsaved.listprice)), "::numeric")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
+      Some((NamedParameter("startdate", ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("enddate", ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
+      Some((NamedParameter("listprice", ParameterValue(unsaved.listprice, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -74,16 +76,16 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def selectById(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Option[ProductlistpricehistoryRow] = {
     SQL"""select productid, startdate::text, enddate::text, listprice, modifieddate::text
           from production.productlistpricehistory
-          where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
        """.as(ProductlistpricehistoryRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productlistpricehistory
-          set enddate = ${row.enddate}::timestamp,
-              listprice = ${row.listprice}::numeric,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
+          set enddate = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+              listprice = ${ParameterValue(row.listprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
@@ -92,11 +94,11 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def upsert(unsaved: ProductlistpricehistoryRow)(implicit c: Connection): ProductlistpricehistoryRow = {
     SQL"""insert into production.productlistpricehistory(productid, startdate, enddate, listprice, modifieddate)
           values (
-            ${unsaved.productid}::int4,
-            ${unsaved.startdate}::timestamp,
-            ${unsaved.enddate}::timestamp,
-            ${unsaved.listprice}::numeric,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
+            ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+            ${ParameterValue(unsaved.listprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productid, startdate)
           do update set

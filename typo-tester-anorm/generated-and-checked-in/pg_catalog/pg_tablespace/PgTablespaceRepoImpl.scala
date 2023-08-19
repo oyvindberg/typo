@@ -7,7 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_tablespace
 
+import adventureworks.TypoAclItem
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +20,14 @@ import typo.dsl.UpdateBuilder
 
 object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_tablespace where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_tablespace where oid = ${ParameterValue(oid, null, PgTablespaceId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTablespaceFields, PgTablespaceRow] = {
     DeleteBuilder("pg_catalog.pg_tablespace", PgTablespaceFields)
   }
   override def insert(unsaved: PgTablespaceRow)(implicit c: Connection): PgTablespaceRow = {
     SQL"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)
-          values (${unsaved.oid}::oid, ${unsaved.spcname}::name, ${unsaved.spcowner}::oid, ${unsaved.spcacl}::_aclitem, ${unsaved.spcoptions}::_text)
+          values (${ParameterValue(unsaved.oid, null, PgTablespaceId.toStatement)}::oid, ${ParameterValue(unsaved.spcname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.spcowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.spcacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem, ${ParameterValue(unsaved.spcoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text)
           returning oid, spcname, spcowner, spcacl, spcoptions
        """
       .executeInsert(PgTablespaceRow.rowParser(1).single)
@@ -40,24 +44,24 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def selectById(oid: PgTablespaceId)(implicit c: Connection): Option[PgTablespaceRow] = {
     SQL"""select oid, spcname, spcowner, spcacl, spcoptions
           from pg_catalog.pg_tablespace
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgTablespaceId.toStatement)}
        """.as(PgTablespaceRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTablespaceId])(implicit c: Connection): List[PgTablespaceRow] = {
     SQL"""select oid, spcname, spcowner, spcacl, spcoptions
           from pg_catalog.pg_tablespace
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgTablespaceRow.rowParser(1).*)
     
   }
   override def update(row: PgTablespaceRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_tablespace
-          set spcname = ${row.spcname}::name,
-              spcowner = ${row.spcowner}::oid,
-              spcacl = ${row.spcacl}::_aclitem,
-              spcoptions = ${row.spcoptions}::_text
-          where oid = $oid
+          set spcname = ${ParameterValue(row.spcname, null, ToStatement.stringToStatement)}::name,
+              spcowner = ${ParameterValue(row.spcowner, null, ToStatement.longToStatement)}::oid,
+              spcacl = ${ParameterValue(row.spcacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem,
+              spcoptions = ${ParameterValue(row.spcoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
+          where oid = ${ParameterValue(oid, null, PgTablespaceId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTablespaceFields, PgTablespaceRow] = {
@@ -66,11 +70,11 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def upsert(unsaved: PgTablespaceRow)(implicit c: Connection): PgTablespaceRow = {
     SQL"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.spcname}::name,
-            ${unsaved.spcowner}::oid,
-            ${unsaved.spcacl}::_aclitem,
-            ${unsaved.spcoptions}::_text
+            ${ParameterValue(unsaved.oid, null, PgTablespaceId.toStatement)}::oid,
+            ${ParameterValue(unsaved.spcname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.spcowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.spcacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem,
+            ${ParameterValue(unsaved.spcoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
           )
           on conflict (oid)
           do update set

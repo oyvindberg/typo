@@ -7,7 +7,11 @@ package adventureworks
 package information_schema
 package sql_parts
 
+import adventureworks.information_schema.CharacterData
+import adventureworks.information_schema.YesOrNo
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -20,7 +24,7 @@ object SqlPartsRepoImpl extends SqlPartsRepo {
   }
   override def insert(unsaved: SqlPartsRow)(implicit c: Connection): SqlPartsRow = {
     SQL"""insert into information_schema.sql_parts(feature_id, feature_name, is_supported, is_verified_by, "comments")
-          values (${unsaved.featureId}::information_schema.character_data, ${unsaved.featureName}::information_schema.character_data, ${unsaved.isSupported}::information_schema.yes_or_no, ${unsaved.isVerifiedBy}::information_schema.character_data, ${unsaved.comments}::information_schema.character_data)
+          values (${ParameterValue(unsaved.featureId, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::information_schema.character_data, ${ParameterValue(unsaved.featureName, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::information_schema.character_data, ${ParameterValue(unsaved.isSupported, null, ToStatement.optionToStatement(YesOrNo.toStatement, YesOrNo.parameterMetadata))}::information_schema.yes_or_no, ${ParameterValue(unsaved.isVerifiedBy, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::information_schema.character_data, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::information_schema.character_data)
           returning feature_id, feature_name, is_supported, is_verified_by, "comments"
        """
       .executeInsert(SqlPartsRow.rowParser(1).single)

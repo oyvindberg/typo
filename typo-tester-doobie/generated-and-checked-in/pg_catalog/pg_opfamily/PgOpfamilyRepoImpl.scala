@@ -41,7 +41,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
     sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ${fromWrite(oid)(Write.fromPut(PgOpfamilyId.put))}".query(PgOpfamilyRow.read).option
   }
   override def selectByIds(oids: Array[PgOpfamilyId]): Stream[ConnectionIO, PgOpfamilyRow] = {
-    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ANY(${fromWrite(oids)(Write.fromPut(PgOpfamilyId.arrayPut))})".query(PgOpfamilyRow.read).stream
+    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ANY(${oids})".query(PgOpfamilyRow.read).stream
   }
   override def update(row: PgOpfamilyRow): ConnectionIO[Boolean] = {
     val oid = row.oid

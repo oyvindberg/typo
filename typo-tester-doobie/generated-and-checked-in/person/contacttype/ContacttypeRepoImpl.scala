@@ -71,7 +71,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".query(ContacttypeRow.read).option
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow] = {
-    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ANY(${fromWrite(contacttypeids)(Write.fromPut(ContacttypeId.arrayPut))})""".query(ContacttypeRow.read).stream
+    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ANY(${contacttypeids})""".query(ContacttypeRow.read).stream
   }
   override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
     val contacttypeid = row.contacttypeid

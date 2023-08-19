@@ -16,8 +16,8 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -25,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person."password" where businessentityid = $businessentityid""".executeUpdate() > 0
+    SQL"""delete from person."password" where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
     DeleteBuilder("person.password", PasswordFields)
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.passwordhash}, ${unsaved.passwordsalt}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.passwordhash, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.passwordsalt, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
        """
       .executeInsert(PasswordRow.rowParser(1).single)
@@ -40,16 +40,16 @@ object PasswordRepoImpl extends PasswordRepo {
   }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
     val namedParameters = List(
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("passwordhash", ParameterValue.from(unsaved.passwordhash)), "")),
-      Some((NamedParameter("passwordsalt", ParameterValue.from(unsaved.passwordsalt)), "")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("passwordhash", ParameterValue(unsaved.passwordhash, null, ToStatement.stringToStatement)), "")),
+      Some((NamedParameter("passwordsalt", ParameterValue(unsaved.passwordsalt, null, ToStatement.stringToStatement)), "")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -79,24 +79,24 @@ object PasswordRepoImpl extends PasswordRepo {
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
           from person."password"
-          where businessentityid = $businessentityid
+          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(PasswordRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
           from person."password"
-          where businessentityid = ANY($businessentityids)
+          where businessentityid = ANY(${businessentityids})
        """.as(PasswordRow.rowParser(1).*)
     
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update person."password"
-          set passwordhash = ${row.passwordhash},
-              passwordsalt = ${row.passwordsalt},
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          set passwordhash = ${ParameterValue(row.passwordhash, null, ToStatement.stringToStatement)},
+              passwordsalt = ${ParameterValue(row.passwordsalt, null, ToStatement.stringToStatement)},
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
@@ -105,11 +105,11 @@ object PasswordRepoImpl extends PasswordRepo {
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.passwordhash},
-            ${unsaved.passwordsalt},
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.passwordhash, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.passwordsalt, null, ToStatement.stringToStatement)},
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (businessentityid)
           do update set

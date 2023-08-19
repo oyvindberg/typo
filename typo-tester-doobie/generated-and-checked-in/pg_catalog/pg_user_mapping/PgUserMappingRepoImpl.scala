@@ -41,7 +41,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
     sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = ${fromWrite(oid)(Write.fromPut(PgUserMappingId.put))}".query(PgUserMappingRow.read).option
   }
   override def selectByIds(oids: Array[PgUserMappingId]): Stream[ConnectionIO, PgUserMappingRow] = {
-    sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = ANY(${fromWrite(oids)(Write.fromPut(PgUserMappingId.arrayPut))})".query(PgUserMappingRow.read).stream
+    sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = ANY(${oids})".query(PgUserMappingRow.read).stream
   }
   override def update(row: PgUserMappingRow): ConnectionIO[Boolean] = {
     val oid = row.oid

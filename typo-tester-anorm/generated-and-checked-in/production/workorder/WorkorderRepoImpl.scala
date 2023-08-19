@@ -9,12 +9,15 @@ package workorder
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.product.ProductId
+import adventureworks.production.scrapreason.ScrapreasonId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.workorder where workorderid = $workorderid".executeUpdate() > 0
+    SQL"delete from production.workorder where workorderid = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
     DeleteBuilder("production.workorder", WorkorderFields)
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
-          values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.orderqty}::int4, ${unsaved.scrappedqty}::int2, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.scrapreasonid}::int2, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.scrappedqty, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
@@ -38,20 +41,20 @@ object WorkorderRepoImpl extends WorkorderRepo {
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
     val namedParameters = List(
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty)), "::int4")),
-      Some((NamedParameter("scrappedqty", ParameterValue.from(unsaved.scrappedqty)), "::int2")),
-      Some((NamedParameter("startdate", ParameterValue.from(unsaved.startdate)), "::timestamp")),
-      Some((NamedParameter("enddate", ParameterValue.from(unsaved.enddate)), "::timestamp")),
-      Some((NamedParameter("duedate", ParameterValue.from(unsaved.duedate)), "::timestamp")),
-      Some((NamedParameter("scrapreasonid", ParameterValue.from(unsaved.scrapreasonid)), "::int2")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
+      Some((NamedParameter("orderqty", ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)), "::int4")),
+      Some((NamedParameter("scrappedqty", ParameterValue(unsaved.scrappedqty, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("startdate", ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("enddate", ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
+      Some((NamedParameter("duedate", ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("scrapreasonid", ParameterValue(unsaved.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))), "::int2")),
       unsaved.workorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("workorderid", ParameterValue.from[WorkorderId](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("workorderid", ParameterValue(value, null, WorkorderId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -81,28 +84,28 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
           from production.workorder
-          where workorderid = $workorderid
+          where workorderid = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}
        """.as(WorkorderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
           from production.workorder
-          where workorderid = ANY($workorderids)
+          where workorderid = ANY(${workorderids})
        """.as(WorkorderRow.rowParser(1).*)
     
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
     val workorderid = row.workorderid
     SQL"""update production.workorder
-          set productid = ${row.productid}::int4,
-              orderqty = ${row.orderqty}::int4,
-              scrappedqty = ${row.scrappedqty}::int2,
-              startdate = ${row.startdate}::timestamp,
-              enddate = ${row.enddate}::timestamp,
-              duedate = ${row.duedate}::timestamp,
-              scrapreasonid = ${row.scrapreasonid}::int2,
-              modifieddate = ${row.modifieddate}::timestamp
-          where workorderid = $workorderid
+          set productid = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
+              orderqty = ${ParameterValue(row.orderqty, null, ToStatement.intToStatement)}::int4,
+              scrappedqty = ${ParameterValue(row.scrappedqty, null, ToStatement.intToStatement)}::int2,
+              startdate = ${ParameterValue(row.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              enddate = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+              duedate = ${ParameterValue(row.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              scrapreasonid = ${ParameterValue(row.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))}::int2,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where workorderid = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
@@ -111,15 +114,15 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
           values (
-            ${unsaved.workorderid}::int4,
-            ${unsaved.productid}::int4,
-            ${unsaved.orderqty}::int4,
-            ${unsaved.scrappedqty}::int2,
-            ${unsaved.startdate}::timestamp,
-            ${unsaved.enddate}::timestamp,
-            ${unsaved.duedate}::timestamp,
-            ${unsaved.scrapreasonid}::int2,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4,
+            ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
+            ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.scrappedqty, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+            ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))}::int2,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (workorderid)
           do update set

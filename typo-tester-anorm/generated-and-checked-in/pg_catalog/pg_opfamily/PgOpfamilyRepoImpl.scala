@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_opfamily
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def delete(oid: PgOpfamilyId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_opfamily where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_opfamily where oid = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
     DeleteBuilder("pg_catalog.pg_opfamily", PgOpfamilyFields)
   }
   override def insert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow = {
     SQL"""insert into pg_catalog.pg_opfamily(oid, opfmethod, opfname, opfnamespace, opfowner)
-          values (${unsaved.oid}::oid, ${unsaved.opfmethod}::oid, ${unsaved.opfname}::name, ${unsaved.opfnamespace}::oid, ${unsaved.opfowner}::oid)
+          values (${ParameterValue(unsaved.oid, null, PgOpfamilyId.toStatement)}::oid, ${ParameterValue(unsaved.opfmethod, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opfname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.opfnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opfowner, null, ToStatement.longToStatement)}::oid)
           returning oid, opfmethod, opfname, opfnamespace, opfowner
        """
       .executeInsert(PgOpfamilyRow.rowParser(1).single)
@@ -40,24 +42,24 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def selectById(oid: PgOpfamilyId)(implicit c: Connection): Option[PgOpfamilyRow] = {
     SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner
           from pg_catalog.pg_opfamily
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}
        """.as(PgOpfamilyRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgOpfamilyId])(implicit c: Connection): List[PgOpfamilyRow] = {
     SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner
           from pg_catalog.pg_opfamily
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgOpfamilyRow.rowParser(1).*)
     
   }
   override def update(row: PgOpfamilyRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_opfamily
-          set opfmethod = ${row.opfmethod}::oid,
-              opfname = ${row.opfname}::name,
-              opfnamespace = ${row.opfnamespace}::oid,
-              opfowner = ${row.opfowner}::oid
-          where oid = $oid
+          set opfmethod = ${ParameterValue(row.opfmethod, null, ToStatement.longToStatement)}::oid,
+              opfname = ${ParameterValue(row.opfname, null, ToStatement.stringToStatement)}::name,
+              opfnamespace = ${ParameterValue(row.opfnamespace, null, ToStatement.longToStatement)}::oid,
+              opfowner = ${ParameterValue(row.opfowner, null, ToStatement.longToStatement)}::oid
+          where oid = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
@@ -66,11 +68,11 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def upsert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow = {
     SQL"""insert into pg_catalog.pg_opfamily(oid, opfmethod, opfname, opfnamespace, opfowner)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.opfmethod}::oid,
-            ${unsaved.opfname}::name,
-            ${unsaved.opfnamespace}::oid,
-            ${unsaved.opfowner}::oid
+            ${ParameterValue(unsaved.oid, null, PgOpfamilyId.toStatement)}::oid,
+            ${ParameterValue(unsaved.opfmethod, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.opfname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.opfnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.opfowner, null, ToStatement.longToStatement)}::oid
           )
           on conflict (oid)
           do update set

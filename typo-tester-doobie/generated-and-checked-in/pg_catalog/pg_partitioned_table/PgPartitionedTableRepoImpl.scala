@@ -44,7 +44,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ${fromWrite(partrelid)(Write.fromPut(PgPartitionedTableId.put))}".query(PgPartitionedTableRow.read).option
   }
   override def selectByIds(partrelids: Array[PgPartitionedTableId]): Stream[ConnectionIO, PgPartitionedTableRow] = {
-    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ANY(${fromWrite(partrelids)(Write.fromPut(PgPartitionedTableId.arrayPut))})".query(PgPartitionedTableRow.read).stream
+    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ANY(${partrelids})".query(PgPartitionedTableRow.read).stream
   }
   override def update(row: PgPartitionedTableRow): ConnectionIO[Boolean] = {
     val partrelid = row.partrelid

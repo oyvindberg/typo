@@ -22,14 +22,14 @@ import typo.dsl.UpdateBuilder
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
-    SQL"""delete from myschema.marital_status where "id" = $id""".executeUpdate() > 0
+    SQL"""delete from myschema.marital_status where "id" = ${ParameterValue(id, null, MaritalStatusId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
     DeleteBuilder("myschema.marital_status", MaritalStatusFields)
   }
   override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     SQL"""insert into myschema.marital_status("id")
-          values (${unsaved.id}::int8)
+          values (${ParameterValue(unsaved.id, null, MaritalStatusId.toStatement)}::int8)
           returning "id"
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)
@@ -46,13 +46,13 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
     SQL"""select "id"
           from myschema.marital_status
-          where "id" = $id
+          where "id" = ${ParameterValue(id, null, MaritalStatusId.toStatement)}
        """.as(MaritalStatusRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select "id"
           from myschema.marital_status
-          where "id" = ANY($ids)
+          where "id" = ANY(${ids})
        """.as(MaritalStatusRow.rowParser(1).*)
     
   }
@@ -61,7 +61,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
       case Nil => selectAll
       case nonEmpty =>
         val namedParameters = nonEmpty.map{
-          case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+          case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue(value, null, MaritalStatusId.toStatement))
         }
         val quote = '"'.toString
         val q = s"""select "id"
@@ -79,7 +79,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     SQL"""insert into myschema.marital_status("id")
           values (
-            ${unsaved.id}::int8
+            ${ParameterValue(unsaved.id, null, MaritalStatusId.toStatement)}::int8
           )
           on conflict ("id")
           do update set

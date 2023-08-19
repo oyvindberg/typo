@@ -9,14 +9,15 @@ package salespersonquotahistory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -24,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}".executeUpdate() > 0
+    SQL"delete from sales.salespersonquotahistory where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND quotadate = ${ParameterValue(compositeId.quotadate, null, TypoLocalDateTime.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     DeleteBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields)
   }
   override def insert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     SQL"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.quotadate}::timestamp, ${unsaved.salesquota}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.quotadate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
        """
       .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
@@ -39,16 +40,16 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
     val namedParameters = List(
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("quotadate", ParameterValue.from(unsaved.quotadate)), "::timestamp")),
-      Some((NamedParameter("salesquota", ParameterValue.from(unsaved.salesquota)), "::numeric")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("quotadate", ParameterValue(unsaved.quotadate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("salesquota", ParameterValue(unsaved.salesquota, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -78,16 +79,16 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow] = {
     SQL"""select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
           from sales.salespersonquotahistory
-          where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
+          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND quotadate = ${ParameterValue(compositeId.quotadate, null, TypoLocalDateTime.toStatement)}
        """.as(SalespersonquotahistoryRow.rowParser(1).singleOpt)
   }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salespersonquotahistory
-          set salesquota = ${row.salesquota}::numeric,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
+          set salesquota = ${ParameterValue(row.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND quotadate = ${ParameterValue(compositeId.quotadate, null, TypoLocalDateTime.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
@@ -96,11 +97,11 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     SQL"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.quotadate}::timestamp,
-            ${unsaved.salesquota}::numeric,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.quotadate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (businessentityid, quotadate)
           do update set

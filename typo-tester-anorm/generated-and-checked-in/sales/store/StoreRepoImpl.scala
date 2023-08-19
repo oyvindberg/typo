@@ -9,15 +9,17 @@ package store
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -25,14 +27,14 @@ import typo.dsl.UpdateBuilder
 
 object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.store where businessentityid = $businessentityid".executeUpdate() > 0
+    SQL"delete from sales.store where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[StoreFields, StoreRow] = {
     DeleteBuilder("sales.store", StoreFields)
   }
   override def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
        """
       .executeInsert(StoreRow.rowParser(1).single)
@@ -40,17 +42,17 @@ object StoreRepoImpl extends StoreRepo {
   }
   override def insert(unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow = {
     val namedParameters = List(
-      Some((NamedParameter("businessentityid", ParameterValue.from(unsaved.businessentityid)), "::int4")),
-      Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
-      Some((NamedParameter("salespersonid", ParameterValue.from(unsaved.salespersonid)), "::int4")),
-      Some((NamedParameter("demographics", ParameterValue.from(unsaved.demographics)), "::xml")),
+      Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("salespersonid", ParameterValue(unsaved.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))), "::int4")),
+      Some((NamedParameter("demographics", ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))), "::xml")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue.from[UUID](value)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -80,25 +82,25 @@ object StoreRepoImpl extends StoreRepo {
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow] = {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
           from sales.store
-          where businessentityid = $businessentityid
+          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(StoreRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
           from sales.store
-          where businessentityid = ANY($businessentityids)
+          where businessentityid = ANY(${businessentityids})
        """.as(StoreRow.rowParser(1).*)
     
   }
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update sales.store
-          set "name" = ${row.name}::"public"."Name",
-              salespersonid = ${row.salespersonid}::int4,
-              demographics = ${row.demographics}::xml,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              salespersonid = ${ParameterValue(row.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+              demographics = ${ParameterValue(row.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
@@ -107,12 +109,12 @@ object StoreRepoImpl extends StoreRepo {
   override def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.salespersonid}::int4,
-            ${unsaved.demographics}::xml,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+            ${ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (businessentityid)
           do update set

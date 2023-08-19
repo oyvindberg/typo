@@ -71,7 +71,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}".query(IllustrationRow.read).option
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow] = {
-    sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ANY(${fromWrite(illustrationids)(Write.fromPut(IllustrationId.arrayPut))})".query(IllustrationRow.read).stream
+    sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ANY(${illustrationids})".query(IllustrationRow.read).stream
   }
   override def update(row: IllustrationRow): ConnectionIO[Boolean] = {
     val illustrationid = row.illustrationid

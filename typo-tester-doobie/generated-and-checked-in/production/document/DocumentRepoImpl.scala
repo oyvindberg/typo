@@ -93,7 +93,7 @@ object DocumentRepoImpl extends DocumentRepo {
     sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode from production."document" where documentnode = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".query(DocumentRow.read).option
   }
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
-    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode from production."document" where documentnode = ANY(${fromWrite(documentnodes)(Write.fromPut(DocumentId.arrayPut))})""".query(DocumentRow.read).stream
+    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode from production."document" where documentnode = ANY(${documentnodes})""".query(DocumentRow.read).stream
   }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     val documentnode = row.documentnode

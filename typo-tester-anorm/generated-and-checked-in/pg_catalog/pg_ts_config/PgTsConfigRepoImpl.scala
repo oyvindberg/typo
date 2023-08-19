@@ -7,7 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_ts_config
 
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +18,14 @@ import typo.dsl.UpdateBuilder
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_ts_config where oid = $oid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_ts_config where oid = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTsConfigFields, PgTsConfigRow] = {
     DeleteBuilder("pg_catalog.pg_ts_config", PgTsConfigFields)
   }
   override def insert(unsaved: PgTsConfigRow)(implicit c: Connection): PgTsConfigRow = {
     SQL"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
-          values (${unsaved.oid}::oid, ${unsaved.cfgname}::name, ${unsaved.cfgnamespace}::oid, ${unsaved.cfgowner}::oid, ${unsaved.cfgparser}::oid)
+          values (${ParameterValue(unsaved.oid, null, PgTsConfigId.toStatement)}::oid, ${ParameterValue(unsaved.cfgname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.cfgnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.cfgowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.cfgparser, null, ToStatement.longToStatement)}::oid)
           returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
        """
       .executeInsert(PgTsConfigRow.rowParser(1).single)
@@ -40,24 +42,24 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def selectById(oid: PgTsConfigId)(implicit c: Connection): Option[PgTsConfigRow] = {
     SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser
           from pg_catalog.pg_ts_config
-          where oid = $oid
+          where oid = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}
        """.as(PgTsConfigRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTsConfigId])(implicit c: Connection): List[PgTsConfigRow] = {
     SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser
           from pg_catalog.pg_ts_config
-          where oid = ANY($oids)
+          where oid = ANY(${oids})
        """.as(PgTsConfigRow.rowParser(1).*)
     
   }
   override def update(row: PgTsConfigRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_config
-          set cfgname = ${row.cfgname}::name,
-              cfgnamespace = ${row.cfgnamespace}::oid,
-              cfgowner = ${row.cfgowner}::oid,
-              cfgparser = ${row.cfgparser}::oid
-          where oid = $oid
+          set cfgname = ${ParameterValue(row.cfgname, null, ToStatement.stringToStatement)}::name,
+              cfgnamespace = ${ParameterValue(row.cfgnamespace, null, ToStatement.longToStatement)}::oid,
+              cfgowner = ${ParameterValue(row.cfgowner, null, ToStatement.longToStatement)}::oid,
+              cfgparser = ${ParameterValue(row.cfgparser, null, ToStatement.longToStatement)}::oid
+          where oid = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTsConfigFields, PgTsConfigRow] = {
@@ -66,11 +68,11 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def upsert(unsaved: PgTsConfigRow)(implicit c: Connection): PgTsConfigRow = {
     SQL"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.cfgname}::name,
-            ${unsaved.cfgnamespace}::oid,
-            ${unsaved.cfgowner}::oid,
-            ${unsaved.cfgparser}::oid
+            ${ParameterValue(unsaved.oid, null, PgTsConfigId.toStatement)}::oid,
+            ${ParameterValue(unsaved.cfgname, null, ToStatement.stringToStatement)}::name,
+            ${ParameterValue(unsaved.cfgnamespace, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.cfgowner, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.cfgparser, null, ToStatement.longToStatement)}::oid
           )
           on conflict (oid)
           do update set

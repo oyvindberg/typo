@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_range
 
+import adventureworks.TypoRegproc
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -16,14 +19,14 @@ import typo.dsl.UpdateBuilder
 
 object PgRangeRepoImpl extends PgRangeRepo {
   override def delete(rngtypid: PgRangeId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_range where rngtypid = $rngtypid".executeUpdate() > 0
+    SQL"delete from pg_catalog.pg_range where rngtypid = ${ParameterValue(rngtypid, null, PgRangeId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgRangeFields, PgRangeRow] = {
     DeleteBuilder("pg_catalog.pg_range", PgRangeFields)
   }
   override def insert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow = {
     SQL"""insert into pg_catalog.pg_range(rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff)
-          values (${unsaved.rngtypid}::oid, ${unsaved.rngsubtype}::oid, ${unsaved.rngmultitypid}::oid, ${unsaved.rngcollation}::oid, ${unsaved.rngsubopc}::oid, ${unsaved.rngcanonical}::regproc, ${unsaved.rngsubdiff}::regproc)
+          values (${ParameterValue(unsaved.rngtypid, null, PgRangeId.toStatement)}::oid, ${ParameterValue(unsaved.rngsubtype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.rngmultitypid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.rngcollation, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.rngsubopc, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.rngcanonical, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.rngsubdiff, null, TypoRegproc.toStatement)}::regproc)
           returning rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
        """
       .executeInsert(PgRangeRow.rowParser(1).single)
@@ -40,26 +43,26 @@ object PgRangeRepoImpl extends PgRangeRepo {
   override def selectById(rngtypid: PgRangeId)(implicit c: Connection): Option[PgRangeRow] = {
     SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
           from pg_catalog.pg_range
-          where rngtypid = $rngtypid
+          where rngtypid = ${ParameterValue(rngtypid, null, PgRangeId.toStatement)}
        """.as(PgRangeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(rngtypids: Array[PgRangeId])(implicit c: Connection): List[PgRangeRow] = {
     SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
           from pg_catalog.pg_range
-          where rngtypid = ANY($rngtypids)
+          where rngtypid = ANY(${rngtypids})
        """.as(PgRangeRow.rowParser(1).*)
     
   }
   override def update(row: PgRangeRow)(implicit c: Connection): Boolean = {
     val rngtypid = row.rngtypid
     SQL"""update pg_catalog.pg_range
-          set rngsubtype = ${row.rngsubtype}::oid,
-              rngmultitypid = ${row.rngmultitypid}::oid,
-              rngcollation = ${row.rngcollation}::oid,
-              rngsubopc = ${row.rngsubopc}::oid,
-              rngcanonical = ${row.rngcanonical}::regproc,
-              rngsubdiff = ${row.rngsubdiff}::regproc
-          where rngtypid = $rngtypid
+          set rngsubtype = ${ParameterValue(row.rngsubtype, null, ToStatement.longToStatement)}::oid,
+              rngmultitypid = ${ParameterValue(row.rngmultitypid, null, ToStatement.longToStatement)}::oid,
+              rngcollation = ${ParameterValue(row.rngcollation, null, ToStatement.longToStatement)}::oid,
+              rngsubopc = ${ParameterValue(row.rngsubopc, null, ToStatement.longToStatement)}::oid,
+              rngcanonical = ${ParameterValue(row.rngcanonical, null, TypoRegproc.toStatement)}::regproc,
+              rngsubdiff = ${ParameterValue(row.rngsubdiff, null, TypoRegproc.toStatement)}::regproc
+          where rngtypid = ${ParameterValue(rngtypid, null, PgRangeId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgRangeFields, PgRangeRow] = {
@@ -68,13 +71,13 @@ object PgRangeRepoImpl extends PgRangeRepo {
   override def upsert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow = {
     SQL"""insert into pg_catalog.pg_range(rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff)
           values (
-            ${unsaved.rngtypid}::oid,
-            ${unsaved.rngsubtype}::oid,
-            ${unsaved.rngmultitypid}::oid,
-            ${unsaved.rngcollation}::oid,
-            ${unsaved.rngsubopc}::oid,
-            ${unsaved.rngcanonical}::regproc,
-            ${unsaved.rngsubdiff}::regproc
+            ${ParameterValue(unsaved.rngtypid, null, PgRangeId.toStatement)}::oid,
+            ${ParameterValue(unsaved.rngsubtype, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.rngmultitypid, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.rngcollation, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.rngsubopc, null, ToStatement.longToStatement)}::oid,
+            ${ParameterValue(unsaved.rngcanonical, null, TypoRegproc.toStatement)}::regproc,
+            ${ParameterValue(unsaved.rngsubdiff, null, TypoRegproc.toStatement)}::regproc
           )
           on conflict (rngtypid)
           do update set

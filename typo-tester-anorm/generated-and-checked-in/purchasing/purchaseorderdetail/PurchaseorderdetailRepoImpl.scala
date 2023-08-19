@@ -9,12 +9,15 @@ package purchaseorderdetail
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.product.ProductId
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -23,14 +26,14 @@ import typo.dsl.UpdateBuilder
 
 object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId)(implicit c: Connection): Boolean = {
-    SQL"delete from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".executeUpdate() > 0
+    SQL"delete from purchasing.purchaseorderdetail where purchaseorderid = ${ParameterValue(compositeId.purchaseorderid, null, PurchaseorderheaderId.toStatement)} AND purchaseorderdetailid = ${ParameterValue(compositeId.purchaseorderdetailid, null, ToStatement.intToStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
     DeleteBuilder("purchasing.purchaseorderdetail", PurchaseorderdetailFields)
   }
   override def insert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
     SQL"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
-          values (${unsaved.purchaseorderid}::int4, ${unsaved.purchaseorderdetailid}::int4, ${unsaved.duedate}::timestamp, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.receivedqty}::numeric, ${unsaved.rejectedqty}::numeric, ${unsaved.modifieddate}::timestamp)
+          values (${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.purchaseorderdetailid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.receivedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rejectedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
        """
       .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
@@ -38,20 +41,20 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): PurchaseorderdetailRow = {
     val namedParameters = List(
-      Some((NamedParameter("purchaseorderid", ParameterValue.from(unsaved.purchaseorderid)), "::int4")),
-      Some((NamedParameter("duedate", ParameterValue.from(unsaved.duedate)), "::timestamp")),
-      Some((NamedParameter("orderqty", ParameterValue.from(unsaved.orderqty)), "::int2")),
-      Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
-      Some((NamedParameter("unitprice", ParameterValue.from(unsaved.unitprice)), "::numeric")),
-      Some((NamedParameter("receivedqty", ParameterValue.from(unsaved.receivedqty)), "::numeric")),
-      Some((NamedParameter("rejectedqty", ParameterValue.from(unsaved.rejectedqty)), "::numeric")),
+      Some((NamedParameter("purchaseorderid", ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)), "::int4")),
+      Some((NamedParameter("duedate", ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
+      Some((NamedParameter("orderqty", ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
+      Some((NamedParameter("unitprice", ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
+      Some((NamedParameter("receivedqty", ParameterValue(unsaved.receivedqty, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
+      Some((NamedParameter("rejectedqty", ParameterValue(unsaved.rejectedqty, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
       unsaved.purchaseorderdetailid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("purchaseorderdetailid", ParameterValue.from[Int](value)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("purchaseorderdetailid", ParameterValue(value, null, ToStatement.intToStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
@@ -81,20 +84,20 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def selectById(compositeId: PurchaseorderdetailId)(implicit c: Connection): Option[PurchaseorderdetailRow] = {
     SQL"""select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
           from purchasing.purchaseorderdetail
-          where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
+          where purchaseorderid = ${ParameterValue(compositeId.purchaseorderid, null, PurchaseorderheaderId.toStatement)} AND purchaseorderdetailid = ${ParameterValue(compositeId.purchaseorderdetailid, null, ToStatement.intToStatement)}
        """.as(PurchaseorderdetailRow.rowParser(1).singleOpt)
   }
   override def update(row: PurchaseorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update purchasing.purchaseorderdetail
-          set duedate = ${row.duedate}::timestamp,
-              orderqty = ${row.orderqty}::int2,
-              productid = ${row.productid}::int4,
-              unitprice = ${row.unitprice}::numeric,
-              receivedqty = ${row.receivedqty}::numeric,
-              rejectedqty = ${row.rejectedqty}::numeric,
-              modifieddate = ${row.modifieddate}::timestamp
-          where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
+          set duedate = ${ParameterValue(row.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              orderqty = ${ParameterValue(row.orderqty, null, ToStatement.intToStatement)}::int2,
+              productid = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
+              unitprice = ${ParameterValue(row.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              receivedqty = ${ParameterValue(row.receivedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              rejectedqty = ${ParameterValue(row.rejectedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where purchaseorderid = ${ParameterValue(compositeId.purchaseorderid, null, PurchaseorderheaderId.toStatement)} AND purchaseorderdetailid = ${ParameterValue(compositeId.purchaseorderdetailid, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
@@ -103,15 +106,15 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def upsert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
     SQL"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
           values (
-            ${unsaved.purchaseorderid}::int4,
-            ${unsaved.purchaseorderdetailid}::int4,
-            ${unsaved.duedate}::timestamp,
-            ${unsaved.orderqty}::int2,
-            ${unsaved.productid}::int4,
-            ${unsaved.unitprice}::numeric,
-            ${unsaved.receivedqty}::numeric,
-            ${unsaved.rejectedqty}::numeric,
-            ${unsaved.modifieddate}::timestamp
+            ${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4,
+            ${ParameterValue(unsaved.purchaseorderdetailid, null, ToStatement.intToStatement)}::int4,
+            ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
+            ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
+            ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.receivedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.rejectedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (purchaseorderid, purchaseorderdetailid)
           do update set

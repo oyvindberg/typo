@@ -270,7 +270,7 @@ object sc {
       case Abstract(_)               => tpe
       case Commented(underlying, _)  => base(underlying)
       case ByName(underlying)        => base(underlying)
-      case UserDefined(_)            => tpe
+      case UserDefined(tpe)          => base(tpe)
     }
   }
 

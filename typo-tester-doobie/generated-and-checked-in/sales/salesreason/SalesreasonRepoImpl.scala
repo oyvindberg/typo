@@ -72,7 +72,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}""".query(SalesreasonRow.read).option
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow] = {
-    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ANY(${fromWrite(salesreasonids)(Write.fromPut(SalesreasonId.arrayPut))})""".query(SalesreasonRow.read).stream
+    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ANY(${salesreasonids})""".query(SalesreasonRow.read).stream
   }
   override def update(row: SalesreasonRow): ConnectionIO[Boolean] = {
     val salesreasonid = row.salesreasonid
