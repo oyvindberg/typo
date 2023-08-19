@@ -1,6 +1,6 @@
 package typo.dsl
 
-import anorm.{Row as _, *}
+import anorm.{AnormException, RowParser, SQL, SimpleSql}
 import typo.dsl.Fragment.FragmentStringInterpolator
 
 import java.sql.Connection
@@ -34,7 +34,7 @@ sealed trait SelectBuilderSql[Fields[_], Row] extends SelectBuilder[Fields, Row]
 
   final override def toList(implicit c: Connection): List[Row] = {
     val (frag, rowParser) = sqlFor(new AtomicInteger(0))
-    SQL(frag.sql).on(frag.params*).as(rowParser.*)(c)
+    SimpleSql(SQL(frag.sql), frag.params.map(_.tupled).toMap, RowParser.successful).as(rowParser.*)(c)
   }
 }
 
@@ -96,10 +96,11 @@ object SelectBuilderSql {
       SelectBuilderSql.Instantiated(
         newStructure,
         leftInstantiated.parts ++ newRightInstantiatedParts,
-        rowParser = (i: Int) => {
-          val rightRowParser = rightInstantiated.rowParser(i + leftInstantiated.columns.size)
-          (leftInstantiated.rowParser(i) ~ rightRowParser).map { case r1 ~ r2 => (r1, r2) }
-        }
+        rowParser = (i: Int) =>
+          for {
+            r1 <- leftInstantiated.rowParser(i)
+            r2 <- rightInstantiated.rowParser(i + leftInstantiated.columns.size)
+          } yield (r1, r2)
       )
     }
 
@@ -152,20 +153,17 @@ object SelectBuilderSql {
       SelectBuilderSql.Instantiated(
         newStructure,
         leftInstantiated.parts ++ newRightInstantiatedParts,
-        rowParser = (i: Int) => {
-
-          /** note, `RowParser` has a `?` combinator, but it doesn't work. fails with exception instead of [[anorm.Error]] */
-          val rightOptRowParser = {
-            RowParser[Option[Row2]] { row =>
+        rowParser = (i: Int) =>
+          for {
+            r1 <- leftInstantiated.rowParser(i)
+            /** note, `RowParser` has a `?` combinator, but it doesn't work. fails with exception instead of [[anorm.Error]] */
+            r2 <- RowParser[Option[Row2]] { row =>
               try rightInstantiated.rowParser(i + leftInstantiated.columns.size)(row).map(Some.apply)
               catch {
                 case x: AnormException if x.message.contains("not found, available columns") => anorm.Success(None)
               }
             }
-          }
-
-          (leftInstantiated.rowParser(i) ~ rightOptRowParser).map { case r1 ~ r2 => (r1, r2) }
-        }
+          } yield (r1, r2)
       )
     }
 

@@ -1,6 +1,6 @@
 package typo.dsl
 
-import anorm.{Row as _, *}
+import anorm.{RowParser, SQL, SimpleSql}
 import typo.dsl.Fragment.FragmentStringInterpolator
 
 import java.sql.Connection
@@ -48,7 +48,7 @@ object DeleteBuilder {
 
     override def execute()(implicit c: Connection): Int = {
       val frag = mkSql(new AtomicInteger(0))
-      SQL(frag.sql).on(frag.params*).executeUpdate()
+      SimpleSql(SQL(frag.sql), frag.params.map(_.tupled).toMap, RowParser.successful).executeUpdate()
     }
   }
 

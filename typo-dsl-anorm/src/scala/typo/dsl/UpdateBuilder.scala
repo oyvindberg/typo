@@ -1,6 +1,6 @@
 package typo.dsl
 
-import anorm.{Row as _, *}
+import anorm.{ParameterMetaData, RowParser, SQL, SimpleSql, ToParameterValue}
 import typo.dsl.Fragment.FragmentStringInterpolator
 
 import java.sql.Connection
@@ -75,14 +75,15 @@ object UpdateBuilder {
 
     override def execute()(implicit c: Connection): Int = {
       val frag = mkSql(new AtomicInteger(0), returning = false)
-      SQL(frag.sql).on(frag.params*).executeUpdate()
+      SimpleSql(SQL(frag.sql), frag.params.map(_.tupled).toMap, RowParser.successful).executeUpdate()
     }
 
     override def executeReturnChanged()(implicit c: Connection): List[Row] = {
       val frag = mkSql(new AtomicInteger(0), returning = true)
-      SQL(frag.sql).on(frag.params*).as(rowParser(1).*)
+      SimpleSql(SQL(frag.sql), frag.params.map(_.tupled).toMap, RowParser.successful).as(rowParser(1).*)
     }
   }
+
   case class UpdateBuilderMock[Id, Fields[_], Row](
       params: UpdateParams[Fields, Row],
       fields: Fields[Row],
