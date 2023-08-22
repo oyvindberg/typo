@@ -11,6 +11,6 @@ FROM sales.salesperson s
          JOIN humanresources.employee e ON e.businessentityid = s.businessentityid
          JOIN person.person p ON p.businessentityid = s.businessentityid
          JOIN person.businessentityaddress bea ON bea.businessentityid = s.businessentityid
-         JOIN person.address a ON a.addressid = bea.addressid
+         LEFT JOIN person.address a ON a.addressid = bea.addressid
 where s.businessentityid = :businessentityid
 and p.modifieddate > :modified_after

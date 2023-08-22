@@ -1,12 +1,12 @@
-package typo.internal.sqlfiles
+package typo
+package internal
+package sqlfiles
 
 import anorm.*
 import org.postgresql.core.SqlCommandType
 import org.postgresql.jdbc.PgConnection
 import org.postgresql.util.PSQLException
 import typo.generated.custom.view_column_dependencies.ViewColumnDependenciesSqlRepoImpl
-import typo.internal.{DebugJson, TypeMapperDb}
-import typo.{RelPath, db}
 
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
@@ -18,6 +18,8 @@ object Load {
       val sqlContent = Files.readString(sqlFile)
       val decomposedSql = DecomposedSql.parse(sqlContent)
       val relativePath = RelPath.relativeTo(scriptsPath, sqlFile)
+
+      println(s"Parsing $sqlFile")
 
       val queryType = queryTypeFor(decomposedSql, c)
       queryType match {
@@ -34,12 +36,16 @@ object Load {
               case Right(jdbcMetadata) =>
                 val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
                   queryType match {
-                    case SqlCommandType.SELECT =>
-                      fetchDepsViaTemporaryView(decomposedSql, relativePath)
-                    case _ =>
-                      Map.empty
+                    case SqlCommandType.SELECT => fetchDepsViaTemporaryView(decomposedSql, relativePath)
+                    case _                     => Map.empty
                   }
-                Some(parseSqlFile(typeMapperDb, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, jdbcMetadata, deps))
+                val nullableColumnsFromJoins =
+                  queryType match {
+                    case SqlCommandType.SELECT => Some(NullabilityFromExplain.from(decomposedSql, jdbcMetadata.params))
+                    case _                     => None
+                  }
+
+                Some(parseSqlFile(typeMapperDb, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, jdbcMetadata, nullableColumnsFromJoins, deps))
             }
           } catch {
             case e: PSQLException =>
@@ -89,10 +95,11 @@ object Load {
       relativePath: RelPath,
       decomposedSql: DecomposedSql,
       jdbcMetadata: JdbcMetadata,
+      nullableColumnsFromJoins: Option[NullabilityFromExplain.NullableColumns],
       depsFromView: Map[db.ColName, (db.RelationName, db.ColName)]
   ): SqlFile = {
     val cols = jdbcMetadata.columns.map { cols =>
-      cols.map { col =>
+      cols.zipWithIndex.map { case (col, idx) =>
         val jsonDescription = DebugJson(col)
         db.Col(
           name = col.name,
@@ -104,7 +111,7 @@ object Load {
           columnDefault = if (col.isAutoIncrement) Some("auto-increment") else None,
           comment = None,
           jsonDescription = jsonDescription,
-          nullability = col.isNullable.toNullability
+          nullability = if (nullableColumnsFromJoins.exists(_.nullableIndices.contains(idx))) Nullability.Nullable else col.isNullable.toNullability
         )
       }
     }
