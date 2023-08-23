@@ -10,6 +10,7 @@ package person
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -36,7 +37,7 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
-          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.persontype, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.namestyle, null, NameStyle.toStatement)}::"public".NameStyle, ${ParameterValue(unsaved.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.firstname, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))}::"public"."Name", ${ParameterValue(unsaved.lastname, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.emailpromotion, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.additionalcontactinfo, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.persontype, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.namestyle, null, NameStyle.toStatement)}::"public".NameStyle, ${ParameterValue(unsaved.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.firstname, null, /* user-picked */ FirstName.toStatement)}::"public"."Name", ${ParameterValue(unsaved.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))}::"public"."Name", ${ParameterValue(unsaved.lastname, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.emailpromotion, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.additionalcontactinfo, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
        """
       .executeInsert(PersonRow.rowParser(1).single)
@@ -47,7 +48,7 @@ object PersonRepoImpl extends PersonRepo {
       Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
       Some((NamedParameter("persontype", ParameterValue(unsaved.persontype, null, ToStatement.stringToStatement)), "::bpchar")),
       Some((NamedParameter("title", ParameterValue(unsaved.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
-      Some((NamedParameter("firstname", ParameterValue(unsaved.firstname, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("firstname", ParameterValue(unsaved.firstname, null, /* user-picked */ FirstName.toStatement)), """::"public"."Name"""")),
       Some((NamedParameter("middlename", ParameterValue(unsaved.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))), """::"public"."Name"""")),
       Some((NamedParameter("lastname", ParameterValue(unsaved.lastname, null, Name.toStatement)), """::"public"."Name"""")),
       Some((NamedParameter("suffix", ParameterValue(unsaved.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
@@ -113,7 +114,7 @@ object PersonRepoImpl extends PersonRepo {
           set persontype = ${ParameterValue(row.persontype, null, ToStatement.stringToStatement)}::bpchar,
               namestyle = ${ParameterValue(row.namestyle, null, NameStyle.toStatement)}::"public".NameStyle,
               title = ${ParameterValue(row.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              firstname = ${ParameterValue(row.firstname, null, Name.toStatement)}::"public"."Name",
+              firstname = ${ParameterValue(row.firstname, null, /* user-picked */ FirstName.toStatement)}::"public"."Name",
               middlename = ${ParameterValue(row.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))}::"public"."Name",
               lastname = ${ParameterValue(row.lastname, null, Name.toStatement)}::"public"."Name",
               suffix = ${ParameterValue(row.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
@@ -135,7 +136,7 @@ object PersonRepoImpl extends PersonRepo {
             ${ParameterValue(unsaved.persontype, null, ToStatement.stringToStatement)}::bpchar,
             ${ParameterValue(unsaved.namestyle, null, NameStyle.toStatement)}::"public".NameStyle,
             ${ParameterValue(unsaved.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-            ${ParameterValue(unsaved.firstname, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.firstname, null, /* user-picked */ FirstName.toStatement)}::"public"."Name",
             ${ParameterValue(unsaved.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))}::"public"."Name",
             ${ParameterValue(unsaved.lastname, null, Name.toStatement)}::"public"."Name",
             ${ParameterValue(unsaved.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},

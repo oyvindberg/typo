@@ -8,8 +8,8 @@ package sa
 package pcc
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -27,7 +27,7 @@ case class PccViewRow(
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.creditcardid]] */
-  creditcardid: Option[CreditcardId],
+  creditcardid: Option[/* user-picked */ CustomCreditcardId],
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.modifieddate]] */
   modifieddate: Option[TypoLocalDateTime]
 )
@@ -38,7 +38,7 @@ object PccViewRow {
         PccViewRow(
           id = json.\("id").toOption.map(_.as(Reads.IntReads)),
           businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          creditcardid = json.\("creditcardid").toOption.map(_.as(CreditcardId.reads)),
+          creditcardid = json.\("creditcardid").toOption.map(_.as(CustomCreditcardId.reads)),
           modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
@@ -49,7 +49,7 @@ object PccViewRow {
       PccViewRow(
         id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
         businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        creditcardid = row(idx + 2)(Column.columnToOption(CreditcardId.column)),
+        creditcardid = row(idx + 2)(Column.columnToOption(CustomCreditcardId.column)),
         modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
@@ -58,7 +58,7 @@ object PccViewRow {
     new JsObject(ListMap[String, JsValue](
       "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
       "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "creditcardid" -> Writes.OptionWrites(CreditcardId.writes).writes(o.creditcardid),
+      "creditcardid" -> Writes.OptionWrites(CustomCreditcardId.writes).writes(o.creditcardid),
       "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

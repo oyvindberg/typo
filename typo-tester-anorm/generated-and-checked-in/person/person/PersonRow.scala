@@ -9,6 +9,7 @@ package person
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -36,7 +37,7 @@ case class PersonRow(
   /** A courtesy title. For example, Mr. or Ms. */
   title: Option[/* max 8 chars */ String],
   /** First name of the person. */
-  firstname: Name,
+  firstname: /* user-picked */ FirstName,
   /** Middle name or middle initial of the person. */
   middlename: Option[Name],
   /** Last name of the person. */
@@ -61,7 +62,7 @@ object PersonRow {
           persontype = json.\("persontype").as(Reads.StringReads),
           namestyle = json.\("namestyle").as(NameStyle.reads),
           title = json.\("title").toOption.map(_.as(Reads.StringReads)),
-          firstname = json.\("firstname").as(Name.reads),
+          firstname = json.\("firstname").as(FirstName.reads),
           middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
           lastname = json.\("lastname").as(Name.reads),
           suffix = json.\("suffix").toOption.map(_.as(Reads.StringReads)),
@@ -81,7 +82,7 @@ object PersonRow {
         persontype = row(idx + 1)(Column.columnToString),
         namestyle = row(idx + 2)(NameStyle.column),
         title = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        firstname = row(idx + 4)(Name.column),
+        firstname = row(idx + 4)(/* user-picked */ FirstName.column),
         middlename = row(idx + 5)(Column.columnToOption(Name.column)),
         lastname = row(idx + 6)(Name.column),
         suffix = row(idx + 7)(Column.columnToOption(Column.columnToString)),
@@ -99,7 +100,7 @@ object PersonRow {
       "persontype" -> Writes.StringWrites.writes(o.persontype),
       "namestyle" -> NameStyle.writes.writes(o.namestyle),
       "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
-      "firstname" -> Name.writes.writes(o.firstname),
+      "firstname" -> FirstName.writes.writes(o.firstname),
       "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
       "lastname" -> Name.writes.writes(o.lastname),
       "suffix" -> Writes.OptionWrites(Writes.StringWrites).writes(o.suffix),

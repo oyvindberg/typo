@@ -8,7 +8,7 @@ package sa
 package cc
 
 import adventureworks.TypoLocalDateTime
-import adventureworks.sales.creditcard.CreditcardId
+import adventureworks.customtype.CustomCreditcardId
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -18,7 +18,7 @@ class CcViewStructure[Row](val prefix: Option[String], val extract: Row => CcVie
     with CcViewFields[Row] { outer =>
 
   override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val creditcardid = new OptField[CreditcardId, Row](prefix, "creditcardid", None, Some("int4"))(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
+  override val creditcardid = new OptField[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, Some("int4"))(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
   override val cardtype = new OptField[/* max 50 chars */ String, Row](prefix, "cardtype", None, None)(x => extract(x).cardtype, (row, value) => merge(row, extract(row).copy(cardtype = value)))
   override val cardnumber = new OptField[/* max 25 chars */ String, Row](prefix, "cardnumber", None, None)(x => extract(x).cardnumber, (row, value) => merge(row, extract(row).copy(cardnumber = value)))
   override val expmonth = new OptField[Int, Row](prefix, "expmonth", None, Some("int2"))(x => extract(x).expmonth, (row, value) => merge(row, extract(row).copy(expmonth = value)))

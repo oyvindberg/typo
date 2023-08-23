@@ -8,6 +8,7 @@ package sales
 package creditcard
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -17,7 +18,7 @@ import java.sql.ResultSet
 
 case class CreditcardRow(
   /** Primary key for CreditCard records. */
-  creditcardid: CreditcardId,
+  creditcardid: /* user-picked */ CustomCreditcardId,
   /** Credit card name. */
   cardtype: /* max 50 chars */ String,
   /** Credit card number. */
@@ -30,11 +31,11 @@ case class CreditcardRow(
 )
 
 object CreditcardRow {
-  implicit lazy val decoder: Decoder[CreditcardRow] = Decoder.forProduct6[CreditcardRow, CreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CreditcardRow.apply)(CreditcardId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[CreditcardRow] = Encoder.forProduct6[CreditcardRow, CreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))(CreditcardId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[CreditcardRow] = Decoder.forProduct6[CreditcardRow, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CreditcardRow.apply)(CustomCreditcardId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CreditcardRow] = Encoder.forProduct6[CreditcardRow, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))(CustomCreditcardId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CreditcardRow] = new Read[CreditcardRow](
     gets = List(
-      (CreditcardId.get, Nullability.NoNulls),
+      (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
@@ -42,7 +43,7 @@ object CreditcardRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CreditcardRow(
-      creditcardid = CreditcardId.get.unsafeGetNonNullable(rs, i + 0),
+      creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 0),
       cardtype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
       cardnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
       expmonth = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),

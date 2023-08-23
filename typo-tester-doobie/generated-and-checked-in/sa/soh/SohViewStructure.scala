@@ -8,13 +8,13 @@ package sa
 package soh
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
@@ -45,7 +45,7 @@ class SohViewStructure[Row](val prefix: Option[String], val extract: Row => SohV
   override val billtoaddressid = new OptField[AddressId, Row](prefix, "billtoaddressid", None, Some("int4"))(x => extract(x).billtoaddressid, (row, value) => merge(row, extract(row).copy(billtoaddressid = value)))
   override val shiptoaddressid = new OptField[AddressId, Row](prefix, "shiptoaddressid", None, Some("int4"))(x => extract(x).shiptoaddressid, (row, value) => merge(row, extract(row).copy(shiptoaddressid = value)))
   override val shipmethodid = new OptField[ShipmethodId, Row](prefix, "shipmethodid", None, Some("int4"))(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))
-  override val creditcardid = new OptField[CreditcardId, Row](prefix, "creditcardid", None, Some("int4"))(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
+  override val creditcardid = new OptField[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, Some("int4"))(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
   override val creditcardapprovalcode = new OptField[/* max 15 chars */ String, Row](prefix, "creditcardapprovalcode", None, None)(x => extract(x).creditcardapprovalcode, (row, value) => merge(row, extract(row).copy(creditcardapprovalcode = value)))
   override val currencyrateid = new OptField[CurrencyrateId, Row](prefix, "currencyrateid", None, Some("int4"))(x => extract(x).currencyrateid, (row, value) => merge(row, extract(row).copy(currencyrateid = value)))
   override val subtotal = new OptField[BigDecimal, Row](prefix, "subtotal", None, Some("numeric"))(x => extract(x).subtotal, (row, value) => merge(row, extract(row).copy(subtotal = value)))

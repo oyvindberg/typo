@@ -9,6 +9,7 @@ package creditcard
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -23,15 +24,15 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 object CreditcardRepoImpl extends CreditcardRepo {
-  override def delete(creditcardid: CreditcardId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.creditcard where creditcardid = ${ParameterValue(creditcardid, null, CreditcardId.toStatement)}".executeUpdate() > 0
+  override def delete(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Boolean = {
+    SQL"delete from sales.creditcard where creditcardid = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
     DeleteBuilder("sales.creditcard", CreditcardFields)
   }
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
-          values (${ParameterValue(unsaved.creditcardid, null, CreditcardId.toStatement)}::int4, ${ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.cardnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.expmonth, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.expyear, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4, ${ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.cardnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.expmonth, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.expyear, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
@@ -45,7 +46,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
       Some((NamedParameter("expyear", ParameterValue(unsaved.expyear, null, ToStatement.intToStatement)), "::int2")),
       unsaved.creditcardid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("creditcardid", ParameterValue(value, null, CreditcardId.toStatement)), "::int4"))
+        case Defaulted.Provided(value) => Some((NamedParameter("creditcardid", ParameterValue(value, null, /* user-picked */ CustomCreditcardId.toStatement)), "::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -76,13 +77,13 @@ object CreditcardRepoImpl extends CreditcardRepo {
           from sales.creditcard
        """.as(CreditcardRow.rowParser(1).*)
   }
-  override def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
+  override def selectById(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
     SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
           from sales.creditcard
-          where creditcardid = ${ParameterValue(creditcardid, null, CreditcardId.toStatement)}
+          where creditcardid = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.as(CreditcardRow.rowParser(1).singleOpt)
   }
-  override def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
+  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow] = {
     SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
           from sales.creditcard
           where creditcardid = ANY(${creditcardids})
@@ -97,7 +98,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
               expmonth = ${ParameterValue(row.expmonth, null, ToStatement.intToStatement)}::int2,
               expyear = ${ParameterValue(row.expyear, null, ToStatement.intToStatement)}::int2,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where creditcardid = ${ParameterValue(creditcardid, null, CreditcardId.toStatement)}
+          where creditcardid = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
@@ -106,7 +107,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
   override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
           values (
-            ${ParameterValue(unsaved.creditcardid, null, CreditcardId.toStatement)}::int4,
+            ${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4,
             ${ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.cardnumber, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.expmonth, null, ToStatement.intToStatement)}::int2,

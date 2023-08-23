@@ -10,6 +10,7 @@ package person
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -33,7 +34,7 @@ case class PersonRowUnsaved(
   /** A courtesy title. For example, Mr. or Ms. */
   title: Option[/* max 8 chars */ String],
   /** First name of the person. */
-  firstname: Name,
+  firstname: /* user-picked */ FirstName,
   /** Middle name or middle initial of the person. */
   middlename: Option[Name],
   /** Last name of the person. */
@@ -91,7 +92,7 @@ object PersonRowUnsaved {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           persontype = json.\("persontype").as(Reads.StringReads),
           title = json.\("title").toOption.map(_.as(Reads.StringReads)),
-          firstname = json.\("firstname").as(Name.reads),
+          firstname = json.\("firstname").as(FirstName.reads),
           middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
           lastname = json.\("lastname").as(Name.reads),
           suffix = json.\("suffix").toOption.map(_.as(Reads.StringReads)),
@@ -110,7 +111,7 @@ object PersonRowUnsaved {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "persontype" -> Writes.StringWrites.writes(o.persontype),
       "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
-      "firstname" -> Name.writes.writes(o.firstname),
+      "firstname" -> FirstName.writes.writes(o.firstname),
       "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
       "lastname" -> Name.writes.writes(o.lastname),
       "suffix" -> Writes.OptionWrites(Writes.StringWrites).writes(o.suffix),

@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package vvendorwithcontacts
 
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
@@ -26,7 +27,7 @@ case class VvendorwithcontactsViewRow(
   /** Points to [[person.person.PersonRow.title]] */
   title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Option[Name],
+  firstname: Option[/* user-picked */ FirstName],
   /** Points to [[person.person.PersonRow.middlename]] */
   middlename: Option[Name],
   /** Points to [[person.person.PersonRow.lastname]] */
@@ -43,15 +44,15 @@ case class VvendorwithcontactsViewRow(
 )
 
 object VvendorwithcontactsViewRow {
-  implicit lazy val decoder: Decoder[VvendorwithcontactsViewRow] = Decoder.forProduct12[VvendorwithcontactsViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int]]("businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion")(VvendorwithcontactsViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt))
-  implicit lazy val encoder: Encoder[VvendorwithcontactsViewRow] = Encoder.forProduct12[VvendorwithcontactsViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int]]("businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion")(x => (x.businessentityid, x.name, x.contacttype, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt))
+  implicit lazy val decoder: Decoder[VvendorwithcontactsViewRow] = Decoder.forProduct12[VvendorwithcontactsViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[/* max 8 chars */ String], Option[/* user-picked */ FirstName], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int]]("businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion")(VvendorwithcontactsViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(FirstName.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt))
+  implicit lazy val encoder: Encoder[VvendorwithcontactsViewRow] = Encoder.forProduct12[VvendorwithcontactsViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[/* max 8 chars */ String], Option[/* user-picked */ FirstName], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int]]("businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion")(x => (x.businessentityid, x.name, x.contacttype, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(FirstName.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt))
   implicit lazy val read: Read[VvendorwithcontactsViewRow] = new Read[VvendorwithcontactsViewRow](
     gets = List(
       (BusinessentityId.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
+      (/* user-picked */ FirstName.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -65,7 +66,7 @@ object VvendorwithcontactsViewRow {
       name = Name.get.unsafeGetNullable(rs, i + 1),
       contacttype = Name.get.unsafeGetNullable(rs, i + 2),
       title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      firstname = Name.get.unsafeGetNullable(rs, i + 4),
+      firstname = /* user-picked */ FirstName.get.unsafeGetNullable(rs, i + 4),
       middlename = Name.get.unsafeGetNullable(rs, i + 5),
       lastname = Name.get.unsafeGetNullable(rs, i + 6),
       suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),

@@ -36,7 +36,12 @@ object GeneratedAdventureWorks {
               pkg = "adventureworks",
               Some(dbLib),
               List(jsonLib),
-              typeOverride = typo.TypeOverride.sqlFileParam { case (_, "businessentityid") => "adventureworks.person.businessentity.BusinessentityId" },
+              typeOverride = typo.TypeOverride
+                .sqlFileParam { case (_, "businessentityid") => "adventureworks.person.businessentity.BusinessentityId" }
+                .orElse(typo.TypeOverride.relation {
+                  case (_, "firstname")                     => "adventureworks.customtype.FirstName"
+                  case ("sales.creditcard", "creditcardid") => "adventureworks.customtype.CustomCreditcardId"
+                }),
               enableDsl = true,
               enableTestInserts = true
             )

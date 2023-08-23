@@ -6,6 +6,7 @@
 package adventureworks
 package person_detail
 
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -27,7 +28,7 @@ case class PersonDetailSqlRow(
   /** Points to [[person.person.PersonRow.title]] */
   title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Name,
+  firstname: /* user-picked */ FirstName,
   /** Points to [[person.person.PersonRow.middlename]] */
   middlename: Option[Name],
   /** Points to [[person.person.PersonRow.namestyle]] */
@@ -48,7 +49,7 @@ object PersonDetailSqlRow {
         PersonDetailSqlRow(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           title = json.\("title").toOption.map(_.as(Reads.StringReads)),
-          firstname = json.\("firstname").as(Name.reads),
+          firstname = json.\("firstname").as(FirstName.reads),
           middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
           namestyle = json.\("namestyle").as(NameStyle.reads),
           jobtitle = json.\("jobtitle").as(Reads.StringReads),
@@ -64,7 +65,7 @@ object PersonDetailSqlRow {
       PersonDetailSqlRow(
         businessentityid = row(idx + 0)(BusinessentityId.column),
         title = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        firstname = row(idx + 2)(Name.column),
+        firstname = row(idx + 2)(/* user-picked */ FirstName.column),
         middlename = row(idx + 3)(Column.columnToOption(Name.column)),
         namestyle = row(idx + 4)(NameStyle.column),
         jobtitle = row(idx + 5)(Column.columnToString),
@@ -78,7 +79,7 @@ object PersonDetailSqlRow {
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
-      "firstname" -> Name.writes.writes(o.firstname),
+      "firstname" -> FirstName.writes.writes(o.firstname),
       "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
       "namestyle" -> NameStyle.writes.writes(o.namestyle),
       "jobtitle" -> Writes.StringWrites.writes(o.jobtitle),

@@ -1,5 +1,6 @@
 package adventureworks.humanresources.employee
 
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
 import adventureworks.person.person.{PersonRepoImpl, PersonRowUnsaved}
 import adventureworks.public.{Flag, Name}
@@ -29,7 +30,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           businessentityid = businessentityRow.businessentityid,
           persontype = "SC",
           title = None,
-          firstname = Name("firstname"),
+          firstname = FirstName("firstname"),
           middlename = Some(Name("middlename")),
           lastname = Name("lastname"),
           suffix = Some("suffix"),

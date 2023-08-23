@@ -8,13 +8,13 @@ package sales
 package salesorderheader
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
@@ -70,7 +70,7 @@ case class SalesorderheaderRow(
   shipmethodid: ShipmethodId,
   /** Credit card identification number. Foreign key to CreditCard.CreditCardID.
       Points to [[creditcard.CreditcardRow.creditcardid]] */
-  creditcardid: Option[CreditcardId],
+  creditcardid: Option[/* user-picked */ CustomCreditcardId],
   /** Approval code provided by the credit card company. */
   creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Currency exchange rate used. Foreign key to CurrencyRate.CurrencyRateID.
@@ -109,7 +109,7 @@ object SalesorderheaderRow {
           billtoaddressid = json.\("billtoaddressid").as(AddressId.reads),
           shiptoaddressid = json.\("shiptoaddressid").as(AddressId.reads),
           shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
-          creditcardid = json.\("creditcardid").toOption.map(_.as(CreditcardId.reads)),
+          creditcardid = json.\("creditcardid").toOption.map(_.as(CustomCreditcardId.reads)),
           creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as(Reads.StringReads)),
           currencyrateid = json.\("currencyrateid").toOption.map(_.as(CurrencyrateId.reads)),
           subtotal = json.\("subtotal").as(Reads.bigDecReads),
@@ -141,7 +141,7 @@ object SalesorderheaderRow {
         billtoaddressid = row(idx + 12)(AddressId.column),
         shiptoaddressid = row(idx + 13)(AddressId.column),
         shipmethodid = row(idx + 14)(ShipmethodId.column),
-        creditcardid = row(idx + 15)(Column.columnToOption(CreditcardId.column)),
+        creditcardid = row(idx + 15)(Column.columnToOption(CustomCreditcardId.column)),
         creditcardapprovalcode = row(idx + 16)(Column.columnToOption(Column.columnToString)),
         currencyrateid = row(idx + 17)(Column.columnToOption(CurrencyrateId.column)),
         subtotal = row(idx + 18)(Column.columnToScalaBigDecimal),
@@ -171,7 +171,7 @@ object SalesorderheaderRow {
       "billtoaddressid" -> AddressId.writes.writes(o.billtoaddressid),
       "shiptoaddressid" -> AddressId.writes.writes(o.shiptoaddressid),
       "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
-      "creditcardid" -> Writes.OptionWrites(CreditcardId.writes).writes(o.creditcardid),
+      "creditcardid" -> Writes.OptionWrites(CustomCreditcardId.writes).writes(o.creditcardid),
       "creditcardapprovalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.creditcardapprovalcode),
       "currencyrateid" -> Writes.OptionWrites(CurrencyrateId.writes).writes(o.currencyrateid),
       "subtotal" -> Writes.BigDecimalWrites.writes(o.subtotal),

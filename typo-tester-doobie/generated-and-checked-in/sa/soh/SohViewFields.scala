@@ -8,13 +8,13 @@ package sa
 package soh
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
@@ -40,7 +40,7 @@ trait SohViewFields[Row] {
   val billtoaddressid: OptField[AddressId, Row]
   val shiptoaddressid: OptField[AddressId, Row]
   val shipmethodid: OptField[ShipmethodId, Row]
-  val creditcardid: OptField[CreditcardId, Row]
+  val creditcardid: OptField[/* user-picked */ CustomCreditcardId, Row]
   val creditcardapprovalcode: OptField[/* max 15 chars */ String, Row]
   val currencyrateid: OptField[CurrencyrateId, Row]
   val subtotal: OptField[BigDecimal, Row]

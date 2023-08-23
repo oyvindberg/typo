@@ -7,15 +7,15 @@ package adventureworks
 package sales
 package personcreditcard
 
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the composite primary key of table `sales.personcreditcard` */
-case class PersoncreditcardId(businessentityid: BusinessentityId, creditcardid: CreditcardId)
+case class PersoncreditcardId(businessentityid: BusinessentityId, creditcardid: /* user-picked */ CustomCreditcardId)
 object PersoncreditcardId {
-  implicit lazy val decoder: Decoder[PersoncreditcardId] = Decoder.forProduct2[PersoncreditcardId, BusinessentityId, CreditcardId]("businessentityid", "creditcardid")(PersoncreditcardId.apply)(BusinessentityId.decoder, CreditcardId.decoder)
-  implicit lazy val encoder: Encoder[PersoncreditcardId] = Encoder.forProduct2[PersoncreditcardId, BusinessentityId, CreditcardId]("businessentityid", "creditcardid")(x => (x.businessentityid, x.creditcardid))(BusinessentityId.encoder, CreditcardId.encoder)
+  implicit lazy val decoder: Decoder[PersoncreditcardId] = Decoder.forProduct2[PersoncreditcardId, BusinessentityId, /* user-picked */ CustomCreditcardId]("businessentityid", "creditcardid")(PersoncreditcardId.apply)(BusinessentityId.decoder, CustomCreditcardId.decoder)
+  implicit lazy val encoder: Encoder[PersoncreditcardId] = Encoder.forProduct2[PersoncreditcardId, BusinessentityId, /* user-picked */ CustomCreditcardId]("businessentityid", "creditcardid")(x => (x.businessentityid, x.creditcardid))(BusinessentityId.encoder, CustomCreditcardId.encoder)
   implicit lazy val ordering: Ordering[PersoncreditcardId] = Ordering.by(x => (x.businessentityid, x.creditcardid))
 }

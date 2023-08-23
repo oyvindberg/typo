@@ -7,20 +7,22 @@ package adventureworks
 package sales
 package creditcard
 
+import adventureworks.customtype.CustomCreditcardId
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait CreditcardRepo {
-  def delete(creditcardid: CreditcardId)(implicit c: Connection): Boolean
+  def delete(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[CreditcardFields, CreditcardRow]
   def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow
   def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow
   def select: SelectBuilder[CreditcardFields, CreditcardRow]
   def selectAll(implicit c: Connection): List[CreditcardRow]
-  def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow]
-  def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow]
+  def selectById(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Option[CreditcardRow]
+  def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow]
   def update(row: CreditcardRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[CreditcardFields, CreditcardRow]
   def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow

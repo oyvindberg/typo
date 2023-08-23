@@ -8,11 +8,12 @@ package sales
 package creditcard
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait CreditcardFields[Row] {
-  val creditcardid: IdField[CreditcardId, Row]
+  val creditcardid: IdField[/* user-picked */ CustomCreditcardId, Row]
   val cardtype: Field[/* max 50 chars */ String, Row]
   val cardnumber: Field[/* max 25 chars */ String, Row]
   val expmonth: Field[Int, Row]

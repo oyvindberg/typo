@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package creditcard
 
+import adventureworks.customtype.CustomCreditcardId
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
@@ -19,8 +21,8 @@ import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import typo.dsl.UpdateParams
 
 class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
-                         map: scala.collection.mutable.Map[CreditcardId, CreditcardRow] = scala.collection.mutable.Map.empty) extends CreditcardRepo {
-  override def delete(creditcardid: CreditcardId)(implicit c: Connection): Boolean = {
+                         map: scala.collection.mutable.Map[/* user-picked */ CustomCreditcardId, CreditcardRow] = scala.collection.mutable.Map.empty) extends CreditcardRepo {
+  override def delete(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Boolean = {
     map.remove(creditcardid).isDefined
   }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
@@ -42,10 +44,10 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
     map.values.toList
   }
-  override def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
+  override def selectById(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
     map.get(creditcardid)
   }
-  override def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
+  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow] = {
     creditcardids.flatMap(map.get).toList
   }
   override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {

@@ -8,6 +8,7 @@ package humanresources
 package vemployeedepartment
 
 import adventureworks.TypoLocalDate
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -23,7 +24,7 @@ case class VemployeedepartmentViewRow(
   /** Points to [[person.person.PersonRow.title]] */
   title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Option[Name],
+  firstname: Option[/* user-picked */ FirstName],
   /** Points to [[person.person.PersonRow.middlename]] */
   middlename: Option[Name],
   /** Points to [[person.person.PersonRow.lastname]] */
@@ -40,13 +41,13 @@ case class VemployeedepartmentViewRow(
 )
 
 object VemployeedepartmentViewRow {
-  implicit lazy val decoder: Decoder[VemployeedepartmentViewRow] = Decoder.forProduct10[VemployeedepartmentViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Name], Option[Name], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "department", "groupname", "startdate")(VemployeedepartmentViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDate.decoder))
-  implicit lazy val encoder: Encoder[VemployeedepartmentViewRow] = Encoder.forProduct10[VemployeedepartmentViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Name], Option[Name], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "department", "groupname", "startdate")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.jobtitle, x.department, x.groupname, x.startdate))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDate.encoder))
+  implicit lazy val decoder: Decoder[VemployeedepartmentViewRow] = Decoder.forProduct10[VemployeedepartmentViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[/* user-picked */ FirstName], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Name], Option[Name], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "department", "groupname", "startdate")(VemployeedepartmentViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(FirstName.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDate.decoder))
+  implicit lazy val encoder: Encoder[VemployeedepartmentViewRow] = Encoder.forProduct10[VemployeedepartmentViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[/* user-picked */ FirstName], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Name], Option[Name], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "department", "groupname", "startdate")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.jobtitle, x.department, x.groupname, x.startdate))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(FirstName.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDate.encoder))
   implicit lazy val read: Read[VemployeedepartmentViewRow] = new Read[VemployeedepartmentViewRow](
     gets = List(
       (BusinessentityId.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
+      (/* user-picked */ FirstName.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -58,7 +59,7 @@ object VemployeedepartmentViewRow {
     unsafeGet = (rs: ResultSet, i: Int) => VemployeedepartmentViewRow(
       businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 0),
       title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      firstname = Name.get.unsafeGetNullable(rs, i + 2),
+      firstname = /* user-picked */ FirstName.get.unsafeGetNullable(rs, i + 2),
       middlename = Name.get.unsafeGetNullable(rs, i + 3),
       lastname = Name.get.unsafeGetNullable(rs, i + 4),
       suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),

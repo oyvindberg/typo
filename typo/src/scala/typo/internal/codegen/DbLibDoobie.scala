@@ -66,7 +66,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
       unaryId match {
         case IdComputed.UnaryUserSpecified(_, tpe) =>
-          code"def selectByIds($idsParam)(implicit puts: ${Put.of(sc.Type.Array.of(tpe))}): ${sc.Type.List.of(rowType)}"
+          code"def selectByIds($idsParam)(implicit puts: ${Put.of(sc.Type.Array.of(tpe))}): ${fs2Stream.of(ConnectionIO, rowType)}"
         case _ =>
           code"def selectByIds($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
       }

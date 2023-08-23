@@ -7,7 +7,7 @@ package adventureworks
 package update_person_returning
 
 import adventureworks.TypoLocalDateTime
-import adventureworks.public.Name
+import adventureworks.customtype.FirstName
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
@@ -16,21 +16,21 @@ import java.sql.ResultSet
 
 case class UpdatePersonReturningSqlRow(
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Name,
+  firstname: /* user-picked */ FirstName,
   /** Points to [[person.person.PersonRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object UpdatePersonReturningSqlRow {
-  implicit lazy val decoder: Decoder[UpdatePersonReturningSqlRow] = Decoder.forProduct2[UpdatePersonReturningSqlRow, Name, TypoLocalDateTime]("firstname", "modifieddate")(UpdatePersonReturningSqlRow.apply)(Name.decoder, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[UpdatePersonReturningSqlRow] = Encoder.forProduct2[UpdatePersonReturningSqlRow, Name, TypoLocalDateTime]("firstname", "modifieddate")(x => (x.firstname, x.modifieddate))(Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[UpdatePersonReturningSqlRow] = Decoder.forProduct2[UpdatePersonReturningSqlRow, /* user-picked */ FirstName, TypoLocalDateTime]("firstname", "modifieddate")(UpdatePersonReturningSqlRow.apply)(FirstName.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[UpdatePersonReturningSqlRow] = Encoder.forProduct2[UpdatePersonReturningSqlRow, /* user-picked */ FirstName, TypoLocalDateTime]("firstname", "modifieddate")(x => (x.firstname, x.modifieddate))(FirstName.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[UpdatePersonReturningSqlRow] = new Read[UpdatePersonReturningSqlRow](
     gets = List(
-      (Name.get, Nullability.NoNulls),
+      (/* user-picked */ FirstName.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UpdatePersonReturningSqlRow(
-      firstname = Name.get.unsafeGetNonNullable(rs, i + 0),
+      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 0),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1)
     )
   )

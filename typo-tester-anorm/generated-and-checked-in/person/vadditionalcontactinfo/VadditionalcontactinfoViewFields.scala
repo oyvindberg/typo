@@ -9,6 +9,7 @@ package vadditionalcontactinfo
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.util.UUID
@@ -16,7 +17,7 @@ import typo.dsl.SqlExpr.OptField
 
 trait VadditionalcontactinfoViewFields[Row] {
   val businessentityid: OptField[BusinessentityId, Row]
-  val firstname: OptField[Name, Row]
+  val firstname: OptField[/* user-picked */ FirstName, Row]
   val middlename: OptField[Name, Row]
   val lastname: OptField[Name, Row]
   val telephonenumber: OptField[TypoXml, Row]

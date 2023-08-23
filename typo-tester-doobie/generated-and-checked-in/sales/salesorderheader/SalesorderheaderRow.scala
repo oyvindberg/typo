@@ -8,13 +8,13 @@ package sales
 package salesorderheader
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
@@ -69,7 +69,7 @@ case class SalesorderheaderRow(
   shipmethodid: ShipmethodId,
   /** Credit card identification number. Foreign key to CreditCard.CreditCardID.
       Points to [[creditcard.CreditcardRow.creditcardid]] */
-  creditcardid: Option[CreditcardId],
+  creditcardid: Option[/* user-picked */ CustomCreditcardId],
   /** Approval code provided by the credit card company. */
   creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Currency exchange rate used. Foreign key to CurrencyRate.CurrencyRateID.
@@ -112,7 +112,7 @@ object SalesorderheaderRow {
         billtoaddressid = orThrow(c.get("billtoaddressid")(AddressId.decoder)),
         shiptoaddressid = orThrow(c.get("shiptoaddressid")(AddressId.decoder)),
         shipmethodid = orThrow(c.get("shipmethodid")(ShipmethodId.decoder)),
-        creditcardid = orThrow(c.get("creditcardid")(Decoder.decodeOption(CreditcardId.decoder))),
+        creditcardid = orThrow(c.get("creditcardid")(Decoder.decodeOption(CustomCreditcardId.decoder))),
         creditcardapprovalcode = orThrow(c.get("creditcardapprovalcode")(Decoder.decodeOption(Decoder.decodeString))),
         currencyrateid = orThrow(c.get("currencyrateid")(Decoder.decodeOption(CurrencyrateId.decoder))),
         subtotal = orThrow(c.get("subtotal")(Decoder.decodeBigDecimal)),
@@ -142,7 +142,7 @@ object SalesorderheaderRow {
       "billtoaddressid" -> AddressId.encoder.apply(row.billtoaddressid),
       "shiptoaddressid" -> AddressId.encoder.apply(row.shiptoaddressid),
       "shipmethodid" -> ShipmethodId.encoder.apply(row.shipmethodid),
-      "creditcardid" -> Encoder.encodeOption(CreditcardId.encoder).apply(row.creditcardid),
+      "creditcardid" -> Encoder.encodeOption(CustomCreditcardId.encoder).apply(row.creditcardid),
       "creditcardapprovalcode" -> Encoder.encodeOption(Encoder.encodeString).apply(row.creditcardapprovalcode),
       "currencyrateid" -> Encoder.encodeOption(CurrencyrateId.encoder).apply(row.currencyrateid),
       "subtotal" -> Encoder.encodeBigDecimal.apply(row.subtotal),
@@ -171,7 +171,7 @@ object SalesorderheaderRow {
       (AddressId.get, Nullability.NoNulls),
       (AddressId.get, Nullability.NoNulls),
       (ShipmethodId.get, Nullability.NoNulls),
-      (CreditcardId.get, Nullability.Nullable),
+      (/* user-picked */ CustomCreditcardId.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (CurrencyrateId.get, Nullability.Nullable),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
@@ -198,7 +198,7 @@ object SalesorderheaderRow {
       billtoaddressid = AddressId.get.unsafeGetNonNullable(rs, i + 12),
       shiptoaddressid = AddressId.get.unsafeGetNonNullable(rs, i + 13),
       shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 14),
-      creditcardid = CreditcardId.get.unsafeGetNullable(rs, i + 15),
+      creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNullable(rs, i + 15),
       creditcardapprovalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 16),
       currencyrateid = CurrencyrateId.get.unsafeGetNullable(rs, i + 17),
       subtotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 18),

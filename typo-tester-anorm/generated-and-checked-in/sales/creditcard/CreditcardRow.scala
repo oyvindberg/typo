@@ -8,6 +8,7 @@ package sales
 package creditcard
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -22,7 +23,7 @@ import scala.util.Try
 
 case class CreditcardRow(
   /** Primary key for CreditCard records. */
-  creditcardid: CreditcardId,
+  creditcardid: /* user-picked */ CustomCreditcardId,
   /** Credit card name. */
   cardtype: /* max 50 chars */ String,
   /** Credit card number. */
@@ -38,7 +39,7 @@ object CreditcardRow {
   implicit lazy val reads: Reads[CreditcardRow] = Reads[CreditcardRow](json => JsResult.fromTry(
       Try(
         CreditcardRow(
-          creditcardid = json.\("creditcardid").as(CreditcardId.reads),
+          creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads),
           cardtype = json.\("cardtype").as(Reads.StringReads),
           cardnumber = json.\("cardnumber").as(Reads.StringReads),
           expmonth = json.\("expmonth").as(Reads.IntReads),
@@ -51,7 +52,7 @@ object CreditcardRow {
   def rowParser(idx: Int): RowParser[CreditcardRow] = RowParser[CreditcardRow] { row =>
     Success(
       CreditcardRow(
-        creditcardid = row(idx + 0)(CreditcardId.column),
+        creditcardid = row(idx + 0)(/* user-picked */ CustomCreditcardId.column),
         cardtype = row(idx + 1)(Column.columnToString),
         cardnumber = row(idx + 2)(Column.columnToString),
         expmonth = row(idx + 3)(Column.columnToInt),
@@ -62,7 +63,7 @@ object CreditcardRow {
   }
   implicit lazy val writes: OWrites[CreditcardRow] = OWrites[CreditcardRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "creditcardid" -> CreditcardId.writes.writes(o.creditcardid),
+      "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid),
       "cardtype" -> Writes.StringWrites.writes(o.cardtype),
       "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
       "expmonth" -> Writes.IntWrites.writes(o.expmonth),

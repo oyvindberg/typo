@@ -8,7 +8,7 @@ package sa
 package cc
 
 import adventureworks.TypoLocalDateTime
-import adventureworks.sales.creditcard.CreditcardId
+import adventureworks.customtype.CustomCreditcardId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -24,7 +24,7 @@ import scala.util.Try
 case class CcViewRow(
   id: Option[Int],
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
-  creditcardid: Option[CreditcardId],
+  creditcardid: Option[/* user-picked */ CustomCreditcardId],
   /** Points to [[sales.creditcard.CreditcardRow.cardtype]] */
   cardtype: Option[/* max 50 chars */ String],
   /** Points to [[sales.creditcard.CreditcardRow.cardnumber]] */
@@ -42,7 +42,7 @@ object CcViewRow {
       Try(
         CcViewRow(
           id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          creditcardid = json.\("creditcardid").toOption.map(_.as(CreditcardId.reads)),
+          creditcardid = json.\("creditcardid").toOption.map(_.as(CustomCreditcardId.reads)),
           cardtype = json.\("cardtype").toOption.map(_.as(Reads.StringReads)),
           cardnumber = json.\("cardnumber").toOption.map(_.as(Reads.StringReads)),
           expmonth = json.\("expmonth").toOption.map(_.as(Reads.IntReads)),
@@ -56,7 +56,7 @@ object CcViewRow {
     Success(
       CcViewRow(
         id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        creditcardid = row(idx + 1)(Column.columnToOption(CreditcardId.column)),
+        creditcardid = row(idx + 1)(Column.columnToOption(CustomCreditcardId.column)),
         cardtype = row(idx + 2)(Column.columnToOption(Column.columnToString)),
         cardnumber = row(idx + 3)(Column.columnToOption(Column.columnToString)),
         expmonth = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
@@ -68,7 +68,7 @@ object CcViewRow {
   implicit lazy val writes: OWrites[CcViewRow] = OWrites[CcViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "creditcardid" -> Writes.OptionWrites(CreditcardId.writes).writes(o.creditcardid),
+      "creditcardid" -> Writes.OptionWrites(CustomCreditcardId.writes).writes(o.creditcardid),
       "cardtype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cardtype),
       "cardnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cardnumber),
       "expmonth" -> Writes.OptionWrites(Writes.IntWrites).writes(o.expmonth),

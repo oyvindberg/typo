@@ -9,6 +9,7 @@ package person
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -22,7 +23,7 @@ trait PersonFields[Row] {
   val persontype: Field[/* bpchar, max 2 chars */ String, Row]
   val namestyle: Field[NameStyle, Row]
   val title: OptField[/* max 8 chars */ String, Row]
-  val firstname: Field[Name, Row]
+  val firstname: Field[/* user-picked */ FirstName, Row]
   val middlename: OptField[Name, Row]
   val lastname: Field[Name, Row]
   val suffix: OptField[/* max 10 chars */ String, Row]

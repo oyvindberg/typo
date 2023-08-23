@@ -8,14 +8,14 @@ package sales
 package personcreditcard
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait PersoncreditcardFields[Row] {
   val businessentityid: IdField[BusinessentityId, Row]
-  val creditcardid: IdField[CreditcardId, Row]
+  val creditcardid: IdField[/* user-picked */ CustomCreditcardId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PersoncreditcardFields extends PersoncreditcardStructure[PersoncreditcardRow](None, identity, (_, x) => x)

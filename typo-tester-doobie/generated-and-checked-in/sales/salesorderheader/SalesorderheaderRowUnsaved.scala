@@ -9,13 +9,13 @@ package salesorderheader
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
@@ -57,7 +57,7 @@ case class SalesorderheaderRowUnsaved(
   shipmethodid: ShipmethodId,
   /** Credit card identification number. Foreign key to CreditCard.CreditCardID.
       Points to [[creditcard.CreditcardRow.creditcardid]] */
-  creditcardid: Option[CreditcardId],
+  creditcardid: Option[/* user-picked */ CustomCreditcardId],
   /** Approval code provided by the credit card company. */
   creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Currency exchange rate used. Foreign key to CurrencyRate.CurrencyRateID.
@@ -173,7 +173,7 @@ object SalesorderheaderRowUnsaved {
         billtoaddressid = orThrow(c.get("billtoaddressid")(AddressId.decoder)),
         shiptoaddressid = orThrow(c.get("shiptoaddressid")(AddressId.decoder)),
         shipmethodid = orThrow(c.get("shipmethodid")(ShipmethodId.decoder)),
-        creditcardid = orThrow(c.get("creditcardid")(Decoder.decodeOption(CreditcardId.decoder))),
+        creditcardid = orThrow(c.get("creditcardid")(Decoder.decodeOption(CustomCreditcardId.decoder))),
         creditcardapprovalcode = orThrow(c.get("creditcardapprovalcode")(Decoder.decodeOption(Decoder.decodeString))),
         currencyrateid = orThrow(c.get("currencyrateid")(Decoder.decodeOption(CurrencyrateId.decoder))),
         totaldue = orThrow(c.get("totaldue")(Decoder.decodeOption(Decoder.decodeBigDecimal))),
@@ -203,7 +203,7 @@ object SalesorderheaderRowUnsaved {
       "billtoaddressid" -> AddressId.encoder.apply(row.billtoaddressid),
       "shiptoaddressid" -> AddressId.encoder.apply(row.shiptoaddressid),
       "shipmethodid" -> ShipmethodId.encoder.apply(row.shipmethodid),
-      "creditcardid" -> Encoder.encodeOption(CreditcardId.encoder).apply(row.creditcardid),
+      "creditcardid" -> Encoder.encodeOption(CustomCreditcardId.encoder).apply(row.creditcardid),
       "creditcardapprovalcode" -> Encoder.encodeOption(Encoder.encodeString).apply(row.creditcardapprovalcode),
       "currencyrateid" -> Encoder.encodeOption(CurrencyrateId.encoder).apply(row.currencyrateid),
       "totaldue" -> Encoder.encodeOption(Encoder.encodeBigDecimal).apply(row.totaldue),

@@ -8,13 +8,13 @@ package sa
 package soh
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
@@ -65,7 +65,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.shipmethodid]] */
   shipmethodid: Option[ShipmethodId],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardid]] */
-  creditcardid: Option[CreditcardId],
+  creditcardid: Option[/* user-picked */ CustomCreditcardId],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.creditcardapprovalcode]] */
   creditcardapprovalcode: Option[/* max 15 chars */ String],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.currencyrateid]] */
@@ -106,7 +106,7 @@ object SohViewRow {
           billtoaddressid = json.\("billtoaddressid").toOption.map(_.as(AddressId.reads)),
           shiptoaddressid = json.\("shiptoaddressid").toOption.map(_.as(AddressId.reads)),
           shipmethodid = json.\("shipmethodid").toOption.map(_.as(ShipmethodId.reads)),
-          creditcardid = json.\("creditcardid").toOption.map(_.as(CreditcardId.reads)),
+          creditcardid = json.\("creditcardid").toOption.map(_.as(CustomCreditcardId.reads)),
           creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as(Reads.StringReads)),
           currencyrateid = json.\("currencyrateid").toOption.map(_.as(CurrencyrateId.reads)),
           subtotal = json.\("subtotal").toOption.map(_.as(Reads.bigDecReads)),
@@ -139,7 +139,7 @@ object SohViewRow {
         billtoaddressid = row(idx + 13)(Column.columnToOption(AddressId.column)),
         shiptoaddressid = row(idx + 14)(Column.columnToOption(AddressId.column)),
         shipmethodid = row(idx + 15)(Column.columnToOption(ShipmethodId.column)),
-        creditcardid = row(idx + 16)(Column.columnToOption(CreditcardId.column)),
+        creditcardid = row(idx + 16)(Column.columnToOption(CustomCreditcardId.column)),
         creditcardapprovalcode = row(idx + 17)(Column.columnToOption(Column.columnToString)),
         currencyrateid = row(idx + 18)(Column.columnToOption(CurrencyrateId.column)),
         subtotal = row(idx + 19)(Column.columnToOption(Column.columnToScalaBigDecimal)),
@@ -170,7 +170,7 @@ object SohViewRow {
       "billtoaddressid" -> Writes.OptionWrites(AddressId.writes).writes(o.billtoaddressid),
       "shiptoaddressid" -> Writes.OptionWrites(AddressId.writes).writes(o.shiptoaddressid),
       "shipmethodid" -> Writes.OptionWrites(ShipmethodId.writes).writes(o.shipmethodid),
-      "creditcardid" -> Writes.OptionWrites(CreditcardId.writes).writes(o.creditcardid),
+      "creditcardid" -> Writes.OptionWrites(CustomCreditcardId.writes).writes(o.creditcardid),
       "creditcardapprovalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.creditcardapprovalcode),
       "currencyrateid" -> Writes.OptionWrites(CurrencyrateId.writes).writes(o.currencyrateid),
       "subtotal" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.subtotal),

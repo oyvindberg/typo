@@ -9,6 +9,7 @@ package vadditionalcontactinfo
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.Column
@@ -28,7 +29,7 @@ case class VadditionalcontactinfoViewRow(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[person.PersonRow.firstname]] */
-  firstname: Option[Name],
+  firstname: Option[/* user-picked */ FirstName],
   /** Points to [[person.PersonRow.middlename]] */
   middlename: Option[Name],
   /** Points to [[person.PersonRow.lastname]] */
@@ -55,7 +56,7 @@ object VadditionalcontactinfoViewRow {
       Try(
         VadditionalcontactinfoViewRow(
           businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          firstname = json.\("firstname").toOption.map(_.as(Name.reads)),
+          firstname = json.\("firstname").toOption.map(_.as(FirstName.reads)),
           middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
           lastname = json.\("lastname").toOption.map(_.as(Name.reads)),
           telephonenumber = json.\("telephonenumber").toOption.map(_.as(TypoXml.reads)),
@@ -79,7 +80,7 @@ object VadditionalcontactinfoViewRow {
     Success(
       VadditionalcontactinfoViewRow(
         businessentityid = row(idx + 0)(Column.columnToOption(BusinessentityId.column)),
-        firstname = row(idx + 1)(Column.columnToOption(Name.column)),
+        firstname = row(idx + 1)(Column.columnToOption(FirstName.column)),
         middlename = row(idx + 2)(Column.columnToOption(Name.column)),
         lastname = row(idx + 3)(Column.columnToOption(Name.column)),
         telephonenumber = row(idx + 4)(Column.columnToOption(TypoXml.column)),
@@ -101,7 +102,7 @@ object VadditionalcontactinfoViewRow {
   implicit lazy val writes: OWrites[VadditionalcontactinfoViewRow] = OWrites[VadditionalcontactinfoViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "firstname" -> Writes.OptionWrites(Name.writes).writes(o.firstname),
+      "firstname" -> Writes.OptionWrites(FirstName.writes).writes(o.firstname),
       "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
       "lastname" -> Writes.OptionWrites(Name.writes).writes(o.lastname),
       "telephonenumber" -> Writes.OptionWrites(TypoXml.writes).writes(o.telephonenumber),

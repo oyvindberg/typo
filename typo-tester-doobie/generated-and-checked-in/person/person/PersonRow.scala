@@ -9,6 +9,7 @@ package person
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -31,7 +32,7 @@ case class PersonRow(
   /** A courtesy title. For example, Mr. or Ms. */
   title: Option[/* max 8 chars */ String],
   /** First name of the person. */
-  firstname: Name,
+  firstname: /* user-picked */ FirstName,
   /** Middle name or middle initial of the person. */
   middlename: Option[Name],
   /** Last name of the person. */
@@ -49,15 +50,15 @@ case class PersonRow(
 )
 
 object PersonRow {
-  implicit lazy val decoder: Decoder[PersonRow] = Decoder.forProduct13[PersonRow, BusinessentityId, /* bpchar, max 2 chars */ String, NameStyle, Option[/* max 8 chars */ String], Name, Option[Name], Name, Option[/* max 10 chars */ String], Int, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(PersonRow.apply)(BusinessentityId.decoder, Decoder.decodeString, NameStyle.decoder, Decoder.decodeOption(Decoder.decodeString), Name.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeInt, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[PersonRow] = Encoder.forProduct13[PersonRow, BusinessentityId, /* bpchar, max 2 chars */ String, NameStyle, Option[/* max 8 chars */ String], Name, Option[Name], Name, Option[/* max 10 chars */ String], Int, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(x => (x.businessentityid, x.persontype, x.namestyle, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.emailpromotion, x.additionalcontactinfo, x.demographics, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, NameStyle.encoder, Encoder.encodeOption(Encoder.encodeString), Name.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeInt, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[PersonRow] = Decoder.forProduct13[PersonRow, BusinessentityId, /* bpchar, max 2 chars */ String, NameStyle, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Int, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(PersonRow.apply)(BusinessentityId.decoder, Decoder.decodeString, NameStyle.decoder, Decoder.decodeOption(Decoder.decodeString), FirstName.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeInt, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PersonRow] = Encoder.forProduct13[PersonRow, BusinessentityId, /* bpchar, max 2 chars */ String, NameStyle, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Int, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(x => (x.businessentityid, x.persontype, x.namestyle, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.emailpromotion, x.additionalcontactinfo, x.demographics, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, NameStyle.encoder, Encoder.encodeOption(Encoder.encodeString), FirstName.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeInt, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PersonRow] = new Read[PersonRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (NameStyle.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Name.get, Nullability.NoNulls),
+      (/* user-picked */ FirstName.get, Nullability.NoNulls),
       (Name.get, Nullability.Nullable),
       (Name.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -72,7 +73,7 @@ object PersonRow {
       persontype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
       namestyle = NameStyle.get.unsafeGetNonNullable(rs, i + 2),
       title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      firstname = Name.get.unsafeGetNonNullable(rs, i + 4),
+      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 4),
       middlename = Name.get.unsafeGetNullable(rs, i + 5),
       lastname = Name.get.unsafeGetNonNullable(rs, i + 6),
       suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),

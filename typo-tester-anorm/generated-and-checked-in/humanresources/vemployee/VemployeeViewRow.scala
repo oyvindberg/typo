@@ -8,6 +8,7 @@ package humanresources
 package vemployee
 
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
@@ -29,7 +30,7 @@ case class VemployeeViewRow(
   /** Points to [[person.person.PersonRow.title]] */
   title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Option[Name],
+  firstname: Option[/* user-picked */ FirstName],
   /** Points to [[person.person.PersonRow.middlename]] */
   middlename: Option[Name],
   /** Points to [[person.person.PersonRow.lastname]] */
@@ -65,7 +66,7 @@ object VemployeeViewRow {
         VemployeeViewRow(
           businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
           title = json.\("title").toOption.map(_.as(Reads.StringReads)),
-          firstname = json.\("firstname").toOption.map(_.as(Name.reads)),
+          firstname = json.\("firstname").toOption.map(_.as(FirstName.reads)),
           middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
           lastname = json.\("lastname").toOption.map(_.as(Name.reads)),
           suffix = json.\("suffix").toOption.map(_.as(Reads.StringReads)),
@@ -90,7 +91,7 @@ object VemployeeViewRow {
       VemployeeViewRow(
         businessentityid = row(idx + 0)(Column.columnToOption(BusinessentityId.column)),
         title = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        firstname = row(idx + 2)(Column.columnToOption(Name.column)),
+        firstname = row(idx + 2)(Column.columnToOption(FirstName.column)),
         middlename = row(idx + 3)(Column.columnToOption(Name.column)),
         lastname = row(idx + 4)(Column.columnToOption(Name.column)),
         suffix = row(idx + 5)(Column.columnToOption(Column.columnToString)),
@@ -113,7 +114,7 @@ object VemployeeViewRow {
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
       "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
-      "firstname" -> Writes.OptionWrites(Name.writes).writes(o.firstname),
+      "firstname" -> Writes.OptionWrites(FirstName.writes).writes(o.firstname),
       "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
       "lastname" -> Writes.OptionWrites(Name.writes).writes(o.lastname),
       "suffix" -> Writes.OptionWrites(Writes.StringWrites).writes(o.suffix),

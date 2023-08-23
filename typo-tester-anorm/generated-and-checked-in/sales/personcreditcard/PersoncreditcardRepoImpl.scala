@@ -9,8 +9,8 @@ package personcreditcard
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -25,14 +25,14 @@ import typo.dsl.UpdateBuilder
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.personcreditcard where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, CreditcardId.toStatement)}".executeUpdate() > 0
+    SQL"delete from sales.personcreditcard where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     DeleteBuilder("sales.personcreditcard", PersoncreditcardFields)
   }
   override def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
-          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.creditcardid, null, CreditcardId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, creditcardid, modifieddate::text
        """
       .executeInsert(PersoncreditcardRow.rowParser(1).single)
@@ -41,7 +41,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def insert(unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
-      Some((NamedParameter("creditcardid", ParameterValue(unsaved.creditcardid, null, CreditcardId.toStatement)), "::int4")),
+      Some((NamedParameter("creditcardid", ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
@@ -74,14 +74,14 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
     SQL"""select businessentityid, creditcardid, modifieddate::text
           from sales.personcreditcard
-          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, CreditcardId.toStatement)}
+          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.as(PersoncreditcardRow.rowParser(1).singleOpt)
   }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.personcreditcard
           set modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, CreditcardId.toStatement)}
+          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
@@ -91,7 +91,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
-            ${ParameterValue(unsaved.creditcardid, null, CreditcardId.toStatement)}::int4,
+            ${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (businessentityid, creditcardid)

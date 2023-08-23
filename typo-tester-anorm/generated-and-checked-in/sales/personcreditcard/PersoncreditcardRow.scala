@@ -8,8 +8,8 @@ package sales
 package personcreditcard
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -26,7 +26,7 @@ case class PersoncreditcardRow(
   businessentityid: BusinessentityId,
   /** Credit card identification number. Foreign key to CreditCard.CreditCardID.
       Points to [[creditcard.CreditcardRow.creditcardid]] */
-  creditcardid: CreditcardId,
+  creditcardid: /* user-picked */ CustomCreditcardId,
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersoncreditcardId = PersoncreditcardId(businessentityid, creditcardid)
@@ -37,7 +37,7 @@ object PersoncreditcardRow {
       Try(
         PersoncreditcardRow(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          creditcardid = json.\("creditcardid").as(CreditcardId.reads),
+          creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -47,7 +47,7 @@ object PersoncreditcardRow {
     Success(
       PersoncreditcardRow(
         businessentityid = row(idx + 0)(BusinessentityId.column),
-        creditcardid = row(idx + 1)(CreditcardId.column),
+        creditcardid = row(idx + 1)(/* user-picked */ CustomCreditcardId.column),
         modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
@@ -55,7 +55,7 @@ object PersoncreditcardRow {
   implicit lazy val writes: OWrites[PersoncreditcardRow] = OWrites[PersoncreditcardRow](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "creditcardid" -> CreditcardId.writes.writes(o.creditcardid),
+      "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

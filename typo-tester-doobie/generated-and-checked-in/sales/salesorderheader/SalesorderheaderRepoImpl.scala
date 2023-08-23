@@ -9,13 +9,13 @@ package salesorderheader
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.OrderNumber
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
@@ -41,7 +41,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   }
   override def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     sql"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)
-          values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.revisionnumber)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.orderdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.shipdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.status)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.onlineorderflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.purchaseordernumber)(Write.fromPutOption(OrderNumber.put))}::"public".OrderNumber, ${fromWrite(unsaved.accountnumber)(Write.fromPutOption(AccountNumber.put))}::"public".AccountNumber, ${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4, ${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.billtoaddressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.shiptoaddressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.creditcardid)(Write.fromPutOption(CreditcardId.put))}::int4, ${fromWrite(unsaved.creditcardapprovalcode)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.currencyrateid)(Write.fromPutOption(CurrencyrateId.put))}::int4, ${fromWrite(unsaved.subtotal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.taxamt)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.freight)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.totaldue)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.comment)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.revisionnumber)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.orderdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.shipdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.status)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.onlineorderflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.purchaseordernumber)(Write.fromPutOption(OrderNumber.put))}::"public".OrderNumber, ${fromWrite(unsaved.accountnumber)(Write.fromPutOption(AccountNumber.put))}::"public".AccountNumber, ${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4, ${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.billtoaddressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.shiptoaddressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.creditcardid)(Write.fromPutOption(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.creditcardapprovalcode)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.currencyrateid)(Write.fromPutOption(CurrencyrateId.put))}::int4, ${fromWrite(unsaved.subtotal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.taxamt)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.freight)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.totaldue)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.comment)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning salesorderid, revisionnumber, orderdate::text, duedate::text, shipdate::text, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate::text
        """.query(SalesorderheaderRow.read).unique
   }
@@ -57,7 +57,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       Some((Fragment.const(s"billtoaddressid"), fr"${fromWrite(unsaved.billtoaddressid)(Write.fromPut(AddressId.put))}::int4")),
       Some((Fragment.const(s"shiptoaddressid"), fr"${fromWrite(unsaved.shiptoaddressid)(Write.fromPut(AddressId.put))}::int4")),
       Some((Fragment.const(s"shipmethodid"), fr"${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4")),
-      Some((Fragment.const(s"creditcardid"), fr"${fromWrite(unsaved.creditcardid)(Write.fromPutOption(CreditcardId.put))}::int4")),
+      Some((Fragment.const(s"creditcardid"), fr"${fromWrite(unsaved.creditcardid)(Write.fromPutOption(/* user-picked */ CustomCreditcardId.put))}::int4")),
       Some((Fragment.const(s"creditcardapprovalcode"), fr"${fromWrite(unsaved.creditcardapprovalcode)(Write.fromPutOption(Meta.StringMeta.put))}")),
       Some((Fragment.const(s"currencyrateid"), fr"${fromWrite(unsaved.currencyrateid)(Write.fromPutOption(CurrencyrateId.put))}::int4")),
       Some((Fragment.const(s"totaldue"), fr"${fromWrite(unsaved.totaldue)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric")),
@@ -147,7 +147,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
               billtoaddressid = ${fromWrite(row.billtoaddressid)(Write.fromPut(AddressId.put))}::int4,
               shiptoaddressid = ${fromWrite(row.shiptoaddressid)(Write.fromPut(AddressId.put))}::int4,
               shipmethodid = ${fromWrite(row.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4,
-              creditcardid = ${fromWrite(row.creditcardid)(Write.fromPutOption(CreditcardId.put))}::int4,
+              creditcardid = ${fromWrite(row.creditcardid)(Write.fromPutOption(/* user-picked */ CustomCreditcardId.put))}::int4,
               creditcardapprovalcode = ${fromWrite(row.creditcardapprovalcode)(Write.fromPutOption(Meta.StringMeta.put))},
               currencyrateid = ${fromWrite(row.currencyrateid)(Write.fromPutOption(CurrencyrateId.put))}::int4,
               subtotal = ${fromWrite(row.subtotal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
@@ -183,7 +183,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
             ${fromWrite(unsaved.billtoaddressid)(Write.fromPut(AddressId.put))}::int4,
             ${fromWrite(unsaved.shiptoaddressid)(Write.fromPut(AddressId.put))}::int4,
             ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4,
-            ${fromWrite(unsaved.creditcardid)(Write.fromPutOption(CreditcardId.put))}::int4,
+            ${fromWrite(unsaved.creditcardid)(Write.fromPutOption(/* user-picked */ CustomCreditcardId.put))}::int4,
             ${fromWrite(unsaved.creditcardapprovalcode)(Write.fromPutOption(Meta.StringMeta.put))},
             ${fromWrite(unsaved.currencyrateid)(Write.fromPutOption(CurrencyrateId.put))}::int4,
             ${fromWrite(unsaved.subtotal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,

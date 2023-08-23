@@ -9,6 +9,7 @@ package creditcard
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -30,11 +31,11 @@ case class CreditcardRowUnsaved(
   expyear: Int,
   /** Default: nextval('sales.creditcard_creditcardid_seq'::regclass)
       Primary key for CreditCard records. */
-  creditcardid: Defaulted[CreditcardId] = Defaulted.UseDefault,
+  creditcardid: Defaulted[/* user-picked */ CustomCreditcardId] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(creditcardidDefault: => CreditcardId, modifieddateDefault: => TypoLocalDateTime): CreditcardRow =
+  def toRow(creditcardidDefault: => /* user-picked */ CustomCreditcardId, modifieddateDefault: => TypoLocalDateTime): CreditcardRow =
     CreditcardRow(
       cardtype = cardtype,
       cardnumber = cardnumber,
@@ -58,7 +59,7 @@ object CreditcardRowUnsaved {
           cardnumber = json.\("cardnumber").as(Reads.StringReads),
           expmonth = json.\("expmonth").as(Reads.IntReads),
           expyear = json.\("expyear").as(Reads.IntReads),
-          creditcardid = json.\("creditcardid").as(Defaulted.reads(CreditcardId.reads)),
+          creditcardid = json.\("creditcardid").as(Defaulted.reads(CustomCreditcardId.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -70,7 +71,7 @@ object CreditcardRowUnsaved {
       "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
       "expmonth" -> Writes.IntWrites.writes(o.expmonth),
       "expyear" -> Writes.IntWrites.writes(o.expyear),
-      "creditcardid" -> Defaulted.writes(CreditcardId.writes).writes(o.creditcardid),
+      "creditcardid" -> Defaulted.writes(CustomCreditcardId.writes).writes(o.creditcardid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

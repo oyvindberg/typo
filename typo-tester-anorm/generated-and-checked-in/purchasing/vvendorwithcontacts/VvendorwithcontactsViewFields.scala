@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package vvendorwithcontacts
 
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
@@ -17,7 +18,7 @@ trait VvendorwithcontactsViewFields[Row] {
   val name: OptField[Name, Row]
   val contacttype: OptField[Name, Row]
   val title: OptField[/* max 8 chars */ String, Row]
-  val firstname: OptField[Name, Row]
+  val firstname: OptField[/* user-picked */ FirstName, Row]
   val middlename: OptField[Name, Row]
   val lastname: OptField[Name, Row]
   val suffix: OptField[/* max 10 chars */ String, Row]

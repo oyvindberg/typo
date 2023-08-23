@@ -10,6 +10,7 @@ package person
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
@@ -35,7 +36,7 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.namestyle)(Write.fromPut(NameStyle.put))}::"public".NameStyle, ${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.firstname)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::"public"."Name", ${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.emailpromotion)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.namestyle)(Write.fromPut(NameStyle.put))}::"public".NameStyle, ${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::"public"."Name", ${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::"public"."Name", ${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.emailpromotion)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
        """.query(PersonRow.read).unique
   }
@@ -44,7 +45,7 @@ object PersonRepoImpl extends PersonRepo {
       Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
       Some((Fragment.const(s"persontype"), fr"${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
       Some((Fragment.const(s"title"), fr"${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s"firstname"), fr"""${fromWrite(unsaved.firstname)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s"firstname"), fr"""${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::"public"."Name"""")),
       Some((Fragment.const(s"middlename"), fr"""${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::"public"."Name"""")),
       Some((Fragment.const(s"lastname"), fr"""${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::"public"."Name"""")),
       Some((Fragment.const(s"suffix"), fr"${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))}")),
@@ -100,7 +101,7 @@ object PersonRepoImpl extends PersonRepo {
           set persontype = ${fromWrite(row.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
               namestyle = ${fromWrite(row.namestyle)(Write.fromPut(NameStyle.put))}::"public".NameStyle,
               title = ${fromWrite(row.title)(Write.fromPutOption(Meta.StringMeta.put))},
-              firstname = ${fromWrite(row.firstname)(Write.fromPut(Name.put))}::"public"."Name",
+              firstname = ${fromWrite(row.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::"public"."Name",
               middlename = ${fromWrite(row.middlename)(Write.fromPutOption(Name.put))}::"public"."Name",
               lastname = ${fromWrite(row.lastname)(Write.fromPut(Name.put))}::"public"."Name",
               suffix = ${fromWrite(row.suffix)(Write.fromPutOption(Meta.StringMeta.put))},
@@ -124,7 +125,7 @@ object PersonRepoImpl extends PersonRepo {
             ${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
             ${fromWrite(unsaved.namestyle)(Write.fromPut(NameStyle.put))}::"public".NameStyle,
             ${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.firstname)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::"public"."Name",
             ${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::"public"."Name",
             ${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::"public"."Name",
             ${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))},

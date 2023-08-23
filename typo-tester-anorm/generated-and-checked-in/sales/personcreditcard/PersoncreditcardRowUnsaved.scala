@@ -9,8 +9,8 @@ package personcreditcard
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.creditcard.CreditcardId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -26,7 +26,7 @@ case class PersoncreditcardRowUnsaved(
   businessentityid: BusinessentityId,
   /** Credit card identification number. Foreign key to CreditCard.CreditCardID.
       Points to [[creditcard.CreditcardRow.creditcardid]] */
-  creditcardid: CreditcardId,
+  creditcardid: /* user-picked */ CustomCreditcardId,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
@@ -45,7 +45,7 @@ object PersoncreditcardRowUnsaved {
       Try(
         PersoncreditcardRowUnsaved(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          creditcardid = json.\("creditcardid").as(CreditcardId.reads),
+          creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -54,7 +54,7 @@ object PersoncreditcardRowUnsaved {
   implicit lazy val writes: OWrites[PersoncreditcardRowUnsaved] = OWrites[PersoncreditcardRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "creditcardid" -> CreditcardId.writes.writes(o.creditcardid),
+      "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

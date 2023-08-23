@@ -7,7 +7,7 @@ package adventureworks
 package update_person_returning
 
 import adventureworks.TypoLocalDateTime
-import adventureworks.public.Name
+import adventureworks.customtype.FirstName
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -20,7 +20,7 @@ import scala.util.Try
 
 case class UpdatePersonReturningSqlRow(
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Name,
+  firstname: /* user-picked */ FirstName,
   /** Points to [[person.person.PersonRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -29,7 +29,7 @@ object UpdatePersonReturningSqlRow {
   implicit lazy val reads: Reads[UpdatePersonReturningSqlRow] = Reads[UpdatePersonReturningSqlRow](json => JsResult.fromTry(
       Try(
         UpdatePersonReturningSqlRow(
-          firstname = json.\("firstname").as(Name.reads),
+          firstname = json.\("firstname").as(FirstName.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -38,14 +38,14 @@ object UpdatePersonReturningSqlRow {
   def rowParser(idx: Int): RowParser[UpdatePersonReturningSqlRow] = RowParser[UpdatePersonReturningSqlRow] { row =>
     Success(
       UpdatePersonReturningSqlRow(
-        firstname = row(idx + 0)(Name.column),
+        firstname = row(idx + 0)(/* user-picked */ FirstName.column),
         modifieddate = row(idx + 1)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[UpdatePersonReturningSqlRow] = OWrites[UpdatePersonReturningSqlRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "firstname" -> Name.writes.writes(o.firstname),
+      "firstname" -> FirstName.writes.writes(o.firstname),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
