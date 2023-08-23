@@ -4,6 +4,7 @@ package metadb
 
 import typo.generated.custom.comments.{CommentsSqlRepoImpl, CommentsSqlRow}
 import typo.generated.custom.domains.{DomainsSqlRepoImpl, DomainsSqlRow}
+import typo.generated.custom.enums.{EnumsSqlRepoImpl, EnumsSqlRow}
 import typo.generated.custom.view_column_dependencies.*
 import typo.generated.custom.view_find_all.*
 import typo.generated.information_schema.columns.{ColumnsViewRepoImpl, ColumnsViewRow}
@@ -21,7 +22,7 @@ object load {
       tableConstraints: List[TableConstraintsViewRow],
       keyColumnUsage: List[KeyColumnUsageViewRow],
       referentialConstraints: List[ReferentialConstraintsViewRow],
-      pgEnums: List[PgEnum.Row],
+      pgEnums: List[EnumsSqlRow],
       tablesViewRows: List[TablesViewRow],
       columnsViewRows: List[ColumnsViewRow],
       viewRows: List[ViewFindAllSqlRow],
@@ -43,7 +44,7 @@ object load {
         tableConstraints = timed("tableConstraints")(TableConstraintsViewRepoImpl.selectAll),
         keyColumnUsage = timed("keyColumnUsage")(KeyColumnUsageViewRepoImpl.selectAll),
         referentialConstraints = timed("referentialConstraints")(ReferentialConstraintsViewRepoImpl.selectAll),
-        pgEnums = timed("pgEnums")(PgEnum.all),
+        pgEnums = timed("pgEnums")(EnumsSqlRepoImpl()),
         tablesViewRows = timed("tablesViewRows")(TablesViewRepoImpl.selectAll),
         columnsViewRows = timed("columnsViewRows")(ColumnsViewRepoImpl.selectAll),
         viewRows = timed("viewRows")(ViewFindAllSqlRepoImpl()),

@@ -10,7 +10,10 @@ package generated
 package custom
 package view_column_dependencies
 
+import anorm.ParameterMetaData
+import anorm.ParameterValue
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 
 object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
@@ -29,7 +32,7 @@ object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
                 AND dep.classid = 'pg_rewrite'::regclass -- it's a view
                 AND rewrite.ev_type = '1' -- only SELECT
                 AND rewrite.is_instead -- INSTEAD rule
-                AND view_class.relname = coalesce($viewName::name, view_class.relname)
+                AND view_class.relname = coalesce(${ParameterValue(viewName, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name, view_class.relname)
             
       """
     sql.as(ViewColumnDependenciesSqlRow.rowParser(1).*)

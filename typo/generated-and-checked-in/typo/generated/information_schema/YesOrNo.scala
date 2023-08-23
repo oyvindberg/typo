@@ -21,14 +21,14 @@ import play.api.libs.json.Writes
 case class YesOrNo(value: String) extends AnyVal
 object YesOrNo {
   implicit lazy val arrayColumn: Column[Array[YesOrNo]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[YesOrNo]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
-  implicit lazy val column: Column[YesOrNo] = implicitly[Column[String]].map(YesOrNo.apply)
+  implicit lazy val arrayToStatement: ToStatement[Array[YesOrNo]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
+  implicit lazy val column: Column[YesOrNo] = Column.columnToString.map(YesOrNo.apply)
   implicit lazy val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[YesOrNo] = new ParameterMetaData[YesOrNo] {
-    override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
+    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
+    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[YesOrNo] = Reads.StringReads.map(YesOrNo.apply)
-  implicit lazy val toStatement: ToStatement[YesOrNo] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit lazy val toStatement: ToStatement[YesOrNo] = ToStatement.stringToStatement.contramap(_.value)
   implicit lazy val writes: Writes[YesOrNo] = Writes.StringWrites.contramap(_.value)
 }

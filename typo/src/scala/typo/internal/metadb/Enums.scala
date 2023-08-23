@@ -2,12 +2,14 @@ package typo
 package internal
 package metadb
 
+import typo.generated.custom.enums.EnumsSqlRow
+
 object Enums {
-  def apply(pgEnums: List[PgEnum.Row]): List[db.StringEnum] = {
+  def apply(pgEnums: List[EnumsSqlRow]): List[db.StringEnum] = {
     pgEnums
-      .groupBy(_.name)
-      .map { case (relName, values) =>
-        db.StringEnum(relName, values.sortBy(_.enum_sort_order).map(_.enum_value))
+      .groupBy(row => db.RelationName(Some(row.enumSchema), row.enumName))
+      .map { case (relName, values: Seq[EnumsSqlRow]) =>
+        db.StringEnum(relName, values.sortBy(_.enumSortOrder).map(_.enumValue))
       }
       .toList
   }
