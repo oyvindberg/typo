@@ -11,18 +11,16 @@ class Naming(val pkg: sc.QIdent) {
     source match {
       case relation: Source.Relation =>
         (pkg / relation.name.schema.toList.map(sc.Ident.apply), relation.name.name)
-      case Source.SqlFile(relPath)      => forRelPath(relPath)
-      case Source.SqlFileParam(relPath) => forRelPath(relPath)
+      case Source.SqlFile(relPath) => forRelPath(relPath)
     }
   }
 
   def suffixFor(source: Source): String =
     source match {
-      case Source.Table(_)        => ""
-      case Source.View(_, false)  => "View"
-      case Source.View(_, true)   => "MV"
-      case Source.SqlFile(_)      => "Sql"
-      case Source.SqlFileParam(_) => ""
+      case Source.Table(_)       => ""
+      case Source.View(_, false) => "View"
+      case Source.View(_, true)  => "MV"
+      case Source.SqlFile(_)     => "Sql"
     }
 
   protected def relation(source: Source, suffix: String): sc.QIdent = {

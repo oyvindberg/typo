@@ -7,9 +7,9 @@ case class TypeMapperScala(
     naming: Naming,
     customTypes: CustomTypes
 ) {
-  def col(from: Source, col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
+  def col(relation: db.RelationName, col: db.Col, typeFromFK: Option[sc.Type]): sc.Type = {
     def go(tpe: db.Type): sc.Type = {
-      val maybeOverridden = typeOverride(from, col.name).map(overriddenString => sc.Type.UserDefined(sc.Type.Qualified(overriddenString)))
+      val maybeOverridden = typeOverride(relation, col.name).map(overriddenString => sc.Type.UserDefined(sc.Type.Qualified(overriddenString)))
       val maybeFromFK = typeFromFK.map(stripOptionAndArray)
       val base = baseType(tpe)
       maybeOverridden.orElse(maybeFromFK).getOrElse(base)
@@ -22,19 +22,12 @@ case class TypeMapperScala(
         go(other)
     }
 
-    withNullability(baseTpe, nullabilityOverride.apply(from, col.name).getOrElse(col.nullability))
+    withNullability(baseTpe, nullabilityOverride.apply(relation, col.name).getOrElse(col.nullability))
   }
 
-  def param(from: Source.SqlFileParam, maybeColName: Option[db.ColName], dbType: db.Type, nullability: Nullability): sc.Type = {
-    def go(tpe: db.Type): sc.Type = {
-      val maybeOverridden = {
-        for {
-          colName <- maybeColName
-          overriddenString <- typeOverride(from, colName)
-        } yield sc.Type.UserDefined(sc.Type.Qualified(overriddenString))
-      }
-      maybeOverridden.getOrElse(baseType(tpe))
-    }
+  def sqlFile(maybeOverridden: Option[sc.Type], dbType: db.Type, nullability: Nullability): sc.Type = {
+    def go(tpe: db.Type): sc.Type =
+      maybeOverridden.map(stripOptionAndArray).getOrElse(baseType(tpe))
 
     val base = dbType match {
       case db.Type.Array(tpe) =>
@@ -42,12 +35,8 @@ case class TypeMapperScala(
       case other =>
         go(other)
     }
-    val nullability1: Nullability =
-      maybeColName
-        .flatMap(colName => nullabilityOverride(from, colName))
-        .getOrElse(nullability)
 
-    withNullability(base, nullability1)
+    withNullability(base, nullability)
   }
 
   // domains have nullability information, but afaiu it's used for checking,

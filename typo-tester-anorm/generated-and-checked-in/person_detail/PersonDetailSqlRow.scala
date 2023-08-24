@@ -9,7 +9,6 @@ package person_detail
 import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import adventureworks.public.NameStyle
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -31,8 +30,8 @@ case class PersonDetailSqlRow(
   firstname: /* user-picked */ FirstName,
   /** Points to [[person.person.PersonRow.middlename]] */
   middlename: Option[Name],
-  /** Points to [[person.person.PersonRow.namestyle]] */
-  namestyle: NameStyle,
+  /** Points to [[person.person.PersonRow.lastname]] */
+  lastname: Name,
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
   jobtitle: /* max 50 chars */ String,
   /** Points to [[person.address.AddressRow.addressline1]] */
@@ -40,7 +39,9 @@ case class PersonDetailSqlRow(
   /** Points to [[person.address.AddressRow.city]] */
   city: Option[/* max 30 chars */ String],
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[/* max 15 chars */ String]
+  postalcode: Option[/* max 15 chars */ String],
+  /** Points to [[person.address.AddressRow.rowguid]] */
+  rowguid: /* user-picked */ String
 )
 
 object PersonDetailSqlRow {
@@ -51,11 +52,12 @@ object PersonDetailSqlRow {
           title = json.\("title").toOption.map(_.as(Reads.StringReads)),
           firstname = json.\("firstname").as(FirstName.reads),
           middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
-          namestyle = json.\("namestyle").as(NameStyle.reads),
+          lastname = json.\("lastname").as(Name.reads),
           jobtitle = json.\("jobtitle").as(Reads.StringReads),
           addressline1 = json.\("addressline1").toOption.map(_.as(Reads.StringReads)),
           city = json.\("city").toOption.map(_.as(Reads.StringReads)),
-          postalcode = json.\("postalcode").toOption.map(_.as(Reads.StringReads))
+          postalcode = json.\("postalcode").toOption.map(_.as(Reads.StringReads)),
+          rowguid = json.\("rowguid").as(Reads.StringReads)
         )
       )
     ),
@@ -67,11 +69,12 @@ object PersonDetailSqlRow {
         title = row(idx + 1)(Column.columnToOption(Column.columnToString)),
         firstname = row(idx + 2)(/* user-picked */ FirstName.column),
         middlename = row(idx + 3)(Column.columnToOption(Name.column)),
-        namestyle = row(idx + 4)(NameStyle.column),
+        lastname = row(idx + 4)(Name.column),
         jobtitle = row(idx + 5)(Column.columnToString),
         addressline1 = row(idx + 6)(Column.columnToOption(Column.columnToString)),
         city = row(idx + 7)(Column.columnToOption(Column.columnToString)),
-        postalcode = row(idx + 8)(Column.columnToOption(Column.columnToString))
+        postalcode = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        rowguid = row(idx + 9)(Column.columnToString)
       )
     )
   }
@@ -81,11 +84,12 @@ object PersonDetailSqlRow {
       "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
       "firstname" -> FirstName.writes.writes(o.firstname),
       "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
-      "namestyle" -> NameStyle.writes.writes(o.namestyle),
+      "lastname" -> Name.writes.writes(o.lastname),
       "jobtitle" -> Writes.StringWrites.writes(o.jobtitle),
       "addressline1" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline1),
       "city" -> Writes.OptionWrites(Writes.StringWrites).writes(o.city),
-      "postalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.postalcode)
+      "postalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.postalcode),
+      "rowguid" -> Writes.StringWrites.writes(o.rowguid)
     ))
   )
 }

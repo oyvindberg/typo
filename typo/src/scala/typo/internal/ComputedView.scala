@@ -31,7 +31,7 @@ case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
         case _ => None
       }
 
-    val tpe = scalaTypeMapper.col(source, dbCol, typeFromFk)
+    val tpe = scalaTypeMapper.col(view.name, dbCol, typeFromFk)
     tpe
   }
 

@@ -2,8 +2,6 @@ package typo
 package internal
 package codegen
 
-import typo.internal.sqlfiles.SqlFile
-
 object sqlCast {
 
   /** cast to correctly insert into PG
@@ -11,8 +9,8 @@ object sqlCast {
   def toPg(dbCol: db.Col): Option[String] =
     toPg(dbCol.tpe, dbCol.udtName)
 
-  def toPg(param: SqlFile.Param): Option[String] =
-    toPg(param.tpe, Some(param.udtName))
+  def toPg(param: ComputedSqlFile.Param): Option[String] =
+    toPg(param.dbType, Some(param.udtName))
 
   /** cast to correctly insert into PG
     */

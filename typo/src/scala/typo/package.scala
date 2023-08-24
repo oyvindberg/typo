@@ -61,7 +61,7 @@ package object typo {
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.get))
+    val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, metaDb.typeMapperDb, scalaTypeMapper, computeds.get))
     computeds.foreach { case (relName, lazyValue) =>
       if (selector.include(relName)) lazyValue.get
     }

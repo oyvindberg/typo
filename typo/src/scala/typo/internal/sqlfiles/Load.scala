@@ -13,7 +13,7 @@ import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import java.sql.Connection
 
 object Load {
-  def apply(scriptsPath: Path, typeMapperDb: TypeMapperDb)(implicit c: Connection): List[SqlFile] =
+  def apply(scriptsPath: Path)(implicit c: Connection): List[SqlFile] =
     findSqlFilesUnder(scriptsPath).flatMap { sqlFile =>
       val sqlContent = Files.readString(sqlFile)
       val decomposedSql = DecomposedSql.parse(sqlContent)
@@ -45,7 +45,7 @@ object Load {
                     case _                     => None
                   }
 
-                Some(parseSqlFile(typeMapperDb, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, jdbcMetadata, nullableColumnsFromJoins, deps))
+                Some(SqlFile(RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, jdbcMetadata, nullableColumnsFromJoins, deps))
             }
           } catch {
             case e: PSQLException =>
@@ -68,7 +68,7 @@ object Load {
     val viewName = relativePath.segments.mkString("_").replace(".sql", "")
     val sql = s"""create temporary view $viewName as (${decomposedSql.sqlWithNulls})"""
     SQL(sql).execute()
-    val ret = ViewColumnDependenciesSqlRepoImpl(viewName).map { row =>
+    val ret = ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
       val table = db.RelationName(row.tableSchema.map(_.value), row.tableName)
       (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
     }.toMap
@@ -88,55 +88,5 @@ object Load {
       }
     )
     found.result()
-  }
-
-  def parseSqlFile(
-      typeMapperDb: TypeMapperDb,
-      relativePath: RelPath,
-      decomposedSql: DecomposedSql,
-      jdbcMetadata: JdbcMetadata,
-      nullableColumnsFromJoins: Option[NullabilityFromExplain.NullableColumns],
-      depsFromView: Map[db.ColName, (db.RelationName, db.ColName)]
-  ): SqlFile = {
-    val cols = jdbcMetadata.columns.map { cols =>
-      cols.zipWithIndex.map { case (col, idx) =>
-        val jsonDescription = DebugJson(col)
-        db.Col(
-          name = col.name,
-          tpe = typeMapperDb.dbTypeFrom(col.columnTypeName, Some(col.precision)).getOrElse {
-            System.err.println(s"Couldn't translate type from file $relativePath column ${col.name.value} with type ${col.columnTypeName}. Falling back to text")
-            db.Type.Text
-          },
-          udtName = None,
-          columnDefault = if (col.isAutoIncrement) Some("auto-increment") else None,
-          comment = None,
-          jsonDescription = jsonDescription,
-          nullability = if (nullableColumnsFromJoins.exists(_.nullableIndices.contains(idx))) Nullability.Nullable else col.isNullable.toNullability
-        )
-      }
-    }
-
-    val deps: Map[db.ColName, (db.RelationName, db.ColName)] = {
-      val fromCols = jdbcMetadata.columns match {
-        case MaybeReturnsRows.Query(columns) =>
-          columns.toList.flatMap { col =>
-            col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)
-          }
-        case MaybeReturnsRows.Update => Nil
-
-      }
-      depsFromView ++ fromCols
-    }
-
-    val params = decomposedSql.paramNamesWithIndices.map { case (maybeName, indices) =>
-      val jdbcParam = jdbcMetadata.params(indices.head)
-      val tpe = typeMapperDb.dbTypeFrom(jdbcParam.parameterTypeName, Some(jdbcParam.precision)).getOrElse {
-        System.err.println(s"$relativePath: Couldn't translate type from param $maybeName")
-        db.Type.Text
-      }
-      SqlFile.Param(maybeName, indices, jdbcParam.parameterTypeName, tpe)
-    }
-
-    SqlFile(relativePath, decomposedSql, params, cols, deps)
   }
 }

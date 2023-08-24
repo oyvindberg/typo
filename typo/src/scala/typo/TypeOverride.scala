@@ -7,13 +7,13 @@ package typo
   */
 trait TypeOverride {
 
-  /** @param from
-    *   inside the ADT you can find the name of the relation or the location of the sql script
+  /** @param relation
+    *   name of schema and relation
     * @param colName
     *   name of column
     * @return
     */
-  def apply(from: Source, colName: db.ColName): Option[String]
+  def apply(relation: db.RelationName, colName: db.ColName): Option[String]
 
   final def orElse(other: TypeOverride): TypeOverride =
     (from, colName) => apply(from, colName).orElse(other(from, colName))
@@ -22,31 +22,10 @@ trait TypeOverride {
 object TypeOverride {
   val Empty: TypeOverride = (_, _) => None
 
-  def of(pf: PartialFunction[(Source, db.ColName), String]): TypeOverride =
+  def of(pf: PartialFunction[(db.RelationName, db.ColName), String]): TypeOverride =
     (from, colName) => pf.lift((from, colName))
 
-  def relation(pf: PartialFunction[(String, String), String]): TypeOverride =
-    (from, colName) => {
-      from match {
-        case rel: Source.Relation => pf.lift((rel.name.value, colName.value))
-        case _                    => None
-      }
-    }
-
-  def sqlFile(pf: PartialFunction[(RelPath, /* column name */ String), String]): TypeOverride =
-    (from, colName) => {
-      from match {
-        case sql: Source.SqlFile => pf.lift((sql.relPath, colName.value))
-        case _                   => None
-      }
-    }
-
-  def sqlFileParam(pf: PartialFunction[(RelPath, /* column name */ String), String]): TypeOverride =
-    (from, colName) => {
-      from match {
-        case Source.SqlFileParam(relPath) => pf.lift((relPath, colName.value))
-        case _                            => None
-      }
-    }
+  def relation(pf: PartialFunction[( /* schemaname.relationname */ String, /* column name*/ String), String]): TypeOverride =
+    (rel, colName) => pf.lift((rel.value, colName.value))
 
 }

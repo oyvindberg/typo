@@ -42,23 +42,13 @@ object GeneratedSources {
       "pg_prepared_statements"
     )
 
-    val nullabilityOverride: NullabilityOverride = {
-      // postgres has problems with a left join in this query
-      case (Source.SqlFile(RelPath(List("custom", "domains.sql"))), db.ColName("collation" | "constraintName")) =>
-        Some(Nullability.Nullable)
-      case (_, _) =>
-        None
-    }
-
     val files: typo.Generated = {
       val options = typo.Options(
         pkg = "typo.generated",
         jsonLibs = List(typo.JsonLibName.PlayJson),
         dbLib = Some(typo.DbLibName.Anorm),
         header = header,
-        nullabilityOverride = nullabilityOverride,
-        debugTypes = true,
-        enableDsl = false
+        debugTypes = true
       )
       typo.fromDbAndScripts(options, sqlScriptDir, selector)
     }

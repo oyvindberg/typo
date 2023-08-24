@@ -48,7 +48,7 @@ object load {
         tablesViewRows = timed("tablesViewRows")(TablesViewRepoImpl.selectAll),
         columnsViewRows = timed("columnsViewRows")(ColumnsViewRepoImpl.selectAll),
         viewRows = timed("viewRows")(ViewFindAllSqlRepoImpl()),
-        viewColumnDeps = timed("viewColumnDeps")(ViewColumnDependenciesSqlRepoImpl.opt(None)),
+        viewColumnDeps = timed("viewColumnDeps")(ViewColumnDependenciesSqlRepoImpl(None)),
         domains = timed("domains")(DomainsSqlRepoImpl()),
         comments = timed("comments")(CommentsSqlRepoImpl())
       )
@@ -159,7 +159,7 @@ object load {
       }
     }
     val sqlScripts = maybeScriptPath match {
-      case Some(scriptPath) => sqlfiles.Load(scriptPath, typeMapperDb)
+      case Some(scriptPath) => sqlfiles.Load(scriptPath)
       case None             => Nil
     }
 
