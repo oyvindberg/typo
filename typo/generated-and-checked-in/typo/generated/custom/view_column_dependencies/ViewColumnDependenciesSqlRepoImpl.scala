@@ -17,7 +17,7 @@ import anorm.ToStatement
 import java.sql.Connection
 
 object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
-  override def opt(viewName: Option[String])(implicit c: Connection): List[ViewColumnDependenciesSqlRow] = {
+  override def apply(viewName: /* nullability unknown */ Option[String])(implicit c: Connection): List[ViewColumnDependenciesSqlRow] = {
     val sql =
       SQL"""SELECT view_class.relnamespace::regnamespace  AS view_schema
                  , view_class.relname                     AS view_name

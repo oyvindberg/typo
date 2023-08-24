@@ -13,7 +13,5 @@ package view_find_all
 import java.sql.Connection
 
 trait ViewFindAllSqlRepo {
-  def opt()(implicit c: Connection): List[ViewFindAllSqlRow]
-  final def apply()(implicit c: Connection): List[ViewFindAllSqlRow] =
-    opt()
+  def apply()(implicit c: Connection): List[ViewFindAllSqlRow]
 }

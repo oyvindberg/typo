@@ -1,6 +1,5 @@
 package typo
 
-import org.postgresql.util.PSQLException
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 import typo.generated.custom.domains.DomainsSqlRepoImpl
@@ -22,7 +21,7 @@ class DbTest extends AnyFunSuite with TypeCheckedTripleEquals {
     println(information_schema.table_constraints.TableConstraintsViewRepoImpl.selectAll.take(1))
     println(information_schema.tables.TablesViewRepoImpl.selectAll.take(1))
     println(ViewFindAllSqlRepoImpl().take(1))
-    println(ViewColumnDependenciesSqlRepoImpl.opt(None).take(1))
+    println(ViewColumnDependenciesSqlRepoImpl(None).take(1))
     println(DomainsSqlRepoImpl().take(1))
   }
 }

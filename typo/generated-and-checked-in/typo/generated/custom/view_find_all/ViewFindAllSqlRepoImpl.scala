@@ -14,7 +14,7 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object ViewFindAllSqlRepoImpl extends ViewFindAllSqlRepo {
-  override def opt()(implicit c: Connection): List[ViewFindAllSqlRow] = {
+  override def apply()(implicit c: Connection): List[ViewFindAllSqlRow] = {
     val sql =
       SQL"""SELECT nc.oid                                        as table_oid,
                    nc.nspname::information_schema.sql_identifier AS table_schema,

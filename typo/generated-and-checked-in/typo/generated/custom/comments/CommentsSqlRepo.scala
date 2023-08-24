@@ -13,7 +13,5 @@ package comments
 import java.sql.Connection
 
 trait CommentsSqlRepo {
-  def opt()(implicit c: Connection): List[CommentsSqlRow]
-  final def apply()(implicit c: Connection): List[CommentsSqlRow] =
-    opt()
+  def apply()(implicit c: Connection): List[CommentsSqlRow]
 }

@@ -13,7 +13,5 @@ package enums
 import java.sql.Connection
 
 trait EnumsSqlRepo {
-  def opt()(implicit c: Connection): List[EnumsSqlRow]
-  final def apply()(implicit c: Connection): List[EnumsSqlRow] =
-    opt()
+  def apply()(implicit c: Connection): List[EnumsSqlRow]
 }

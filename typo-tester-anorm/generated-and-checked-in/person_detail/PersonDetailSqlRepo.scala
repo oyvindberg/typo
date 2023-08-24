@@ -11,7 +11,5 @@ import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
 
 trait PersonDetailSqlRepo {
-  def opt(businessentityid: Option[/* user-picked */ BusinessentityId], modifiedAfter: Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow]
-  final def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime)(implicit c: Connection): List[PersonDetailSqlRow] =
-    opt(Option(businessentityid), Option(modifiedAfter))
+  def apply(businessentityid: /* nullability unknown */ Option[/* user-picked */ BusinessentityId], modifiedAfter: /* nullability unknown */ Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow]
 }

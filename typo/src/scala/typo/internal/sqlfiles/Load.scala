@@ -68,7 +68,7 @@ object Load {
     val viewName = relativePath.segments.mkString("_").replace(".sql", "")
     val sql = s"""create temporary view $viewName as (${decomposedSql.sqlWithNulls})"""
     SQL(sql).execute()
-    val ret = ViewColumnDependenciesSqlRepoImpl(viewName).map { row =>
+    val ret = ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
       val table = db.RelationName(row.tableSchema.map(_.value), row.tableName)
       (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
     }.toMap
@@ -134,7 +134,7 @@ object Load {
         System.err.println(s"$relativePath: Couldn't translate type from param $maybeName")
         db.Type.Text
       }
-      SqlFile.Param(maybeName, indices, jdbcParam.parameterTypeName, tpe)
+      SqlFile.Param(maybeName, indices, jdbcParam.parameterTypeName, tpe, jdbcParam.isNullable.toNullability)
     }
 
     SqlFile(relativePath, decomposedSql, params, cols, deps)
