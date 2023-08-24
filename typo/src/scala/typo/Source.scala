@@ -8,5 +8,4 @@ object Source {
   case class Table(name: db.RelationName) extends Relation
   case class View(name: db.RelationName, isMaterialized: Boolean) extends Relation
   case class SqlFile(relPath: RelPath) extends Source
-  case class SqlFileParam(relPath: RelPath) extends Source
 }

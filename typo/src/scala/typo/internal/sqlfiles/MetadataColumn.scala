@@ -11,7 +11,7 @@ case class MetadataColumn(
     catalogName: Option[String],
     columnClassName: String,
     columnDisplaySize: Int,
-    columnLabel: db.ColName,
+    parsedColumnName: ParsedName,
     columnName: db.ColName,
     columnType: JdbcType,
     columnTypeName: String,
@@ -30,7 +30,7 @@ case class MetadataColumn(
     schemaName: Option[String],
     tableName: Option[String]
 ) {
-  def name = columnLabel
+  def name: db.ColName = parsedColumnName.name
 }
 
 object MetadataColumn {
@@ -41,7 +41,7 @@ object MetadataColumn {
       "catalogName" -> x.catalogName,
       "columnClassName" -> x.columnClassName,
       "columnDisplaySize" -> x.columnDisplaySize,
-      "columnLabel" -> x.columnLabel.value,
+      "parsedColumnName" -> Json.toJson(x.parsedColumnName),
       "columnName" -> x.columnName.value,
       "columnType" -> x.columnType.toString,
       "columnTypeName" -> x.columnTypeName,

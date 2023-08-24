@@ -5,11 +5,7 @@ package sqlfiles
 case class SqlFile(
     relPath: RelPath,
     decomposedSql: DecomposedSql,
-    params: List[SqlFile.Param],
-    cols: MaybeReturnsRows[NonEmptyList[db.Col]],
-    dependencies: Map[db.ColName, (db.RelationName, db.ColName)]
+    jdbcMetadata: JdbcMetadata,
+    nullableColumnsFromJoins: Option[NullabilityFromExplain.NullableColumns],
+    depsFromView: Map[db.ColName, (db.RelationName, db.ColName)]
 )
-
-object SqlFile {
-  case class Param(maybeName: DecomposedSql.Param, indices: List[Int], udtName: String, tpe: db.Type, nullability: Nullability)
-}

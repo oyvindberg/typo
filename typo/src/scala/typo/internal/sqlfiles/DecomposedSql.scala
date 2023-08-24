@@ -2,7 +2,8 @@ package typo
 package internal
 package sqlfiles
 
-import codegen.CodeOps
+import typo.internal.codegen.CodeOps
+import typo.internal.compat.ListOps
 
 case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
   val sqlWithQuestionMarks: String = render(_ => "?")
@@ -39,13 +40,18 @@ case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
   val paramNamesWithIndices: List[(DecomposedSql.Param, List[Int])] = {
     val paramsWithIndex = params.zipWithIndex
 
-    def indicesFor(string: String): List[Int] =
-      paramsWithIndex.collect { case (DecomposedSql.NamedParam(name), i) if name == string => i }
+    def indicesFor(name: db.ColName): List[Int] =
+      paramsWithIndex.collect { case (DecomposedSql.NamedParam(parsedName), i) if parsedName.name == name => i }
 
-    paramsWithIndex.map {
-      case (DecomposedSql.NotNamedParam, idx)      => (DecomposedSql.NotNamedParam, List(idx))
-      case (p @ DecomposedSql.NamedParam(name), _) => p -> indicesFor(name)
-    }.distinct
+    paramsWithIndex
+      .distinctByCompat {
+        case (DecomposedSql.NotNamedParam, idx)        => idx.toString
+        case (DecomposedSql.NamedParam(parsedName), _) => parsedName.name
+      }
+      .map {
+        case (DecomposedSql.NotNamedParam, idx)            => (DecomposedSql.NotNamedParam, List(idx))
+        case (p @ DecomposedSql.NamedParam(parsedName), _) => p -> indicesFor(parsedName.name)
+      }
   }
 }
 
@@ -54,7 +60,7 @@ object DecomposedSql {
   case class SqlText(value: String) extends Fragment
   sealed trait Param extends Fragment
   case object NotNamedParam extends Param
-  case class NamedParam(name: String) extends Param
+  case class NamedParam(name: ParsedName) extends Param
 
   /** Parse the query string containing named parameters and result a parse result, which holds the parsed sql (named parameters replaced by standard '?' parameters and an ordered list of the named
     * parameters.
@@ -125,9 +131,21 @@ object DecomposedSql {
           fragments += SqlText(buf.result())
           buf.clear()
           keepC = false
-          fragments += NamedParam(name)
+          fragments += NamedParam(parseName(name))
           c = '?'; // replace the parameter with a question mark
           i += name.length(); // skip past the end if the parameter
+        } else if (c == ':' && i + 1 < length && query.charAt(i + 1) == '"') {
+          var j = i + 3;
+          while (j < length && query.charAt(j) != '"') {
+            j += 1;
+          }
+          val name = query.substring(i + 2, j);
+          fragments += SqlText(buf.result())
+          buf.clear()
+          keepC = false
+          fragments += NamedParam(parseName(name))
+          c = '?'; // replace the parameter with a question mark
+          i = j; // skip past the end if the parameter
         }
       }
       if (keepC) buf.append(c)

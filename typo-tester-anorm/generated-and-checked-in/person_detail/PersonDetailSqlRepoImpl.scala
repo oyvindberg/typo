@@ -10,11 +10,10 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
-  override def apply(businessentityid: /* nullability unknown */ Option[/* user-picked */ BusinessentityId], modifiedAfter: /* nullability unknown */ Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow] = {
+  override def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime)(implicit c: Connection): List[PersonDetailSqlRow] = {
     val sql =
       SQL"""SELECT s.businessentityid,
                    p.title,
@@ -24,14 +23,15 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                    e.jobtitle,
                    a.addressline1,
                    a.city,
-                   a.postalcode
+                   a.postalcode,
+                   a.rowguid as "rowguid:java.lang.String!"
             FROM sales.salesperson s
                      JOIN humanresources.employee e ON e.businessentityid = s.businessentityid
                      JOIN person.person p ON p.businessentityid = s.businessentityid
                      JOIN person.businessentityaddress bea ON bea.businessentityid = s.businessentityid
                      LEFT JOIN person.address a ON a.addressid = bea.addressid
-            where s.businessentityid = ${ParameterValue(businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4
-              and p.modifieddate > ${ParameterValue(modifiedAfter, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp"""
+            where s.businessentityid = ${ParameterValue(businessentityid, null, /* user-picked */ BusinessentityId.toStatement)}::int4
+              and p.modifieddate > ${ParameterValue(modifiedAfter, null, TypoLocalDateTime.toStatement)}::timestamp"""
     sql.as(PersonDetailSqlRow.rowParser(1).*)
   }
 }

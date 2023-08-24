@@ -12,5 +12,5 @@ import doobie.free.connection.ConnectionIO
 import fs2.Stream
 
 trait PersonDetailSqlRepo {
-  def apply(businessentityid: /* nullability unknown */ Option[/* user-picked */ BusinessentityId], modifiedAfter: /* nullability unknown */ Option[TypoLocalDateTime]): Stream[ConnectionIO, PersonDetailSqlRow]
+  def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime): Stream[ConnectionIO, PersonDetailSqlRow]
 }

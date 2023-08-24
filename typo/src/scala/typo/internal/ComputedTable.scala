@@ -38,7 +38,7 @@ case class ComputedTable(
       pk.colNames match {
         case NonEmptyList(colName, Nil) =>
           val dbCol = dbColsByName(colName)
-          val underlying = scalaTypeMapper.col(Source.Table(dbTable.name), dbCol, None)
+          val underlying = scalaTypeMapper.col(dbTable.name, dbCol, None)
           val col = ComputedColumn(
             pointsTo = pointsTo.get(dbCol.name),
             name = naming.field(dbCol.name),
@@ -108,7 +108,7 @@ case class ComputedTable(
         case _                                                         => None
       }
 
-    val tpe = scalaTypeMapper.col(source, dbCol, typeFromFk.orElse(typeFromId))
+    val tpe = scalaTypeMapper.col(dbTable.name, dbCol, typeFromFk.orElse(typeFromId))
 
     tpe
   }

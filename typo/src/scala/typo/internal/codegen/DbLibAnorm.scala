@@ -399,8 +399,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"$sql.executeUpdate() > 0"
       case RepoMethod.SqlFile(sqlScript) =>
         val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.renderCode { (paramAtIndex: Int) =>
-          val param = sqlScript.params.find(_.underlying.indices.contains(paramAtIndex)).get
-          val cast = sqlCast.toPg(param.underlying).fold("")(udtType => s"::$udtType")
+          val param = sqlScript.params.find(_.indices.contains(paramAtIndex)).get
+          val cast = sqlCast.toPg(param).fold("")(udtType => s"::$udtType")
           code"${runtimeInterpolateValue(param.name, param.tpe)}$cast"
         }
         val ret = for {

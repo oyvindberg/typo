@@ -159,7 +159,7 @@ object load {
       }
     }
     val sqlScripts = maybeScriptPath match {
-      case Some(scriptPath) => sqlfiles.Load(scriptPath, typeMapperDb)
+      case Some(scriptPath) => sqlfiles.Load(scriptPath)
       case None             => Nil
     }
 

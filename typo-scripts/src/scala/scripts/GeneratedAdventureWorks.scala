@@ -26,7 +26,7 @@ object GeneratedAdventureWorks {
         val metadb = typo.MetaDb.fromDbAndScripts(scriptsPath)
 
         def go() = {
-          val newSqlScripts = typo.internal.sqlfiles.Load(scriptsPath, metadb.typeMapperDb)
+          val newSqlScripts = typo.internal.sqlfiles.Load(scriptsPath)
 
           List(
             (typo.DbLibName.Anorm, typo.JsonLibName.PlayJson, "typo-tester-anorm"),
@@ -36,12 +36,10 @@ object GeneratedAdventureWorks {
               pkg = "adventureworks",
               Some(dbLib),
               List(jsonLib),
-              typeOverride = typo.TypeOverride
-                .sqlFileParam { case (_, "businessentityid") => "adventureworks.person.businessentity.BusinessentityId" }
-                .orElse(typo.TypeOverride.relation {
-                  case (_, "firstname")                     => "adventureworks.customtype.FirstName"
-                  case ("sales.creditcard", "creditcardid") => "adventureworks.customtype.CustomCreditcardId"
-                }),
+              typeOverride = typo.TypeOverride.relation {
+                case (_, "firstname")                     => "adventureworks.customtype.FirstName"
+                case ("sales.creditcard", "creditcardid") => "adventureworks.customtype.CustomCreditcardId"
+              },
               enableDsl = true,
               enableTestInserts = true
             )

@@ -34,12 +34,14 @@ case class PersonDetailSqlRow(
   /** Points to [[person.address.AddressRow.city]] */
   city: Option[/* max 30 chars */ String],
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[/* max 15 chars */ String]
+  postalcode: Option[/* max 15 chars */ String],
+  /** Points to [[person.address.AddressRow.rowguid]] */
+  rowguid: /* user-picked */ String
 )
 
 object PersonDetailSqlRow {
-  implicit lazy val decoder: Decoder[PersonDetailSqlRow] = Decoder.forProduct9[PersonDetailSqlRow, BusinessentityId, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, /* max 50 chars */ String, Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[/* max 15 chars */ String]]("businessentityid", "title", "firstname", "middlename", "lastname", "jobtitle", "addressline1", "city", "postalcode")(PersonDetailSqlRow.apply)(BusinessentityId.decoder, Decoder.decodeOption(Decoder.decodeString), FirstName.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit lazy val encoder: Encoder[PersonDetailSqlRow] = Encoder.forProduct9[PersonDetailSqlRow, BusinessentityId, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, /* max 50 chars */ String, Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[/* max 15 chars */ String]]("businessentityid", "title", "firstname", "middlename", "lastname", "jobtitle", "addressline1", "city", "postalcode")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.jobtitle, x.addressline1, x.city, x.postalcode))(BusinessentityId.encoder, Encoder.encodeOption(Encoder.encodeString), FirstName.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val decoder: Decoder[PersonDetailSqlRow] = Decoder.forProduct10[PersonDetailSqlRow, BusinessentityId, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, /* max 50 chars */ String, Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[/* max 15 chars */ String], /* user-picked */ String]("businessentityid", "title", "firstname", "middlename", "lastname", "jobtitle", "addressline1", "city", "postalcode", "rowguid")(PersonDetailSqlRow.apply)(BusinessentityId.decoder, Decoder.decodeOption(Decoder.decodeString), FirstName.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString)
+  implicit lazy val encoder: Encoder[PersonDetailSqlRow] = Encoder.forProduct10[PersonDetailSqlRow, BusinessentityId, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, /* max 50 chars */ String, Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[/* max 15 chars */ String], /* user-picked */ String]("businessentityid", "title", "firstname", "middlename", "lastname", "jobtitle", "addressline1", "city", "postalcode", "rowguid")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.jobtitle, x.addressline1, x.city, x.postalcode, x.rowguid))(BusinessentityId.encoder, Encoder.encodeOption(Encoder.encodeString), FirstName.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString)
   implicit lazy val read: Read[PersonDetailSqlRow] = new Read[PersonDetailSqlRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
@@ -50,7 +52,8 @@ object PersonDetailSqlRow {
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PersonDetailSqlRow(
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
@@ -61,7 +64,8 @@ object PersonDetailSqlRow {
       jobtitle = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
       addressline1 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
       city = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      postalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8)
+      postalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      rowguid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 9)
     )
   )
 }

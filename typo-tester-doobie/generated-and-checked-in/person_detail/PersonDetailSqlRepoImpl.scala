@@ -15,7 +15,7 @@ import doobie.util.Write
 import fs2.Stream
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
-  override def apply(businessentityid: /* nullability unknown */ Option[/* user-picked */ BusinessentityId], modifiedAfter: /* nullability unknown */ Option[TypoLocalDateTime]): Stream[ConnectionIO, PersonDetailSqlRow] = {
+  override def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime): Stream[ConnectionIO, PersonDetailSqlRow] = {
     val sql =
       sql"""SELECT s.businessentityid,
                    p.title,
@@ -25,14 +25,15 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                    e.jobtitle,
                    a.addressline1,
                    a.city,
-                   a.postalcode
+                   a.postalcode,
+                   a.rowguid as "rowguid:java.lang.String!"
             FROM sales.salesperson s
                      JOIN humanresources.employee e ON e.businessentityid = s.businessentityid
                      JOIN person.person p ON p.businessentityid = s.businessentityid
                      JOIN person.businessentityaddress bea ON bea.businessentityid = s.businessentityid
                      LEFT JOIN person.address a ON a.addressid = bea.addressid
-            where s.businessentityid = ${fromWrite(businessentityid)(Write.fromPutOption(/* user-picked */ BusinessentityId.put))}::int4
-              and p.modifieddate > ${fromWrite(modifiedAfter)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp"""
+            where s.businessentityid = ${fromWrite(businessentityid)(Write.fromPut(/* user-picked */ BusinessentityId.put))}::int4
+              and p.modifieddate > ${fromWrite(modifiedAfter)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"""
     sql.query(PersonDetailSqlRow.read).stream
   }
 }

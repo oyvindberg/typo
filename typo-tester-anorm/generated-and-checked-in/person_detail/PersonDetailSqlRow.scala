@@ -39,7 +39,9 @@ case class PersonDetailSqlRow(
   /** Points to [[person.address.AddressRow.city]] */
   city: Option[/* max 30 chars */ String],
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[/* max 15 chars */ String]
+  postalcode: Option[/* max 15 chars */ String],
+  /** Points to [[person.address.AddressRow.rowguid]] */
+  rowguid: /* user-picked */ String
 )
 
 object PersonDetailSqlRow {
@@ -54,7 +56,8 @@ object PersonDetailSqlRow {
           jobtitle = json.\("jobtitle").as(Reads.StringReads),
           addressline1 = json.\("addressline1").toOption.map(_.as(Reads.StringReads)),
           city = json.\("city").toOption.map(_.as(Reads.StringReads)),
-          postalcode = json.\("postalcode").toOption.map(_.as(Reads.StringReads))
+          postalcode = json.\("postalcode").toOption.map(_.as(Reads.StringReads)),
+          rowguid = json.\("rowguid").as(Reads.StringReads)
         )
       )
     ),
@@ -70,7 +73,8 @@ object PersonDetailSqlRow {
         jobtitle = row(idx + 5)(Column.columnToString),
         addressline1 = row(idx + 6)(Column.columnToOption(Column.columnToString)),
         city = row(idx + 7)(Column.columnToOption(Column.columnToString)),
-        postalcode = row(idx + 8)(Column.columnToOption(Column.columnToString))
+        postalcode = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        rowguid = row(idx + 9)(Column.columnToString)
       )
     )
   }
@@ -84,7 +88,8 @@ object PersonDetailSqlRow {
       "jobtitle" -> Writes.StringWrites.writes(o.jobtitle),
       "addressline1" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline1),
       "city" -> Writes.OptionWrites(Writes.StringWrites).writes(o.city),
-      "postalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.postalcode)
+      "postalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.postalcode),
+      "rowguid" -> Writes.StringWrites.writes(o.rowguid)
     ))
   )
 }
