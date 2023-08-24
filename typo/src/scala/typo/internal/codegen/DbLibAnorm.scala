@@ -78,9 +78,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$Column.columnToByteArray"
         // fallback array case. implementation looks loco, but I guess it works
         case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$Column.columnToArray[$targ](${lookupColumnFor(targ)}, implicitly)"
-        case other =>
-          println(Column.of(other).render)
-          sc.Summon(Column.of(other)).code
+        case other                                     => sc.Summon(Column.of(other)).code
       }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
@@ -110,9 +108,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$ParameterMetaData.ByteArrayParameterMetaData"
         // fallback array case.
         case sc.Type.TApply(sc.Type.Array, List(targ)) => code"${pkg / arrayParameterMetaDataName}(${lookupParameterMetaDataFor(targ)})"
-        case other =>
-          println(ParameterMetaData.of(other).render)
-          sc.Summon(ParameterMetaData.of(other)).code
+        case other                                     => sc.Summon(ParameterMetaData.of(other)).code
       }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
