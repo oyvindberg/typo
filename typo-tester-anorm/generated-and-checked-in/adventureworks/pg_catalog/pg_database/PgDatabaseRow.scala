@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_database
 
-import adventureworks.TypoAclItem
-import adventureworks.TypoXid
+import adventureworks.customtypes.TypoAclItem
+import adventureworks.customtypes.TypoXid
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

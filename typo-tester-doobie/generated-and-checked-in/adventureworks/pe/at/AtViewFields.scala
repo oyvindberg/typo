@@ -7,7 +7,7 @@ package adventureworks
 package pe
 package at
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
 import java.util.UUID

@@ -7,9 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_type
 
-import adventureworks.TypoAclItem
-import adventureworks.TypoPgNodeTree
-import adventureworks.TypoRegproc
+import adventureworks.customtypes.TypoAclItem
+import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoRegproc
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

@@ -7,10 +7,10 @@ package adventureworks
 package humanresources
 package vemployeedepartmenthistory
 
-import adventureworks.TypoLocalDate
-import adventureworks.customtype.FirstName
+import adventureworks.customtypes.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import adventureworks.userdefined.FirstName
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

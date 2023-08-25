@@ -8,7 +8,7 @@ package person
 package businessentitycontact
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import anorm.NamedParameter

@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package currency
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField

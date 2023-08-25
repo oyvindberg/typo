@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package creditcard
 
-import adventureworks.customtype.CustomCreditcardId
+import adventureworks.userdefined.CustomCreditcardId
 import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder

@@ -7,9 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_index
 
-import adventureworks.TypoInt2Vector
-import adventureworks.TypoOidVector
-import adventureworks.TypoPgNodeTree
+import adventureworks.customtypes.TypoInt2Vector
+import adventureworks.customtypes.TypoOidVector
+import adventureworks.customtypes.TypoPgNodeTree
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement

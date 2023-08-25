@@ -8,7 +8,7 @@ package production
 package workorderrouting
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import anorm.NamedParameter

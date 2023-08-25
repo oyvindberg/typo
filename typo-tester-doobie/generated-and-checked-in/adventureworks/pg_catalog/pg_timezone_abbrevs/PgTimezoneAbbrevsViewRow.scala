@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_timezone_abbrevs
 
-import adventureworks.TypoInterval
+import adventureworks.customtypes.TypoInterval
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

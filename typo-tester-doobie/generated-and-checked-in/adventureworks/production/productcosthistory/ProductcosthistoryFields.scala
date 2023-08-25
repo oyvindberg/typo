@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productcosthistory
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField

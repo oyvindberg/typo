@@ -8,7 +8,7 @@ package sales
 package currencyrate
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult

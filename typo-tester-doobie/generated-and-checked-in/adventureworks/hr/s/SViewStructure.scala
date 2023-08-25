@@ -7,8 +7,8 @@ package adventureworks
 package hr
 package s
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoLocalTime
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalTime
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.FieldLikeNoHkt

@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_prepared_statements
 
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoRegtype
+import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoRegtype
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

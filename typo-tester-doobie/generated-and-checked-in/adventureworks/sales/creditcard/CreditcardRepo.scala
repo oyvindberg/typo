@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package creditcard
 
-import adventureworks.customtype.CustomCreditcardId
+import adventureworks.userdefined.CustomCreditcardId
 import doobie.free.connection.ConnectionIO
 import doobie.util.Put
 import fs2.Stream

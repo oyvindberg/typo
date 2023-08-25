@@ -8,7 +8,7 @@ package production
 package productcosthistory
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult

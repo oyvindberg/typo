@@ -8,7 +8,7 @@ package person
 package stateprovince
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name

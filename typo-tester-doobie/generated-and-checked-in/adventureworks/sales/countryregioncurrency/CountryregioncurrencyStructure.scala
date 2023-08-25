@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package countryregioncurrency
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import typo.dsl.SqlExpr.Field

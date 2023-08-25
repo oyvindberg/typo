@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_policy
 
-import adventureworks.TypoPgNodeTree
+import adventureworks.customtypes.TypoPgNodeTree
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement

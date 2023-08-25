@@ -7,7 +7,7 @@ package adventureworks
 package pr
 package sr
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.OptField

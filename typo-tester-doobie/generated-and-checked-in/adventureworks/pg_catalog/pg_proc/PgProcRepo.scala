@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
-import adventureworks.TypoOidVector
+import adventureworks.customtypes.TypoOidVector
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
 import typo.dsl.DeleteBuilder

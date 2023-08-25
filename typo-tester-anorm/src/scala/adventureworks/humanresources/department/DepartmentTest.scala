@@ -1,7 +1,8 @@
 package adventureworks.humanresources.department
 
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
-import adventureworks.{Defaulted, TypoLocalDateTime, withConnection}
+import adventureworks.{Defaulted, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 

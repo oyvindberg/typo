@@ -7,7 +7,7 @@ package adventureworks
 package production
 package workorderrouting
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import typo.dsl.SqlExpr.Field

@@ -7,7 +7,7 @@ package adventureworks
 package pe
 package bec
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import java.util.UUID

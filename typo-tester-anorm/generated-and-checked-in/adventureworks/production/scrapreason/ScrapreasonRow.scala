@@ -7,7 +7,7 @@ package adventureworks
 package production
 package scrapreason
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success

@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_prepared_statements
 
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoRegtype
+import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoRegtype
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

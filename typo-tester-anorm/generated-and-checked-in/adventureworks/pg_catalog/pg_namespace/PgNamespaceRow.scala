@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_namespace
 
-import adventureworks.TypoAclItem
+import adventureworks.customtypes.TypoAclItem
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

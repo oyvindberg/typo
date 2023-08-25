@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_replication_slots
 
-import adventureworks.TypoXid
+import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

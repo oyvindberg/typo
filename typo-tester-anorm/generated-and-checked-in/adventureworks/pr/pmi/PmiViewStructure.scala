@@ -7,7 +7,7 @@ package adventureworks
 package pr
 package pmi
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
 import typo.dsl.SqlExpr.FieldLikeNoHkt

@@ -7,7 +7,7 @@ package adventureworks
 package sa
 package so
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.specialoffer.SpecialofferId
 import java.util.UUID
 import typo.dsl.SqlExpr.OptField

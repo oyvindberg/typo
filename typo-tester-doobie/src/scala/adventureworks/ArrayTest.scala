@@ -1,5 +1,6 @@
 package adventureworks
 
+import adventureworks.customtypes.*
 import adventureworks.public.pgtest.{PgtestRepoImpl, PgtestRow}
 import adventureworks.public.pgtestnull.{PgtestnullRepoImpl, PgtestnullRow}
 import doobie.implicits.toSqlInterpolator

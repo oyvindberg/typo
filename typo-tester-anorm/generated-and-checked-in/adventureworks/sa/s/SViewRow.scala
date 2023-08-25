@@ -7,8 +7,8 @@ package adventureworks
 package sa
 package s
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.Column

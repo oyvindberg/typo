@@ -7,8 +7,7 @@ package adventureworks
 package sales
 package salesorderheader
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.customtype.CustomCreditcardId
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -18,6 +17,7 @@ import adventureworks.purchasing.shipmethod.ShipmethodId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.userdefined.CustomCreditcardId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

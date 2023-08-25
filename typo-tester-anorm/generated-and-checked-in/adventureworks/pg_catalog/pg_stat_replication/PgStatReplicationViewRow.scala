@@ -7,10 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_stat_replication
 
-import adventureworks.TypoInet
-import adventureworks.TypoInterval
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoXid
+import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInterval
+import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoXid
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

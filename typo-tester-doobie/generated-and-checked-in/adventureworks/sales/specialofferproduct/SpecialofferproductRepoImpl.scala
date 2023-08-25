@@ -8,7 +8,7 @@ package sales
 package specialofferproduct
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.free.connection.ConnectionIO

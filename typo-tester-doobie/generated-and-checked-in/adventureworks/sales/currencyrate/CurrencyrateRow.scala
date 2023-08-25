@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package currencyrate
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import doobie.enumerated.Nullability
 import doobie.util.Read

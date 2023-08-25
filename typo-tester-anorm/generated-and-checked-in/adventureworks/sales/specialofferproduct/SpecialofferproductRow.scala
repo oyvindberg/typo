@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package specialofferproduct
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.Column

@@ -8,12 +8,12 @@ package person
 package person
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
-import adventureworks.customtype.FirstName
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
+import adventureworks.userdefined.FirstName
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult

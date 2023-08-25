@@ -7,7 +7,7 @@ package adventureworks
 package pr
 package um
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.FieldLikeNoHkt

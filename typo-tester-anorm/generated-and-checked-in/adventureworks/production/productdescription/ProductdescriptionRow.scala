@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productdescription
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

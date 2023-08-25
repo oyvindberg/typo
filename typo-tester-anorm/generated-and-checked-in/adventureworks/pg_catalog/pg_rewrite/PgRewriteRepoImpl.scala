@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_rewrite
 
-import adventureworks.TypoPgNodeTree
+import adventureworks.customtypes.TypoPgNodeTree
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement

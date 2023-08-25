@@ -8,7 +8,7 @@ package sales
 package shoppingcartitem
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.NamedParameter
 import anorm.ParameterValue

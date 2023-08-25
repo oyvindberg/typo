@@ -38,8 +38,8 @@ object GeneratedAdventureWorks {
               Some(dbLib),
               List(jsonLib),
               typeOverride = typo.TypeOverride.relation {
-                case (_, "firstname")                     => "adventureworks.customtype.FirstName"
-                case ("sales.creditcard", "creditcardid") => "adventureworks.customtype.CustomCreditcardId"
+                case (_, "firstname")                     => "adventureworks.userdefined.FirstName"
+                case ("sales.creditcard", "creditcardid") => "adventureworks.userdefined.CustomCreditcardId"
               },
               enableDsl = true,
               enableTestInserts = true

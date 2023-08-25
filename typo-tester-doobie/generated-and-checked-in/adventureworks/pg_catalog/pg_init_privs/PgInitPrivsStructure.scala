@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_init_privs
 
-import adventureworks.TypoAclItem
+import adventureworks.customtypes.TypoAclItem
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

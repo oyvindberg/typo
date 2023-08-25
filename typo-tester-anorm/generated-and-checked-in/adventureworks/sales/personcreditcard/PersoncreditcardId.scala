@@ -7,8 +7,8 @@ package adventureworks
 package sales
 package personcreditcard
 
-import adventureworks.customtype.CustomCreditcardId
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.userdefined.CustomCreditcardId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue

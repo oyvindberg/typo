@@ -7,7 +7,7 @@ package adventureworks
 package pr
 package c
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.FieldLikeNoHkt

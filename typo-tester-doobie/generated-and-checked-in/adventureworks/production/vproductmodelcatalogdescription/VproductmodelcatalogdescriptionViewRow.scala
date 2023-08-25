@@ -7,7 +7,7 @@ package adventureworks
 package production
 package vproductmodelcatalogdescription
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability

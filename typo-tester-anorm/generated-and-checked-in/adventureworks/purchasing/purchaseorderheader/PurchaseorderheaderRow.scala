@@ -7,7 +7,7 @@ package adventureworks
 package purchasing
 package purchaseorderheader
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.Column

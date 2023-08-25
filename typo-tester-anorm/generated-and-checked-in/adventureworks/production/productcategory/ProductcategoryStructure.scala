@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productcategory
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import java.util.UUID
 import typo.dsl.SqlExpr.Field

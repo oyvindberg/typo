@@ -7,7 +7,7 @@ package adventureworks
 package pr
 package wr
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import doobie.enumerated.Nullability

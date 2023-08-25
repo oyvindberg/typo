@@ -7,7 +7,7 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 

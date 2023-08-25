@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_aggregate
 
-import adventureworks.TypoRegproc
+import adventureworks.customtypes.TypoRegproc
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder

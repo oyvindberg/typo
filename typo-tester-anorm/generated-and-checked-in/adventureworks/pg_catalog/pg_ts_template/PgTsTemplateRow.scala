@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_ts_template
 
-import adventureworks.TypoRegproc
+import adventureworks.customtypes.TypoRegproc
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

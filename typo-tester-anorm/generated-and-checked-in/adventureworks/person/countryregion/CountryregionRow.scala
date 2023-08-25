@@ -7,7 +7,7 @@ package adventureworks
 package person
 package countryregion
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success

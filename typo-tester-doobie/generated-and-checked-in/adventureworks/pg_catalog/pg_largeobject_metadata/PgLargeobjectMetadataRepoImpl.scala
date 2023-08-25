@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_largeobject_metadata
 
-import adventureworks.TypoAclItem
+import adventureworks.customtypes.TypoAclItem
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

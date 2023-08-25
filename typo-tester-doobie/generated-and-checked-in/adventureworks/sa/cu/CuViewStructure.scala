@@ -7,7 +7,7 @@ package adventureworks
 package sa
 package cu
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
 import typo.dsl.SqlExpr.FieldLikeNoHkt

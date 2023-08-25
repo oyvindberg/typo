@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package salesterritoryhistory
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.Column

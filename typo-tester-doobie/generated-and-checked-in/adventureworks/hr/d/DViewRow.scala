@@ -7,7 +7,7 @@ package adventureworks
 package hr
 package d
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability

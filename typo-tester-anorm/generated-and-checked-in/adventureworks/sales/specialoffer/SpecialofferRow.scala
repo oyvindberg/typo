@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package specialoffer
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

@@ -8,8 +8,8 @@ package humanresources
 package shift
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoLocalTime
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder

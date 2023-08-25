@@ -7,10 +7,10 @@ package adventureworks
 package humanresources
 package vemployeedepartment
 
-import adventureworks.TypoLocalDate
-import adventureworks.customtype.FirstName
+import adventureworks.customtypes.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import adventureworks.userdefined.FirstName
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

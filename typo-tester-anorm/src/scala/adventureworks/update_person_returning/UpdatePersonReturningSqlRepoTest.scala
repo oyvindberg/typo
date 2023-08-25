@@ -1,6 +1,7 @@
 package adventureworks.update_person_returning
 
-import adventureworks.{TypoLocalDateTime, withConnection}
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 

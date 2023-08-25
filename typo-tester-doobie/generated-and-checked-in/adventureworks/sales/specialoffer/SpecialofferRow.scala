@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package specialoffer
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

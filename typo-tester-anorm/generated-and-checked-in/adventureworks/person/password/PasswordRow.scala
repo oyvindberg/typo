@@ -7,7 +7,7 @@ package adventureworks
 package person
 package password
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser

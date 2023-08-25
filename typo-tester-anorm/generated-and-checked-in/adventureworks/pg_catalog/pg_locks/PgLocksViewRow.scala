@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_locks
 
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoXid
+import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoXid
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

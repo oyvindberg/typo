@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
-import adventureworks.TypoInt2Vector
-import adventureworks.TypoPgNodeTree
+import adventureworks.customtypes.TypoInt2Vector
+import adventureworks.customtypes.TypoPgNodeTree
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

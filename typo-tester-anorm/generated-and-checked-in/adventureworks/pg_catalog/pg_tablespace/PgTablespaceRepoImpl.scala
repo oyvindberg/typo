@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_tablespace
 
-import adventureworks.TypoAclItem
+import adventureworks.customtypes.TypoAclItem
 import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation

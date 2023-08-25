@@ -1,7 +1,8 @@
 package adventureworks.person_detail
 
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.{TypoLocalDateTime, withConnection}
+import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 

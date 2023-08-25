@@ -7,9 +7,9 @@ package adventureworks
 package sales
 package personcreditcard
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.customtype.CustomCreditcardId
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.userdefined.CustomCreditcardId
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject

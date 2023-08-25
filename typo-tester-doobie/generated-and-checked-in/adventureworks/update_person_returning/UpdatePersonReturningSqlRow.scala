@@ -6,8 +6,8 @@
 package adventureworks
 package update_person_returning
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.customtype.FirstName
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.userdefined.FirstName
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder

@@ -6,9 +6,9 @@
 package adventureworks
 package person_detail
 
-import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import adventureworks.userdefined.FirstName
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

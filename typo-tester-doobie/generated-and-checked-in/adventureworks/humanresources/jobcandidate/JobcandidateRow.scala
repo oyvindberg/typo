@@ -7,8 +7,8 @@ package adventureworks
 package humanresources
 package jobcandidate
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.util.Read

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
-import adventureworks.TypoOidVector
+import adventureworks.customtypes.TypoOidVector
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder

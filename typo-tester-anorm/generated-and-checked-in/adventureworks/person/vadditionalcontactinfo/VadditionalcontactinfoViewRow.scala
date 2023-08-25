@@ -7,11 +7,11 @@ package adventureworks
 package person
 package vadditionalcontactinfo
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
-import adventureworks.customtype.FirstName
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import adventureworks.userdefined.FirstName
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

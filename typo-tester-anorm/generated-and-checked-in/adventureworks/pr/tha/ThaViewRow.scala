@@ -7,7 +7,7 @@ package adventureworks
 package pr
 package tha
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.transactionhistoryarchive.TransactionhistoryarchiveId
 import anorm.Column
 import anorm.RowParser

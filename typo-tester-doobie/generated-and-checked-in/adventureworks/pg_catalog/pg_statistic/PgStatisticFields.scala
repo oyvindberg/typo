@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_statistic
 
-import adventureworks.TypoAnyArray
+import adventureworks.customtypes.TypoAnyArray
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField

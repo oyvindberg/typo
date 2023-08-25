@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_largeobject_metadata
 
-import adventureworks.TypoAclItem
+import adventureworks.customtypes.TypoAclItem
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement

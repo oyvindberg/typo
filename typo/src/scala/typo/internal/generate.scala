@@ -36,7 +36,7 @@ object generate {
       keepDependencies = publicOptions.keepDependencies,
       debugTypes = publicOptions.debugTypes
     )
-    val customTypes = new CustomTypes(options.pkg)
+    val customTypes = new CustomTypes(options.pkg / sc.Ident("customtypes"))
     val genOrdering = new GenOrdering(customTypes, options.pkg)
     val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming, customTypes)
     val enums = metaDb.enums.map(ComputedStringEnum(naming))

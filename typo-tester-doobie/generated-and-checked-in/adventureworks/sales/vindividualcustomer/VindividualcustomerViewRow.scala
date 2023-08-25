@@ -7,11 +7,11 @@ package adventureworks
 package sales
 package vindividualcustomer
 
-import adventureworks.TypoXml
-import adventureworks.customtype.FirstName
+import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
+import adventureworks.userdefined.FirstName
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

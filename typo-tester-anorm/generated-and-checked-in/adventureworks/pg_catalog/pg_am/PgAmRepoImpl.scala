@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_am
 
-import adventureworks.TypoRegproc
+import adventureworks.customtypes.TypoRegproc
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement

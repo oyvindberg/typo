@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_sequences
 
-import adventureworks.TypoRegtype
+import adventureworks.customtypes.TypoRegtype
 import typo.dsl.SqlExpr.OptField
 
 trait PgSequencesViewFields[Row] {

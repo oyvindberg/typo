@@ -8,7 +8,7 @@ package sales
 package currency
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.NamedParameter
 import anorm.ParameterValue

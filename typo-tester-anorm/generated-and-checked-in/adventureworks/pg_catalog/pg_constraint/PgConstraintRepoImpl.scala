@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_constraint
 
-import adventureworks.TypoPgNodeTree
+import adventureworks.customtypes.TypoPgNodeTree
 import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation

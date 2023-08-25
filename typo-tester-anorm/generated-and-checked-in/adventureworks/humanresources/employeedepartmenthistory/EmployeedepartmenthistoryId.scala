@@ -7,7 +7,7 @@ package adventureworks
 package humanresources
 package employeedepartmenthistory
 
-import adventureworks.TypoLocalDate
+import adventureworks.customtypes.TypoLocalDate
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId

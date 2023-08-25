@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_aggregate
 
-import adventureworks.TypoRegproc
+import adventureworks.customtypes.TypoRegproc
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

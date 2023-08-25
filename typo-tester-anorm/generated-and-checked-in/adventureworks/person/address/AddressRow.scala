@@ -7,7 +7,7 @@ package adventureworks
 package person
 package address
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import anorm.Column
 import anorm.RowParser

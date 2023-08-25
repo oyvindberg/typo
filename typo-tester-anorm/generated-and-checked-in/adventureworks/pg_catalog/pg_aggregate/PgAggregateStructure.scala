@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_aggregate
 
-import adventureworks.TypoRegproc
+import adventureworks.customtypes.TypoRegproc
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

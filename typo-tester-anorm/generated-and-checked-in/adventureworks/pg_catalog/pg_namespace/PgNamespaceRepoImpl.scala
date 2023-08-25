@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_namespace
 
-import adventureworks.TypoAclItem
+import adventureworks.customtypes.TypoAclItem
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement

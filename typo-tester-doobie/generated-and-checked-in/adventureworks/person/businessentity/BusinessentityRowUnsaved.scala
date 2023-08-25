@@ -8,7 +8,7 @@ package person
 package businessentity
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder
 import java.util.UUID

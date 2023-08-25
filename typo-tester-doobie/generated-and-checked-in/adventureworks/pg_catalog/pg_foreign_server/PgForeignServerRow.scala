@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_foreign_server
 
-import adventureworks.TypoAclItem
+import adventureworks.customtypes.TypoAclItem
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

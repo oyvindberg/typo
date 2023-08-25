@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productdocument
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import typo.dsl.SqlExpr.Field

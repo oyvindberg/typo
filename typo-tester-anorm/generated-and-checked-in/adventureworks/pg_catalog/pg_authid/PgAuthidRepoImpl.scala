@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
-import adventureworks.TypoOffsetDateTime
+import adventureworks.customtypes.TypoOffsetDateTime
 import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation

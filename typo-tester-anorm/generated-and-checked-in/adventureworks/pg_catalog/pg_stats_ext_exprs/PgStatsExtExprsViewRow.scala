@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stats_ext_exprs
 
-import adventureworks.TypoAnyArray
+import adventureworks.customtypes.TypoAnyArray
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

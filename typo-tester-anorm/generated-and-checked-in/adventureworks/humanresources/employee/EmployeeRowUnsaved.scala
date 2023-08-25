@@ -8,8 +8,8 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDate
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDate
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID

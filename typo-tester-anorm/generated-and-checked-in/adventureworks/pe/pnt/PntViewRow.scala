@@ -7,7 +7,7 @@ package adventureworks
 package pe
 package pnt
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
 import anorm.Column

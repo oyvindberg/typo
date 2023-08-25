@@ -6,7 +6,7 @@
 package adventureworks
 package information_schema
 
-import adventureworks.TypoOffsetDateTime
+import adventureworks.customtypes.TypoOffsetDateTime
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement

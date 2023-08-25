@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext
 
-import adventureworks.TypoInt2Vector
-import adventureworks.TypoPgNodeTree
+import adventureworks.customtypes.TypoInt2Vector
+import adventureworks.customtypes.TypoPgNodeTree
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

@@ -7,8 +7,8 @@ package adventureworks
 package production
 package illustration
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoXml
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

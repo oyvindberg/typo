@@ -7,7 +7,7 @@ package adventureworks
 package production
 package transactionhistory
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.Column
 import anorm.RowParser

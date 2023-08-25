@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_timezone_abbrevs
 
-import adventureworks.TypoInterval
+import adventureworks.customtypes.TypoInterval
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

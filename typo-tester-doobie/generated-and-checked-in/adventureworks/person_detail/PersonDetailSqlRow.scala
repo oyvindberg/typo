@@ -6,9 +6,9 @@
 package adventureworks
 package person_detail
 
-import adventureworks.customtype.FirstName
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import adventureworks.userdefined.FirstName
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

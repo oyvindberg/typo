@@ -7,10 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
-import adventureworks.TypoAclItem
-import adventureworks.TypoOidVector
-import adventureworks.TypoPgNodeTree
-import adventureworks.TypoRegproc
+import adventureworks.customtypes.TypoAclItem
+import adventureworks.customtypes.TypoOidVector
+import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoRegproc
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

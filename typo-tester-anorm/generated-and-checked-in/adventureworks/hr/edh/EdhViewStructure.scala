@@ -7,8 +7,8 @@ package adventureworks
 package hr
 package edh
 
-import adventureworks.TypoLocalDate
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDate
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId

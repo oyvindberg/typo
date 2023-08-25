@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_prepared_xacts
 
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoXid
+import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.OptField
 
 trait PgPreparedXactsViewFields[Row] {

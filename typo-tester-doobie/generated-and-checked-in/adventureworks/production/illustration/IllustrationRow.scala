@@ -7,8 +7,8 @@ package adventureworks
 package production
 package illustration
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoXml
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder

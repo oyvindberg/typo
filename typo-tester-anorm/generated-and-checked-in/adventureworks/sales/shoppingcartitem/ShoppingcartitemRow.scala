@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package shoppingcartitem
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.Column
 import anorm.RowParser

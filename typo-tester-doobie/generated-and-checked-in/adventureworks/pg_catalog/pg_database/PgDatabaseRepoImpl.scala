@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_database
 
-import adventureworks.TypoAclItem
-import adventureworks.TypoXid
+import adventureworks.customtypes.TypoAclItem
+import adventureworks.customtypes.TypoXid
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

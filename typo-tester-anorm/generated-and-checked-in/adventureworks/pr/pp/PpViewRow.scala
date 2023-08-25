@@ -7,7 +7,7 @@ package adventureworks
 package pr
 package pp
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
 import anorm.Column
 import anorm.RowParser

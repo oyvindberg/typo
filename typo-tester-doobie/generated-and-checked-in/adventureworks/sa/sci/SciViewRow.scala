@@ -7,7 +7,7 @@ package adventureworks
 package sa
 package sci
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
 import doobie.enumerated.Nullability

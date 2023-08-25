@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_locks
 
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoXid
+import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoXid
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

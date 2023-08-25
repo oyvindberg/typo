@@ -7,8 +7,8 @@ package adventureworks
 package sa
 package cc
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.customtype.CustomCreditcardId
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.userdefined.CustomCreditcardId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

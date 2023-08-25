@@ -5,8 +5,32 @@
  */
 package adventureworks
 
-import adventureworks.customtype.CustomCreditcardId
-import adventureworks.customtype.FirstName
+import adventureworks.customtypes.TypoAclItem
+import adventureworks.customtypes.TypoAnyArray
+import adventureworks.customtypes.TypoBox
+import adventureworks.customtypes.TypoCircle
+import adventureworks.customtypes.TypoHStore
+import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInt2Vector
+import adventureworks.customtypes.TypoInterval
+import adventureworks.customtypes.TypoJson
+import adventureworks.customtypes.TypoJsonb
+import adventureworks.customtypes.TypoLine
+import adventureworks.customtypes.TypoLineSegment
+import adventureworks.customtypes.TypoLocalDate
+import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalTime
+import adventureworks.customtypes.TypoMoney
+import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoOffsetTime
+import adventureworks.customtypes.TypoOidVector
+import adventureworks.customtypes.TypoPath
+import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoPoint
+import adventureworks.customtypes.TypoPolygon
+import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoXid
+import adventureworks.customtypes.TypoXml
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.department.DepartmentRepoImpl
 import adventureworks.humanresources.department.DepartmentRow
@@ -441,6 +465,8 @@ import adventureworks.sales.specialofferproduct.SpecialofferproductRowUnsaved
 import adventureworks.sales.store.StoreRepoImpl
 import adventureworks.sales.store.StoreRow
 import adventureworks.sales.store.StoreRowUnsaved
+import adventureworks.userdefined.CustomCreditcardId
+import adventureworks.userdefined.FirstName
 import doobie.free.connection.ConnectionIO
 import java.time.LocalDate
 import java.time.LocalDateTime

@@ -7,8 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_database
 
-import adventureworks.TypoAclItem
-import adventureworks.TypoXid
+import adventureworks.customtypes.TypoAclItem
+import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

@@ -7,7 +7,7 @@ package adventureworks
 package sa
 package cr
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import doobie.enumerated.Nullability

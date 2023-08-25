@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_rewrite
 
-import adventureworks.TypoPgNodeTree
+import adventureworks.customtypes.TypoPgNodeTree
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

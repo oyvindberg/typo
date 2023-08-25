@@ -8,7 +8,7 @@ package production
 package productdocument
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import doobie.free.connection.ConnectionIO

@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package salespersonquotahistory
 
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_subscription
 
-import adventureworks.TypoOffsetDateTime
+import adventureworks.customtypes.TypoOffsetDateTime
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

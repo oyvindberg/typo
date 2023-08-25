@@ -7,9 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_partitioned_table
 
-import adventureworks.TypoInt2Vector
-import adventureworks.TypoOidVector
-import adventureworks.TypoPgNodeTree
+import adventureworks.customtypes.TypoInt2Vector
+import adventureworks.customtypes.TypoOidVector
+import adventureworks.customtypes.TypoPgNodeTree
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

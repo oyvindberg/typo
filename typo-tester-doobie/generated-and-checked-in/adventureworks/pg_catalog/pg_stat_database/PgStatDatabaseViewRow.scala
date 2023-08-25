@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_database
 
-import adventureworks.TypoOffsetDateTime
+import adventureworks.customtypes.TypoOffsetDateTime
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

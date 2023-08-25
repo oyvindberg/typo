@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_foreign_data_wrapper
 
-import adventureworks.TypoAclItem
+import adventureworks.customtypes.TypoAclItem
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

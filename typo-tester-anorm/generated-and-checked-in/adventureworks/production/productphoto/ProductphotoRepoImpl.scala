@@ -8,7 +8,7 @@ package production
 package productphoto
 
 import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
+import adventureworks.customtypes.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
