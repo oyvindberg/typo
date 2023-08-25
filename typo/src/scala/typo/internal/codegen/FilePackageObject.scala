@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-object PackageObjectFile {
+object FilePackageObject {
   def packageObject(options: InternalOptions): Option[sc.File] = {
     val parentPkg = NonEmptyList.fromList(options.pkg.idents.dropRight(1))
     val instances = options.dbLib.toList.flatMap(_.missingInstances) ++ options.jsonLibs.flatMap(_.missingInstances)

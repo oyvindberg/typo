@@ -2,8 +2,8 @@ package typo
 package internal
 package codegen
 
-case class ViewFiles(view: ComputedView, options: InternalOptions) {
-  val relation = RelationFiles(view.naming, view.names, Some(view.cols), options)
+case class FilesView(view: ComputedView, options: InternalOptions) {
+  val relation = FilesRelation(view.naming, view.names, Some(view.cols), options)
   val all: List[sc.File] = List(
     relation.RowFile,
     relation.FieldsFile,

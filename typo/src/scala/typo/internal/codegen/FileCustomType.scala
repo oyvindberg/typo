@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-object CustomTypeFile {
+object FileCustomType {
   def apply(options: InternalOptions, genOrdering: GenOrdering)(ct: CustomType): sc.File = {
 
     val comments = scaladoc(ct.comment)(Nil)

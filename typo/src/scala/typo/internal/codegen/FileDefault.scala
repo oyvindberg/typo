@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-case class DefaultFile(default: ComputedDefault, jsonLibs: List[JsonLib]) {
+case class FileDefault(default: ComputedDefault, jsonLibs: List[JsonLib]) {
   val instances: List[sc.Given] = jsonLibs.flatMap(_.defaultedInstance(default))
 
   val obj: sc.Code = genObject.withBody(default.Defaulted.value, instances)(

@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-object DomainFile {
+object FileDomain {
   def apply(domain: ComputedDomain, options: InternalOptions, genOrdering: GenOrdering): sc.File = {
     val comments = scaladoc(s"Domain `${domain.underlying.name.value}`")(
       domain.underlying.constraintDefinition match {

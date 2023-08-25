@@ -4,8 +4,8 @@ package codegen
 
 import play.api.libs.json.Json
 
-case class TableFiles(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
-  val relation = RelationFiles(table.naming, table.names, Some(table.cols), options)
+case class FilesTable(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
+  val relation = FilesRelation(table.naming, table.names, Some(table.cols), options)
 
   val UnsavedRowFile: Option[sc.File] =
     for {

@@ -60,20 +60,20 @@ object generate {
 
     // yeah, sorry about the naming overload. this is a list of output files generated for each input sql file
     val sqlFileFiles: List[sc.File] =
-      computedSqlFiles.flatMap(x => SqlFileFiles(x, naming, options).all)
+      computedSqlFiles.flatMap(x => FilesSqlFile(x, naming, options).all)
 
     val relationFilesByName = computedRelations.flatMap {
-      case viewComputed: ComputedView   => ViewFiles(viewComputed, options).all.map(x => (viewComputed.view.name, x))
-      case tableComputed: ComputedTable => TableFiles(tableComputed, options, genOrdering).all.map(x => (tableComputed.dbTable.name, x))
+      case viewComputed: ComputedView   => FilesView(viewComputed, options).all.map(x => (viewComputed.view.name, x))
+      case tableComputed: ComputedTable => FilesTable(tableComputed, options, genOrdering).all.map(x => (tableComputed.dbTable.name, x))
       case _                            => Nil
     }
 
     val mostFiles: List[sc.File] =
       List(
-        List(DefaultFile(default, options.jsonLibs).file),
-        enums.map(enm => StringEnumFile(options, enm)),
-        domains.map(d => DomainFile(d, options, genOrdering)),
-        customTypes.All.map(CustomTypeFile(options, genOrdering)),
+        List(FileDefault(default, options.jsonLibs).file),
+        enums.map(enm => FileStringEnum(options, enm)),
+        domains.map(d => FileDomain(d, options, genOrdering)),
+        customTypes.All.map(FileCustomType(options, genOrdering)),
         relationFilesByName.map { case (_, f) => f },
         sqlFileFiles
       ).flatten
@@ -92,7 +92,7 @@ object generate {
 
     // package objects have weird scoping, so don't attempt to automatically write imports for them.
     // this should be a stop-gap solution anyway
-    val pkgObject = PackageObjectFile.packageObject(options)
+    val pkgObject = FilePackageObject.packageObject(options)
 
     val testDataFile = options.dbLib match {
       case Some(dbLib) if options.enableTestInserts =>

@@ -2,8 +2,8 @@ package typo
 package internal
 package codegen
 
-case class SqlFileFiles(script: ComputedSqlFile, naming: Naming, options: InternalOptions) {
-  val relation = RelationFiles(naming, script.names, script.maybeCols.toOption, options)
+case class FilesSqlFile(script: ComputedSqlFile, naming: Naming, options: InternalOptions) {
+  val relation = FilesRelation(naming, script.names, script.maybeCols.toOption, options)
   val all: List[sc.File] = List(
     relation.RowFile,
     relation.FieldsFile,

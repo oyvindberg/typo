@@ -4,7 +4,7 @@ package codegen
 
 import play.api.libs.json.Json
 
-case class RelationFiles(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions) {
+case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions) {
   val RowFile: Option[sc.File] = maybeCols.map { cols =>
     val compositeId = names.maybeId match {
       case Some(x: IdComputed.Composite) =>

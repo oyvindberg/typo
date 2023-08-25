@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-object StringEnumFile {
+object FileStringEnum {
   def apply(options: InternalOptions, enm: ComputedStringEnum): sc.File = {
 
     val comments = scaladoc(s"Enum `${enm.name.value}`")(enm.members.map { case (_, v) => " - " + v })
