@@ -20,6 +20,7 @@ trait PgPolicyRepo {
   def selectAll(implicit c: Connection): List[PgPolicyRow]
   def selectById(oid: PgPolicyId)(implicit c: Connection): Option[PgPolicyRow]
   def selectByIds(oids: Array[PgPolicyId])(implicit c: Connection): List[PgPolicyRow]
+  def selectByUnique(polrelid: /* oid */ Long, polname: String)(implicit c: Connection): Option[PgPolicyRow]
   def update(row: PgPolicyRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgPolicyFields, PgPolicyRow]
   def upsert(unsaved: PgPolicyRow)(implicit c: Connection): PgPolicyRow

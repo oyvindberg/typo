@@ -48,6 +48,9 @@ class PgDatabaseRepoMock(map: scala.collection.mutable.Map[PgDatabaseId, PgDatab
   override def selectByIds(oids: Array[PgDatabaseId]): Stream[ConnectionIO, PgDatabaseRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(datname: String): ConnectionIO[Option[PgDatabaseRow]] = {
+    delay(map.values.find(v => datname == v.datname))
+  }
   override def update(row: PgDatabaseRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

@@ -44,6 +44,9 @@ class PgTsParserRepoMock(map: scala.collection.mutable.Map[PgTsParserId, PgTsPar
   override def selectByIds(oids: Array[PgTsParserId])(implicit c: Connection): List[PgTsParserRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(prsname: String, prsnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsParserRow] = {
+    map.values.find(v => prsname == v.prsname && prsnamespace == v.prsnamespace)
+  }
   override def update(row: PgTsParserRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

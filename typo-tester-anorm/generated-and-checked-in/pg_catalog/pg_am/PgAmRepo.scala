@@ -20,6 +20,7 @@ trait PgAmRepo {
   def selectAll(implicit c: Connection): List[PgAmRow]
   def selectById(oid: PgAmId)(implicit c: Connection): Option[PgAmRow]
   def selectByIds(oids: Array[PgAmId])(implicit c: Connection): List[PgAmRow]
+  def selectByUnique(amname: String)(implicit c: Connection): Option[PgAmRow]
   def update(row: PgAmRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgAmFields, PgAmRow]
   def upsert(unsaved: PgAmRow)(implicit c: Connection): PgAmRow

@@ -20,6 +20,7 @@ trait PgPublicationRepo {
   def selectAll(implicit c: Connection): List[PgPublicationRow]
   def selectById(oid: PgPublicationId)(implicit c: Connection): Option[PgPublicationRow]
   def selectByIds(oids: Array[PgPublicationId])(implicit c: Connection): List[PgPublicationRow]
+  def selectByUnique(pubname: String)(implicit c: Connection): Option[PgPublicationRow]
   def update(row: PgPublicationRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgPublicationFields, PgPublicationRow]
   def upsert(unsaved: PgPublicationRow)(implicit c: Connection): PgPublicationRow

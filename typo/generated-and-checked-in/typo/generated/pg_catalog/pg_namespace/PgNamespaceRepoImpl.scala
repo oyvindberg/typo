@@ -46,6 +46,13 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
        """.as(PgNamespaceRow.rowParser(1).*)
     
   }
+  override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
+    SQL"""select nspname
+          from pg_catalog.pg_namespace
+          where nspname = ${ParameterValue(nspname, null, ToStatement.stringToStatement)}
+       """.as(PgNamespaceRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgNamespaceRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_namespace

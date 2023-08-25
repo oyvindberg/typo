@@ -46,6 +46,12 @@ object PgClassRepoImpl extends PgClassRepo {
   override def selectByIds(oids: Array[PgClassId]): Stream[ConnectionIO, PgClassRow] = {
     sql"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = ANY(${oids})".query(PgClassRow.read).stream
   }
+  override def selectByUnique(relname: String, relnamespace: /* oid */ Long): ConnectionIO[Option[PgClassRow]] = {
+    sql"""select relname, relnamespace
+          from pg_catalog.pg_class
+          where relname = ${fromWrite(relname)(Write.fromPut(Meta.StringMeta.put))} AND relnamespace = ${fromWrite(relnamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgClassRow.read).option
+  }
   override def update(row: PgClassRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_class

@@ -21,6 +21,7 @@ trait PgAttrdefRepo {
   def selectAll: Stream[ConnectionIO, PgAttrdefRow]
   def selectById(oid: PgAttrdefId): ConnectionIO[Option[PgAttrdefRow]]
   def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow]
+  def selectByUnique(adrelid: /* oid */ Long, adnum: Int): ConnectionIO[Option[PgAttrdefRow]]
   def update(row: PgAttrdefRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgAttrdefFields, PgAttrdefRow]
   def upsert(unsaved: PgAttrdefRow): ConnectionIO[PgAttrdefRow]

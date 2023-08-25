@@ -44,6 +44,12 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
   override def selectByIds(oids: Array[PgRewriteId]): Stream[ConnectionIO, PgRewriteRow] = {
     sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ANY(${oids})".query(PgRewriteRow.read).stream
   }
+  override def selectByUnique(evClass: /* oid */ Long, rulename: String): ConnectionIO[Option[PgRewriteRow]] = {
+    sql"""select ev_class, rulename
+          from pg_catalog.pg_rewrite
+          where ev_class = ${fromWrite(evClass)(Write.fromPut(Meta.LongMeta.put))} AND rulename = ${fromWrite(rulename)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgRewriteRow.read).option
+  }
   override def update(row: PgRewriteRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_rewrite

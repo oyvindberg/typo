@@ -20,6 +20,7 @@ trait PgTsConfigRepo {
   def selectAll(implicit c: Connection): List[PgTsConfigRow]
   def selectById(oid: PgTsConfigId)(implicit c: Connection): Option[PgTsConfigRow]
   def selectByIds(oids: Array[PgTsConfigId])(implicit c: Connection): List[PgTsConfigRow]
+  def selectByUnique(cfgname: String, cfgnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsConfigRow]
   def update(row: PgTsConfigRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgTsConfigFields, PgTsConfigRow]
   def upsert(unsaved: PgTsConfigRow)(implicit c: Connection): PgTsConfigRow

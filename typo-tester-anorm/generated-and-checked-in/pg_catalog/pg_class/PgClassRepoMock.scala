@@ -44,6 +44,9 @@ class PgClassRepoMock(map: scala.collection.mutable.Map[PgClassId, PgClassRow] =
   override def selectByIds(oids: Array[PgClassId])(implicit c: Connection): List[PgClassRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(relname: String, relnamespace: /* oid */ Long)(implicit c: Connection): Option[PgClassRow] = {
+    map.values.find(v => relname == v.relname && relnamespace == v.relnamespace)
+  }
   override def update(row: PgClassRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

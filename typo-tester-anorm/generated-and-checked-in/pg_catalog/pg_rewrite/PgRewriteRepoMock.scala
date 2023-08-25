@@ -44,6 +44,9 @@ class PgRewriteRepoMock(map: scala.collection.mutable.Map[PgRewriteId, PgRewrite
   override def selectByIds(oids: Array[PgRewriteId])(implicit c: Connection): List[PgRewriteRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(evClass: /* oid */ Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow] = {
+    map.values.find(v => evClass == v.evClass && rulename == v.rulename)
+  }
   override def update(row: PgRewriteRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

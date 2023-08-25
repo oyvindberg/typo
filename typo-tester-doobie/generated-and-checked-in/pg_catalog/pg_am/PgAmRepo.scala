@@ -21,6 +21,7 @@ trait PgAmRepo {
   def selectAll: Stream[ConnectionIO, PgAmRow]
   def selectById(oid: PgAmId): ConnectionIO[Option[PgAmRow]]
   def selectByIds(oids: Array[PgAmId]): Stream[ConnectionIO, PgAmRow]
+  def selectByUnique(amname: String): ConnectionIO[Option[PgAmRow]]
   def update(row: PgAmRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgAmFields, PgAmRow]
   def upsert(unsaved: PgAmRow): ConnectionIO[PgAmRow]

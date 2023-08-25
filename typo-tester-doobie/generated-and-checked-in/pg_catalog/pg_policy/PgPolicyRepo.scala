@@ -21,6 +21,7 @@ trait PgPolicyRepo {
   def selectAll: Stream[ConnectionIO, PgPolicyRow]
   def selectById(oid: PgPolicyId): ConnectionIO[Option[PgPolicyRow]]
   def selectByIds(oids: Array[PgPolicyId]): Stream[ConnectionIO, PgPolicyRow]
+  def selectByUnique(polrelid: /* oid */ Long, polname: String): ConnectionIO[Option[PgPolicyRow]]
   def update(row: PgPolicyRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgPolicyFields, PgPolicyRow]
   def upsert(unsaved: PgPolicyRow): ConnectionIO[PgPolicyRow]

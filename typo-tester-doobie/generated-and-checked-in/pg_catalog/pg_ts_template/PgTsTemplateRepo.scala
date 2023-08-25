@@ -21,6 +21,7 @@ trait PgTsTemplateRepo {
   def selectAll: Stream[ConnectionIO, PgTsTemplateRow]
   def selectById(oid: PgTsTemplateId): ConnectionIO[Option[PgTsTemplateRow]]
   def selectByIds(oids: Array[PgTsTemplateId]): Stream[ConnectionIO, PgTsTemplateRow]
+  def selectByUnique(tmplname: String, tmplnamespace: /* oid */ Long): ConnectionIO[Option[PgTsTemplateRow]]
   def update(row: PgTsTemplateRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgTsTemplateFields, PgTsTemplateRow]
   def upsert(unsaved: PgTsTemplateRow): ConnectionIO[PgTsTemplateRow]

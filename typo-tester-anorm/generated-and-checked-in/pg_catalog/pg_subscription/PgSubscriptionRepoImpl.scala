@@ -53,6 +53,13 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
        """.as(PgSubscriptionRow.rowParser(1).*)
     
   }
+  override def selectByUnique(subdbid: /* oid */ Long, subname: String)(implicit c: Connection): Option[PgSubscriptionRow] = {
+    SQL"""select subdbid, subname
+          from pg_catalog.pg_subscription
+          where subdbid = ${ParameterValue(subdbid, null, ToStatement.longToStatement)} AND subname = ${ParameterValue(subname, null, ToStatement.stringToStatement)}
+       """.as(PgSubscriptionRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgSubscriptionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_subscription

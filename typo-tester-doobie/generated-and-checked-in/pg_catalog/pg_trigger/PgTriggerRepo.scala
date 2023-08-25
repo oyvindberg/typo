@@ -21,6 +21,7 @@ trait PgTriggerRepo {
   def selectAll: Stream[ConnectionIO, PgTriggerRow]
   def selectById(oid: PgTriggerId): ConnectionIO[Option[PgTriggerRow]]
   def selectByIds(oids: Array[PgTriggerId]): Stream[ConnectionIO, PgTriggerRow]
+  def selectByUnique(tgrelid: /* oid */ Long, tgname: String): ConnectionIO[Option[PgTriggerRow]]
   def update(row: PgTriggerRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgTriggerFields, PgTriggerRow]
   def upsert(unsaved: PgTriggerRow): ConnectionIO[PgTriggerRow]

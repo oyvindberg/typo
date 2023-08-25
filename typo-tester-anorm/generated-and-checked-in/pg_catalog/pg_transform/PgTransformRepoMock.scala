@@ -44,6 +44,9 @@ class PgTransformRepoMock(map: scala.collection.mutable.Map[PgTransformId, PgTra
   override def selectByIds(oids: Array[PgTransformId])(implicit c: Connection): List[PgTransformRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(trftype: /* oid */ Long, trflang: /* oid */ Long)(implicit c: Connection): Option[PgTransformRow] = {
+    map.values.find(v => trftype == v.trftype && trflang == v.trflang)
+  }
   override def update(row: PgTransformRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

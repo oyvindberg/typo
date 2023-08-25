@@ -53,6 +53,13 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
        """.as(PgOperatorRow.rowParser(1).*)
     
   }
+  override def selectByUnique(oprname: String, oprleft: /* oid */ Long, oprright: /* oid */ Long, oprnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOperatorRow] = {
+    SQL"""select oprname, oprleft, oprright, oprnamespace
+          from pg_catalog.pg_operator
+          where oprname = ${ParameterValue(oprname, null, ToStatement.stringToStatement)} AND oprleft = ${ParameterValue(oprleft, null, ToStatement.longToStatement)} AND oprright = ${ParameterValue(oprright, null, ToStatement.longToStatement)} AND oprnamespace = ${ParameterValue(oprnamespace, null, ToStatement.longToStatement)}
+       """.as(PgOperatorRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgOperatorRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_operator

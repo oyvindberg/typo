@@ -48,6 +48,13 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           where attrelid = ${ParameterValue(compositeId.attrelid, null, ToStatement.longToStatement)} AND attnum = ${ParameterValue(compositeId.attnum, null, ToStatement.intToStatement)}
        """.as(PgAttributeRow.rowParser(1).singleOpt)
   }
+  override def selectByUnique(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
+    SQL"""select attrelid, attname
+          from pg_catalog.pg_attribute
+          where attrelid = ${ParameterValue(attrelid, null, ToStatement.longToStatement)} AND attname = ${ParameterValue(attname, null, ToStatement.stringToStatement)}
+       """.as(PgAttributeRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgAttributeRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_attribute

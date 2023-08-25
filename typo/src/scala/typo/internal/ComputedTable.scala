@@ -186,11 +186,8 @@ case class ComputedTable(
         maybeId.map(id => RepoMethod.Delete(dbTable.name, id))
       ).flatten,
       dbTable.uniqueKeys
-        .flatMap { uk =>
-          names.FieldValueName.map { fieldValueName =>
-            val params = uk.cols.map(colName => cols.find(_.dbName == colName).get)
-            RepoMethod.SelectByUnique(params, fieldValueName, names.RowName)
-          }
+        .map { uk =>
+          RepoMethod.SelectByUnique(dbTable.name, uk.cols.map(colName => cols.find(_.dbName == colName).get), names.RowName)
         }
         .distinctByCompat(x => x.params.map(_.tpe)) // avoid erasure clashes
     )

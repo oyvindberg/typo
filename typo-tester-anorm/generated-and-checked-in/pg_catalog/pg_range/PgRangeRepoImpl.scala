@@ -53,6 +53,13 @@ object PgRangeRepoImpl extends PgRangeRepo {
        """.as(PgRangeRow.rowParser(1).*)
     
   }
+  override def selectByUnique(rngmultitypid: /* oid */ Long)(implicit c: Connection): Option[PgRangeRow] = {
+    SQL"""select rngmultitypid
+          from pg_catalog.pg_range
+          where rngmultitypid = ${ParameterValue(rngmultitypid, null, ToStatement.longToStatement)}
+       """.as(PgRangeRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgRangeRow)(implicit c: Connection): Boolean = {
     val rngtypid = row.rngtypid
     SQL"""update pg_catalog.pg_range

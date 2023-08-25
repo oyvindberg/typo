@@ -45,6 +45,12 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
   override def selectByIds(oids: Array[PgTriggerId]): Stream[ConnectionIO, PgTriggerRow] = {
     sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ANY(${oids})".query(PgTriggerRow.read).stream
   }
+  override def selectByUnique(tgrelid: /* oid */ Long, tgname: String): ConnectionIO[Option[PgTriggerRow]] = {
+    sql"""select tgrelid, tgname
+          from pg_catalog.pg_trigger
+          where tgrelid = ${fromWrite(tgrelid)(Write.fromPut(Meta.LongMeta.put))} AND tgname = ${fromWrite(tgname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgTriggerRow.read).option
+  }
   override def update(row: PgTriggerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_trigger

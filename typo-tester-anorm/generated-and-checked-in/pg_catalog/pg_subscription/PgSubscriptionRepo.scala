@@ -20,6 +20,7 @@ trait PgSubscriptionRepo {
   def selectAll(implicit c: Connection): List[PgSubscriptionRow]
   def selectById(oid: PgSubscriptionId)(implicit c: Connection): Option[PgSubscriptionRow]
   def selectByIds(oids: Array[PgSubscriptionId])(implicit c: Connection): List[PgSubscriptionRow]
+  def selectByUnique(subdbid: /* oid */ Long, subname: String)(implicit c: Connection): Option[PgSubscriptionRow]
   def update(row: PgSubscriptionRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgSubscriptionFields, PgSubscriptionRow]
   def upsert(unsaved: PgSubscriptionRow)(implicit c: Connection): PgSubscriptionRow

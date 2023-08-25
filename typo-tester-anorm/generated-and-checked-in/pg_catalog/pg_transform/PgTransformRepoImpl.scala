@@ -53,6 +53,13 @@ object PgTransformRepoImpl extends PgTransformRepo {
        """.as(PgTransformRow.rowParser(1).*)
     
   }
+  override def selectByUnique(trftype: /* oid */ Long, trflang: /* oid */ Long)(implicit c: Connection): Option[PgTransformRow] = {
+    SQL"""select trftype, trflang
+          from pg_catalog.pg_transform
+          where trftype = ${ParameterValue(trftype, null, ToStatement.longToStatement)} AND trflang = ${ParameterValue(trflang, null, ToStatement.longToStatement)}
+       """.as(PgTransformRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgTransformRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_transform

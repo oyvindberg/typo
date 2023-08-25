@@ -44,6 +44,12 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
   override def selectByIds(oids: Array[PgLanguageId]): Stream[ConnectionIO, PgLanguageRow] = {
     sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ANY(${oids})".query(PgLanguageRow.read).stream
   }
+  override def selectByUnique(lanname: String): ConnectionIO[Option[PgLanguageRow]] = {
+    sql"""select lanname
+          from pg_catalog.pg_language
+          where lanname = ${fromWrite(lanname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgLanguageRow.read).option
+  }
   override def update(row: PgLanguageRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_language

@@ -44,6 +44,9 @@ class PgTsDictRepoMock(map: scala.collection.mutable.Map[PgTsDictId, PgTsDictRow
   override def selectByIds(oids: Array[PgTsDictId])(implicit c: Connection): List[PgTsDictRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(dictname: String, dictnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsDictRow] = {
+    map.values.find(v => dictname == v.dictname && dictnamespace == v.dictnamespace)
+  }
   override def update(row: PgTsDictRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

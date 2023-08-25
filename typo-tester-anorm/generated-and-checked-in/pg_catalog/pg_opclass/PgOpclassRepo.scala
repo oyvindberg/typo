@@ -20,6 +20,7 @@ trait PgOpclassRepo {
   def selectAll(implicit c: Connection): List[PgOpclassRow]
   def selectById(oid: PgOpclassId)(implicit c: Connection): Option[PgOpclassRow]
   def selectByIds(oids: Array[PgOpclassId])(implicit c: Connection): List[PgOpclassRow]
+  def selectByUnique(opcmethod: /* oid */ Long, opcname: String, opcnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOpclassRow]
   def update(row: PgOpclassRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgOpclassFields, PgOpclassRow]
   def upsert(unsaved: PgOpclassRow)(implicit c: Connection): PgOpclassRow

@@ -43,6 +43,12 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow] = {
     sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${oids})".query(PgTsConfigRow.read).stream
   }
+  override def selectByUnique(cfgname: String, cfgnamespace: /* oid */ Long): ConnectionIO[Option[PgTsConfigRow]] = {
+    sql"""select cfgname, cfgnamespace
+          from pg_catalog.pg_ts_config
+          where cfgname = ${fromWrite(cfgname)(Write.fromPut(Meta.StringMeta.put))} AND cfgnamespace = ${fromWrite(cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgTsConfigRow.read).option
+  }
   override def update(row: PgTsConfigRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_config

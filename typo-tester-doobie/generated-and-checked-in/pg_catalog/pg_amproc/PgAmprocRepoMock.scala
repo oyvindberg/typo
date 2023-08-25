@@ -48,6 +48,9 @@ class PgAmprocRepoMock(map: scala.collection.mutable.Map[PgAmprocId, PgAmprocRow
   override def selectByIds(oids: Array[PgAmprocId]): Stream[ConnectionIO, PgAmprocRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int): ConnectionIO[Option[PgAmprocRow]] = {
+    delay(map.values.find(v => amprocfamily == v.amprocfamily && amproclefttype == v.amproclefttype && amprocrighttype == v.amprocrighttype && amprocnum == v.amprocnum))
+  }
   override def update(row: PgAmprocRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

@@ -20,6 +20,7 @@ trait PgAuthMembersRepo {
   def select: SelectBuilder[PgAuthMembersFields, PgAuthMembersRow]
   def selectAll: Stream[ConnectionIO, PgAuthMembersRow]
   def selectById(compositeId: PgAuthMembersId): ConnectionIO[Option[PgAuthMembersRow]]
+  def selectByUnique(member: /* oid */ Long, roleid: /* oid */ Long): ConnectionIO[Option[PgAuthMembersRow]]
   def update(row: PgAuthMembersRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgAuthMembersFields, PgAuthMembersRow]
   def upsert(unsaved: PgAuthMembersRow): ConnectionIO[PgAuthMembersRow]

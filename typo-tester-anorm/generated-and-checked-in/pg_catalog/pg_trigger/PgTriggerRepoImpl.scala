@@ -55,6 +55,13 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
        """.as(PgTriggerRow.rowParser(1).*)
     
   }
+  override def selectByUnique(tgrelid: /* oid */ Long, tgname: String)(implicit c: Connection): Option[PgTriggerRow] = {
+    SQL"""select tgrelid, tgname
+          from pg_catalog.pg_trigger
+          where tgrelid = ${ParameterValue(tgrelid, null, ToStatement.longToStatement)} AND tgname = ${ParameterValue(tgname, null, ToStatement.stringToStatement)}
+       """.as(PgTriggerRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgTriggerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_trigger

@@ -48,6 +48,9 @@ class PgTablespaceRepoMock(map: scala.collection.mutable.Map[PgTablespaceId, PgT
   override def selectByIds(oids: Array[PgTablespaceId]): Stream[ConnectionIO, PgTablespaceRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(spcname: String): ConnectionIO[Option[PgTablespaceRow]] = {
+    delay(map.values.find(v => spcname == v.spcname))
+  }
   override def update(row: PgTablespaceRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

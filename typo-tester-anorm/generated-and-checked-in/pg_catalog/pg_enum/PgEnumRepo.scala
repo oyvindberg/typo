@@ -20,6 +20,8 @@ trait PgEnumRepo {
   def selectAll(implicit c: Connection): List[PgEnumRow]
   def selectById(oid: PgEnumId)(implicit c: Connection): Option[PgEnumRow]
   def selectByIds(oids: Array[PgEnumId])(implicit c: Connection): List[PgEnumRow]
+  def selectByUnique(enumtypid: /* oid */ Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow]
+  def selectByUnique(enumtypid: /* oid */ Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow]
   def update(row: PgEnumRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgEnumFields, PgEnumRow]
   def upsert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow

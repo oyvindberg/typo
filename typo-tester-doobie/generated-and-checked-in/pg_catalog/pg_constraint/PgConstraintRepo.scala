@@ -21,6 +21,7 @@ trait PgConstraintRepo {
   def selectAll: Stream[ConnectionIO, PgConstraintRow]
   def selectById(oid: PgConstraintId): ConnectionIO[Option[PgConstraintRow]]
   def selectByIds(oids: Array[PgConstraintId]): Stream[ConnectionIO, PgConstraintRow]
+  def selectByUnique(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String): ConnectionIO[Option[PgConstraintRow]]
   def update(row: PgConstraintRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgConstraintFields, PgConstraintRow]
   def upsert(unsaved: PgConstraintRow): ConnectionIO[PgConstraintRow]

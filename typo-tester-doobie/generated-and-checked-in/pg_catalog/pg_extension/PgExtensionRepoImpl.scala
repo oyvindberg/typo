@@ -43,6 +43,12 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
   override def selectByIds(oids: Array[PgExtensionId]): Stream[ConnectionIO, PgExtensionRow] = {
     sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ANY(${oids})".query(PgExtensionRow.read).stream
   }
+  override def selectByUnique(extname: String): ConnectionIO[Option[PgExtensionRow]] = {
+    sql"""select extname
+          from pg_catalog.pg_extension
+          where extname = ${fromWrite(extname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgExtensionRow.read).option
+  }
   override def update(row: PgExtensionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_extension

@@ -45,6 +45,12 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def selectByIds(oids: Array[PgStatisticExtId]): Stream[ConnectionIO, PgStatisticExtRow] = {
     sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ANY(${oids})".query(PgStatisticExtRow.read).stream
   }
+  override def selectByUnique(stxname: String, stxnamespace: /* oid */ Long): ConnectionIO[Option[PgStatisticExtRow]] = {
+    sql"""select stxname, stxnamespace
+          from pg_catalog.pg_statistic_ext
+          where stxname = ${fromWrite(stxname)(Write.fromPut(Meta.StringMeta.put))} AND stxnamespace = ${fromWrite(stxnamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgStatisticExtRow.read).option
+  }
   override def update(row: PgStatisticExtRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_statistic_ext

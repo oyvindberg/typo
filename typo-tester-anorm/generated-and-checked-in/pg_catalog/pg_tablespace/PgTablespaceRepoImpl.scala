@@ -54,6 +54,13 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
        """.as(PgTablespaceRow.rowParser(1).*)
     
   }
+  override def selectByUnique(spcname: String)(implicit c: Connection): Option[PgTablespaceRow] = {
+    SQL"""select spcname
+          from pg_catalog.pg_tablespace
+          where spcname = ${ParameterValue(spcname, null, ToStatement.stringToStatement)}
+       """.as(PgTablespaceRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgTablespaceRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_tablespace

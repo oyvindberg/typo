@@ -44,6 +44,12 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
   override def selectByIds(oids: Array[PgOperatorId]): Stream[ConnectionIO, PgOperatorRow] = {
     sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ANY(${oids})".query(PgOperatorRow.read).stream
   }
+  override def selectByUnique(oprname: String, oprleft: /* oid */ Long, oprright: /* oid */ Long, oprnamespace: /* oid */ Long): ConnectionIO[Option[PgOperatorRow]] = {
+    sql"""select oprname, oprleft, oprright, oprnamespace
+          from pg_catalog.pg_operator
+          where oprname = ${fromWrite(oprname)(Write.fromPut(Meta.StringMeta.put))} AND oprleft = ${fromWrite(oprleft)(Write.fromPut(Meta.LongMeta.put))} AND oprright = ${fromWrite(oprright)(Write.fromPut(Meta.LongMeta.put))} AND oprnamespace = ${fromWrite(oprnamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgOperatorRow.read).option
+  }
   override def update(row: PgOperatorRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_operator

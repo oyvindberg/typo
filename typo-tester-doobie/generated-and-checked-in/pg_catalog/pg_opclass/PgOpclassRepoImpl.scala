@@ -43,6 +43,12 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
   override def selectByIds(oids: Array[PgOpclassId]): Stream[ConnectionIO, PgOpclassRow] = {
     sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${oids})".query(PgOpclassRow.read).stream
   }
+  override def selectByUnique(opcmethod: /* oid */ Long, opcname: String, opcnamespace: /* oid */ Long): ConnectionIO[Option[PgOpclassRow]] = {
+    sql"""select opcmethod, opcname, opcnamespace
+          from pg_catalog.pg_opclass
+          where opcmethod = ${fromWrite(opcmethod)(Write.fromPut(Meta.LongMeta.put))} AND opcname = ${fromWrite(opcname)(Write.fromPut(Meta.StringMeta.put))} AND opcnamespace = ${fromWrite(opcnamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgOpclassRow.read).option
+  }
   override def update(row: PgOpclassRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_opclass

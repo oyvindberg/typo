@@ -43,6 +43,12 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def selectByIds(oids: Array[PgSubscriptionId]): Stream[ConnectionIO, PgSubscriptionRow] = {
     sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ANY(${oids})".query(PgSubscriptionRow.read).stream
   }
+  override def selectByUnique(subdbid: /* oid */ Long, subname: String): ConnectionIO[Option[PgSubscriptionRow]] = {
+    sql"""select subdbid, subname
+          from pg_catalog.pg_subscription
+          where subdbid = ${fromWrite(subdbid)(Write.fromPut(Meta.LongMeta.put))} AND subname = ${fromWrite(subname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgSubscriptionRow.read).option
+  }
   override def update(row: PgSubscriptionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_subscription

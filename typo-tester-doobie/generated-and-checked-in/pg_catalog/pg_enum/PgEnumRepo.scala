@@ -21,6 +21,8 @@ trait PgEnumRepo {
   def selectAll: Stream[ConnectionIO, PgEnumRow]
   def selectById(oid: PgEnumId): ConnectionIO[Option[PgEnumRow]]
   def selectByIds(oids: Array[PgEnumId]): Stream[ConnectionIO, PgEnumRow]
+  def selectByUnique(enumtypid: /* oid */ Long, enumlabel: String): ConnectionIO[Option[PgEnumRow]]
+  def selectByUnique(enumtypid: /* oid */ Long, enumsortorder: Float): ConnectionIO[Option[PgEnumRow]]
   def update(row: PgEnumRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgEnumFields, PgEnumRow]
   def upsert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow]

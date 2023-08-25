@@ -53,6 +53,20 @@ object PgConversionRepoImpl extends PgConversionRepo {
        """.as(PgConversionRow.rowParser(1).*)
     
   }
+  override def selectByUnique(conname: String, connamespace: /* oid */ Long)(implicit c: Connection): Option[PgConversionRow] = {
+    SQL"""select conname, connamespace
+          from pg_catalog.pg_conversion
+          where conname = ${ParameterValue(conname, null, ToStatement.stringToStatement)} AND connamespace = ${ParameterValue(connamespace, null, ToStatement.longToStatement)}
+       """.as(PgConversionRow.rowParser(1).singleOpt)
+    
+  }
+  override def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow] = {
+    SQL"""select connamespace, conforencoding, contoencoding, oid
+          from pg_catalog.pg_conversion
+          where connamespace = ${ParameterValue(connamespace, null, ToStatement.longToStatement)} AND conforencoding = ${ParameterValue(conforencoding, null, ToStatement.intToStatement)} AND contoencoding = ${ParameterValue(contoencoding, null, ToStatement.intToStatement)} AND oid = ${ParameterValue(oid, null, PgConversionId.toStatement)}
+       """.as(PgConversionRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgConversionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_conversion

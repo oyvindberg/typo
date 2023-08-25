@@ -21,6 +21,7 @@ trait PgExtensionRepo {
   def selectAll: Stream[ConnectionIO, PgExtensionRow]
   def selectById(oid: PgExtensionId): ConnectionIO[Option[PgExtensionRow]]
   def selectByIds(oids: Array[PgExtensionId]): Stream[ConnectionIO, PgExtensionRow]
+  def selectByUnique(extname: String): ConnectionIO[Option[PgExtensionRow]]
   def update(row: PgExtensionRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgExtensionFields, PgExtensionRow]
   def upsert(unsaved: PgExtensionRow): ConnectionIO[PgExtensionRow]

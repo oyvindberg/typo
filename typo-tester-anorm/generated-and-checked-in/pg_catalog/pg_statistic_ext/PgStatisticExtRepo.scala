@@ -20,6 +20,7 @@ trait PgStatisticExtRepo {
   def selectAll(implicit c: Connection): List[PgStatisticExtRow]
   def selectById(oid: PgStatisticExtId)(implicit c: Connection): Option[PgStatisticExtRow]
   def selectByIds(oids: Array[PgStatisticExtId])(implicit c: Connection): List[PgStatisticExtRow]
+  def selectByUnique(stxname: String, stxnamespace: /* oid */ Long)(implicit c: Connection): Option[PgStatisticExtRow]
   def update(row: PgStatisticExtRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgStatisticExtFields, PgStatisticExtRow]
   def upsert(unsaved: PgStatisticExtRow)(implicit c: Connection): PgStatisticExtRow

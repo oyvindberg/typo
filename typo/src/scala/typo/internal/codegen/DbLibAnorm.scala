@@ -155,9 +155,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case _ =>
           code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
       }
-    case RepoMethod.SelectByUnique(params, _, rowType) =>
-      val ident = Naming.camelCaseIdent(Array("selectByUnique"))
-      code"def $ident(${params.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
+    case RepoMethod.SelectByUnique(_, cols, rowType) =>
+      code"def selectByUnique(${cols.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
@@ -220,11 +219,16 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
         code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.rowParser)"
 
-      case RepoMethod.SelectByUnique(params, fieldValue, _) =>
-        val args = params.map { param =>
-          code"$fieldValue.${param.name}(${param.name})"
+      case RepoMethod.SelectByUnique(relName, cols, rowType) =>
+        val sql = SQL {
+          code"""|select ${dbNames(cols, isRead = true)}
+                 |from $relName
+                 |where ${cols.map(c => code"${maybeQuoted(c.dbName)} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
+                 |""".stripMargin
         }
-        code"""selectByFieldValues(${sc.Type.List}(${args.mkCode(", ")})).headOption"""
+
+        code"""|$sql.as(${rowParserFor(rowType)}.singleOpt)
+               |""".stripMargin
 
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases: NonEmptyList[sc.Code] =
@@ -435,11 +439,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"map.get(${id.paramName})"
       case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
         code"${idsParam.name}.flatMap(map.get).toList"
-      case RepoMethod.SelectByUnique(params, fieldValue, _) =>
-        val args = params.map { param =>
-          code"$fieldValue.${param.name}(${param.name})"
-        }
-        code"""selectByFieldValues(${sc.Type.List}(${args.mkCode(", ")})).headOption"""
+      case RepoMethod.SelectByUnique(_, cols, _) =>
+        code"map.values.find(v => ${cols.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")})"
 
       case RepoMethod.SelectByFieldValues(_, cols, fieldValue, fieldValueOrIdsParam, _) =>
         val cases = cols.map { col =>

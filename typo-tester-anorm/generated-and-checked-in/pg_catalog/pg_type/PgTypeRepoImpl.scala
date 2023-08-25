@@ -56,6 +56,13 @@ object PgTypeRepoImpl extends PgTypeRepo {
        """.as(PgTypeRow.rowParser(1).*)
     
   }
+  override def selectByUnique(typname: String, typnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTypeRow] = {
+    SQL"""select typname, typnamespace
+          from pg_catalog.pg_type
+          where typname = ${ParameterValue(typname, null, ToStatement.stringToStatement)} AND typnamespace = ${ParameterValue(typnamespace, null, ToStatement.longToStatement)}
+       """.as(PgTypeRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgTypeRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_type

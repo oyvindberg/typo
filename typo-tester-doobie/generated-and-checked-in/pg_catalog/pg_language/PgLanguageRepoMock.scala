@@ -48,6 +48,9 @@ class PgLanguageRepoMock(map: scala.collection.mutable.Map[PgLanguageId, PgLangu
   override def selectByIds(oids: Array[PgLanguageId]): Stream[ConnectionIO, PgLanguageRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(lanname: String): ConnectionIO[Option[PgLanguageRow]] = {
+    delay(map.values.find(v => lanname == v.lanname))
+  }
   override def update(row: PgLanguageRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

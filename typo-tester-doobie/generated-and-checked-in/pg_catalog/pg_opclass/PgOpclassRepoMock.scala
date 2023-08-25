@@ -48,6 +48,9 @@ class PgOpclassRepoMock(map: scala.collection.mutable.Map[PgOpclassId, PgOpclass
   override def selectByIds(oids: Array[PgOpclassId]): Stream[ConnectionIO, PgOpclassRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(opcmethod: /* oid */ Long, opcname: String, opcnamespace: /* oid */ Long): ConnectionIO[Option[PgOpclassRow]] = {
+    delay(map.values.find(v => opcmethod == v.opcmethod && opcname == v.opcname && opcnamespace == v.opcnamespace))
+  }
   override def update(row: PgOpclassRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

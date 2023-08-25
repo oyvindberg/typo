@@ -48,6 +48,12 @@ class PgAmopRepoMock(map: scala.collection.mutable.Map[PgAmopId, PgAmopRow] = sc
   override def selectByIds(oids: Array[PgAmopId]): Stream[ConnectionIO, PgAmopRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int): ConnectionIO[Option[PgAmopRow]] = {
+    delay(map.values.find(v => amopfamily == v.amopfamily && amoplefttype == v.amoplefttype && amoprighttype == v.amoprighttype && amopstrategy == v.amopstrategy))
+  }
+  override def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long): ConnectionIO[Option[PgAmopRow]] = {
+    delay(map.values.find(v => amopopr == v.amopopr && amoppurpose == v.amoppurpose && amopfamily == v.amopfamily))
+  }
   override def update(row: PgAmopRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

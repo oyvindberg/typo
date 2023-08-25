@@ -21,6 +21,7 @@ trait PgTsDictRepo {
   def selectAll: Stream[ConnectionIO, PgTsDictRow]
   def selectById(oid: PgTsDictId): ConnectionIO[Option[PgTsDictRow]]
   def selectByIds(oids: Array[PgTsDictId]): Stream[ConnectionIO, PgTsDictRow]
+  def selectByUnique(dictname: String, dictnamespace: /* oid */ Long): ConnectionIO[Option[PgTsDictRow]]
   def update(row: PgTsDictRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgTsDictFields, PgTsDictRow]
   def upsert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow]

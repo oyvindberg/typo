@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
+import adventureworks.TypoOidVector
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -20,6 +21,7 @@ trait PgProcRepo {
   def selectAll(implicit c: Connection): List[PgProcRow]
   def selectById(oid: PgProcId)(implicit c: Connection): Option[PgProcRow]
   def selectByIds(oids: Array[PgProcId])(implicit c: Connection): List[PgProcRow]
+  def selectByUnique(proname: String, proargtypes: TypoOidVector, pronamespace: /* oid */ Long)(implicit c: Connection): Option[PgProcRow]
   def update(row: PgProcRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgProcFields, PgProcRow]
   def upsert(unsaved: PgProcRow)(implicit c: Connection): PgProcRow

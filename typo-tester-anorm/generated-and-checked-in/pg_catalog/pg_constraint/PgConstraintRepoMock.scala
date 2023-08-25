@@ -44,6 +44,9 @@ class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgC
   override def selectByIds(oids: Array[PgConstraintId])(implicit c: Connection): List[PgConstraintRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
+    map.values.find(v => conrelid == v.conrelid && contypid == v.contypid && conname == v.conname)
+  }
   override def update(row: PgConstraintRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

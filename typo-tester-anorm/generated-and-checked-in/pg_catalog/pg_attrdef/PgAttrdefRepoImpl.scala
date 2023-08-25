@@ -53,6 +53,13 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
        """.as(PgAttrdefRow.rowParser(1).*)
     
   }
+  override def selectByUnique(adrelid: /* oid */ Long, adnum: Int)(implicit c: Connection): Option[PgAttrdefRow] = {
+    SQL"""select adrelid, adnum
+          from pg_catalog.pg_attrdef
+          where adrelid = ${ParameterValue(adrelid, null, ToStatement.longToStatement)} AND adnum = ${ParameterValue(adnum, null, ToStatement.intToStatement)}
+       """.as(PgAttrdefRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgAttrdefRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_attrdef

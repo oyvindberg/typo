@@ -44,6 +44,9 @@ class PgExtensionRepoMock(map: scala.collection.mutable.Map[PgExtensionId, PgExt
   override def selectByIds(oids: Array[PgExtensionId])(implicit c: Connection): List[PgExtensionRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(extname: String)(implicit c: Connection): Option[PgExtensionRow] = {
+    map.values.find(v => extname == v.extname)
+  }
   override def update(row: PgExtensionRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

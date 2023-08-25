@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
+import adventureworks.TypoOidVector
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
@@ -47,6 +48,9 @@ class PgProcRepoMock(map: scala.collection.mutable.Map[PgProcId, PgProcRow] = sc
   }
   override def selectByIds(oids: Array[PgProcId]): Stream[ConnectionIO, PgProcRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
+  }
+  override def selectByUnique(proname: String, proargtypes: TypoOidVector, pronamespace: /* oid */ Long): ConnectionIO[Option[PgProcRow]] = {
+    delay(map.values.find(v => proname == v.proname && proargtypes == v.proargtypes && pronamespace == v.pronamespace))
   }
   override def update(row: PgProcRow): ConnectionIO[Boolean] = {
     delay {

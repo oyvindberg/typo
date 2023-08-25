@@ -20,6 +20,7 @@ trait PgCastRepo {
   def selectAll(implicit c: Connection): List[PgCastRow]
   def selectById(oid: PgCastId)(implicit c: Connection): Option[PgCastRow]
   def selectByIds(oids: Array[PgCastId])(implicit c: Connection): List[PgCastRow]
+  def selectByUnique(castsource: /* oid */ Long, casttarget: /* oid */ Long)(implicit c: Connection): Option[PgCastRow]
   def update(row: PgCastRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgCastFields, PgCastRow]
   def upsert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow

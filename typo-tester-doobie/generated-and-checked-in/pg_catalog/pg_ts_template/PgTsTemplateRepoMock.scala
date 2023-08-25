@@ -48,6 +48,9 @@ class PgTsTemplateRepoMock(map: scala.collection.mutable.Map[PgTsTemplateId, PgT
   override def selectByIds(oids: Array[PgTsTemplateId]): Stream[ConnectionIO, PgTsTemplateRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(tmplname: String, tmplnamespace: /* oid */ Long): ConnectionIO[Option[PgTsTemplateRow]] = {
+    delay(map.values.find(v => tmplname == v.tmplname && tmplnamespace == v.tmplnamespace))
+  }
   override def update(row: PgTsTemplateRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

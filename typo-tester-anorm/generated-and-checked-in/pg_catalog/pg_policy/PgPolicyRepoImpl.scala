@@ -53,6 +53,13 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
        """.as(PgPolicyRow.rowParser(1).*)
     
   }
+  override def selectByUnique(polrelid: /* oid */ Long, polname: String)(implicit c: Connection): Option[PgPolicyRow] = {
+    SQL"""select polrelid, polname
+          from pg_catalog.pg_policy
+          where polrelid = ${ParameterValue(polrelid, null, ToStatement.longToStatement)} AND polname = ${ParameterValue(polname, null, ToStatement.stringToStatement)}
+       """.as(PgPolicyRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgPolicyRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_policy

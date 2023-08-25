@@ -44,6 +44,12 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
   override def selectByIds(oids: Array[PgConversionId])(implicit c: Connection): List[PgConversionRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(conname: String, connamespace: /* oid */ Long)(implicit c: Connection): Option[PgConversionRow] = {
+    map.values.find(v => conname == v.conname && connamespace == v.connamespace)
+  }
+  override def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow] = {
+    map.values.find(v => connamespace == v.connamespace && conforencoding == v.conforencoding && contoencoding == v.contoencoding && oid == v.oid)
+  }
   override def update(row: PgConversionRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

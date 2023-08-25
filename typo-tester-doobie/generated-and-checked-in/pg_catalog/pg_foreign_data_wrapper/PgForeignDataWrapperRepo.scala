@@ -21,6 +21,7 @@ trait PgForeignDataWrapperRepo {
   def selectAll: Stream[ConnectionIO, PgForeignDataWrapperRow]
   def selectById(oid: PgForeignDataWrapperId): ConnectionIO[Option[PgForeignDataWrapperRow]]
   def selectByIds(oids: Array[PgForeignDataWrapperId]): Stream[ConnectionIO, PgForeignDataWrapperRow]
+  def selectByUnique(fdwname: String): ConnectionIO[Option[PgForeignDataWrapperRow]]
   def update(row: PgForeignDataWrapperRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow]
   def upsert(unsaved: PgForeignDataWrapperRow): ConnectionIO[PgForeignDataWrapperRow]

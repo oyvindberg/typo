@@ -53,6 +53,13 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
        """.as(PgTsTemplateRow.rowParser(1).*)
     
   }
+  override def selectByUnique(tmplname: String, tmplnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsTemplateRow] = {
+    SQL"""select tmplname, tmplnamespace
+          from pg_catalog.pg_ts_template
+          where tmplname = ${ParameterValue(tmplname, null, ToStatement.stringToStatement)} AND tmplnamespace = ${ParameterValue(tmplnamespace, null, ToStatement.longToStatement)}
+       """.as(PgTsTemplateRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgTsTemplateRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_template

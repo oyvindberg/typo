@@ -20,6 +20,7 @@ trait PgAmprocRepo {
   def selectAll(implicit c: Connection): List[PgAmprocRow]
   def selectById(oid: PgAmprocId)(implicit c: Connection): Option[PgAmprocRow]
   def selectByIds(oids: Array[PgAmprocId])(implicit c: Connection): List[PgAmprocRow]
+  def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int)(implicit c: Connection): Option[PgAmprocRow]
   def update(row: PgAmprocRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgAmprocFields, PgAmprocRow]
   def upsert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow

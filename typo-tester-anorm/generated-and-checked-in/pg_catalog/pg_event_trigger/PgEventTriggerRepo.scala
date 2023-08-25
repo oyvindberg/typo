@@ -20,6 +20,7 @@ trait PgEventTriggerRepo {
   def selectAll(implicit c: Connection): List[PgEventTriggerRow]
   def selectById(oid: PgEventTriggerId)(implicit c: Connection): Option[PgEventTriggerRow]
   def selectByIds(oids: Array[PgEventTriggerId])(implicit c: Connection): List[PgEventTriggerRow]
+  def selectByUnique(evtname: String)(implicit c: Connection): Option[PgEventTriggerRow]
   def update(row: PgEventTriggerRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgEventTriggerFields, PgEventTriggerRow]
   def upsert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow

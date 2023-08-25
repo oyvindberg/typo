@@ -21,6 +21,7 @@ trait PgDefaultAclRepo {
   def selectAll: Stream[ConnectionIO, PgDefaultAclRow]
   def selectById(oid: PgDefaultAclId): ConnectionIO[Option[PgDefaultAclRow]]
   def selectByIds(oids: Array[PgDefaultAclId]): Stream[ConnectionIO, PgDefaultAclRow]
+  def selectByUnique(defaclrole: /* oid */ Long, defaclnamespace: /* oid */ Long, defaclobjtype: String): ConnectionIO[Option[PgDefaultAclRow]]
   def update(row: PgDefaultAclRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow]
   def upsert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow]

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
+import adventureworks.TypoOidVector
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
 import typo.dsl.DeleteBuilder
@@ -21,6 +22,7 @@ trait PgProcRepo {
   def selectAll: Stream[ConnectionIO, PgProcRow]
   def selectById(oid: PgProcId): ConnectionIO[Option[PgProcRow]]
   def selectByIds(oids: Array[PgProcId]): Stream[ConnectionIO, PgProcRow]
+  def selectByUnique(proname: String, proargtypes: TypoOidVector, pronamespace: /* oid */ Long): ConnectionIO[Option[PgProcRow]]
   def update(row: PgProcRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgProcFields, PgProcRow]
   def upsert(unsaved: PgProcRow): ConnectionIO[PgProcRow]

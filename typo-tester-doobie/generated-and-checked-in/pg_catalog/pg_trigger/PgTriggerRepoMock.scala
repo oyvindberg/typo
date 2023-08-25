@@ -48,6 +48,9 @@ class PgTriggerRepoMock(map: scala.collection.mutable.Map[PgTriggerId, PgTrigger
   override def selectByIds(oids: Array[PgTriggerId]): Stream[ConnectionIO, PgTriggerRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(tgrelid: /* oid */ Long, tgname: String): ConnectionIO[Option[PgTriggerRow]] = {
+    delay(map.values.find(v => tgrelid == v.tgrelid && tgname == v.tgname))
+  }
   override def update(row: PgTriggerRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

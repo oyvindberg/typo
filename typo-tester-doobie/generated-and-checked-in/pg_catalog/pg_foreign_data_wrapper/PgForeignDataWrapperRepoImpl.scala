@@ -44,6 +44,12 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
   override def selectByIds(oids: Array[PgForeignDataWrapperId]): Stream[ConnectionIO, PgForeignDataWrapperRow] = {
     sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = ANY(${oids})".query(PgForeignDataWrapperRow.read).stream
   }
+  override def selectByUnique(fdwname: String): ConnectionIO[Option[PgForeignDataWrapperRow]] = {
+    sql"""select fdwname
+          from pg_catalog.pg_foreign_data_wrapper
+          where fdwname = ${fromWrite(fdwname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgForeignDataWrapperRow.read).option
+  }
   override def update(row: PgForeignDataWrapperRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_foreign_data_wrapper

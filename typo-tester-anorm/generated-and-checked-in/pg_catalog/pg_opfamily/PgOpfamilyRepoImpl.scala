@@ -52,6 +52,13 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
        """.as(PgOpfamilyRow.rowParser(1).*)
     
   }
+  override def selectByUnique(opfmethod: /* oid */ Long, opfname: String, opfnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOpfamilyRow] = {
+    SQL"""select opfmethod, opfname, opfnamespace
+          from pg_catalog.pg_opfamily
+          where opfmethod = ${ParameterValue(opfmethod, null, ToStatement.longToStatement)} AND opfname = ${ParameterValue(opfname, null, ToStatement.stringToStatement)} AND opfnamespace = ${ParameterValue(opfnamespace, null, ToStatement.longToStatement)}
+       """.as(PgOpfamilyRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgOpfamilyRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_opfamily

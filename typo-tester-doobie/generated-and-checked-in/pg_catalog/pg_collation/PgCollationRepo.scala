@@ -21,6 +21,7 @@ trait PgCollationRepo {
   def selectAll: Stream[ConnectionIO, PgCollationRow]
   def selectById(oid: PgCollationId): ConnectionIO[Option[PgCollationRow]]
   def selectByIds(oids: Array[PgCollationId]): Stream[ConnectionIO, PgCollationRow]
+  def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long): ConnectionIO[Option[PgCollationRow]]
   def update(row: PgCollationRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgCollationFields, PgCollationRow]
   def upsert(unsaved: PgCollationRow): ConnectionIO[PgCollationRow]

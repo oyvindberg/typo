@@ -10,6 +10,7 @@ package document
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -51,6 +52,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   }
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
     Stream.emits(documentnodes.flatMap(map.get).toList)
+  }
+  override def selectByUnique(rowguid: UUID): ConnectionIO[Option[DocumentRow]] = {
+    delay(map.values.find(v => rowguid == v.rowguid))
   }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     delay {

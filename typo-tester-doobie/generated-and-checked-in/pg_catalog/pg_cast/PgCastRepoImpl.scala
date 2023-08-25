@@ -43,6 +43,12 @@ object PgCastRepoImpl extends PgCastRepo {
   override def selectByIds(oids: Array[PgCastId]): Stream[ConnectionIO, PgCastRow] = {
     sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ANY(${oids})".query(PgCastRow.read).stream
   }
+  override def selectByUnique(castsource: /* oid */ Long, casttarget: /* oid */ Long): ConnectionIO[Option[PgCastRow]] = {
+    sql"""select castsource, casttarget
+          from pg_catalog.pg_cast
+          where castsource = ${fromWrite(castsource)(Write.fromPut(Meta.LongMeta.put))} AND casttarget = ${fromWrite(casttarget)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgCastRow.read).option
+  }
   override def update(row: PgCastRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_cast

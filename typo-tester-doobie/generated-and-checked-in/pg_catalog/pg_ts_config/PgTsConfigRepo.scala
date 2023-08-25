@@ -21,6 +21,7 @@ trait PgTsConfigRepo {
   def selectAll: Stream[ConnectionIO, PgTsConfigRow]
   def selectById(oid: PgTsConfigId): ConnectionIO[Option[PgTsConfigRow]]
   def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow]
+  def selectByUnique(cfgname: String, cfgnamespace: /* oid */ Long): ConnectionIO[Option[PgTsConfigRow]]
   def update(row: PgTsConfigRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgTsConfigFields, PgTsConfigRow]
   def upsert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow]

@@ -20,6 +20,7 @@ trait PgUserMappingRepo {
   def selectAll(implicit c: Connection): List[PgUserMappingRow]
   def selectById(oid: PgUserMappingId)(implicit c: Connection): Option[PgUserMappingRow]
   def selectByIds(oids: Array[PgUserMappingId])(implicit c: Connection): List[PgUserMappingRow]
+  def selectByUnique(umuser: /* oid */ Long, umserver: /* oid */ Long)(implicit c: Connection): Option[PgUserMappingRow]
   def update(row: PgUserMappingRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgUserMappingFields, PgUserMappingRow]
   def upsert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow

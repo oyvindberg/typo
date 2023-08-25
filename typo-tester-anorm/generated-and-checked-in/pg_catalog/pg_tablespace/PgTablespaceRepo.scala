@@ -20,6 +20,7 @@ trait PgTablespaceRepo {
   def selectAll(implicit c: Connection): List[PgTablespaceRow]
   def selectById(oid: PgTablespaceId)(implicit c: Connection): Option[PgTablespaceRow]
   def selectByIds(oids: Array[PgTablespaceId])(implicit c: Connection): List[PgTablespaceRow]
+  def selectByUnique(spcname: String)(implicit c: Connection): Option[PgTablespaceRow]
   def update(row: PgTablespaceRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgTablespaceFields, PgTablespaceRow]
   def upsert(unsaved: PgTablespaceRow)(implicit c: Connection): PgTablespaceRow

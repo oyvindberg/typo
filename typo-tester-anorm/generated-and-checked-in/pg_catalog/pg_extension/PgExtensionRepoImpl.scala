@@ -53,6 +53,13 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
        """.as(PgExtensionRow.rowParser(1).*)
     
   }
+  override def selectByUnique(extname: String)(implicit c: Connection): Option[PgExtensionRow] = {
+    SQL"""select extname
+          from pg_catalog.pg_extension
+          where extname = ${ParameterValue(extname, null, ToStatement.stringToStatement)}
+       """.as(PgExtensionRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgExtensionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_extension

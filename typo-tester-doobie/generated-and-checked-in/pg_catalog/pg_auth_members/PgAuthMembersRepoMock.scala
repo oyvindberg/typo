@@ -45,6 +45,9 @@ class PgAuthMembersRepoMock(map: scala.collection.mutable.Map[PgAuthMembersId, P
   override def selectById(compositeId: PgAuthMembersId): ConnectionIO[Option[PgAuthMembersRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByUnique(member: /* oid */ Long, roleid: /* oid */ Long): ConnectionIO[Option[PgAuthMembersRow]] = {
+    delay(map.values.find(v => member == v.member && roleid == v.roleid))
+  }
   override def update(row: PgAuthMembersRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

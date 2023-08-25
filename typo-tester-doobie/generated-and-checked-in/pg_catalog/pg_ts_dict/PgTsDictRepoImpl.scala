@@ -43,6 +43,12 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
   override def selectByIds(oids: Array[PgTsDictId]): Stream[ConnectionIO, PgTsDictRow] = {
     sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ANY(${oids})".query(PgTsDictRow.read).stream
   }
+  override def selectByUnique(dictname: String, dictnamespace: /* oid */ Long): ConnectionIO[Option[PgTsDictRow]] = {
+    sql"""select dictname, dictnamespace
+          from pg_catalog.pg_ts_dict
+          where dictname = ${fromWrite(dictname)(Write.fromPut(Meta.StringMeta.put))} AND dictnamespace = ${fromWrite(dictnamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgTsDictRow.read).option
+  }
   override def update(row: PgTsDictRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_dict

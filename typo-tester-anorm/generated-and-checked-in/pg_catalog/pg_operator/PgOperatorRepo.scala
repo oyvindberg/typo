@@ -20,6 +20,7 @@ trait PgOperatorRepo {
   def selectAll(implicit c: Connection): List[PgOperatorRow]
   def selectById(oid: PgOperatorId)(implicit c: Connection): Option[PgOperatorRow]
   def selectByIds(oids: Array[PgOperatorId])(implicit c: Connection): List[PgOperatorRow]
+  def selectByUnique(oprname: String, oprleft: /* oid */ Long, oprright: /* oid */ Long, oprnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOperatorRow]
   def update(row: PgOperatorRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgOperatorFields, PgOperatorRow]
   def upsert(unsaved: PgOperatorRow)(implicit c: Connection): PgOperatorRow

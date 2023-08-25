@@ -20,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -106,6 +107,13 @@ object DocumentRepoImpl extends DocumentRepo {
           from production."document"
           where documentnode = ANY(${documentnodes})
        """.as(DocumentRow.rowParser(1).*)
+    
+  }
+  override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
+    SQL"""select rowguid
+          from production."document"
+          where rowguid = ${ParameterValue(rowguid, null, ToStatement.uuidToStatement)}
+       """.as(DocumentRow.rowParser(1).singleOpt)
     
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {

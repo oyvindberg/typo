@@ -52,6 +52,13 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
        """.as(PgTsConfigRow.rowParser(1).*)
     
   }
+  override def selectByUnique(cfgname: String, cfgnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsConfigRow] = {
+    SQL"""select cfgname, cfgnamespace
+          from pg_catalog.pg_ts_config
+          where cfgname = ${ParameterValue(cfgname, null, ToStatement.stringToStatement)} AND cfgnamespace = ${ParameterValue(cfgnamespace, null, ToStatement.longToStatement)}
+       """.as(PgTsConfigRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgTsConfigRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_config

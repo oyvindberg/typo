@@ -48,6 +48,9 @@ class PgTsDictRepoMock(map: scala.collection.mutable.Map[PgTsDictId, PgTsDictRow
   override def selectByIds(oids: Array[PgTsDictId]): Stream[ConnectionIO, PgTsDictRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(dictname: String, dictnamespace: /* oid */ Long): ConnectionIO[Option[PgTsDictRow]] = {
+    delay(map.values.find(v => dictname == v.dictname && dictnamespace == v.dictnamespace))
+  }
   override def update(row: PgTsDictRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

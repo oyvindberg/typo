@@ -21,6 +21,7 @@ trait PgOperatorRepo {
   def selectAll: Stream[ConnectionIO, PgOperatorRow]
   def selectById(oid: PgOperatorId): ConnectionIO[Option[PgOperatorRow]]
   def selectByIds(oids: Array[PgOperatorId]): Stream[ConnectionIO, PgOperatorRow]
+  def selectByUnique(oprname: String, oprleft: /* oid */ Long, oprright: /* oid */ Long, oprnamespace: /* oid */ Long): ConnectionIO[Option[PgOperatorRow]]
   def update(row: PgOperatorRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgOperatorFields, PgOperatorRow]
   def upsert(unsaved: PgOperatorRow): ConnectionIO[PgOperatorRow]

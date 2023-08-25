@@ -44,6 +44,9 @@ class PgCollationRepoMock(map: scala.collection.mutable.Map[PgCollationId, PgCol
   override def selectByIds(oids: Array[PgCollationId])(implicit c: Connection): List[PgCollationRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {
+    map.values.find(v => collname == v.collname && collencoding == v.collencoding && collnamespace == v.collnamespace)
+  }
   override def update(row: PgCollationRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

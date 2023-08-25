@@ -21,6 +21,7 @@ trait PgUserMappingRepo {
   def selectAll: Stream[ConnectionIO, PgUserMappingRow]
   def selectById(oid: PgUserMappingId): ConnectionIO[Option[PgUserMappingRow]]
   def selectByIds(oids: Array[PgUserMappingId]): Stream[ConnectionIO, PgUserMappingRow]
+  def selectByUnique(umuser: /* oid */ Long, umserver: /* oid */ Long): ConnectionIO[Option[PgUserMappingRow]]
   def update(row: PgUserMappingRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgUserMappingFields, PgUserMappingRow]
   def upsert(unsaved: PgUserMappingRow): ConnectionIO[PgUserMappingRow]

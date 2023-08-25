@@ -52,6 +52,20 @@ object PgAmopRepoImpl extends PgAmopRepo {
        """.as(PgAmopRow.rowParser(1).*)
     
   }
+  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
+    SQL"""select amopfamily, amoplefttype, amoprighttype, amopstrategy
+          from pg_catalog.pg_amop
+          where amopfamily = ${ParameterValue(amopfamily, null, ToStatement.longToStatement)} AND amoplefttype = ${ParameterValue(amoplefttype, null, ToStatement.longToStatement)} AND amoprighttype = ${ParameterValue(amoprighttype, null, ToStatement.longToStatement)} AND amopstrategy = ${ParameterValue(amopstrategy, null, ToStatement.intToStatement)}
+       """.as(PgAmopRow.rowParser(1).singleOpt)
+    
+  }
+  override def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long)(implicit c: Connection): Option[PgAmopRow] = {
+    SQL"""select amopopr, amoppurpose, amopfamily
+          from pg_catalog.pg_amop
+          where amopopr = ${ParameterValue(amopopr, null, ToStatement.longToStatement)} AND amoppurpose = ${ParameterValue(amoppurpose, null, ToStatement.stringToStatement)} AND amopfamily = ${ParameterValue(amopfamily, null, ToStatement.longToStatement)}
+       """.as(PgAmopRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgAmopRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_amop

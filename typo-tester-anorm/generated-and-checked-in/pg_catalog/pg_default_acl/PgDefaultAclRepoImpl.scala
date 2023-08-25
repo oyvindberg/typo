@@ -53,6 +53,13 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
        """.as(PgDefaultAclRow.rowParser(1).*)
     
   }
+  override def selectByUnique(defaclrole: /* oid */ Long, defaclnamespace: /* oid */ Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow] = {
+    SQL"""select defaclrole, defaclnamespace, defaclobjtype
+          from pg_catalog.pg_default_acl
+          where defaclrole = ${ParameterValue(defaclrole, null, ToStatement.longToStatement)} AND defaclnamespace = ${ParameterValue(defaclnamespace, null, ToStatement.longToStatement)} AND defaclobjtype = ${ParameterValue(defaclobjtype, null, ToStatement.stringToStatement)}
+       """.as(PgDefaultAclRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgDefaultAclRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_default_acl

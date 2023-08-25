@@ -44,6 +44,9 @@ class PgForeignServerRepoMock(map: scala.collection.mutable.Map[PgForeignServerI
   override def selectByIds(oids: Array[PgForeignServerId])(implicit c: Connection): List[PgForeignServerRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(srvname: String)(implicit c: Connection): Option[PgForeignServerRow] = {
+    map.values.find(v => srvname == v.srvname)
+  }
   override def update(row: PgForeignServerRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

@@ -44,6 +44,12 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   override def selectByIds(oids: Array[PgAuthidId]): Stream[ConnectionIO, PgAuthidRow] = {
     sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ANY(${oids})".query(PgAuthidRow.read).stream
   }
+  override def selectByUnique(rolname: String): ConnectionIO[Option[PgAuthidRow]] = {
+    sql"""select rolname
+          from pg_catalog.pg_authid
+          where rolname = ${fromWrite(rolname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgAuthidRow.read).option
+  }
   override def update(row: PgAuthidRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_authid

@@ -44,6 +44,18 @@ object PgConversionRepoImpl extends PgConversionRepo {
   override def selectByIds(oids: Array[PgConversionId]): Stream[ConnectionIO, PgConversionRow] = {
     sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ANY(${oids})".query(PgConversionRow.read).stream
   }
+  override def selectByUnique(conname: String, connamespace: /* oid */ Long): ConnectionIO[Option[PgConversionRow]] = {
+    sql"""select conname, connamespace
+          from pg_catalog.pg_conversion
+          where conname = ${fromWrite(conname)(Write.fromPut(Meta.StringMeta.put))} AND connamespace = ${fromWrite(connamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgConversionRow.read).option
+  }
+  override def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId): ConnectionIO[Option[PgConversionRow]] = {
+    sql"""select connamespace, conforencoding, contoencoding, oid
+          from pg_catalog.pg_conversion
+          where connamespace = ${fromWrite(connamespace)(Write.fromPut(Meta.LongMeta.put))} AND conforencoding = ${fromWrite(conforencoding)(Write.fromPut(Meta.IntMeta.put))} AND contoencoding = ${fromWrite(contoencoding)(Write.fromPut(Meta.IntMeta.put))} AND oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}
+       """.query(PgConversionRow.read).option
+  }
   override def update(row: PgConversionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_conversion

@@ -20,6 +20,7 @@ trait PgDefaultAclRepo {
   def selectAll(implicit c: Connection): List[PgDefaultAclRow]
   def selectById(oid: PgDefaultAclId)(implicit c: Connection): Option[PgDefaultAclRow]
   def selectByIds(oids: Array[PgDefaultAclId])(implicit c: Connection): List[PgDefaultAclRow]
+  def selectByUnique(defaclrole: /* oid */ Long, defaclnamespace: /* oid */ Long, defaclobjtype: String)(implicit c: Connection): Option[PgDefaultAclRow]
   def update(row: PgDefaultAclRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow]
   def upsert(unsaved: PgDefaultAclRow)(implicit c: Connection): PgDefaultAclRow

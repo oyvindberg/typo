@@ -52,6 +52,20 @@ object PgEnumRepoImpl extends PgEnumRepo {
        """.as(PgEnumRow.rowParser(1).*)
     
   }
+  override def selectByUnique(enumtypid: /* oid */ Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow] = {
+    SQL"""select enumtypid, enumlabel
+          from pg_catalog.pg_enum
+          where enumtypid = ${ParameterValue(enumtypid, null, ToStatement.longToStatement)} AND enumlabel = ${ParameterValue(enumlabel, null, ToStatement.stringToStatement)}
+       """.as(PgEnumRow.rowParser(1).singleOpt)
+    
+  }
+  override def selectByUnique(enumtypid: /* oid */ Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow] = {
+    SQL"""select enumtypid, enumsortorder
+          from pg_catalog.pg_enum
+          where enumtypid = ${ParameterValue(enumtypid, null, ToStatement.longToStatement)} AND enumsortorder = ${ParameterValue(enumsortorder, null, ToStatement.floatToStatement)}
+       """.as(PgEnumRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgEnumRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_enum

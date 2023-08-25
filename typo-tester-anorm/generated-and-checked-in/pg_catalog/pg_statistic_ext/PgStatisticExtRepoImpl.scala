@@ -55,6 +55,13 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
        """.as(PgStatisticExtRow.rowParser(1).*)
     
   }
+  override def selectByUnique(stxname: String, stxnamespace: /* oid */ Long)(implicit c: Connection): Option[PgStatisticExtRow] = {
+    SQL"""select stxname, stxnamespace
+          from pg_catalog.pg_statistic_ext
+          where stxname = ${ParameterValue(stxname, null, ToStatement.stringToStatement)} AND stxnamespace = ${ParameterValue(stxnamespace, null, ToStatement.longToStatement)}
+       """.as(PgStatisticExtRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgStatisticExtRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_statistic_ext

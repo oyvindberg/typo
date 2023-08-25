@@ -48,6 +48,9 @@ class PgTransformRepoMock(map: scala.collection.mutable.Map[PgTransformId, PgTra
   override def selectByIds(oids: Array[PgTransformId]): Stream[ConnectionIO, PgTransformRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(trftype: /* oid */ Long, trflang: /* oid */ Long): ConnectionIO[Option[PgTransformRow]] = {
+    delay(map.values.find(v => trftype == v.trftype && trflang == v.trflang))
+  }
   override def update(row: PgTransformRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

@@ -21,6 +21,7 @@ trait PgRewriteRepo {
   def selectAll: Stream[ConnectionIO, PgRewriteRow]
   def selectById(oid: PgRewriteId): ConnectionIO[Option[PgRewriteRow]]
   def selectByIds(oids: Array[PgRewriteId]): Stream[ConnectionIO, PgRewriteRow]
+  def selectByUnique(evClass: /* oid */ Long, rulename: String): ConnectionIO[Option[PgRewriteRow]]
   def update(row: PgRewriteRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgRewriteFields, PgRewriteRow]
   def upsert(unsaved: PgRewriteRow): ConnectionIO[PgRewriteRow]

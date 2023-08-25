@@ -40,6 +40,12 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def selectById(compositeId: PgAuthMembersId): ConnectionIO[Option[PgAuthMembersRow]] = {
     sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members where roleid = ${fromWrite(compositeId.roleid)(Write.fromPut(Meta.LongMeta.put))} AND "member" = ${fromWrite(compositeId.member)(Write.fromPut(Meta.LongMeta.put))}""".query(PgAuthMembersRow.read).option
   }
+  override def selectByUnique(member: /* oid */ Long, roleid: /* oid */ Long): ConnectionIO[Option[PgAuthMembersRow]] = {
+    sql"""select "member", roleid
+          from pg_catalog.pg_auth_members
+          where "member" = ${fromWrite(member)(Write.fromPut(Meta.LongMeta.put))} AND roleid = ${fromWrite(roleid)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgAuthMembersRow.read).option
+  }
   override def update(row: PgAuthMembersRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_auth_members

@@ -21,6 +21,7 @@ trait PgSubscriptionRepo {
   def selectAll: Stream[ConnectionIO, PgSubscriptionRow]
   def selectById(oid: PgSubscriptionId): ConnectionIO[Option[PgSubscriptionRow]]
   def selectByIds(oids: Array[PgSubscriptionId]): Stream[ConnectionIO, PgSubscriptionRow]
+  def selectByUnique(subdbid: /* oid */ Long, subname: String): ConnectionIO[Option[PgSubscriptionRow]]
   def update(row: PgSubscriptionRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgSubscriptionFields, PgSubscriptionRow]
   def upsert(unsaved: PgSubscriptionRow): ConnectionIO[PgSubscriptionRow]

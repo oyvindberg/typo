@@ -53,6 +53,13 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
        """.as(PgTsParserRow.rowParser(1).*)
     
   }
+  override def selectByUnique(prsname: String, prsnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsParserRow] = {
+    SQL"""select prsname, prsnamespace
+          from pg_catalog.pg_ts_parser
+          where prsname = ${ParameterValue(prsname, null, ToStatement.stringToStatement)} AND prsnamespace = ${ParameterValue(prsnamespace, null, ToStatement.longToStatement)}
+       """.as(PgTsParserRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgTsParserRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_parser

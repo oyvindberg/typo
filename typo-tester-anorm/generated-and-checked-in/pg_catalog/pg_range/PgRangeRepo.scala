@@ -20,6 +20,7 @@ trait PgRangeRepo {
   def selectAll(implicit c: Connection): List[PgRangeRow]
   def selectById(rngtypid: PgRangeId)(implicit c: Connection): Option[PgRangeRow]
   def selectByIds(rngtypids: Array[PgRangeId])(implicit c: Connection): List[PgRangeRow]
+  def selectByUnique(rngmultitypid: /* oid */ Long)(implicit c: Connection): Option[PgRangeRow]
   def update(row: PgRangeRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgRangeFields, PgRangeRow]
   def upsert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow

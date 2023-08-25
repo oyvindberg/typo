@@ -20,6 +20,7 @@ trait PgAttributeRepo {
   def select: SelectBuilder[PgAttributeFields, PgAttributeRow]
   def selectAll: Stream[ConnectionIO, PgAttributeRow]
   def selectById(compositeId: PgAttributeId): ConnectionIO[Option[PgAttributeRow]]
+  def selectByUnique(attrelid: /* oid */ Long, attname: String): ConnectionIO[Option[PgAttributeRow]]
   def update(row: PgAttributeRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgAttributeFields, PgAttributeRow]
   def upsert(unsaved: PgAttributeRow): ConnectionIO[PgAttributeRow]

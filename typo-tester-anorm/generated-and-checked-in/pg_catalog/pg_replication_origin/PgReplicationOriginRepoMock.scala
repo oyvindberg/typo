@@ -44,6 +44,9 @@ class PgReplicationOriginRepoMock(map: scala.collection.mutable.Map[PgReplicatio
   override def selectByIds(roidents: Array[PgReplicationOriginId])(implicit c: Connection): List[PgReplicationOriginRow] = {
     roidents.flatMap(map.get).toList
   }
+  override def selectByUnique(roname: String)(implicit c: Connection): Option[PgReplicationOriginRow] = {
+    map.values.find(v => roname == v.roname)
+  }
   override def update(row: PgReplicationOriginRow)(implicit c: Connection): Boolean = {
     map.get(row.roident) match {
       case Some(`row`) => false

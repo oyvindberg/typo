@@ -44,6 +44,9 @@ class PgTsTemplateRepoMock(map: scala.collection.mutable.Map[PgTsTemplateId, PgT
   override def selectByIds(oids: Array[PgTsTemplateId])(implicit c: Connection): List[PgTsTemplateRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(tmplname: String, tmplnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsTemplateRow] = {
+    map.values.find(v => tmplname == v.tmplname && tmplnamespace == v.tmplnamespace)
+  }
   override def update(row: PgTsTemplateRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

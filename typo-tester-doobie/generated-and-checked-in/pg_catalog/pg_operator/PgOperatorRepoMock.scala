@@ -48,6 +48,9 @@ class PgOperatorRepoMock(map: scala.collection.mutable.Map[PgOperatorId, PgOpera
   override def selectByIds(oids: Array[PgOperatorId]): Stream[ConnectionIO, PgOperatorRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(oprname: String, oprleft: /* oid */ Long, oprright: /* oid */ Long, oprnamespace: /* oid */ Long): ConnectionIO[Option[PgOperatorRow]] = {
+    delay(map.values.find(v => oprname == v.oprname && oprleft == v.oprleft && oprright == v.oprright && oprnamespace == v.oprnamespace))
+  }
   override def update(row: PgOperatorRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

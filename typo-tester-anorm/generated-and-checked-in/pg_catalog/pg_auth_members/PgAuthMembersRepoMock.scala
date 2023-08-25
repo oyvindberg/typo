@@ -41,6 +41,9 @@ class PgAuthMembersRepoMock(map: scala.collection.mutable.Map[PgAuthMembersId, P
   override def selectById(compositeId: PgAuthMembersId)(implicit c: Connection): Option[PgAuthMembersRow] = {
     map.get(compositeId)
   }
+  override def selectByUnique(member: /* oid */ Long, roleid: /* oid */ Long)(implicit c: Connection): Option[PgAuthMembersRow] = {
+    map.values.find(v => member == v.member && roleid == v.roleid)
+  }
   override def update(row: PgAuthMembersRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false

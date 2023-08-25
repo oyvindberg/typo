@@ -48,6 +48,9 @@ class PgForeignServerRepoMock(map: scala.collection.mutable.Map[PgForeignServerI
   override def selectByIds(oids: Array[PgForeignServerId]): Stream[ConnectionIO, PgForeignServerRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(srvname: String): ConnectionIO[Option[PgForeignServerRow]] = {
+    delay(map.values.find(v => srvname == v.srvname))
+  }
   override def update(row: PgForeignServerRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

@@ -44,6 +44,12 @@ class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = sc
   override def selectByIds(oids: Array[PgEnumId])(implicit c: Connection): List[PgEnumRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(enumtypid: /* oid */ Long, enumlabel: String)(implicit c: Connection): Option[PgEnumRow] = {
+    map.values.find(v => enumtypid == v.enumtypid && enumlabel == v.enumlabel)
+  }
+  override def selectByUnique(enumtypid: /* oid */ Long, enumsortorder: Float)(implicit c: Connection): Option[PgEnumRow] = {
+    map.values.find(v => enumtypid == v.enumtypid && enumsortorder == v.enumsortorder)
+  }
   override def update(row: PgEnumRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

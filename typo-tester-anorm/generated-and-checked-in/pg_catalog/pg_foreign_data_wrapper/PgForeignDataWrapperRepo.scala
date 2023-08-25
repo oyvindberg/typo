@@ -20,6 +20,7 @@ trait PgForeignDataWrapperRepo {
   def selectAll(implicit c: Connection): List[PgForeignDataWrapperRow]
   def selectById(oid: PgForeignDataWrapperId)(implicit c: Connection): Option[PgForeignDataWrapperRow]
   def selectByIds(oids: Array[PgForeignDataWrapperId])(implicit c: Connection): List[PgForeignDataWrapperRow]
+  def selectByUnique(fdwname: String)(implicit c: Connection): Option[PgForeignDataWrapperRow]
   def update(row: PgForeignDataWrapperRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow]
   def upsert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow

@@ -56,6 +56,13 @@ object PgClassRepoImpl extends PgClassRepo {
        """.as(PgClassRow.rowParser(1).*)
     
   }
+  override def selectByUnique(relname: String, relnamespace: /* oid */ Long)(implicit c: Connection): Option[PgClassRow] = {
+    SQL"""select relname, relnamespace
+          from pg_catalog.pg_class
+          where relname = ${ParameterValue(relname, null, ToStatement.stringToStatement)} AND relnamespace = ${ParameterValue(relnamespace, null, ToStatement.longToStatement)}
+       """.as(PgClassRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgClassRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_class

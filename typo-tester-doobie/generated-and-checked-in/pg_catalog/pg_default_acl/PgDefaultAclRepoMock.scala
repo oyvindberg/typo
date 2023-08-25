@@ -48,6 +48,9 @@ class PgDefaultAclRepoMock(map: scala.collection.mutable.Map[PgDefaultAclId, PgD
   override def selectByIds(oids: Array[PgDefaultAclId]): Stream[ConnectionIO, PgDefaultAclRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(defaclrole: /* oid */ Long, defaclnamespace: /* oid */ Long, defaclobjtype: String): ConnectionIO[Option[PgDefaultAclRow]] = {
+    delay(map.values.find(v => defaclrole == v.defaclrole && defaclnamespace == v.defaclnamespace && defaclobjtype == v.defaclobjtype))
+  }
   override def update(row: PgDefaultAclRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

@@ -54,6 +54,13 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
        """.as(PgForeignServerRow.rowParser(1).*)
     
   }
+  override def selectByUnique(srvname: String)(implicit c: Connection): Option[PgForeignServerRow] = {
+    SQL"""select srvname
+          from pg_catalog.pg_foreign_server
+          where srvname = ${ParameterValue(srvname, null, ToStatement.stringToStatement)}
+       """.as(PgForeignServerRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgForeignServerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_foreign_server

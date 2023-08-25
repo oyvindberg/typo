@@ -48,6 +48,9 @@ class PgEventTriggerRepoMock(map: scala.collection.mutable.Map[PgEventTriggerId,
   override def selectByIds(oids: Array[PgEventTriggerId]): Stream[ConnectionIO, PgEventTriggerRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(evtname: String): ConnectionIO[Option[PgEventTriggerRow]] = {
+    delay(map.values.find(v => evtname == v.evtname))
+  }
   override def update(row: PgEventTriggerRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

@@ -20,6 +20,7 @@ trait PgOpfamilyRepo {
   def selectAll(implicit c: Connection): List[PgOpfamilyRow]
   def selectById(oid: PgOpfamilyId)(implicit c: Connection): Option[PgOpfamilyRow]
   def selectByIds(oids: Array[PgOpfamilyId])(implicit c: Connection): List[PgOpfamilyRow]
+  def selectByUnique(opfmethod: /* oid */ Long, opfname: String, opfnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOpfamilyRow]
   def update(row: PgOpfamilyRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgOpfamilyFields, PgOpfamilyRow]
   def upsert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow

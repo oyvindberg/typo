@@ -44,6 +44,12 @@ object PgRangeRepoImpl extends PgRangeRepo {
   override def selectByIds(rngtypids: Array[PgRangeId]): Stream[ConnectionIO, PgRangeRow] = {
     sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = ANY(${rngtypids})".query(PgRangeRow.read).stream
   }
+  override def selectByUnique(rngmultitypid: /* oid */ Long): ConnectionIO[Option[PgRangeRow]] = {
+    sql"""select rngmultitypid
+          from pg_catalog.pg_range
+          where rngmultitypid = ${fromWrite(rngmultitypid)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgRangeRow.read).option
+  }
   override def update(row: PgRangeRow): ConnectionIO[Boolean] = {
     val rngtypid = row.rngtypid
     sql"""update pg_catalog.pg_range

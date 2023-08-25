@@ -44,6 +44,9 @@ class PgPublicationRepoMock(map: scala.collection.mutable.Map[PgPublicationId, P
   override def selectByIds(oids: Array[PgPublicationId])(implicit c: Connection): List[PgPublicationRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(pubname: String)(implicit c: Connection): Option[PgPublicationRow] = {
+    map.values.find(v => pubname == v.pubname)
+  }
   override def update(row: PgPublicationRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

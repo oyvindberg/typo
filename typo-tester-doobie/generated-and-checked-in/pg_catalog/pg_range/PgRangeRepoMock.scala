@@ -48,6 +48,9 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
   override def selectByIds(rngtypids: Array[PgRangeId]): Stream[ConnectionIO, PgRangeRow] = {
     Stream.emits(rngtypids.flatMap(map.get).toList)
   }
+  override def selectByUnique(rngmultitypid: /* oid */ Long): ConnectionIO[Option[PgRangeRow]] = {
+    delay(map.values.find(v => rngmultitypid == v.rngmultitypid))
+  }
   override def update(row: PgRangeRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.rngtypid) match {

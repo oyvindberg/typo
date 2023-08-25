@@ -45,6 +45,9 @@ class PgAttributeRepoMock(map: scala.collection.mutable.Map[PgAttributeId, PgAtt
   override def selectById(compositeId: PgAttributeId): ConnectionIO[Option[PgAttributeRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByUnique(attrelid: /* oid */ Long, attname: String): ConnectionIO[Option[PgAttributeRow]] = {
+    delay(map.values.find(v => attrelid == v.attrelid && attname == v.attname))
+  }
   override def update(row: PgAttributeRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

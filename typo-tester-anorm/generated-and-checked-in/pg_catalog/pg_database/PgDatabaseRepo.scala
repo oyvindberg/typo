@@ -20,6 +20,7 @@ trait PgDatabaseRepo {
   def selectAll(implicit c: Connection): List[PgDatabaseRow]
   def selectById(oid: PgDatabaseId)(implicit c: Connection): Option[PgDatabaseRow]
   def selectByIds(oids: Array[PgDatabaseId])(implicit c: Connection): List[PgDatabaseRow]
+  def selectByUnique(datname: String)(implicit c: Connection): Option[PgDatabaseRow]
   def update(row: PgDatabaseRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgDatabaseFields, PgDatabaseRow]
   def upsert(unsaved: PgDatabaseRow)(implicit c: Connection): PgDatabaseRow

@@ -43,6 +43,18 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def selectByIds(oids: Array[PgAmopId]): Stream[ConnectionIO, PgAmopRow] = {
     sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = ANY(${oids})".query(PgAmopRow.read).stream
   }
+  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int): ConnectionIO[Option[PgAmopRow]] = {
+    sql"""select amopfamily, amoplefttype, amoprighttype, amopstrategy
+          from pg_catalog.pg_amop
+          where amopfamily = ${fromWrite(amopfamily)(Write.fromPut(Meta.LongMeta.put))} AND amoplefttype = ${fromWrite(amoplefttype)(Write.fromPut(Meta.LongMeta.put))} AND amoprighttype = ${fromWrite(amoprighttype)(Write.fromPut(Meta.LongMeta.put))} AND amopstrategy = ${fromWrite(amopstrategy)(Write.fromPut(Meta.IntMeta.put))}
+       """.query(PgAmopRow.read).option
+  }
+  override def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long): ConnectionIO[Option[PgAmopRow]] = {
+    sql"""select amopopr, amoppurpose, amopfamily
+          from pg_catalog.pg_amop
+          where amopopr = ${fromWrite(amopopr)(Write.fromPut(Meta.LongMeta.put))} AND amoppurpose = ${fromWrite(amoppurpose)(Write.fromPut(Meta.StringMeta.put))} AND amopfamily = ${fromWrite(amopfamily)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgAmopRow.read).option
+  }
   override def update(row: PgAmopRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_amop

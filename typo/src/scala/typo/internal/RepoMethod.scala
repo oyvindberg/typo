@@ -32,8 +32,8 @@ object RepoMethod {
   ) extends RepoMethod
 
   case class SelectByUnique(
+      relName: db.RelationName,
       params: NonEmptyList[ComputedColumn],
-      fieldsType: sc.Type.Qualified,
       rowType: sc.Type
   ) extends RepoMethod
 

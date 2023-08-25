@@ -20,6 +20,7 @@ trait PgRewriteRepo {
   def selectAll(implicit c: Connection): List[PgRewriteRow]
   def selectById(oid: PgRewriteId)(implicit c: Connection): Option[PgRewriteRow]
   def selectByIds(oids: Array[PgRewriteId])(implicit c: Connection): List[PgRewriteRow]
+  def selectByUnique(evClass: /* oid */ Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow]
   def update(row: PgRewriteRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgRewriteFields, PgRewriteRow]
   def upsert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow

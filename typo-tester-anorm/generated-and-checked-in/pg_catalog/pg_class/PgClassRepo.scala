@@ -20,6 +20,7 @@ trait PgClassRepo {
   def selectAll(implicit c: Connection): List[PgClassRow]
   def selectById(oid: PgClassId)(implicit c: Connection): Option[PgClassRow]
   def selectByIds(oids: Array[PgClassId])(implicit c: Connection): List[PgClassRow]
+  def selectByUnique(relname: String, relnamespace: /* oid */ Long)(implicit c: Connection): Option[PgClassRow]
   def update(row: PgClassRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgClassFields, PgClassRow]
   def upsert(unsaved: PgClassRow)(implicit c: Connection): PgClassRow

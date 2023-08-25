@@ -21,6 +21,7 @@ trait PgPublicationRepo {
   def selectAll: Stream[ConnectionIO, PgPublicationRow]
   def selectById(oid: PgPublicationId): ConnectionIO[Option[PgPublicationRow]]
   def selectByIds(oids: Array[PgPublicationId]): Stream[ConnectionIO, PgPublicationRow]
+  def selectByUnique(pubname: String): ConnectionIO[Option[PgPublicationRow]]
   def update(row: PgPublicationRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgPublicationFields, PgPublicationRow]
   def upsert(unsaved: PgPublicationRow): ConnectionIO[PgPublicationRow]

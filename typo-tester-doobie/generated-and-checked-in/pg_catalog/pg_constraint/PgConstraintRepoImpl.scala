@@ -44,6 +44,12 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def selectByIds(oids: Array[PgConstraintId]): Stream[ConnectionIO, PgConstraintRow] = {
     sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ANY(${oids})".query(PgConstraintRow.read).stream
   }
+  override def selectByUnique(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String): ConnectionIO[Option[PgConstraintRow]] = {
+    sql"""select conrelid, contypid, conname
+          from pg_catalog.pg_constraint
+          where conrelid = ${fromWrite(conrelid)(Write.fromPut(Meta.LongMeta.put))} AND contypid = ${fromWrite(contypid)(Write.fromPut(Meta.LongMeta.put))} AND conname = ${fromWrite(conname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgConstraintRow.read).option
+  }
   override def update(row: PgConstraintRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_constraint

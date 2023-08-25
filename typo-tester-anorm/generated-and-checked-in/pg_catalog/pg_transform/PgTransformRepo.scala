@@ -20,6 +20,7 @@ trait PgTransformRepo {
   def selectAll(implicit c: Connection): List[PgTransformRow]
   def selectById(oid: PgTransformId)(implicit c: Connection): Option[PgTransformRow]
   def selectByIds(oids: Array[PgTransformId])(implicit c: Connection): List[PgTransformRow]
+  def selectByUnique(trftype: /* oid */ Long, trflang: /* oid */ Long)(implicit c: Connection): Option[PgTransformRow]
   def update(row: PgTransformRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgTransformFields, PgTransformRow]
   def upsert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow

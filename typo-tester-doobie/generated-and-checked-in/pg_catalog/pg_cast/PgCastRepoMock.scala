@@ -48,6 +48,9 @@ class PgCastRepoMock(map: scala.collection.mutable.Map[PgCastId, PgCastRow] = sc
   override def selectByIds(oids: Array[PgCastId]): Stream[ConnectionIO, PgCastRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(castsource: /* oid */ Long, casttarget: /* oid */ Long): ConnectionIO[Option[PgCastRow]] = {
+    delay(map.values.find(v => castsource == v.castsource && casttarget == v.casttarget))
+  }
   override def update(row: PgCastRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

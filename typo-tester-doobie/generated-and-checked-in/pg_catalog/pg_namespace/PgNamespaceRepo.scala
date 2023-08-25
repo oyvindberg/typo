@@ -21,6 +21,7 @@ trait PgNamespaceRepo {
   def selectAll: Stream[ConnectionIO, PgNamespaceRow]
   def selectById(oid: PgNamespaceId): ConnectionIO[Option[PgNamespaceRow]]
   def selectByIds(oids: Array[PgNamespaceId]): Stream[ConnectionIO, PgNamespaceRow]
+  def selectByUnique(nspname: String): ConnectionIO[Option[PgNamespaceRow]]
   def update(row: PgNamespaceRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgNamespaceFields, PgNamespaceRow]
   def upsert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow]

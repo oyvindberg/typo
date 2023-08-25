@@ -44,6 +44,12 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def selectByIds(oids: Array[PgTablespaceId]): Stream[ConnectionIO, PgTablespaceRow] = {
     sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ANY(${oids})".query(PgTablespaceRow.read).stream
   }
+  override def selectByUnique(spcname: String): ConnectionIO[Option[PgTablespaceRow]] = {
+    sql"""select spcname
+          from pg_catalog.pg_tablespace
+          where spcname = ${fromWrite(spcname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgTablespaceRow.read).option
+  }
   override def update(row: PgTablespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_tablespace

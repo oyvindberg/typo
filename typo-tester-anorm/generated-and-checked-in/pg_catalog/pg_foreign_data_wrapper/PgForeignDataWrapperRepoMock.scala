@@ -44,6 +44,9 @@ class PgForeignDataWrapperRepoMock(map: scala.collection.mutable.Map[PgForeignDa
   override def selectByIds(oids: Array[PgForeignDataWrapperId])(implicit c: Connection): List[PgForeignDataWrapperRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(fdwname: String)(implicit c: Connection): Option[PgForeignDataWrapperRow] = {
+    map.values.find(v => fdwname == v.fdwname)
+  }
   override def update(row: PgForeignDataWrapperRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

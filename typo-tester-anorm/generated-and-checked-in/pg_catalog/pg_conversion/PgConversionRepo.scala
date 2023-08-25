@@ -20,6 +20,8 @@ trait PgConversionRepo {
   def selectAll(implicit c: Connection): List[PgConversionRow]
   def selectById(oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow]
   def selectByIds(oids: Array[PgConversionId])(implicit c: Connection): List[PgConversionRow]
+  def selectByUnique(conname: String, connamespace: /* oid */ Long)(implicit c: Connection): Option[PgConversionRow]
+  def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow]
   def update(row: PgConversionRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgConversionFields, PgConversionRow]
   def upsert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow

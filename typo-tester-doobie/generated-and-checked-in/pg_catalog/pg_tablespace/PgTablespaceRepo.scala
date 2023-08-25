@@ -21,6 +21,7 @@ trait PgTablespaceRepo {
   def selectAll: Stream[ConnectionIO, PgTablespaceRow]
   def selectById(oid: PgTablespaceId): ConnectionIO[Option[PgTablespaceRow]]
   def selectByIds(oids: Array[PgTablespaceId]): Stream[ConnectionIO, PgTablespaceRow]
+  def selectByUnique(spcname: String): ConnectionIO[Option[PgTablespaceRow]]
   def update(row: PgTablespaceRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgTablespaceFields, PgTablespaceRow]
   def upsert(unsaved: PgTablespaceRow): ConnectionIO[PgTablespaceRow]

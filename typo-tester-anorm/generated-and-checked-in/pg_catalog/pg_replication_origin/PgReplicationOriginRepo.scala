@@ -20,6 +20,7 @@ trait PgReplicationOriginRepo {
   def selectAll(implicit c: Connection): List[PgReplicationOriginRow]
   def selectById(roident: PgReplicationOriginId)(implicit c: Connection): Option[PgReplicationOriginRow]
   def selectByIds(roidents: Array[PgReplicationOriginId])(implicit c: Connection): List[PgReplicationOriginRow]
+  def selectByUnique(roname: String)(implicit c: Connection): Option[PgReplicationOriginRow]
   def update(row: PgReplicationOriginRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow]
   def upsert(unsaved: PgReplicationOriginRow)(implicit c: Connection): PgReplicationOriginRow

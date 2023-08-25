@@ -52,6 +52,13 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
        """.as(PgPublicationRow.rowParser(1).*)
     
   }
+  override def selectByUnique(pubname: String)(implicit c: Connection): Option[PgPublicationRow] = {
+    SQL"""select pubname
+          from pg_catalog.pg_publication
+          where pubname = ${ParameterValue(pubname, null, ToStatement.stringToStatement)}
+       """.as(PgPublicationRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgPublicationRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_publication

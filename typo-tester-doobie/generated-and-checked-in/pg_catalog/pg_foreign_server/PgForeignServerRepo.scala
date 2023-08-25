@@ -21,6 +21,7 @@ trait PgForeignServerRepo {
   def selectAll: Stream[ConnectionIO, PgForeignServerRow]
   def selectById(oid: PgForeignServerId): ConnectionIO[Option[PgForeignServerRow]]
   def selectByIds(oids: Array[PgForeignServerId]): Stream[ConnectionIO, PgForeignServerRow]
+  def selectByUnique(srvname: String): ConnectionIO[Option[PgForeignServerRow]]
   def update(row: PgForeignServerRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgForeignServerFields, PgForeignServerRow]
   def upsert(unsaved: PgForeignServerRow): ConnectionIO[PgForeignServerRow]

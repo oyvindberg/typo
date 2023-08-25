@@ -52,6 +52,13 @@ object PgCastRepoImpl extends PgCastRepo {
        """.as(PgCastRow.rowParser(1).*)
     
   }
+  override def selectByUnique(castsource: /* oid */ Long, casttarget: /* oid */ Long)(implicit c: Connection): Option[PgCastRow] = {
+    SQL"""select castsource, casttarget
+          from pg_catalog.pg_cast
+          where castsource = ${ParameterValue(castsource, null, ToStatement.longToStatement)} AND casttarget = ${ParameterValue(casttarget, null, ToStatement.longToStatement)}
+       """.as(PgCastRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgCastRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_cast

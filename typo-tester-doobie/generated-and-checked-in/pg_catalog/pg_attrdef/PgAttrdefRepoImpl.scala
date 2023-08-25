@@ -44,6 +44,12 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow] = {
     sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY(${oids})".query(PgAttrdefRow.read).stream
   }
+  override def selectByUnique(adrelid: /* oid */ Long, adnum: Int): ConnectionIO[Option[PgAttrdefRow]] = {
+    sql"""select adrelid, adnum
+          from pg_catalog.pg_attrdef
+          where adrelid = ${fromWrite(adrelid)(Write.fromPut(Meta.LongMeta.put))} AND adnum = ${fromWrite(adnum)(Write.fromPut(Meta.IntMeta.put))}
+       """.query(PgAttrdefRow.read).option
+  }
   override def update(row: PgAttrdefRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_attrdef

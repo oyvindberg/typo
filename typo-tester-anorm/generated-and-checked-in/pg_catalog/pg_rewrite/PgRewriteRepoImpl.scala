@@ -53,6 +53,13 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
        """.as(PgRewriteRow.rowParser(1).*)
     
   }
+  override def selectByUnique(evClass: /* oid */ Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow] = {
+    SQL"""select ev_class, rulename
+          from pg_catalog.pg_rewrite
+          where ev_class = ${ParameterValue(evClass, null, ToStatement.longToStatement)} AND rulename = ${ParameterValue(rulename, null, ToStatement.stringToStatement)}
+       """.as(PgRewriteRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgRewriteRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_rewrite

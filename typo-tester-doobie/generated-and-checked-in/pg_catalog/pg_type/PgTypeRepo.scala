@@ -21,6 +21,7 @@ trait PgTypeRepo {
   def selectAll: Stream[ConnectionIO, PgTypeRow]
   def selectById(oid: PgTypeId): ConnectionIO[Option[PgTypeRow]]
   def selectByIds(oids: Array[PgTypeId]): Stream[ConnectionIO, PgTypeRow]
+  def selectByUnique(typname: String, typnamespace: /* oid */ Long): ConnectionIO[Option[PgTypeRow]]
   def update(row: PgTypeRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgTypeFields, PgTypeRow]
   def upsert(unsaved: PgTypeRow): ConnectionIO[PgTypeRow]

@@ -44,6 +44,9 @@ class PgAttrdefRepoMock(map: scala.collection.mutable.Map[PgAttrdefId, PgAttrdef
   override def selectByIds(oids: Array[PgAttrdefId])(implicit c: Connection): List[PgAttrdefRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(adrelid: /* oid */ Long, adnum: Int)(implicit c: Connection): Option[PgAttrdefRow] = {
+    map.values.find(v => adrelid == v.adrelid && adnum == v.adnum)
+  }
   override def update(row: PgAttrdefRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

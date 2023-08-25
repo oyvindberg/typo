@@ -70,9 +70,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case _ =>
           code"def selectByIds($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
       }
-    case RepoMethod.SelectByUnique(params, _, rowType) =>
-      val ident = Naming.camelCaseIdent(Array("selectByUnique"))
-      code"def $ident(${params.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(sc.Type.Option.of(rowType))}"
+    case RepoMethod.SelectByUnique(_, params, rowType) =>
+      code"def selectByUnique(${params.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(sc.Type.Option.of(rowType))}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
     case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
@@ -124,9 +123,14 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"""select $joinedColNames from $relName where ${code"${maybeQuoted(unaryId.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
         )
         code"""$sql.query($rowType.$readName).stream"""
-      case RepoMethod.SelectByUnique(params, fieldValue, _) =>
-        val args = params.map { param => code"$fieldValue.${param.name}(${param.name})" }.mkCode(", ")
-        code"""selectByFieldValues(${sc.Type.List}($args)).compile.last"""
+      case RepoMethod.SelectByUnique(relName, cols, rowType) =>
+        val sql = SQL {
+          code"""|select ${dbNames(cols, isRead = true)}
+                 |from $relName
+                 |where ${cols.map(c => code"${maybeQuoted(c.dbName)} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
+                 |""".stripMargin
+        }
+        code"""$sql.query($rowType.$readName).option"""
 
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases: NonEmptyList[sc.Code] =
@@ -305,11 +309,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"$delayCIO(map.get(${id.paramName}))"
       case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
         code"$fs2Stream.emits(${idsParam.name}.flatMap(map.get).toList)"
-      case RepoMethod.SelectByUnique(params, fieldValue, _) =>
-        val args = params.map { param =>
-          code"$fieldValue.${param.name}(${param.name})"
-        }
-        code"""selectByFieldValues(${sc.Type.List}(${args.mkCode(", ")})).compile.last"""
+      case RepoMethod.SelectByUnique(_, cols, _) =>
+        code"${delayCIO}(map.values.find(v => ${cols.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
 
       case RepoMethod.SelectByFieldValues(_, cols, fieldValue, fieldValueOrIdsParam, _) =>
         val cases = cols.map { col =>

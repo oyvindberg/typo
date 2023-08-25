@@ -53,6 +53,13 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
        """.as(PgAmprocRow.rowParser(1).*)
     
   }
+  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int)(implicit c: Connection): Option[PgAmprocRow] = {
+    SQL"""select amprocfamily, amproclefttype, amprocrighttype, amprocnum
+          from pg_catalog.pg_amproc
+          where amprocfamily = ${ParameterValue(amprocfamily, null, ToStatement.longToStatement)} AND amproclefttype = ${ParameterValue(amproclefttype, null, ToStatement.longToStatement)} AND amprocrighttype = ${ParameterValue(amprocrighttype, null, ToStatement.longToStatement)} AND amprocnum = ${ParameterValue(amprocnum, null, ToStatement.intToStatement)}
+       """.as(PgAmprocRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgAmprocRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_amproc

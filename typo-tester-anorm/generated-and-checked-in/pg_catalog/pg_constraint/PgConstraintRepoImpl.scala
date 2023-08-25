@@ -54,6 +54,13 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
        """.as(PgConstraintRow.rowParser(1).*)
     
   }
+  override def selectByUnique(conrelid: /* oid */ Long, contypid: /* oid */ Long, conname: String)(implicit c: Connection): Option[PgConstraintRow] = {
+    SQL"""select conrelid, contypid, conname
+          from pg_catalog.pg_constraint
+          where conrelid = ${ParameterValue(conrelid, null, ToStatement.longToStatement)} AND contypid = ${ParameterValue(contypid, null, ToStatement.longToStatement)} AND conname = ${ParameterValue(conname, null, ToStatement.stringToStatement)}
+       """.as(PgConstraintRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgConstraintRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_constraint

@@ -42,6 +42,12 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def selectById(compositeId: PgAttributeId): ConnectionIO[Option[PgAttributeRow]] = {
     sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${fromWrite(compositeId.attrelid)(Write.fromPut(Meta.LongMeta.put))} AND attnum = ${fromWrite(compositeId.attnum)(Write.fromPut(Meta.IntMeta.put))}".query(PgAttributeRow.read).option
   }
+  override def selectByUnique(attrelid: /* oid */ Long, attname: String): ConnectionIO[Option[PgAttributeRow]] = {
+    sql"""select attrelid, attname
+          from pg_catalog.pg_attribute
+          where attrelid = ${fromWrite(attrelid)(Write.fromPut(Meta.LongMeta.put))} AND attname = ${fromWrite(attname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgAttributeRow.read).option
+  }
   override def update(row: PgAttributeRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_attribute

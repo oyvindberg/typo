@@ -44,6 +44,12 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def selectByIds(oids: Array[PgNamespaceId]): Stream[ConnectionIO, PgNamespaceRow] = {
     sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY(${oids})".query(PgNamespaceRow.read).stream
   }
+  override def selectByUnique(nspname: String): ConnectionIO[Option[PgNamespaceRow]] = {
+    sql"""select nspname
+          from pg_catalog.pg_namespace
+          where nspname = ${fromWrite(nspname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgNamespaceRow.read).option
+  }
   override def update(row: PgNamespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_namespace

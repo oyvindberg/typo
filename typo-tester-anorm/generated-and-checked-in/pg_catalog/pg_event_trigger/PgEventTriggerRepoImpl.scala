@@ -53,6 +53,13 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
        """.as(PgEventTriggerRow.rowParser(1).*)
     
   }
+  override def selectByUnique(evtname: String)(implicit c: Connection): Option[PgEventTriggerRow] = {
+    SQL"""select evtname
+          from pg_catalog.pg_event_trigger
+          where evtname = ${ParameterValue(evtname, null, ToStatement.stringToStatement)}
+       """.as(PgEventTriggerRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgEventTriggerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_event_trigger

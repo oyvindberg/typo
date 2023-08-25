@@ -44,6 +44,9 @@ class PgEventTriggerRepoMock(map: scala.collection.mutable.Map[PgEventTriggerId,
   override def selectByIds(oids: Array[PgEventTriggerId])(implicit c: Connection): List[PgEventTriggerRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(evtname: String)(implicit c: Connection): Option[PgEventTriggerRow] = {
+    map.values.find(v => evtname == v.evtname)
+  }
   override def update(row: PgEventTriggerRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

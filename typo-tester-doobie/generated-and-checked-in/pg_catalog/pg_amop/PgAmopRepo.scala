@@ -21,6 +21,8 @@ trait PgAmopRepo {
   def selectAll: Stream[ConnectionIO, PgAmopRow]
   def selectById(oid: PgAmopId): ConnectionIO[Option[PgAmopRow]]
   def selectByIds(oids: Array[PgAmopId]): Stream[ConnectionIO, PgAmopRow]
+  def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int): ConnectionIO[Option[PgAmopRow]]
+  def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long): ConnectionIO[Option[PgAmopRow]]
   def update(row: PgAmopRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgAmopFields, PgAmopRow]
   def upsert(unsaved: PgAmopRow): ConnectionIO[PgAmopRow]

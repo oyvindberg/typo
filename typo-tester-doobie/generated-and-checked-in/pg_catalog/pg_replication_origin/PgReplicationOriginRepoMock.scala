@@ -48,6 +48,9 @@ class PgReplicationOriginRepoMock(map: scala.collection.mutable.Map[PgReplicatio
   override def selectByIds(roidents: Array[PgReplicationOriginId]): Stream[ConnectionIO, PgReplicationOriginRow] = {
     Stream.emits(roidents.flatMap(map.get).toList)
   }
+  override def selectByUnique(roname: String): ConnectionIO[Option[PgReplicationOriginRow]] = {
+    delay(map.values.find(v => roname == v.roname))
+  }
   override def update(row: PgReplicationOriginRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.roident) match {

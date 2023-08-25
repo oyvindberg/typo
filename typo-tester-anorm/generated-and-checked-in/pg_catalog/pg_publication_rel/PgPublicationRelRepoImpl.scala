@@ -52,6 +52,13 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
        """.as(PgPublicationRelRow.rowParser(1).*)
     
   }
+  override def selectByUnique(prrelid: /* oid */ Long, prpubid: /* oid */ Long)(implicit c: Connection): Option[PgPublicationRelRow] = {
+    SQL"""select prrelid, prpubid
+          from pg_catalog.pg_publication_rel
+          where prrelid = ${ParameterValue(prrelid, null, ToStatement.longToStatement)} AND prpubid = ${ParameterValue(prpubid, null, ToStatement.longToStatement)}
+       """.as(PgPublicationRelRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgPublicationRelRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_publication_rel

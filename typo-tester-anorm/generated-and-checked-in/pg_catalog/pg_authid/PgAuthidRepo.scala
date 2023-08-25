@@ -20,6 +20,7 @@ trait PgAuthidRepo {
   def selectAll(implicit c: Connection): List[PgAuthidRow]
   def selectById(oid: PgAuthidId)(implicit c: Connection): Option[PgAuthidRow]
   def selectByIds(oids: Array[PgAuthidId])(implicit c: Connection): List[PgAuthidRow]
+  def selectByUnique(rolname: String)(implicit c: Connection): Option[PgAuthidRow]
   def update(row: PgAuthidRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgAuthidFields, PgAuthidRow]
   def upsert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow

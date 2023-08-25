@@ -48,6 +48,9 @@ class PgTsConfigRepoMock(map: scala.collection.mutable.Map[PgTsConfigId, PgTsCon
   override def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(cfgname: String, cfgnamespace: /* oid */ Long): ConnectionIO[Option[PgTsConfigRow]] = {
+    delay(map.values.find(v => cfgname == v.cfgname && cfgnamespace == v.cfgnamespace))
+  }
   override def update(row: PgTsConfigRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

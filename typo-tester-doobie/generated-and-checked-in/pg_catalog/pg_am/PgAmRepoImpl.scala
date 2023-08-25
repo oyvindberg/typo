@@ -44,6 +44,12 @@ object PgAmRepoImpl extends PgAmRepo {
   override def selectByIds(oids: Array[PgAmId]): Stream[ConnectionIO, PgAmRow] = {
     sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ANY(${oids})".query(PgAmRow.read).stream
   }
+  override def selectByUnique(amname: String): ConnectionIO[Option[PgAmRow]] = {
+    sql"""select amname
+          from pg_catalog.pg_am
+          where amname = ${fromWrite(amname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgAmRow.read).option
+  }
   override def update(row: PgAmRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_am

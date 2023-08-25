@@ -47,6 +47,12 @@ object PgProcRepoImpl extends PgProcRepo {
   override def selectByIds(oids: Array[PgProcId]): Stream[ConnectionIO, PgProcRow] = {
     sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ANY(${oids})".query(PgProcRow.read).stream
   }
+  override def selectByUnique(proname: String, proargtypes: TypoOidVector, pronamespace: /* oid */ Long): ConnectionIO[Option[PgProcRow]] = {
+    sql"""select proname, proargtypes, pronamespace
+          from pg_catalog.pg_proc
+          where proname = ${fromWrite(proname)(Write.fromPut(Meta.StringMeta.put))} AND proargtypes = ${fromWrite(proargtypes)(Write.fromPut(TypoOidVector.put))} AND pronamespace = ${fromWrite(pronamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgProcRow.read).option
+  }
   override def update(row: PgProcRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_proc

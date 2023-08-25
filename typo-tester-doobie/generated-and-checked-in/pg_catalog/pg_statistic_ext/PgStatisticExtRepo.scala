@@ -21,6 +21,7 @@ trait PgStatisticExtRepo {
   def selectAll: Stream[ConnectionIO, PgStatisticExtRow]
   def selectById(oid: PgStatisticExtId): ConnectionIO[Option[PgStatisticExtRow]]
   def selectByIds(oids: Array[PgStatisticExtId]): Stream[ConnectionIO, PgStatisticExtRow]
+  def selectByUnique(stxname: String, stxnamespace: /* oid */ Long): ConnectionIO[Option[PgStatisticExtRow]]
   def update(row: PgStatisticExtRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgStatisticExtFields, PgStatisticExtRow]
   def upsert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow]

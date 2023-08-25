@@ -48,6 +48,9 @@ class PgForeignDataWrapperRepoMock(map: scala.collection.mutable.Map[PgForeignDa
   override def selectByIds(oids: Array[PgForeignDataWrapperId]): Stream[ConnectionIO, PgForeignDataWrapperRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(fdwname: String): ConnectionIO[Option[PgForeignDataWrapperRow]] = {
+    delay(map.values.find(v => fdwname == v.fdwname))
+  }
   override def update(row: PgForeignDataWrapperRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

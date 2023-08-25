@@ -48,6 +48,9 @@ class PgTsParserRepoMock(map: scala.collection.mutable.Map[PgTsParserId, PgTsPar
   override def selectByIds(oids: Array[PgTsParserId]): Stream[ConnectionIO, PgTsParserRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(prsname: String, prsnamespace: /* oid */ Long): ConnectionIO[Option[PgTsParserRow]] = {
+    delay(map.values.find(v => prsname == v.prsname && prsnamespace == v.prsnamespace))
+  }
   override def update(row: PgTsParserRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

@@ -54,6 +54,13 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
        """.as(PgAuthidRow.rowParser(1).*)
     
   }
+  override def selectByUnique(rolname: String)(implicit c: Connection): Option[PgAuthidRow] = {
+    SQL"""select rolname
+          from pg_catalog.pg_authid
+          where rolname = ${ParameterValue(rolname, null, ToStatement.stringToStatement)}
+       """.as(PgAuthidRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgAuthidRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_authid

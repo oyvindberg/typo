@@ -44,6 +44,9 @@ class PgOpfamilyRepoMock(map: scala.collection.mutable.Map[PgOpfamilyId, PgOpfam
   override def selectByIds(oids: Array[PgOpfamilyId])(implicit c: Connection): List[PgOpfamilyRow] = {
     oids.flatMap(map.get).toList
   }
+  override def selectByUnique(opfmethod: /* oid */ Long, opfname: String, opfnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOpfamilyRow] = {
+    map.values.find(v => opfmethod == v.opfmethod && opfname == v.opfname && opfnamespace == v.opfnamespace)
+  }
   override def update(row: PgOpfamilyRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {
       case Some(`row`) => false

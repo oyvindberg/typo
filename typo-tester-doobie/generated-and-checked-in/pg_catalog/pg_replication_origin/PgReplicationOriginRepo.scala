@@ -21,6 +21,7 @@ trait PgReplicationOriginRepo {
   def selectAll: Stream[ConnectionIO, PgReplicationOriginRow]
   def selectById(roident: PgReplicationOriginId): ConnectionIO[Option[PgReplicationOriginRow]]
   def selectByIds(roidents: Array[PgReplicationOriginId]): Stream[ConnectionIO, PgReplicationOriginRow]
+  def selectByUnique(roname: String): ConnectionIO[Option[PgReplicationOriginRow]]
   def update(row: PgReplicationOriginRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow]
   def upsert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow]

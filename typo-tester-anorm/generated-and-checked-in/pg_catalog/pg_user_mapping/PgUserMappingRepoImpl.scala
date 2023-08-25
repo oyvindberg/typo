@@ -53,6 +53,13 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
        """.as(PgUserMappingRow.rowParser(1).*)
     
   }
+  override def selectByUnique(umuser: /* oid */ Long, umserver: /* oid */ Long)(implicit c: Connection): Option[PgUserMappingRow] = {
+    SQL"""select umuser, umserver
+          from pg_catalog.pg_user_mapping
+          where umuser = ${ParameterValue(umuser, null, ToStatement.longToStatement)} AND umserver = ${ParameterValue(umserver, null, ToStatement.longToStatement)}
+       """.as(PgUserMappingRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgUserMappingRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_user_mapping

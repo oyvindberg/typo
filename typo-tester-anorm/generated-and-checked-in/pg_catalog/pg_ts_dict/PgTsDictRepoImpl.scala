@@ -53,6 +53,13 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
        """.as(PgTsDictRow.rowParser(1).*)
     
   }
+  override def selectByUnique(dictname: String, dictnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsDictRow] = {
+    SQL"""select dictname, dictnamespace
+          from pg_catalog.pg_ts_dict
+          where dictname = ${ParameterValue(dictname, null, ToStatement.stringToStatement)} AND dictnamespace = ${ParameterValue(dictnamespace, null, ToStatement.longToStatement)}
+       """.as(PgTsDictRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgTsDictRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_dict

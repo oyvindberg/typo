@@ -21,6 +21,7 @@ trait PgLanguageRepo {
   def selectAll: Stream[ConnectionIO, PgLanguageRow]
   def selectById(oid: PgLanguageId): ConnectionIO[Option[PgLanguageRow]]
   def selectByIds(oids: Array[PgLanguageId]): Stream[ConnectionIO, PgLanguageRow]
+  def selectByUnique(lanname: String): ConnectionIO[Option[PgLanguageRow]]
   def update(row: PgLanguageRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgLanguageFields, PgLanguageRow]
   def upsert(unsaved: PgLanguageRow): ConnectionIO[PgLanguageRow]

@@ -52,6 +52,13 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
        """.as(PgReplicationOriginRow.rowParser(1).*)
     
   }
+  override def selectByUnique(roname: String)(implicit c: Connection): Option[PgReplicationOriginRow] = {
+    SQL"""select roname
+          from pg_catalog.pg_replication_origin
+          where roname = ${ParameterValue(roname, null, ToStatement.stringToStatement)}
+       """.as(PgReplicationOriginRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgReplicationOriginRow)(implicit c: Connection): Boolean = {
     val roident = row.roident
     SQL"""update pg_catalog.pg_replication_origin

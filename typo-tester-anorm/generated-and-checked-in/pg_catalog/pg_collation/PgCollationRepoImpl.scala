@@ -53,6 +53,13 @@ object PgCollationRepoImpl extends PgCollationRepo {
        """.as(PgCollationRow.rowParser(1).*)
     
   }
+  override def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow] = {
+    SQL"""select collname, collencoding, collnamespace
+          from pg_catalog.pg_collation
+          where collname = ${ParameterValue(collname, null, ToStatement.stringToStatement)} AND collencoding = ${ParameterValue(collencoding, null, ToStatement.intToStatement)} AND collnamespace = ${ParameterValue(collnamespace, null, ToStatement.longToStatement)}
+       """.as(PgCollationRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgCollationRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_collation

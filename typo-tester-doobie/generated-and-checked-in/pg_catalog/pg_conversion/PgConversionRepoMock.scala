@@ -48,6 +48,12 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
   override def selectByIds(oids: Array[PgConversionId]): Stream[ConnectionIO, PgConversionRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(conname: String, connamespace: /* oid */ Long): ConnectionIO[Option[PgConversionRow]] = {
+    delay(map.values.find(v => conname == v.conname && connamespace == v.connamespace))
+  }
+  override def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId): ConnectionIO[Option[PgConversionRow]] = {
+    delay(map.values.find(v => connamespace == v.connamespace && conforencoding == v.conforencoding && contoencoding == v.contoencoding && oid == v.oid))
+  }
   override def update(row: PgConversionRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

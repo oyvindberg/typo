@@ -21,6 +21,7 @@ trait PgDatabaseRepo {
   def selectAll: Stream[ConnectionIO, PgDatabaseRow]
   def selectById(oid: PgDatabaseId): ConnectionIO[Option[PgDatabaseRow]]
   def selectByIds(oids: Array[PgDatabaseId]): Stream[ConnectionIO, PgDatabaseRow]
+  def selectByUnique(datname: String): ConnectionIO[Option[PgDatabaseRow]]
   def update(row: PgDatabaseRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgDatabaseFields, PgDatabaseRow]
   def upsert(unsaved: PgDatabaseRow): ConnectionIO[PgDatabaseRow]

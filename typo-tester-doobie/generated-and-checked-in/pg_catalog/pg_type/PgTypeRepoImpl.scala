@@ -46,6 +46,12 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def selectByIds(oids: Array[PgTypeId]): Stream[ConnectionIO, PgTypeRow] = {
     sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ANY(${oids})".query(PgTypeRow.read).stream
   }
+  override def selectByUnique(typname: String, typnamespace: /* oid */ Long): ConnectionIO[Option[PgTypeRow]] = {
+    sql"""select typname, typnamespace
+          from pg_catalog.pg_type
+          where typname = ${fromWrite(typname)(Write.fromPut(Meta.StringMeta.put))} AND typnamespace = ${fromWrite(typnamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgTypeRow.read).option
+  }
   override def update(row: PgTypeRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_type

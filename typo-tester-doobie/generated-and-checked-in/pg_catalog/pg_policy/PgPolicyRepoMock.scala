@@ -48,6 +48,9 @@ class PgPolicyRepoMock(map: scala.collection.mutable.Map[PgPolicyId, PgPolicyRow
   override def selectByIds(oids: Array[PgPolicyId]): Stream[ConnectionIO, PgPolicyRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(polrelid: /* oid */ Long, polname: String): ConnectionIO[Option[PgPolicyRow]] = {
+    delay(map.values.find(v => polrelid == v.polrelid && polname == v.polname))
+  }
   override def update(row: PgPolicyRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

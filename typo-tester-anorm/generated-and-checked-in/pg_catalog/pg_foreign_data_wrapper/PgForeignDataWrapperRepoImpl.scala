@@ -54,6 +54,13 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
        """.as(PgForeignDataWrapperRow.rowParser(1).*)
     
   }
+  override def selectByUnique(fdwname: String)(implicit c: Connection): Option[PgForeignDataWrapperRow] = {
+    SQL"""select fdwname
+          from pg_catalog.pg_foreign_data_wrapper
+          where fdwname = ${ParameterValue(fdwname, null, ToStatement.stringToStatement)}
+       """.as(PgForeignDataWrapperRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgForeignDataWrapperRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_foreign_data_wrapper

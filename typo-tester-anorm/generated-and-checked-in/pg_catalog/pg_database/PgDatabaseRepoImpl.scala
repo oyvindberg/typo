@@ -54,6 +54,13 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
        """.as(PgDatabaseRow.rowParser(1).*)
     
   }
+  override def selectByUnique(datname: String)(implicit c: Connection): Option[PgDatabaseRow] = {
+    SQL"""select datname
+          from pg_catalog.pg_database
+          where datname = ${ParameterValue(datname, null, ToStatement.stringToStatement)}
+       """.as(PgDatabaseRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgDatabaseRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_database

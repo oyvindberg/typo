@@ -20,6 +20,7 @@ trait PgTsDictRepo {
   def selectAll(implicit c: Connection): List[PgTsDictRow]
   def selectById(oid: PgTsDictId)(implicit c: Connection): Option[PgTsDictRow]
   def selectByIds(oids: Array[PgTsDictId])(implicit c: Connection): List[PgTsDictRow]
+  def selectByUnique(dictname: String, dictnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsDictRow]
   def update(row: PgTsDictRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgTsDictFields, PgTsDictRow]
   def upsert(unsaved: PgTsDictRow)(implicit c: Connection): PgTsDictRow

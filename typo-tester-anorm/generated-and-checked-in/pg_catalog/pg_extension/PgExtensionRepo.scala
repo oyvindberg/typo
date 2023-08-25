@@ -20,6 +20,7 @@ trait PgExtensionRepo {
   def selectAll(implicit c: Connection): List[PgExtensionRow]
   def selectById(oid: PgExtensionId)(implicit c: Connection): Option[PgExtensionRow]
   def selectByIds(oids: Array[PgExtensionId])(implicit c: Connection): List[PgExtensionRow]
+  def selectByUnique(extname: String)(implicit c: Connection): Option[PgExtensionRow]
   def update(row: PgExtensionRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgExtensionFields, PgExtensionRow]
   def upsert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow

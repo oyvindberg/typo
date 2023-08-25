@@ -19,6 +19,7 @@ trait PgAuthMembersRepo {
   def select: SelectBuilder[PgAuthMembersFields, PgAuthMembersRow]
   def selectAll(implicit c: Connection): List[PgAuthMembersRow]
   def selectById(compositeId: PgAuthMembersId)(implicit c: Connection): Option[PgAuthMembersRow]
+  def selectByUnique(member: /* oid */ Long, roleid: /* oid */ Long)(implicit c: Connection): Option[PgAuthMembersRow]
   def update(row: PgAuthMembersRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgAuthMembersFields, PgAuthMembersRow]
   def upsert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow

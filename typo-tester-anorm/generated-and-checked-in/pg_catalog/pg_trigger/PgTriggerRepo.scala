@@ -20,6 +20,7 @@ trait PgTriggerRepo {
   def selectAll(implicit c: Connection): List[PgTriggerRow]
   def selectById(oid: PgTriggerId)(implicit c: Connection): Option[PgTriggerRow]
   def selectByIds(oids: Array[PgTriggerId])(implicit c: Connection): List[PgTriggerRow]
+  def selectByUnique(tgrelid: /* oid */ Long, tgname: String)(implicit c: Connection): Option[PgTriggerRow]
   def update(row: PgTriggerRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgTriggerFields, PgTriggerRow]
   def upsert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow

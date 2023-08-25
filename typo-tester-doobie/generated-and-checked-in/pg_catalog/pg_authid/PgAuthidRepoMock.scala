@@ -48,6 +48,9 @@ class PgAuthidRepoMock(map: scala.collection.mutable.Map[PgAuthidId, PgAuthidRow
   override def selectByIds(oids: Array[PgAuthidId]): Stream[ConnectionIO, PgAuthidRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
+  override def selectByUnique(rolname: String): ConnectionIO[Option[PgAuthidRow]] = {
+    delay(map.values.find(v => rolname == v.rolname))
+  }
   override def update(row: PgAuthidRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.oid) match {

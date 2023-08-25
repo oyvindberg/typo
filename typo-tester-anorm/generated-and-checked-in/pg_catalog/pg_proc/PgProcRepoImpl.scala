@@ -57,6 +57,13 @@ object PgProcRepoImpl extends PgProcRepo {
        """.as(PgProcRow.rowParser(1).*)
     
   }
+  override def selectByUnique(proname: String, proargtypes: TypoOidVector, pronamespace: /* oid */ Long)(implicit c: Connection): Option[PgProcRow] = {
+    SQL"""select proname, proargtypes, pronamespace
+          from pg_catalog.pg_proc
+          where proname = ${ParameterValue(proname, null, ToStatement.stringToStatement)} AND proargtypes = ${ParameterValue(proargtypes, null, TypoOidVector.toStatement)} AND pronamespace = ${ParameterValue(pronamespace, null, ToStatement.longToStatement)}
+       """.as(PgProcRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgProcRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_proc

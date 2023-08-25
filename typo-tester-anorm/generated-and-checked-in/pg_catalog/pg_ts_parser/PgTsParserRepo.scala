@@ -20,6 +20,7 @@ trait PgTsParserRepo {
   def selectAll(implicit c: Connection): List[PgTsParserRow]
   def selectById(oid: PgTsParserId)(implicit c: Connection): Option[PgTsParserRow]
   def selectByIds(oids: Array[PgTsParserId])(implicit c: Connection): List[PgTsParserRow]
+  def selectByUnique(prsname: String, prsnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsParserRow]
   def update(row: PgTsParserRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgTsParserFields, PgTsParserRow]
   def upsert(unsaved: PgTsParserRow)(implicit c: Connection): PgTsParserRow

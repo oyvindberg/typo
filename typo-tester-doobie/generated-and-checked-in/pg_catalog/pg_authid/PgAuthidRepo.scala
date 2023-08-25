@@ -21,6 +21,7 @@ trait PgAuthidRepo {
   def selectAll: Stream[ConnectionIO, PgAuthidRow]
   def selectById(oid: PgAuthidId): ConnectionIO[Option[PgAuthidRow]]
   def selectByIds(oids: Array[PgAuthidId]): Stream[ConnectionIO, PgAuthidRow]
+  def selectByUnique(rolname: String): ConnectionIO[Option[PgAuthidRow]]
   def update(row: PgAuthidRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgAuthidFields, PgAuthidRow]
   def upsert(unsaved: PgAuthidRow): ConnectionIO[PgAuthidRow]

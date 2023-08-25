@@ -44,6 +44,12 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   override def selectByIds(oids: Array[PgAmprocId]): Stream[ConnectionIO, PgAmprocRow] = {
     sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = ANY(${oids})".query(PgAmprocRow.read).stream
   }
+  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int): ConnectionIO[Option[PgAmprocRow]] = {
+    sql"""select amprocfamily, amproclefttype, amprocrighttype, amprocnum
+          from pg_catalog.pg_amproc
+          where amprocfamily = ${fromWrite(amprocfamily)(Write.fromPut(Meta.LongMeta.put))} AND amproclefttype = ${fromWrite(amproclefttype)(Write.fromPut(Meta.LongMeta.put))} AND amprocrighttype = ${fromWrite(amprocrighttype)(Write.fromPut(Meta.LongMeta.put))} AND amprocnum = ${fromWrite(amprocnum)(Write.fromPut(Meta.IntMeta.put))}
+       """.query(PgAmprocRow.read).option
+  }
   override def update(row: PgAmprocRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_amproc

@@ -44,6 +44,12 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def selectByIds(oids: Array[PgTsTemplateId]): Stream[ConnectionIO, PgTsTemplateRow] = {
     sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY(${oids})".query(PgTsTemplateRow.read).stream
   }
+  override def selectByUnique(tmplname: String, tmplnamespace: /* oid */ Long): ConnectionIO[Option[PgTsTemplateRow]] = {
+    sql"""select tmplname, tmplnamespace
+          from pg_catalog.pg_ts_template
+          where tmplname = ${fromWrite(tmplname)(Write.fromPut(Meta.StringMeta.put))} AND tmplnamespace = ${fromWrite(tmplnamespace)(Write.fromPut(Meta.LongMeta.put))}
+       """.query(PgTsTemplateRow.read).option
+  }
   override def update(row: PgTsTemplateRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_template

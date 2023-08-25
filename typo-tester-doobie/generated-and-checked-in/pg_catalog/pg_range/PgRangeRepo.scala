@@ -21,6 +21,7 @@ trait PgRangeRepo {
   def selectAll: Stream[ConnectionIO, PgRangeRow]
   def selectById(rngtypid: PgRangeId): ConnectionIO[Option[PgRangeRow]]
   def selectByIds(rngtypids: Array[PgRangeId]): Stream[ConnectionIO, PgRangeRow]
+  def selectByUnique(rngmultitypid: /* oid */ Long): ConnectionIO[Option[PgRangeRow]]
   def update(row: PgRangeRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgRangeFields, PgRangeRow]
   def upsert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow]

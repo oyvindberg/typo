@@ -8,6 +8,7 @@ package production
 package document
 
 import java.sql.Connection
+import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
@@ -21,6 +22,7 @@ trait DocumentRepo {
   def selectAll(implicit c: Connection): List[DocumentRow]
   def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow]
   def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow]
+  def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow]
   def update(row: DocumentRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[DocumentFields, DocumentRow]
   def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow

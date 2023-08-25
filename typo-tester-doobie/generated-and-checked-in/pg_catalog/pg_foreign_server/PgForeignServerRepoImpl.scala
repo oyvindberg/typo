@@ -44,6 +44,12 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def selectByIds(oids: Array[PgForeignServerId]): Stream[ConnectionIO, PgForeignServerRow] = {
     sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ANY(${oids})".query(PgForeignServerRow.read).stream
   }
+  override def selectByUnique(srvname: String): ConnectionIO[Option[PgForeignServerRow]] = {
+    sql"""select srvname
+          from pg_catalog.pg_foreign_server
+          where srvname = ${fromWrite(srvname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgForeignServerRow.read).option
+  }
   override def update(row: PgForeignServerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_foreign_server

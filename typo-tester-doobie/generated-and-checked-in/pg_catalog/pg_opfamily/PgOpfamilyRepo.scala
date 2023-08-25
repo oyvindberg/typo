@@ -21,6 +21,7 @@ trait PgOpfamilyRepo {
   def selectAll: Stream[ConnectionIO, PgOpfamilyRow]
   def selectById(oid: PgOpfamilyId): ConnectionIO[Option[PgOpfamilyRow]]
   def selectByIds(oids: Array[PgOpfamilyId]): Stream[ConnectionIO, PgOpfamilyRow]
+  def selectByUnique(opfmethod: /* oid */ Long, opfname: String, opfnamespace: /* oid */ Long): ConnectionIO[Option[PgOpfamilyRow]]
   def update(row: PgOpfamilyRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgOpfamilyFields, PgOpfamilyRow]
   def upsert(unsaved: PgOpfamilyRow): ConnectionIO[PgOpfamilyRow]

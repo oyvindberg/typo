@@ -20,6 +20,7 @@ trait PgLanguageRepo {
   def selectAll(implicit c: Connection): List[PgLanguageRow]
   def selectById(oid: PgLanguageId)(implicit c: Connection): Option[PgLanguageRow]
   def selectByIds(oids: Array[PgLanguageId])(implicit c: Connection): List[PgLanguageRow]
+  def selectByUnique(lanname: String)(implicit c: Connection): Option[PgLanguageRow]
   def update(row: PgLanguageRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgLanguageFields, PgLanguageRow]
   def upsert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow

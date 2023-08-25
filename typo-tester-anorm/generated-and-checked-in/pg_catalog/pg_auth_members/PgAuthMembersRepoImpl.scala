@@ -45,6 +45,13 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
           where roleid = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}
        """.as(PgAuthMembersRow.rowParser(1).singleOpt)
   }
+  override def selectByUnique(member: /* oid */ Long, roleid: /* oid */ Long)(implicit c: Connection): Option[PgAuthMembersRow] = {
+    SQL"""select "member", roleid
+          from pg_catalog.pg_auth_members
+          where "member" = ${ParameterValue(member, null, ToStatement.longToStatement)} AND roleid = ${ParameterValue(roleid, null, ToStatement.longToStatement)}
+       """.as(PgAuthMembersRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgAuthMembersRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_auth_members

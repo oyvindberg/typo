@@ -53,6 +53,13 @@ object PgAmRepoImpl extends PgAmRepo {
        """.as(PgAmRow.rowParser(1).*)
     
   }
+  override def selectByUnique(amname: String)(implicit c: Connection): Option[PgAmRow] = {
+    SQL"""select amname
+          from pg_catalog.pg_am
+          where amname = ${ParameterValue(amname, null, ToStatement.stringToStatement)}
+       """.as(PgAmRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgAmRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_am

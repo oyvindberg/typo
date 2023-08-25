@@ -20,6 +20,7 @@ trait PgTsTemplateRepo {
   def selectAll(implicit c: Connection): List[PgTsTemplateRow]
   def selectById(oid: PgTsTemplateId)(implicit c: Connection): Option[PgTsTemplateRow]
   def selectByIds(oids: Array[PgTsTemplateId])(implicit c: Connection): List[PgTsTemplateRow]
+  def selectByUnique(tmplname: String, tmplnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsTemplateRow]
   def update(row: PgTsTemplateRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgTsTemplateFields, PgTsTemplateRow]
   def upsert(unsaved: PgTsTemplateRow)(implicit c: Connection): PgTsTemplateRow

@@ -20,6 +20,7 @@ trait PgForeignServerRepo {
   def selectAll(implicit c: Connection): List[PgForeignServerRow]
   def selectById(oid: PgForeignServerId)(implicit c: Connection): Option[PgForeignServerRow]
   def selectByIds(oids: Array[PgForeignServerId])(implicit c: Connection): List[PgForeignServerRow]
+  def selectByUnique(srvname: String)(implicit c: Connection): Option[PgForeignServerRow]
   def update(row: PgForeignServerRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgForeignServerFields, PgForeignServerRow]
   def upsert(unsaved: PgForeignServerRow)(implicit c: Connection): PgForeignServerRow

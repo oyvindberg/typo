@@ -21,6 +21,7 @@ trait PgCastRepo {
   def selectAll: Stream[ConnectionIO, PgCastRow]
   def selectById(oid: PgCastId): ConnectionIO[Option[PgCastRow]]
   def selectByIds(oids: Array[PgCastId]): Stream[ConnectionIO, PgCastRow]
+  def selectByUnique(castsource: /* oid */ Long, casttarget: /* oid */ Long): ConnectionIO[Option[PgCastRow]]
   def update(row: PgCastRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgCastFields, PgCastRow]
   def upsert(unsaved: PgCastRow): ConnectionIO[PgCastRow]

@@ -44,6 +44,12 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
   override def selectByIds(oids: Array[PgPolicyId]): Stream[ConnectionIO, PgPolicyRow] = {
     sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY(${oids})".query(PgPolicyRow.read).stream
   }
+  override def selectByUnique(polrelid: /* oid */ Long, polname: String): ConnectionIO[Option[PgPolicyRow]] = {
+    sql"""select polrelid, polname
+          from pg_catalog.pg_policy
+          where polrelid = ${fromWrite(polrelid)(Write.fromPut(Meta.LongMeta.put))} AND polname = ${fromWrite(polname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgPolicyRow.read).option
+  }
   override def update(row: PgPolicyRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_policy

@@ -21,6 +21,7 @@ trait PgTsParserRepo {
   def selectAll: Stream[ConnectionIO, PgTsParserRow]
   def selectById(oid: PgTsParserId): ConnectionIO[Option[PgTsParserRow]]
   def selectByIds(oids: Array[PgTsParserId]): Stream[ConnectionIO, PgTsParserRow]
+  def selectByUnique(prsname: String, prsnamespace: /* oid */ Long): ConnectionIO[Option[PgTsParserRow]]
   def update(row: PgTsParserRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgTsParserFields, PgTsParserRow]
   def upsert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow]

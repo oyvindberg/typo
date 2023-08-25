@@ -20,6 +20,7 @@ trait PgCollationRepo {
   def selectAll(implicit c: Connection): List[PgCollationRow]
   def selectById(oid: PgCollationId)(implicit c: Connection): Option[PgCollationRow]
   def selectByIds(oids: Array[PgCollationId])(implicit c: Connection): List[PgCollationRow]
+  def selectByUnique(collname: String, collencoding: Int, collnamespace: /* oid */ Long)(implicit c: Connection): Option[PgCollationRow]
   def update(row: PgCollationRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgCollationFields, PgCollationRow]
   def upsert(unsaved: PgCollationRow)(implicit c: Connection): PgCollationRow

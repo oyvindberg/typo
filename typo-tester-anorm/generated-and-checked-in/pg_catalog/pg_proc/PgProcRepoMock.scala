@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
+import adventureworks.TypoOidVector
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
@@ -43,6 +44,9 @@ class PgProcRepoMock(map: scala.collection.mutable.Map[PgProcId, PgProcRow] = sc
   }
   override def selectByIds(oids: Array[PgProcId])(implicit c: Connection): List[PgProcRow] = {
     oids.flatMap(map.get).toList
+  }
+  override def selectByUnique(proname: String, proargtypes: TypoOidVector, pronamespace: /* oid */ Long)(implicit c: Connection): Option[PgProcRow] = {
+    map.values.find(v => proname == v.proname && proargtypes == v.proargtypes && pronamespace == v.pronamespace)
   }
   override def update(row: PgProcRow)(implicit c: Connection): Boolean = {
     map.get(row.oid) match {

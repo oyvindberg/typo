@@ -45,6 +45,12 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def selectByIds(oids: Array[PgDatabaseId]): Stream[ConnectionIO, PgDatabaseRow] = {
     sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ANY(${oids})""".query(PgDatabaseRow.read).stream
   }
+  override def selectByUnique(datname: String): ConnectionIO[Option[PgDatabaseRow]] = {
+    sql"""select datname
+          from pg_catalog.pg_database
+          where datname = ${fromWrite(datname)(Write.fromPut(Meta.StringMeta.put))}
+       """.query(PgDatabaseRow.read).option
+  }
   override def update(row: PgDatabaseRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_database

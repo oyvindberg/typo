@@ -53,6 +53,13 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
        """.as(PgLanguageRow.rowParser(1).*)
     
   }
+  override def selectByUnique(lanname: String)(implicit c: Connection): Option[PgLanguageRow] = {
+    SQL"""select lanname
+          from pg_catalog.pg_language
+          where lanname = ${ParameterValue(lanname, null, ToStatement.stringToStatement)}
+       """.as(PgLanguageRow.rowParser(1).singleOpt)
+    
+  }
   override def update(row: PgLanguageRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_language

@@ -21,6 +21,8 @@ trait PgConversionRepo {
   def selectAll: Stream[ConnectionIO, PgConversionRow]
   def selectById(oid: PgConversionId): ConnectionIO[Option[PgConversionRow]]
   def selectByIds(oids: Array[PgConversionId]): Stream[ConnectionIO, PgConversionRow]
+  def selectByUnique(conname: String, connamespace: /* oid */ Long): ConnectionIO[Option[PgConversionRow]]
+  def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId): ConnectionIO[Option[PgConversionRow]]
   def update(row: PgConversionRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgConversionFields, PgConversionRow]
   def upsert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow]
