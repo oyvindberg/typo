@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productmodel
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name

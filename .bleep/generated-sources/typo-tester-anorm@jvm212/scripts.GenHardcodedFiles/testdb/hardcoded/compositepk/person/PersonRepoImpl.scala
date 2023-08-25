@@ -17,7 +17,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
-import testdb.hardcoded.Defaulted
+import testdb.hardcoded.customtypes.Defaulted
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

@@ -5,6 +5,7 @@
  */
 package adventureworks
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoAnyArray
 import adventureworks.customtypes.TypoBox

@@ -7,7 +7,7 @@ package adventureworks
 package person
 package businessentity
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue

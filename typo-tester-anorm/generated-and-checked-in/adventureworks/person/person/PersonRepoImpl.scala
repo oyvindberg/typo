@@ -7,7 +7,7 @@ package adventureworks
 package person
 package person
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId

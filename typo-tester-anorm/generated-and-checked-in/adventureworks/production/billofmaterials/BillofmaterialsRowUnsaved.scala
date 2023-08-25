@@ -7,7 +7,7 @@ package adventureworks
 package production
 package billofmaterials
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId

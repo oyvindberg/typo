@@ -5,6 +5,7 @@
  */
 package testdb
 package hardcoded
+package customtypes
 
 import play.api.libs.json.JsError
 import play.api.libs.json.JsNull

@@ -1,6 +1,6 @@
 package adventureworks.person.businessentityaddress
 
-import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.{Defaulted, TypoLocalDateTime}
 import adventureworks.person.address.{AddressRepoImpl, AddressRowUnsaved}
 import adventureworks.person.addresstype.{AddresstypeRepoImpl, AddresstypeRowUnsaved}
 import adventureworks.person.businessentity.{BusinessentityRepoImpl, BusinessentityRowUnsaved}
@@ -8,7 +8,7 @@ import adventureworks.person.countryregion.{CountryregionId, CountryregionRepoIm
 import adventureworks.person.stateprovince.{StateprovinceId, StateprovinceRepoImpl, StateprovinceRowUnsaved}
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.{SalesterritoryRepoImpl, SalesterritoryRowUnsaved}
-import adventureworks.{Defaulted, withConnection}
+import adventureworks.withConnection
 import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite

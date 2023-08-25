@@ -7,7 +7,7 @@ package adventureworks
 package sales
 package creditcard
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.userdefined.CustomCreditcardId
 import anorm.NamedParameter

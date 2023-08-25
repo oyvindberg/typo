@@ -1,12 +1,12 @@
 package adventureworks.production.product
 
-import adventureworks.customtypes.{TypoLocalDateTime, TypoXml}
+import adventureworks.customtypes.{Defaulted, TypoLocalDateTime, TypoXml}
 import adventureworks.production.productcategory.*
 import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
 import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
-import adventureworks.{Defaulted, withConnection}
+import adventureworks.withConnection
 import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion

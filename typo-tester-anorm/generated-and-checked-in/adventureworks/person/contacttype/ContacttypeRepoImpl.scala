@@ -7,7 +7,7 @@ package adventureworks
 package person
 package contacttype
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.NamedParameter

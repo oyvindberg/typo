@@ -1,11 +1,11 @@
 package adventureworks.humanresources.employee
 
-import adventureworks.customtypes.{TypoLocalDate, TypoLocalDateTime, TypoXml}
+import adventureworks.customtypes.{Defaulted, TypoLocalDate, TypoLocalDateTime, TypoXml}
 import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
 import adventureworks.person.person.{PersonRepoImpl, PersonRowUnsaved}
 import adventureworks.public.{Flag, Name}
 import adventureworks.userdefined.FirstName
-import adventureworks.{Defaulted, withConnection}
+import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 

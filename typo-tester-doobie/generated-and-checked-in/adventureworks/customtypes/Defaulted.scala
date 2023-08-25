@@ -4,6 +4,7 @@
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
 package adventureworks
+package customtypes
 
 import io.circe.Decoder
 import io.circe.Encoder

@@ -7,7 +7,7 @@ package adventureworks
 package person
 package phonenumbertype
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.NamedParameter

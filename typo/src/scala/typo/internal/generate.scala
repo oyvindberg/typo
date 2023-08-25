@@ -12,9 +12,12 @@ object generate {
     Banner.maybePrint(publicOptions)
 
     val pkg = sc.Type.Qualified(publicOptions.pkg).value
-    val naming = publicOptions.naming(pkg)
+    val customTypesPackage = pkg / sc.Ident("customtypes")
+
     val default: ComputedDefault =
-      ComputedDefault(naming)
+      ComputedDefault(publicOptions.naming(customTypesPackage))
+
+    val naming = publicOptions.naming(pkg)
 
     val options = InternalOptions(
       pkg = pkg,
@@ -36,7 +39,7 @@ object generate {
       keepDependencies = publicOptions.keepDependencies,
       debugTypes = publicOptions.debugTypes
     )
-    val customTypes = new CustomTypes(options.pkg / sc.Ident("customtypes"))
+    val customTypes = new CustomTypes(customTypesPackage)
     val genOrdering = new GenOrdering(customTypes, options.pkg)
     val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming, customTypes)
     val enums = metaDb.enums.map(ComputedStringEnum(naming))

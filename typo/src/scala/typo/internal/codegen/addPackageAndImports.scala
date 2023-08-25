@@ -19,7 +19,7 @@ object addPackageAndImports {
           case currentQName =>
             val currentName = currentQName.value.name
             val shortenedQName = sc.Type.Qualified(currentName)
-            knownNamesByPkg(file.pkg).get(currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
+            knownNamesByPkg.get(file.pkg).flatMap(_.get(currentName)).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
               case Some(alreadyAvailable) =>
                 if (alreadyAvailable == currentQName) shortenedQName else currentQName
               case None =>

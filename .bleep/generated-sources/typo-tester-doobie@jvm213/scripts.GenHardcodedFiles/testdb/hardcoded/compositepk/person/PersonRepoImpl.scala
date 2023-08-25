@@ -18,7 +18,7 @@ import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import doobie.util.meta.Meta
 import fs2.Stream
-import testdb.hardcoded.Defaulted
+import testdb.hardcoded.customtypes.Defaulted
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

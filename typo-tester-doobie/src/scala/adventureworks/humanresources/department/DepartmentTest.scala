@@ -1,8 +1,8 @@
 package adventureworks.humanresources.department
 
-import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.{Defaulted, TypoLocalDateTime}
 import adventureworks.public.Name
-import adventureworks.{Defaulted, withConnection}
+import adventureworks.withConnection
 import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite

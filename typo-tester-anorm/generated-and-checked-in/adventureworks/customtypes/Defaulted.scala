@@ -4,6 +4,7 @@
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
 package adventureworks
+package customtypes
 
 import play.api.libs.json.JsError
 import play.api.libs.json.JsNull

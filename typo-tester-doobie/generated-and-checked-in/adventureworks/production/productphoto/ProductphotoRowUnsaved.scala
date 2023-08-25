@@ -7,7 +7,7 @@ package adventureworks
 package production
 package productphoto
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder

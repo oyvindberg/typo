@@ -5,6 +5,7 @@
  */
 package testdb
 package hardcoded
+package customtypes
 
 import io.circe.Decoder
 import io.circe.Encoder

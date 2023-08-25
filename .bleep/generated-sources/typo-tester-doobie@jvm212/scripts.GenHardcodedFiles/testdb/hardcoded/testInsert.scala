@@ -11,6 +11,7 @@ import scala.util.Random
 import testdb.hardcoded.compositepk.person.PersonRepoImpl
 import testdb.hardcoded.compositepk.person.PersonRow
 import testdb.hardcoded.compositepk.person.PersonRowUnsaved
+import testdb.hardcoded.customtypes.Defaulted
 import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId

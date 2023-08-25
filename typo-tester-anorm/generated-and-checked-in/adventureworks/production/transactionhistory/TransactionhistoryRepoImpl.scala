@@ -7,7 +7,7 @@ package adventureworks
 package production
 package transactionhistory
 
-import adventureworks.Defaulted
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.NamedParameter
