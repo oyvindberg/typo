@@ -138,9 +138,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"$targ.$arrayToStatementName"
         // fallback array case.
         case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$ToStatement.arrayToParameter(${lookupParameterMetaDataFor(targ)})"
-        case other =>
-          println(ToStatement.of(other).render)
-          sc.Summon(ToStatement.of(other)).code
+        case other                                     => sc.Summon(ToStatement.of(other)).code
       }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
