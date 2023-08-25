@@ -22,29 +22,29 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PchViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.startdate]] */
-  startdate: Option[TypoLocalDateTime],
+  startdate: TypoLocalDateTime,
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.enddate]] */
-  enddate: Option[TypoLocalDateTime],
+  enddate: TypoLocalDateTime,
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.standardcost]] */
-  standardcost: Option[BigDecimal],
+  standardcost: BigDecimal,
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PchViewRow {
   implicit lazy val reads: Reads[PchViewRow] = Reads[PchViewRow](json => JsResult.fromTry(
       Try(
         PchViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
-          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          standardcost = json.\("standardcost").toOption.map(_.as(Reads.bigDecReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          productid = json.\("productid").as(ProductId.reads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").as(TypoLocalDateTime.reads),
+          standardcost = json.\("standardcost").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -52,23 +52,23 @@ object PchViewRow {
   def rowParser(idx: Int): RowParser[PchViewRow] = RowParser[PchViewRow] { row =>
     Success(
       PchViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        productid = row(idx + 1)(Column.columnToOption(ProductId.column)),
-        startdate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
-        enddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column)),
-        standardcost = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        productid = row(idx + 1)(ProductId.column),
+        startdate = row(idx + 2)(TypoLocalDateTime.column),
+        enddate = row(idx + 3)(TypoLocalDateTime.column),
+        standardcost = row(idx + 4)(Column.columnToScalaBigDecimal),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PchViewRow] = OWrites[PchViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
-      "startdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.startdate),
-      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
-      "standardcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.standardcost),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+      "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
+      "standardcost" -> Writes.BigDecimalWrites.writes(o.standardcost),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

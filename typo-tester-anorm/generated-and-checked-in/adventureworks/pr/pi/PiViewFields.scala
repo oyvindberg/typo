@@ -11,17 +11,17 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PiViewFields[Row] {
-  val id: OptField[Int, Row]
-  val productid: OptField[ProductId, Row]
-  val locationid: OptField[LocationId, Row]
-  val shelf: OptField[/* max 10 chars */ String, Row]
-  val bin: OptField[Int, Row]
-  val quantity: OptField[Int, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val productid: Field[ProductId, Row]
+  val locationid: Field[LocationId, Row]
+  val shelf: Field[/* max 10 chars */ String, Row]
+  val bin: Field[Int, Row]
+  val quantity: Field[Int, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PiViewFields extends PiViewStructure[PiViewRow](None, identity, (_, x) => x)
 

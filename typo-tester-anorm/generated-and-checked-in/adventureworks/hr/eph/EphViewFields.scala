@@ -9,15 +9,15 @@ package eph
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait EphViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val ratechangedate: OptField[TypoLocalDateTime, Row]
-  val rate: OptField[BigDecimal, Row]
-  val payfrequency: OptField[Int, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val ratechangedate: Field[TypoLocalDateTime, Row]
+  val rate: Field[BigDecimal, Row]
+  val payfrequency: Field[Int, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object EphViewFields extends EphViewStructure[EphViewRow](None, identity, (_, x) => x)
 

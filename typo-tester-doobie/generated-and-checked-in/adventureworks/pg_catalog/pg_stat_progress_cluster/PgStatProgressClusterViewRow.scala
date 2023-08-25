@@ -15,51 +15,51 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatProgressClusterViewRow(
-  pid: Option[Int],
-  datid: Option[/* oid */ Long],
+  pid: Int,
+  datid: /* oid */ Long,
   datname: Option[String],
-  relid: Option[/* oid */ Long],
-  command: Option[String],
-  phase: Option[String],
-  clusterIndexRelid: Option[/* oid */ Long],
-  heapTuplesScanned: Option[Long],
-  heapTuplesWritten: Option[Long],
-  heapBlksTotal: Option[Long],
-  heapBlksScanned: Option[Long],
-  indexRebuildCount: Option[Long]
+  relid: /* oid */ Long,
+  command: String,
+  phase: String,
+  clusterIndexRelid: /* oid */ Long,
+  heapTuplesScanned: Long,
+  heapTuplesWritten: Long,
+  heapBlksTotal: Long,
+  heapBlksScanned: Long,
+  indexRebuildCount: Long
 )
 
 object PgStatProgressClusterViewRow {
-  implicit lazy val decoder: Decoder[PgStatProgressClusterViewRow] = Decoder.forProduct12[PgStatProgressClusterViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[/* oid */ Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count")(PgStatProgressClusterViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit lazy val encoder: Encoder[PgStatProgressClusterViewRow] = Encoder.forProduct12[PgStatProgressClusterViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[/* oid */ Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count")(x => (x.pid, x.datid, x.datname, x.relid, x.command, x.phase, x.clusterIndexRelid, x.heapTuplesScanned, x.heapTuplesWritten, x.heapBlksTotal, x.heapBlksScanned, x.indexRebuildCount))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val decoder: Decoder[PgStatProgressClusterViewRow] = Decoder.forProduct12[PgStatProgressClusterViewRow, Int, /* oid */ Long, Option[String], /* oid */ Long, String, String, /* oid */ Long, Long, Long, Long, Long, Long]("pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count")(PgStatProgressClusterViewRow.apply)(Decoder.decodeInt, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgStatProgressClusterViewRow] = Encoder.forProduct12[PgStatProgressClusterViewRow, Int, /* oid */ Long, Option[String], /* oid */ Long, String, String, /* oid */ Long, Long, Long, Long, Long, Long]("pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count")(x => (x.pid, x.datid, x.datname, x.relid, x.command, x.phase, x.clusterIndexRelid, x.heapTuplesScanned, x.heapTuplesWritten, x.heapBlksTotal, x.heapBlksScanned, x.indexRebuildCount))(Encoder.encodeInt, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgStatProgressClusterViewRow] = new Read[PgStatProgressClusterViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressClusterViewRow(
-      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      pid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      datid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
       datname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      command = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      phase = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      clusterIndexRelid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
-      heapTuplesScanned = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
-      heapTuplesWritten = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
-      heapBlksTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
-      heapBlksScanned = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10),
-      indexRebuildCount = Meta.LongMeta.get.unsafeGetNullable(rs, i + 11)
+      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      command = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      phase = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      clusterIndexRelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
+      heapTuplesScanned = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
+      heapTuplesWritten = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 8),
+      heapBlksTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 9),
+      heapBlksScanned = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 10),
+      indexRebuildCount = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 11)
     )
   )
 }

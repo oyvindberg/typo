@@ -18,34 +18,34 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class DViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
-  departmentid: Option[DepartmentId],
+  departmentid: DepartmentId,
   /** Points to [[humanresources.department.DepartmentRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[humanresources.department.DepartmentRow.groupname]] */
-  groupname: Option[Name],
+  groupname: Name,
   /** Points to [[humanresources.department.DepartmentRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object DViewRow {
-  implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(DepartmentId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(DepartmentId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, Int, DepartmentId, Name, Name, TypoLocalDateTime]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)(Decoder.decodeInt, DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, Int, DepartmentId, Name, Name, TypoLocalDateTime]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))(Encoder.encodeInt, DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[DViewRow] = new Read[DViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (DepartmentId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (DepartmentId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      departmentid = DepartmentId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      groupname = Name.get.unsafeGetNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      groupname = Name.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

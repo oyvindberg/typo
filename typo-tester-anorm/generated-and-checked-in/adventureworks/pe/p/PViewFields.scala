@@ -15,23 +15,22 @@ import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.OptField
 
 trait PViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val persontype: OptField[/* bpchar, max 2 chars */ String, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val persontype: Field[/* bpchar, max 2 chars */ String, Row]
   val namestyle: Field[NameStyle, Row]
-  val title: OptField[/* max 8 chars */ String, Row]
-  val firstname: OptField[/* user-picked */ FirstName, Row]
-  val middlename: OptField[Name, Row]
-  val lastname: OptField[Name, Row]
-  val suffix: OptField[/* max 10 chars */ String, Row]
-  val emailpromotion: OptField[Int, Row]
-  val additionalcontactinfo: OptField[TypoXml, Row]
-  val demographics: OptField[TypoXml, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val title: Field[/* max 8 chars */ String, Row]
+  val firstname: Field[/* user-picked */ FirstName, Row]
+  val middlename: Field[Name, Row]
+  val lastname: Field[Name, Row]
+  val suffix: Field[/* max 10 chars */ String, Row]
+  val emailpromotion: Field[Int, Row]
+  val additionalcontactinfo: Field[TypoXml, Row]
+  val demographics: Field[TypoXml, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PViewFields extends PViewStructure[PViewRow](None, identity, (_, x) => x)
 

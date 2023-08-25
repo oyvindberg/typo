@@ -19,34 +19,34 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PpViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.personphone.PersonphoneRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
-  phonenumber: Option[Phone],
+  phonenumber: Phone,
   /** Points to [[person.personphone.PersonphoneRow.phonenumbertypeid]] */
-  phonenumbertypeid: Option[PhonenumbertypeId],
+  phonenumbertypeid: PhonenumbertypeId,
   /** Points to [[person.personphone.PersonphoneRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PpViewRow {
-  implicit lazy val decoder: Decoder[PpViewRow] = Decoder.forProduct5[PpViewRow, Option[Int], Option[BusinessentityId], Option[Phone], Option[PhonenumbertypeId], Option[TypoLocalDateTime]]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PpViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(PhonenumbertypeId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PpViewRow] = Encoder.forProduct5[PpViewRow, Option[Int], Option[BusinessentityId], Option[Phone], Option[PhonenumbertypeId], Option[TypoLocalDateTime]]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.id, x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(PhonenumbertypeId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PpViewRow] = Decoder.forProduct5[PpViewRow, Int, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PpViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, Phone.decoder, PhonenumbertypeId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PpViewRow] = Encoder.forProduct5[PpViewRow, Int, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.id, x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, Phone.encoder, PhonenumbertypeId.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PpViewRow] = new Read[PpViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (Phone.get, Nullability.Nullable),
-      (PhonenumbertypeId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Phone.get, Nullability.NoNulls),
+      (PhonenumbertypeId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      phonenumber = Phone.get.unsafeGetNullable(rs, i + 2),
-      phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      phonenumber = Phone.get.unsafeGetNonNullable(rs, i + 2),
+      phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

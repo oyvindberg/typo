@@ -7,17 +7,18 @@ package adventureworks
 package pg_catalog
 package pg_tables
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgTablesViewFields[Row] {
   val schemaname: OptField[String, Row]
-  val tablename: OptField[String, Row]
-  val tableowner: OptField[String, Row]
+  val tablename: Field[String, Row]
+  val tableowner: Field[String, Row]
   val tablespace: OptField[String, Row]
-  val hasindexes: OptField[Boolean, Row]
-  val hasrules: OptField[Boolean, Row]
-  val hastriggers: OptField[Boolean, Row]
-  val rowsecurity: OptField[Boolean, Row]
+  val hasindexes: Field[Boolean, Row]
+  val hasrules: Field[Boolean, Row]
+  val hastriggers: Field[Boolean, Row]
+  val rowsecurity: Field[Boolean, Row]
 }
 object PgTablesViewFields extends PgTablesViewStructure[PgTablesViewRow](None, identity, (_, x) => x)
 

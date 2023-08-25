@@ -18,38 +18,38 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class LViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.location.LocationRow.locationid]] */
-  locationid: Option[LocationId],
+  locationid: LocationId,
   /** Points to [[production.location.LocationRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[production.location.LocationRow.costrate]] */
-  costrate: Option[BigDecimal],
+  costrate: BigDecimal,
   /** Points to [[production.location.LocationRow.availability]] */
-  availability: Option[BigDecimal],
+  availability: BigDecimal,
   /** Points to [[production.location.LocationRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object LViewRow {
-  implicit lazy val decoder: Decoder[LViewRow] = Decoder.forProduct6[LViewRow, Option[Int], Option[LocationId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "locationid", "name", "costrate", "availability", "modifieddate")(LViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(LocationId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[LViewRow] = Encoder.forProduct6[LViewRow, Option[Int], Option[LocationId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "locationid", "name", "costrate", "availability", "modifieddate")(x => (x.id, x.locationid, x.name, x.costrate, x.availability, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(LocationId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[LViewRow] = Decoder.forProduct6[LViewRow, Int, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "locationid", "name", "costrate", "availability", "modifieddate")(LViewRow.apply)(Decoder.decodeInt, LocationId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[LViewRow] = Encoder.forProduct6[LViewRow, Int, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "locationid", "name", "costrate", "availability", "modifieddate")(x => (x.id, x.locationid, x.name, x.costrate, x.availability, x.modifieddate))(Encoder.encodeInt, LocationId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[LViewRow] = new Read[LViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (LocationId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (LocationId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => LViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      locationid = LocationId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      costrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
-      availability = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      locationid = LocationId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      costrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      availability = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

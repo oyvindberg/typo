@@ -8,15 +8,15 @@ package pg_catalog
 package pg_cursors
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgCursorsViewFields[Row] {
-  val name: OptField[String, Row]
-  val statement: OptField[String, Row]
-  val isHoldable: OptField[Boolean, Row]
-  val isBinary: OptField[Boolean, Row]
-  val isScrollable: OptField[Boolean, Row]
-  val creationTime: OptField[TypoOffsetDateTime, Row]
+  val name: Field[String, Row]
+  val statement: Field[String, Row]
+  val isHoldable: Field[Boolean, Row]
+  val isBinary: Field[Boolean, Row]
+  val isScrollable: Field[Boolean, Row]
+  val creationTime: Field[TypoOffsetDateTime, Row]
 }
 object PgCursorsViewFields extends PgCursorsViewStructure[PgCursorsViewRow](None, identity, (_, x) => x)
 

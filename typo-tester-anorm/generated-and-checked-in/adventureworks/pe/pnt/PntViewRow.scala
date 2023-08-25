@@ -23,23 +23,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PntViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
-  phonenumbertypeid: Option[PhonenumbertypeId],
+  phonenumbertypeid: PhonenumbertypeId,
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PntViewRow {
   implicit lazy val reads: Reads[PntViewRow] = Reads[PntViewRow](json => JsResult.fromTry(
       Try(
         PntViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as(PhonenumbertypeId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          phonenumbertypeid = json.\("phonenumbertypeid").as(PhonenumbertypeId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,19 +47,19 @@ object PntViewRow {
   def rowParser(idx: Int): RowParser[PntViewRow] = RowParser[PntViewRow] { row =>
     Success(
       PntViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        phonenumbertypeid = row(idx + 1)(Column.columnToOption(PhonenumbertypeId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        phonenumbertypeid = row(idx + 1)(PhonenumbertypeId.column),
+        name = row(idx + 2)(Name.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PntViewRow] = OWrites[PntViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "phonenumbertypeid" -> Writes.OptionWrites(PhonenumbertypeId.writes).writes(o.phonenumbertypeid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "phonenumbertypeid" -> PhonenumbertypeId.writes.writes(o.phonenumbertypeid),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

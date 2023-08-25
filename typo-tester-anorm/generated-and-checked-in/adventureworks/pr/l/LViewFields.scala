@@ -10,15 +10,15 @@ package l
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait LViewFields[Row] {
-  val id: OptField[Int, Row]
-  val locationid: OptField[LocationId, Row]
-  val name: OptField[Name, Row]
-  val costrate: OptField[BigDecimal, Row]
-  val availability: OptField[BigDecimal, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val locationid: Field[LocationId, Row]
+  val name: Field[Name, Row]
+  val costrate: Field[BigDecimal, Row]
+  val availability: Field[BigDecimal, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object LViewFields extends LViewStructure[LViewRow](None, identity, (_, x) => x)
 

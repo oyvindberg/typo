@@ -11,16 +11,16 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SmViewFields[Row] {
-  val id: OptField[Int, Row]
-  val shipmethodid: OptField[ShipmethodId, Row]
-  val name: OptField[Name, Row]
-  val shipbase: OptField[BigDecimal, Row]
-  val shiprate: OptField[BigDecimal, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val shipmethodid: Field[ShipmethodId, Row]
+  val name: Field[Name, Row]
+  val shipbase: Field[BigDecimal, Row]
+  val shiprate: Field[BigDecimal, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SmViewFields extends SmViewStructure[SmViewRow](None, identity, (_, x) => x)
 

@@ -8,15 +8,15 @@ package information_schema
 package check_constraint_routine_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CheckConstraintRoutineUsageViewFields[Row] {
-  val constraintCatalog: OptField[SqlIdentifier, Row]
-  val constraintSchema: OptField[SqlIdentifier, Row]
-  val constraintName: OptField[SqlIdentifier, Row]
-  val specificCatalog: OptField[SqlIdentifier, Row]
-  val specificSchema: OptField[SqlIdentifier, Row]
-  val specificName: OptField[SqlIdentifier, Row]
+  val constraintCatalog: Field[SqlIdentifier, Row]
+  val constraintSchema: Field[SqlIdentifier, Row]
+  val constraintName: Field[SqlIdentifier, Row]
+  val specificCatalog: Field[SqlIdentifier, Row]
+  val specificSchema: Field[SqlIdentifier, Row]
+  val specificName: Field[SqlIdentifier, Row]
 }
 object CheckConstraintRoutineUsageViewFields extends CheckConstraintRoutineUsageViewStructure[CheckConstraintRoutineUsageViewRow](None, identity, (_, x) => x)
 

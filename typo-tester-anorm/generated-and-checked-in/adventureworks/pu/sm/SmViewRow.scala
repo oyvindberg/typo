@@ -24,32 +24,32 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SmViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
-  shipmethodid: Option[ShipmethodId],
+  shipmethodid: ShipmethodId,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipbase]] */
-  shipbase: Option[BigDecimal],
+  shipbase: BigDecimal,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shiprate]] */
-  shiprate: Option[BigDecimal],
+  shiprate: BigDecimal,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SmViewRow {
   implicit lazy val reads: Reads[SmViewRow] = Reads[SmViewRow](json => JsResult.fromTry(
       Try(
         SmViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          shipmethodid = json.\("shipmethodid").toOption.map(_.as(ShipmethodId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          shipbase = json.\("shipbase").toOption.map(_.as(Reads.bigDecReads)),
-          shiprate = json.\("shiprate").toOption.map(_.as(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
+          name = json.\("name").as(Name.reads),
+          shipbase = json.\("shipbase").as(Reads.bigDecReads),
+          shiprate = json.\("shiprate").as(Reads.bigDecReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -57,25 +57,25 @@ object SmViewRow {
   def rowParser(idx: Int): RowParser[SmViewRow] = RowParser[SmViewRow] { row =>
     Success(
       SmViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        shipmethodid = row(idx + 1)(Column.columnToOption(ShipmethodId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        shipbase = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        shiprate = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        rowguid = row(idx + 5)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        shipmethodid = row(idx + 1)(ShipmethodId.column),
+        name = row(idx + 2)(Name.column),
+        shipbase = row(idx + 3)(Column.columnToScalaBigDecimal),
+        shiprate = row(idx + 4)(Column.columnToScalaBigDecimal),
+        rowguid = row(idx + 5)(Column.columnToUUID),
+        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SmViewRow] = OWrites[SmViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "shipmethodid" -> Writes.OptionWrites(ShipmethodId.writes).writes(o.shipmethodid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "shipbase" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.shipbase),
-      "shiprate" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.shiprate),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
+      "name" -> Name.writes.writes(o.name),
+      "shipbase" -> Writes.BigDecimalWrites.writes(o.shipbase),
+      "shiprate" -> Writes.BigDecimalWrites.writes(o.shiprate),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

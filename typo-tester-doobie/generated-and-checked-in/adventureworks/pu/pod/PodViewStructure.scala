@@ -10,24 +10,24 @@ package pod
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PodViewStructure[Row](val prefix: Option[String], val extract: Row => PodViewRow, val merge: (Row, PodViewRow) => Row)
   extends Relation[PodViewFields, PodViewRow, Row]
     with PodViewFields[Row] { outer =>
 
-  override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val purchaseorderid = new OptField[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, Some("int4"))(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
-  override val purchaseorderdetailid = new OptField[Int, Row](prefix, "purchaseorderdetailid", None, Some("int4"))(x => extract(x).purchaseorderdetailid, (row, value) => merge(row, extract(row).copy(purchaseorderdetailid = value)))
-  override val duedate = new OptField[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), Some("timestamp"))(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
-  override val orderqty = new OptField[Int, Row](prefix, "orderqty", None, Some("int2"))(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
-  override val productid = new OptField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val unitprice = new OptField[BigDecimal, Row](prefix, "unitprice", None, Some("numeric"))(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
-  override val receivedqty = new OptField[BigDecimal, Row](prefix, "receivedqty", None, Some("numeric"))(x => extract(x).receivedqty, (row, value) => merge(row, extract(row).copy(receivedqty = value)))
-  override val rejectedqty = new OptField[BigDecimal, Row](prefix, "rejectedqty", None, Some("numeric"))(x => extract(x).rejectedqty, (row, value) => merge(row, extract(row).copy(rejectedqty = value)))
-  override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val purchaseorderid = new Field[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, Some("int4"))(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
+  override val purchaseorderdetailid = new Field[Int, Row](prefix, "purchaseorderdetailid", None, Some("int4"))(x => extract(x).purchaseorderdetailid, (row, value) => merge(row, extract(row).copy(purchaseorderdetailid = value)))
+  override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), Some("timestamp"))(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
+  override val orderqty = new Field[Int, Row](prefix, "orderqty", None, Some("int2"))(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
+  override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+  override val unitprice = new Field[BigDecimal, Row](prefix, "unitprice", None, Some("numeric"))(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
+  override val receivedqty = new Field[BigDecimal, Row](prefix, "receivedqty", None, Some("numeric"))(x => extract(x).receivedqty, (row, value) => merge(row, extract(row).copy(receivedqty = value)))
+  override val rejectedqty = new Field[BigDecimal, Row](prefix, "rejectedqty", None, Some("numeric"))(x => extract(x).rejectedqty, (row, value) => merge(row, extract(row).copy(rejectedqty = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)

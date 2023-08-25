@@ -20,42 +20,42 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class PmViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productmodel.ProductmodelRow.productmodelid]] */
-  productmodelid: Option[ProductmodelId],
+  productmodelid: ProductmodelId,
   /** Points to [[production.productmodel.ProductmodelRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[production.productmodel.ProductmodelRow.catalogdescription]] */
-  catalogdescription: Option[TypoXml],
+  catalogdescription: TypoXml,
   /** Points to [[production.productmodel.ProductmodelRow.instructions]] */
-  instructions: Option[TypoXml],
+  instructions: TypoXml,
   /** Points to [[production.productmodel.ProductmodelRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[production.productmodel.ProductmodelRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PmViewRow {
-  implicit lazy val decoder: Decoder[PmViewRow] = Decoder.forProduct7[PmViewRow, Option[Int], Option[ProductmodelId], Option[Name], Option[TypoXml], Option[TypoXml], Option[UUID], Option[TypoLocalDateTime]]("id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(PmViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PmViewRow] = Encoder.forProduct7[PmViewRow, Option[Int], Option[ProductmodelId], Option[Name], Option[TypoXml], Option[TypoXml], Option[UUID], Option[TypoLocalDateTime]]("id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(x => (x.id, x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PmViewRow] = Decoder.forProduct7[PmViewRow, Int, ProductmodelId, Name, TypoXml, TypoXml, UUID, TypoLocalDateTime]("id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(PmViewRow.apply)(Decoder.decodeInt, ProductmodelId.decoder, Name.decoder, TypoXml.decoder, TypoXml.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PmViewRow] = Encoder.forProduct7[PmViewRow, Int, ProductmodelId, Name, TypoXml, TypoXml, UUID, TypoLocalDateTime]("id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(x => (x.id, x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate))(Encoder.encodeInt, ProductmodelId.encoder, Name.encoder, TypoXml.encoder, TypoXml.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PmViewRow] = new Read[PmViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ProductmodelId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductmodelId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoXml.get, Nullability.NoNulls),
+      (TypoXml.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PmViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      productmodelid = ProductmodelId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      catalogdescription = TypoXml.get.unsafeGetNullable(rs, i + 3),
-      instructions = TypoXml.get.unsafeGetNullable(rs, i + 4),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      catalogdescription = TypoXml.get.unsafeGetNonNullable(rs, i + 3),
+      instructions = TypoXml.get.unsafeGetNonNullable(rs, i + 4),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

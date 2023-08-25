@@ -11,19 +11,19 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait BomViewFields[Row] {
-  val id: OptField[Int, Row]
-  val billofmaterialsid: OptField[BillofmaterialsId, Row]
-  val productassemblyid: OptField[ProductId, Row]
-  val componentid: OptField[ProductId, Row]
-  val startdate: OptField[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val unitmeasurecode: OptField[UnitmeasureId, Row]
-  val bomlevel: OptField[Int, Row]
-  val perassemblyqty: OptField[BigDecimal, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val billofmaterialsid: Field[BillofmaterialsId, Row]
+  val productassemblyid: Field[ProductId, Row]
+  val componentid: Field[ProductId, Row]
+  val startdate: Field[TypoLocalDateTime, Row]
+  val enddate: Field[TypoLocalDateTime, Row]
+  val unitmeasurecode: Field[UnitmeasureId, Row]
+  val bomlevel: Field[Int, Row]
+  val perassemblyqty: Field[BigDecimal, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object BomViewFields extends BomViewStructure[BomViewRow](None, identity, (_, x) => x)
 

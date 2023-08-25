@@ -24,29 +24,29 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
-  shiftid: Option[ShiftId],
+  shiftid: ShiftId,
   /** Points to [[humanresources.shift.ShiftRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[humanresources.shift.ShiftRow.starttime]] */
-  starttime: Option[TypoLocalTime],
+  starttime: TypoLocalTime,
   /** Points to [[humanresources.shift.ShiftRow.endtime]] */
-  endtime: Option[TypoLocalTime],
+  endtime: TypoLocalTime,
   /** Points to [[humanresources.shift.ShiftRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SViewRow {
   implicit lazy val reads: Reads[SViewRow] = Reads[SViewRow](json => JsResult.fromTry(
       Try(
         SViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          shiftid = json.\("shiftid").toOption.map(_.as(ShiftId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          starttime = json.\("starttime").toOption.map(_.as(TypoLocalTime.reads)),
-          endtime = json.\("endtime").toOption.map(_.as(TypoLocalTime.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          shiftid = json.\("shiftid").as(ShiftId.reads),
+          name = json.\("name").as(Name.reads),
+          starttime = json.\("starttime").as(TypoLocalTime.reads),
+          endtime = json.\("endtime").as(TypoLocalTime.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -54,23 +54,23 @@ object SViewRow {
   def rowParser(idx: Int): RowParser[SViewRow] = RowParser[SViewRow] { row =>
     Success(
       SViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        shiftid = row(idx + 1)(Column.columnToOption(ShiftId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        starttime = row(idx + 3)(Column.columnToOption(TypoLocalTime.column)),
-        endtime = row(idx + 4)(Column.columnToOption(TypoLocalTime.column)),
-        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        shiftid = row(idx + 1)(ShiftId.column),
+        name = row(idx + 2)(Name.column),
+        starttime = row(idx + 3)(TypoLocalTime.column),
+        endtime = row(idx + 4)(TypoLocalTime.column),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SViewRow] = OWrites[SViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "shiftid" -> Writes.OptionWrites(ShiftId.writes).writes(o.shiftid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "starttime" -> Writes.OptionWrites(TypoLocalTime.writes).writes(o.starttime),
-      "endtime" -> Writes.OptionWrites(TypoLocalTime.writes).writes(o.endtime),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "shiftid" -> ShiftId.writes.writes(o.shiftid),
+      "name" -> Name.writes.writes(o.name),
+      "starttime" -> TypoLocalTime.writes.writes(o.starttime),
+      "endtime" -> TypoLocalTime.writes.writes(o.endtime),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

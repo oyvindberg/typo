@@ -15,33 +15,33 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatUserFunctionsViewRow(
-  funcid: Option[/* oid */ Long],
+  funcid: /* oid */ Long,
   schemaname: Option[String],
-  funcname: Option[String],
-  calls: Option[Long],
-  totalTime: Option[Double],
-  selfTime: Option[Double]
+  funcname: String,
+  calls: Long,
+  totalTime: Double,
+  selfTime: Double
 )
 
 object PgStatUserFunctionsViewRow {
-  implicit lazy val decoder: Decoder[PgStatUserFunctionsViewRow] = Decoder.forProduct6[PgStatUserFunctionsViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Double], Option[Double]]("funcid", "schemaname", "funcname", "calls", "total_time", "self_time")(PgStatUserFunctionsViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeDouble))
-  implicit lazy val encoder: Encoder[PgStatUserFunctionsViewRow] = Encoder.forProduct6[PgStatUserFunctionsViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Double], Option[Double]]("funcid", "schemaname", "funcname", "calls", "total_time", "self_time")(x => (x.funcid, x.schemaname, x.funcname, x.calls, x.totalTime, x.selfTime))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeDouble))
+  implicit lazy val decoder: Decoder[PgStatUserFunctionsViewRow] = Decoder.forProduct6[PgStatUserFunctionsViewRow, /* oid */ Long, Option[String], String, Long, Double, Double]("funcid", "schemaname", "funcname", "calls", "total_time", "self_time")(PgStatUserFunctionsViewRow.apply)(Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeLong, Decoder.decodeDouble, Decoder.decodeDouble)
+  implicit lazy val encoder: Encoder[PgStatUserFunctionsViewRow] = Encoder.forProduct6[PgStatUserFunctionsViewRow, /* oid */ Long, Option[String], String, Long, Double, Double]("funcid", "schemaname", "funcname", "calls", "total_time", "self_time")(x => (x.funcid, x.schemaname, x.funcname, x.calls, x.totalTime, x.selfTime))(Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeLong, Encoder.encodeDouble, Encoder.encodeDouble)
   implicit lazy val read: Read[PgStatUserFunctionsViewRow] = new Read[PgStatUserFunctionsViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.DoubleMeta.get, Nullability.Nullable),
-      (Meta.DoubleMeta.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.DoubleMeta.get, Nullability.NoNulls),
+      (Meta.DoubleMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatUserFunctionsViewRow(
-      funcid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
+      funcid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
       schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      funcname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      calls = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      totalTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 4),
-      selfTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 5)
+      funcname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      calls = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      totalTime = Meta.DoubleMeta.get.unsafeGetNonNullable(rs, i + 4),
+      selfTime = Meta.DoubleMeta.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

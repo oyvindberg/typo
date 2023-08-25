@@ -16,48 +16,48 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatBgwriterViewRow(
-  checkpointsTimed: Option[Long],
-  checkpointsReq: Option[Long],
-  checkpointWriteTime: Option[Double],
-  checkpointSyncTime: Option[Double],
-  buffersCheckpoint: Option[Long],
-  buffersClean: Option[Long],
-  maxwrittenClean: Option[Long],
-  buffersBackend: Option[Long],
-  buffersBackendFsync: Option[Long],
-  buffersAlloc: Option[Long],
-  statsReset: Option[TypoOffsetDateTime]
+  checkpointsTimed: Long,
+  checkpointsReq: Long,
+  checkpointWriteTime: Double,
+  checkpointSyncTime: Double,
+  buffersCheckpoint: Long,
+  buffersClean: Long,
+  maxwrittenClean: Long,
+  buffersBackend: Long,
+  buffersBackendFsync: Long,
+  buffersAlloc: Long,
+  statsReset: TypoOffsetDateTime
 )
 
 object PgStatBgwriterViewRow {
-  implicit lazy val decoder: Decoder[PgStatBgwriterViewRow] = Decoder.forProduct11[PgStatBgwriterViewRow, Option[Long], Option[Long], Option[Double], Option[Double], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(PgStatBgwriterViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[PgStatBgwriterViewRow] = Encoder.forProduct11[PgStatBgwriterViewRow, Option[Long], Option[Long], Option[Double], Option[Double], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(x => (x.checkpointsTimed, x.checkpointsReq, x.checkpointWriteTime, x.checkpointSyncTime, x.buffersCheckpoint, x.buffersClean, x.maxwrittenClean, x.buffersBackend, x.buffersBackendFsync, x.buffersAlloc, x.statsReset))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[PgStatBgwriterViewRow] = Decoder.forProduct11[PgStatBgwriterViewRow, Long, Long, Double, Double, Long, Long, Long, Long, Long, Long, TypoOffsetDateTime]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(PgStatBgwriterViewRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeDouble, Decoder.decodeDouble, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, TypoOffsetDateTime.decoder)
+  implicit lazy val encoder: Encoder[PgStatBgwriterViewRow] = Encoder.forProduct11[PgStatBgwriterViewRow, Long, Long, Double, Double, Long, Long, Long, Long, Long, Long, TypoOffsetDateTime]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(x => (x.checkpointsTimed, x.checkpointsReq, x.checkpointWriteTime, x.checkpointSyncTime, x.buffersCheckpoint, x.buffersClean, x.maxwrittenClean, x.buffersBackend, x.buffersBackendFsync, x.buffersAlloc, x.statsReset))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeDouble, Encoder.encodeDouble, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, TypoOffsetDateTime.encoder)
   implicit lazy val read: Read[PgStatBgwriterViewRow] = new Read[PgStatBgwriterViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.DoubleMeta.get, Nullability.Nullable),
-      (Meta.DoubleMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.DoubleMeta.get, Nullability.NoNulls),
+      (Meta.DoubleMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (TypoOffsetDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatBgwriterViewRow(
-      checkpointsTimed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
-      checkpointsReq = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
-      checkpointWriteTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 2),
-      checkpointSyncTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 3),
-      buffersCheckpoint = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
-      buffersClean = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
-      maxwrittenClean = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
-      buffersBackend = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
-      buffersBackendFsync = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
-      buffersAlloc = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
-      statsReset = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 10)
+      checkpointsTimed = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      checkpointsReq = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      checkpointWriteTime = Meta.DoubleMeta.get.unsafeGetNonNullable(rs, i + 2),
+      checkpointSyncTime = Meta.DoubleMeta.get.unsafeGetNonNullable(rs, i + 3),
+      buffersCheckpoint = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      buffersClean = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      maxwrittenClean = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
+      buffersBackend = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
+      buffersBackendFsync = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 8),
+      buffersAlloc = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 9),
+      statsReset = TypoOffsetDateTime.get.unsafeGetNonNullable(rs, i + 10)
     )
   )
 }

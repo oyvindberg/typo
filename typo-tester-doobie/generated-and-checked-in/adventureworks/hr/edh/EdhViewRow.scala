@@ -20,42 +20,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class EdhViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.departmentid]] */
-  departmentid: Option[DepartmentId],
+  departmentid: DepartmentId,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.shiftid]] */
-  shiftid: Option[ShiftId],
+  shiftid: ShiftId,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
-  startdate: Option[TypoLocalDate],
+  startdate: TypoLocalDate,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.enddate]] */
-  enddate: Option[TypoLocalDate],
+  enddate: TypoLocalDate,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object EdhViewRow {
-  implicit lazy val decoder: Decoder[EdhViewRow] = Decoder.forProduct7[EdhViewRow, Option[Int], Option[BusinessentityId], Option[DepartmentId], Option[ShiftId], Option[TypoLocalDate], Option[TypoLocalDate], Option[TypoLocalDateTime]]("id", "businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(EdhViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(DepartmentId.decoder), Decoder.decodeOption(ShiftId.decoder), Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[EdhViewRow] = Encoder.forProduct7[EdhViewRow, Option[Int], Option[BusinessentityId], Option[DepartmentId], Option[ShiftId], Option[TypoLocalDate], Option[TypoLocalDate], Option[TypoLocalDateTime]]("id", "businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(x => (x.id, x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(DepartmentId.encoder), Encoder.encodeOption(ShiftId.encoder), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[EdhViewRow] = Decoder.forProduct7[EdhViewRow, Int, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, TypoLocalDate, TypoLocalDateTime]("id", "businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(EdhViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, DepartmentId.decoder, ShiftId.decoder, TypoLocalDate.decoder, TypoLocalDate.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[EdhViewRow] = Encoder.forProduct7[EdhViewRow, Int, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, TypoLocalDate, TypoLocalDateTime]("id", "businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(x => (x.id, x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, DepartmentId.encoder, ShiftId.encoder, TypoLocalDate.encoder, TypoLocalDate.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[EdhViewRow] = new Read[EdhViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (DepartmentId.get, Nullability.Nullable),
-      (ShiftId.get, Nullability.Nullable),
-      (TypoLocalDate.get, Nullability.Nullable),
-      (TypoLocalDate.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (DepartmentId.get, Nullability.NoNulls),
+      (ShiftId.get, Nullability.NoNulls),
+      (TypoLocalDate.get, Nullability.NoNulls),
+      (TypoLocalDate.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EdhViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      departmentid = DepartmentId.get.unsafeGetNullable(rs, i + 2),
-      shiftid = ShiftId.get.unsafeGetNullable(rs, i + 3),
-      startdate = TypoLocalDate.get.unsafeGetNullable(rs, i + 4),
-      enddate = TypoLocalDate.get.unsafeGetNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 2),
+      shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 3),
+      startdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 4),
+      enddate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

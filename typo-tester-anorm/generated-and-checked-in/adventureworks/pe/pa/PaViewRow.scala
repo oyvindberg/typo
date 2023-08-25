@@ -23,29 +23,29 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PaViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.password.PasswordRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.password.PasswordRow.passwordhash]] */
-  passwordhash: Option[/* max 128 chars */ String],
+  passwordhash: /* max 128 chars */ String,
   /** Points to [[person.password.PasswordRow.passwordsalt]] */
-  passwordsalt: Option[/* max 10 chars */ String],
+  passwordsalt: /* max 10 chars */ String,
   /** Points to [[person.password.PasswordRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.password.PasswordRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PaViewRow {
   implicit lazy val reads: Reads[PaViewRow] = Reads[PaViewRow](json => JsResult.fromTry(
       Try(
         PaViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          passwordhash = json.\("passwordhash").toOption.map(_.as(Reads.StringReads)),
-          passwordsalt = json.\("passwordsalt").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          passwordhash = json.\("passwordhash").as(Reads.StringReads),
+          passwordsalt = json.\("passwordsalt").as(Reads.StringReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -53,23 +53,23 @@ object PaViewRow {
   def rowParser(idx: Int): RowParser[PaViewRow] = RowParser[PaViewRow] { row =>
     Success(
       PaViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        passwordhash = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        passwordsalt = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 4)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        passwordhash = row(idx + 2)(Column.columnToString),
+        passwordsalt = row(idx + 3)(Column.columnToString),
+        rowguid = row(idx + 4)(Column.columnToUUID),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PaViewRow] = OWrites[PaViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "passwordhash" -> Writes.OptionWrites(Writes.StringWrites).writes(o.passwordhash),
-      "passwordsalt" -> Writes.OptionWrites(Writes.StringWrites).writes(o.passwordsalt),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "passwordhash" -> Writes.StringWrites.writes(o.passwordhash),
+      "passwordsalt" -> Writes.StringWrites.writes(o.passwordsalt),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

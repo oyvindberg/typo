@@ -11,14 +11,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait JcViewFields[Row] {
-  val id: OptField[Int, Row]
-  val jobcandidateid: OptField[JobcandidateId, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val resume: OptField[TypoXml, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val jobcandidateid: Field[JobcandidateId, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val resume: Field[TypoXml, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object JcViewFields extends JcViewStructure[JcViewRow](None, identity, (_, x) => x)
 

@@ -18,66 +18,66 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class WrViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.workorderid]] */
-  workorderid: Option[WorkorderId],
+  workorderid: WorkorderId,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.productid]] */
-  productid: Option[Int],
+  productid: Int,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.operationsequence]] */
-  operationsequence: Option[Int],
+  operationsequence: Int,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.locationid]] */
-  locationid: Option[LocationId],
+  locationid: LocationId,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.scheduledstartdate]] */
-  scheduledstartdate: Option[TypoLocalDateTime],
+  scheduledstartdate: TypoLocalDateTime,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.scheduledenddate]] */
-  scheduledenddate: Option[TypoLocalDateTime],
+  scheduledenddate: TypoLocalDateTime,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualstartdate]] */
-  actualstartdate: Option[TypoLocalDateTime],
+  actualstartdate: TypoLocalDateTime,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualenddate]] */
-  actualenddate: Option[TypoLocalDateTime],
+  actualenddate: TypoLocalDateTime,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualresourcehrs]] */
-  actualresourcehrs: Option[BigDecimal],
+  actualresourcehrs: BigDecimal,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.plannedcost]] */
-  plannedcost: Option[BigDecimal],
+  plannedcost: BigDecimal,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualcost]] */
-  actualcost: Option[BigDecimal],
+  actualcost: BigDecimal,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object WrViewRow {
-  implicit lazy val decoder: Decoder[WrViewRow] = Decoder.forProduct13[WrViewRow, Option[Int], Option[WorkorderId], Option[Int], Option[Int], Option[LocationId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(WrViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(WorkorderId.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(LocationId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[WrViewRow] = Encoder.forProduct13[WrViewRow, Option[Int], Option[WorkorderId], Option[Int], Option[Int], Option[LocationId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(x => (x.id, x.workorderid, x.productid, x.operationsequence, x.locationid, x.scheduledstartdate, x.scheduledenddate, x.actualstartdate, x.actualenddate, x.actualresourcehrs, x.plannedcost, x.actualcost, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(WorkorderId.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(LocationId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[WrViewRow] = Decoder.forProduct13[WrViewRow, Int, WorkorderId, Int, Int, LocationId, TypoLocalDateTime, TypoLocalDateTime, TypoLocalDateTime, TypoLocalDateTime, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(WrViewRow.apply)(Decoder.decodeInt, WorkorderId.decoder, Decoder.decodeInt, Decoder.decodeInt, LocationId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[WrViewRow] = Encoder.forProduct13[WrViewRow, Int, WorkorderId, Int, Int, LocationId, TypoLocalDateTime, TypoLocalDateTime, TypoLocalDateTime, TypoLocalDateTime, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(x => (x.id, x.workorderid, x.productid, x.operationsequence, x.locationid, x.scheduledstartdate, x.scheduledenddate, x.actualstartdate, x.actualenddate, x.actualresourcehrs, x.plannedcost, x.actualcost, x.modifieddate))(Encoder.encodeInt, WorkorderId.encoder, Encoder.encodeInt, Encoder.encodeInt, LocationId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[WrViewRow] = new Read[WrViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (WorkorderId.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (LocationId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (WorkorderId.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (LocationId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => WrViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      workorderid = WorkorderId.get.unsafeGetNullable(rs, i + 1),
-      productid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
-      operationsequence = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
-      locationid = LocationId.get.unsafeGetNullable(rs, i + 4),
-      scheduledstartdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
-      scheduledenddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6),
-      actualstartdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
-      actualenddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 8),
-      actualresourcehrs = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 9),
-      plannedcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 10),
-      actualcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 11),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 12)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      workorderid = WorkorderId.get.unsafeGetNonNullable(rs, i + 1),
+      productid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      operationsequence = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      locationid = LocationId.get.unsafeGetNonNullable(rs, i + 4),
+      scheduledstartdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
+      scheduledenddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6),
+      actualstartdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7),
+      actualenddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8),
+      actualresourcehrs = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 9),
+      plannedcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 10),
+      actualcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 11),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 12)
     )
   )
 }

@@ -9,20 +9,20 @@ package eph
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class EphViewStructure[Row](val prefix: Option[String], val extract: Row => EphViewRow, val merge: (Row, EphViewRow) => Row)
   extends Relation[EphViewFields, EphViewRow, Row]
     with EphViewFields[Row] { outer =>
 
-  override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val businessentityid = new OptField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val ratechangedate = new OptField[TypoLocalDateTime, Row](prefix, "ratechangedate", Some("text"), Some("timestamp"))(x => extract(x).ratechangedate, (row, value) => merge(row, extract(row).copy(ratechangedate = value)))
-  override val rate = new OptField[BigDecimal, Row](prefix, "rate", None, Some("numeric"))(x => extract(x).rate, (row, value) => merge(row, extract(row).copy(rate = value)))
-  override val payfrequency = new OptField[Int, Row](prefix, "payfrequency", None, Some("int2"))(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
-  override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+  override val ratechangedate = new Field[TypoLocalDateTime, Row](prefix, "ratechangedate", Some("text"), Some("timestamp"))(x => extract(x).ratechangedate, (row, value) => merge(row, extract(row).copy(ratechangedate = value)))
+  override val rate = new Field[BigDecimal, Row](prefix, "rate", None, Some("numeric"))(x => extract(x).rate, (row, value) => merge(row, extract(row).copy(rate = value)))
+  override val payfrequency = new Field[Int, Row](prefix, "payfrequency", None, Some("int2"))(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, businessentityid, ratechangedate, rate, payfrequency, modifieddate)

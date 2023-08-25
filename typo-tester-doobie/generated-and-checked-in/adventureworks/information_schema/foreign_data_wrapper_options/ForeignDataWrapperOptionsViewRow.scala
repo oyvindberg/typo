@@ -17,28 +17,28 @@ import java.sql.ResultSet
 
 case class ForeignDataWrapperOptionsViewRow(
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperCatalog]] */
-  foreignDataWrapperCatalog: Option[SqlIdentifier],
+  foreignDataWrapperCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperName]] */
-  foreignDataWrapperName: Option[SqlIdentifier],
-  optionName: Option[SqlIdentifier],
-  optionValue: Option[CharacterData]
+  foreignDataWrapperName: SqlIdentifier,
+  optionName: SqlIdentifier,
+  optionValue: CharacterData
 )
 
 object ForeignDataWrapperOptionsViewRow {
-  implicit lazy val decoder: Decoder[ForeignDataWrapperOptionsViewRow] = Decoder.forProduct4[ForeignDataWrapperOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(ForeignDataWrapperOptionsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit lazy val encoder: Encoder[ForeignDataWrapperOptionsViewRow] = Encoder.forProduct4[ForeignDataWrapperOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.optionName, x.optionValue))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val decoder: Decoder[ForeignDataWrapperOptionsViewRow] = Decoder.forProduct4[ForeignDataWrapperOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(ForeignDataWrapperOptionsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
+  implicit lazy val encoder: Encoder[ForeignDataWrapperOptionsViewRow] = Encoder.forProduct4[ForeignDataWrapperOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.optionName, x.optionValue))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
   implicit lazy val read: Read[ForeignDataWrapperOptionsViewRow] = new Read[ForeignDataWrapperOptionsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ForeignDataWrapperOptionsViewRow(
-      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      optionName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      optionValue = CharacterData.get.unsafeGetNullable(rs, i + 3)
+      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      optionName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      optionValue = CharacterData.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

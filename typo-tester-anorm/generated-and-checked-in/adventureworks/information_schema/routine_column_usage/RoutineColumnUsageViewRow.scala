@@ -8,7 +8,6 @@ package information_schema
 package routine_column_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,37 +15,36 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class RoutineColumnUsageViewRow(
-  specificCatalog: Option[SqlIdentifier],
-  specificSchema: Option[SqlIdentifier],
-  specificName: Option[SqlIdentifier],
-  routineCatalog: Option[SqlIdentifier],
-  routineSchema: Option[SqlIdentifier],
-  routineName: Option[SqlIdentifier],
-  tableCatalog: Option[SqlIdentifier],
-  tableSchema: Option[SqlIdentifier],
-  tableName: Option[SqlIdentifier],
-  columnName: Option[SqlIdentifier]
+  specificCatalog: SqlIdentifier,
+  specificSchema: SqlIdentifier,
+  specificName: SqlIdentifier,
+  routineCatalog: SqlIdentifier,
+  routineSchema: SqlIdentifier,
+  routineName: SqlIdentifier,
+  tableCatalog: SqlIdentifier,
+  tableSchema: SqlIdentifier,
+  tableName: SqlIdentifier,
+  columnName: SqlIdentifier
 )
 
 object RoutineColumnUsageViewRow {
   implicit lazy val reads: Reads[RoutineColumnUsageViewRow] = Reads[RoutineColumnUsageViewRow](json => JsResult.fromTry(
       Try(
         RoutineColumnUsageViewRow(
-          specificCatalog = json.\("specific_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          specificSchema = json.\("specific_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          specificName = json.\("specific_name").toOption.map(_.as(SqlIdentifier.reads)),
-          routineCatalog = json.\("routine_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          routineSchema = json.\("routine_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          routineName = json.\("routine_name").toOption.map(_.as(SqlIdentifier.reads)),
-          tableCatalog = json.\("table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          tableSchema = json.\("table_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          tableName = json.\("table_name").toOption.map(_.as(SqlIdentifier.reads)),
-          columnName = json.\("column_name").toOption.map(_.as(SqlIdentifier.reads))
+          specificCatalog = json.\("specific_catalog").as(SqlIdentifier.reads),
+          specificSchema = json.\("specific_schema").as(SqlIdentifier.reads),
+          specificName = json.\("specific_name").as(SqlIdentifier.reads),
+          routineCatalog = json.\("routine_catalog").as(SqlIdentifier.reads),
+          routineSchema = json.\("routine_schema").as(SqlIdentifier.reads),
+          routineName = json.\("routine_name").as(SqlIdentifier.reads),
+          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
+          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
+          tableName = json.\("table_name").as(SqlIdentifier.reads),
+          columnName = json.\("column_name").as(SqlIdentifier.reads)
         )
       )
     ),
@@ -54,31 +52,31 @@ object RoutineColumnUsageViewRow {
   def rowParser(idx: Int): RowParser[RoutineColumnUsageViewRow] = RowParser[RoutineColumnUsageViewRow] { row =>
     Success(
       RoutineColumnUsageViewRow(
-        specificCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        specificSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        specificName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        routineCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        routineSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        routineName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
-        tableCatalog = row(idx + 6)(Column.columnToOption(SqlIdentifier.column)),
-        tableSchema = row(idx + 7)(Column.columnToOption(SqlIdentifier.column)),
-        tableName = row(idx + 8)(Column.columnToOption(SqlIdentifier.column)),
-        columnName = row(idx + 9)(Column.columnToOption(SqlIdentifier.column))
+        specificCatalog = row(idx + 0)(SqlIdentifier.column),
+        specificSchema = row(idx + 1)(SqlIdentifier.column),
+        specificName = row(idx + 2)(SqlIdentifier.column),
+        routineCatalog = row(idx + 3)(SqlIdentifier.column),
+        routineSchema = row(idx + 4)(SqlIdentifier.column),
+        routineName = row(idx + 5)(SqlIdentifier.column),
+        tableCatalog = row(idx + 6)(SqlIdentifier.column),
+        tableSchema = row(idx + 7)(SqlIdentifier.column),
+        tableName = row(idx + 8)(SqlIdentifier.column),
+        columnName = row(idx + 9)(SqlIdentifier.column)
       )
     )
   }
   implicit lazy val writes: OWrites[RoutineColumnUsageViewRow] = OWrites[RoutineColumnUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "specific_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificCatalog),
-      "specific_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificSchema),
-      "specific_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificName),
-      "routine_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.routineCatalog),
-      "routine_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.routineSchema),
-      "routine_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.routineName),
-      "table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableCatalog),
-      "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),
-      "table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableName),
-      "column_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.columnName)
+      "specific_catalog" -> SqlIdentifier.writes.writes(o.specificCatalog),
+      "specific_schema" -> SqlIdentifier.writes.writes(o.specificSchema),
+      "specific_name" -> SqlIdentifier.writes.writes(o.specificName),
+      "routine_catalog" -> SqlIdentifier.writes.writes(o.routineCatalog),
+      "routine_schema" -> SqlIdentifier.writes.writes(o.routineSchema),
+      "routine_name" -> SqlIdentifier.writes.writes(o.routineName),
+      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
+      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
+      "table_name" -> SqlIdentifier.writes.writes(o.tableName),
+      "column_name" -> SqlIdentifier.writes.writes(o.columnName)
     ))
   )
 }

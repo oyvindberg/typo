@@ -9,18 +9,18 @@ package key_column_usage
 
 import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait KeyColumnUsageViewFields[Row] {
-  val constraintCatalog: OptField[SqlIdentifier, Row]
-  val constraintSchema: OptField[SqlIdentifier, Row]
-  val constraintName: OptField[SqlIdentifier, Row]
-  val tableCatalog: OptField[SqlIdentifier, Row]
-  val tableSchema: OptField[SqlIdentifier, Row]
-  val tableName: OptField[SqlIdentifier, Row]
-  val columnName: OptField[SqlIdentifier, Row]
-  val ordinalPosition: OptField[CardinalNumber, Row]
-  val positionInUniqueConstraint: OptField[CardinalNumber, Row]
+  val constraintCatalog: Field[SqlIdentifier, Row]
+  val constraintSchema: Field[SqlIdentifier, Row]
+  val constraintName: Field[SqlIdentifier, Row]
+  val tableCatalog: Field[SqlIdentifier, Row]
+  val tableSchema: Field[SqlIdentifier, Row]
+  val tableName: Field[SqlIdentifier, Row]
+  val columnName: Field[SqlIdentifier, Row]
+  val ordinalPosition: Field[CardinalNumber, Row]
+  val positionInUniqueConstraint: Field[CardinalNumber, Row]
 }
 object KeyColumnUsageViewFields extends KeyColumnUsageViewStructure[KeyColumnUsageViewRow](None, identity, (_, x) => x)
 

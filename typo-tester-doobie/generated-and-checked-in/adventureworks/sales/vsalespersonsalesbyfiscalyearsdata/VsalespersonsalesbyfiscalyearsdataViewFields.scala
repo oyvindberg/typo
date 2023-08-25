@@ -9,15 +9,15 @@ package vsalespersonsalesbyfiscalyearsdata
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait VsalespersonsalesbyfiscalyearsdataViewFields[Row] {
-  val salespersonid: OptField[BusinessentityId, Row]
-  val fullname: OptField[String, Row]
-  val jobtitle: OptField[/* max 50 chars */ String, Row]
-  val salesterritory: OptField[Name, Row]
-  val salestotal: OptField[BigDecimal, Row]
-  val fiscalyear: OptField[BigDecimal, Row]
+  val salespersonid: Field[BusinessentityId, Row]
+  val fullname: Field[String, Row]
+  val jobtitle: Field[/* max 50 chars */ String, Row]
+  val salesterritory: Field[Name, Row]
+  val salestotal: Field[BigDecimal, Row]
+  val fiscalyear: Field[BigDecimal, Row]
 }
 object VsalespersonsalesbyfiscalyearsdataViewFields extends VsalespersonsalesbyfiscalyearsdataViewStructure[VsalespersonsalesbyfiscalyearsdataViewRow](None, identity, (_, x) => x)
 

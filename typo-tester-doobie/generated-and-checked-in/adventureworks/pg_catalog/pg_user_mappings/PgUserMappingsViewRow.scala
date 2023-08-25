@@ -15,33 +15,33 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgUserMappingsViewRow(
-  umid: Option[/* oid */ Long],
-  srvid: Option[/* oid */ Long],
-  srvname: Option[String],
-  umuser: Option[/* oid */ Long],
-  usename: Option[String],
-  umoptions: Option[Array[String]]
+  umid: /* oid */ Long,
+  srvid: /* oid */ Long,
+  srvname: String,
+  umuser: /* oid */ Long,
+  usename: String,
+  umoptions: Array[String]
 )
 
 object PgUserMappingsViewRow {
-  implicit lazy val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct6[PgUserMappingsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Array[String]]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(PgUserMappingsViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
-  implicit lazy val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct6[PgUserMappingsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Array[String]]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(x => (x.umid, x.srvid, x.srvname, x.umuser, x.usename, x.umoptions))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
+  implicit lazy val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct6[PgUserMappingsViewRow, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, String, Array[String]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(PgUserMappingsViewRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeArray[String](Decoder.decodeString, implicitly))
+  implicit lazy val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct6[PgUserMappingsViewRow, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, String, Array[String]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(x => (x.umid, x.srvid, x.srvname, x.umuser, x.usename, x.umoptions))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly))
   implicit lazy val read: Read[PgUserMappingsViewRow] = new Read[PgUserMappingsViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (adventureworks.StringArrayMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgUserMappingsViewRow(
-      umid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
-      srvid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
-      srvname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      umuser = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      usename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      umoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 5)
+      umid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      srvid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      srvname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      umuser = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      usename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      umoptions = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

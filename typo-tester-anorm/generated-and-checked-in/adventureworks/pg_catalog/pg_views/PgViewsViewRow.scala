@@ -21,9 +21,9 @@ import scala.util.Try
 
 case class PgViewsViewRow(
   schemaname: Option[String],
-  viewname: Option[String],
-  viewowner: Option[String],
-  definition: Option[String]
+  viewname: String,
+  viewowner: String,
+  definition: String
 )
 
 object PgViewsViewRow {
@@ -31,9 +31,9 @@ object PgViewsViewRow {
       Try(
         PgViewsViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          viewname = json.\("viewname").toOption.map(_.as(Reads.StringReads)),
-          viewowner = json.\("viewowner").toOption.map(_.as(Reads.StringReads)),
-          definition = json.\("definition").toOption.map(_.as(Reads.StringReads))
+          viewname = json.\("viewname").as(Reads.StringReads),
+          viewowner = json.\("viewowner").as(Reads.StringReads),
+          definition = json.\("definition").as(Reads.StringReads)
         )
       )
     ),
@@ -42,18 +42,18 @@ object PgViewsViewRow {
     Success(
       PgViewsViewRow(
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        viewname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        viewowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        definition = row(idx + 3)(Column.columnToOption(Column.columnToString))
+        viewname = row(idx + 1)(Column.columnToString),
+        viewowner = row(idx + 2)(Column.columnToString),
+        definition = row(idx + 3)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[PgViewsViewRow] = OWrites[PgViewsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "viewname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.viewname),
-      "viewowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.viewowner),
-      "definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.definition)
+      "viewname" -> Writes.StringWrites.writes(o.viewname),
+      "viewowner" -> Writes.StringWrites.writes(o.viewowner),
+      "definition" -> Writes.StringWrites.writes(o.definition)
     ))
   )
 }

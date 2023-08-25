@@ -7,20 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_vacuum
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatProgressVacuumViewFields[Row] {
-  val pid: OptField[Int, Row]
-  val datid: OptField[/* oid */ Long, Row]
+  val pid: Field[Int, Row]
+  val datid: Field[/* oid */ Long, Row]
   val datname: OptField[String, Row]
-  val relid: OptField[/* oid */ Long, Row]
-  val phase: OptField[String, Row]
-  val heapBlksTotal: OptField[Long, Row]
-  val heapBlksScanned: OptField[Long, Row]
-  val heapBlksVacuumed: OptField[Long, Row]
-  val indexVacuumCount: OptField[Long, Row]
-  val maxDeadTuples: OptField[Long, Row]
-  val numDeadTuples: OptField[Long, Row]
+  val relid: Field[/* oid */ Long, Row]
+  val phase: Field[String, Row]
+  val heapBlksTotal: Field[Long, Row]
+  val heapBlksScanned: Field[Long, Row]
+  val heapBlksVacuumed: Field[Long, Row]
+  val indexVacuumCount: Field[Long, Row]
+  val maxDeadTuples: Field[Long, Row]
+  val numDeadTuples: Field[Long, Row]
 }
 object PgStatProgressVacuumViewFields extends PgStatProgressVacuumViewStructure[PgStatProgressVacuumViewRow](None, identity, (_, x) => x)
 

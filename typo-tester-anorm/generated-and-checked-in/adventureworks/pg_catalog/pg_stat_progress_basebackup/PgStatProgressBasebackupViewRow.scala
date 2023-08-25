@@ -20,24 +20,24 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatProgressBasebackupViewRow(
-  pid: Option[Int],
-  phase: Option[String],
-  backupTotal: Option[Long],
-  backupStreamed: Option[Long],
-  tablespacesTotal: Option[Long],
-  tablespacesStreamed: Option[Long]
+  pid: Int,
+  phase: String,
+  backupTotal: Long,
+  backupStreamed: Long,
+  tablespacesTotal: Long,
+  tablespacesStreamed: Long
 )
 
 object PgStatProgressBasebackupViewRow {
   implicit lazy val reads: Reads[PgStatProgressBasebackupViewRow] = Reads[PgStatProgressBasebackupViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressBasebackupViewRow(
-          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
-          phase = json.\("phase").toOption.map(_.as(Reads.StringReads)),
-          backupTotal = json.\("backup_total").toOption.map(_.as(Reads.LongReads)),
-          backupStreamed = json.\("backup_streamed").toOption.map(_.as(Reads.LongReads)),
-          tablespacesTotal = json.\("tablespaces_total").toOption.map(_.as(Reads.LongReads)),
-          tablespacesStreamed = json.\("tablespaces_streamed").toOption.map(_.as(Reads.LongReads))
+          pid = json.\("pid").as(Reads.IntReads),
+          phase = json.\("phase").as(Reads.StringReads),
+          backupTotal = json.\("backup_total").as(Reads.LongReads),
+          backupStreamed = json.\("backup_streamed").as(Reads.LongReads),
+          tablespacesTotal = json.\("tablespaces_total").as(Reads.LongReads),
+          tablespacesStreamed = json.\("tablespaces_streamed").as(Reads.LongReads)
         )
       )
     ),
@@ -45,23 +45,23 @@ object PgStatProgressBasebackupViewRow {
   def rowParser(idx: Int): RowParser[PgStatProgressBasebackupViewRow] = RowParser[PgStatProgressBasebackupViewRow] { row =>
     Success(
       PgStatProgressBasebackupViewRow(
-        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        phase = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        backupTotal = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
-        backupStreamed = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
-        tablespacesTotal = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
-        tablespacesStreamed = row(idx + 5)(Column.columnToOption(Column.columnToLong))
+        pid = row(idx + 0)(Column.columnToInt),
+        phase = row(idx + 1)(Column.columnToString),
+        backupTotal = row(idx + 2)(Column.columnToLong),
+        backupStreamed = row(idx + 3)(Column.columnToLong),
+        tablespacesTotal = row(idx + 4)(Column.columnToLong),
+        tablespacesStreamed = row(idx + 5)(Column.columnToLong)
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatProgressBasebackupViewRow] = OWrites[PgStatProgressBasebackupViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
-      "phase" -> Writes.OptionWrites(Writes.StringWrites).writes(o.phase),
-      "backup_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.backupTotal),
-      "backup_streamed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.backupStreamed),
-      "tablespaces_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tablespacesTotal),
-      "tablespaces_streamed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tablespacesStreamed)
+      "pid" -> Writes.IntWrites.writes(o.pid),
+      "phase" -> Writes.StringWrites.writes(o.phase),
+      "backup_total" -> Writes.LongWrites.writes(o.backupTotal),
+      "backup_streamed" -> Writes.LongWrites.writes(o.backupStreamed),
+      "tablespaces_total" -> Writes.LongWrites.writes(o.tablespacesTotal),
+      "tablespaces_streamed" -> Writes.LongWrites.writes(o.tablespacesStreamed)
     ))
   )
 }

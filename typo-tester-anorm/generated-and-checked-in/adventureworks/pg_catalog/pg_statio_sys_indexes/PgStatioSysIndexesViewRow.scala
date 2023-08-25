@@ -21,32 +21,32 @@ import scala.util.Try
 
 case class PgStatioSysIndexesViewRow(
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.relid]] */
-  relid: Option[/* oid */ Long],
+  relid: /* oid */ Long,
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.indexrelid]] */
-  indexrelid: Option[/* oid */ Long],
+  indexrelid: /* oid */ Long,
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.schemaname]] */
-  schemaname: Option[String],
+  schemaname: String,
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.relname]] */
-  relname: Option[String],
+  relname: String,
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.indexrelname]] */
-  indexrelname: Option[String],
+  indexrelname: String,
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.idxBlksRead]] */
-  idxBlksRead: Option[Long],
+  idxBlksRead: Long,
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.idxBlksHit]] */
-  idxBlksHit: Option[Long]
+  idxBlksHit: Long
 )
 
 object PgStatioSysIndexesViewRow {
   implicit lazy val reads: Reads[PgStatioSysIndexesViewRow] = Reads[PgStatioSysIndexesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioSysIndexesViewRow(
-          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
-          indexrelid = json.\("indexrelid").toOption.map(_.as(Reads.LongReads)),
-          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          relname = json.\("relname").toOption.map(_.as(Reads.StringReads)),
-          indexrelname = json.\("indexrelname").toOption.map(_.as(Reads.StringReads)),
-          idxBlksRead = json.\("idx_blks_read").toOption.map(_.as(Reads.LongReads)),
-          idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as(Reads.LongReads))
+          relid = json.\("relid").as(Reads.LongReads),
+          indexrelid = json.\("indexrelid").as(Reads.LongReads),
+          schemaname = json.\("schemaname").as(Reads.StringReads),
+          relname = json.\("relname").as(Reads.StringReads),
+          indexrelname = json.\("indexrelname").as(Reads.StringReads),
+          idxBlksRead = json.\("idx_blks_read").as(Reads.LongReads),
+          idxBlksHit = json.\("idx_blks_hit").as(Reads.LongReads)
         )
       )
     ),
@@ -54,25 +54,25 @@ object PgStatioSysIndexesViewRow {
   def rowParser(idx: Int): RowParser[PgStatioSysIndexesViewRow] = RowParser[PgStatioSysIndexesViewRow] { row =>
     Success(
       PgStatioSysIndexesViewRow(
-        relid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
-        indexrelid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
-        schemaname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        relname = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        indexrelname = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        idxBlksRead = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
-        idxBlksHit = row(idx + 6)(Column.columnToOption(Column.columnToLong))
+        relid = row(idx + 0)(Column.columnToLong),
+        indexrelid = row(idx + 1)(Column.columnToLong),
+        schemaname = row(idx + 2)(Column.columnToString),
+        relname = row(idx + 3)(Column.columnToString),
+        indexrelname = row(idx + 4)(Column.columnToString),
+        idxBlksRead = row(idx + 5)(Column.columnToLong),
+        idxBlksHit = row(idx + 6)(Column.columnToLong)
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatioSysIndexesViewRow] = OWrites[PgStatioSysIndexesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
-      "indexrelid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.indexrelid),
-      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "relname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.relname),
-      "indexrelname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.indexrelname),
-      "idx_blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxBlksRead),
-      "idx_blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxBlksHit)
+      "relid" -> Writes.LongWrites.writes(o.relid),
+      "indexrelid" -> Writes.LongWrites.writes(o.indexrelid),
+      "schemaname" -> Writes.StringWrites.writes(o.schemaname),
+      "relname" -> Writes.StringWrites.writes(o.relname),
+      "indexrelname" -> Writes.StringWrites.writes(o.indexrelname),
+      "idx_blks_read" -> Writes.LongWrites.writes(o.idxBlksRead),
+      "idx_blks_hit" -> Writes.LongWrites.writes(o.idxBlksHit)
     ))
   )
 }

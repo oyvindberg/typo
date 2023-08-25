@@ -19,66 +19,66 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PohViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
-  purchaseorderid: Option[PurchaseorderheaderId],
+  purchaseorderid: PurchaseorderheaderId,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.revisionnumber]] */
-  revisionnumber: Option[Int],
+  revisionnumber: Int,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.status]] */
-  status: Option[Int],
+  status: Int,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.employeeid]] */
-  employeeid: Option[BusinessentityId],
+  employeeid: BusinessentityId,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.vendorid]] */
-  vendorid: Option[BusinessentityId],
+  vendorid: BusinessentityId,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.shipmethodid]] */
-  shipmethodid: Option[ShipmethodId],
+  shipmethodid: ShipmethodId,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.orderdate]] */
-  orderdate: Option[TypoLocalDateTime],
+  orderdate: TypoLocalDateTime,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.shipdate]] */
-  shipdate: Option[TypoLocalDateTime],
+  shipdate: TypoLocalDateTime,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.subtotal]] */
-  subtotal: Option[BigDecimal],
+  subtotal: BigDecimal,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.taxamt]] */
-  taxamt: Option[BigDecimal],
+  taxamt: BigDecimal,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.freight]] */
-  freight: Option[BigDecimal],
+  freight: BigDecimal,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PohViewRow {
-  implicit lazy val decoder: Decoder[PohViewRow] = Decoder.forProduct13[PohViewRow, Option[Int], Option[PurchaseorderheaderId], Option[Int], Option[Int], Option[BusinessentityId], Option[BusinessentityId], Option[ShipmethodId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(PohViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(PurchaseorderheaderId.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(ShipmethodId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PohViewRow] = Encoder.forProduct13[PohViewRow, Option[Int], Option[PurchaseorderheaderId], Option[Int], Option[Int], Option[BusinessentityId], Option[BusinessentityId], Option[ShipmethodId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.id, x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(PurchaseorderheaderId.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(ShipmethodId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PohViewRow] = Decoder.forProduct13[PohViewRow, Int, PurchaseorderheaderId, Int, Int, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, TypoLocalDateTime, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(PohViewRow.apply)(Decoder.decodeInt, PurchaseorderheaderId.decoder, Decoder.decodeInt, Decoder.decodeInt, BusinessentityId.decoder, BusinessentityId.decoder, ShipmethodId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PohViewRow] = Encoder.forProduct13[PohViewRow, Int, PurchaseorderheaderId, Int, Int, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, TypoLocalDateTime, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.id, x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(Encoder.encodeInt, PurchaseorderheaderId.encoder, Encoder.encodeInt, Encoder.encodeInt, BusinessentityId.encoder, BusinessentityId.encoder, ShipmethodId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PohViewRow] = new Read[PohViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (PurchaseorderheaderId.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (ShipmethodId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (PurchaseorderheaderId.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (ShipmethodId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PohViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      purchaseorderid = PurchaseorderheaderId.get.unsafeGetNullable(rs, i + 1),
-      revisionnumber = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
-      status = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
-      employeeid = BusinessentityId.get.unsafeGetNullable(rs, i + 4),
-      vendorid = BusinessentityId.get.unsafeGetNullable(rs, i + 5),
-      shipmethodid = ShipmethodId.get.unsafeGetNullable(rs, i + 6),
-      orderdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
-      shipdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 8),
-      subtotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 9),
-      taxamt = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 10),
-      freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 11),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 12)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      purchaseorderid = PurchaseorderheaderId.get.unsafeGetNonNullable(rs, i + 1),
+      revisionnumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      status = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      employeeid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 4),
+      vendorid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 5),
+      shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 6),
+      orderdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7),
+      shipdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8),
+      subtotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 9),
+      taxamt = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 10),
+      freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 11),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 12)
     )
   )
 }

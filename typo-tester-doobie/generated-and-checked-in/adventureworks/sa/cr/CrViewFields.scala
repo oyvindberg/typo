@@ -10,16 +10,16 @@ package cr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import adventureworks.sales.currencyrate.CurrencyrateId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CrViewFields[Row] {
-  val currencyrateid: OptField[CurrencyrateId, Row]
-  val currencyratedate: OptField[TypoLocalDateTime, Row]
-  val fromcurrencycode: OptField[CurrencyId, Row]
-  val tocurrencycode: OptField[CurrencyId, Row]
-  val averagerate: OptField[BigDecimal, Row]
-  val endofdayrate: OptField[BigDecimal, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val currencyrateid: Field[CurrencyrateId, Row]
+  val currencyratedate: Field[TypoLocalDateTime, Row]
+  val fromcurrencycode: Field[CurrencyId, Row]
+  val tocurrencycode: Field[CurrencyId, Row]
+  val averagerate: Field[BigDecimal, Row]
+  val endofdayrate: Field[BigDecimal, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object CrViewFields extends CrViewStructure[CrViewRow](None, identity, (_, x) => x)
 

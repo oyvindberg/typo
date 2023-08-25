@@ -16,34 +16,34 @@ import java.sql.ResultSet
 
 case class ForeignTablesViewRow(
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableCatalog]] */
-  foreignTableCatalog: Option[SqlIdentifier],
+  foreignTableCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableSchema]] */
-  foreignTableSchema: Option[SqlIdentifier],
+  foreignTableSchema: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableName]] */
-  foreignTableName: Option[SqlIdentifier],
+  foreignTableName: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: Option[SqlIdentifier],
+  foreignServerCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignServerName]] */
-  foreignServerName: Option[SqlIdentifier]
+  foreignServerName: SqlIdentifier
 )
 
 object ForeignTablesViewRow {
-  implicit lazy val decoder: Decoder[ForeignTablesViewRow] = Decoder.forProduct5[ForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(ForeignTablesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[ForeignTablesViewRow] = Encoder.forProduct5[ForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(x => (x.foreignTableCatalog, x.foreignTableSchema, x.foreignTableName, x.foreignServerCatalog, x.foreignServerName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[ForeignTablesViewRow] = Decoder.forProduct5[ForeignTablesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(ForeignTablesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[ForeignTablesViewRow] = Encoder.forProduct5[ForeignTablesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(x => (x.foreignTableCatalog, x.foreignTableSchema, x.foreignTableName, x.foreignServerCatalog, x.foreignServerName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
   implicit lazy val read: Read[ForeignTablesViewRow] = new Read[ForeignTablesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ForeignTablesViewRow(
-      foreignTableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      foreignTableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      foreignTableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      foreignServerCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      foreignServerName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4)
+      foreignTableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      foreignTableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      foreignTableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      foreignServerCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      foreignServerName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

@@ -11,21 +11,22 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
 import adventureworks.userdefined.FirstName
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait VstorewithcontactsViewFields[Row] {
-  val businessentityid: OptField[BusinessentityId, Row]
-  val name: OptField[Name, Row]
-  val contacttype: OptField[Name, Row]
-  val title: OptField[/* max 8 chars */ String, Row]
-  val firstname: OptField[/* user-picked */ FirstName, Row]
-  val middlename: OptField[Name, Row]
-  val lastname: OptField[Name, Row]
-  val suffix: OptField[/* max 10 chars */ String, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val name: Field[Name, Row]
+  val contacttype: Field[Name, Row]
+  val title: Field[/* max 8 chars */ String, Row]
+  val firstname: Field[/* user-picked */ FirstName, Row]
+  val middlename: Field[Name, Row]
+  val lastname: Field[Name, Row]
+  val suffix: Field[/* max 10 chars */ String, Row]
   val phonenumber: OptField[Phone, Row]
   val phonenumbertype: OptField[Name, Row]
   val emailaddress: OptField[/* max 50 chars */ String, Row]
-  val emailpromotion: OptField[Int, Row]
+  val emailpromotion: Field[Int, Row]
 }
 object VstorewithcontactsViewFields extends VstorewithcontactsViewStructure[VstorewithcontactsViewRow](None, identity, (_, x) => x)
 

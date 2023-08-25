@@ -8,7 +8,6 @@ package information_schema
 package domain_udt_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,29 +15,28 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class DomainUdtUsageViewRow(
-  udtCatalog: Option[SqlIdentifier],
-  udtSchema: Option[SqlIdentifier],
-  udtName: Option[SqlIdentifier],
-  domainCatalog: Option[SqlIdentifier],
-  domainSchema: Option[SqlIdentifier],
-  domainName: Option[SqlIdentifier]
+  udtCatalog: SqlIdentifier,
+  udtSchema: SqlIdentifier,
+  udtName: SqlIdentifier,
+  domainCatalog: SqlIdentifier,
+  domainSchema: SqlIdentifier,
+  domainName: SqlIdentifier
 )
 
 object DomainUdtUsageViewRow {
   implicit lazy val reads: Reads[DomainUdtUsageViewRow] = Reads[DomainUdtUsageViewRow](json => JsResult.fromTry(
       Try(
         DomainUdtUsageViewRow(
-          udtCatalog = json.\("udt_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          udtSchema = json.\("udt_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          udtName = json.\("udt_name").toOption.map(_.as(SqlIdentifier.reads)),
-          domainCatalog = json.\("domain_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          domainSchema = json.\("domain_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          domainName = json.\("domain_name").toOption.map(_.as(SqlIdentifier.reads))
+          udtCatalog = json.\("udt_catalog").as(SqlIdentifier.reads),
+          udtSchema = json.\("udt_schema").as(SqlIdentifier.reads),
+          udtName = json.\("udt_name").as(SqlIdentifier.reads),
+          domainCatalog = json.\("domain_catalog").as(SqlIdentifier.reads),
+          domainSchema = json.\("domain_schema").as(SqlIdentifier.reads),
+          domainName = json.\("domain_name").as(SqlIdentifier.reads)
         )
       )
     ),
@@ -46,23 +44,23 @@ object DomainUdtUsageViewRow {
   def rowParser(idx: Int): RowParser[DomainUdtUsageViewRow] = RowParser[DomainUdtUsageViewRow] { row =>
     Success(
       DomainUdtUsageViewRow(
-        udtCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        udtSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        udtName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        domainCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        domainSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        domainName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column))
+        udtCatalog = row(idx + 0)(SqlIdentifier.column),
+        udtSchema = row(idx + 1)(SqlIdentifier.column),
+        udtName = row(idx + 2)(SqlIdentifier.column),
+        domainCatalog = row(idx + 3)(SqlIdentifier.column),
+        domainSchema = row(idx + 4)(SqlIdentifier.column),
+        domainName = row(idx + 5)(SqlIdentifier.column)
       )
     )
   }
   implicit lazy val writes: OWrites[DomainUdtUsageViewRow] = OWrites[DomainUdtUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "udt_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtCatalog),
-      "udt_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtSchema),
-      "udt_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtName),
-      "domain_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainCatalog),
-      "domain_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainSchema),
-      "domain_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainName)
+      "udt_catalog" -> SqlIdentifier.writes.writes(o.udtCatalog),
+      "udt_schema" -> SqlIdentifier.writes.writes(o.udtSchema),
+      "udt_name" -> SqlIdentifier.writes.writes(o.udtName),
+      "domain_catalog" -> SqlIdentifier.writes.writes(o.domainCatalog),
+      "domain_schema" -> SqlIdentifier.writes.writes(o.domainSchema),
+      "domain_name" -> SqlIdentifier.writes.writes(o.domainName)
     ))
   )
 }

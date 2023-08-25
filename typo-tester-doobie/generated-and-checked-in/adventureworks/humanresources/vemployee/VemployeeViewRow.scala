@@ -21,83 +21,83 @@ import java.sql.ResultSet
 
 case class VemployeeViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.person.PersonRow.title]] */
-  title: Option[/* max 8 chars */ String],
+  title: /* max 8 chars */ String,
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Option[/* user-picked */ FirstName],
+  firstname: /* user-picked */ FirstName,
   /** Points to [[person.person.PersonRow.middlename]] */
-  middlename: Option[Name],
+  middlename: Name,
   /** Points to [[person.person.PersonRow.lastname]] */
-  lastname: Option[Name],
+  lastname: Name,
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: Option[/* max 10 chars */ String],
+  suffix: /* max 10 chars */ String,
   /** Points to [[employee.EmployeeRow.jobtitle]] */
-  jobtitle: Option[/* max 50 chars */ String],
+  jobtitle: /* max 50 chars */ String,
   /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
   phonenumber: Option[Phone],
   phonenumbertype: Option[Name],
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
   emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[person.person.PersonRow.emailpromotion]] */
-  emailpromotion: Option[Int],
+  emailpromotion: Int,
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: Option[/* max 60 chars */ String],
+  addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: Option[/* max 60 chars */ String],
+  addressline2: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.city]] */
-  city: Option[/* max 30 chars */ String],
-  stateprovincename: Option[Name],
+  city: /* max 30 chars */ String,
+  stateprovincename: Name,
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[/* max 15 chars */ String],
-  countryregionname: Option[Name],
+  postalcode: /* max 15 chars */ String,
+  countryregionname: Name,
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
-  additionalcontactinfo: Option[TypoXml]
+  additionalcontactinfo: TypoXml
 )
 
 object VemployeeViewRow {
-  implicit lazy val decoder: Decoder[VemployeeViewRow] = Decoder.forProduct18[VemployeeViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[/* user-picked */ FirstName], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[TypoXml]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo")(VemployeeViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(FirstName.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoXml.decoder))
-  implicit lazy val encoder: Encoder[VemployeeViewRow] = Encoder.forProduct18[VemployeeViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[/* user-picked */ FirstName], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[TypoXml]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.jobtitle, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname, x.additionalcontactinfo))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(FirstName.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoXml.encoder))
+  implicit lazy val decoder: Decoder[VemployeeViewRow] = Decoder.forProduct18[VemployeeViewRow, BusinessentityId, /* max 8 chars */ String, /* user-picked */ FirstName, Name, Name, /* max 10 chars */ String, /* max 50 chars */ String, Option[Phone], Option[Name], Option[/* max 50 chars */ String], Int, /* max 60 chars */ String, /* max 60 chars */ String, /* max 30 chars */ String, Name, /* max 15 chars */ String, Name, TypoXml]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo")(VemployeeViewRow.apply)(BusinessentityId.decoder, Decoder.decodeString, FirstName.decoder, Name.decoder, Name.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeInt, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Name.decoder, Decoder.decodeString, Name.decoder, TypoXml.decoder)
+  implicit lazy val encoder: Encoder[VemployeeViewRow] = Encoder.forProduct18[VemployeeViewRow, BusinessentityId, /* max 8 chars */ String, /* user-picked */ FirstName, Name, Name, /* max 10 chars */ String, /* max 50 chars */ String, Option[Phone], Option[Name], Option[/* max 50 chars */ String], Int, /* max 60 chars */ String, /* max 60 chars */ String, /* max 30 chars */ String, Name, /* max 15 chars */ String, Name, TypoXml]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.jobtitle, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname, x.additionalcontactinfo))(BusinessentityId.encoder, Encoder.encodeString, FirstName.encoder, Name.encoder, Name.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeInt, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Name.encoder, Encoder.encodeString, Name.encoder, TypoXml.encoder)
   implicit lazy val read: Read[VemployeeViewRow] = new Read[VemployeeViewRow](
     gets = List(
-      (BusinessentityId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (/* user-picked */ FirstName.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (/* user-picked */ FirstName.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
       (Phone.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoXml.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VemployeeViewRow(
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 0),
-      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      firstname = /* user-picked */ FirstName.get.unsafeGetNullable(rs, i + 2),
-      middlename = Name.get.unsafeGetNullable(rs, i + 3),
-      lastname = Name.get.unsafeGetNullable(rs, i + 4),
-      suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      jobtitle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      title = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 2),
+      middlename = Name.get.unsafeGetNonNullable(rs, i + 3),
+      lastname = Name.get.unsafeGetNonNullable(rs, i + 4),
+      suffix = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      jobtitle = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
       phonenumber = Phone.get.unsafeGetNullable(rs, i + 7),
       phonenumbertype = Name.get.unsafeGetNullable(rs, i + 8),
       emailaddress = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
-      emailpromotion = Meta.IntMeta.get.unsafeGetNullable(rs, i + 10),
-      addressline1 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11),
-      addressline2 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
-      city = Meta.StringMeta.get.unsafeGetNullable(rs, i + 13),
-      stateprovincename = Name.get.unsafeGetNullable(rs, i + 14),
-      postalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 15),
-      countryregionname = Name.get.unsafeGetNullable(rs, i + 16),
-      additionalcontactinfo = TypoXml.get.unsafeGetNullable(rs, i + 17)
+      emailpromotion = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 10),
+      addressline1 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 11),
+      addressline2 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 12),
+      city = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 13),
+      stateprovincename = Name.get.unsafeGetNonNullable(rs, i + 14),
+      postalcode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 15),
+      countryregionname = Name.get.unsafeGetNonNullable(rs, i + 16),
+      additionalcontactinfo = TypoXml.get.unsafeGetNonNullable(rs, i + 17)
     )
   )
 }

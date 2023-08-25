@@ -21,38 +21,38 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgRolesViewRow(
-  rolname: Option[String],
-  rolsuper: Option[Boolean],
-  rolinherit: Option[Boolean],
-  rolcreaterole: Option[Boolean],
-  rolcreatedb: Option[Boolean],
-  rolcanlogin: Option[Boolean],
-  rolreplication: Option[Boolean],
-  rolconnlimit: Option[Int],
-  rolpassword: Option[String],
-  rolvaliduntil: Option[TypoOffsetDateTime],
-  rolbypassrls: Option[Boolean],
+  rolname: String,
+  rolsuper: Boolean,
+  rolinherit: Boolean,
+  rolcreaterole: Boolean,
+  rolcreatedb: Boolean,
+  rolcanlogin: Boolean,
+  rolreplication: Boolean,
+  rolconnlimit: Int,
+  rolpassword: String,
+  rolvaliduntil: TypoOffsetDateTime,
+  rolbypassrls: Boolean,
   rolconfig: Option[Array[String]],
-  oid: Option[/* oid */ Long]
+  oid: /* oid */ Long
 )
 
 object PgRolesViewRow {
   implicit lazy val reads: Reads[PgRolesViewRow] = Reads[PgRolesViewRow](json => JsResult.fromTry(
       Try(
         PgRolesViewRow(
-          rolname = json.\("rolname").toOption.map(_.as(Reads.StringReads)),
-          rolsuper = json.\("rolsuper").toOption.map(_.as(Reads.BooleanReads)),
-          rolinherit = json.\("rolinherit").toOption.map(_.as(Reads.BooleanReads)),
-          rolcreaterole = json.\("rolcreaterole").toOption.map(_.as(Reads.BooleanReads)),
-          rolcreatedb = json.\("rolcreatedb").toOption.map(_.as(Reads.BooleanReads)),
-          rolcanlogin = json.\("rolcanlogin").toOption.map(_.as(Reads.BooleanReads)),
-          rolreplication = json.\("rolreplication").toOption.map(_.as(Reads.BooleanReads)),
-          rolconnlimit = json.\("rolconnlimit").toOption.map(_.as(Reads.IntReads)),
-          rolpassword = json.\("rolpassword").toOption.map(_.as(Reads.StringReads)),
-          rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          rolbypassrls = json.\("rolbypassrls").toOption.map(_.as(Reads.BooleanReads)),
+          rolname = json.\("rolname").as(Reads.StringReads),
+          rolsuper = json.\("rolsuper").as(Reads.BooleanReads),
+          rolinherit = json.\("rolinherit").as(Reads.BooleanReads),
+          rolcreaterole = json.\("rolcreaterole").as(Reads.BooleanReads),
+          rolcreatedb = json.\("rolcreatedb").as(Reads.BooleanReads),
+          rolcanlogin = json.\("rolcanlogin").as(Reads.BooleanReads),
+          rolreplication = json.\("rolreplication").as(Reads.BooleanReads),
+          rolconnlimit = json.\("rolconnlimit").as(Reads.IntReads),
+          rolpassword = json.\("rolpassword").as(Reads.StringReads),
+          rolvaliduntil = json.\("rolvaliduntil").as(TypoOffsetDateTime.reads),
+          rolbypassrls = json.\("rolbypassrls").as(Reads.BooleanReads),
           rolconfig = json.\("rolconfig").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
-          oid = json.\("oid").toOption.map(_.as(Reads.LongReads))
+          oid = json.\("oid").as(Reads.LongReads)
         )
       )
     ),
@@ -60,37 +60,37 @@ object PgRolesViewRow {
   def rowParser(idx: Int): RowParser[PgRolesViewRow] = RowParser[PgRolesViewRow] { row =>
     Success(
       PgRolesViewRow(
-        rolname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        rolsuper = row(idx + 1)(Column.columnToOption(Column.columnToBoolean)),
-        rolinherit = row(idx + 2)(Column.columnToOption(Column.columnToBoolean)),
-        rolcreaterole = row(idx + 3)(Column.columnToOption(Column.columnToBoolean)),
-        rolcreatedb = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
-        rolcanlogin = row(idx + 5)(Column.columnToOption(Column.columnToBoolean)),
-        rolreplication = row(idx + 6)(Column.columnToOption(Column.columnToBoolean)),
-        rolconnlimit = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
-        rolpassword = row(idx + 8)(Column.columnToOption(Column.columnToString)),
-        rolvaliduntil = row(idx + 9)(Column.columnToOption(TypoOffsetDateTime.column)),
-        rolbypassrls = row(idx + 10)(Column.columnToOption(Column.columnToBoolean)),
+        rolname = row(idx + 0)(Column.columnToString),
+        rolsuper = row(idx + 1)(Column.columnToBoolean),
+        rolinherit = row(idx + 2)(Column.columnToBoolean),
+        rolcreaterole = row(idx + 3)(Column.columnToBoolean),
+        rolcreatedb = row(idx + 4)(Column.columnToBoolean),
+        rolcanlogin = row(idx + 5)(Column.columnToBoolean),
+        rolreplication = row(idx + 6)(Column.columnToBoolean),
+        rolconnlimit = row(idx + 7)(Column.columnToInt),
+        rolpassword = row(idx + 8)(Column.columnToString),
+        rolvaliduntil = row(idx + 9)(TypoOffsetDateTime.column),
+        rolbypassrls = row(idx + 10)(Column.columnToBoolean),
         rolconfig = row(idx + 11)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
-        oid = row(idx + 12)(Column.columnToOption(Column.columnToLong))
+        oid = row(idx + 12)(Column.columnToLong)
       )
     )
   }
   implicit lazy val writes: OWrites[PgRolesViewRow] = OWrites[PgRolesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "rolname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.rolname),
-      "rolsuper" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rolsuper),
-      "rolinherit" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rolinherit),
-      "rolcreaterole" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rolcreaterole),
-      "rolcreatedb" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rolcreatedb),
-      "rolcanlogin" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rolcanlogin),
-      "rolreplication" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rolreplication),
-      "rolconnlimit" -> Writes.OptionWrites(Writes.IntWrites).writes(o.rolconnlimit),
-      "rolpassword" -> Writes.OptionWrites(Writes.StringWrites).writes(o.rolpassword),
-      "rolvaliduntil" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.rolvaliduntil),
-      "rolbypassrls" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rolbypassrls),
+      "rolname" -> Writes.StringWrites.writes(o.rolname),
+      "rolsuper" -> Writes.BooleanWrites.writes(o.rolsuper),
+      "rolinherit" -> Writes.BooleanWrites.writes(o.rolinherit),
+      "rolcreaterole" -> Writes.BooleanWrites.writes(o.rolcreaterole),
+      "rolcreatedb" -> Writes.BooleanWrites.writes(o.rolcreatedb),
+      "rolcanlogin" -> Writes.BooleanWrites.writes(o.rolcanlogin),
+      "rolreplication" -> Writes.BooleanWrites.writes(o.rolreplication),
+      "rolconnlimit" -> Writes.IntWrites.writes(o.rolconnlimit),
+      "rolpassword" -> Writes.StringWrites.writes(o.rolpassword),
+      "rolvaliduntil" -> TypoOffsetDateTime.writes.writes(o.rolvaliduntil),
+      "rolbypassrls" -> Writes.BooleanWrites.writes(o.rolbypassrls),
       "rolconfig" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.rolconfig),
-      "oid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.oid)
+      "oid" -> Writes.LongWrites.writes(o.oid)
     ))
   )
 }

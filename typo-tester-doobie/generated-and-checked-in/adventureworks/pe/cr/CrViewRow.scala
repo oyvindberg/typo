@@ -18,26 +18,26 @@ import java.sql.ResultSet
 
 case class CrViewRow(
   /** Points to [[person.countryregion.CountryregionRow.countryregioncode]] */
-  countryregioncode: Option[CountryregionId],
+  countryregioncode: CountryregionId,
   /** Points to [[person.countryregion.CountryregionRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[person.countryregion.CountryregionRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CrViewRow {
-  implicit lazy val decoder: Decoder[CrViewRow] = Decoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(CrViewRow.apply)(Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[CrViewRow] = Encoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[CrViewRow] = Decoder.forProduct3[CrViewRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(CrViewRow.apply)(CountryregionId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CrViewRow] = Encoder.forProduct3[CrViewRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(CountryregionId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CrViewRow] = new Read[CrViewRow](
     gets = List(
-      (CountryregionId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (CountryregionId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CrViewRow(
-      countryregioncode = CountryregionId.get.unsafeGetNullable(rs, i + 0),
-      name = Name.get.unsafeGetNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2)
+      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

@@ -8,22 +8,23 @@ package pg_catalog
 package pg_roles
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgRolesViewFields[Row] {
-  val rolname: OptField[String, Row]
-  val rolsuper: OptField[Boolean, Row]
-  val rolinherit: OptField[Boolean, Row]
-  val rolcreaterole: OptField[Boolean, Row]
-  val rolcreatedb: OptField[Boolean, Row]
-  val rolcanlogin: OptField[Boolean, Row]
-  val rolreplication: OptField[Boolean, Row]
-  val rolconnlimit: OptField[Int, Row]
-  val rolpassword: OptField[String, Row]
-  val rolvaliduntil: OptField[TypoOffsetDateTime, Row]
-  val rolbypassrls: OptField[Boolean, Row]
+  val rolname: Field[String, Row]
+  val rolsuper: Field[Boolean, Row]
+  val rolinherit: Field[Boolean, Row]
+  val rolcreaterole: Field[Boolean, Row]
+  val rolcreatedb: Field[Boolean, Row]
+  val rolcanlogin: Field[Boolean, Row]
+  val rolreplication: Field[Boolean, Row]
+  val rolconnlimit: Field[Int, Row]
+  val rolpassword: Field[String, Row]
+  val rolvaliduntil: Field[TypoOffsetDateTime, Row]
+  val rolbypassrls: Field[Boolean, Row]
   val rolconfig: OptField[Array[String], Row]
-  val oid: OptField[/* oid */ Long, Row]
+  val oid: Field[/* oid */ Long, Row]
 }
 object PgRolesViewFields extends PgRolesViewStructure[PgRolesViewRow](None, identity, (_, x) => x)
 

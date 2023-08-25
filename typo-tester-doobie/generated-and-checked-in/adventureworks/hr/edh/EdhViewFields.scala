@@ -12,16 +12,16 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait EdhViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val departmentid: OptField[DepartmentId, Row]
-  val shiftid: OptField[ShiftId, Row]
-  val startdate: OptField[TypoLocalDate, Row]
-  val enddate: OptField[TypoLocalDate, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val departmentid: Field[DepartmentId, Row]
+  val shiftid: Field[ShiftId, Row]
+  val startdate: Field[TypoLocalDate, Row]
+  val enddate: Field[TypoLocalDate, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object EdhViewFields extends EdhViewStructure[EdhViewRow](None, identity, (_, x) => x)
 

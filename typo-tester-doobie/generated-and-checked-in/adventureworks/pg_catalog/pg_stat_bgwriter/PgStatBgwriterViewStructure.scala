@@ -8,25 +8,25 @@ package pg_catalog
 package pg_stat_bgwriter
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgStatBgwriterViewStructure[Row](val prefix: Option[String], val extract: Row => PgStatBgwriterViewRow, val merge: (Row, PgStatBgwriterViewRow) => Row)
   extends Relation[PgStatBgwriterViewFields, PgStatBgwriterViewRow, Row]
     with PgStatBgwriterViewFields[Row] { outer =>
 
-  override val checkpointsTimed = new OptField[Long, Row](prefix, "checkpoints_timed", None, Some("int8"))(x => extract(x).checkpointsTimed, (row, value) => merge(row, extract(row).copy(checkpointsTimed = value)))
-  override val checkpointsReq = new OptField[Long, Row](prefix, "checkpoints_req", None, Some("int8"))(x => extract(x).checkpointsReq, (row, value) => merge(row, extract(row).copy(checkpointsReq = value)))
-  override val checkpointWriteTime = new OptField[Double, Row](prefix, "checkpoint_write_time", None, Some("float8"))(x => extract(x).checkpointWriteTime, (row, value) => merge(row, extract(row).copy(checkpointWriteTime = value)))
-  override val checkpointSyncTime = new OptField[Double, Row](prefix, "checkpoint_sync_time", None, Some("float8"))(x => extract(x).checkpointSyncTime, (row, value) => merge(row, extract(row).copy(checkpointSyncTime = value)))
-  override val buffersCheckpoint = new OptField[Long, Row](prefix, "buffers_checkpoint", None, Some("int8"))(x => extract(x).buffersCheckpoint, (row, value) => merge(row, extract(row).copy(buffersCheckpoint = value)))
-  override val buffersClean = new OptField[Long, Row](prefix, "buffers_clean", None, Some("int8"))(x => extract(x).buffersClean, (row, value) => merge(row, extract(row).copy(buffersClean = value)))
-  override val maxwrittenClean = new OptField[Long, Row](prefix, "maxwritten_clean", None, Some("int8"))(x => extract(x).maxwrittenClean, (row, value) => merge(row, extract(row).copy(maxwrittenClean = value)))
-  override val buffersBackend = new OptField[Long, Row](prefix, "buffers_backend", None, Some("int8"))(x => extract(x).buffersBackend, (row, value) => merge(row, extract(row).copy(buffersBackend = value)))
-  override val buffersBackendFsync = new OptField[Long, Row](prefix, "buffers_backend_fsync", None, Some("int8"))(x => extract(x).buffersBackendFsync, (row, value) => merge(row, extract(row).copy(buffersBackendFsync = value)))
-  override val buffersAlloc = new OptField[Long, Row](prefix, "buffers_alloc", None, Some("int8"))(x => extract(x).buffersAlloc, (row, value) => merge(row, extract(row).copy(buffersAlloc = value)))
-  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), Some("timestamptz"))(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val checkpointsTimed = new Field[Long, Row](prefix, "checkpoints_timed", None, Some("int8"))(x => extract(x).checkpointsTimed, (row, value) => merge(row, extract(row).copy(checkpointsTimed = value)))
+  override val checkpointsReq = new Field[Long, Row](prefix, "checkpoints_req", None, Some("int8"))(x => extract(x).checkpointsReq, (row, value) => merge(row, extract(row).copy(checkpointsReq = value)))
+  override val checkpointWriteTime = new Field[Double, Row](prefix, "checkpoint_write_time", None, Some("float8"))(x => extract(x).checkpointWriteTime, (row, value) => merge(row, extract(row).copy(checkpointWriteTime = value)))
+  override val checkpointSyncTime = new Field[Double, Row](prefix, "checkpoint_sync_time", None, Some("float8"))(x => extract(x).checkpointSyncTime, (row, value) => merge(row, extract(row).copy(checkpointSyncTime = value)))
+  override val buffersCheckpoint = new Field[Long, Row](prefix, "buffers_checkpoint", None, Some("int8"))(x => extract(x).buffersCheckpoint, (row, value) => merge(row, extract(row).copy(buffersCheckpoint = value)))
+  override val buffersClean = new Field[Long, Row](prefix, "buffers_clean", None, Some("int8"))(x => extract(x).buffersClean, (row, value) => merge(row, extract(row).copy(buffersClean = value)))
+  override val maxwrittenClean = new Field[Long, Row](prefix, "maxwritten_clean", None, Some("int8"))(x => extract(x).maxwrittenClean, (row, value) => merge(row, extract(row).copy(maxwrittenClean = value)))
+  override val buffersBackend = new Field[Long, Row](prefix, "buffers_backend", None, Some("int8"))(x => extract(x).buffersBackend, (row, value) => merge(row, extract(row).copy(buffersBackend = value)))
+  override val buffersBackendFsync = new Field[Long, Row](prefix, "buffers_backend_fsync", None, Some("int8"))(x => extract(x).buffersBackendFsync, (row, value) => merge(row, extract(row).copy(buffersBackendFsync = value)))
+  override val buffersAlloc = new Field[Long, Row](prefix, "buffers_alloc", None, Some("int8"))(x => extract(x).buffersAlloc, (row, value) => merge(row, extract(row).copy(buffersAlloc = value)))
+  override val statsReset = new Field[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), Some("timestamptz"))(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](checkpointsTimed, checkpointsReq, checkpointWriteTime, checkpointSyncTime, buffersCheckpoint, buffersClean, maxwrittenClean, buffersBackend, buffersBackendFsync, buffersAlloc, statsReset)

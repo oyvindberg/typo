@@ -15,36 +15,36 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatDatabaseConflictsViewRow(
-  datid: Option[/* oid */ Long],
-  datname: Option[String],
-  conflTablespace: Option[Long],
-  conflLock: Option[Long],
-  conflSnapshot: Option[Long],
-  conflBufferpin: Option[Long],
-  conflDeadlock: Option[Long]
+  datid: /* oid */ Long,
+  datname: String,
+  conflTablespace: Long,
+  conflLock: Long,
+  conflSnapshot: Long,
+  conflBufferpin: Long,
+  conflDeadlock: Long
 )
 
 object PgStatDatabaseConflictsViewRow {
-  implicit lazy val decoder: Decoder[PgStatDatabaseConflictsViewRow] = Decoder.forProduct7[PgStatDatabaseConflictsViewRow, Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("datid", "datname", "confl_tablespace", "confl_lock", "confl_snapshot", "confl_bufferpin", "confl_deadlock")(PgStatDatabaseConflictsViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit lazy val encoder: Encoder[PgStatDatabaseConflictsViewRow] = Encoder.forProduct7[PgStatDatabaseConflictsViewRow, Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("datid", "datname", "confl_tablespace", "confl_lock", "confl_snapshot", "confl_bufferpin", "confl_deadlock")(x => (x.datid, x.datname, x.conflTablespace, x.conflLock, x.conflSnapshot, x.conflBufferpin, x.conflDeadlock))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val decoder: Decoder[PgStatDatabaseConflictsViewRow] = Decoder.forProduct7[PgStatDatabaseConflictsViewRow, /* oid */ Long, String, Long, Long, Long, Long, Long]("datid", "datname", "confl_tablespace", "confl_lock", "confl_snapshot", "confl_bufferpin", "confl_deadlock")(PgStatDatabaseConflictsViewRow.apply)(Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgStatDatabaseConflictsViewRow] = Encoder.forProduct7[PgStatDatabaseConflictsViewRow, /* oid */ Long, String, Long, Long, Long, Long, Long]("datid", "datname", "confl_tablespace", "confl_lock", "confl_snapshot", "confl_bufferpin", "confl_deadlock")(x => (x.datid, x.datname, x.conflTablespace, x.conflLock, x.conflSnapshot, x.conflBufferpin, x.conflDeadlock))(Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgStatDatabaseConflictsViewRow] = new Read[PgStatDatabaseConflictsViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatDatabaseConflictsViewRow(
-      datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
-      datname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      conflTablespace = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
-      conflLock = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      conflSnapshot = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
-      conflBufferpin = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
-      conflDeadlock = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6)
+      datid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      datname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      conflTablespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      conflLock = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      conflSnapshot = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      conflBufferpin = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      conflDeadlock = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

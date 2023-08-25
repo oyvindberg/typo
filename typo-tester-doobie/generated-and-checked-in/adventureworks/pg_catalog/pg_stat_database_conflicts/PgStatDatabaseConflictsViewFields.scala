@@ -7,16 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_stat_database_conflicts
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgStatDatabaseConflictsViewFields[Row] {
-  val datid: OptField[/* oid */ Long, Row]
-  val datname: OptField[String, Row]
-  val conflTablespace: OptField[Long, Row]
-  val conflLock: OptField[Long, Row]
-  val conflSnapshot: OptField[Long, Row]
-  val conflBufferpin: OptField[Long, Row]
-  val conflDeadlock: OptField[Long, Row]
+  val datid: Field[/* oid */ Long, Row]
+  val datname: Field[String, Row]
+  val conflTablespace: Field[Long, Row]
+  val conflLock: Field[Long, Row]
+  val conflSnapshot: Field[Long, Row]
+  val conflBufferpin: Field[Long, Row]
+  val conflDeadlock: Field[Long, Row]
 }
 object PgStatDatabaseConflictsViewFields extends PgStatDatabaseConflictsViewStructure[PgStatDatabaseConflictsViewRow](None, identity, (_, x) => x)
 

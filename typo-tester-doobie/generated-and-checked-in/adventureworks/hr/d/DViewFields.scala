@@ -10,14 +10,14 @@ package d
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait DViewFields[Row] {
-  val id: OptField[Int, Row]
-  val departmentid: OptField[DepartmentId, Row]
-  val name: OptField[Name, Row]
-  val groupname: OptField[Name, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val departmentid: Field[DepartmentId, Row]
+  val name: Field[Name, Row]
+  val groupname: Field[Name, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object DViewFields extends DViewStructure[DViewRow](None, identity, (_, x) => x)
 

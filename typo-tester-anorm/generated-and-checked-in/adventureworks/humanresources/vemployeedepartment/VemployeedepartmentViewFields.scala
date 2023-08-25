@@ -11,19 +11,19 @@ import adventureworks.customtypes.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait VemployeedepartmentViewFields[Row] {
-  val businessentityid: OptField[BusinessentityId, Row]
-  val title: OptField[/* max 8 chars */ String, Row]
-  val firstname: OptField[/* user-picked */ FirstName, Row]
-  val middlename: OptField[Name, Row]
-  val lastname: OptField[Name, Row]
-  val suffix: OptField[/* max 10 chars */ String, Row]
-  val jobtitle: OptField[/* max 50 chars */ String, Row]
-  val department: OptField[Name, Row]
-  val groupname: OptField[Name, Row]
-  val startdate: OptField[TypoLocalDate, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val title: Field[/* max 8 chars */ String, Row]
+  val firstname: Field[/* user-picked */ FirstName, Row]
+  val middlename: Field[Name, Row]
+  val lastname: Field[Name, Row]
+  val suffix: Field[/* max 10 chars */ String, Row]
+  val jobtitle: Field[/* max 50 chars */ String, Row]
+  val department: Field[Name, Row]
+  val groupname: Field[Name, Row]
+  val startdate: Field[TypoLocalDate, Row]
 }
 object VemployeedepartmentViewFields extends VemployeedepartmentViewStructure[VemployeedepartmentViewRow](None, identity, (_, x) => x)
 

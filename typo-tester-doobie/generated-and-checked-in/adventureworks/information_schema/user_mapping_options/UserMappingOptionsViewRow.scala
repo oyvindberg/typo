@@ -17,32 +17,32 @@ import java.sql.ResultSet
 
 case class UserMappingOptionsViewRow(
   /** Points to [[`_pg_user_mappings`.PgUserMappingsViewRow.authorizationIdentifier]] */
-  authorizationIdentifier: Option[SqlIdentifier],
+  authorizationIdentifier: SqlIdentifier,
   /** Points to [[`_pg_user_mappings`.PgUserMappingsViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: Option[SqlIdentifier],
+  foreignServerCatalog: SqlIdentifier,
   /** Points to [[`_pg_user_mappings`.PgUserMappingsViewRow.foreignServerName]] */
-  foreignServerName: Option[SqlIdentifier],
-  optionName: Option[SqlIdentifier],
-  optionValue: Option[CharacterData]
+  foreignServerName: SqlIdentifier,
+  optionName: SqlIdentifier,
+  optionValue: CharacterData
 )
 
 object UserMappingOptionsViewRow {
-  implicit lazy val decoder: Decoder[UserMappingOptionsViewRow] = Decoder.forProduct5[UserMappingOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(UserMappingOptionsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit lazy val encoder: Encoder[UserMappingOptionsViewRow] = Encoder.forProduct5[UserMappingOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName, x.optionName, x.optionValue))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val decoder: Decoder[UserMappingOptionsViewRow] = Decoder.forProduct5[UserMappingOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(UserMappingOptionsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
+  implicit lazy val encoder: Encoder[UserMappingOptionsViewRow] = Encoder.forProduct5[UserMappingOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName, x.optionName, x.optionValue))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
   implicit lazy val read: Read[UserMappingOptionsViewRow] = new Read[UserMappingOptionsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UserMappingOptionsViewRow(
-      authorizationIdentifier = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      foreignServerCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      foreignServerName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      optionName = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      optionValue = CharacterData.get.unsafeGetNullable(rs, i + 4)
+      authorizationIdentifier = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      foreignServerCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      foreignServerName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      optionName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      optionValue = CharacterData.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

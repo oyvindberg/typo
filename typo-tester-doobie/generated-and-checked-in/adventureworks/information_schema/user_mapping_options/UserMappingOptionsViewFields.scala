@@ -9,14 +9,14 @@ package user_mapping_options
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait UserMappingOptionsViewFields[Row] {
-  val authorizationIdentifier: OptField[SqlIdentifier, Row]
-  val foreignServerCatalog: OptField[SqlIdentifier, Row]
-  val foreignServerName: OptField[SqlIdentifier, Row]
-  val optionName: OptField[SqlIdentifier, Row]
-  val optionValue: OptField[CharacterData, Row]
+  val authorizationIdentifier: Field[SqlIdentifier, Row]
+  val foreignServerCatalog: Field[SqlIdentifier, Row]
+  val foreignServerName: Field[SqlIdentifier, Row]
+  val optionName: Field[SqlIdentifier, Row]
+  val optionValue: Field[CharacterData, Row]
 }
 object UserMappingOptionsViewFields extends UserMappingOptionsViewStructure[UserMappingOptionsViewRow](None, identity, (_, x) => x)
 

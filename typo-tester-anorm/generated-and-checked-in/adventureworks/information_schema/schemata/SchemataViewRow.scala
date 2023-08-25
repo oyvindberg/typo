@@ -9,7 +9,6 @@ package schemata
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -17,31 +16,30 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SchemataViewRow(
-  catalogName: Option[SqlIdentifier],
-  schemaName: Option[SqlIdentifier],
-  schemaOwner: Option[SqlIdentifier],
-  defaultCharacterSetCatalog: Option[SqlIdentifier],
-  defaultCharacterSetSchema: Option[SqlIdentifier],
-  defaultCharacterSetName: Option[SqlIdentifier],
-  sqlPath: Option[CharacterData]
+  catalogName: SqlIdentifier,
+  schemaName: SqlIdentifier,
+  schemaOwner: SqlIdentifier,
+  defaultCharacterSetCatalog: SqlIdentifier,
+  defaultCharacterSetSchema: SqlIdentifier,
+  defaultCharacterSetName: SqlIdentifier,
+  sqlPath: CharacterData
 )
 
 object SchemataViewRow {
   implicit lazy val reads: Reads[SchemataViewRow] = Reads[SchemataViewRow](json => JsResult.fromTry(
       Try(
         SchemataViewRow(
-          catalogName = json.\("catalog_name").toOption.map(_.as(SqlIdentifier.reads)),
-          schemaName = json.\("schema_name").toOption.map(_.as(SqlIdentifier.reads)),
-          schemaOwner = json.\("schema_owner").toOption.map(_.as(SqlIdentifier.reads)),
-          defaultCharacterSetCatalog = json.\("default_character_set_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          defaultCharacterSetSchema = json.\("default_character_set_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          defaultCharacterSetName = json.\("default_character_set_name").toOption.map(_.as(SqlIdentifier.reads)),
-          sqlPath = json.\("sql_path").toOption.map(_.as(CharacterData.reads))
+          catalogName = json.\("catalog_name").as(SqlIdentifier.reads),
+          schemaName = json.\("schema_name").as(SqlIdentifier.reads),
+          schemaOwner = json.\("schema_owner").as(SqlIdentifier.reads),
+          defaultCharacterSetCatalog = json.\("default_character_set_catalog").as(SqlIdentifier.reads),
+          defaultCharacterSetSchema = json.\("default_character_set_schema").as(SqlIdentifier.reads),
+          defaultCharacterSetName = json.\("default_character_set_name").as(SqlIdentifier.reads),
+          sqlPath = json.\("sql_path").as(CharacterData.reads)
         )
       )
     ),
@@ -49,25 +47,25 @@ object SchemataViewRow {
   def rowParser(idx: Int): RowParser[SchemataViewRow] = RowParser[SchemataViewRow] { row =>
     Success(
       SchemataViewRow(
-        catalogName = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        schemaName = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        schemaOwner = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        defaultCharacterSetCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        defaultCharacterSetSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        defaultCharacterSetName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
-        sqlPath = row(idx + 6)(Column.columnToOption(CharacterData.column))
+        catalogName = row(idx + 0)(SqlIdentifier.column),
+        schemaName = row(idx + 1)(SqlIdentifier.column),
+        schemaOwner = row(idx + 2)(SqlIdentifier.column),
+        defaultCharacterSetCatalog = row(idx + 3)(SqlIdentifier.column),
+        defaultCharacterSetSchema = row(idx + 4)(SqlIdentifier.column),
+        defaultCharacterSetName = row(idx + 5)(SqlIdentifier.column),
+        sqlPath = row(idx + 6)(CharacterData.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SchemataViewRow] = OWrites[SchemataViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "catalog_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.catalogName),
-      "schema_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.schemaName),
-      "schema_owner" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.schemaOwner),
-      "default_character_set_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.defaultCharacterSetCatalog),
-      "default_character_set_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.defaultCharacterSetSchema),
-      "default_character_set_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.defaultCharacterSetName),
-      "sql_path" -> Writes.OptionWrites(CharacterData.writes).writes(o.sqlPath)
+      "catalog_name" -> SqlIdentifier.writes.writes(o.catalogName),
+      "schema_name" -> SqlIdentifier.writes.writes(o.schemaName),
+      "schema_owner" -> SqlIdentifier.writes.writes(o.schemaOwner),
+      "default_character_set_catalog" -> SqlIdentifier.writes.writes(o.defaultCharacterSetCatalog),
+      "default_character_set_schema" -> SqlIdentifier.writes.writes(o.defaultCharacterSetSchema),
+      "default_character_set_name" -> SqlIdentifier.writes.writes(o.defaultCharacterSetName),
+      "sql_path" -> CharacterData.writes.writes(o.sqlPath)
     ))
   )
 }

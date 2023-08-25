@@ -23,29 +23,29 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.emailaddress.EmailaddressRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddressid]] */
-  emailaddressid: Option[Int],
+  emailaddressid: Int,
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
-  emailaddress: Option[/* max 50 chars */ String],
+  emailaddress: /* max 50 chars */ String,
   /** Points to [[person.emailaddress.EmailaddressRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.emailaddress.EmailaddressRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object EViewRow {
   implicit lazy val reads: Reads[EViewRow] = Reads[EViewRow](json => JsResult.fromTry(
       Try(
         EViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          emailaddressid = json.\("emailaddressid").toOption.map(_.as(Reads.IntReads)),
-          emailaddress = json.\("emailaddress").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          emailaddressid = json.\("emailaddressid").as(Reads.IntReads),
+          emailaddress = json.\("emailaddress").as(Reads.StringReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -53,23 +53,23 @@ object EViewRow {
   def rowParser(idx: Int): RowParser[EViewRow] = RowParser[EViewRow] { row =>
     Success(
       EViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        emailaddressid = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
-        emailaddress = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 4)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        emailaddressid = row(idx + 2)(Column.columnToInt),
+        emailaddress = row(idx + 3)(Column.columnToString),
+        rowguid = row(idx + 4)(Column.columnToUUID),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[EViewRow] = OWrites[EViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "emailaddressid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.emailaddressid),
-      "emailaddress" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailaddress),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "emailaddressid" -> Writes.IntWrites.writes(o.emailaddressid),
+      "emailaddress" -> Writes.StringWrites.writes(o.emailaddress),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

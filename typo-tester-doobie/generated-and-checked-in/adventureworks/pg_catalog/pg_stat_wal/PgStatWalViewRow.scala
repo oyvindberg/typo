@@ -16,42 +16,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatWalViewRow(
-  walRecords: Option[Long],
-  walFpi: Option[Long],
-  walBytes: Option[BigDecimal],
-  walBuffersFull: Option[Long],
-  walWrite: Option[Long],
-  walSync: Option[Long],
-  walWriteTime: Option[Double],
-  walSyncTime: Option[Double],
-  statsReset: Option[TypoOffsetDateTime]
+  walRecords: Long,
+  walFpi: Long,
+  walBytes: BigDecimal,
+  walBuffersFull: Long,
+  walWrite: Long,
+  walSync: Long,
+  walWriteTime: Double,
+  walSyncTime: Double,
+  statsReset: TypoOffsetDateTime
 )
 
 object PgStatWalViewRow {
-  implicit lazy val decoder: Decoder[PgStatWalViewRow] = Decoder.forProduct9[PgStatWalViewRow, Option[Long], Option[Long], Option[BigDecimal], Option[Long], Option[Long], Option[Long], Option[Double], Option[Double], Option[TypoOffsetDateTime]]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(PgStatWalViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[PgStatWalViewRow] = Encoder.forProduct9[PgStatWalViewRow, Option[Long], Option[Long], Option[BigDecimal], Option[Long], Option[Long], Option[Long], Option[Double], Option[Double], Option[TypoOffsetDateTime]]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(x => (x.walRecords, x.walFpi, x.walBytes, x.walBuffersFull, x.walWrite, x.walSync, x.walWriteTime, x.walSyncTime, x.statsReset))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[PgStatWalViewRow] = Decoder.forProduct9[PgStatWalViewRow, Long, Long, BigDecimal, Long, Long, Long, Double, Double, TypoOffsetDateTime]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(PgStatWalViewRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBigDecimal, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeDouble, Decoder.decodeDouble, TypoOffsetDateTime.decoder)
+  implicit lazy val encoder: Encoder[PgStatWalViewRow] = Encoder.forProduct9[PgStatWalViewRow, Long, Long, BigDecimal, Long, Long, Long, Double, Double, TypoOffsetDateTime]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(x => (x.walRecords, x.walFpi, x.walBytes, x.walBuffersFull, x.walWrite, x.walSync, x.walWriteTime, x.walSyncTime, x.statsReset))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBigDecimal, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeDouble, Encoder.encodeDouble, TypoOffsetDateTime.encoder)
   implicit lazy val read: Read[PgStatWalViewRow] = new Read[PgStatWalViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.DoubleMeta.get, Nullability.Nullable),
-      (Meta.DoubleMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.DoubleMeta.get, Nullability.NoNulls),
+      (Meta.DoubleMeta.get, Nullability.NoNulls),
+      (TypoOffsetDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatWalViewRow(
-      walRecords = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
-      walFpi = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
-      walBytes = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 2),
-      walBuffersFull = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      walWrite = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
-      walSync = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
-      walWriteTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 6),
-      walSyncTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 7),
-      statsReset = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 8)
+      walRecords = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      walFpi = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      walBytes = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
+      walBuffersFull = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      walWrite = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      walSync = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      walWriteTime = Meta.DoubleMeta.get.unsafeGetNonNullable(rs, i + 6),
+      walSyncTime = Meta.DoubleMeta.get.unsafeGetNonNullable(rs, i + 7),
+      statsReset = TypoOffsetDateTime.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

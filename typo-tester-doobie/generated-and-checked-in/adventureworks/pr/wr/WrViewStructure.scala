@@ -10,27 +10,27 @@ package wr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class WrViewStructure[Row](val prefix: Option[String], val extract: Row => WrViewRow, val merge: (Row, WrViewRow) => Row)
   extends Relation[WrViewFields, WrViewRow, Row]
     with WrViewFields[Row] { outer =>
 
-  override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val workorderid = new OptField[WorkorderId, Row](prefix, "workorderid", None, Some("int4"))(x => extract(x).workorderid, (row, value) => merge(row, extract(row).copy(workorderid = value)))
-  override val productid = new OptField[Int, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val operationsequence = new OptField[Int, Row](prefix, "operationsequence", None, Some("int2"))(x => extract(x).operationsequence, (row, value) => merge(row, extract(row).copy(operationsequence = value)))
-  override val locationid = new OptField[LocationId, Row](prefix, "locationid", None, Some("int2"))(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
-  override val scheduledstartdate = new OptField[TypoLocalDateTime, Row](prefix, "scheduledstartdate", Some("text"), Some("timestamp"))(x => extract(x).scheduledstartdate, (row, value) => merge(row, extract(row).copy(scheduledstartdate = value)))
-  override val scheduledenddate = new OptField[TypoLocalDateTime, Row](prefix, "scheduledenddate", Some("text"), Some("timestamp"))(x => extract(x).scheduledenddate, (row, value) => merge(row, extract(row).copy(scheduledenddate = value)))
-  override val actualstartdate = new OptField[TypoLocalDateTime, Row](prefix, "actualstartdate", Some("text"), Some("timestamp"))(x => extract(x).actualstartdate, (row, value) => merge(row, extract(row).copy(actualstartdate = value)))
-  override val actualenddate = new OptField[TypoLocalDateTime, Row](prefix, "actualenddate", Some("text"), Some("timestamp"))(x => extract(x).actualenddate, (row, value) => merge(row, extract(row).copy(actualenddate = value)))
-  override val actualresourcehrs = new OptField[BigDecimal, Row](prefix, "actualresourcehrs", None, Some("numeric"))(x => extract(x).actualresourcehrs, (row, value) => merge(row, extract(row).copy(actualresourcehrs = value)))
-  override val plannedcost = new OptField[BigDecimal, Row](prefix, "plannedcost", None, Some("numeric"))(x => extract(x).plannedcost, (row, value) => merge(row, extract(row).copy(plannedcost = value)))
-  override val actualcost = new OptField[BigDecimal, Row](prefix, "actualcost", None, Some("numeric"))(x => extract(x).actualcost, (row, value) => merge(row, extract(row).copy(actualcost = value)))
-  override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val workorderid = new Field[WorkorderId, Row](prefix, "workorderid", None, Some("int4"))(x => extract(x).workorderid, (row, value) => merge(row, extract(row).copy(workorderid = value)))
+  override val productid = new Field[Int, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+  override val operationsequence = new Field[Int, Row](prefix, "operationsequence", None, Some("int2"))(x => extract(x).operationsequence, (row, value) => merge(row, extract(row).copy(operationsequence = value)))
+  override val locationid = new Field[LocationId, Row](prefix, "locationid", None, Some("int2"))(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
+  override val scheduledstartdate = new Field[TypoLocalDateTime, Row](prefix, "scheduledstartdate", Some("text"), Some("timestamp"))(x => extract(x).scheduledstartdate, (row, value) => merge(row, extract(row).copy(scheduledstartdate = value)))
+  override val scheduledenddate = new Field[TypoLocalDateTime, Row](prefix, "scheduledenddate", Some("text"), Some("timestamp"))(x => extract(x).scheduledenddate, (row, value) => merge(row, extract(row).copy(scheduledenddate = value)))
+  override val actualstartdate = new Field[TypoLocalDateTime, Row](prefix, "actualstartdate", Some("text"), Some("timestamp"))(x => extract(x).actualstartdate, (row, value) => merge(row, extract(row).copy(actualstartdate = value)))
+  override val actualenddate = new Field[TypoLocalDateTime, Row](prefix, "actualenddate", Some("text"), Some("timestamp"))(x => extract(x).actualenddate, (row, value) => merge(row, extract(row).copy(actualenddate = value)))
+  override val actualresourcehrs = new Field[BigDecimal, Row](prefix, "actualresourcehrs", None, Some("numeric"))(x => extract(x).actualresourcehrs, (row, value) => merge(row, extract(row).copy(actualresourcehrs = value)))
+  override val plannedcost = new Field[BigDecimal, Row](prefix, "plannedcost", None, Some("numeric"))(x => extract(x).plannedcost, (row, value) => merge(row, extract(row).copy(plannedcost = value)))
+  override val actualcost = new Field[BigDecimal, Row](prefix, "actualcost", None, Some("numeric"))(x => extract(x).actualcost, (row, value) => merge(row, extract(row).copy(actualcost = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)

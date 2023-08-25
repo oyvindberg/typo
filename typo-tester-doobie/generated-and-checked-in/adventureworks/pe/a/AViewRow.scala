@@ -19,54 +19,54 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class AViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.address.AddressRow.addressid]] */
-  addressid: Option[AddressId],
+  addressid: AddressId,
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: Option[/* max 60 chars */ String],
+  addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: Option[/* max 60 chars */ String],
+  addressline2: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.city]] */
-  city: Option[/* max 30 chars */ String],
+  city: /* max 30 chars */ String,
   /** Points to [[person.address.AddressRow.stateprovinceid]] */
-  stateprovinceid: Option[StateprovinceId],
+  stateprovinceid: StateprovinceId,
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[/* max 15 chars */ String],
+  postalcode: /* max 15 chars */ String,
   /** Points to [[person.address.AddressRow.spatiallocation]] */
-  spatiallocation: Option[Byte],
+  spatiallocation: Byte,
   /** Points to [[person.address.AddressRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.address.AddressRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object AViewRow {
-  implicit lazy val decoder: Decoder[AViewRow] = Decoder.forProduct10[AViewRow, Option[Int], Option[AddressId], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[StateprovinceId], Option[/* max 15 chars */ String], Option[Byte], Option[UUID], Option[TypoLocalDateTime]]("id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(AViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(AddressId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(StateprovinceId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeByte), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[AViewRow] = Encoder.forProduct10[AViewRow, Option[Int], Option[AddressId], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[StateprovinceId], Option[/* max 15 chars */ String], Option[Byte], Option[UUID], Option[TypoLocalDateTime]]("id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(x => (x.id, x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(AddressId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(StateprovinceId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeByte), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[AViewRow] = Decoder.forProduct10[AViewRow, Int, AddressId, /* max 60 chars */ String, /* max 60 chars */ String, /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Byte, UUID, TypoLocalDateTime]("id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(AViewRow.apply)(Decoder.decodeInt, AddressId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, StateprovinceId.decoder, Decoder.decodeString, Decoder.decodeByte, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[AViewRow] = Encoder.forProduct10[AViewRow, Int, AddressId, /* max 60 chars */ String, /* max 60 chars */ String, /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Byte, UUID, TypoLocalDateTime]("id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(x => (x.id, x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate))(Encoder.encodeInt, AddressId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, StateprovinceId.encoder, Encoder.encodeString, Encoder.encodeByte, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[AViewRow] = new Read[AViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (AddressId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (StateprovinceId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.ByteMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (AddressId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (StateprovinceId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.ByteMeta.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => AViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      addressid = AddressId.get.unsafeGetNullable(rs, i + 1),
-      addressline1 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      addressline2 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      city = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      stateprovinceid = StateprovinceId.get.unsafeGetNullable(rs, i + 5),
-      postalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      spatiallocation = Meta.ByteMeta.get.unsafeGetNullable(rs, i + 7),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 8),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 9)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      addressid = AddressId.get.unsafeGetNonNullable(rs, i + 1),
+      addressline1 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      addressline2 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      city = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 5),
+      postalcode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
+      spatiallocation = Meta.ByteMeta.get.unsafeGetNonNullable(rs, i + 7),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 8),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
     )
   )
 }

@@ -9,23 +9,23 @@ package referential_constraints
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class ReferentialConstraintsViewStructure[Row](val prefix: Option[String], val extract: Row => ReferentialConstraintsViewRow, val merge: (Row, ReferentialConstraintsViewRow) => Row)
   extends Relation[ReferentialConstraintsViewFields, ReferentialConstraintsViewRow, Row]
     with ReferentialConstraintsViewFields[Row] { outer =>
 
-  override val constraintCatalog = new OptField[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
-  override val constraintSchema = new OptField[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
-  override val constraintName = new OptField[SqlIdentifier, Row](prefix, "constraint_name", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
-  override val uniqueConstraintCatalog = new OptField[SqlIdentifier, Row](prefix, "unique_constraint_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).uniqueConstraintCatalog, (row, value) => merge(row, extract(row).copy(uniqueConstraintCatalog = value)))
-  override val uniqueConstraintSchema = new OptField[SqlIdentifier, Row](prefix, "unique_constraint_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).uniqueConstraintSchema, (row, value) => merge(row, extract(row).copy(uniqueConstraintSchema = value)))
-  override val uniqueConstraintName = new OptField[SqlIdentifier, Row](prefix, "unique_constraint_name", None, Some("information_schema.sql_identifier"))(x => extract(x).uniqueConstraintName, (row, value) => merge(row, extract(row).copy(uniqueConstraintName = value)))
-  override val matchOption = new OptField[CharacterData, Row](prefix, "match_option", None, Some("information_schema.character_data"))(x => extract(x).matchOption, (row, value) => merge(row, extract(row).copy(matchOption = value)))
-  override val updateRule = new OptField[CharacterData, Row](prefix, "update_rule", None, Some("information_schema.character_data"))(x => extract(x).updateRule, (row, value) => merge(row, extract(row).copy(updateRule = value)))
-  override val deleteRule = new OptField[CharacterData, Row](prefix, "delete_rule", None, Some("information_schema.character_data"))(x => extract(x).deleteRule, (row, value) => merge(row, extract(row).copy(deleteRule = value)))
+  override val constraintCatalog = new Field[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
+  override val constraintSchema = new Field[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
+  override val constraintName = new Field[SqlIdentifier, Row](prefix, "constraint_name", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
+  override val uniqueConstraintCatalog = new Field[SqlIdentifier, Row](prefix, "unique_constraint_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).uniqueConstraintCatalog, (row, value) => merge(row, extract(row).copy(uniqueConstraintCatalog = value)))
+  override val uniqueConstraintSchema = new Field[SqlIdentifier, Row](prefix, "unique_constraint_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).uniqueConstraintSchema, (row, value) => merge(row, extract(row).copy(uniqueConstraintSchema = value)))
+  override val uniqueConstraintName = new Field[SqlIdentifier, Row](prefix, "unique_constraint_name", None, Some("information_schema.sql_identifier"))(x => extract(x).uniqueConstraintName, (row, value) => merge(row, extract(row).copy(uniqueConstraintName = value)))
+  override val matchOption = new Field[CharacterData, Row](prefix, "match_option", None, Some("information_schema.character_data"))(x => extract(x).matchOption, (row, value) => merge(row, extract(row).copy(matchOption = value)))
+  override val updateRule = new Field[CharacterData, Row](prefix, "update_rule", None, Some("information_schema.character_data"))(x => extract(x).updateRule, (row, value) => merge(row, extract(row).copy(updateRule = value)))
+  override val deleteRule = new Field[CharacterData, Row](prefix, "delete_rule", None, Some("information_schema.character_data"))(x => extract(x).deleteRule, (row, value) => merge(row, extract(row).copy(deleteRule = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](constraintCatalog, constraintSchema, constraintName, uniqueConstraintCatalog, uniqueConstraintSchema, uniqueConstraintName, matchOption, updateRule, deleteRule)

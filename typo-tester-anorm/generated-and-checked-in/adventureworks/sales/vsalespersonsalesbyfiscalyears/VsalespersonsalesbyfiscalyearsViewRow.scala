@@ -20,26 +20,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VsalespersonsalesbyfiscalyearsViewRow(
-  SalesPersonID: Option[Int],
-  FullName: Option[String],
-  JobTitle: Option[String],
-  SalesTerritory: Option[String],
-  `2012`: Option[BigDecimal],
-  `2013`: Option[BigDecimal],
-  `2014`: Option[BigDecimal]
+  SalesPersonID: Int,
+  FullName: String,
+  JobTitle: String,
+  SalesTerritory: String,
+  `2012`: BigDecimal,
+  `2013`: BigDecimal,
+  `2014`: BigDecimal
 )
 
 object VsalespersonsalesbyfiscalyearsViewRow {
   implicit lazy val reads: Reads[VsalespersonsalesbyfiscalyearsViewRow] = Reads[VsalespersonsalesbyfiscalyearsViewRow](json => JsResult.fromTry(
       Try(
         VsalespersonsalesbyfiscalyearsViewRow(
-          SalesPersonID = json.\("SalesPersonID").toOption.map(_.as(Reads.IntReads)),
-          FullName = json.\("FullName").toOption.map(_.as(Reads.StringReads)),
-          JobTitle = json.\("JobTitle").toOption.map(_.as(Reads.StringReads)),
-          SalesTerritory = json.\("SalesTerritory").toOption.map(_.as(Reads.StringReads)),
-          `2012` = json.\("2012").toOption.map(_.as(Reads.bigDecReads)),
-          `2013` = json.\("2013").toOption.map(_.as(Reads.bigDecReads)),
-          `2014` = json.\("2014").toOption.map(_.as(Reads.bigDecReads))
+          SalesPersonID = json.\("SalesPersonID").as(Reads.IntReads),
+          FullName = json.\("FullName").as(Reads.StringReads),
+          JobTitle = json.\("JobTitle").as(Reads.StringReads),
+          SalesTerritory = json.\("SalesTerritory").as(Reads.StringReads),
+          `2012` = json.\("2012").as(Reads.bigDecReads),
+          `2013` = json.\("2013").as(Reads.bigDecReads),
+          `2014` = json.\("2014").as(Reads.bigDecReads)
         )
       )
     ),
@@ -47,25 +47,25 @@ object VsalespersonsalesbyfiscalyearsViewRow {
   def rowParser(idx: Int): RowParser[VsalespersonsalesbyfiscalyearsViewRow] = RowParser[VsalespersonsalesbyfiscalyearsViewRow] { row =>
     Success(
       VsalespersonsalesbyfiscalyearsViewRow(
-        SalesPersonID = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        FullName = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        JobTitle = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        SalesTerritory = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        `2012` = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        `2013` = row(idx + 5)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        `2014` = row(idx + 6)(Column.columnToOption(Column.columnToScalaBigDecimal))
+        SalesPersonID = row(idx + 0)(Column.columnToInt),
+        FullName = row(idx + 1)(Column.columnToString),
+        JobTitle = row(idx + 2)(Column.columnToString),
+        SalesTerritory = row(idx + 3)(Column.columnToString),
+        `2012` = row(idx + 4)(Column.columnToScalaBigDecimal),
+        `2013` = row(idx + 5)(Column.columnToScalaBigDecimal),
+        `2014` = row(idx + 6)(Column.columnToScalaBigDecimal)
       )
     )
   }
   implicit lazy val writes: OWrites[VsalespersonsalesbyfiscalyearsViewRow] = OWrites[VsalespersonsalesbyfiscalyearsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "SalesPersonID" -> Writes.OptionWrites(Writes.IntWrites).writes(o.SalesPersonID),
-      "FullName" -> Writes.OptionWrites(Writes.StringWrites).writes(o.FullName),
-      "JobTitle" -> Writes.OptionWrites(Writes.StringWrites).writes(o.JobTitle),
-      "SalesTerritory" -> Writes.OptionWrites(Writes.StringWrites).writes(o.SalesTerritory),
-      "2012" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.`2012`),
-      "2013" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.`2013`),
-      "2014" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.`2014`)
+      "SalesPersonID" -> Writes.IntWrites.writes(o.SalesPersonID),
+      "FullName" -> Writes.StringWrites.writes(o.FullName),
+      "JobTitle" -> Writes.StringWrites.writes(o.JobTitle),
+      "SalesTerritory" -> Writes.StringWrites.writes(o.SalesTerritory),
+      "2012" -> Writes.BigDecimalWrites.writes(o.`2012`),
+      "2013" -> Writes.BigDecimalWrites.writes(o.`2013`),
+      "2014" -> Writes.BigDecimalWrites.writes(o.`2014`)
     ))
   )
 }

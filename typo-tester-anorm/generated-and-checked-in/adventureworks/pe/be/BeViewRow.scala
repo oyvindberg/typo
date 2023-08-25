@@ -23,23 +23,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BeViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.businessentity.BusinessentityRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.businessentity.BusinessentityRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.businessentity.BusinessentityRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object BeViewRow {
   implicit lazy val reads: Reads[BeViewRow] = Reads[BeViewRow](json => JsResult.fromTry(
       Try(
         BeViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,19 +47,19 @@ object BeViewRow {
   def rowParser(idx: Int): RowParser[BeViewRow] = RowParser[BeViewRow] { row =>
     Success(
       BeViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        rowguid = row(idx + 2)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        rowguid = row(idx + 2)(Column.columnToUUID),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[BeViewRow] = OWrites[BeViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

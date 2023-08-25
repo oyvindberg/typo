@@ -15,27 +15,27 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgReplicationOriginStatusViewRow(
-  localId: Option[/* oid */ Long],
-  externalId: Option[String],
-  remoteLsn: Option[/* pg_lsn */ Long],
-  localLsn: Option[/* pg_lsn */ Long]
+  localId: /* oid */ Long,
+  externalId: String,
+  remoteLsn: /* pg_lsn */ Long,
+  localLsn: /* pg_lsn */ Long
 )
 
 object PgReplicationOriginStatusViewRow {
-  implicit lazy val decoder: Decoder[PgReplicationOriginStatusViewRow] = Decoder.forProduct4[PgReplicationOriginStatusViewRow, Option[/* oid */ Long], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long]]("local_id", "external_id", "remote_lsn", "local_lsn")(PgReplicationOriginStatusViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit lazy val encoder: Encoder[PgReplicationOriginStatusViewRow] = Encoder.forProduct4[PgReplicationOriginStatusViewRow, Option[/* oid */ Long], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long]]("local_id", "external_id", "remote_lsn", "local_lsn")(x => (x.localId, x.externalId, x.remoteLsn, x.localLsn))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val decoder: Decoder[PgReplicationOriginStatusViewRow] = Decoder.forProduct4[PgReplicationOriginStatusViewRow, /* oid */ Long, String, /* pg_lsn */ Long, /* pg_lsn */ Long]("local_id", "external_id", "remote_lsn", "local_lsn")(PgReplicationOriginStatusViewRow.apply)(Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgReplicationOriginStatusViewRow] = Encoder.forProduct4[PgReplicationOriginStatusViewRow, /* oid */ Long, String, /* pg_lsn */ Long, /* pg_lsn */ Long]("local_id", "external_id", "remote_lsn", "local_lsn")(x => (x.localId, x.externalId, x.remoteLsn, x.localLsn))(Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgReplicationOriginStatusViewRow] = new Read[PgReplicationOriginStatusViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgReplicationOriginStatusViewRow(
-      localId = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
-      externalId = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      remoteLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
-      localLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3)
+      localId = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      externalId = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      remoteLsn = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      localLsn = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

@@ -24,26 +24,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SopViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.specialofferid]] */
-  specialofferid: Option[SpecialofferId],
+  specialofferid: SpecialofferId,
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SopViewRow {
   implicit lazy val reads: Reads[SopViewRow] = Reads[SopViewRow](json => JsResult.fromTry(
       Try(
         SopViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          specialofferid = json.\("specialofferid").toOption.map(_.as(SpecialofferId.reads)),
-          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
+          productid = json.\("productid").as(ProductId.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,21 +51,21 @@ object SopViewRow {
   def rowParser(idx: Int): RowParser[SopViewRow] = RowParser[SopViewRow] { row =>
     Success(
       SopViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        specialofferid = row(idx + 1)(Column.columnToOption(SpecialofferId.column)),
-        productid = row(idx + 2)(Column.columnToOption(ProductId.column)),
-        rowguid = row(idx + 3)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        specialofferid = row(idx + 1)(SpecialofferId.column),
+        productid = row(idx + 2)(ProductId.column),
+        rowguid = row(idx + 3)(Column.columnToUUID),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SopViewRow] = OWrites[SopViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "specialofferid" -> Writes.OptionWrites(SpecialofferId.writes).writes(o.specialofferid),
-      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -18,30 +18,30 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class SrViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
-  scrapreasonid: Option[ScrapreasonId],
+  scrapreasonid: ScrapreasonId,
   /** Points to [[production.scrapreason.ScrapreasonRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[production.scrapreason.ScrapreasonRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SrViewRow {
-  implicit lazy val decoder: Decoder[SrViewRow] = Decoder.forProduct4[SrViewRow, Option[Int], Option[ScrapreasonId], Option[Name], Option[TypoLocalDateTime]]("id", "scrapreasonid", "name", "modifieddate")(SrViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ScrapreasonId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SrViewRow] = Encoder.forProduct4[SrViewRow, Option[Int], Option[ScrapreasonId], Option[Name], Option[TypoLocalDateTime]]("id", "scrapreasonid", "name", "modifieddate")(x => (x.id, x.scrapreasonid, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ScrapreasonId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SrViewRow] = Decoder.forProduct4[SrViewRow, Int, ScrapreasonId, Name, TypoLocalDateTime]("id", "scrapreasonid", "name", "modifieddate")(SrViewRow.apply)(Decoder.decodeInt, ScrapreasonId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SrViewRow] = Encoder.forProduct4[SrViewRow, Int, ScrapreasonId, Name, TypoLocalDateTime]("id", "scrapreasonid", "name", "modifieddate")(x => (x.id, x.scrapreasonid, x.name, x.modifieddate))(Encoder.encodeInt, ScrapreasonId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SrViewRow] = new Read[SrViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ScrapreasonId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ScrapreasonId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SrViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      scrapreasonid = ScrapreasonId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      scrapreasonid = ScrapreasonId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

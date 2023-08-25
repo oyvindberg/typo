@@ -7,13 +7,13 @@ package adventureworks
 package information_schema
 package `_pg_foreign_table_columns`
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgForeignTableColumnsViewFields[Row] {
-  val nspname: OptField[String, Row]
-  val relname: OptField[String, Row]
-  val attname: OptField[String, Row]
-  val attfdwoptions: OptField[Array[String], Row]
+  val nspname: Field[String, Row]
+  val relname: Field[String, Row]
+  val attname: Field[String, Row]
+  val attfdwoptions: Field[Array[String], Row]
 }
 object PgForeignTableColumnsViewFields extends PgForeignTableColumnsViewStructure[PgForeignTableColumnsViewRow](None, identity, (_, x) => x)
 

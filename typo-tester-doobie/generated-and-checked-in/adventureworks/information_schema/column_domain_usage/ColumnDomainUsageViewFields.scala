@@ -8,16 +8,16 @@ package information_schema
 package column_domain_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ColumnDomainUsageViewFields[Row] {
-  val domainCatalog: OptField[SqlIdentifier, Row]
-  val domainSchema: OptField[SqlIdentifier, Row]
-  val domainName: OptField[SqlIdentifier, Row]
-  val tableCatalog: OptField[SqlIdentifier, Row]
-  val tableSchema: OptField[SqlIdentifier, Row]
-  val tableName: OptField[SqlIdentifier, Row]
-  val columnName: OptField[SqlIdentifier, Row]
+  val domainCatalog: Field[SqlIdentifier, Row]
+  val domainSchema: Field[SqlIdentifier, Row]
+  val domainName: Field[SqlIdentifier, Row]
+  val tableCatalog: Field[SqlIdentifier, Row]
+  val tableSchema: Field[SqlIdentifier, Row]
+  val tableName: Field[SqlIdentifier, Row]
+  val columnName: Field[SqlIdentifier, Row]
 }
 object ColumnDomainUsageViewFields extends ColumnDomainUsageViewStructure[ColumnDomainUsageViewRow](None, identity, (_, x) => x)
 

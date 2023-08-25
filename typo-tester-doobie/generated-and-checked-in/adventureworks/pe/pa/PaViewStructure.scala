@@ -10,20 +10,20 @@ package pa
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import java.util.UUID
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PaViewStructure[Row](val prefix: Option[String], val extract: Row => PaViewRow, val merge: (Row, PaViewRow) => Row)
   extends Relation[PaViewFields, PaViewRow, Row]
     with PaViewFields[Row] { outer =>
 
-  override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val businessentityid = new OptField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val passwordhash = new OptField[/* max 128 chars */ String, Row](prefix, "passwordhash", None, None)(x => extract(x).passwordhash, (row, value) => merge(row, extract(row).copy(passwordhash = value)))
-  override val passwordsalt = new OptField[/* max 10 chars */ String, Row](prefix, "passwordsalt", None, None)(x => extract(x).passwordsalt, (row, value) => merge(row, extract(row).copy(passwordsalt = value)))
-  override val rowguid = new OptField[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-  override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+  override val passwordhash = new Field[/* max 128 chars */ String, Row](prefix, "passwordhash", None, None)(x => extract(x).passwordhash, (row, value) => merge(row, extract(row).copy(passwordhash = value)))
+  override val passwordsalt = new Field[/* max 10 chars */ String, Row](prefix, "passwordsalt", None, None)(x => extract(x).passwordsalt, (row, value) => merge(row, extract(row).copy(passwordsalt = value)))
+  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)

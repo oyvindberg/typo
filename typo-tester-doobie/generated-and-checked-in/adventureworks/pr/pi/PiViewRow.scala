@@ -19,46 +19,46 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class PiViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productinventory.ProductinventoryRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[production.productinventory.ProductinventoryRow.locationid]] */
-  locationid: Option[LocationId],
+  locationid: LocationId,
   /** Points to [[production.productinventory.ProductinventoryRow.shelf]] */
-  shelf: Option[/* max 10 chars */ String],
+  shelf: /* max 10 chars */ String,
   /** Points to [[production.productinventory.ProductinventoryRow.bin]] */
-  bin: Option[Int],
+  bin: Int,
   /** Points to [[production.productinventory.ProductinventoryRow.quantity]] */
-  quantity: Option[Int],
+  quantity: Int,
   /** Points to [[production.productinventory.ProductinventoryRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[production.productinventory.ProductinventoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PiViewRow {
-  implicit lazy val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, Option[Int], Option[ProductId], Option[LocationId], Option[/* max 10 chars */ String], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(LocationId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, Option[Int], Option[ProductId], Option[LocationId], Option[/* max 10 chars */ String], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(LocationId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, Int, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(Decoder.decodeInt, ProductId.decoder, LocationId.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, Int, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(Encoder.encodeInt, ProductId.encoder, LocationId.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PiViewRow] = new Read[PiViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ProductId.get, Nullability.Nullable),
-      (LocationId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductId.get, Nullability.NoNulls),
+      (LocationId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      productid = ProductId.get.unsafeGetNullable(rs, i + 1),
-      locationid = LocationId.get.unsafeGetNullable(rs, i + 2),
-      shelf = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      bin = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
-      quantity = Meta.IntMeta.get.unsafeGetNullable(rs, i + 5),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 6),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
+      locationid = LocationId.get.unsafeGetNonNullable(rs, i + 2),
+      shelf = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      bin = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
+      quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 5),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 6),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
     )
   )
 }

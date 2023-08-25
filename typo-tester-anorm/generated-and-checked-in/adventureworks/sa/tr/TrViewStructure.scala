@@ -12,22 +12,22 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
 import java.util.UUID
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class TrViewStructure[Row](val prefix: Option[String], val extract: Row => TrViewRow, val merge: (Row, TrViewRow) => Row)
   extends Relation[TrViewFields, TrViewRow, Row]
     with TrViewFields[Row] { outer =>
 
-  override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val salestaxrateid = new OptField[SalestaxrateId, Row](prefix, "salestaxrateid", None, Some("int4"))(x => extract(x).salestaxrateid, (row, value) => merge(row, extract(row).copy(salestaxrateid = value)))
-  override val stateprovinceid = new OptField[StateprovinceId, Row](prefix, "stateprovinceid", None, Some("int4"))(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
-  override val taxtype = new OptField[Int, Row](prefix, "taxtype", None, Some("int2"))(x => extract(x).taxtype, (row, value) => merge(row, extract(row).copy(taxtype = value)))
-  override val taxrate = new OptField[BigDecimal, Row](prefix, "taxrate", None, Some("numeric"))(x => extract(x).taxrate, (row, value) => merge(row, extract(row).copy(taxrate = value)))
-  override val name = new OptField[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val rowguid = new OptField[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-  override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val salestaxrateid = new Field[SalestaxrateId, Row](prefix, "salestaxrateid", None, Some("int4"))(x => extract(x).salestaxrateid, (row, value) => merge(row, extract(row).copy(salestaxrateid = value)))
+  override val stateprovinceid = new Field[StateprovinceId, Row](prefix, "stateprovinceid", None, Some("int4"))(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
+  override val taxtype = new Field[Int, Row](prefix, "taxtype", None, Some("int2"))(x => extract(x).taxtype, (row, value) => merge(row, extract(row).copy(taxtype = value)))
+  override val taxrate = new Field[BigDecimal, Row](prefix, "taxrate", None, Some("numeric"))(x => extract(x).taxrate, (row, value) => merge(row, extract(row).copy(taxrate = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate)

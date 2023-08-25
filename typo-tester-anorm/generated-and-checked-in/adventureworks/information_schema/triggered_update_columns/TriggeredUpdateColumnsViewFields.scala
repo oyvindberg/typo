@@ -8,16 +8,16 @@ package information_schema
 package triggered_update_columns
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait TriggeredUpdateColumnsViewFields[Row] {
-  val triggerCatalog: OptField[SqlIdentifier, Row]
-  val triggerSchema: OptField[SqlIdentifier, Row]
-  val triggerName: OptField[SqlIdentifier, Row]
-  val eventObjectCatalog: OptField[SqlIdentifier, Row]
-  val eventObjectSchema: OptField[SqlIdentifier, Row]
-  val eventObjectTable: OptField[SqlIdentifier, Row]
-  val eventObjectColumn: OptField[SqlIdentifier, Row]
+  val triggerCatalog: Field[SqlIdentifier, Row]
+  val triggerSchema: Field[SqlIdentifier, Row]
+  val triggerName: Field[SqlIdentifier, Row]
+  val eventObjectCatalog: Field[SqlIdentifier, Row]
+  val eventObjectSchema: Field[SqlIdentifier, Row]
+  val eventObjectTable: Field[SqlIdentifier, Row]
+  val eventObjectColumn: Field[SqlIdentifier, Row]
 }
 object TriggeredUpdateColumnsViewFields extends TriggeredUpdateColumnsViewStructure[TriggeredUpdateColumnsViewRow](None, identity, (_, x) => x)
 

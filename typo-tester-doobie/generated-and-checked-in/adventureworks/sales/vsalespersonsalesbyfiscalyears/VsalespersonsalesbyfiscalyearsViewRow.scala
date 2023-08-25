@@ -15,36 +15,36 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class VsalespersonsalesbyfiscalyearsViewRow(
-  SalesPersonID: Option[Int],
-  FullName: Option[String],
-  JobTitle: Option[String],
-  SalesTerritory: Option[String],
-  `2012`: Option[BigDecimal],
-  `2013`: Option[BigDecimal],
-  `2014`: Option[BigDecimal]
+  SalesPersonID: Int,
+  FullName: String,
+  JobTitle: String,
+  SalesTerritory: String,
+  `2012`: BigDecimal,
+  `2013`: BigDecimal,
+  `2014`: BigDecimal
 )
 
 object VsalespersonsalesbyfiscalyearsViewRow {
-  implicit lazy val decoder: Decoder[VsalespersonsalesbyfiscalyearsViewRow] = Decoder.forProduct7[VsalespersonsalesbyfiscalyearsViewRow, Option[Int], Option[String], Option[String], Option[String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014")(VsalespersonsalesbyfiscalyearsViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal))
-  implicit lazy val encoder: Encoder[VsalespersonsalesbyfiscalyearsViewRow] = Encoder.forProduct7[VsalespersonsalesbyfiscalyearsViewRow, Option[Int], Option[String], Option[String], Option[String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014")(x => (x.SalesPersonID, x.FullName, x.JobTitle, x.SalesTerritory, x.`2012`, x.`2013`, x.`2014`))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal))
+  implicit lazy val decoder: Decoder[VsalespersonsalesbyfiscalyearsViewRow] = Decoder.forProduct7[VsalespersonsalesbyfiscalyearsViewRow, Int, String, String, String, BigDecimal, BigDecimal, BigDecimal]("SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014")(VsalespersonsalesbyfiscalyearsViewRow.apply)(Decoder.decodeInt, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal)
+  implicit lazy val encoder: Encoder[VsalespersonsalesbyfiscalyearsViewRow] = Encoder.forProduct7[VsalespersonsalesbyfiscalyearsViewRow, Int, String, String, String, BigDecimal, BigDecimal, BigDecimal]("SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014")(x => (x.SalesPersonID, x.FullName, x.JobTitle, x.SalesTerritory, x.`2012`, x.`2013`, x.`2014`))(Encoder.encodeInt, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal)
   implicit lazy val read: Read[VsalespersonsalesbyfiscalyearsViewRow] = new Read[VsalespersonsalesbyfiscalyearsViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VsalespersonsalesbyfiscalyearsViewRow(
-      SalesPersonID = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      FullName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      JobTitle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      SalesTerritory = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      `2012` = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
-      `2013` = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5),
-      `2014` = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 6)
+      SalesPersonID = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      FullName = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      JobTitle = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      SalesTerritory = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      `2012` = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
+      `2013` = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 5),
+      `2014` = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

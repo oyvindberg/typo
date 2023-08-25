@@ -18,34 +18,34 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class SrViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salesreason.SalesreasonRow.salesreasonid]] */
-  salesreasonid: Option[SalesreasonId],
+  salesreasonid: SalesreasonId,
   /** Points to [[sales.salesreason.SalesreasonRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[sales.salesreason.SalesreasonRow.reasontype]] */
-  reasontype: Option[Name],
+  reasontype: Name,
   /** Points to [[sales.salesreason.SalesreasonRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SrViewRow {
-  implicit lazy val decoder: Decoder[SrViewRow] = Decoder.forProduct5[SrViewRow, Option[Int], Option[SalesreasonId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "salesreasonid", "name", "reasontype", "modifieddate")(SrViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SalesreasonId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SrViewRow] = Encoder.forProduct5[SrViewRow, Option[Int], Option[SalesreasonId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "salesreasonid", "name", "reasontype", "modifieddate")(x => (x.id, x.salesreasonid, x.name, x.reasontype, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SalesreasonId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SrViewRow] = Decoder.forProduct5[SrViewRow, Int, SalesreasonId, Name, Name, TypoLocalDateTime]("id", "salesreasonid", "name", "reasontype", "modifieddate")(SrViewRow.apply)(Decoder.decodeInt, SalesreasonId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SrViewRow] = Encoder.forProduct5[SrViewRow, Int, SalesreasonId, Name, Name, TypoLocalDateTime]("id", "salesreasonid", "name", "reasontype", "modifieddate")(x => (x.id, x.salesreasonid, x.name, x.reasontype, x.modifieddate))(Encoder.encodeInt, SalesreasonId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SrViewRow] = new Read[SrViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (SalesreasonId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (SalesreasonId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SrViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      salesreasonid = SalesreasonId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      reasontype = Name.get.unsafeGetNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      reasontype = Name.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

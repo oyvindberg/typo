@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_indexes
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgIndexesViewFields[Row] {
   val schemaname: OptField[String, Row]
-  val tablename: OptField[String, Row]
-  val indexname: OptField[String, Row]
+  val tablename: Field[String, Row]
+  val indexname: Field[String, Row]
   val tablespace: OptField[String, Row]
-  val indexdef: OptField[String, Row]
+  val indexdef: Field[String, Row]
 }
 object PgIndexesViewFields extends PgIndexesViewStructure[PgIndexesViewRow](None, identity, (_, x) => x)
 

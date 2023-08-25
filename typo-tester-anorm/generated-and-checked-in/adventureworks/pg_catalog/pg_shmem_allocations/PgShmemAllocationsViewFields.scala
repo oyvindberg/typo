@@ -7,13 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_shmem_allocations
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgShmemAllocationsViewFields[Row] {
-  val name: OptField[String, Row]
-  val off: OptField[Long, Row]
-  val size: OptField[Long, Row]
-  val allocatedSize: OptField[Long, Row]
+  val name: Field[String, Row]
+  val off: Field[Long, Row]
+  val size: Field[Long, Row]
+  val allocatedSize: Field[Long, Row]
 }
 object PgShmemAllocationsViewFields extends PgShmemAllocationsViewStructure[PgShmemAllocationsViewRow](None, identity, (_, x) => x)
 

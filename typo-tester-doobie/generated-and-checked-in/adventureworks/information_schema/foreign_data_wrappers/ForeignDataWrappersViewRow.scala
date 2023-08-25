@@ -17,33 +17,33 @@ import java.sql.ResultSet
 
 case class ForeignDataWrappersViewRow(
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperCatalog]] */
-  foreignDataWrapperCatalog: Option[SqlIdentifier],
+  foreignDataWrapperCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperName]] */
-  foreignDataWrapperName: Option[SqlIdentifier],
+  foreignDataWrapperName: SqlIdentifier,
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.authorizationIdentifier]] */
-  authorizationIdentifier: Option[SqlIdentifier],
-  libraryName: Option[CharacterData],
+  authorizationIdentifier: SqlIdentifier,
+  libraryName: CharacterData,
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperLanguage]] */
-  foreignDataWrapperLanguage: Option[CharacterData]
+  foreignDataWrapperLanguage: CharacterData
 )
 
 object ForeignDataWrappersViewRow {
-  implicit lazy val decoder: Decoder[ForeignDataWrappersViewRow] = Decoder.forProduct5[ForeignDataWrappersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "library_name", "foreign_data_wrapper_language")(ForeignDataWrappersViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit lazy val encoder: Encoder[ForeignDataWrappersViewRow] = Encoder.forProduct5[ForeignDataWrappersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "library_name", "foreign_data_wrapper_language")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.authorizationIdentifier, x.libraryName, x.foreignDataWrapperLanguage))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val decoder: Decoder[ForeignDataWrappersViewRow] = Decoder.forProduct5[ForeignDataWrappersViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CharacterData]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "library_name", "foreign_data_wrapper_language")(ForeignDataWrappersViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, CharacterData.decoder)
+  implicit lazy val encoder: Encoder[ForeignDataWrappersViewRow] = Encoder.forProduct5[ForeignDataWrappersViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CharacterData]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "library_name", "foreign_data_wrapper_language")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.authorizationIdentifier, x.libraryName, x.foreignDataWrapperLanguage))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, CharacterData.encoder)
   implicit lazy val read: Read[ForeignDataWrappersViewRow] = new Read[ForeignDataWrappersViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ForeignDataWrappersViewRow(
-      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      authorizationIdentifier = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      libraryName = CharacterData.get.unsafeGetNullable(rs, i + 3),
-      foreignDataWrapperLanguage = CharacterData.get.unsafeGetNullable(rs, i + 4)
+      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      authorizationIdentifier = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      libraryName = CharacterData.get.unsafeGetNonNullable(rs, i + 3),
+      foreignDataWrapperLanguage = CharacterData.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

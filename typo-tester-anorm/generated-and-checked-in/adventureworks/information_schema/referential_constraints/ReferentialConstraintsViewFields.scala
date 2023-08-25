@@ -9,18 +9,18 @@ package referential_constraints
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ReferentialConstraintsViewFields[Row] {
-  val constraintCatalog: OptField[SqlIdentifier, Row]
-  val constraintSchema: OptField[SqlIdentifier, Row]
-  val constraintName: OptField[SqlIdentifier, Row]
-  val uniqueConstraintCatalog: OptField[SqlIdentifier, Row]
-  val uniqueConstraintSchema: OptField[SqlIdentifier, Row]
-  val uniqueConstraintName: OptField[SqlIdentifier, Row]
-  val matchOption: OptField[CharacterData, Row]
-  val updateRule: OptField[CharacterData, Row]
-  val deleteRule: OptField[CharacterData, Row]
+  val constraintCatalog: Field[SqlIdentifier, Row]
+  val constraintSchema: Field[SqlIdentifier, Row]
+  val constraintName: Field[SqlIdentifier, Row]
+  val uniqueConstraintCatalog: Field[SqlIdentifier, Row]
+  val uniqueConstraintSchema: Field[SqlIdentifier, Row]
+  val uniqueConstraintName: Field[SqlIdentifier, Row]
+  val matchOption: Field[CharacterData, Row]
+  val updateRule: Field[CharacterData, Row]
+  val deleteRule: Field[CharacterData, Row]
 }
 object ReferentialConstraintsViewFields extends ReferentialConstraintsViewStructure[ReferentialConstraintsViewRow](None, identity, (_, x) => x)
 

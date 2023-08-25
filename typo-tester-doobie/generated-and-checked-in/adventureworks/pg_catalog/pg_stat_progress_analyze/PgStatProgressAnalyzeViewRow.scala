@@ -15,51 +15,51 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatProgressAnalyzeViewRow(
-  pid: Option[Int],
-  datid: Option[/* oid */ Long],
+  pid: Int,
+  datid: /* oid */ Long,
   datname: Option[String],
-  relid: Option[/* oid */ Long],
-  phase: Option[String],
-  sampleBlksTotal: Option[Long],
-  sampleBlksScanned: Option[Long],
-  extStatsTotal: Option[Long],
-  extStatsComputed: Option[Long],
-  childTablesTotal: Option[Long],
-  childTablesDone: Option[Long],
-  currentChildTableRelid: Option[/* oid */ Long]
+  relid: /* oid */ Long,
+  phase: String,
+  sampleBlksTotal: Long,
+  sampleBlksScanned: Long,
+  extStatsTotal: Long,
+  extStatsComputed: Long,
+  childTablesTotal: Long,
+  childTablesDone: Long,
+  currentChildTableRelid: /* oid */ Long
 )
 
 object PgStatProgressAnalyzeViewRow {
-  implicit lazy val decoder: Decoder[PgStatProgressAnalyzeViewRow] = Decoder.forProduct12[PgStatProgressAnalyzeViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[/* oid */ Long]]("pid", "datid", "datname", "relid", "phase", "sample_blks_total", "sample_blks_scanned", "ext_stats_total", "ext_stats_computed", "child_tables_total", "child_tables_done", "current_child_table_relid")(PgStatProgressAnalyzeViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit lazy val encoder: Encoder[PgStatProgressAnalyzeViewRow] = Encoder.forProduct12[PgStatProgressAnalyzeViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[/* oid */ Long]]("pid", "datid", "datname", "relid", "phase", "sample_blks_total", "sample_blks_scanned", "ext_stats_total", "ext_stats_computed", "child_tables_total", "child_tables_done", "current_child_table_relid")(x => (x.pid, x.datid, x.datname, x.relid, x.phase, x.sampleBlksTotal, x.sampleBlksScanned, x.extStatsTotal, x.extStatsComputed, x.childTablesTotal, x.childTablesDone, x.currentChildTableRelid))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val decoder: Decoder[PgStatProgressAnalyzeViewRow] = Decoder.forProduct12[PgStatProgressAnalyzeViewRow, Int, /* oid */ Long, Option[String], /* oid */ Long, String, Long, Long, Long, Long, Long, Long, /* oid */ Long]("pid", "datid", "datname", "relid", "phase", "sample_blks_total", "sample_blks_scanned", "ext_stats_total", "ext_stats_computed", "child_tables_total", "child_tables_done", "current_child_table_relid")(PgStatProgressAnalyzeViewRow.apply)(Decoder.decodeInt, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgStatProgressAnalyzeViewRow] = Encoder.forProduct12[PgStatProgressAnalyzeViewRow, Int, /* oid */ Long, Option[String], /* oid */ Long, String, Long, Long, Long, Long, Long, Long, /* oid */ Long]("pid", "datid", "datname", "relid", "phase", "sample_blks_total", "sample_blks_scanned", "ext_stats_total", "ext_stats_computed", "child_tables_total", "child_tables_done", "current_child_table_relid")(x => (x.pid, x.datid, x.datname, x.relid, x.phase, x.sampleBlksTotal, x.sampleBlksScanned, x.extStatsTotal, x.extStatsComputed, x.childTablesTotal, x.childTablesDone, x.currentChildTableRelid))(Encoder.encodeInt, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgStatProgressAnalyzeViewRow] = new Read[PgStatProgressAnalyzeViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressAnalyzeViewRow(
-      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      pid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      datid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
       datname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      phase = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      sampleBlksTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
-      sampleBlksScanned = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
-      extStatsTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
-      extStatsComputed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
-      childTablesTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
-      childTablesDone = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10),
-      currentChildTableRelid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 11)
+      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      phase = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      sampleBlksTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      sampleBlksScanned = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
+      extStatsTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
+      extStatsComputed = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 8),
+      childTablesTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 9),
+      childTablesDone = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 10),
+      currentChildTableRelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 11)
     )
   )
 }

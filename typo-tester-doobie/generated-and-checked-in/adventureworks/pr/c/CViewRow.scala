@@ -18,30 +18,30 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CViewRow(
-  id: Option[/* bpchar, max 6 chars */ String],
+  id: /* bpchar, max 6 chars */ String,
   /** Points to [[production.culture.CultureRow.cultureid]] */
-  cultureid: Option[CultureId],
+  cultureid: CultureId,
   /** Points to [[production.culture.CultureRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[production.culture.CultureRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CViewRow {
-  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct4[CViewRow, Option[/* bpchar, max 6 chars */ String], Option[CultureId], Option[Name], Option[TypoLocalDateTime]]("id", "cultureid", "name", "modifieddate")(CViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(CultureId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct4[CViewRow, Option[/* bpchar, max 6 chars */ String], Option[CultureId], Option[Name], Option[TypoLocalDateTime]]("id", "cultureid", "name", "modifieddate")(x => (x.id, x.cultureid, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(CultureId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct4[CViewRow, /* bpchar, max 6 chars */ String, CultureId, Name, TypoLocalDateTime]("id", "cultureid", "name", "modifieddate")(CViewRow.apply)(Decoder.decodeString, CultureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct4[CViewRow, /* bpchar, max 6 chars */ String, CultureId, Name, TypoLocalDateTime]("id", "cultureid", "name", "modifieddate")(x => (x.id, x.cultureid, x.name, x.modifieddate))(Encoder.encodeString, CultureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CViewRow] = new Read[CViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (CultureId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (CultureId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CViewRow(
-      id = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
-      cultureid = CultureId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
+      id = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

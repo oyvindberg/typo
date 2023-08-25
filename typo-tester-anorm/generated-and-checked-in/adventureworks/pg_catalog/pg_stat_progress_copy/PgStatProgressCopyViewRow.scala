@@ -20,32 +20,32 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatProgressCopyViewRow(
-  pid: Option[Int],
-  datid: Option[/* oid */ Long],
+  pid: Int,
+  datid: /* oid */ Long,
   datname: Option[String],
-  relid: Option[/* oid */ Long],
-  command: Option[String],
-  `type`: Option[String],
-  bytesProcessed: Option[Long],
-  bytesTotal: Option[Long],
-  tuplesProcessed: Option[Long],
-  tuplesExcluded: Option[Long]
+  relid: /* oid */ Long,
+  command: String,
+  `type`: String,
+  bytesProcessed: Long,
+  bytesTotal: Long,
+  tuplesProcessed: Long,
+  tuplesExcluded: Long
 )
 
 object PgStatProgressCopyViewRow {
   implicit lazy val reads: Reads[PgStatProgressCopyViewRow] = Reads[PgStatProgressCopyViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressCopyViewRow(
-          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
-          datid = json.\("datid").toOption.map(_.as(Reads.LongReads)),
+          pid = json.\("pid").as(Reads.IntReads),
+          datid = json.\("datid").as(Reads.LongReads),
           datname = json.\("datname").toOption.map(_.as(Reads.StringReads)),
-          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
-          command = json.\("command").toOption.map(_.as(Reads.StringReads)),
-          `type` = json.\("type").toOption.map(_.as(Reads.StringReads)),
-          bytesProcessed = json.\("bytes_processed").toOption.map(_.as(Reads.LongReads)),
-          bytesTotal = json.\("bytes_total").toOption.map(_.as(Reads.LongReads)),
-          tuplesProcessed = json.\("tuples_processed").toOption.map(_.as(Reads.LongReads)),
-          tuplesExcluded = json.\("tuples_excluded").toOption.map(_.as(Reads.LongReads))
+          relid = json.\("relid").as(Reads.LongReads),
+          command = json.\("command").as(Reads.StringReads),
+          `type` = json.\("type").as(Reads.StringReads),
+          bytesProcessed = json.\("bytes_processed").as(Reads.LongReads),
+          bytesTotal = json.\("bytes_total").as(Reads.LongReads),
+          tuplesProcessed = json.\("tuples_processed").as(Reads.LongReads),
+          tuplesExcluded = json.\("tuples_excluded").as(Reads.LongReads)
         )
       )
     ),
@@ -53,31 +53,31 @@ object PgStatProgressCopyViewRow {
   def rowParser(idx: Int): RowParser[PgStatProgressCopyViewRow] = RowParser[PgStatProgressCopyViewRow] { row =>
     Success(
       PgStatProgressCopyViewRow(
-        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        datid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        pid = row(idx + 0)(Column.columnToInt),
+        datid = row(idx + 1)(Column.columnToLong),
         datname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
-        command = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        `type` = row(idx + 5)(Column.columnToOption(Column.columnToString)),
-        bytesProcessed = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
-        bytesTotal = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
-        tuplesProcessed = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
-        tuplesExcluded = row(idx + 9)(Column.columnToOption(Column.columnToLong))
+        relid = row(idx + 3)(Column.columnToLong),
+        command = row(idx + 4)(Column.columnToString),
+        `type` = row(idx + 5)(Column.columnToString),
+        bytesProcessed = row(idx + 6)(Column.columnToLong),
+        bytesTotal = row(idx + 7)(Column.columnToLong),
+        tuplesProcessed = row(idx + 8)(Column.columnToLong),
+        tuplesExcluded = row(idx + 9)(Column.columnToLong)
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatProgressCopyViewRow] = OWrites[PgStatProgressCopyViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
-      "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),
+      "pid" -> Writes.IntWrites.writes(o.pid),
+      "datid" -> Writes.LongWrites.writes(o.datid),
       "datname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.datname),
-      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
-      "command" -> Writes.OptionWrites(Writes.StringWrites).writes(o.command),
-      "type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`type`),
-      "bytes_processed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.bytesProcessed),
-      "bytes_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.bytesTotal),
-      "tuples_processed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tuplesProcessed),
-      "tuples_excluded" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tuplesExcluded)
+      "relid" -> Writes.LongWrites.writes(o.relid),
+      "command" -> Writes.StringWrites.writes(o.command),
+      "type" -> Writes.StringWrites.writes(o.`type`),
+      "bytes_processed" -> Writes.LongWrites.writes(o.bytesProcessed),
+      "bytes_total" -> Writes.LongWrites.writes(o.bytesTotal),
+      "tuples_processed" -> Writes.LongWrites.writes(o.tuplesProcessed),
+      "tuples_excluded" -> Writes.LongWrites.writes(o.tuplesExcluded)
     ))
   )
 }

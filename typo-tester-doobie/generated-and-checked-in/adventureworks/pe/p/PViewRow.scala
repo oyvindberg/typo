@@ -22,70 +22,70 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class PViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.person.PersonRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.person.PersonRow.persontype]] */
-  persontype: Option[/* bpchar, max 2 chars */ String],
+  persontype: /* bpchar, max 2 chars */ String,
   /** Points to [[person.person.PersonRow.namestyle]] */
   namestyle: NameStyle,
   /** Points to [[person.person.PersonRow.title]] */
-  title: Option[/* max 8 chars */ String],
+  title: /* max 8 chars */ String,
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Option[/* user-picked */ FirstName],
+  firstname: /* user-picked */ FirstName,
   /** Points to [[person.person.PersonRow.middlename]] */
-  middlename: Option[Name],
+  middlename: Name,
   /** Points to [[person.person.PersonRow.lastname]] */
-  lastname: Option[Name],
+  lastname: Name,
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: Option[/* max 10 chars */ String],
+  suffix: /* max 10 chars */ String,
   /** Points to [[person.person.PersonRow.emailpromotion]] */
-  emailpromotion: Option[Int],
+  emailpromotion: Int,
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
-  additionalcontactinfo: Option[TypoXml],
+  additionalcontactinfo: TypoXml,
   /** Points to [[person.person.PersonRow.demographics]] */
-  demographics: Option[TypoXml],
+  demographics: TypoXml,
   /** Points to [[person.person.PersonRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.person.PersonRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PViewRow {
-  implicit lazy val decoder: Decoder[PViewRow] = Decoder.forProduct14[PViewRow, Option[Int], Option[BusinessentityId], Option[/* bpchar, max 2 chars */ String], NameStyle, Option[/* max 8 chars */ String], Option[/* user-picked */ FirstName], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Int], Option[TypoXml], Option[TypoXml], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(PViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), NameStyle.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(FirstName.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PViewRow] = Encoder.forProduct14[PViewRow, Option[Int], Option[BusinessentityId], Option[/* bpchar, max 2 chars */ String], NameStyle, Option[/* max 8 chars */ String], Option[/* user-picked */ FirstName], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Int], Option[TypoXml], Option[TypoXml], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.persontype, x.namestyle, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.emailpromotion, x.additionalcontactinfo, x.demographics, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), NameStyle.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(FirstName.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PViewRow] = Decoder.forProduct14[PViewRow, Int, BusinessentityId, /* bpchar, max 2 chars */ String, NameStyle, /* max 8 chars */ String, /* user-picked */ FirstName, Name, Name, /* max 10 chars */ String, Int, TypoXml, TypoXml, UUID, TypoLocalDateTime]("id", "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(PViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, Decoder.decodeString, NameStyle.decoder, Decoder.decodeString, FirstName.decoder, Name.decoder, Name.decoder, Decoder.decodeString, Decoder.decodeInt, TypoXml.decoder, TypoXml.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PViewRow] = Encoder.forProduct14[PViewRow, Int, BusinessentityId, /* bpchar, max 2 chars */ String, NameStyle, /* max 8 chars */ String, /* user-picked */ FirstName, Name, Name, /* max 10 chars */ String, Int, TypoXml, TypoXml, UUID, TypoLocalDateTime]("id", "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.persontype, x.namestyle, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.emailpromotion, x.additionalcontactinfo, x.demographics, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, Encoder.encodeString, NameStyle.encoder, Encoder.encodeString, FirstName.encoder, Name.encoder, Name.encoder, Encoder.encodeString, Encoder.encodeInt, TypoXml.encoder, TypoXml.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PViewRow] = new Read[PViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
       (NameStyle.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (/* user-picked */ FirstName.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (/* user-picked */ FirstName.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoXml.get, Nullability.NoNulls),
+      (TypoXml.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      persontype = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      persontype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
       namestyle = NameStyle.get.unsafeGetNonNullable(rs, i + 3),
-      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      firstname = /* user-picked */ FirstName.get.unsafeGetNullable(rs, i + 5),
-      middlename = Name.get.unsafeGetNullable(rs, i + 6),
-      lastname = Name.get.unsafeGetNullable(rs, i + 7),
-      suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      emailpromotion = Meta.IntMeta.get.unsafeGetNullable(rs, i + 9),
-      additionalcontactinfo = TypoXml.get.unsafeGetNullable(rs, i + 10),
-      demographics = TypoXml.get.unsafeGetNullable(rs, i + 11),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 12),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 13)
+      title = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 5),
+      middlename = Name.get.unsafeGetNonNullable(rs, i + 6),
+      lastname = Name.get.unsafeGetNonNullable(rs, i + 7),
+      suffix = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 8),
+      emailpromotion = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 9),
+      additionalcontactinfo = TypoXml.get.unsafeGetNonNullable(rs, i + 10),
+      demographics = TypoXml.get.unsafeGetNonNullable(rs, i + 11),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 12),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 13)
     )
   )
 }

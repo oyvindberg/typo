@@ -18,54 +18,54 @@ import java.sql.ResultSet
 
 case class VjobcandidateeducationViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
-  jobcandidateid: Option[JobcandidateId],
-  `Edu.Level`: Option[/* max 50 chars */ String],
-  `Edu.StartDate`: Option[TypoLocalDate],
-  `Edu.EndDate`: Option[TypoLocalDate],
-  `Edu.Degree`: Option[/* max 50 chars */ String],
-  `Edu.Major`: Option[/* max 50 chars */ String],
-  `Edu.Minor`: Option[/* max 50 chars */ String],
-  `Edu.GPA`: Option[/* max 5 chars */ String],
-  `Edu.GPAScale`: Option[/* max 5 chars */ String],
-  `Edu.School`: Option[/* max 100 chars */ String],
-  `Edu.Loc.CountryRegion`: Option[/* max 100 chars */ String],
-  `Edu.Loc.State`: Option[/* max 100 chars */ String],
-  `Edu.Loc.City`: Option[/* max 100 chars */ String]
+  jobcandidateid: JobcandidateId,
+  `Edu.Level`: /* max 50 chars */ String,
+  `Edu.StartDate`: TypoLocalDate,
+  `Edu.EndDate`: TypoLocalDate,
+  `Edu.Degree`: /* max 50 chars */ String,
+  `Edu.Major`: /* max 50 chars */ String,
+  `Edu.Minor`: /* max 50 chars */ String,
+  `Edu.GPA`: /* max 5 chars */ String,
+  `Edu.GPAScale`: /* max 5 chars */ String,
+  `Edu.School`: /* max 100 chars */ String,
+  `Edu.Loc.CountryRegion`: /* max 100 chars */ String,
+  `Edu.Loc.State`: /* max 100 chars */ String,
+  `Edu.Loc.City`: /* max 100 chars */ String
 )
 
 object VjobcandidateeducationViewRow {
-  implicit lazy val decoder: Decoder[VjobcandidateeducationViewRow] = Decoder.forProduct13[VjobcandidateeducationViewRow, Option[JobcandidateId], Option[/* max 50 chars */ String], Option[TypoLocalDate], Option[TypoLocalDate], Option[/* max 50 chars */ String], Option[/* max 50 chars */ String], Option[/* max 50 chars */ String], Option[/* max 5 chars */ String], Option[/* max 5 chars */ String], Option[/* max 100 chars */ String], Option[/* max 100 chars */ String], Option[/* max 100 chars */ String], Option[/* max 100 chars */ String]]("jobcandidateid", "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City")(VjobcandidateeducationViewRow.apply)(Decoder.decodeOption(JobcandidateId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit lazy val encoder: Encoder[VjobcandidateeducationViewRow] = Encoder.forProduct13[VjobcandidateeducationViewRow, Option[JobcandidateId], Option[/* max 50 chars */ String], Option[TypoLocalDate], Option[TypoLocalDate], Option[/* max 50 chars */ String], Option[/* max 50 chars */ String], Option[/* max 50 chars */ String], Option[/* max 5 chars */ String], Option[/* max 5 chars */ String], Option[/* max 100 chars */ String], Option[/* max 100 chars */ String], Option[/* max 100 chars */ String], Option[/* max 100 chars */ String]]("jobcandidateid", "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City")(x => (x.jobcandidateid, x.`Edu.Level`, x.`Edu.StartDate`, x.`Edu.EndDate`, x.`Edu.Degree`, x.`Edu.Major`, x.`Edu.Minor`, x.`Edu.GPA`, x.`Edu.GPAScale`, x.`Edu.School`, x.`Edu.Loc.CountryRegion`, x.`Edu.Loc.State`, x.`Edu.Loc.City`))(Encoder.encodeOption(JobcandidateId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val decoder: Decoder[VjobcandidateeducationViewRow] = Decoder.forProduct13[VjobcandidateeducationViewRow, JobcandidateId, /* max 50 chars */ String, TypoLocalDate, TypoLocalDate, /* max 50 chars */ String, /* max 50 chars */ String, /* max 50 chars */ String, /* max 5 chars */ String, /* max 5 chars */ String, /* max 100 chars */ String, /* max 100 chars */ String, /* max 100 chars */ String, /* max 100 chars */ String]("jobcandidateid", "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City")(VjobcandidateeducationViewRow.apply)(JobcandidateId.decoder, Decoder.decodeString, TypoLocalDate.decoder, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[VjobcandidateeducationViewRow] = Encoder.forProduct13[VjobcandidateeducationViewRow, JobcandidateId, /* max 50 chars */ String, TypoLocalDate, TypoLocalDate, /* max 50 chars */ String, /* max 50 chars */ String, /* max 50 chars */ String, /* max 5 chars */ String, /* max 5 chars */ String, /* max 100 chars */ String, /* max 100 chars */ String, /* max 100 chars */ String, /* max 100 chars */ String]("jobcandidateid", "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City")(x => (x.jobcandidateid, x.`Edu.Level`, x.`Edu.StartDate`, x.`Edu.EndDate`, x.`Edu.Degree`, x.`Edu.Major`, x.`Edu.Minor`, x.`Edu.GPA`, x.`Edu.GPAScale`, x.`Edu.School`, x.`Edu.Loc.CountryRegion`, x.`Edu.Loc.State`, x.`Edu.Loc.City`))(JobcandidateId.encoder, Encoder.encodeString, TypoLocalDate.encoder, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString)
   implicit lazy val read: Read[VjobcandidateeducationViewRow] = new Read[VjobcandidateeducationViewRow](
     gets = List(
-      (JobcandidateId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoLocalDate.get, Nullability.Nullable),
-      (TypoLocalDate.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable)
+      (JobcandidateId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (TypoLocalDate.get, Nullability.NoNulls),
+      (TypoLocalDate.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateeducationViewRow(
-      jobcandidateid = JobcandidateId.get.unsafeGetNullable(rs, i + 0),
-      `Edu.Level` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      `Edu.StartDate` = TypoLocalDate.get.unsafeGetNullable(rs, i + 2),
-      `Edu.EndDate` = TypoLocalDate.get.unsafeGetNullable(rs, i + 3),
-      `Edu.Degree` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      `Edu.Major` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      `Edu.Minor` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      `Edu.GPA` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      `Edu.GPAScale` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      `Edu.School` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
-      `Edu.Loc.CountryRegion` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
-      `Edu.Loc.State` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11),
-      `Edu.Loc.City` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12)
+      jobcandidateid = JobcandidateId.get.unsafeGetNonNullable(rs, i + 0),
+      `Edu.Level` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      `Edu.StartDate` = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 2),
+      `Edu.EndDate` = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 3),
+      `Edu.Degree` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      `Edu.Major` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      `Edu.Minor` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
+      `Edu.GPA` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 7),
+      `Edu.GPAScale` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 8),
+      `Edu.School` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 9),
+      `Edu.Loc.CountryRegion` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 10),
+      `Edu.Loc.State` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 11),
+      `Edu.Loc.City` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 12)
     )
   )
 }

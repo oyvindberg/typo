@@ -9,7 +9,6 @@ package transforms
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -17,33 +16,32 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TransformsViewRow(
-  udtCatalog: Option[SqlIdentifier],
-  udtSchema: Option[SqlIdentifier],
-  udtName: Option[SqlIdentifier],
-  specificCatalog: Option[SqlIdentifier],
-  specificSchema: Option[SqlIdentifier],
-  specificName: Option[SqlIdentifier],
-  groupName: Option[SqlIdentifier],
-  transformType: Option[CharacterData]
+  udtCatalog: SqlIdentifier,
+  udtSchema: SqlIdentifier,
+  udtName: SqlIdentifier,
+  specificCatalog: SqlIdentifier,
+  specificSchema: SqlIdentifier,
+  specificName: SqlIdentifier,
+  groupName: SqlIdentifier,
+  transformType: CharacterData
 )
 
 object TransformsViewRow {
   implicit lazy val reads: Reads[TransformsViewRow] = Reads[TransformsViewRow](json => JsResult.fromTry(
       Try(
         TransformsViewRow(
-          udtCatalog = json.\("udt_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          udtSchema = json.\("udt_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          udtName = json.\("udt_name").toOption.map(_.as(SqlIdentifier.reads)),
-          specificCatalog = json.\("specific_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          specificSchema = json.\("specific_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          specificName = json.\("specific_name").toOption.map(_.as(SqlIdentifier.reads)),
-          groupName = json.\("group_name").toOption.map(_.as(SqlIdentifier.reads)),
-          transformType = json.\("transform_type").toOption.map(_.as(CharacterData.reads))
+          udtCatalog = json.\("udt_catalog").as(SqlIdentifier.reads),
+          udtSchema = json.\("udt_schema").as(SqlIdentifier.reads),
+          udtName = json.\("udt_name").as(SqlIdentifier.reads),
+          specificCatalog = json.\("specific_catalog").as(SqlIdentifier.reads),
+          specificSchema = json.\("specific_schema").as(SqlIdentifier.reads),
+          specificName = json.\("specific_name").as(SqlIdentifier.reads),
+          groupName = json.\("group_name").as(SqlIdentifier.reads),
+          transformType = json.\("transform_type").as(CharacterData.reads)
         )
       )
     ),
@@ -51,27 +49,27 @@ object TransformsViewRow {
   def rowParser(idx: Int): RowParser[TransformsViewRow] = RowParser[TransformsViewRow] { row =>
     Success(
       TransformsViewRow(
-        udtCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        udtSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        udtName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        specificCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        specificSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        specificName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
-        groupName = row(idx + 6)(Column.columnToOption(SqlIdentifier.column)),
-        transformType = row(idx + 7)(Column.columnToOption(CharacterData.column))
+        udtCatalog = row(idx + 0)(SqlIdentifier.column),
+        udtSchema = row(idx + 1)(SqlIdentifier.column),
+        udtName = row(idx + 2)(SqlIdentifier.column),
+        specificCatalog = row(idx + 3)(SqlIdentifier.column),
+        specificSchema = row(idx + 4)(SqlIdentifier.column),
+        specificName = row(idx + 5)(SqlIdentifier.column),
+        groupName = row(idx + 6)(SqlIdentifier.column),
+        transformType = row(idx + 7)(CharacterData.column)
       )
     )
   }
   implicit lazy val writes: OWrites[TransformsViewRow] = OWrites[TransformsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "udt_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtCatalog),
-      "udt_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtSchema),
-      "udt_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtName),
-      "specific_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificCatalog),
-      "specific_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificSchema),
-      "specific_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificName),
-      "group_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.groupName),
-      "transform_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.transformType)
+      "udt_catalog" -> SqlIdentifier.writes.writes(o.udtCatalog),
+      "udt_schema" -> SqlIdentifier.writes.writes(o.udtSchema),
+      "udt_name" -> SqlIdentifier.writes.writes(o.udtName),
+      "specific_catalog" -> SqlIdentifier.writes.writes(o.specificCatalog),
+      "specific_schema" -> SqlIdentifier.writes.writes(o.specificSchema),
+      "specific_name" -> SqlIdentifier.writes.writes(o.specificName),
+      "group_name" -> SqlIdentifier.writes.writes(o.groupName),
+      "transform_type" -> CharacterData.writes.writes(o.transformType)
     ))
   )
 }

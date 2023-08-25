@@ -15,42 +15,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class RoutineSequenceUsageViewRow(
-  specificCatalog: Option[SqlIdentifier],
-  specificSchema: Option[SqlIdentifier],
-  specificName: Option[SqlIdentifier],
-  routineCatalog: Option[SqlIdentifier],
-  routineSchema: Option[SqlIdentifier],
-  routineName: Option[SqlIdentifier],
-  sequenceCatalog: Option[SqlIdentifier],
-  sequenceSchema: Option[SqlIdentifier],
-  sequenceName: Option[SqlIdentifier]
+  specificCatalog: SqlIdentifier,
+  specificSchema: SqlIdentifier,
+  specificName: SqlIdentifier,
+  routineCatalog: SqlIdentifier,
+  routineSchema: SqlIdentifier,
+  routineName: SqlIdentifier,
+  sequenceCatalog: SqlIdentifier,
+  sequenceSchema: SqlIdentifier,
+  sequenceName: SqlIdentifier
 )
 
 object RoutineSequenceUsageViewRow {
-  implicit lazy val decoder: Decoder[RoutineSequenceUsageViewRow] = Decoder.forProduct9[RoutineSequenceUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "sequence_catalog", "sequence_schema", "sequence_name")(RoutineSequenceUsageViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[RoutineSequenceUsageViewRow] = Encoder.forProduct9[RoutineSequenceUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "sequence_catalog", "sequence_schema", "sequence_name")(x => (x.specificCatalog, x.specificSchema, x.specificName, x.routineCatalog, x.routineSchema, x.routineName, x.sequenceCatalog, x.sequenceSchema, x.sequenceName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[RoutineSequenceUsageViewRow] = Decoder.forProduct9[RoutineSequenceUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "sequence_catalog", "sequence_schema", "sequence_name")(RoutineSequenceUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[RoutineSequenceUsageViewRow] = Encoder.forProduct9[RoutineSequenceUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "sequence_catalog", "sequence_schema", "sequence_name")(x => (x.specificCatalog, x.specificSchema, x.specificName, x.routineCatalog, x.routineSchema, x.routineName, x.sequenceCatalog, x.sequenceSchema, x.sequenceName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
   implicit lazy val read: Read[RoutineSequenceUsageViewRow] = new Read[RoutineSequenceUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => RoutineSequenceUsageViewRow(
-      specificCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      specificSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      specificName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      routineCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      routineSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      routineName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
-      sequenceCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 6),
-      sequenceSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 7),
-      sequenceName = SqlIdentifier.get.unsafeGetNullable(rs, i + 8)
+      specificCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      specificSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      specificName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      routineCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      routineSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      routineName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
+      sequenceCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6),
+      sequenceSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 7),
+      sequenceName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

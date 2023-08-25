@@ -19,38 +19,38 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class BecViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.personid]] */
-  personid: Option[BusinessentityId],
+  personid: BusinessentityId,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.contacttypeid]] */
-  contacttypeid: Option[ContacttypeId],
+  contacttypeid: ContacttypeId,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object BecViewRow {
-  implicit lazy val decoder: Decoder[BecViewRow] = Decoder.forProduct6[BecViewRow, Option[Int], Option[BusinessentityId], Option[BusinessentityId], Option[ContacttypeId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BecViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(ContacttypeId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[BecViewRow] = Encoder.forProduct6[BecViewRow, Option[Int], Option[BusinessentityId], Option[BusinessentityId], Option[ContacttypeId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(ContacttypeId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[BecViewRow] = Decoder.forProduct6[BecViewRow, Int, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BecViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BecViewRow] = Encoder.forProduct6[BecViewRow, Int, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BecViewRow] = new Read[BecViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (ContacttypeId.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (ContacttypeId.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BecViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      personid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
-      contacttypeid = ContacttypeId.get.unsafeGetNullable(rs, i + 3),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      personid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 2),
+      contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

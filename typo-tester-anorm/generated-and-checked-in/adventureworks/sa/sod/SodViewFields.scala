@@ -12,20 +12,20 @@ import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SodViewFields[Row] {
-  val id: OptField[Int, Row]
-  val salesorderid: OptField[SalesorderheaderId, Row]
-  val salesorderdetailid: OptField[Int, Row]
-  val carriertrackingnumber: OptField[/* max 25 chars */ String, Row]
-  val orderqty: OptField[Int, Row]
-  val productid: OptField[ProductId, Row]
-  val specialofferid: OptField[SpecialofferId, Row]
-  val unitprice: OptField[BigDecimal, Row]
-  val unitpricediscount: OptField[BigDecimal, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val salesorderid: Field[SalesorderheaderId, Row]
+  val salesorderdetailid: Field[Int, Row]
+  val carriertrackingnumber: Field[/* max 25 chars */ String, Row]
+  val orderqty: Field[Int, Row]
+  val productid: Field[ProductId, Row]
+  val specialofferid: Field[SpecialofferId, Row]
+  val unitprice: Field[BigDecimal, Row]
+  val unitpricediscount: Field[BigDecimal, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SodViewFields extends SodViewStructure[SodViewRow](None, identity, (_, x) => x)
 

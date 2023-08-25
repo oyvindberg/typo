@@ -22,26 +22,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPreparedStatementsViewRow(
-  name: Option[String],
-  statement: Option[String],
-  prepareTime: Option[TypoOffsetDateTime],
-  parameterTypes: Option[Array[TypoRegtype]],
-  fromSql: Option[Boolean],
-  genericPlans: Option[Long],
-  customPlans: Option[Long]
+  name: String,
+  statement: String,
+  prepareTime: TypoOffsetDateTime,
+  parameterTypes: Array[TypoRegtype],
+  fromSql: Boolean,
+  genericPlans: Long,
+  customPlans: Long
 )
 
 object PgPreparedStatementsViewRow {
   implicit lazy val reads: Reads[PgPreparedStatementsViewRow] = Reads[PgPreparedStatementsViewRow](json => JsResult.fromTry(
       Try(
         PgPreparedStatementsViewRow(
-          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
-          statement = json.\("statement").toOption.map(_.as(Reads.StringReads)),
-          prepareTime = json.\("prepare_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          parameterTypes = json.\("parameter_types").toOption.map(_.as(Reads.ArrayReads[TypoRegtype](TypoRegtype.reads, implicitly))),
-          fromSql = json.\("from_sql").toOption.map(_.as(Reads.BooleanReads)),
-          genericPlans = json.\("generic_plans").toOption.map(_.as(Reads.LongReads)),
-          customPlans = json.\("custom_plans").toOption.map(_.as(Reads.LongReads))
+          name = json.\("name").as(Reads.StringReads),
+          statement = json.\("statement").as(Reads.StringReads),
+          prepareTime = json.\("prepare_time").as(TypoOffsetDateTime.reads),
+          parameterTypes = json.\("parameter_types").as(Reads.ArrayReads[TypoRegtype](TypoRegtype.reads, implicitly)),
+          fromSql = json.\("from_sql").as(Reads.BooleanReads),
+          genericPlans = json.\("generic_plans").as(Reads.LongReads),
+          customPlans = json.\("custom_plans").as(Reads.LongReads)
         )
       )
     ),
@@ -49,25 +49,25 @@ object PgPreparedStatementsViewRow {
   def rowParser(idx: Int): RowParser[PgPreparedStatementsViewRow] = RowParser[PgPreparedStatementsViewRow] { row =>
     Success(
       PgPreparedStatementsViewRow(
-        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        statement = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        prepareTime = row(idx + 2)(Column.columnToOption(TypoOffsetDateTime.column)),
-        parameterTypes = row(idx + 3)(Column.columnToOption(TypoRegtype.arrayColumn)),
-        fromSql = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
-        genericPlans = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
-        customPlans = row(idx + 6)(Column.columnToOption(Column.columnToLong))
+        name = row(idx + 0)(Column.columnToString),
+        statement = row(idx + 1)(Column.columnToString),
+        prepareTime = row(idx + 2)(TypoOffsetDateTime.column),
+        parameterTypes = row(idx + 3)(TypoRegtype.arrayColumn),
+        fromSql = row(idx + 4)(Column.columnToBoolean),
+        genericPlans = row(idx + 5)(Column.columnToLong),
+        customPlans = row(idx + 6)(Column.columnToLong)
       )
     )
   }
   implicit lazy val writes: OWrites[PgPreparedStatementsViewRow] = OWrites[PgPreparedStatementsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
-      "statement" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statement),
-      "prepare_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.prepareTime),
-      "parameter_types" -> Writes.OptionWrites(Writes.arrayWrites[TypoRegtype](implicitly, TypoRegtype.writes)).writes(o.parameterTypes),
-      "from_sql" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.fromSql),
-      "generic_plans" -> Writes.OptionWrites(Writes.LongWrites).writes(o.genericPlans),
-      "custom_plans" -> Writes.OptionWrites(Writes.LongWrites).writes(o.customPlans)
+      "name" -> Writes.StringWrites.writes(o.name),
+      "statement" -> Writes.StringWrites.writes(o.statement),
+      "prepare_time" -> TypoOffsetDateTime.writes.writes(o.prepareTime),
+      "parameter_types" -> Writes.arrayWrites[TypoRegtype](implicitly, TypoRegtype.writes).writes(o.parameterTypes),
+      "from_sql" -> Writes.BooleanWrites.writes(o.fromSql),
+      "generic_plans" -> Writes.LongWrites.writes(o.genericPlans),
+      "custom_plans" -> Writes.LongWrites.writes(o.customPlans)
     ))
   )
 }

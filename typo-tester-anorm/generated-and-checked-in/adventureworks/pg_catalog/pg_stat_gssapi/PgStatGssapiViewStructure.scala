@@ -7,18 +7,18 @@ package adventureworks
 package pg_catalog
 package pg_stat_gssapi
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgStatGssapiViewStructure[Row](val prefix: Option[String], val extract: Row => PgStatGssapiViewRow, val merge: (Row, PgStatGssapiViewRow) => Row)
   extends Relation[PgStatGssapiViewFields, PgStatGssapiViewRow, Row]
     with PgStatGssapiViewFields[Row] { outer =>
 
-  override val pid = new OptField[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
-  override val gssAuthenticated = new OptField[Boolean, Row](prefix, "gss_authenticated", None, None)(x => extract(x).gssAuthenticated, (row, value) => merge(row, extract(row).copy(gssAuthenticated = value)))
-  override val principal = new OptField[String, Row](prefix, "principal", None, None)(x => extract(x).principal, (row, value) => merge(row, extract(row).copy(principal = value)))
-  override val encrypted = new OptField[Boolean, Row](prefix, "encrypted", None, None)(x => extract(x).encrypted, (row, value) => merge(row, extract(row).copy(encrypted = value)))
+  override val pid = new Field[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
+  override val gssAuthenticated = new Field[Boolean, Row](prefix, "gss_authenticated", None, None)(x => extract(x).gssAuthenticated, (row, value) => merge(row, extract(row).copy(gssAuthenticated = value)))
+  override val principal = new Field[String, Row](prefix, "principal", None, None)(x => extract(x).principal, (row, value) => merge(row, extract(row).copy(principal = value)))
+  override val encrypted = new Field[Boolean, Row](prefix, "encrypted", None, None)(x => extract(x).encrypted, (row, value) => merge(row, extract(row).copy(encrypted = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](pid, gssAuthenticated, principal, encrypted)

@@ -16,27 +16,27 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CheckConstraintsViewRow(
-  constraintCatalog: Option[SqlIdentifier],
-  constraintSchema: Option[SqlIdentifier],
-  constraintName: Option[SqlIdentifier],
-  checkClause: Option[CharacterData]
+  constraintCatalog: SqlIdentifier,
+  constraintSchema: SqlIdentifier,
+  constraintName: SqlIdentifier,
+  checkClause: CharacterData
 )
 
 object CheckConstraintsViewRow {
-  implicit lazy val decoder: Decoder[CheckConstraintsViewRow] = Decoder.forProduct4[CheckConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(CheckConstraintsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit lazy val encoder: Encoder[CheckConstraintsViewRow] = Encoder.forProduct4[CheckConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.checkClause))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val decoder: Decoder[CheckConstraintsViewRow] = Decoder.forProduct4[CheckConstraintsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(CheckConstraintsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
+  implicit lazy val encoder: Encoder[CheckConstraintsViewRow] = Encoder.forProduct4[CheckConstraintsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.checkClause))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
   implicit lazy val read: Read[CheckConstraintsViewRow] = new Read[CheckConstraintsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CheckConstraintsViewRow(
-      constraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      constraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      constraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      checkClause = CharacterData.get.unsafeGetNullable(rs, i + 3)
+      constraintCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      constraintSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      constraintName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      checkClause = CharacterData.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

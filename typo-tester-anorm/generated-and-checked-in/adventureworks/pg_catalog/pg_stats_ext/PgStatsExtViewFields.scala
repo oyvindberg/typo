@@ -7,23 +7,24 @@ package adventureworks
 package pg_catalog
 package pg_stats_ext
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatsExtViewFields[Row] {
-  val schemaname: OptField[String, Row]
-  val tablename: OptField[String, Row]
+  val schemaname: Field[String, Row]
+  val tablename: Field[String, Row]
   val statisticsSchemaname: OptField[String, Row]
-  val statisticsName: OptField[String, Row]
-  val statisticsOwner: OptField[String, Row]
-  val attnames: OptField[Array[String], Row]
-  val exprs: OptField[Array[String], Row]
-  val kinds: OptField[Array[String], Row]
-  val nDistinct: OptField[String, Row]
-  val dependencies: OptField[String, Row]
-  val mostCommonVals: OptField[Array[String], Row]
-  val mostCommonValNulls: OptField[Array[Boolean], Row]
-  val mostCommonFreqs: OptField[Array[Double], Row]
-  val mostCommonBaseFreqs: OptField[Array[Double], Row]
+  val statisticsName: Field[String, Row]
+  val statisticsOwner: Field[String, Row]
+  val attnames: Field[Array[String], Row]
+  val exprs: Field[Array[String], Row]
+  val kinds: Field[Array[String], Row]
+  val nDistinct: Field[String, Row]
+  val dependencies: Field[String, Row]
+  val mostCommonVals: Field[Array[String], Row]
+  val mostCommonValNulls: Field[Array[Boolean], Row]
+  val mostCommonFreqs: Field[Array[Double], Row]
+  val mostCommonBaseFreqs: Field[Array[Double], Row]
 }
 object PgStatsExtViewFields extends PgStatsExtViewStructure[PgStatsExtViewRow](None, identity, (_, x) => x)
 

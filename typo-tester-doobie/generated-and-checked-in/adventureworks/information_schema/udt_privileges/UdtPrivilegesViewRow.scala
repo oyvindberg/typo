@@ -17,36 +17,36 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class UdtPrivilegesViewRow(
-  grantor: Option[SqlIdentifier],
-  grantee: Option[SqlIdentifier],
-  udtCatalog: Option[SqlIdentifier],
-  udtSchema: Option[SqlIdentifier],
-  udtName: Option[SqlIdentifier],
-  privilegeType: Option[CharacterData],
-  isGrantable: Option[YesOrNo]
+  grantor: SqlIdentifier,
+  grantee: SqlIdentifier,
+  udtCatalog: SqlIdentifier,
+  udtSchema: SqlIdentifier,
+  udtName: SqlIdentifier,
+  privilegeType: CharacterData,
+  isGrantable: YesOrNo
 )
 
 object UdtPrivilegesViewRow {
-  implicit lazy val decoder: Decoder[UdtPrivilegesViewRow] = Decoder.forProduct7[UdtPrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(UdtPrivilegesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder))
-  implicit lazy val encoder: Encoder[UdtPrivilegesViewRow] = Encoder.forProduct7[UdtPrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.udtCatalog, x.udtSchema, x.udtName, x.privilegeType, x.isGrantable))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder))
+  implicit lazy val decoder: Decoder[UdtPrivilegesViewRow] = Decoder.forProduct7[UdtPrivilegesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(UdtPrivilegesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, YesOrNo.decoder)
+  implicit lazy val encoder: Encoder[UdtPrivilegesViewRow] = Encoder.forProduct7[UdtPrivilegesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.udtCatalog, x.udtSchema, x.udtName, x.privilegeType, x.isGrantable))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, YesOrNo.encoder)
   implicit lazy val read: Read[UdtPrivilegesViewRow] = new Read[UdtPrivilegesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (YesOrNo.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UdtPrivilegesViewRow(
-      grantor = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      grantee = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      udtCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      udtSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      udtName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      privilegeType = CharacterData.get.unsafeGetNullable(rs, i + 5),
-      isGrantable = YesOrNo.get.unsafeGetNullable(rs, i + 6)
+      grantor = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      grantee = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      udtCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      udtSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      udtName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      privilegeType = CharacterData.get.unsafeGetNonNullable(rs, i + 5),
+      isGrantable = YesOrNo.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

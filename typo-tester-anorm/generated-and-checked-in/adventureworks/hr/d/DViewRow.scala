@@ -23,26 +23,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class DViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
-  departmentid: Option[DepartmentId],
+  departmentid: DepartmentId,
   /** Points to [[humanresources.department.DepartmentRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[humanresources.department.DepartmentRow.groupname]] */
-  groupname: Option[Name],
+  groupname: Name,
   /** Points to [[humanresources.department.DepartmentRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object DViewRow {
   implicit lazy val reads: Reads[DViewRow] = Reads[DViewRow](json => JsResult.fromTry(
       Try(
         DViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          departmentid = json.\("departmentid").toOption.map(_.as(DepartmentId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          groupname = json.\("groupname").toOption.map(_.as(Name.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          departmentid = json.\("departmentid").as(DepartmentId.reads),
+          name = json.\("name").as(Name.reads),
+          groupname = json.\("groupname").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -50,21 +50,21 @@ object DViewRow {
   def rowParser(idx: Int): RowParser[DViewRow] = RowParser[DViewRow] { row =>
     Success(
       DViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        departmentid = row(idx + 1)(Column.columnToOption(DepartmentId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        groupname = row(idx + 3)(Column.columnToOption(Name.column)),
-        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        departmentid = row(idx + 1)(DepartmentId.column),
+        name = row(idx + 2)(Name.column),
+        groupname = row(idx + 3)(Name.column),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[DViewRow] = OWrites[DViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "departmentid" -> Writes.OptionWrites(DepartmentId.writes).writes(o.departmentid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "groupname" -> Writes.OptionWrites(Name.writes).writes(o.groupname),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "departmentid" -> DepartmentId.writes.writes(o.departmentid),
+      "name" -> Name.writes.writes(o.name),
+      "groupname" -> Name.writes.writes(o.groupname),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

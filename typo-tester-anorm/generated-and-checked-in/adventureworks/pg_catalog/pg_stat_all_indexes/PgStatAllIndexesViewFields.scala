@@ -7,17 +7,18 @@ package adventureworks
 package pg_catalog
 package pg_stat_all_indexes
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatAllIndexesViewFields[Row] {
-  val relid: OptField[/* oid */ Long, Row]
-  val indexrelid: OptField[/* oid */ Long, Row]
+  val relid: Field[/* oid */ Long, Row]
+  val indexrelid: Field[/* oid */ Long, Row]
   val schemaname: OptField[String, Row]
-  val relname: OptField[String, Row]
-  val indexrelname: OptField[String, Row]
-  val idxScan: OptField[Long, Row]
-  val idxTupRead: OptField[Long, Row]
-  val idxTupFetch: OptField[Long, Row]
+  val relname: Field[String, Row]
+  val indexrelname: Field[String, Row]
+  val idxScan: Field[Long, Row]
+  val idxTupRead: Field[Long, Row]
+  val idxTupFetch: Field[Long, Row]
 }
 object PgStatAllIndexesViewFields extends PgStatAllIndexesViewStructure[PgStatAllIndexesViewRow](None, identity, (_, x) => x)
 

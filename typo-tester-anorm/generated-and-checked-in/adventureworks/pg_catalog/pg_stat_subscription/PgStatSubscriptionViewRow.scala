@@ -21,8 +21,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatSubscriptionViewRow(
-  subid: Option[/* oid */ Long],
-  subname: Option[String],
+  subid: /* oid */ Long,
+  subname: String,
   pid: Option[Int],
   relid: Option[/* oid */ Long],
   receivedLsn: Option[/* pg_lsn */ Long],
@@ -36,8 +36,8 @@ object PgStatSubscriptionViewRow {
   implicit lazy val reads: Reads[PgStatSubscriptionViewRow] = Reads[PgStatSubscriptionViewRow](json => JsResult.fromTry(
       Try(
         PgStatSubscriptionViewRow(
-          subid = json.\("subid").toOption.map(_.as(Reads.LongReads)),
-          subname = json.\("subname").toOption.map(_.as(Reads.StringReads)),
+          subid = json.\("subid").as(Reads.LongReads),
+          subname = json.\("subname").as(Reads.StringReads),
           pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
           relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
           receivedLsn = json.\("received_lsn").toOption.map(_.as(Reads.LongReads)),
@@ -52,8 +52,8 @@ object PgStatSubscriptionViewRow {
   def rowParser(idx: Int): RowParser[PgStatSubscriptionViewRow] = RowParser[PgStatSubscriptionViewRow] { row =>
     Success(
       PgStatSubscriptionViewRow(
-        subid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
-        subname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        subid = row(idx + 0)(Column.columnToLong),
+        subname = row(idx + 1)(Column.columnToString),
         pid = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
         relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
         receivedLsn = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
@@ -66,8 +66,8 @@ object PgStatSubscriptionViewRow {
   }
   implicit lazy val writes: OWrites[PgStatSubscriptionViewRow] = OWrites[PgStatSubscriptionViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "subid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.subid),
-      "subname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.subname),
+      "subid" -> Writes.LongWrites.writes(o.subid),
+      "subname" -> Writes.StringWrites.writes(o.subname),
       "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
       "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
       "received_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.receivedLsn),

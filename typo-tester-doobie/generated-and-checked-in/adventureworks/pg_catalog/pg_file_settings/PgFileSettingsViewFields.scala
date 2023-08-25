@@ -7,16 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_file_settings
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgFileSettingsViewFields[Row] {
-  val sourcefile: OptField[String, Row]
-  val sourceline: OptField[Int, Row]
-  val seqno: OptField[Int, Row]
-  val name: OptField[String, Row]
-  val setting: OptField[String, Row]
-  val applied: OptField[Boolean, Row]
-  val error: OptField[String, Row]
+  val sourcefile: Field[String, Row]
+  val sourceline: Field[Int, Row]
+  val seqno: Field[Int, Row]
+  val name: Field[String, Row]
+  val setting: Field[String, Row]
+  val applied: Field[Boolean, Row]
+  val error: Field[String, Row]
 }
 object PgFileSettingsViewFields extends PgFileSettingsViewStructure[PgFileSettingsViewRow](None, identity, (_, x) => x)
 

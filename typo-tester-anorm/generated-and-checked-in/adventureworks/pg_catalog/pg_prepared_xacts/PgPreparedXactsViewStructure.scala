@@ -9,6 +9,7 @@ package pg_prepared_xacts
 
 import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoXid
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -17,9 +18,9 @@ class PgPreparedXactsViewStructure[Row](val prefix: Option[String], val extract:
   extends Relation[PgPreparedXactsViewFields, PgPreparedXactsViewRow, Row]
     with PgPreparedXactsViewFields[Row] { outer =>
 
-  override val transaction = new OptField[TypoXid, Row](prefix, "transaction", None, Some("xid"))(x => extract(x).transaction, (row, value) => merge(row, extract(row).copy(transaction = value)))
-  override val gid = new OptField[String, Row](prefix, "gid", None, None)(x => extract(x).gid, (row, value) => merge(row, extract(row).copy(gid = value)))
-  override val prepared = new OptField[TypoOffsetDateTime, Row](prefix, "prepared", Some("text"), Some("timestamptz"))(x => extract(x).prepared, (row, value) => merge(row, extract(row).copy(prepared = value)))
+  override val transaction = new Field[TypoXid, Row](prefix, "transaction", None, Some("xid"))(x => extract(x).transaction, (row, value) => merge(row, extract(row).copy(transaction = value)))
+  override val gid = new Field[String, Row](prefix, "gid", None, None)(x => extract(x).gid, (row, value) => merge(row, extract(row).copy(gid = value)))
+  override val prepared = new Field[TypoOffsetDateTime, Row](prefix, "prepared", Some("text"), Some("timestamptz"))(x => extract(x).prepared, (row, value) => merge(row, extract(row).copy(prepared = value)))
   override val owner = new OptField[String, Row](prefix, "owner", None, Some("name"))(x => extract(x).owner, (row, value) => merge(row, extract(row).copy(owner = value)))
   override val database = new OptField[String, Row](prefix, "database", None, Some("name"))(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
 

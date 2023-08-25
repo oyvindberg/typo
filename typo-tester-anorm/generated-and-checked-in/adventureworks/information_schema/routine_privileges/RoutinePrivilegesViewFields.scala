@@ -10,19 +10,19 @@ package routine_privileges
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait RoutinePrivilegesViewFields[Row] {
-  val grantor: OptField[SqlIdentifier, Row]
-  val grantee: OptField[SqlIdentifier, Row]
-  val specificCatalog: OptField[SqlIdentifier, Row]
-  val specificSchema: OptField[SqlIdentifier, Row]
-  val specificName: OptField[SqlIdentifier, Row]
-  val routineCatalog: OptField[SqlIdentifier, Row]
-  val routineSchema: OptField[SqlIdentifier, Row]
-  val routineName: OptField[SqlIdentifier, Row]
-  val privilegeType: OptField[CharacterData, Row]
-  val isGrantable: OptField[YesOrNo, Row]
+  val grantor: Field[SqlIdentifier, Row]
+  val grantee: Field[SqlIdentifier, Row]
+  val specificCatalog: Field[SqlIdentifier, Row]
+  val specificSchema: Field[SqlIdentifier, Row]
+  val specificName: Field[SqlIdentifier, Row]
+  val routineCatalog: Field[SqlIdentifier, Row]
+  val routineSchema: Field[SqlIdentifier, Row]
+  val routineName: Field[SqlIdentifier, Row]
+  val privilegeType: Field[CharacterData, Row]
+  val isGrantable: Field[YesOrNo, Row]
 }
 object RoutinePrivilegesViewFields extends RoutinePrivilegesViewStructure[RoutinePrivilegesViewRow](None, identity, (_, x) => x)
 

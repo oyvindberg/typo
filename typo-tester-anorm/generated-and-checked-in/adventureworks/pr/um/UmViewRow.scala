@@ -23,23 +23,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UmViewRow(
-  id: Option[/* bpchar, max 3 chars */ String],
+  id: /* bpchar, max 3 chars */ String,
   /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
-  unitmeasurecode: Option[UnitmeasureId],
+  unitmeasurecode: UnitmeasureId,
   /** Points to [[production.unitmeasure.UnitmeasureRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[production.unitmeasure.UnitmeasureRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object UmViewRow {
   implicit lazy val reads: Reads[UmViewRow] = Reads[UmViewRow](json => JsResult.fromTry(
       Try(
         UmViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.StringReads)),
-          unitmeasurecode = json.\("unitmeasurecode").toOption.map(_.as(UnitmeasureId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.StringReads),
+          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,19 +47,19 @@ object UmViewRow {
   def rowParser(idx: Int): RowParser[UmViewRow] = RowParser[UmViewRow] { row =>
     Success(
       UmViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        unitmeasurecode = row(idx + 1)(Column.columnToOption(UnitmeasureId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToString),
+        unitmeasurecode = row(idx + 1)(UnitmeasureId.column),
+        name = row(idx + 2)(Name.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[UmViewRow] = OWrites[UmViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.StringWrites).writes(o.id),
-      "unitmeasurecode" -> Writes.OptionWrites(UnitmeasureId.writes).writes(o.unitmeasurecode),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.StringWrites.writes(o.id),
+      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

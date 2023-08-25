@@ -12,16 +12,16 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CViewFields[Row] {
-  val id: OptField[Int, Row]
-  val customerid: OptField[CustomerId, Row]
-  val personid: OptField[BusinessentityId, Row]
-  val storeid: OptField[BusinessentityId, Row]
-  val territoryid: OptField[SalesterritoryId, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val customerid: Field[CustomerId, Row]
+  val personid: Field[BusinessentityId, Row]
+  val storeid: Field[BusinessentityId, Row]
+  val territoryid: Field[SalesterritoryId, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object CViewFields extends CViewStructure[CViewRow](None, identity, (_, x) => x)
 

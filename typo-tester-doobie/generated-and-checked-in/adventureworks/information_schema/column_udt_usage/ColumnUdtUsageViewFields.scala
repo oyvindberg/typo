@@ -8,16 +8,16 @@ package information_schema
 package column_udt_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ColumnUdtUsageViewFields[Row] {
-  val udtCatalog: OptField[SqlIdentifier, Row]
-  val udtSchema: OptField[SqlIdentifier, Row]
-  val udtName: OptField[SqlIdentifier, Row]
-  val tableCatalog: OptField[SqlIdentifier, Row]
-  val tableSchema: OptField[SqlIdentifier, Row]
-  val tableName: OptField[SqlIdentifier, Row]
-  val columnName: OptField[SqlIdentifier, Row]
+  val udtCatalog: Field[SqlIdentifier, Row]
+  val udtSchema: Field[SqlIdentifier, Row]
+  val udtName: Field[SqlIdentifier, Row]
+  val tableCatalog: Field[SqlIdentifier, Row]
+  val tableSchema: Field[SqlIdentifier, Row]
+  val tableName: Field[SqlIdentifier, Row]
+  val columnName: Field[SqlIdentifier, Row]
 }
 object ColumnUdtUsageViewFields extends ColumnUdtUsageViewStructure[ColumnUdtUsageViewRow](None, identity, (_, x) => x)
 

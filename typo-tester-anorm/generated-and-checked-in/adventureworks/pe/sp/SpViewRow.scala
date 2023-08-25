@@ -27,38 +27,38 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
-  stateprovinceid: Option[StateprovinceId],
+  stateprovinceid: StateprovinceId,
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovincecode]] */
-  stateprovincecode: Option[/* bpchar, max 3 chars */ String],
+  stateprovincecode: /* bpchar, max 3 chars */ String,
   /** Points to [[person.stateprovince.StateprovinceRow.countryregioncode]] */
-  countryregioncode: Option[CountryregionId],
+  countryregioncode: CountryregionId,
   /** Points to [[person.stateprovince.StateprovinceRow.isonlystateprovinceflag]] */
   isonlystateprovinceflag: Flag,
   /** Points to [[person.stateprovince.StateprovinceRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[person.stateprovince.StateprovinceRow.territoryid]] */
-  territoryid: Option[SalesterritoryId],
+  territoryid: SalesterritoryId,
   /** Points to [[person.stateprovince.StateprovinceRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.stateprovince.StateprovinceRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SpViewRow {
   implicit lazy val reads: Reads[SpViewRow] = Reads[SpViewRow](json => JsResult.fromTry(
       Try(
         SpViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as(StateprovinceId.reads)),
-          stateprovincecode = json.\("stateprovincecode").toOption.map(_.as(Reads.StringReads)),
-          countryregioncode = json.\("countryregioncode").toOption.map(_.as(CountryregionId.reads)),
+          id = json.\("id").as(Reads.IntReads),
+          stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
+          stateprovincecode = json.\("stateprovincecode").as(Reads.StringReads),
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
           isonlystateprovinceflag = json.\("isonlystateprovinceflag").as(Flag.reads),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          name = json.\("name").as(Name.reads),
+          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -66,29 +66,29 @@ object SpViewRow {
   def rowParser(idx: Int): RowParser[SpViewRow] = RowParser[SpViewRow] { row =>
     Success(
       SpViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        stateprovinceid = row(idx + 1)(Column.columnToOption(StateprovinceId.column)),
-        stateprovincecode = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        countryregioncode = row(idx + 3)(Column.columnToOption(CountryregionId.column)),
+        id = row(idx + 0)(Column.columnToInt),
+        stateprovinceid = row(idx + 1)(StateprovinceId.column),
+        stateprovincecode = row(idx + 2)(Column.columnToString),
+        countryregioncode = row(idx + 3)(CountryregionId.column),
         isonlystateprovinceflag = row(idx + 4)(Flag.column),
-        name = row(idx + 5)(Column.columnToOption(Name.column)),
-        territoryid = row(idx + 6)(Column.columnToOption(SalesterritoryId.column)),
-        rowguid = row(idx + 7)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 8)(Column.columnToOption(TypoLocalDateTime.column))
+        name = row(idx + 5)(Name.column),
+        territoryid = row(idx + 6)(SalesterritoryId.column),
+        rowguid = row(idx + 7)(Column.columnToUUID),
+        modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SpViewRow] = OWrites[SpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "stateprovinceid" -> Writes.OptionWrites(StateprovinceId.writes).writes(o.stateprovinceid),
-      "stateprovincecode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stateprovincecode),
-      "countryregioncode" -> Writes.OptionWrites(CountryregionId.writes).writes(o.countryregioncode),
+      "id" -> Writes.IntWrites.writes(o.id),
+      "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
+      "stateprovincecode" -> Writes.StringWrites.writes(o.stateprovincecode),
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
       "isonlystateprovinceflag" -> Flag.writes.writes(o.isonlystateprovinceflag),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

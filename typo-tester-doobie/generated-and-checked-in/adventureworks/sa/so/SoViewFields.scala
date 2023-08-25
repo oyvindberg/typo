@@ -10,21 +10,21 @@ package so
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.specialoffer.SpecialofferId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SoViewFields[Row] {
-  val id: OptField[Int, Row]
-  val specialofferid: OptField[SpecialofferId, Row]
-  val description: OptField[/* max 255 chars */ String, Row]
-  val discountpct: OptField[BigDecimal, Row]
-  val `type`: OptField[/* max 50 chars */ String, Row]
-  val category: OptField[/* max 50 chars */ String, Row]
-  val startdate: OptField[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val minqty: OptField[Int, Row]
-  val maxqty: OptField[Int, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val specialofferid: Field[SpecialofferId, Row]
+  val description: Field[/* max 255 chars */ String, Row]
+  val discountpct: Field[BigDecimal, Row]
+  val `type`: Field[/* max 50 chars */ String, Row]
+  val category: Field[/* max 50 chars */ String, Row]
+  val startdate: Field[TypoLocalDateTime, Row]
+  val enddate: Field[TypoLocalDateTime, Row]
+  val minqty: Field[Int, Row]
+  val maxqty: Field[Int, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SoViewFields extends SoViewStructure[SoViewRow](None, identity, (_, x) => x)
 

@@ -11,14 +11,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait AtViewFields[Row] {
-  val id: OptField[Int, Row]
-  val addresstypeid: OptField[AddresstypeId, Row]
-  val name: OptField[Name, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val addresstypeid: Field[AddresstypeId, Row]
+  val name: Field[Name, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object AtViewFields extends AtViewStructure[AtViewRow](None, identity, (_, x) => x)
 

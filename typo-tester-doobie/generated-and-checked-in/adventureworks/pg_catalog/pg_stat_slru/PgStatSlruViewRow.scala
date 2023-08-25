@@ -16,42 +16,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatSlruViewRow(
-  name: Option[String],
-  blksZeroed: Option[Long],
-  blksHit: Option[Long],
-  blksRead: Option[Long],
-  blksWritten: Option[Long],
-  blksExists: Option[Long],
-  flushes: Option[Long],
-  truncates: Option[Long],
-  statsReset: Option[TypoOffsetDateTime]
+  name: String,
+  blksZeroed: Long,
+  blksHit: Long,
+  blksRead: Long,
+  blksWritten: Long,
+  blksExists: Long,
+  flushes: Long,
+  truncates: Long,
+  statsReset: TypoOffsetDateTime
 )
 
 object PgStatSlruViewRow {
-  implicit lazy val decoder: Decoder[PgStatSlruViewRow] = Decoder.forProduct9[PgStatSlruViewRow, Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("name", "blks_zeroed", "blks_hit", "blks_read", "blks_written", "blks_exists", "flushes", "truncates", "stats_reset")(PgStatSlruViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[PgStatSlruViewRow] = Encoder.forProduct9[PgStatSlruViewRow, Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("name", "blks_zeroed", "blks_hit", "blks_read", "blks_written", "blks_exists", "flushes", "truncates", "stats_reset")(x => (x.name, x.blksZeroed, x.blksHit, x.blksRead, x.blksWritten, x.blksExists, x.flushes, x.truncates, x.statsReset))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[PgStatSlruViewRow] = Decoder.forProduct9[PgStatSlruViewRow, String, Long, Long, Long, Long, Long, Long, Long, TypoOffsetDateTime]("name", "blks_zeroed", "blks_hit", "blks_read", "blks_written", "blks_exists", "flushes", "truncates", "stats_reset")(PgStatSlruViewRow.apply)(Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, TypoOffsetDateTime.decoder)
+  implicit lazy val encoder: Encoder[PgStatSlruViewRow] = Encoder.forProduct9[PgStatSlruViewRow, String, Long, Long, Long, Long, Long, Long, Long, TypoOffsetDateTime]("name", "blks_zeroed", "blks_hit", "blks_read", "blks_written", "blks_exists", "flushes", "truncates", "stats_reset")(x => (x.name, x.blksZeroed, x.blksHit, x.blksRead, x.blksWritten, x.blksExists, x.flushes, x.truncates, x.statsReset))(Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, TypoOffsetDateTime.encoder)
   implicit lazy val read: Read[PgStatSlruViewRow] = new Read[PgStatSlruViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (TypoOffsetDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatSlruViewRow(
-      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
-      blksZeroed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
-      blksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
-      blksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      blksWritten = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
-      blksExists = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
-      flushes = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
-      truncates = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
-      statsReset = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 8)
+      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      blksZeroed = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      blksHit = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      blksRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      blksWritten = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      blksExists = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      flushes = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
+      truncates = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
+      statsReset = TypoOffsetDateTime.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

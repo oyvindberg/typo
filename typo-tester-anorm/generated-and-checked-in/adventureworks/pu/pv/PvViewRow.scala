@@ -24,47 +24,47 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PvViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[purchasing.productvendor.ProductvendorRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[purchasing.productvendor.ProductvendorRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[purchasing.productvendor.ProductvendorRow.averageleadtime]] */
-  averageleadtime: Option[Int],
+  averageleadtime: Int,
   /** Points to [[purchasing.productvendor.ProductvendorRow.standardprice]] */
-  standardprice: Option[BigDecimal],
+  standardprice: BigDecimal,
   /** Points to [[purchasing.productvendor.ProductvendorRow.lastreceiptcost]] */
-  lastreceiptcost: Option[BigDecimal],
+  lastreceiptcost: BigDecimal,
   /** Points to [[purchasing.productvendor.ProductvendorRow.lastreceiptdate]] */
-  lastreceiptdate: Option[TypoLocalDateTime],
+  lastreceiptdate: TypoLocalDateTime,
   /** Points to [[purchasing.productvendor.ProductvendorRow.minorderqty]] */
-  minorderqty: Option[Int],
+  minorderqty: Int,
   /** Points to [[purchasing.productvendor.ProductvendorRow.maxorderqty]] */
-  maxorderqty: Option[Int],
+  maxorderqty: Int,
   /** Points to [[purchasing.productvendor.ProductvendorRow.onorderqty]] */
-  onorderqty: Option[Int],
+  onorderqty: Int,
   /** Points to [[purchasing.productvendor.ProductvendorRow.unitmeasurecode]] */
-  unitmeasurecode: Option[UnitmeasureId],
+  unitmeasurecode: UnitmeasureId,
   /** Points to [[purchasing.productvendor.ProductvendorRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PvViewRow {
   implicit lazy val reads: Reads[PvViewRow] = Reads[PvViewRow](json => JsResult.fromTry(
       Try(
         PvViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          averageleadtime = json.\("averageleadtime").toOption.map(_.as(Reads.IntReads)),
-          standardprice = json.\("standardprice").toOption.map(_.as(Reads.bigDecReads)),
-          lastreceiptcost = json.\("lastreceiptcost").toOption.map(_.as(Reads.bigDecReads)),
-          lastreceiptdate = json.\("lastreceiptdate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          minorderqty = json.\("minorderqty").toOption.map(_.as(Reads.IntReads)),
-          maxorderqty = json.\("maxorderqty").toOption.map(_.as(Reads.IntReads)),
-          onorderqty = json.\("onorderqty").toOption.map(_.as(Reads.IntReads)),
-          unitmeasurecode = json.\("unitmeasurecode").toOption.map(_.as(UnitmeasureId.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          productid = json.\("productid").as(ProductId.reads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          averageleadtime = json.\("averageleadtime").as(Reads.IntReads),
+          standardprice = json.\("standardprice").as(Reads.bigDecReads),
+          lastreceiptcost = json.\("lastreceiptcost").as(Reads.bigDecReads),
+          lastreceiptdate = json.\("lastreceiptdate").as(TypoLocalDateTime.reads),
+          minorderqty = json.\("minorderqty").as(Reads.IntReads),
+          maxorderqty = json.\("maxorderqty").as(Reads.IntReads),
+          onorderqty = json.\("onorderqty").as(Reads.IntReads),
+          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -72,35 +72,35 @@ object PvViewRow {
   def rowParser(idx: Int): RowParser[PvViewRow] = RowParser[PvViewRow] { row =>
     Success(
       PvViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        productid = row(idx + 1)(Column.columnToOption(ProductId.column)),
-        businessentityid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
-        averageleadtime = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
-        standardprice = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        lastreceiptcost = row(idx + 5)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        lastreceiptdate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column)),
-        minorderqty = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
-        maxorderqty = row(idx + 8)(Column.columnToOption(Column.columnToInt)),
-        onorderqty = row(idx + 9)(Column.columnToOption(Column.columnToInt)),
-        unitmeasurecode = row(idx + 10)(Column.columnToOption(UnitmeasureId.column)),
-        modifieddate = row(idx + 11)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        productid = row(idx + 1)(ProductId.column),
+        businessentityid = row(idx + 2)(BusinessentityId.column),
+        averageleadtime = row(idx + 3)(Column.columnToInt),
+        standardprice = row(idx + 4)(Column.columnToScalaBigDecimal),
+        lastreceiptcost = row(idx + 5)(Column.columnToScalaBigDecimal),
+        lastreceiptdate = row(idx + 6)(TypoLocalDateTime.column),
+        minorderqty = row(idx + 7)(Column.columnToInt),
+        maxorderqty = row(idx + 8)(Column.columnToInt),
+        onorderqty = row(idx + 9)(Column.columnToInt),
+        unitmeasurecode = row(idx + 10)(UnitmeasureId.column),
+        modifieddate = row(idx + 11)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PvViewRow] = OWrites[PvViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "averageleadtime" -> Writes.OptionWrites(Writes.IntWrites).writes(o.averageleadtime),
-      "standardprice" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.standardprice),
-      "lastreceiptcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.lastreceiptcost),
-      "lastreceiptdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.lastreceiptdate),
-      "minorderqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.minorderqty),
-      "maxorderqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.maxorderqty),
-      "onorderqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.onorderqty),
-      "unitmeasurecode" -> Writes.OptionWrites(UnitmeasureId.writes).writes(o.unitmeasurecode),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "averageleadtime" -> Writes.IntWrites.writes(o.averageleadtime),
+      "standardprice" -> Writes.BigDecimalWrites.writes(o.standardprice),
+      "lastreceiptcost" -> Writes.BigDecimalWrites.writes(o.lastreceiptcost),
+      "lastreceiptdate" -> TypoLocalDateTime.writes.writes(o.lastreceiptdate),
+      "minorderqty" -> Writes.IntWrites.writes(o.minorderqty),
+      "maxorderqty" -> Writes.IntWrites.writes(o.maxorderqty),
+      "onorderqty" -> Writes.IntWrites.writes(o.onorderqty),
+      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

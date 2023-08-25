@@ -10,7 +10,6 @@ package pmi
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,26 +17,25 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PmiViewRow(
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.productmodelid]] */
-  productmodelid: Option[ProductmodelId],
+  productmodelid: ProductmodelId,
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.illustrationid]] */
-  illustrationid: Option[IllustrationId],
+  illustrationid: IllustrationId,
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PmiViewRow {
   implicit lazy val reads: Reads[PmiViewRow] = Reads[PmiViewRow](json => JsResult.fromTry(
       Try(
         PmiViewRow(
-          productmodelid = json.\("productmodelid").toOption.map(_.as(ProductmodelId.reads)),
-          illustrationid = json.\("illustrationid").toOption.map(_.as(IllustrationId.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
+          illustrationid = json.\("illustrationid").as(IllustrationId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -45,17 +43,17 @@ object PmiViewRow {
   def rowParser(idx: Int): RowParser[PmiViewRow] = RowParser[PmiViewRow] { row =>
     Success(
       PmiViewRow(
-        productmodelid = row(idx + 0)(Column.columnToOption(ProductmodelId.column)),
-        illustrationid = row(idx + 1)(Column.columnToOption(IllustrationId.column)),
-        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column))
+        productmodelid = row(idx + 0)(ProductmodelId.column),
+        illustrationid = row(idx + 1)(IllustrationId.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PmiViewRow] = OWrites[PmiViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productmodelid" -> Writes.OptionWrites(ProductmodelId.writes).writes(o.productmodelid),
-      "illustrationid" -> Writes.OptionWrites(IllustrationId.writes).writes(o.illustrationid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
+      "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

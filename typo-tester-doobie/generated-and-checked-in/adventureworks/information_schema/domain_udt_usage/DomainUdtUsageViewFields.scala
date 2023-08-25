@@ -8,15 +8,15 @@ package information_schema
 package domain_udt_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait DomainUdtUsageViewFields[Row] {
-  val udtCatalog: OptField[SqlIdentifier, Row]
-  val udtSchema: OptField[SqlIdentifier, Row]
-  val udtName: OptField[SqlIdentifier, Row]
-  val domainCatalog: OptField[SqlIdentifier, Row]
-  val domainSchema: OptField[SqlIdentifier, Row]
-  val domainName: OptField[SqlIdentifier, Row]
+  val udtCatalog: Field[SqlIdentifier, Row]
+  val udtSchema: Field[SqlIdentifier, Row]
+  val udtName: Field[SqlIdentifier, Row]
+  val domainCatalog: Field[SqlIdentifier, Row]
+  val domainSchema: Field[SqlIdentifier, Row]
+  val domainName: Field[SqlIdentifier, Row]
 }
 object DomainUdtUsageViewFields extends DomainUdtUsageViewStructure[DomainUdtUsageViewRow](None, identity, (_, x) => x)
 

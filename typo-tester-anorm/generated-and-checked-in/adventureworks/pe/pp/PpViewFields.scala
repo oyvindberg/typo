@@ -11,14 +11,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PpViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val phonenumber: OptField[Phone, Row]
-  val phonenumbertypeid: OptField[PhonenumbertypeId, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val phonenumber: Field[Phone, Row]
+  val phonenumbertypeid: Field[PhonenumbertypeId, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PpViewFields extends PpViewStructure[PpViewRow](None, identity, (_, x) => x)
 

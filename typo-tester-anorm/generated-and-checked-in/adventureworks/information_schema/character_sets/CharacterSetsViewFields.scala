@@ -8,17 +8,17 @@ package information_schema
 package character_sets
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CharacterSetsViewFields[Row] {
-  val characterSetCatalog: OptField[SqlIdentifier, Row]
-  val characterSetSchema: OptField[SqlIdentifier, Row]
-  val characterSetName: OptField[SqlIdentifier, Row]
-  val characterRepertoire: OptField[SqlIdentifier, Row]
-  val formOfUse: OptField[SqlIdentifier, Row]
-  val defaultCollateCatalog: OptField[SqlIdentifier, Row]
-  val defaultCollateSchema: OptField[SqlIdentifier, Row]
-  val defaultCollateName: OptField[SqlIdentifier, Row]
+  val characterSetCatalog: Field[SqlIdentifier, Row]
+  val characterSetSchema: Field[SqlIdentifier, Row]
+  val characterSetName: Field[SqlIdentifier, Row]
+  val characterRepertoire: Field[SqlIdentifier, Row]
+  val formOfUse: Field[SqlIdentifier, Row]
+  val defaultCollateCatalog: Field[SqlIdentifier, Row]
+  val defaultCollateSchema: Field[SqlIdentifier, Row]
+  val defaultCollateName: Field[SqlIdentifier, Row]
 }
 object CharacterSetsViewFields extends CharacterSetsViewStructure[CharacterSetsViewRow](None, identity, (_, x) => x)
 

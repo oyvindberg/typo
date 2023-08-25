@@ -7,22 +7,22 @@ package adventureworks
 package pg_catalog
 package pg_policies
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgPoliciesViewStructure[Row](val prefix: Option[String], val extract: Row => PgPoliciesViewRow, val merge: (Row, PgPoliciesViewRow) => Row)
   extends Relation[PgPoliciesViewFields, PgPoliciesViewRow, Row]
     with PgPoliciesViewFields[Row] { outer =>
 
-  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val tablename = new OptField[String, Row](prefix, "tablename", None, Some("name"))(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
-  override val policyname = new OptField[String, Row](prefix, "policyname", None, Some("name"))(x => extract(x).policyname, (row, value) => merge(row, extract(row).copy(policyname = value)))
-  override val permissive = new OptField[String, Row](prefix, "permissive", None, None)(x => extract(x).permissive, (row, value) => merge(row, extract(row).copy(permissive = value)))
-  override val roles = new OptField[Array[String], Row](prefix, "roles", None, Some("_name"))(x => extract(x).roles, (row, value) => merge(row, extract(row).copy(roles = value)))
-  override val cmd = new OptField[String, Row](prefix, "cmd", None, None)(x => extract(x).cmd, (row, value) => merge(row, extract(row).copy(cmd = value)))
-  override val qual = new OptField[String, Row](prefix, "qual", None, None)(x => extract(x).qual, (row, value) => merge(row, extract(row).copy(qual = value)))
-  override val withCheck = new OptField[String, Row](prefix, "with_check", None, None)(x => extract(x).withCheck, (row, value) => merge(row, extract(row).copy(withCheck = value)))
+  override val schemaname = new Field[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
+  override val tablename = new Field[String, Row](prefix, "tablename", None, Some("name"))(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
+  override val policyname = new Field[String, Row](prefix, "policyname", None, Some("name"))(x => extract(x).policyname, (row, value) => merge(row, extract(row).copy(policyname = value)))
+  override val permissive = new Field[String, Row](prefix, "permissive", None, None)(x => extract(x).permissive, (row, value) => merge(row, extract(row).copy(permissive = value)))
+  override val roles = new Field[Array[String], Row](prefix, "roles", None, Some("_name"))(x => extract(x).roles, (row, value) => merge(row, extract(row).copy(roles = value)))
+  override val cmd = new Field[String, Row](prefix, "cmd", None, None)(x => extract(x).cmd, (row, value) => merge(row, extract(row).copy(cmd = value)))
+  override val qual = new Field[String, Row](prefix, "qual", None, None)(x => extract(x).qual, (row, value) => merge(row, extract(row).copy(qual = value)))
+  override val withCheck = new Field[String, Row](prefix, "with_check", None, None)(x => extract(x).withCheck, (row, value) => merge(row, extract(row).copy(withCheck = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](schemaname, tablename, policyname, permissive, roles, cmd, qual, withCheck)

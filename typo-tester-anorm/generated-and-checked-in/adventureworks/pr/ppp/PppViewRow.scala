@@ -11,7 +11,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -19,29 +18,28 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PppViewRow(
   /** Points to [[production.productproductphoto.ProductproductphotoRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[production.productproductphoto.ProductproductphotoRow.productphotoid]] */
-  productphotoid: Option[ProductphotoId],
+  productphotoid: ProductphotoId,
   /** Points to [[production.productproductphoto.ProductproductphotoRow.primary]] */
   primary: Flag,
   /** Points to [[production.productproductphoto.ProductproductphotoRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PppViewRow {
   implicit lazy val reads: Reads[PppViewRow] = Reads[PppViewRow](json => JsResult.fromTry(
       Try(
         PppViewRow(
-          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
-          productphotoid = json.\("productphotoid").toOption.map(_.as(ProductphotoId.reads)),
+          productid = json.\("productid").as(ProductId.reads),
+          productphotoid = json.\("productphotoid").as(ProductphotoId.reads),
           primary = json.\("primary").as(Flag.reads),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -49,19 +47,19 @@ object PppViewRow {
   def rowParser(idx: Int): RowParser[PppViewRow] = RowParser[PppViewRow] { row =>
     Success(
       PppViewRow(
-        productid = row(idx + 0)(Column.columnToOption(ProductId.column)),
-        productphotoid = row(idx + 1)(Column.columnToOption(ProductphotoId.column)),
+        productid = row(idx + 0)(ProductId.column),
+        productphotoid = row(idx + 1)(ProductphotoId.column),
         primary = row(idx + 2)(Flag.column),
-        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PppViewRow] = OWrites[PppViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
-      "productphotoid" -> Writes.OptionWrites(ProductphotoId.writes).writes(o.productphotoid),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "productphotoid" -> ProductphotoId.writes.writes(o.productphotoid),
       "primary" -> Flag.writes.writes(o.primary),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

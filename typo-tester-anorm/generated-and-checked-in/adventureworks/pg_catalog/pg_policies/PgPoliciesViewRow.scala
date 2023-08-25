@@ -20,28 +20,28 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPoliciesViewRow(
-  schemaname: Option[String],
-  tablename: Option[String],
-  policyname: Option[String],
-  permissive: Option[String],
-  roles: Option[Array[String]],
-  cmd: Option[String],
-  qual: Option[String],
-  withCheck: Option[String]
+  schemaname: String,
+  tablename: String,
+  policyname: String,
+  permissive: String,
+  roles: Array[String],
+  cmd: String,
+  qual: String,
+  withCheck: String
 )
 
 object PgPoliciesViewRow {
   implicit lazy val reads: Reads[PgPoliciesViewRow] = Reads[PgPoliciesViewRow](json => JsResult.fromTry(
       Try(
         PgPoliciesViewRow(
-          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
-          policyname = json.\("policyname").toOption.map(_.as(Reads.StringReads)),
-          permissive = json.\("permissive").toOption.map(_.as(Reads.StringReads)),
-          roles = json.\("roles").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
-          cmd = json.\("cmd").toOption.map(_.as(Reads.StringReads)),
-          qual = json.\("qual").toOption.map(_.as(Reads.StringReads)),
-          withCheck = json.\("with_check").toOption.map(_.as(Reads.StringReads))
+          schemaname = json.\("schemaname").as(Reads.StringReads),
+          tablename = json.\("tablename").as(Reads.StringReads),
+          policyname = json.\("policyname").as(Reads.StringReads),
+          permissive = json.\("permissive").as(Reads.StringReads),
+          roles = json.\("roles").as(Reads.ArrayReads[String](Reads.StringReads, implicitly)),
+          cmd = json.\("cmd").as(Reads.StringReads),
+          qual = json.\("qual").as(Reads.StringReads),
+          withCheck = json.\("with_check").as(Reads.StringReads)
         )
       )
     ),
@@ -49,27 +49,27 @@ object PgPoliciesViewRow {
   def rowParser(idx: Int): RowParser[PgPoliciesViewRow] = RowParser[PgPoliciesViewRow] { row =>
     Success(
       PgPoliciesViewRow(
-        schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        policyname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        permissive = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        roles = row(idx + 4)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
-        cmd = row(idx + 5)(Column.columnToOption(Column.columnToString)),
-        qual = row(idx + 6)(Column.columnToOption(Column.columnToString)),
-        withCheck = row(idx + 7)(Column.columnToOption(Column.columnToString))
+        schemaname = row(idx + 0)(Column.columnToString),
+        tablename = row(idx + 1)(Column.columnToString),
+        policyname = row(idx + 2)(Column.columnToString),
+        permissive = row(idx + 3)(Column.columnToString),
+        roles = row(idx + 4)(Column.columnToArray[String](Column.columnToString, implicitly)),
+        cmd = row(idx + 5)(Column.columnToString),
+        qual = row(idx + 6)(Column.columnToString),
+        withCheck = row(idx + 7)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[PgPoliciesViewRow] = OWrites[PgPoliciesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
-      "policyname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.policyname),
-      "permissive" -> Writes.OptionWrites(Writes.StringWrites).writes(o.permissive),
-      "roles" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.roles),
-      "cmd" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cmd),
-      "qual" -> Writes.OptionWrites(Writes.StringWrites).writes(o.qual),
-      "with_check" -> Writes.OptionWrites(Writes.StringWrites).writes(o.withCheck)
+      "schemaname" -> Writes.StringWrites.writes(o.schemaname),
+      "tablename" -> Writes.StringWrites.writes(o.tablename),
+      "policyname" -> Writes.StringWrites.writes(o.policyname),
+      "permissive" -> Writes.StringWrites.writes(o.permissive),
+      "roles" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.roles),
+      "cmd" -> Writes.StringWrites.writes(o.cmd),
+      "qual" -> Writes.StringWrites.writes(o.qual),
+      "with_check" -> Writes.StringWrites.writes(o.withCheck)
     ))
   )
 }

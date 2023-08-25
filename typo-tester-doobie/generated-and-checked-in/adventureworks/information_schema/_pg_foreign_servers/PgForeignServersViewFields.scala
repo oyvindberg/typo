@@ -9,18 +9,18 @@ package `_pg_foreign_servers`
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgForeignServersViewFields[Row] {
-  val oid: OptField[/* oid */ Long, Row]
-  val srvoptions: OptField[Array[String], Row]
-  val foreignServerCatalog: OptField[SqlIdentifier, Row]
-  val foreignServerName: OptField[SqlIdentifier, Row]
-  val foreignDataWrapperCatalog: OptField[SqlIdentifier, Row]
-  val foreignDataWrapperName: OptField[SqlIdentifier, Row]
-  val foreignServerType: OptField[CharacterData, Row]
-  val foreignServerVersion: OptField[CharacterData, Row]
-  val authorizationIdentifier: OptField[SqlIdentifier, Row]
+  val oid: Field[/* oid */ Long, Row]
+  val srvoptions: Field[Array[String], Row]
+  val foreignServerCatalog: Field[SqlIdentifier, Row]
+  val foreignServerName: Field[SqlIdentifier, Row]
+  val foreignDataWrapperCatalog: Field[SqlIdentifier, Row]
+  val foreignDataWrapperName: Field[SqlIdentifier, Row]
+  val foreignServerType: Field[CharacterData, Row]
+  val foreignServerVersion: Field[CharacterData, Row]
+  val authorizationIdentifier: Field[SqlIdentifier, Row]
 }
 object PgForeignServersViewFields extends PgForeignServersViewStructure[PgForeignServersViewRow](None, identity, (_, x) => x)
 

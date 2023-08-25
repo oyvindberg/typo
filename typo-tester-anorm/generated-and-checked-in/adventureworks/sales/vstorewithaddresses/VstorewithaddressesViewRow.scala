@@ -23,35 +23,35 @@ import scala.util.Try
 
 case class VstorewithaddressesViewRow(
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.stateprovince.StateprovinceRow.name]] */
-  name: Option[Name],
-  addresstype: Option[Name],
+  name: Name,
+  addresstype: Name,
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: Option[/* max 60 chars */ String],
+  addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: Option[/* max 60 chars */ String],
+  addressline2: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.city]] */
-  city: Option[/* max 30 chars */ String],
-  stateprovincename: Option[Name],
+  city: /* max 30 chars */ String,
+  stateprovincename: Name,
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[/* max 15 chars */ String],
-  countryregionname: Option[Name]
+  postalcode: /* max 15 chars */ String,
+  countryregionname: Name
 )
 
 object VstorewithaddressesViewRow {
   implicit lazy val reads: Reads[VstorewithaddressesViewRow] = Reads[VstorewithaddressesViewRow](json => JsResult.fromTry(
       Try(
         VstorewithaddressesViewRow(
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          addresstype = json.\("addresstype").toOption.map(_.as(Name.reads)),
-          addressline1 = json.\("addressline1").toOption.map(_.as(Reads.StringReads)),
-          addressline2 = json.\("addressline2").toOption.map(_.as(Reads.StringReads)),
-          city = json.\("city").toOption.map(_.as(Reads.StringReads)),
-          stateprovincename = json.\("stateprovincename").toOption.map(_.as(Name.reads)),
-          postalcode = json.\("postalcode").toOption.map(_.as(Reads.StringReads)),
-          countryregionname = json.\("countryregionname").toOption.map(_.as(Name.reads))
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          name = json.\("name").as(Name.reads),
+          addresstype = json.\("addresstype").as(Name.reads),
+          addressline1 = json.\("addressline1").as(Reads.StringReads),
+          addressline2 = json.\("addressline2").as(Reads.StringReads),
+          city = json.\("city").as(Reads.StringReads),
+          stateprovincename = json.\("stateprovincename").as(Name.reads),
+          postalcode = json.\("postalcode").as(Reads.StringReads),
+          countryregionname = json.\("countryregionname").as(Name.reads)
         )
       )
     ),
@@ -59,29 +59,29 @@ object VstorewithaddressesViewRow {
   def rowParser(idx: Int): RowParser[VstorewithaddressesViewRow] = RowParser[VstorewithaddressesViewRow] { row =>
     Success(
       VstorewithaddressesViewRow(
-        businessentityid = row(idx + 0)(Column.columnToOption(BusinessentityId.column)),
-        name = row(idx + 1)(Column.columnToOption(Name.column)),
-        addresstype = row(idx + 2)(Column.columnToOption(Name.column)),
-        addressline1 = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        addressline2 = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        city = row(idx + 5)(Column.columnToOption(Column.columnToString)),
-        stateprovincename = row(idx + 6)(Column.columnToOption(Name.column)),
-        postalcode = row(idx + 7)(Column.columnToOption(Column.columnToString)),
-        countryregionname = row(idx + 8)(Column.columnToOption(Name.column))
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        name = row(idx + 1)(Name.column),
+        addresstype = row(idx + 2)(Name.column),
+        addressline1 = row(idx + 3)(Column.columnToString),
+        addressline2 = row(idx + 4)(Column.columnToString),
+        city = row(idx + 5)(Column.columnToString),
+        stateprovincename = row(idx + 6)(Name.column),
+        postalcode = row(idx + 7)(Column.columnToString),
+        countryregionname = row(idx + 8)(Name.column)
       )
     )
   }
   implicit lazy val writes: OWrites[VstorewithaddressesViewRow] = OWrites[VstorewithaddressesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "addresstype" -> Writes.OptionWrites(Name.writes).writes(o.addresstype),
-      "addressline1" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline1),
-      "addressline2" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline2),
-      "city" -> Writes.OptionWrites(Writes.StringWrites).writes(o.city),
-      "stateprovincename" -> Writes.OptionWrites(Name.writes).writes(o.stateprovincename),
-      "postalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.postalcode),
-      "countryregionname" -> Writes.OptionWrites(Name.writes).writes(o.countryregionname)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "name" -> Name.writes.writes(o.name),
+      "addresstype" -> Name.writes.writes(o.addresstype),
+      "addressline1" -> Writes.StringWrites.writes(o.addressline1),
+      "addressline2" -> Writes.StringWrites.writes(o.addressline2),
+      "city" -> Writes.StringWrites.writes(o.city),
+      "stateprovincename" -> Name.writes.writes(o.stateprovincename),
+      "postalcode" -> Writes.StringWrites.writes(o.postalcode),
+      "countryregionname" -> Name.writes.writes(o.countryregionname)
     ))
   )
 }

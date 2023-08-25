@@ -10,19 +10,19 @@ package views
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ViewsViewFields[Row] {
-  val tableCatalog: OptField[SqlIdentifier, Row]
-  val tableSchema: OptField[SqlIdentifier, Row]
-  val tableName: OptField[SqlIdentifier, Row]
-  val viewDefinition: OptField[CharacterData, Row]
-  val checkOption: OptField[CharacterData, Row]
-  val isUpdatable: OptField[YesOrNo, Row]
-  val isInsertableInto: OptField[YesOrNo, Row]
-  val isTriggerUpdatable: OptField[YesOrNo, Row]
-  val isTriggerDeletable: OptField[YesOrNo, Row]
-  val isTriggerInsertableInto: OptField[YesOrNo, Row]
+  val tableCatalog: Field[SqlIdentifier, Row]
+  val tableSchema: Field[SqlIdentifier, Row]
+  val tableName: Field[SqlIdentifier, Row]
+  val viewDefinition: Field[CharacterData, Row]
+  val checkOption: Field[CharacterData, Row]
+  val isUpdatable: Field[YesOrNo, Row]
+  val isInsertableInto: Field[YesOrNo, Row]
+  val isTriggerUpdatable: Field[YesOrNo, Row]
+  val isTriggerDeletable: Field[YesOrNo, Row]
+  val isTriggerInsertableInto: Field[YesOrNo, Row]
 }
 object ViewsViewFields extends ViewsViewStructure[ViewsViewRow](None, identity, (_, x) => x)
 

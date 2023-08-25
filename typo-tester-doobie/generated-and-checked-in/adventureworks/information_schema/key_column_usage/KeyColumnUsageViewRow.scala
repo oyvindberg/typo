@@ -16,42 +16,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class KeyColumnUsageViewRow(
-  constraintCatalog: Option[SqlIdentifier],
-  constraintSchema: Option[SqlIdentifier],
-  constraintName: Option[SqlIdentifier],
-  tableCatalog: Option[SqlIdentifier],
-  tableSchema: Option[SqlIdentifier],
-  tableName: Option[SqlIdentifier],
-  columnName: Option[SqlIdentifier],
-  ordinalPosition: Option[CardinalNumber],
-  positionInUniqueConstraint: Option[CardinalNumber]
+  constraintCatalog: SqlIdentifier,
+  constraintSchema: SqlIdentifier,
+  constraintName: SqlIdentifier,
+  tableCatalog: SqlIdentifier,
+  tableSchema: SqlIdentifier,
+  tableName: SqlIdentifier,
+  columnName: SqlIdentifier,
+  ordinalPosition: CardinalNumber,
+  positionInUniqueConstraint: CardinalNumber
 )
 
 object KeyColumnUsageViewRow {
-  implicit lazy val decoder: Decoder[KeyColumnUsageViewRow] = Decoder.forProduct9[KeyColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CardinalNumber], Option[CardinalNumber]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "column_name", "ordinal_position", "position_in_unique_constraint")(KeyColumnUsageViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CardinalNumber.decoder))
-  implicit lazy val encoder: Encoder[KeyColumnUsageViewRow] = Encoder.forProduct9[KeyColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CardinalNumber], Option[CardinalNumber]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "column_name", "ordinal_position", "position_in_unique_constraint")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.ordinalPosition, x.positionInUniqueConstraint))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CardinalNumber.encoder))
+  implicit lazy val decoder: Decoder[KeyColumnUsageViewRow] = Decoder.forProduct9[KeyColumnUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CardinalNumber, CardinalNumber]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "column_name", "ordinal_position", "position_in_unique_constraint")(KeyColumnUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CardinalNumber.decoder, CardinalNumber.decoder)
+  implicit lazy val encoder: Encoder[KeyColumnUsageViewRow] = Encoder.forProduct9[KeyColumnUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CardinalNumber, CardinalNumber]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "column_name", "ordinal_position", "position_in_unique_constraint")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.ordinalPosition, x.positionInUniqueConstraint))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CardinalNumber.encoder, CardinalNumber.encoder)
   implicit lazy val read: Read[KeyColumnUsageViewRow] = new Read[KeyColumnUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CardinalNumber.get, Nullability.Nullable),
-      (CardinalNumber.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CardinalNumber.get, Nullability.NoNulls),
+      (CardinalNumber.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => KeyColumnUsageViewRow(
-      constraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      constraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      constraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
-      columnName = SqlIdentifier.get.unsafeGetNullable(rs, i + 6),
-      ordinalPosition = CardinalNumber.get.unsafeGetNullable(rs, i + 7),
-      positionInUniqueConstraint = CardinalNumber.get.unsafeGetNullable(rs, i + 8)
+      constraintCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      constraintSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      constraintName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
+      columnName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6),
+      ordinalPosition = CardinalNumber.get.unsafeGetNonNullable(rs, i + 7),
+      positionInUniqueConstraint = CardinalNumber.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

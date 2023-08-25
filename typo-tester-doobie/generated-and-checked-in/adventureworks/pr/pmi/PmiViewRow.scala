@@ -18,26 +18,26 @@ import java.sql.ResultSet
 
 case class PmiViewRow(
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.productmodelid]] */
-  productmodelid: Option[ProductmodelId],
+  productmodelid: ProductmodelId,
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.illustrationid]] */
-  illustrationid: Option[IllustrationId],
+  illustrationid: IllustrationId,
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PmiViewRow {
-  implicit lazy val decoder: Decoder[PmiViewRow] = Decoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(PmiViewRow.apply)(Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(IllustrationId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PmiViewRow] = Encoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(IllustrationId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PmiViewRow] = Decoder.forProduct3[PmiViewRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(PmiViewRow.apply)(ProductmodelId.decoder, IllustrationId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PmiViewRow] = Encoder.forProduct3[PmiViewRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(ProductmodelId.encoder, IllustrationId.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PmiViewRow] = new Read[PmiViewRow](
     gets = List(
-      (ProductmodelId.get, Nullability.Nullable),
-      (IllustrationId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (ProductmodelId.get, Nullability.NoNulls),
+      (IllustrationId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PmiViewRow(
-      productmodelid = ProductmodelId.get.unsafeGetNullable(rs, i + 0),
-      illustrationid = IllustrationId.get.unsafeGetNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2)
+      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+      illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

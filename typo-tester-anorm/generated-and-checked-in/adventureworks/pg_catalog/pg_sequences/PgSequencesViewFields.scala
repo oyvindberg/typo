@@ -8,20 +8,20 @@ package pg_catalog
 package pg_sequences
 
 import adventureworks.customtypes.TypoRegtype
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgSequencesViewFields[Row] {
-  val schemaname: OptField[String, Row]
-  val sequencename: OptField[String, Row]
-  val sequenceowner: OptField[String, Row]
-  val dataType: OptField[TypoRegtype, Row]
-  val startValue: OptField[Long, Row]
-  val minValue: OptField[Long, Row]
-  val maxValue: OptField[Long, Row]
-  val incrementBy: OptField[Long, Row]
-  val cycle: OptField[Boolean, Row]
-  val cacheSize: OptField[Long, Row]
-  val lastValue: OptField[Long, Row]
+  val schemaname: Field[String, Row]
+  val sequencename: Field[String, Row]
+  val sequenceowner: Field[String, Row]
+  val dataType: Field[TypoRegtype, Row]
+  val startValue: Field[Long, Row]
+  val minValue: Field[Long, Row]
+  val maxValue: Field[Long, Row]
+  val incrementBy: Field[Long, Row]
+  val cycle: Field[Boolean, Row]
+  val cacheSize: Field[Long, Row]
+  val lastValue: Field[Long, Row]
 }
 object PgSequencesViewFields extends PgSequencesViewStructure[PgSequencesViewRow](None, identity, (_, x) => x)
 

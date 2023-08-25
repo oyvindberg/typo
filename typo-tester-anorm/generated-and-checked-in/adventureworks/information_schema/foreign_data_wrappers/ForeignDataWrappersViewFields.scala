@@ -9,14 +9,14 @@ package foreign_data_wrappers
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ForeignDataWrappersViewFields[Row] {
-  val foreignDataWrapperCatalog: OptField[SqlIdentifier, Row]
-  val foreignDataWrapperName: OptField[SqlIdentifier, Row]
-  val authorizationIdentifier: OptField[SqlIdentifier, Row]
-  val libraryName: OptField[CharacterData, Row]
-  val foreignDataWrapperLanguage: OptField[CharacterData, Row]
+  val foreignDataWrapperCatalog: Field[SqlIdentifier, Row]
+  val foreignDataWrapperName: Field[SqlIdentifier, Row]
+  val authorizationIdentifier: Field[SqlIdentifier, Row]
+  val libraryName: Field[CharacterData, Row]
+  val foreignDataWrapperLanguage: Field[CharacterData, Row]
 }
 object ForeignDataWrappersViewFields extends ForeignDataWrappersViewStructure[ForeignDataWrappersViewRow](None, identity, (_, x) => x)
 

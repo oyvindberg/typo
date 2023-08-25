@@ -20,38 +20,38 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class BeaViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.addressid]] */
-  addressid: Option[AddressId],
+  addressid: AddressId,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.addresstypeid]] */
-  addresstypeid: Option[AddresstypeId],
+  addresstypeid: AddresstypeId,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object BeaViewRow {
-  implicit lazy val decoder: Decoder[BeaViewRow] = Decoder.forProduct6[BeaViewRow, Option[Int], Option[BusinessentityId], Option[AddressId], Option[AddresstypeId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BeaViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(AddressId.decoder), Decoder.decodeOption(AddresstypeId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[BeaViewRow] = Encoder.forProduct6[BeaViewRow, Option[Int], Option[BusinessentityId], Option[AddressId], Option[AddresstypeId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(AddressId.encoder), Encoder.encodeOption(AddresstypeId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[BeaViewRow] = Decoder.forProduct6[BeaViewRow, Int, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BeaViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BeaViewRow] = Encoder.forProduct6[BeaViewRow, Int, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BeaViewRow] = new Read[BeaViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (AddressId.get, Nullability.Nullable),
-      (AddresstypeId.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (AddressId.get, Nullability.NoNulls),
+      (AddresstypeId.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BeaViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      addressid = AddressId.get.unsafeGetNullable(rs, i + 2),
-      addresstypeid = AddresstypeId.get.unsafeGetNullable(rs, i + 3),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      addressid = AddressId.get.unsafeGetNonNullable(rs, i + 2),
+      addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

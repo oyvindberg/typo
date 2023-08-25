@@ -9,13 +9,13 @@ package check_constraints
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CheckConstraintsViewFields[Row] {
-  val constraintCatalog: OptField[SqlIdentifier, Row]
-  val constraintSchema: OptField[SqlIdentifier, Row]
-  val constraintName: OptField[SqlIdentifier, Row]
-  val checkClause: OptField[CharacterData, Row]
+  val constraintCatalog: Field[SqlIdentifier, Row]
+  val constraintSchema: Field[SqlIdentifier, Row]
+  val constraintName: Field[SqlIdentifier, Row]
+  val checkClause: Field[CharacterData, Row]
 }
 object CheckConstraintsViewFields extends CheckConstraintsViewStructure[CheckConstraintsViewRow](None, identity, (_, x) => x)
 

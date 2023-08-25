@@ -21,12 +21,12 @@ import scala.util.Try
 
 case class PgMatviewsViewRow(
   schemaname: Option[String],
-  matviewname: Option[String],
-  matviewowner: Option[String],
+  matviewname: String,
+  matviewowner: String,
   tablespace: Option[String],
-  hasindexes: Option[Boolean],
-  ispopulated: Option[Boolean],
-  definition: Option[String]
+  hasindexes: Boolean,
+  ispopulated: Boolean,
+  definition: String
 )
 
 object PgMatviewsViewRow {
@@ -34,12 +34,12 @@ object PgMatviewsViewRow {
       Try(
         PgMatviewsViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          matviewname = json.\("matviewname").toOption.map(_.as(Reads.StringReads)),
-          matviewowner = json.\("matviewowner").toOption.map(_.as(Reads.StringReads)),
+          matviewname = json.\("matviewname").as(Reads.StringReads),
+          matviewowner = json.\("matviewowner").as(Reads.StringReads),
           tablespace = json.\("tablespace").toOption.map(_.as(Reads.StringReads)),
-          hasindexes = json.\("hasindexes").toOption.map(_.as(Reads.BooleanReads)),
-          ispopulated = json.\("ispopulated").toOption.map(_.as(Reads.BooleanReads)),
-          definition = json.\("definition").toOption.map(_.as(Reads.StringReads))
+          hasindexes = json.\("hasindexes").as(Reads.BooleanReads),
+          ispopulated = json.\("ispopulated").as(Reads.BooleanReads),
+          definition = json.\("definition").as(Reads.StringReads)
         )
       )
     ),
@@ -48,24 +48,24 @@ object PgMatviewsViewRow {
     Success(
       PgMatviewsViewRow(
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        matviewname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        matviewowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        matviewname = row(idx + 1)(Column.columnToString),
+        matviewowner = row(idx + 2)(Column.columnToString),
         tablespace = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        hasindexes = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
-        ispopulated = row(idx + 5)(Column.columnToOption(Column.columnToBoolean)),
-        definition = row(idx + 6)(Column.columnToOption(Column.columnToString))
+        hasindexes = row(idx + 4)(Column.columnToBoolean),
+        ispopulated = row(idx + 5)(Column.columnToBoolean),
+        definition = row(idx + 6)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[PgMatviewsViewRow] = OWrites[PgMatviewsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "matviewname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.matviewname),
-      "matviewowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.matviewowner),
+      "matviewname" -> Writes.StringWrites.writes(o.matviewname),
+      "matviewowner" -> Writes.StringWrites.writes(o.matviewowner),
       "tablespace" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablespace),
-      "hasindexes" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.hasindexes),
-      "ispopulated" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.ispopulated),
-      "definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.definition)
+      "hasindexes" -> Writes.BooleanWrites.writes(o.hasindexes),
+      "ispopulated" -> Writes.BooleanWrites.writes(o.ispopulated),
+      "definition" -> Writes.StringWrites.writes(o.definition)
     ))
   )
 }

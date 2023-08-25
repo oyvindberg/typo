@@ -7,20 +7,20 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_basebackup
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgStatProgressBasebackupViewStructure[Row](val prefix: Option[String], val extract: Row => PgStatProgressBasebackupViewRow, val merge: (Row, PgStatProgressBasebackupViewRow) => Row)
   extends Relation[PgStatProgressBasebackupViewFields, PgStatProgressBasebackupViewRow, Row]
     with PgStatProgressBasebackupViewFields[Row] { outer =>
 
-  override val pid = new OptField[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
-  override val phase = new OptField[String, Row](prefix, "phase", None, None)(x => extract(x).phase, (row, value) => merge(row, extract(row).copy(phase = value)))
-  override val backupTotal = new OptField[Long, Row](prefix, "backup_total", None, Some("int8"))(x => extract(x).backupTotal, (row, value) => merge(row, extract(row).copy(backupTotal = value)))
-  override val backupStreamed = new OptField[Long, Row](prefix, "backup_streamed", None, Some("int8"))(x => extract(x).backupStreamed, (row, value) => merge(row, extract(row).copy(backupStreamed = value)))
-  override val tablespacesTotal = new OptField[Long, Row](prefix, "tablespaces_total", None, Some("int8"))(x => extract(x).tablespacesTotal, (row, value) => merge(row, extract(row).copy(tablespacesTotal = value)))
-  override val tablespacesStreamed = new OptField[Long, Row](prefix, "tablespaces_streamed", None, Some("int8"))(x => extract(x).tablespacesStreamed, (row, value) => merge(row, extract(row).copy(tablespacesStreamed = value)))
+  override val pid = new Field[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
+  override val phase = new Field[String, Row](prefix, "phase", None, None)(x => extract(x).phase, (row, value) => merge(row, extract(row).copy(phase = value)))
+  override val backupTotal = new Field[Long, Row](prefix, "backup_total", None, Some("int8"))(x => extract(x).backupTotal, (row, value) => merge(row, extract(row).copy(backupTotal = value)))
+  override val backupStreamed = new Field[Long, Row](prefix, "backup_streamed", None, Some("int8"))(x => extract(x).backupStreamed, (row, value) => merge(row, extract(row).copy(backupStreamed = value)))
+  override val tablespacesTotal = new Field[Long, Row](prefix, "tablespaces_total", None, Some("int8"))(x => extract(x).tablespacesTotal, (row, value) => merge(row, extract(row).copy(tablespacesTotal = value)))
+  override val tablespacesStreamed = new Field[Long, Row](prefix, "tablespaces_streamed", None, Some("int8"))(x => extract(x).tablespacesStreamed, (row, value) => merge(row, extract(row).copy(tablespacesStreamed = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](pid, phase, backupTotal, backupStreamed, tablespacesTotal, tablespacesStreamed)

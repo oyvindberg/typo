@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoInet
 import adventureworks.customtypes.TypoInterval
 import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoXid
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -19,26 +20,26 @@ class PgStatReplicationViewStructure[Row](val prefix: Option[String], val extrac
   extends Relation[PgStatReplicationViewFields, PgStatReplicationViewRow, Row]
     with PgStatReplicationViewFields[Row] { outer =>
 
-  override val pid = new OptField[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
-  override val usesysid = new OptField[/* oid */ Long, Row](prefix, "usesysid", None, Some("oid"))(x => extract(x).usesysid, (row, value) => merge(row, extract(row).copy(usesysid = value)))
+  override val pid = new Field[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
+  override val usesysid = new Field[/* oid */ Long, Row](prefix, "usesysid", None, Some("oid"))(x => extract(x).usesysid, (row, value) => merge(row, extract(row).copy(usesysid = value)))
   override val usename = new OptField[String, Row](prefix, "usename", None, Some("name"))(x => extract(x).usename, (row, value) => merge(row, extract(row).copy(usename = value)))
-  override val applicationName = new OptField[String, Row](prefix, "application_name", None, None)(x => extract(x).applicationName, (row, value) => merge(row, extract(row).copy(applicationName = value)))
-  override val clientAddr = new OptField[TypoInet, Row](prefix, "client_addr", None, Some("inet"))(x => extract(x).clientAddr, (row, value) => merge(row, extract(row).copy(clientAddr = value)))
-  override val clientHostname = new OptField[String, Row](prefix, "client_hostname", None, None)(x => extract(x).clientHostname, (row, value) => merge(row, extract(row).copy(clientHostname = value)))
-  override val clientPort = new OptField[Int, Row](prefix, "client_port", None, Some("int4"))(x => extract(x).clientPort, (row, value) => merge(row, extract(row).copy(clientPort = value)))
-  override val backendStart = new OptField[TypoOffsetDateTime, Row](prefix, "backend_start", Some("text"), Some("timestamptz"))(x => extract(x).backendStart, (row, value) => merge(row, extract(row).copy(backendStart = value)))
-  override val backendXmin = new OptField[TypoXid, Row](prefix, "backend_xmin", None, Some("xid"))(x => extract(x).backendXmin, (row, value) => merge(row, extract(row).copy(backendXmin = value)))
-  override val state = new OptField[String, Row](prefix, "state", None, None)(x => extract(x).state, (row, value) => merge(row, extract(row).copy(state = value)))
-  override val sentLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "sent_lsn", None, Some("pg_lsn"))(x => extract(x).sentLsn, (row, value) => merge(row, extract(row).copy(sentLsn = value)))
-  override val writeLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "write_lsn", None, Some("pg_lsn"))(x => extract(x).writeLsn, (row, value) => merge(row, extract(row).copy(writeLsn = value)))
-  override val flushLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "flush_lsn", None, Some("pg_lsn"))(x => extract(x).flushLsn, (row, value) => merge(row, extract(row).copy(flushLsn = value)))
-  override val replayLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "replay_lsn", None, Some("pg_lsn"))(x => extract(x).replayLsn, (row, value) => merge(row, extract(row).copy(replayLsn = value)))
-  override val writeLag = new OptField[TypoInterval, Row](prefix, "write_lag", None, Some("interval"))(x => extract(x).writeLag, (row, value) => merge(row, extract(row).copy(writeLag = value)))
-  override val flushLag = new OptField[TypoInterval, Row](prefix, "flush_lag", None, Some("interval"))(x => extract(x).flushLag, (row, value) => merge(row, extract(row).copy(flushLag = value)))
-  override val replayLag = new OptField[TypoInterval, Row](prefix, "replay_lag", None, Some("interval"))(x => extract(x).replayLag, (row, value) => merge(row, extract(row).copy(replayLag = value)))
-  override val syncPriority = new OptField[Int, Row](prefix, "sync_priority", None, Some("int4"))(x => extract(x).syncPriority, (row, value) => merge(row, extract(row).copy(syncPriority = value)))
-  override val syncState = new OptField[String, Row](prefix, "sync_state", None, None)(x => extract(x).syncState, (row, value) => merge(row, extract(row).copy(syncState = value)))
-  override val replyTime = new OptField[TypoOffsetDateTime, Row](prefix, "reply_time", Some("text"), Some("timestamptz"))(x => extract(x).replyTime, (row, value) => merge(row, extract(row).copy(replyTime = value)))
+  override val applicationName = new Field[String, Row](prefix, "application_name", None, None)(x => extract(x).applicationName, (row, value) => merge(row, extract(row).copy(applicationName = value)))
+  override val clientAddr = new Field[TypoInet, Row](prefix, "client_addr", None, Some("inet"))(x => extract(x).clientAddr, (row, value) => merge(row, extract(row).copy(clientAddr = value)))
+  override val clientHostname = new Field[String, Row](prefix, "client_hostname", None, None)(x => extract(x).clientHostname, (row, value) => merge(row, extract(row).copy(clientHostname = value)))
+  override val clientPort = new Field[Int, Row](prefix, "client_port", None, Some("int4"))(x => extract(x).clientPort, (row, value) => merge(row, extract(row).copy(clientPort = value)))
+  override val backendStart = new Field[TypoOffsetDateTime, Row](prefix, "backend_start", Some("text"), Some("timestamptz"))(x => extract(x).backendStart, (row, value) => merge(row, extract(row).copy(backendStart = value)))
+  override val backendXmin = new Field[TypoXid, Row](prefix, "backend_xmin", None, Some("xid"))(x => extract(x).backendXmin, (row, value) => merge(row, extract(row).copy(backendXmin = value)))
+  override val state = new Field[String, Row](prefix, "state", None, None)(x => extract(x).state, (row, value) => merge(row, extract(row).copy(state = value)))
+  override val sentLsn = new Field[/* pg_lsn */ Long, Row](prefix, "sent_lsn", None, Some("pg_lsn"))(x => extract(x).sentLsn, (row, value) => merge(row, extract(row).copy(sentLsn = value)))
+  override val writeLsn = new Field[/* pg_lsn */ Long, Row](prefix, "write_lsn", None, Some("pg_lsn"))(x => extract(x).writeLsn, (row, value) => merge(row, extract(row).copy(writeLsn = value)))
+  override val flushLsn = new Field[/* pg_lsn */ Long, Row](prefix, "flush_lsn", None, Some("pg_lsn"))(x => extract(x).flushLsn, (row, value) => merge(row, extract(row).copy(flushLsn = value)))
+  override val replayLsn = new Field[/* pg_lsn */ Long, Row](prefix, "replay_lsn", None, Some("pg_lsn"))(x => extract(x).replayLsn, (row, value) => merge(row, extract(row).copy(replayLsn = value)))
+  override val writeLag = new Field[TypoInterval, Row](prefix, "write_lag", None, Some("interval"))(x => extract(x).writeLag, (row, value) => merge(row, extract(row).copy(writeLag = value)))
+  override val flushLag = new Field[TypoInterval, Row](prefix, "flush_lag", None, Some("interval"))(x => extract(x).flushLag, (row, value) => merge(row, extract(row).copy(flushLag = value)))
+  override val replayLag = new Field[TypoInterval, Row](prefix, "replay_lag", None, Some("interval"))(x => extract(x).replayLag, (row, value) => merge(row, extract(row).copy(replayLag = value)))
+  override val syncPriority = new Field[Int, Row](prefix, "sync_priority", None, Some("int4"))(x => extract(x).syncPriority, (row, value) => merge(row, extract(row).copy(syncPriority = value)))
+  override val syncState = new Field[String, Row](prefix, "sync_state", None, None)(x => extract(x).syncState, (row, value) => merge(row, extract(row).copy(syncState = value)))
+  override val replyTime = new Field[TypoOffsetDateTime, Row](prefix, "reply_time", Some("text"), Some("timestamptz"))(x => extract(x).replyTime, (row, value) => merge(row, extract(row).copy(replyTime = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](pid, usesysid, usename, applicationName, clientAddr, clientHostname, clientPort, backendStart, backendXmin, state, sentLsn, writeLsn, flushLsn, replayLsn, writeLag, flushLag, replayLag, syncPriority, syncState, replyTime)

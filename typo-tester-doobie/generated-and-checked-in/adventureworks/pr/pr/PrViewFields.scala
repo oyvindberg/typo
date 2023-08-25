@@ -11,18 +11,18 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PrViewFields[Row] {
-  val id: OptField[Int, Row]
-  val productreviewid: OptField[ProductreviewId, Row]
-  val productid: OptField[ProductId, Row]
-  val reviewername: OptField[Name, Row]
-  val reviewdate: OptField[TypoLocalDateTime, Row]
-  val emailaddress: OptField[/* max 50 chars */ String, Row]
-  val rating: OptField[Int, Row]
-  val comments: OptField[/* max 3850 chars */ String, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val productreviewid: Field[ProductreviewId, Row]
+  val productid: Field[ProductId, Row]
+  val reviewername: Field[Name, Row]
+  val reviewdate: Field[TypoLocalDateTime, Row]
+  val emailaddress: Field[/* max 50 chars */ String, Row]
+  val rating: Field[Int, Row]
+  val comments: Field[/* max 3850 chars */ String, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PrViewFields extends PrViewStructure[PrViewRow](None, identity, (_, x) => x)
 

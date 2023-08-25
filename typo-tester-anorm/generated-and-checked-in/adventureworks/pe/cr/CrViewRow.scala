@@ -10,7 +10,6 @@ package cr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,26 +17,25 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CrViewRow(
   /** Points to [[person.countryregion.CountryregionRow.countryregioncode]] */
-  countryregioncode: Option[CountryregionId],
+  countryregioncode: CountryregionId,
   /** Points to [[person.countryregion.CountryregionRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[person.countryregion.CountryregionRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CrViewRow {
   implicit lazy val reads: Reads[CrViewRow] = Reads[CrViewRow](json => JsResult.fromTry(
       Try(
         CrViewRow(
-          countryregioncode = json.\("countryregioncode").toOption.map(_.as(CountryregionId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -45,17 +43,17 @@ object CrViewRow {
   def rowParser(idx: Int): RowParser[CrViewRow] = RowParser[CrViewRow] { row =>
     Success(
       CrViewRow(
-        countryregioncode = row(idx + 0)(Column.columnToOption(CountryregionId.column)),
-        name = row(idx + 1)(Column.columnToOption(Name.column)),
-        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column))
+        countryregioncode = row(idx + 0)(CountryregionId.column),
+        name = row(idx + 1)(Name.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[CrViewRow] = OWrites[CrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "countryregioncode" -> Writes.OptionWrites(CountryregionId.writes).writes(o.countryregioncode),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

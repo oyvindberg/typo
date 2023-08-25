@@ -9,16 +9,16 @@ package pg_prepared_statements
 
 import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoRegtype
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgPreparedStatementsViewFields[Row] {
-  val name: OptField[String, Row]
-  val statement: OptField[String, Row]
-  val prepareTime: OptField[TypoOffsetDateTime, Row]
-  val parameterTypes: OptField[Array[TypoRegtype], Row]
-  val fromSql: OptField[Boolean, Row]
-  val genericPlans: OptField[Long, Row]
-  val customPlans: OptField[Long, Row]
+  val name: Field[String, Row]
+  val statement: Field[String, Row]
+  val prepareTime: Field[TypoOffsetDateTime, Row]
+  val parameterTypes: Field[Array[TypoRegtype], Row]
+  val fromSql: Field[Boolean, Row]
+  val genericPlans: Field[Long, Row]
+  val customPlans: Field[Long, Row]
 }
 object PgPreparedStatementsViewFields extends PgPreparedStatementsViewStructure[PgPreparedStatementsViewRow](None, identity, (_, x) => x)
 

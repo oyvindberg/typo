@@ -24,26 +24,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class JcViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.jobcandidateid]] */
-  jobcandidateid: Option[JobcandidateId],
+  jobcandidateid: JobcandidateId,
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.resume]] */
-  resume: Option[TypoXml],
+  resume: TypoXml,
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object JcViewRow {
   implicit lazy val reads: Reads[JcViewRow] = Reads[JcViewRow](json => JsResult.fromTry(
       Try(
         JcViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          jobcandidateid = json.\("jobcandidateid").toOption.map(_.as(JobcandidateId.reads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          resume = json.\("resume").toOption.map(_.as(TypoXml.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          jobcandidateid = json.\("jobcandidateid").as(JobcandidateId.reads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          resume = json.\("resume").as(TypoXml.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,21 +51,21 @@ object JcViewRow {
   def rowParser(idx: Int): RowParser[JcViewRow] = RowParser[JcViewRow] { row =>
     Success(
       JcViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        jobcandidateid = row(idx + 1)(Column.columnToOption(JobcandidateId.column)),
-        businessentityid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
-        resume = row(idx + 3)(Column.columnToOption(TypoXml.column)),
-        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        jobcandidateid = row(idx + 1)(JobcandidateId.column),
+        businessentityid = row(idx + 2)(BusinessentityId.column),
+        resume = row(idx + 3)(TypoXml.column),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[JcViewRow] = OWrites[JcViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "jobcandidateid" -> Writes.OptionWrites(JobcandidateId.writes).writes(o.jobcandidateid),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "resume" -> Writes.OptionWrites(TypoXml.writes).writes(o.resume),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "jobcandidateid" -> JobcandidateId.writes.writes(o.jobcandidateid),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "resume" -> TypoXml.writes.writes(o.resume),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

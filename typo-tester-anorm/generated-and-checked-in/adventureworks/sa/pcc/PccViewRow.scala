@@ -23,23 +23,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PccViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.creditcardid]] */
-  creditcardid: Option[/* user-picked */ CustomCreditcardId],
+  creditcardid: /* user-picked */ CustomCreditcardId,
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PccViewRow {
   implicit lazy val reads: Reads[PccViewRow] = Reads[PccViewRow](json => JsResult.fromTry(
       Try(
         PccViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          creditcardid = json.\("creditcardid").toOption.map(_.as(CustomCreditcardId.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,19 +47,19 @@ object PccViewRow {
   def rowParser(idx: Int): RowParser[PccViewRow] = RowParser[PccViewRow] { row =>
     Success(
       PccViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        creditcardid = row(idx + 2)(Column.columnToOption(CustomCreditcardId.column)),
-        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        creditcardid = row(idx + 2)(/* user-picked */ CustomCreditcardId.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PccViewRow] = OWrites[PccViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "creditcardid" -> Writes.OptionWrites(CustomCreditcardId.writes).writes(o.creditcardid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

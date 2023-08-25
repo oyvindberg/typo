@@ -7,13 +7,14 @@ package adventureworks
 package pg_catalog
 package pg_views
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgViewsViewFields[Row] {
   val schemaname: OptField[String, Row]
-  val viewname: OptField[String, Row]
-  val viewowner: OptField[String, Row]
-  val definition: OptField[String, Row]
+  val viewname: Field[String, Row]
+  val viewowner: Field[String, Row]
+  val definition: Field[String, Row]
 }
 object PgViewsViewFields extends PgViewsViewStructure[PgViewsViewRow](None, identity, (_, x) => x)
 

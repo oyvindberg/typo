@@ -23,8 +23,9 @@ object NullabilityFromExplain {
     * However, the order of the columns *will* match, so `nullableIndices` can be used to find the indices of the nullable columns.
     */
   case class NullableColumns(plan: Plan, nullableOutputs: List[String]) {
-    def nullableIndices: Seq[Int] = plan.Output.get.zipWithIndex.filter { case (name, _) => nullableOutputs.contains(name) }.map(_._2)
+    lazy val nullableIndices: Option[NullableIndices] = plan.Output.map(output => NullableIndices(output.zipWithIndex.filter { case (name, _) => nullableOutputs.contains(name) }.map(_._2).toSet))
   }
+  case class NullableIndices(values: Set[Int])
 
   case class HasPlans(Plan: Plan)
   case class Plan(`Node Type`: String, `Join Type`: Option[String], Output: Option[List[String]], Plans: Option[List[Plan]]) {
@@ -92,7 +93,7 @@ object NullabilityFromExplain {
               case "Inner" => Nil
               case "Right" => leftPlan.plan.output
               case "Left"  => rightPlan.plan.output
-              case "Full"  => leftPlan.plan.output ++ rightPlan.plan.output
+              case "Full" | "Anti"  => leftPlan.plan.output ++ rightPlan.plan.output
             }
 
           val allNullables = leftPlan.nullableOutputs ++ rightPlan.nullableOutputs ++ newNullables

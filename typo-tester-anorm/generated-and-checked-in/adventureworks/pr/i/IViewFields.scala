@@ -10,13 +10,13 @@ package i
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.production.illustration.IllustrationId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait IViewFields[Row] {
-  val id: OptField[Int, Row]
-  val illustrationid: OptField[IllustrationId, Row]
-  val diagram: OptField[TypoXml, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val illustrationid: Field[IllustrationId, Row]
+  val diagram: Field[TypoXml, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object IViewFields extends IViewStructure[IViewRow](None, identity, (_, x) => x)
 

@@ -22,29 +22,29 @@ import scala.util.Try
 
 case class PgUserMappingsViewRow(
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.oid]] */
-  oid: Option[/* oid */ Long],
-  umoptions: Option[Array[String]],
-  umuser: Option[/* oid */ Long],
+  oid: /* oid */ Long,
+  umoptions: Array[String],
+  umuser: /* oid */ Long,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.authorizationIdentifier]] */
-  authorizationIdentifier: Option[SqlIdentifier],
+  authorizationIdentifier: SqlIdentifier,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: Option[SqlIdentifier],
+  foreignServerCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerName]] */
-  foreignServerName: Option[SqlIdentifier],
-  srvowner: Option[SqlIdentifier]
+  foreignServerName: SqlIdentifier,
+  srvowner: SqlIdentifier
 )
 
 object PgUserMappingsViewRow {
   implicit lazy val reads: Reads[PgUserMappingsViewRow] = Reads[PgUserMappingsViewRow](json => JsResult.fromTry(
       Try(
         PgUserMappingsViewRow(
-          oid = json.\("oid").toOption.map(_.as(Reads.LongReads)),
-          umoptions = json.\("umoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
-          umuser = json.\("umuser").toOption.map(_.as(Reads.LongReads)),
-          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(SqlIdentifier.reads)),
-          srvowner = json.\("srvowner").toOption.map(_.as(SqlIdentifier.reads))
+          oid = json.\("oid").as(Reads.LongReads),
+          umoptions = json.\("umoptions").as(Reads.ArrayReads[String](Reads.StringReads, implicitly)),
+          umuser = json.\("umuser").as(Reads.LongReads),
+          authorizationIdentifier = json.\("authorization_identifier").as(SqlIdentifier.reads),
+          foreignServerCatalog = json.\("foreign_server_catalog").as(SqlIdentifier.reads),
+          foreignServerName = json.\("foreign_server_name").as(SqlIdentifier.reads),
+          srvowner = json.\("srvowner").as(SqlIdentifier.reads)
         )
       )
     ),
@@ -52,25 +52,25 @@ object PgUserMappingsViewRow {
   def rowParser(idx: Int): RowParser[PgUserMappingsViewRow] = RowParser[PgUserMappingsViewRow] { row =>
     Success(
       PgUserMappingsViewRow(
-        oid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
-        umoptions = row(idx + 1)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
-        umuser = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
-        authorizationIdentifier = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        foreignServerCatalog = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        foreignServerName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
-        srvowner = row(idx + 6)(Column.columnToOption(SqlIdentifier.column))
+        oid = row(idx + 0)(Column.columnToLong),
+        umoptions = row(idx + 1)(Column.columnToArray[String](Column.columnToString, implicitly)),
+        umuser = row(idx + 2)(Column.columnToLong),
+        authorizationIdentifier = row(idx + 3)(SqlIdentifier.column),
+        foreignServerCatalog = row(idx + 4)(SqlIdentifier.column),
+        foreignServerName = row(idx + 5)(SqlIdentifier.column),
+        srvowner = row(idx + 6)(SqlIdentifier.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PgUserMappingsViewRow] = OWrites[PgUserMappingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.oid),
-      "umoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.umoptions),
-      "umuser" -> Writes.OptionWrites(Writes.LongWrites).writes(o.umuser),
-      "authorization_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.authorizationIdentifier),
-      "foreign_server_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerCatalog),
-      "foreign_server_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerName),
-      "srvowner" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.srvowner)
+      "oid" -> Writes.LongWrites.writes(o.oid),
+      "umoptions" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.umoptions),
+      "umuser" -> Writes.LongWrites.writes(o.umuser),
+      "authorization_identifier" -> SqlIdentifier.writes.writes(o.authorizationIdentifier),
+      "foreign_server_catalog" -> SqlIdentifier.writes.writes(o.foreignServerCatalog),
+      "foreign_server_name" -> SqlIdentifier.writes.writes(o.foreignServerName),
+      "srvowner" -> SqlIdentifier.writes.writes(o.srvowner)
     ))
   )
 }

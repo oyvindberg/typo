@@ -21,42 +21,42 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgReplicationSlotsViewRow(
-  slotName: Option[String],
-  plugin: Option[String],
-  slotType: Option[String],
-  datoid: Option[/* oid */ Long],
+  slotName: String,
+  plugin: String,
+  slotType: String,
+  datoid: /* oid */ Long,
   database: Option[String],
-  temporary: Option[Boolean],
-  active: Option[Boolean],
-  activePid: Option[Int],
-  xmin: Option[TypoXid],
-  catalogXmin: Option[TypoXid],
-  restartLsn: Option[/* pg_lsn */ Long],
-  confirmedFlushLsn: Option[/* pg_lsn */ Long],
-  walStatus: Option[String],
-  safeWalSize: Option[Long],
-  twoPhase: Option[Boolean]
+  temporary: Boolean,
+  active: Boolean,
+  activePid: Int,
+  xmin: TypoXid,
+  catalogXmin: TypoXid,
+  restartLsn: /* pg_lsn */ Long,
+  confirmedFlushLsn: /* pg_lsn */ Long,
+  walStatus: String,
+  safeWalSize: Long,
+  twoPhase: Boolean
 )
 
 object PgReplicationSlotsViewRow {
   implicit lazy val reads: Reads[PgReplicationSlotsViewRow] = Reads[PgReplicationSlotsViewRow](json => JsResult.fromTry(
       Try(
         PgReplicationSlotsViewRow(
-          slotName = json.\("slot_name").toOption.map(_.as(Reads.StringReads)),
-          plugin = json.\("plugin").toOption.map(_.as(Reads.StringReads)),
-          slotType = json.\("slot_type").toOption.map(_.as(Reads.StringReads)),
-          datoid = json.\("datoid").toOption.map(_.as(Reads.LongReads)),
+          slotName = json.\("slot_name").as(Reads.StringReads),
+          plugin = json.\("plugin").as(Reads.StringReads),
+          slotType = json.\("slot_type").as(Reads.StringReads),
+          datoid = json.\("datoid").as(Reads.LongReads),
           database = json.\("database").toOption.map(_.as(Reads.StringReads)),
-          temporary = json.\("temporary").toOption.map(_.as(Reads.BooleanReads)),
-          active = json.\("active").toOption.map(_.as(Reads.BooleanReads)),
-          activePid = json.\("active_pid").toOption.map(_.as(Reads.IntReads)),
-          xmin = json.\("xmin").toOption.map(_.as(TypoXid.reads)),
-          catalogXmin = json.\("catalog_xmin").toOption.map(_.as(TypoXid.reads)),
-          restartLsn = json.\("restart_lsn").toOption.map(_.as(Reads.LongReads)),
-          confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as(Reads.LongReads)),
-          walStatus = json.\("wal_status").toOption.map(_.as(Reads.StringReads)),
-          safeWalSize = json.\("safe_wal_size").toOption.map(_.as(Reads.LongReads)),
-          twoPhase = json.\("two_phase").toOption.map(_.as(Reads.BooleanReads))
+          temporary = json.\("temporary").as(Reads.BooleanReads),
+          active = json.\("active").as(Reads.BooleanReads),
+          activePid = json.\("active_pid").as(Reads.IntReads),
+          xmin = json.\("xmin").as(TypoXid.reads),
+          catalogXmin = json.\("catalog_xmin").as(TypoXid.reads),
+          restartLsn = json.\("restart_lsn").as(Reads.LongReads),
+          confirmedFlushLsn = json.\("confirmed_flush_lsn").as(Reads.LongReads),
+          walStatus = json.\("wal_status").as(Reads.StringReads),
+          safeWalSize = json.\("safe_wal_size").as(Reads.LongReads),
+          twoPhase = json.\("two_phase").as(Reads.BooleanReads)
         )
       )
     ),
@@ -64,41 +64,41 @@ object PgReplicationSlotsViewRow {
   def rowParser(idx: Int): RowParser[PgReplicationSlotsViewRow] = RowParser[PgReplicationSlotsViewRow] { row =>
     Success(
       PgReplicationSlotsViewRow(
-        slotName = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        plugin = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        slotType = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        datoid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        slotName = row(idx + 0)(Column.columnToString),
+        plugin = row(idx + 1)(Column.columnToString),
+        slotType = row(idx + 2)(Column.columnToString),
+        datoid = row(idx + 3)(Column.columnToLong),
         database = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        temporary = row(idx + 5)(Column.columnToOption(Column.columnToBoolean)),
-        active = row(idx + 6)(Column.columnToOption(Column.columnToBoolean)),
-        activePid = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
-        xmin = row(idx + 8)(Column.columnToOption(TypoXid.column)),
-        catalogXmin = row(idx + 9)(Column.columnToOption(TypoXid.column)),
-        restartLsn = row(idx + 10)(Column.columnToOption(Column.columnToLong)),
-        confirmedFlushLsn = row(idx + 11)(Column.columnToOption(Column.columnToLong)),
-        walStatus = row(idx + 12)(Column.columnToOption(Column.columnToString)),
-        safeWalSize = row(idx + 13)(Column.columnToOption(Column.columnToLong)),
-        twoPhase = row(idx + 14)(Column.columnToOption(Column.columnToBoolean))
+        temporary = row(idx + 5)(Column.columnToBoolean),
+        active = row(idx + 6)(Column.columnToBoolean),
+        activePid = row(idx + 7)(Column.columnToInt),
+        xmin = row(idx + 8)(TypoXid.column),
+        catalogXmin = row(idx + 9)(TypoXid.column),
+        restartLsn = row(idx + 10)(Column.columnToLong),
+        confirmedFlushLsn = row(idx + 11)(Column.columnToLong),
+        walStatus = row(idx + 12)(Column.columnToString),
+        safeWalSize = row(idx + 13)(Column.columnToLong),
+        twoPhase = row(idx + 14)(Column.columnToBoolean)
       )
     )
   }
   implicit lazy val writes: OWrites[PgReplicationSlotsViewRow] = OWrites[PgReplicationSlotsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "slot_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.slotName),
-      "plugin" -> Writes.OptionWrites(Writes.StringWrites).writes(o.plugin),
-      "slot_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.slotType),
-      "datoid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datoid),
+      "slot_name" -> Writes.StringWrites.writes(o.slotName),
+      "plugin" -> Writes.StringWrites.writes(o.plugin),
+      "slot_type" -> Writes.StringWrites.writes(o.slotType),
+      "datoid" -> Writes.LongWrites.writes(o.datoid),
       "database" -> Writes.OptionWrites(Writes.StringWrites).writes(o.database),
-      "temporary" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.temporary),
-      "active" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.active),
-      "active_pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.activePid),
-      "xmin" -> Writes.OptionWrites(TypoXid.writes).writes(o.xmin),
-      "catalog_xmin" -> Writes.OptionWrites(TypoXid.writes).writes(o.catalogXmin),
-      "restart_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.restartLsn),
-      "confirmed_flush_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.confirmedFlushLsn),
-      "wal_status" -> Writes.OptionWrites(Writes.StringWrites).writes(o.walStatus),
-      "safe_wal_size" -> Writes.OptionWrites(Writes.LongWrites).writes(o.safeWalSize),
-      "two_phase" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.twoPhase)
+      "temporary" -> Writes.BooleanWrites.writes(o.temporary),
+      "active" -> Writes.BooleanWrites.writes(o.active),
+      "active_pid" -> Writes.IntWrites.writes(o.activePid),
+      "xmin" -> TypoXid.writes.writes(o.xmin),
+      "catalog_xmin" -> TypoXid.writes.writes(o.catalogXmin),
+      "restart_lsn" -> Writes.LongWrites.writes(o.restartLsn),
+      "confirmed_flush_lsn" -> Writes.LongWrites.writes(o.confirmedFlushLsn),
+      "wal_status" -> Writes.StringWrites.writes(o.walStatus),
+      "safe_wal_size" -> Writes.LongWrites.writes(o.safeWalSize),
+      "two_phase" -> Writes.BooleanWrites.writes(o.twoPhase)
     ))
   )
 }

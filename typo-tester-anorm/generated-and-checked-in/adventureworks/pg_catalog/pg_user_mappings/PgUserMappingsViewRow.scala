@@ -20,24 +20,24 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgUserMappingsViewRow(
-  umid: Option[/* oid */ Long],
-  srvid: Option[/* oid */ Long],
-  srvname: Option[String],
-  umuser: Option[/* oid */ Long],
-  usename: Option[String],
-  umoptions: Option[Array[String]]
+  umid: /* oid */ Long,
+  srvid: /* oid */ Long,
+  srvname: String,
+  umuser: /* oid */ Long,
+  usename: String,
+  umoptions: Array[String]
 )
 
 object PgUserMappingsViewRow {
   implicit lazy val reads: Reads[PgUserMappingsViewRow] = Reads[PgUserMappingsViewRow](json => JsResult.fromTry(
       Try(
         PgUserMappingsViewRow(
-          umid = json.\("umid").toOption.map(_.as(Reads.LongReads)),
-          srvid = json.\("srvid").toOption.map(_.as(Reads.LongReads)),
-          srvname = json.\("srvname").toOption.map(_.as(Reads.StringReads)),
-          umuser = json.\("umuser").toOption.map(_.as(Reads.LongReads)),
-          usename = json.\("usename").toOption.map(_.as(Reads.StringReads)),
-          umoptions = json.\("umoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
+          umid = json.\("umid").as(Reads.LongReads),
+          srvid = json.\("srvid").as(Reads.LongReads),
+          srvname = json.\("srvname").as(Reads.StringReads),
+          umuser = json.\("umuser").as(Reads.LongReads),
+          usename = json.\("usename").as(Reads.StringReads),
+          umoptions = json.\("umoptions").as(Reads.ArrayReads[String](Reads.StringReads, implicitly))
         )
       )
     ),
@@ -45,23 +45,23 @@ object PgUserMappingsViewRow {
   def rowParser(idx: Int): RowParser[PgUserMappingsViewRow] = RowParser[PgUserMappingsViewRow] { row =>
     Success(
       PgUserMappingsViewRow(
-        umid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
-        srvid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
-        srvname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        umuser = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
-        usename = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        umoptions = row(idx + 5)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
+        umid = row(idx + 0)(Column.columnToLong),
+        srvid = row(idx + 1)(Column.columnToLong),
+        srvname = row(idx + 2)(Column.columnToString),
+        umuser = row(idx + 3)(Column.columnToLong),
+        usename = row(idx + 4)(Column.columnToString),
+        umoptions = row(idx + 5)(Column.columnToArray[String](Column.columnToString, implicitly))
       )
     )
   }
   implicit lazy val writes: OWrites[PgUserMappingsViewRow] = OWrites[PgUserMappingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "umid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.umid),
-      "srvid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.srvid),
-      "srvname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.srvname),
-      "umuser" -> Writes.OptionWrites(Writes.LongWrites).writes(o.umuser),
-      "usename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.usename),
-      "umoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.umoptions)
+      "umid" -> Writes.LongWrites.writes(o.umid),
+      "srvid" -> Writes.LongWrites.writes(o.srvid),
+      "srvname" -> Writes.StringWrites.writes(o.srvname),
+      "umuser" -> Writes.LongWrites.writes(o.umuser),
+      "usename" -> Writes.StringWrites.writes(o.usename),
+      "umoptions" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.umoptions)
     ))
   )
 }

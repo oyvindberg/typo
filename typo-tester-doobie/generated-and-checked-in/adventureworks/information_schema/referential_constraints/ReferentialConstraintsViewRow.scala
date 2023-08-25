@@ -16,42 +16,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ReferentialConstraintsViewRow(
-  constraintCatalog: Option[SqlIdentifier],
-  constraintSchema: Option[SqlIdentifier],
-  constraintName: Option[SqlIdentifier],
-  uniqueConstraintCatalog: Option[SqlIdentifier],
-  uniqueConstraintSchema: Option[SqlIdentifier],
-  uniqueConstraintName: Option[SqlIdentifier],
-  matchOption: Option[CharacterData],
-  updateRule: Option[CharacterData],
-  deleteRule: Option[CharacterData]
+  constraintCatalog: SqlIdentifier,
+  constraintSchema: SqlIdentifier,
+  constraintName: SqlIdentifier,
+  uniqueConstraintCatalog: SqlIdentifier,
+  uniqueConstraintSchema: SqlIdentifier,
+  uniqueConstraintName: SqlIdentifier,
+  matchOption: CharacterData,
+  updateRule: CharacterData,
+  deleteRule: CharacterData
 )
 
 object ReferentialConstraintsViewRow {
-  implicit lazy val decoder: Decoder[ReferentialConstraintsViewRow] = Decoder.forProduct9[ReferentialConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "unique_constraint_catalog", "unique_constraint_schema", "unique_constraint_name", "match_option", "update_rule", "delete_rule")(ReferentialConstraintsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit lazy val encoder: Encoder[ReferentialConstraintsViewRow] = Encoder.forProduct9[ReferentialConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "unique_constraint_catalog", "unique_constraint_schema", "unique_constraint_name", "match_option", "update_rule", "delete_rule")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.uniqueConstraintCatalog, x.uniqueConstraintSchema, x.uniqueConstraintName, x.matchOption, x.updateRule, x.deleteRule))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val decoder: Decoder[ReferentialConstraintsViewRow] = Decoder.forProduct9[ReferentialConstraintsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CharacterData, CharacterData]("constraint_catalog", "constraint_schema", "constraint_name", "unique_constraint_catalog", "unique_constraint_schema", "unique_constraint_name", "match_option", "update_rule", "delete_rule")(ReferentialConstraintsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, CharacterData.decoder, CharacterData.decoder)
+  implicit lazy val encoder: Encoder[ReferentialConstraintsViewRow] = Encoder.forProduct9[ReferentialConstraintsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CharacterData, CharacterData]("constraint_catalog", "constraint_schema", "constraint_name", "unique_constraint_catalog", "unique_constraint_schema", "unique_constraint_name", "match_option", "update_rule", "delete_rule")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.uniqueConstraintCatalog, x.uniqueConstraintSchema, x.uniqueConstraintName, x.matchOption, x.updateRule, x.deleteRule))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, CharacterData.encoder, CharacterData.encoder)
   implicit lazy val read: Read[ReferentialConstraintsViewRow] = new Read[ReferentialConstraintsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ReferentialConstraintsViewRow(
-      constraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      constraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      constraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      uniqueConstraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      uniqueConstraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      uniqueConstraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
-      matchOption = CharacterData.get.unsafeGetNullable(rs, i + 6),
-      updateRule = CharacterData.get.unsafeGetNullable(rs, i + 7),
-      deleteRule = CharacterData.get.unsafeGetNullable(rs, i + 8)
+      constraintCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      constraintSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      constraintName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      uniqueConstraintCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      uniqueConstraintSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      uniqueConstraintName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
+      matchOption = CharacterData.get.unsafeGetNonNullable(rs, i + 6),
+      updateRule = CharacterData.get.unsafeGetNonNullable(rs, i + 7),
+      deleteRule = CharacterData.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

@@ -15,30 +15,30 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ColumnColumnUsageViewRow(
-  tableCatalog: Option[SqlIdentifier],
-  tableSchema: Option[SqlIdentifier],
-  tableName: Option[SqlIdentifier],
-  columnName: Option[SqlIdentifier],
-  dependentColumn: Option[SqlIdentifier]
+  tableCatalog: SqlIdentifier,
+  tableSchema: SqlIdentifier,
+  tableName: SqlIdentifier,
+  columnName: SqlIdentifier,
+  dependentColumn: SqlIdentifier
 )
 
 object ColumnColumnUsageViewRow {
-  implicit lazy val decoder: Decoder[ColumnColumnUsageViewRow] = Decoder.forProduct5[ColumnColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(ColumnColumnUsageViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[ColumnColumnUsageViewRow] = Encoder.forProduct5[ColumnColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.dependentColumn))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[ColumnColumnUsageViewRow] = Decoder.forProduct5[ColumnColumnUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(ColumnColumnUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[ColumnColumnUsageViewRow] = Encoder.forProduct5[ColumnColumnUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.dependentColumn))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
   implicit lazy val read: Read[ColumnColumnUsageViewRow] = new Read[ColumnColumnUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ColumnColumnUsageViewRow(
-      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      columnName = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      dependentColumn = SqlIdentifier.get.unsafeGetNullable(rs, i + 4)
+      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      columnName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      dependentColumn = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

@@ -18,38 +18,38 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class SpqhViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.quotadate]] */
-  quotadate: Option[TypoLocalDateTime],
+  quotadate: TypoLocalDateTime,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.salesquota]] */
-  salesquota: Option[BigDecimal],
+  salesquota: BigDecimal,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SpqhViewRow {
-  implicit lazy val decoder: Decoder[SpqhViewRow] = Decoder.forProduct6[SpqhViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SpqhViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SpqhViewRow] = Encoder.forProduct6[SpqhViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SpqhViewRow] = Decoder.forProduct6[SpqhViewRow, Int, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SpqhViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SpqhViewRow] = Encoder.forProduct6[SpqhViewRow, Int, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SpqhViewRow] = new Read[SpqhViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SpqhViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      quotadate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2),
-      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      quotadate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
+      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

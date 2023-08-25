@@ -11,19 +11,19 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SpViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val territoryid: OptField[SalesterritoryId, Row]
-  val salesquota: OptField[BigDecimal, Row]
-  val bonus: OptField[BigDecimal, Row]
-  val commissionpct: OptField[BigDecimal, Row]
-  val salesytd: OptField[BigDecimal, Row]
-  val saleslastyear: OptField[BigDecimal, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val territoryid: Field[SalesterritoryId, Row]
+  val salesquota: Field[BigDecimal, Row]
+  val bonus: Field[BigDecimal, Row]
+  val commissionpct: Field[BigDecimal, Row]
+  val salesytd: Field[BigDecimal, Row]
+  val saleslastyear: Field[BigDecimal, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SpViewFields extends SpViewStructure[SpViewRow](None, identity, (_, x) => x)
 

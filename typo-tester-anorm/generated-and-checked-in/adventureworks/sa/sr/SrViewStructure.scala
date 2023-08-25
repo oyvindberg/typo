@@ -10,19 +10,19 @@ package sr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.salesreason.SalesreasonId
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class SrViewStructure[Row](val prefix: Option[String], val extract: Row => SrViewRow, val merge: (Row, SrViewRow) => Row)
   extends Relation[SrViewFields, SrViewRow, Row]
     with SrViewFields[Row] { outer =>
 
-  override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val salesreasonid = new OptField[SalesreasonId, Row](prefix, "salesreasonid", None, Some("int4"))(x => extract(x).salesreasonid, (row, value) => merge(row, extract(row).copy(salesreasonid = value)))
-  override val name = new OptField[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val reasontype = new OptField[Name, Row](prefix, "reasontype", None, Some(""""public"."Name""""))(x => extract(x).reasontype, (row, value) => merge(row, extract(row).copy(reasontype = value)))
-  override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val salesreasonid = new Field[SalesreasonId, Row](prefix, "salesreasonid", None, Some("int4"))(x => extract(x).salesreasonid, (row, value) => merge(row, extract(row).copy(salesreasonid = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val reasontype = new Field[Name, Row](prefix, "reasontype", None, Some(""""public"."Name""""))(x => extract(x).reasontype, (row, value) => merge(row, extract(row).copy(reasontype = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, salesreasonid, name, reasontype, modifieddate)

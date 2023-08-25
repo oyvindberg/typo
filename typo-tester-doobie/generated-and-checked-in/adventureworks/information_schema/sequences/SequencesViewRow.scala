@@ -18,51 +18,51 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class SequencesViewRow(
-  sequenceCatalog: Option[SqlIdentifier],
-  sequenceSchema: Option[SqlIdentifier],
-  sequenceName: Option[SqlIdentifier],
-  dataType: Option[CharacterData],
-  numericPrecision: Option[CardinalNumber],
-  numericPrecisionRadix: Option[CardinalNumber],
-  numericScale: Option[CardinalNumber],
-  startValue: Option[CharacterData],
-  minimumValue: Option[CharacterData],
-  maximumValue: Option[CharacterData],
-  increment: Option[CharacterData],
-  cycleOption: Option[YesOrNo]
+  sequenceCatalog: SqlIdentifier,
+  sequenceSchema: SqlIdentifier,
+  sequenceName: SqlIdentifier,
+  dataType: CharacterData,
+  numericPrecision: CardinalNumber,
+  numericPrecisionRadix: CardinalNumber,
+  numericScale: CardinalNumber,
+  startValue: CharacterData,
+  minimumValue: CharacterData,
+  maximumValue: CharacterData,
+  increment: CharacterData,
+  cycleOption: YesOrNo
 )
 
 object SequencesViewRow {
-  implicit lazy val decoder: Decoder[SequencesViewRow] = Decoder.forProduct12[SequencesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CardinalNumber], Option[CardinalNumber], Option[CardinalNumber], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[YesOrNo]]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(SequencesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder))
-  implicit lazy val encoder: Encoder[SequencesViewRow] = Encoder.forProduct12[SequencesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CardinalNumber], Option[CardinalNumber], Option[CardinalNumber], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[YesOrNo]]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(x => (x.sequenceCatalog, x.sequenceSchema, x.sequenceName, x.dataType, x.numericPrecision, x.numericPrecisionRadix, x.numericScale, x.startValue, x.minimumValue, x.maximumValue, x.increment, x.cycleOption))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder))
+  implicit lazy val decoder: Decoder[SequencesViewRow] = Decoder.forProduct12[SequencesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CardinalNumber, CardinalNumber, CardinalNumber, CharacterData, CharacterData, CharacterData, CharacterData, YesOrNo]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(SequencesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, CardinalNumber.decoder, CardinalNumber.decoder, CardinalNumber.decoder, CharacterData.decoder, CharacterData.decoder, CharacterData.decoder, CharacterData.decoder, YesOrNo.decoder)
+  implicit lazy val encoder: Encoder[SequencesViewRow] = Encoder.forProduct12[SequencesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CardinalNumber, CardinalNumber, CardinalNumber, CharacterData, CharacterData, CharacterData, CharacterData, YesOrNo]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(x => (x.sequenceCatalog, x.sequenceSchema, x.sequenceName, x.dataType, x.numericPrecision, x.numericPrecisionRadix, x.numericScale, x.startValue, x.minimumValue, x.maximumValue, x.increment, x.cycleOption))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, CardinalNumber.encoder, CardinalNumber.encoder, CardinalNumber.encoder, CharacterData.encoder, CharacterData.encoder, CharacterData.encoder, CharacterData.encoder, YesOrNo.encoder)
   implicit lazy val read: Read[SequencesViewRow] = new Read[SequencesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CardinalNumber.get, Nullability.Nullable),
-      (CardinalNumber.get, Nullability.Nullable),
-      (CardinalNumber.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (CardinalNumber.get, Nullability.NoNulls),
+      (CardinalNumber.get, Nullability.NoNulls),
+      (CardinalNumber.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (YesOrNo.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SequencesViewRow(
-      sequenceCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      sequenceSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      sequenceName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      dataType = CharacterData.get.unsafeGetNullable(rs, i + 3),
-      numericPrecision = CardinalNumber.get.unsafeGetNullable(rs, i + 4),
-      numericPrecisionRadix = CardinalNumber.get.unsafeGetNullable(rs, i + 5),
-      numericScale = CardinalNumber.get.unsafeGetNullable(rs, i + 6),
-      startValue = CharacterData.get.unsafeGetNullable(rs, i + 7),
-      minimumValue = CharacterData.get.unsafeGetNullable(rs, i + 8),
-      maximumValue = CharacterData.get.unsafeGetNullable(rs, i + 9),
-      increment = CharacterData.get.unsafeGetNullable(rs, i + 10),
-      cycleOption = YesOrNo.get.unsafeGetNullable(rs, i + 11)
+      sequenceCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      sequenceSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      sequenceName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      dataType = CharacterData.get.unsafeGetNonNullable(rs, i + 3),
+      numericPrecision = CardinalNumber.get.unsafeGetNonNullable(rs, i + 4),
+      numericPrecisionRadix = CardinalNumber.get.unsafeGetNonNullable(rs, i + 5),
+      numericScale = CardinalNumber.get.unsafeGetNonNullable(rs, i + 6),
+      startValue = CharacterData.get.unsafeGetNonNullable(rs, i + 7),
+      minimumValue = CharacterData.get.unsafeGetNonNullable(rs, i + 8),
+      maximumValue = CharacterData.get.unsafeGetNonNullable(rs, i + 9),
+      increment = CharacterData.get.unsafeGetNonNullable(rs, i + 10),
+      cycleOption = YesOrNo.get.unsafeGetNonNullable(rs, i + 11)
     )
   )
 }

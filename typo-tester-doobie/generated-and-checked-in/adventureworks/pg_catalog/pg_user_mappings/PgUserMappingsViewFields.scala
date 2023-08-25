@@ -7,15 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_user_mappings
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgUserMappingsViewFields[Row] {
-  val umid: OptField[/* oid */ Long, Row]
-  val srvid: OptField[/* oid */ Long, Row]
-  val srvname: OptField[String, Row]
-  val umuser: OptField[/* oid */ Long, Row]
-  val usename: OptField[String, Row]
-  val umoptions: OptField[Array[String], Row]
+  val umid: Field[/* oid */ Long, Row]
+  val srvid: Field[/* oid */ Long, Row]
+  val srvname: Field[String, Row]
+  val umuser: Field[/* oid */ Long, Row]
+  val usename: Field[String, Row]
+  val umoptions: Field[Array[String], Row]
 }
 object PgUserMappingsViewFields extends PgUserMappingsViewStructure[PgUserMappingsViewRow](None, identity, (_, x) => x)
 

@@ -7,13 +7,14 @@ package adventureworks
 package pg_catalog
 package pg_rules
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgRulesViewFields[Row] {
   val schemaname: OptField[String, Row]
-  val tablename: OptField[String, Row]
-  val rulename: OptField[String, Row]
-  val definition: OptField[String, Row]
+  val tablename: Field[String, Row]
+  val rulename: Field[String, Row]
+  val definition: Field[String, Row]
 }
 object PgRulesViewFields extends PgRulesViewStructure[PgRulesViewRow](None, identity, (_, x) => x)
 

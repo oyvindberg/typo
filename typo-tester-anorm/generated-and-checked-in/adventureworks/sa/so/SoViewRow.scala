@@ -23,47 +23,47 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SoViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.specialoffer.SpecialofferRow.specialofferid]] */
-  specialofferid: Option[SpecialofferId],
+  specialofferid: SpecialofferId,
   /** Points to [[sales.specialoffer.SpecialofferRow.description]] */
-  description: Option[/* max 255 chars */ String],
+  description: /* max 255 chars */ String,
   /** Points to [[sales.specialoffer.SpecialofferRow.discountpct]] */
-  discountpct: Option[BigDecimal],
+  discountpct: BigDecimal,
   /** Points to [[sales.specialoffer.SpecialofferRow.type]] */
-  `type`: Option[/* max 50 chars */ String],
+  `type`: /* max 50 chars */ String,
   /** Points to [[sales.specialoffer.SpecialofferRow.category]] */
-  category: Option[/* max 50 chars */ String],
+  category: /* max 50 chars */ String,
   /** Points to [[sales.specialoffer.SpecialofferRow.startdate]] */
-  startdate: Option[TypoLocalDateTime],
+  startdate: TypoLocalDateTime,
   /** Points to [[sales.specialoffer.SpecialofferRow.enddate]] */
-  enddate: Option[TypoLocalDateTime],
+  enddate: TypoLocalDateTime,
   /** Points to [[sales.specialoffer.SpecialofferRow.minqty]] */
-  minqty: Option[Int],
+  minqty: Int,
   /** Points to [[sales.specialoffer.SpecialofferRow.maxqty]] */
-  maxqty: Option[Int],
+  maxqty: Int,
   /** Points to [[sales.specialoffer.SpecialofferRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.specialoffer.SpecialofferRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SoViewRow {
   implicit lazy val reads: Reads[SoViewRow] = Reads[SoViewRow](json => JsResult.fromTry(
       Try(
         SoViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          specialofferid = json.\("specialofferid").toOption.map(_.as(SpecialofferId.reads)),
-          description = json.\("description").toOption.map(_.as(Reads.StringReads)),
-          discountpct = json.\("discountpct").toOption.map(_.as(Reads.bigDecReads)),
-          `type` = json.\("type").toOption.map(_.as(Reads.StringReads)),
-          category = json.\("category").toOption.map(_.as(Reads.StringReads)),
-          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          minqty = json.\("minqty").toOption.map(_.as(Reads.IntReads)),
-          maxqty = json.\("maxqty").toOption.map(_.as(Reads.IntReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
+          description = json.\("description").as(Reads.StringReads),
+          discountpct = json.\("discountpct").as(Reads.bigDecReads),
+          `type` = json.\("type").as(Reads.StringReads),
+          category = json.\("category").as(Reads.StringReads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").as(TypoLocalDateTime.reads),
+          minqty = json.\("minqty").as(Reads.IntReads),
+          maxqty = json.\("maxqty").as(Reads.IntReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -71,35 +71,35 @@ object SoViewRow {
   def rowParser(idx: Int): RowParser[SoViewRow] = RowParser[SoViewRow] { row =>
     Success(
       SoViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        specialofferid = row(idx + 1)(Column.columnToOption(SpecialofferId.column)),
-        description = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        discountpct = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        `type` = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        category = row(idx + 5)(Column.columnToOption(Column.columnToString)),
-        startdate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column)),
-        enddate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column)),
-        minqty = row(idx + 8)(Column.columnToOption(Column.columnToInt)),
-        maxqty = row(idx + 9)(Column.columnToOption(Column.columnToInt)),
-        rowguid = row(idx + 10)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 11)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        specialofferid = row(idx + 1)(SpecialofferId.column),
+        description = row(idx + 2)(Column.columnToString),
+        discountpct = row(idx + 3)(Column.columnToScalaBigDecimal),
+        `type` = row(idx + 4)(Column.columnToString),
+        category = row(idx + 5)(Column.columnToString),
+        startdate = row(idx + 6)(TypoLocalDateTime.column),
+        enddate = row(idx + 7)(TypoLocalDateTime.column),
+        minqty = row(idx + 8)(Column.columnToInt),
+        maxqty = row(idx + 9)(Column.columnToInt),
+        rowguid = row(idx + 10)(Column.columnToUUID),
+        modifieddate = row(idx + 11)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SoViewRow] = OWrites[SoViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "specialofferid" -> Writes.OptionWrites(SpecialofferId.writes).writes(o.specialofferid),
-      "description" -> Writes.OptionWrites(Writes.StringWrites).writes(o.description),
-      "discountpct" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.discountpct),
-      "type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`type`),
-      "category" -> Writes.OptionWrites(Writes.StringWrites).writes(o.category),
-      "startdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.startdate),
-      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
-      "minqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.minqty),
-      "maxqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.maxqty),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
+      "description" -> Writes.StringWrites.writes(o.description),
+      "discountpct" -> Writes.BigDecimalWrites.writes(o.discountpct),
+      "type" -> Writes.StringWrites.writes(o.`type`),
+      "category" -> Writes.StringWrites.writes(o.category),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+      "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
+      "minqty" -> Writes.IntWrites.writes(o.minqty),
+      "maxqty" -> Writes.IntWrites.writes(o.maxqty),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

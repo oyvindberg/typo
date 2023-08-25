@@ -10,15 +10,15 @@ package spqh
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SpqhViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val quotadate: OptField[TypoLocalDateTime, Row]
-  val salesquota: OptField[BigDecimal, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val quotadate: Field[TypoLocalDateTime, Row]
+  val salesquota: Field[BigDecimal, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SpqhViewFields extends SpqhViewStructure[SpqhViewRow](None, identity, (_, x) => x)
 

@@ -21,9 +21,9 @@ import scala.util.Try
 
 case class PgRulesViewRow(
   schemaname: Option[String],
-  tablename: Option[String],
-  rulename: Option[String],
-  definition: Option[String]
+  tablename: String,
+  rulename: String,
+  definition: String
 )
 
 object PgRulesViewRow {
@@ -31,9 +31,9 @@ object PgRulesViewRow {
       Try(
         PgRulesViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
-          rulename = json.\("rulename").toOption.map(_.as(Reads.StringReads)),
-          definition = json.\("definition").toOption.map(_.as(Reads.StringReads))
+          tablename = json.\("tablename").as(Reads.StringReads),
+          rulename = json.\("rulename").as(Reads.StringReads),
+          definition = json.\("definition").as(Reads.StringReads)
         )
       )
     ),
@@ -42,18 +42,18 @@ object PgRulesViewRow {
     Success(
       PgRulesViewRow(
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        rulename = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        definition = row(idx + 3)(Column.columnToOption(Column.columnToString))
+        tablename = row(idx + 1)(Column.columnToString),
+        rulename = row(idx + 2)(Column.columnToString),
+        definition = row(idx + 3)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[PgRulesViewRow] = OWrites[PgRulesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
-      "rulename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.rulename),
-      "definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.definition)
+      "tablename" -> Writes.StringWrites.writes(o.tablename),
+      "rulename" -> Writes.StringWrites.writes(o.rulename),
+      "definition" -> Writes.StringWrites.writes(o.definition)
     ))
   )
 }

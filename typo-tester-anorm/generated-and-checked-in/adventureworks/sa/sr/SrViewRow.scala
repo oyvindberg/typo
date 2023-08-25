@@ -23,26 +23,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SrViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salesreason.SalesreasonRow.salesreasonid]] */
-  salesreasonid: Option[SalesreasonId],
+  salesreasonid: SalesreasonId,
   /** Points to [[sales.salesreason.SalesreasonRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[sales.salesreason.SalesreasonRow.reasontype]] */
-  reasontype: Option[Name],
+  reasontype: Name,
   /** Points to [[sales.salesreason.SalesreasonRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SrViewRow {
   implicit lazy val reads: Reads[SrViewRow] = Reads[SrViewRow](json => JsResult.fromTry(
       Try(
         SrViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          salesreasonid = json.\("salesreasonid").toOption.map(_.as(SalesreasonId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          reasontype = json.\("reasontype").toOption.map(_.as(Name.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          salesreasonid = json.\("salesreasonid").as(SalesreasonId.reads),
+          name = json.\("name").as(Name.reads),
+          reasontype = json.\("reasontype").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -50,21 +50,21 @@ object SrViewRow {
   def rowParser(idx: Int): RowParser[SrViewRow] = RowParser[SrViewRow] { row =>
     Success(
       SrViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        salesreasonid = row(idx + 1)(Column.columnToOption(SalesreasonId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        reasontype = row(idx + 3)(Column.columnToOption(Name.column)),
-        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        salesreasonid = row(idx + 1)(SalesreasonId.column),
+        name = row(idx + 2)(Name.column),
+        reasontype = row(idx + 3)(Name.column),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SrViewRow] = OWrites[SrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "salesreasonid" -> Writes.OptionWrites(SalesreasonId.writes).writes(o.salesreasonid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "reasontype" -> Writes.OptionWrites(Name.writes).writes(o.reasontype),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "salesreasonid" -> SalesreasonId.writes.writes(o.salesreasonid),
+      "name" -> Name.writes.writes(o.name),
+      "reasontype" -> Name.writes.writes(o.reasontype),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -22,41 +22,41 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ThaViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]] */
-  transactionid: Option[TransactionhistoryarchiveId],
+  transactionid: TransactionhistoryarchiveId,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.productid]] */
-  productid: Option[Int],
+  productid: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderid]] */
-  referenceorderid: Option[Int],
+  referenceorderid: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderlineid]] */
-  referenceorderlineid: Option[Int],
+  referenceorderlineid: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiondate]] */
-  transactiondate: Option[TypoLocalDateTime],
+  transactiondate: TypoLocalDateTime,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiontype]] */
-  transactiontype: Option[/* bpchar, max 1 chars */ String],
+  transactiontype: /* bpchar, max 1 chars */ String,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.quantity]] */
-  quantity: Option[Int],
+  quantity: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.actualcost]] */
-  actualcost: Option[BigDecimal],
+  actualcost: BigDecimal,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object ThaViewRow {
   implicit lazy val reads: Reads[ThaViewRow] = Reads[ThaViewRow](json => JsResult.fromTry(
       Try(
         ThaViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          transactionid = json.\("transactionid").toOption.map(_.as(TransactionhistoryarchiveId.reads)),
-          productid = json.\("productid").toOption.map(_.as(Reads.IntReads)),
-          referenceorderid = json.\("referenceorderid").toOption.map(_.as(Reads.IntReads)),
-          referenceorderlineid = json.\("referenceorderlineid").toOption.map(_.as(Reads.IntReads)),
-          transactiondate = json.\("transactiondate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          transactiontype = json.\("transactiontype").toOption.map(_.as(Reads.StringReads)),
-          quantity = json.\("quantity").toOption.map(_.as(Reads.IntReads)),
-          actualcost = json.\("actualcost").toOption.map(_.as(Reads.bigDecReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          transactionid = json.\("transactionid").as(TransactionhistoryarchiveId.reads),
+          productid = json.\("productid").as(Reads.IntReads),
+          referenceorderid = json.\("referenceorderid").as(Reads.IntReads),
+          referenceorderlineid = json.\("referenceorderlineid").as(Reads.IntReads),
+          transactiondate = json.\("transactiondate").as(TypoLocalDateTime.reads),
+          transactiontype = json.\("transactiontype").as(Reads.StringReads),
+          quantity = json.\("quantity").as(Reads.IntReads),
+          actualcost = json.\("actualcost").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -64,31 +64,31 @@ object ThaViewRow {
   def rowParser(idx: Int): RowParser[ThaViewRow] = RowParser[ThaViewRow] { row =>
     Success(
       ThaViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        transactionid = row(idx + 1)(Column.columnToOption(TransactionhistoryarchiveId.column)),
-        productid = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
-        referenceorderid = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
-        referenceorderlineid = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
-        transactiondate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
-        transactiontype = row(idx + 6)(Column.columnToOption(Column.columnToString)),
-        quantity = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
-        actualcost = row(idx + 8)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        modifieddate = row(idx + 9)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        transactionid = row(idx + 1)(TransactionhistoryarchiveId.column),
+        productid = row(idx + 2)(Column.columnToInt),
+        referenceorderid = row(idx + 3)(Column.columnToInt),
+        referenceorderlineid = row(idx + 4)(Column.columnToInt),
+        transactiondate = row(idx + 5)(TypoLocalDateTime.column),
+        transactiontype = row(idx + 6)(Column.columnToString),
+        quantity = row(idx + 7)(Column.columnToInt),
+        actualcost = row(idx + 8)(Column.columnToScalaBigDecimal),
+        modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[ThaViewRow] = OWrites[ThaViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "transactionid" -> Writes.OptionWrites(TransactionhistoryarchiveId.writes).writes(o.transactionid),
-      "productid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.productid),
-      "referenceorderid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.referenceorderid),
-      "referenceorderlineid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.referenceorderlineid),
-      "transactiondate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.transactiondate),
-      "transactiontype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.transactiontype),
-      "quantity" -> Writes.OptionWrites(Writes.IntWrites).writes(o.quantity),
-      "actualcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.actualcost),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "transactionid" -> TransactionhistoryarchiveId.writes.writes(o.transactionid),
+      "productid" -> Writes.IntWrites.writes(o.productid),
+      "referenceorderid" -> Writes.IntWrites.writes(o.referenceorderid),
+      "referenceorderlineid" -> Writes.IntWrites.writes(o.referenceorderlineid),
+      "transactiondate" -> TypoLocalDateTime.writes.writes(o.transactiondate),
+      "transactiontype" -> Writes.StringWrites.writes(o.transactiontype),
+      "quantity" -> Writes.IntWrites.writes(o.quantity),
+      "actualcost" -> Writes.BigDecimalWrites.writes(o.actualcost),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -10,13 +10,13 @@ package cu
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CuViewFields[Row] {
-  val id: OptField[/* bpchar, max 3 chars */ String, Row]
-  val currencycode: OptField[CurrencyId, Row]
-  val name: OptField[Name, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[/* bpchar, max 3 chars */ String, Row]
+  val currencycode: Field[CurrencyId, Row]
+  val name: Field[Name, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object CuViewFields extends CuViewStructure[CuViewRow](None, identity, (_, x) => x)
 

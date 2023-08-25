@@ -16,24 +16,24 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ApplicableRolesViewRow(
-  grantee: Option[SqlIdentifier],
-  roleName: Option[SqlIdentifier],
-  isGrantable: Option[YesOrNo]
+  grantee: SqlIdentifier,
+  roleName: SqlIdentifier,
+  isGrantable: YesOrNo
 )
 
 object ApplicableRolesViewRow {
-  implicit lazy val decoder: Decoder[ApplicableRolesViewRow] = Decoder.forProduct3[ApplicableRolesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(ApplicableRolesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(YesOrNo.decoder))
-  implicit lazy val encoder: Encoder[ApplicableRolesViewRow] = Encoder.forProduct3[ApplicableRolesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(YesOrNo.encoder))
+  implicit lazy val decoder: Decoder[ApplicableRolesViewRow] = Decoder.forProduct3[ApplicableRolesViewRow, SqlIdentifier, SqlIdentifier, YesOrNo]("grantee", "role_name", "is_grantable")(ApplicableRolesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, YesOrNo.decoder)
+  implicit lazy val encoder: Encoder[ApplicableRolesViewRow] = Encoder.forProduct3[ApplicableRolesViewRow, SqlIdentifier, SqlIdentifier, YesOrNo]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(SqlIdentifier.encoder, SqlIdentifier.encoder, YesOrNo.encoder)
   implicit lazy val read: Read[ApplicableRolesViewRow] = new Read[ApplicableRolesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (YesOrNo.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ApplicableRolesViewRow(
-      grantee = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      roleName = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      isGrantable = YesOrNo.get.unsafeGetNullable(rs, i + 2)
+      grantee = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      roleName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      isGrantable = YesOrNo.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

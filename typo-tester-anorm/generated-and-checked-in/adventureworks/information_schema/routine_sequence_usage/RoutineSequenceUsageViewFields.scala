@@ -8,18 +8,18 @@ package information_schema
 package routine_sequence_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait RoutineSequenceUsageViewFields[Row] {
-  val specificCatalog: OptField[SqlIdentifier, Row]
-  val specificSchema: OptField[SqlIdentifier, Row]
-  val specificName: OptField[SqlIdentifier, Row]
-  val routineCatalog: OptField[SqlIdentifier, Row]
-  val routineSchema: OptField[SqlIdentifier, Row]
-  val routineName: OptField[SqlIdentifier, Row]
-  val sequenceCatalog: OptField[SqlIdentifier, Row]
-  val sequenceSchema: OptField[SqlIdentifier, Row]
-  val sequenceName: OptField[SqlIdentifier, Row]
+  val specificCatalog: Field[SqlIdentifier, Row]
+  val specificSchema: Field[SqlIdentifier, Row]
+  val specificName: Field[SqlIdentifier, Row]
+  val routineCatalog: Field[SqlIdentifier, Row]
+  val routineSchema: Field[SqlIdentifier, Row]
+  val routineName: Field[SqlIdentifier, Row]
+  val sequenceCatalog: Field[SqlIdentifier, Row]
+  val sequenceSchema: Field[SqlIdentifier, Row]
+  val sequenceName: Field[SqlIdentifier, Row]
 }
 object RoutineSequenceUsageViewFields extends RoutineSequenceUsageViewStructure[RoutineSequenceUsageViewRow](None, identity, (_, x) => x)
 

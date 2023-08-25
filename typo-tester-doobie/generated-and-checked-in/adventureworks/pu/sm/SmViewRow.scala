@@ -19,42 +19,42 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class SmViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
-  shipmethodid: Option[ShipmethodId],
+  shipmethodid: ShipmethodId,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipbase]] */
-  shipbase: Option[BigDecimal],
+  shipbase: BigDecimal,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shiprate]] */
-  shiprate: Option[BigDecimal],
+  shiprate: BigDecimal,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SmViewRow {
-  implicit lazy val decoder: Decoder[SmViewRow] = Decoder.forProduct7[SmViewRow, Option[Int], Option[ShipmethodId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(SmViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ShipmethodId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SmViewRow] = Encoder.forProduct7[SmViewRow, Option[Int], Option[ShipmethodId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.id, x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ShipmethodId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SmViewRow] = Decoder.forProduct7[SmViewRow, Int, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(SmViewRow.apply)(Decoder.decodeInt, ShipmethodId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SmViewRow] = Encoder.forProduct7[SmViewRow, Int, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.id, x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(Encoder.encodeInt, ShipmethodId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SmViewRow] = new Read[SmViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ShipmethodId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ShipmethodId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SmViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      shipmethodid = ShipmethodId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      shipbase = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
-      shiprate = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      shipbase = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      shiprate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

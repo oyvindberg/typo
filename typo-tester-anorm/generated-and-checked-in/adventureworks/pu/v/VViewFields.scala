@@ -13,18 +13,17 @@ import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.OptField
 
 trait VViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val accountnumber: OptField[AccountNumber, Row]
-  val name: OptField[Name, Row]
-  val creditrating: OptField[Int, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val accountnumber: Field[AccountNumber, Row]
+  val name: Field[Name, Row]
+  val creditrating: Field[Int, Row]
   val preferredvendorstatus: Field[Flag, Row]
   val activeflag: Field[Flag, Row]
-  val purchasingwebserviceurl: OptField[/* max 1024 chars */ String, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val purchasingwebserviceurl: Field[/* max 1024 chars */ String, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object VViewFields extends VViewStructure[VViewRow](None, identity, (_, x) => x)
 

@@ -18,30 +18,30 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CuViewRow(
-  id: Option[/* bpchar, max 3 chars */ String],
+  id: /* bpchar, max 3 chars */ String,
   /** Points to [[sales.currency.CurrencyRow.currencycode]] */
-  currencycode: Option[CurrencyId],
+  currencycode: CurrencyId,
   /** Points to [[sales.currency.CurrencyRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[sales.currency.CurrencyRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CuViewRow {
-  implicit lazy val decoder: Decoder[CuViewRow] = Decoder.forProduct4[CuViewRow, Option[/* bpchar, max 3 chars */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(CuViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[CuViewRow] = Encoder.forProduct4[CuViewRow, Option[/* bpchar, max 3 chars */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(x => (x.id, x.currencycode, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[CuViewRow] = Decoder.forProduct4[CuViewRow, /* bpchar, max 3 chars */ String, CurrencyId, Name, TypoLocalDateTime]("id", "currencycode", "name", "modifieddate")(CuViewRow.apply)(Decoder.decodeString, CurrencyId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CuViewRow] = Encoder.forProduct4[CuViewRow, /* bpchar, max 3 chars */ String, CurrencyId, Name, TypoLocalDateTime]("id", "currencycode", "name", "modifieddate")(x => (x.id, x.currencycode, x.name, x.modifieddate))(Encoder.encodeString, CurrencyId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CuViewRow] = new Read[CuViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (CurrencyId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (CurrencyId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CuViewRow(
-      id = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
-      currencycode = CurrencyId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
+      id = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      currencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

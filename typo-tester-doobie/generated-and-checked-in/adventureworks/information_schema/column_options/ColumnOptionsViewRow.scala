@@ -16,33 +16,33 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ColumnOptionsViewRow(
-  tableCatalog: Option[SqlIdentifier],
-  tableSchema: Option[SqlIdentifier],
-  tableName: Option[SqlIdentifier],
-  columnName: Option[SqlIdentifier],
-  optionName: Option[SqlIdentifier],
-  optionValue: Option[CharacterData]
+  tableCatalog: SqlIdentifier,
+  tableSchema: SqlIdentifier,
+  tableName: SqlIdentifier,
+  columnName: SqlIdentifier,
+  optionName: SqlIdentifier,
+  optionValue: CharacterData
 )
 
 object ColumnOptionsViewRow {
-  implicit lazy val decoder: Decoder[ColumnOptionsViewRow] = Decoder.forProduct6[ColumnOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(ColumnOptionsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit lazy val encoder: Encoder[ColumnOptionsViewRow] = Encoder.forProduct6[ColumnOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.optionName, x.optionValue))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val decoder: Decoder[ColumnOptionsViewRow] = Decoder.forProduct6[ColumnOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(ColumnOptionsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
+  implicit lazy val encoder: Encoder[ColumnOptionsViewRow] = Encoder.forProduct6[ColumnOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.optionName, x.optionValue))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
   implicit lazy val read: Read[ColumnOptionsViewRow] = new Read[ColumnOptionsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ColumnOptionsViewRow(
-      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      columnName = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      optionName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      optionValue = CharacterData.get.unsafeGetNullable(rs, i + 5)
+      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      columnName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      optionName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      optionValue = CharacterData.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

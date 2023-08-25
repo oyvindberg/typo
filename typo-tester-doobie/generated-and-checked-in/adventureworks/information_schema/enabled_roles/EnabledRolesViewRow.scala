@@ -15,18 +15,18 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class EnabledRolesViewRow(
-  roleName: Option[SqlIdentifier]
+  roleName: SqlIdentifier
 )
 
 object EnabledRolesViewRow {
-  implicit lazy val decoder: Decoder[EnabledRolesViewRow] = Decoder.forProduct1[EnabledRolesViewRow, Option[SqlIdentifier]]("role_name")(EnabledRolesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[EnabledRolesViewRow] = Encoder.forProduct1[EnabledRolesViewRow, Option[SqlIdentifier]]("role_name")(x => (x.roleName))(Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[EnabledRolesViewRow] = Decoder.forProduct1[EnabledRolesViewRow, SqlIdentifier]("role_name")(EnabledRolesViewRow.apply)(SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[EnabledRolesViewRow] = Encoder.forProduct1[EnabledRolesViewRow, SqlIdentifier]("role_name")(x => (x.roleName))(SqlIdentifier.encoder)
   implicit lazy val read: Read[EnabledRolesViewRow] = new Read[EnabledRolesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EnabledRolesViewRow(
-      roleName = SqlIdentifier.get.unsafeGetNullable(rs, i + 0)
+      roleName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0)
     )
   )
 }

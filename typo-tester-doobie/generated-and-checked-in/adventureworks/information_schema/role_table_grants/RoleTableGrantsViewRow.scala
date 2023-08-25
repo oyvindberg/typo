@@ -18,46 +18,46 @@ import java.sql.ResultSet
 
 case class RoleTableGrantsViewRow(
   /** Points to [[table_privileges.TablePrivilegesViewRow.grantor]] */
-  grantor: Option[SqlIdentifier],
+  grantor: SqlIdentifier,
   /** Points to [[table_privileges.TablePrivilegesViewRow.grantee]] */
-  grantee: Option[SqlIdentifier],
+  grantee: SqlIdentifier,
   /** Points to [[table_privileges.TablePrivilegesViewRow.tableCatalog]] */
-  tableCatalog: Option[SqlIdentifier],
+  tableCatalog: SqlIdentifier,
   /** Points to [[table_privileges.TablePrivilegesViewRow.tableSchema]] */
-  tableSchema: Option[SqlIdentifier],
+  tableSchema: SqlIdentifier,
   /** Points to [[table_privileges.TablePrivilegesViewRow.tableName]] */
-  tableName: Option[SqlIdentifier],
+  tableName: SqlIdentifier,
   /** Points to [[table_privileges.TablePrivilegesViewRow.privilegeType]] */
-  privilegeType: Option[CharacterData],
+  privilegeType: CharacterData,
   /** Points to [[table_privileges.TablePrivilegesViewRow.isGrantable]] */
-  isGrantable: Option[YesOrNo],
+  isGrantable: YesOrNo,
   /** Points to [[table_privileges.TablePrivilegesViewRow.withHierarchy]] */
-  withHierarchy: Option[YesOrNo]
+  withHierarchy: YesOrNo
 )
 
 object RoleTableGrantsViewRow {
-  implicit lazy val decoder: Decoder[RoleTableGrantsViewRow] = Decoder.forProduct8[RoleTableGrantsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo], Option[YesOrNo]]("grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy")(RoleTableGrantsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder))
-  implicit lazy val encoder: Encoder[RoleTableGrantsViewRow] = Encoder.forProduct8[RoleTableGrantsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo], Option[YesOrNo]]("grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy")(x => (x.grantor, x.grantee, x.tableCatalog, x.tableSchema, x.tableName, x.privilegeType, x.isGrantable, x.withHierarchy))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder))
+  implicit lazy val decoder: Decoder[RoleTableGrantsViewRow] = Decoder.forProduct8[RoleTableGrantsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo, YesOrNo]("grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy")(RoleTableGrantsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, YesOrNo.decoder, YesOrNo.decoder)
+  implicit lazy val encoder: Encoder[RoleTableGrantsViewRow] = Encoder.forProduct8[RoleTableGrantsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo, YesOrNo]("grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy")(x => (x.grantor, x.grantee, x.tableCatalog, x.tableSchema, x.tableName, x.privilegeType, x.isGrantable, x.withHierarchy))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, YesOrNo.encoder, YesOrNo.encoder)
   implicit lazy val read: Read[RoleTableGrantsViewRow] = new Read[RoleTableGrantsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (YesOrNo.get, Nullability.NoNulls),
+      (YesOrNo.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => RoleTableGrantsViewRow(
-      grantor = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      grantee = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      privilegeType = CharacterData.get.unsafeGetNullable(rs, i + 5),
-      isGrantable = YesOrNo.get.unsafeGetNullable(rs, i + 6),
-      withHierarchy = YesOrNo.get.unsafeGetNullable(rs, i + 7)
+      grantor = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      grantee = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      privilegeType = CharacterData.get.unsafeGetNonNullable(rs, i + 5),
+      isGrantable = YesOrNo.get.unsafeGetNonNullable(rs, i + 6),
+      withHierarchy = YesOrNo.get.unsafeGetNonNullable(rs, i + 7)
     )
   )
 }

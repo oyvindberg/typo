@@ -9,13 +9,13 @@ package collations
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CollationsViewFields[Row] {
-  val collationCatalog: OptField[SqlIdentifier, Row]
-  val collationSchema: OptField[SqlIdentifier, Row]
-  val collationName: OptField[SqlIdentifier, Row]
-  val padAttribute: OptField[CharacterData, Row]
+  val collationCatalog: Field[SqlIdentifier, Row]
+  val collationSchema: Field[SqlIdentifier, Row]
+  val collationName: Field[SqlIdentifier, Row]
+  val padAttribute: Field[CharacterData, Row]
 }
 object CollationsViewFields extends CollationsViewStructure[CollationsViewRow](None, identity, (_, x) => x)
 

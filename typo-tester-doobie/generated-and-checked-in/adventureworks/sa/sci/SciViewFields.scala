@@ -10,16 +10,16 @@ package sci
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SciViewFields[Row] {
-  val id: OptField[Int, Row]
-  val shoppingcartitemid: OptField[ShoppingcartitemId, Row]
-  val shoppingcartid: OptField[/* max 50 chars */ String, Row]
-  val quantity: OptField[Int, Row]
-  val productid: OptField[ProductId, Row]
-  val datecreated: OptField[TypoLocalDateTime, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val shoppingcartitemid: Field[ShoppingcartitemId, Row]
+  val shoppingcartid: Field[/* max 50 chars */ String, Row]
+  val quantity: Field[Int, Row]
+  val productid: Field[ProductId, Row]
+  val datecreated: Field[TypoLocalDateTime, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SciViewFields extends SciViewStructure[SciViewRow](None, identity, (_, x) => x)
 

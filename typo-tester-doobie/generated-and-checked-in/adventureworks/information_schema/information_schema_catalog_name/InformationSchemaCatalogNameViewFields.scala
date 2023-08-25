@@ -8,10 +8,10 @@ package information_schema
 package information_schema_catalog_name
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait InformationSchemaCatalogNameViewFields[Row] {
-  val catalogName: OptField[SqlIdentifier, Row]
+  val catalogName: Field[SqlIdentifier, Row]
 }
 object InformationSchemaCatalogNameViewFields extends InformationSchemaCatalogNameViewStructure[InformationSchemaCatalogNameViewRow](None, identity, (_, x) => x)
 

@@ -7,11 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_config
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgConfigViewFields[Row] {
-  val name: OptField[String, Row]
-  val setting: OptField[String, Row]
+  val name: Field[String, Row]
+  val setting: Field[String, Row]
 }
 object PgConfigViewFields extends PgConfigViewStructure[PgConfigViewRow](None, identity, (_, x) => x)
 

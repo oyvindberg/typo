@@ -12,20 +12,20 @@ import adventureworks.customtypes.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait VproductmodelinstructionsViewFields[Row] {
-  val productmodelid: OptField[ProductmodelId, Row]
-  val name: OptField[Name, Row]
-  val instructions: OptField[TypoXml, Row]
-  val LocationID: OptField[Int, Row]
-  val SetupHours: OptField[BigDecimal, Row]
-  val MachineHours: OptField[BigDecimal, Row]
-  val LaborHours: OptField[BigDecimal, Row]
-  val LotSize: OptField[Int, Row]
-  val Step: OptField[/* max 1024 chars */ String, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val productmodelid: Field[ProductmodelId, Row]
+  val name: Field[Name, Row]
+  val instructions: Field[TypoXml, Row]
+  val LocationID: Field[Int, Row]
+  val SetupHours: Field[BigDecimal, Row]
+  val MachineHours: Field[BigDecimal, Row]
+  val LaborHours: Field[BigDecimal, Row]
+  val LotSize: Field[Int, Row]
+  val Step: Field[/* max 1024 chars */ String, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object VproductmodelinstructionsViewFields extends VproductmodelinstructionsViewStructure[VproductmodelinstructionsViewRow](None, identity, (_, x) => x)
 

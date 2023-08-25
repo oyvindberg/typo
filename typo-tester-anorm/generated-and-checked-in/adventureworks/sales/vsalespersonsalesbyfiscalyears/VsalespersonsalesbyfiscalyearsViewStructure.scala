@@ -7,21 +7,21 @@ package adventureworks
 package sales
 package vsalespersonsalesbyfiscalyears
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class VsalespersonsalesbyfiscalyearsViewStructure[Row](val prefix: Option[String], val extract: Row => VsalespersonsalesbyfiscalyearsViewRow, val merge: (Row, VsalespersonsalesbyfiscalyearsViewRow) => Row)
   extends Relation[VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow, Row]
     with VsalespersonsalesbyfiscalyearsViewFields[Row] { outer =>
 
-  override val SalesPersonID = new OptField[Int, Row](prefix, "SalesPersonID", None, Some("int4"))(x => extract(x).SalesPersonID, (row, value) => merge(row, extract(row).copy(SalesPersonID = value)))
-  override val FullName = new OptField[String, Row](prefix, "FullName", None, None)(x => extract(x).FullName, (row, value) => merge(row, extract(row).copy(FullName = value)))
-  override val JobTitle = new OptField[String, Row](prefix, "JobTitle", None, None)(x => extract(x).JobTitle, (row, value) => merge(row, extract(row).copy(JobTitle = value)))
-  override val SalesTerritory = new OptField[String, Row](prefix, "SalesTerritory", None, None)(x => extract(x).SalesTerritory, (row, value) => merge(row, extract(row).copy(SalesTerritory = value)))
-  override val `2012` = new OptField[BigDecimal, Row](prefix, "2012", None, Some("numeric"))(x => extract(x).`2012`, (row, value) => merge(row, extract(row).copy(`2012` = value)))
-  override val `2013` = new OptField[BigDecimal, Row](prefix, "2013", None, Some("numeric"))(x => extract(x).`2013`, (row, value) => merge(row, extract(row).copy(`2013` = value)))
-  override val `2014` = new OptField[BigDecimal, Row](prefix, "2014", None, Some("numeric"))(x => extract(x).`2014`, (row, value) => merge(row, extract(row).copy(`2014` = value)))
+  override val SalesPersonID = new Field[Int, Row](prefix, "SalesPersonID", None, Some("int4"))(x => extract(x).SalesPersonID, (row, value) => merge(row, extract(row).copy(SalesPersonID = value)))
+  override val FullName = new Field[String, Row](prefix, "FullName", None, None)(x => extract(x).FullName, (row, value) => merge(row, extract(row).copy(FullName = value)))
+  override val JobTitle = new Field[String, Row](prefix, "JobTitle", None, None)(x => extract(x).JobTitle, (row, value) => merge(row, extract(row).copy(JobTitle = value)))
+  override val SalesTerritory = new Field[String, Row](prefix, "SalesTerritory", None, None)(x => extract(x).SalesTerritory, (row, value) => merge(row, extract(row).copy(SalesTerritory = value)))
+  override val `2012` = new Field[BigDecimal, Row](prefix, "2012", None, Some("numeric"))(x => extract(x).`2012`, (row, value) => merge(row, extract(row).copy(`2012` = value)))
+  override val `2013` = new Field[BigDecimal, Row](prefix, "2013", None, Some("numeric"))(x => extract(x).`2013`, (row, value) => merge(row, extract(row).copy(`2013` = value)))
+  override val `2014` = new Field[BigDecimal, Row](prefix, "2014", None, Some("numeric"))(x => extract(x).`2014`, (row, value) => merge(row, extract(row).copy(`2014` = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](SalesPersonID, FullName, JobTitle, SalesTerritory, `2012`, `2013`, `2014`)

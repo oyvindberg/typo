@@ -19,30 +19,30 @@ import java.sql.ResultSet
 
 case class PmpdcViewRow(
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.productmodelid]] */
-  productmodelid: Option[ProductmodelId],
+  productmodelid: ProductmodelId,
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.productdescriptionid]] */
-  productdescriptionid: Option[ProductdescriptionId],
+  productdescriptionid: ProductdescriptionId,
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.cultureid]] */
-  cultureid: Option[CultureId],
+  cultureid: CultureId,
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PmpdcViewRow {
-  implicit lazy val decoder: Decoder[PmpdcViewRow] = Decoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(PmpdcViewRow.apply)(Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(ProductdescriptionId.decoder), Decoder.decodeOption(CultureId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PmpdcViewRow] = Encoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(ProductdescriptionId.encoder), Encoder.encodeOption(CultureId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PmpdcViewRow] = Decoder.forProduct4[PmpdcViewRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(PmpdcViewRow.apply)(ProductmodelId.decoder, ProductdescriptionId.decoder, CultureId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PmpdcViewRow] = Encoder.forProduct4[PmpdcViewRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(ProductmodelId.encoder, ProductdescriptionId.encoder, CultureId.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PmpdcViewRow] = new Read[PmpdcViewRow](
     gets = List(
-      (ProductmodelId.get, Nullability.Nullable),
-      (ProductdescriptionId.get, Nullability.Nullable),
-      (CultureId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (ProductmodelId.get, Nullability.NoNulls),
+      (ProductdescriptionId.get, Nullability.NoNulls),
+      (CultureId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PmpdcViewRow(
-      productmodelid = ProductmodelId.get.unsafeGetNullable(rs, i + 0),
-      productdescriptionid = ProductdescriptionId.get.unsafeGetNullable(rs, i + 1),
-      cultureid = CultureId.get.unsafeGetNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
+      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+      productdescriptionid = ProductdescriptionId.get.unsafeGetNonNullable(rs, i + 1),
+      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

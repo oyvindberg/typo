@@ -11,16 +11,16 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SthViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val territoryid: OptField[SalesterritoryId, Row]
-  val startdate: OptField[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val territoryid: Field[SalesterritoryId, Row]
+  val startdate: Field[TypoLocalDateTime, Row]
+  val enddate: Field[TypoLocalDateTime, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SthViewFields extends SthViewStructure[SthViewRow](None, identity, (_, x) => x)
 

@@ -7,17 +7,17 @@ package adventureworks
 package pg_catalog
 package pg_publication_tables
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgPublicationTablesViewStructure[Row](val prefix: Option[String], val extract: Row => PgPublicationTablesViewRow, val merge: (Row, PgPublicationTablesViewRow) => Row)
   extends Relation[PgPublicationTablesViewFields, PgPublicationTablesViewRow, Row]
     with PgPublicationTablesViewFields[Row] { outer =>
 
-  override val pubname = new OptField[String, Row](prefix, "pubname", None, Some("name"))(x => extract(x).pubname, (row, value) => merge(row, extract(row).copy(pubname = value)))
-  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val tablename = new OptField[String, Row](prefix, "tablename", None, Some("name"))(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
+  override val pubname = new Field[String, Row](prefix, "pubname", None, Some("name"))(x => extract(x).pubname, (row, value) => merge(row, extract(row).copy(pubname = value)))
+  override val schemaname = new Field[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
+  override val tablename = new Field[String, Row](prefix, "tablename", None, Some("name"))(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](pubname, schemaname, tablename)

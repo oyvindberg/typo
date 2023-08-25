@@ -8,15 +8,15 @@ package information_schema
 package collation_character_set_applicability
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CollationCharacterSetApplicabilityViewFields[Row] {
-  val collationCatalog: OptField[SqlIdentifier, Row]
-  val collationSchema: OptField[SqlIdentifier, Row]
-  val collationName: OptField[SqlIdentifier, Row]
-  val characterSetCatalog: OptField[SqlIdentifier, Row]
-  val characterSetSchema: OptField[SqlIdentifier, Row]
-  val characterSetName: OptField[SqlIdentifier, Row]
+  val collationCatalog: Field[SqlIdentifier, Row]
+  val collationSchema: Field[SqlIdentifier, Row]
+  val collationName: Field[SqlIdentifier, Row]
+  val characterSetCatalog: Field[SqlIdentifier, Row]
+  val characterSetSchema: Field[SqlIdentifier, Row]
+  val characterSetName: Field[SqlIdentifier, Row]
 }
 object CollationCharacterSetApplicabilityViewFields extends CollationCharacterSetApplicabilityViewStructure[CollationCharacterSetApplicabilityViewRow](None, identity, (_, x) => x)
 

@@ -10,13 +10,13 @@ package pcc
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PccViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val creditcardid: OptField[/* user-picked */ CustomCreditcardId, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val creditcardid: Field[/* user-picked */ CustomCreditcardId, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PccViewFields extends PccViewStructure[PccViewRow](None, identity, (_, x) => x)
 

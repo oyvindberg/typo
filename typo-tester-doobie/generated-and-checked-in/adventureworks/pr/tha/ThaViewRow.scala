@@ -17,54 +17,54 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ThaViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]] */
-  transactionid: Option[TransactionhistoryarchiveId],
+  transactionid: TransactionhistoryarchiveId,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.productid]] */
-  productid: Option[Int],
+  productid: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderid]] */
-  referenceorderid: Option[Int],
+  referenceorderid: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderlineid]] */
-  referenceorderlineid: Option[Int],
+  referenceorderlineid: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiondate]] */
-  transactiondate: Option[TypoLocalDateTime],
+  transactiondate: TypoLocalDateTime,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiontype]] */
-  transactiontype: Option[/* bpchar, max 1 chars */ String],
+  transactiontype: /* bpchar, max 1 chars */ String,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.quantity]] */
-  quantity: Option[Int],
+  quantity: Int,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.actualcost]] */
-  actualcost: Option[BigDecimal],
+  actualcost: BigDecimal,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object ThaViewRow {
-  implicit lazy val decoder: Decoder[ThaViewRow] = Decoder.forProduct10[ThaViewRow, Option[Int], Option[TransactionhistoryarchiveId], Option[Int], Option[Int], Option[Int], Option[TypoLocalDateTime], Option[/* bpchar, max 1 chars */ String], Option[Int], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(ThaViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TransactionhistoryarchiveId.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[ThaViewRow] = Encoder.forProduct10[ThaViewRow, Option[Int], Option[TransactionhistoryarchiveId], Option[Int], Option[Int], Option[Int], Option[TypoLocalDateTime], Option[/* bpchar, max 1 chars */ String], Option[Int], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.id, x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TransactionhistoryarchiveId.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[ThaViewRow] = Decoder.forProduct10[ThaViewRow, Int, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(ThaViewRow.apply)(Decoder.decodeInt, TransactionhistoryarchiveId.decoder, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ThaViewRow] = Encoder.forProduct10[ThaViewRow, Int, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.id, x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))(Encoder.encodeInt, TransactionhistoryarchiveId.encoder, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[ThaViewRow] = new Read[ThaViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (TransactionhistoryarchiveId.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TransactionhistoryarchiveId.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ThaViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      transactionid = TransactionhistoryarchiveId.get.unsafeGetNullable(rs, i + 1),
-      productid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
-      referenceorderid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
-      referenceorderlineid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
-      transactiondate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
-      transactiontype = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      quantity = Meta.IntMeta.get.unsafeGetNullable(rs, i + 7),
-      actualcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 8),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 9)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      transactionid = TransactionhistoryarchiveId.get.unsafeGetNonNullable(rs, i + 1),
+      productid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      referenceorderid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      referenceorderlineid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
+      transactiondate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
+      transactiontype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
+      quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
+      actualcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
     )
   )
 }

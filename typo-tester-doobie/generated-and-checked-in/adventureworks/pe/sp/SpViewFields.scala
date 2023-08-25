@@ -15,18 +15,17 @@ import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.OptField
 
 trait SpViewFields[Row] {
-  val id: OptField[Int, Row]
-  val stateprovinceid: OptField[StateprovinceId, Row]
-  val stateprovincecode: OptField[/* bpchar, max 3 chars */ String, Row]
-  val countryregioncode: OptField[CountryregionId, Row]
+  val id: Field[Int, Row]
+  val stateprovinceid: Field[StateprovinceId, Row]
+  val stateprovincecode: Field[/* bpchar, max 3 chars */ String, Row]
+  val countryregioncode: Field[CountryregionId, Row]
   val isonlystateprovinceflag: Field[Flag, Row]
-  val name: OptField[Name, Row]
-  val territoryid: OptField[SalesterritoryId, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val name: Field[Name, Row]
+  val territoryid: Field[SalesterritoryId, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SpViewFields extends SpViewStructure[SpViewRow](None, identity, (_, x) => x)
 

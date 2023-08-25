@@ -10,12 +10,12 @@ package cr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CrViewFields[Row] {
-  val countryregioncode: OptField[CountryregionId, Row]
-  val name: OptField[Name, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val countryregioncode: Field[CountryregionId, Row]
+  val name: Field[Name, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object CrViewFields extends CrViewStructure[CrViewRow](None, identity, (_, x) => x)
 

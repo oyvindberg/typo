@@ -7,12 +7,12 @@ package adventureworks
 package pg_catalog
 package pg_publication_tables
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgPublicationTablesViewFields[Row] {
-  val pubname: OptField[String, Row]
-  val schemaname: OptField[String, Row]
-  val tablename: OptField[String, Row]
+  val pubname: Field[String, Row]
+  val schemaname: Field[String, Row]
+  val tablename: Field[String, Row]
 }
 object PgPublicationTablesViewFields extends PgPublicationTablesViewStructure[PgPublicationTablesViewRow](None, identity, (_, x) => x)
 

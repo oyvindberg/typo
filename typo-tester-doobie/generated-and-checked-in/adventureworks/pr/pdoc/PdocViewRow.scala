@@ -18,30 +18,30 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PdocViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productdocument.ProductdocumentRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[production.productdocument.ProductdocumentRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime],
+  modifieddate: TypoLocalDateTime,
   /** Points to [[production.productdocument.ProductdocumentRow.documentnode]] */
-  documentnode: Option[DocumentId]
+  documentnode: DocumentId
 )
 
 object PdocViewRow {
-  implicit lazy val decoder: Decoder[PdocViewRow] = Decoder.forProduct4[PdocViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[DocumentId]]("id", "productid", "modifieddate", "documentnode")(PdocViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(DocumentId.decoder))
-  implicit lazy val encoder: Encoder[PdocViewRow] = Encoder.forProduct4[PdocViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[DocumentId]]("id", "productid", "modifieddate", "documentnode")(x => (x.id, x.productid, x.modifieddate, x.documentnode))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(DocumentId.encoder))
+  implicit lazy val decoder: Decoder[PdocViewRow] = Decoder.forProduct4[PdocViewRow, Int, ProductId, TypoLocalDateTime, DocumentId]("id", "productid", "modifieddate", "documentnode")(PdocViewRow.apply)(Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, DocumentId.decoder)
+  implicit lazy val encoder: Encoder[PdocViewRow] = Encoder.forProduct4[PdocViewRow, Int, ProductId, TypoLocalDateTime, DocumentId]("id", "productid", "modifieddate", "documentnode")(x => (x.id, x.productid, x.modifieddate, x.documentnode))(Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, DocumentId.encoder)
   implicit lazy val read: Read[PdocViewRow] = new Read[PdocViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ProductId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (DocumentId.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (DocumentId.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PdocViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      productid = ProductId.get.unsafeGetNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2),
-      documentnode = DocumentId.get.unsafeGetNullable(rs, i + 3)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
+      documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

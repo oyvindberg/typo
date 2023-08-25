@@ -20,58 +20,58 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class StViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
-  territoryid: Option[SalesterritoryId],
+  territoryid: SalesterritoryId,
   /** Points to [[sales.salesterritory.SalesterritoryRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[sales.salesterritory.SalesterritoryRow.countryregioncode]] */
-  countryregioncode: Option[CountryregionId],
+  countryregioncode: CountryregionId,
   /** Points to [[sales.salesterritory.SalesterritoryRow.group]] */
-  group: Option[/* max 50 chars */ String],
+  group: /* max 50 chars */ String,
   /** Points to [[sales.salesterritory.SalesterritoryRow.salesytd]] */
-  salesytd: Option[BigDecimal],
+  salesytd: BigDecimal,
   /** Points to [[sales.salesterritory.SalesterritoryRow.saleslastyear]] */
-  saleslastyear: Option[BigDecimal],
+  saleslastyear: BigDecimal,
   /** Points to [[sales.salesterritory.SalesterritoryRow.costytd]] */
-  costytd: Option[BigDecimal],
+  costytd: BigDecimal,
   /** Points to [[sales.salesterritory.SalesterritoryRow.costlastyear]] */
-  costlastyear: Option[BigDecimal],
+  costlastyear: BigDecimal,
   /** Points to [[sales.salesterritory.SalesterritoryRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.salesterritory.SalesterritoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object StViewRow {
-  implicit lazy val decoder: Decoder[StViewRow] = Decoder.forProduct11[StViewRow, Option[Int], Option[SalesterritoryId], Option[Name], Option[CountryregionId], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(StViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[StViewRow] = Encoder.forProduct11[StViewRow, Option[Int], Option[SalesterritoryId], Option[Name], Option[CountryregionId], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(x => (x.id, x.territoryid, x.name, x.countryregioncode, x.group, x.salesytd, x.saleslastyear, x.costytd, x.costlastyear, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[StViewRow] = Decoder.forProduct11[StViewRow, Int, SalesterritoryId, Name, CountryregionId, /* max 50 chars */ String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(StViewRow.apply)(Decoder.decodeInt, SalesterritoryId.decoder, Name.decoder, CountryregionId.decoder, Decoder.decodeString, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[StViewRow] = Encoder.forProduct11[StViewRow, Int, SalesterritoryId, Name, CountryregionId, /* max 50 chars */ String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(x => (x.id, x.territoryid, x.name, x.countryregioncode, x.group, x.salesytd, x.saleslastyear, x.costytd, x.costlastyear, x.rowguid, x.modifieddate))(Encoder.encodeInt, SalesterritoryId.encoder, Name.encoder, CountryregionId.encoder, Encoder.encodeString, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[StViewRow] = new Read[StViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (SalesterritoryId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (CountryregionId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (SalesterritoryId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (CountryregionId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => StViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      countryregioncode = CountryregionId.get.unsafeGetNullable(rs, i + 3),
-      group = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      salesytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5),
-      saleslastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 6),
-      costytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 7),
-      costlastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 8),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 9),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 10)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 3),
+      group = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      salesytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 5),
+      saleslastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6),
+      costytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 7),
+      costlastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 9),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 10)
     )
   )
 }

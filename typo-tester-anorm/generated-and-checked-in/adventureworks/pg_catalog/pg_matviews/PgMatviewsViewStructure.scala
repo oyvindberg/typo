@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_matviews
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -16,12 +17,12 @@ class PgMatviewsViewStructure[Row](val prefix: Option[String], val extract: Row 
     with PgMatviewsViewFields[Row] { outer =>
 
   override val schemaname = new OptField[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val matviewname = new OptField[String, Row](prefix, "matviewname", None, Some("name"))(x => extract(x).matviewname, (row, value) => merge(row, extract(row).copy(matviewname = value)))
-  override val matviewowner = new OptField[String, Row](prefix, "matviewowner", None, Some("name"))(x => extract(x).matviewowner, (row, value) => merge(row, extract(row).copy(matviewowner = value)))
+  override val matviewname = new Field[String, Row](prefix, "matviewname", None, Some("name"))(x => extract(x).matviewname, (row, value) => merge(row, extract(row).copy(matviewname = value)))
+  override val matviewowner = new Field[String, Row](prefix, "matviewowner", None, Some("name"))(x => extract(x).matviewowner, (row, value) => merge(row, extract(row).copy(matviewowner = value)))
   override val tablespace = new OptField[String, Row](prefix, "tablespace", None, Some("name"))(x => extract(x).tablespace, (row, value) => merge(row, extract(row).copy(tablespace = value)))
-  override val hasindexes = new OptField[Boolean, Row](prefix, "hasindexes", None, None)(x => extract(x).hasindexes, (row, value) => merge(row, extract(row).copy(hasindexes = value)))
-  override val ispopulated = new OptField[Boolean, Row](prefix, "ispopulated", None, None)(x => extract(x).ispopulated, (row, value) => merge(row, extract(row).copy(ispopulated = value)))
-  override val definition = new OptField[String, Row](prefix, "definition", None, None)(x => extract(x).definition, (row, value) => merge(row, extract(row).copy(definition = value)))
+  override val hasindexes = new Field[Boolean, Row](prefix, "hasindexes", None, None)(x => extract(x).hasindexes, (row, value) => merge(row, extract(row).copy(hasindexes = value)))
+  override val ispopulated = new Field[Boolean, Row](prefix, "ispopulated", None, None)(x => extract(x).ispopulated, (row, value) => merge(row, extract(row).copy(ispopulated = value)))
+  override val definition = new Field[String, Row](prefix, "definition", None, None)(x => extract(x).definition, (row, value) => merge(row, extract(row).copy(definition = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](schemaname, matviewname, matviewowner, tablespace, hasindexes, ispopulated, definition)

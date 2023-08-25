@@ -9,7 +9,6 @@ package foreign_data_wrappers
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -17,31 +16,30 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ForeignDataWrappersViewRow(
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperCatalog]] */
-  foreignDataWrapperCatalog: Option[SqlIdentifier],
+  foreignDataWrapperCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperName]] */
-  foreignDataWrapperName: Option[SqlIdentifier],
+  foreignDataWrapperName: SqlIdentifier,
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.authorizationIdentifier]] */
-  authorizationIdentifier: Option[SqlIdentifier],
-  libraryName: Option[CharacterData],
+  authorizationIdentifier: SqlIdentifier,
+  libraryName: CharacterData,
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperLanguage]] */
-  foreignDataWrapperLanguage: Option[CharacterData]
+  foreignDataWrapperLanguage: CharacterData
 )
 
 object ForeignDataWrappersViewRow {
   implicit lazy val reads: Reads[ForeignDataWrappersViewRow] = Reads[ForeignDataWrappersViewRow](json => JsResult.fromTry(
       Try(
         ForeignDataWrappersViewRow(
-          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as(SqlIdentifier.reads)),
-          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(SqlIdentifier.reads)),
-          libraryName = json.\("library_name").toOption.map(_.as(CharacterData.reads)),
-          foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as(CharacterData.reads))
+          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").as(SqlIdentifier.reads),
+          foreignDataWrapperName = json.\("foreign_data_wrapper_name").as(SqlIdentifier.reads),
+          authorizationIdentifier = json.\("authorization_identifier").as(SqlIdentifier.reads),
+          libraryName = json.\("library_name").as(CharacterData.reads),
+          foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").as(CharacterData.reads)
         )
       )
     ),
@@ -49,21 +47,21 @@ object ForeignDataWrappersViewRow {
   def rowParser(idx: Int): RowParser[ForeignDataWrappersViewRow] = RowParser[ForeignDataWrappersViewRow] { row =>
     Success(
       ForeignDataWrappersViewRow(
-        foreignDataWrapperCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        foreignDataWrapperName = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        authorizationIdentifier = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        libraryName = row(idx + 3)(Column.columnToOption(CharacterData.column)),
-        foreignDataWrapperLanguage = row(idx + 4)(Column.columnToOption(CharacterData.column))
+        foreignDataWrapperCatalog = row(idx + 0)(SqlIdentifier.column),
+        foreignDataWrapperName = row(idx + 1)(SqlIdentifier.column),
+        authorizationIdentifier = row(idx + 2)(SqlIdentifier.column),
+        libraryName = row(idx + 3)(CharacterData.column),
+        foreignDataWrapperLanguage = row(idx + 4)(CharacterData.column)
       )
     )
   }
   implicit lazy val writes: OWrites[ForeignDataWrappersViewRow] = OWrites[ForeignDataWrappersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_data_wrapper_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignDataWrapperCatalog),
-      "foreign_data_wrapper_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignDataWrapperName),
-      "authorization_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.authorizationIdentifier),
-      "library_name" -> Writes.OptionWrites(CharacterData.writes).writes(o.libraryName),
-      "foreign_data_wrapper_language" -> Writes.OptionWrites(CharacterData.writes).writes(o.foreignDataWrapperLanguage)
+      "foreign_data_wrapper_catalog" -> SqlIdentifier.writes.writes(o.foreignDataWrapperCatalog),
+      "foreign_data_wrapper_name" -> SqlIdentifier.writes.writes(o.foreignDataWrapperName),
+      "authorization_identifier" -> SqlIdentifier.writes.writes(o.authorizationIdentifier),
+      "library_name" -> CharacterData.writes.writes(o.libraryName),
+      "foreign_data_wrapper_language" -> CharacterData.writes.writes(o.foreignDataWrapperLanguage)
     ))
   )
 }

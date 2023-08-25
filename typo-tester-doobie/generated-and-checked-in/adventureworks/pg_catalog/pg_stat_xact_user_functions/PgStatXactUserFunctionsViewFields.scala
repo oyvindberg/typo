@@ -7,15 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_stat_xact_user_functions
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatXactUserFunctionsViewFields[Row] {
-  val funcid: OptField[/* oid */ Long, Row]
+  val funcid: Field[/* oid */ Long, Row]
   val schemaname: OptField[String, Row]
-  val funcname: OptField[String, Row]
-  val calls: OptField[Long, Row]
-  val totalTime: OptField[Double, Row]
-  val selfTime: OptField[Double, Row]
+  val funcname: Field[String, Row]
+  val calls: Field[Long, Row]
+  val totalTime: Field[Double, Row]
+  val selfTime: Field[Double, Row]
 }
 object PgStatXactUserFunctionsViewFields extends PgStatXactUserFunctionsViewStructure[PgStatXactUserFunctionsViewRow](None, identity, (_, x) => x)
 

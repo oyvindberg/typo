@@ -24,41 +24,41 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class AViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.address.AddressRow.addressid]] */
-  addressid: Option[AddressId],
+  addressid: AddressId,
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: Option[/* max 60 chars */ String],
+  addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: Option[/* max 60 chars */ String],
+  addressline2: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.city]] */
-  city: Option[/* max 30 chars */ String],
+  city: /* max 30 chars */ String,
   /** Points to [[person.address.AddressRow.stateprovinceid]] */
-  stateprovinceid: Option[StateprovinceId],
+  stateprovinceid: StateprovinceId,
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[/* max 15 chars */ String],
+  postalcode: /* max 15 chars */ String,
   /** Points to [[person.address.AddressRow.spatiallocation]] */
-  spatiallocation: Option[Byte],
+  spatiallocation: Byte,
   /** Points to [[person.address.AddressRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.address.AddressRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object AViewRow {
   implicit lazy val reads: Reads[AViewRow] = Reads[AViewRow](json => JsResult.fromTry(
       Try(
         AViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          addressid = json.\("addressid").toOption.map(_.as(AddressId.reads)),
-          addressline1 = json.\("addressline1").toOption.map(_.as(Reads.StringReads)),
-          addressline2 = json.\("addressline2").toOption.map(_.as(Reads.StringReads)),
-          city = json.\("city").toOption.map(_.as(Reads.StringReads)),
-          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as(StateprovinceId.reads)),
-          postalcode = json.\("postalcode").toOption.map(_.as(Reads.StringReads)),
-          spatiallocation = json.\("spatiallocation").toOption.map(_.as(Reads.ByteReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          addressid = json.\("addressid").as(AddressId.reads),
+          addressline1 = json.\("addressline1").as(Reads.StringReads),
+          addressline2 = json.\("addressline2").as(Reads.StringReads),
+          city = json.\("city").as(Reads.StringReads),
+          stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
+          postalcode = json.\("postalcode").as(Reads.StringReads),
+          spatiallocation = json.\("spatiallocation").as(Reads.ByteReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -66,31 +66,31 @@ object AViewRow {
   def rowParser(idx: Int): RowParser[AViewRow] = RowParser[AViewRow] { row =>
     Success(
       AViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        addressid = row(idx + 1)(Column.columnToOption(AddressId.column)),
-        addressline1 = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        addressline2 = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        city = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        stateprovinceid = row(idx + 5)(Column.columnToOption(StateprovinceId.column)),
-        postalcode = row(idx + 6)(Column.columnToOption(Column.columnToString)),
-        spatiallocation = row(idx + 7)(Column.columnToOption(Column.columnToByte)),
-        rowguid = row(idx + 8)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 9)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        addressid = row(idx + 1)(AddressId.column),
+        addressline1 = row(idx + 2)(Column.columnToString),
+        addressline2 = row(idx + 3)(Column.columnToString),
+        city = row(idx + 4)(Column.columnToString),
+        stateprovinceid = row(idx + 5)(StateprovinceId.column),
+        postalcode = row(idx + 6)(Column.columnToString),
+        spatiallocation = row(idx + 7)(Column.columnToByte),
+        rowguid = row(idx + 8)(Column.columnToUUID),
+        modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[AViewRow] = OWrites[AViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "addressid" -> Writes.OptionWrites(AddressId.writes).writes(o.addressid),
-      "addressline1" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline1),
-      "addressline2" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline2),
-      "city" -> Writes.OptionWrites(Writes.StringWrites).writes(o.city),
-      "stateprovinceid" -> Writes.OptionWrites(StateprovinceId.writes).writes(o.stateprovinceid),
-      "postalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.postalcode),
-      "spatiallocation" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.spatiallocation),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "addressid" -> AddressId.writes.writes(o.addressid),
+      "addressline1" -> Writes.StringWrites.writes(o.addressline1),
+      "addressline2" -> Writes.StringWrites.writes(o.addressline2),
+      "city" -> Writes.StringWrites.writes(o.city),
+      "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
+      "postalcode" -> Writes.StringWrites.writes(o.postalcode),
+      "spatiallocation" -> Writes.ByteWrites.writes(o.spatiallocation),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

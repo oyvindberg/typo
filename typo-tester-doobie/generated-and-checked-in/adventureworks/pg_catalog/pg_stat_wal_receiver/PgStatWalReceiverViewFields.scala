@@ -8,24 +8,24 @@ package pg_catalog
 package pg_stat_wal_receiver
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgStatWalReceiverViewFields[Row] {
-  val pid: OptField[Int, Row]
-  val status: OptField[String, Row]
-  val receiveStartLsn: OptField[/* pg_lsn */ Long, Row]
-  val receiveStartTli: OptField[Int, Row]
-  val writtenLsn: OptField[/* pg_lsn */ Long, Row]
-  val flushedLsn: OptField[/* pg_lsn */ Long, Row]
-  val receivedTli: OptField[Int, Row]
-  val lastMsgSendTime: OptField[TypoOffsetDateTime, Row]
-  val lastMsgReceiptTime: OptField[TypoOffsetDateTime, Row]
-  val latestEndLsn: OptField[/* pg_lsn */ Long, Row]
-  val latestEndTime: OptField[TypoOffsetDateTime, Row]
-  val slotName: OptField[String, Row]
-  val senderHost: OptField[String, Row]
-  val senderPort: OptField[Int, Row]
-  val conninfo: OptField[String, Row]
+  val pid: Field[Int, Row]
+  val status: Field[String, Row]
+  val receiveStartLsn: Field[/* pg_lsn */ Long, Row]
+  val receiveStartTli: Field[Int, Row]
+  val writtenLsn: Field[/* pg_lsn */ Long, Row]
+  val flushedLsn: Field[/* pg_lsn */ Long, Row]
+  val receivedTli: Field[Int, Row]
+  val lastMsgSendTime: Field[TypoOffsetDateTime, Row]
+  val lastMsgReceiptTime: Field[TypoOffsetDateTime, Row]
+  val latestEndLsn: Field[/* pg_lsn */ Long, Row]
+  val latestEndTime: Field[TypoOffsetDateTime, Row]
+  val slotName: Field[String, Row]
+  val senderHost: Field[String, Row]
+  val senderPort: Field[Int, Row]
+  val conninfo: Field[String, Row]
 }
 object PgStatWalReceiverViewFields extends PgStatWalReceiverViewStructure[PgStatWalReceiverViewRow](None, identity, (_, x) => x)
 

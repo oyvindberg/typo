@@ -10,21 +10,21 @@ package tables
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait TablesViewFields[Row] {
-  val tableCatalog: OptField[SqlIdentifier, Row]
-  val tableSchema: OptField[SqlIdentifier, Row]
-  val tableName: OptField[SqlIdentifier, Row]
-  val tableType: OptField[CharacterData, Row]
-  val selfReferencingColumnName: OptField[SqlIdentifier, Row]
-  val referenceGeneration: OptField[CharacterData, Row]
-  val userDefinedTypeCatalog: OptField[SqlIdentifier, Row]
-  val userDefinedTypeSchema: OptField[SqlIdentifier, Row]
-  val userDefinedTypeName: OptField[SqlIdentifier, Row]
-  val isInsertableInto: OptField[YesOrNo, Row]
-  val isTyped: OptField[YesOrNo, Row]
-  val commitAction: OptField[CharacterData, Row]
+  val tableCatalog: Field[SqlIdentifier, Row]
+  val tableSchema: Field[SqlIdentifier, Row]
+  val tableName: Field[SqlIdentifier, Row]
+  val tableType: Field[CharacterData, Row]
+  val selfReferencingColumnName: Field[SqlIdentifier, Row]
+  val referenceGeneration: Field[CharacterData, Row]
+  val userDefinedTypeCatalog: Field[SqlIdentifier, Row]
+  val userDefinedTypeSchema: Field[SqlIdentifier, Row]
+  val userDefinedTypeName: Field[SqlIdentifier, Row]
+  val isInsertableInto: Field[YesOrNo, Row]
+  val isTyped: Field[YesOrNo, Row]
+  val commitAction: Field[CharacterData, Row]
 }
 object TablesViewFields extends TablesViewStructure[TablesViewRow](None, identity, (_, x) => x)
 

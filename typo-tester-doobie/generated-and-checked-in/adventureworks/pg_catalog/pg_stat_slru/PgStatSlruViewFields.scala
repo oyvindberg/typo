@@ -8,18 +8,18 @@ package pg_catalog
 package pg_stat_slru
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgStatSlruViewFields[Row] {
-  val name: OptField[String, Row]
-  val blksZeroed: OptField[Long, Row]
-  val blksHit: OptField[Long, Row]
-  val blksRead: OptField[Long, Row]
-  val blksWritten: OptField[Long, Row]
-  val blksExists: OptField[Long, Row]
-  val flushes: OptField[Long, Row]
-  val truncates: OptField[Long, Row]
-  val statsReset: OptField[TypoOffsetDateTime, Row]
+  val name: Field[String, Row]
+  val blksZeroed: Field[Long, Row]
+  val blksHit: Field[Long, Row]
+  val blksRead: Field[Long, Row]
+  val blksWritten: Field[Long, Row]
+  val blksExists: Field[Long, Row]
+  val flushes: Field[Long, Row]
+  val truncates: Field[Long, Row]
+  val statsReset: Field[TypoOffsetDateTime, Row]
 }
 object PgStatSlruViewFields extends PgStatSlruViewStructure[PgStatSlruViewRow](None, identity, (_, x) => x)
 

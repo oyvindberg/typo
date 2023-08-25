@@ -20,38 +20,38 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class PscViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.productsubcategoryid]] */
-  productsubcategoryid: Option[ProductsubcategoryId],
+  productsubcategoryid: ProductsubcategoryId,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.productcategoryid]] */
-  productcategoryid: Option[ProductcategoryId],
+  productcategoryid: ProductcategoryId,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PscViewRow {
-  implicit lazy val decoder: Decoder[PscViewRow] = Decoder.forProduct6[PscViewRow, Option[Int], Option[ProductsubcategoryId], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(PscViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductsubcategoryId.decoder), Decoder.decodeOption(ProductcategoryId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PscViewRow] = Encoder.forProduct6[PscViewRow, Option[Int], Option[ProductsubcategoryId], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductsubcategoryId.encoder), Encoder.encodeOption(ProductcategoryId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PscViewRow] = Decoder.forProduct6[PscViewRow, Int, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(PscViewRow.apply)(Decoder.decodeInt, ProductsubcategoryId.decoder, ProductcategoryId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PscViewRow] = Encoder.forProduct6[PscViewRow, Int, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeInt, ProductsubcategoryId.encoder, ProductcategoryId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PscViewRow] = new Read[PscViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ProductsubcategoryId.get, Nullability.Nullable),
-      (ProductcategoryId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductsubcategoryId.get, Nullability.NoNulls),
+      (ProductcategoryId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PscViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      productsubcategoryid = ProductsubcategoryId.get.unsafeGetNullable(rs, i + 1),
-      productcategoryid = ProductcategoryId.get.unsafeGetNullable(rs, i + 2),
-      name = Name.get.unsafeGetNullable(rs, i + 3),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      productsubcategoryid = ProductsubcategoryId.get.unsafeGetNonNullable(rs, i + 1),
+      productcategoryid = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 2),
+      name = Name.get.unsafeGetNonNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

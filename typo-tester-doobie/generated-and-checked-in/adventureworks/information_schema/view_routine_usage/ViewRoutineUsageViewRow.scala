@@ -15,33 +15,33 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ViewRoutineUsageViewRow(
-  tableCatalog: Option[SqlIdentifier],
-  tableSchema: Option[SqlIdentifier],
-  tableName: Option[SqlIdentifier],
-  specificCatalog: Option[SqlIdentifier],
-  specificSchema: Option[SqlIdentifier],
-  specificName: Option[SqlIdentifier]
+  tableCatalog: SqlIdentifier,
+  tableSchema: SqlIdentifier,
+  tableName: SqlIdentifier,
+  specificCatalog: SqlIdentifier,
+  specificSchema: SqlIdentifier,
+  specificName: SqlIdentifier
 )
 
 object ViewRoutineUsageViewRow {
-  implicit lazy val decoder: Decoder[ViewRoutineUsageViewRow] = Decoder.forProduct6[ViewRoutineUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "specific_catalog", "specific_schema", "specific_name")(ViewRoutineUsageViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[ViewRoutineUsageViewRow] = Encoder.forProduct6[ViewRoutineUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "specific_catalog", "specific_schema", "specific_name")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.specificCatalog, x.specificSchema, x.specificName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[ViewRoutineUsageViewRow] = Decoder.forProduct6[ViewRoutineUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("table_catalog", "table_schema", "table_name", "specific_catalog", "specific_schema", "specific_name")(ViewRoutineUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[ViewRoutineUsageViewRow] = Encoder.forProduct6[ViewRoutineUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("table_catalog", "table_schema", "table_name", "specific_catalog", "specific_schema", "specific_name")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.specificCatalog, x.specificSchema, x.specificName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
   implicit lazy val read: Read[ViewRoutineUsageViewRow] = new Read[ViewRoutineUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ViewRoutineUsageViewRow(
-      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      specificCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      specificSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      specificName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5)
+      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      specificCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      specificSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      specificName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

@@ -15,63 +15,63 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatProgressCreateIndexViewRow(
-  pid: Option[Int],
-  datid: Option[/* oid */ Long],
+  pid: Int,
+  datid: /* oid */ Long,
   datname: Option[String],
-  relid: Option[/* oid */ Long],
-  indexRelid: Option[/* oid */ Long],
-  command: Option[String],
-  phase: Option[String],
-  lockersTotal: Option[Long],
-  lockersDone: Option[Long],
-  currentLockerPid: Option[Long],
-  blocksTotal: Option[Long],
-  blocksDone: Option[Long],
-  tuplesTotal: Option[Long],
-  tuplesDone: Option[Long],
-  partitionsTotal: Option[Long],
-  partitionsDone: Option[Long]
+  relid: /* oid */ Long,
+  indexRelid: /* oid */ Long,
+  command: String,
+  phase: String,
+  lockersTotal: Long,
+  lockersDone: Long,
+  currentLockerPid: Long,
+  blocksTotal: Long,
+  blocksDone: Long,
+  tuplesTotal: Long,
+  tuplesDone: Long,
+  partitionsTotal: Long,
+  partitionsDone: Long
 )
 
 object PgStatProgressCreateIndexViewRow {
-  implicit lazy val decoder: Decoder[PgStatProgressCreateIndexViewRow] = Decoder.forProduct16[PgStatProgressCreateIndexViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "index_relid", "command", "phase", "lockers_total", "lockers_done", "current_locker_pid", "blocks_total", "blocks_done", "tuples_total", "tuples_done", "partitions_total", "partitions_done")(PgStatProgressCreateIndexViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit lazy val encoder: Encoder[PgStatProgressCreateIndexViewRow] = Encoder.forProduct16[PgStatProgressCreateIndexViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "index_relid", "command", "phase", "lockers_total", "lockers_done", "current_locker_pid", "blocks_total", "blocks_done", "tuples_total", "tuples_done", "partitions_total", "partitions_done")(x => (x.pid, x.datid, x.datname, x.relid, x.indexRelid, x.command, x.phase, x.lockersTotal, x.lockersDone, x.currentLockerPid, x.blocksTotal, x.blocksDone, x.tuplesTotal, x.tuplesDone, x.partitionsTotal, x.partitionsDone))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val decoder: Decoder[PgStatProgressCreateIndexViewRow] = Decoder.forProduct16[PgStatProgressCreateIndexViewRow, Int, /* oid */ Long, Option[String], /* oid */ Long, /* oid */ Long, String, String, Long, Long, Long, Long, Long, Long, Long, Long, Long]("pid", "datid", "datname", "relid", "index_relid", "command", "phase", "lockers_total", "lockers_done", "current_locker_pid", "blocks_total", "blocks_done", "tuples_total", "tuples_done", "partitions_total", "partitions_done")(PgStatProgressCreateIndexViewRow.apply)(Decoder.decodeInt, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgStatProgressCreateIndexViewRow] = Encoder.forProduct16[PgStatProgressCreateIndexViewRow, Int, /* oid */ Long, Option[String], /* oid */ Long, /* oid */ Long, String, String, Long, Long, Long, Long, Long, Long, Long, Long, Long]("pid", "datid", "datname", "relid", "index_relid", "command", "phase", "lockers_total", "lockers_done", "current_locker_pid", "blocks_total", "blocks_done", "tuples_total", "tuples_done", "partitions_total", "partitions_done")(x => (x.pid, x.datid, x.datname, x.relid, x.indexRelid, x.command, x.phase, x.lockersTotal, x.lockersDone, x.currentLockerPid, x.blocksTotal, x.blocksDone, x.tuplesTotal, x.tuplesDone, x.partitionsTotal, x.partitionsDone))(Encoder.encodeInt, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgStatProgressCreateIndexViewRow] = new Read[PgStatProgressCreateIndexViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressCreateIndexViewRow(
-      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      pid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      datid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
       datname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      indexRelid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
-      command = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      phase = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      lockersTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
-      lockersDone = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
-      currentLockerPid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
-      blocksTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10),
-      blocksDone = Meta.LongMeta.get.unsafeGetNullable(rs, i + 11),
-      tuplesTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 12),
-      tuplesDone = Meta.LongMeta.get.unsafeGetNullable(rs, i + 13),
-      partitionsTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 14),
-      partitionsDone = Meta.LongMeta.get.unsafeGetNullable(rs, i + 15)
+      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      indexRelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      command = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      phase = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
+      lockersTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
+      lockersDone = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 8),
+      currentLockerPid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 9),
+      blocksTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 10),
+      blocksDone = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 11),
+      tuplesTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 12),
+      tuplesDone = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 13),
+      partitionsTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 14),
+      partitionsDone = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 15)
     )
   )
 }

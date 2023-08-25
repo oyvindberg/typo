@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_vacuum
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -15,17 +16,17 @@ class PgStatProgressVacuumViewStructure[Row](val prefix: Option[String], val ext
   extends Relation[PgStatProgressVacuumViewFields, PgStatProgressVacuumViewRow, Row]
     with PgStatProgressVacuumViewFields[Row] { outer =>
 
-  override val pid = new OptField[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
-  override val datid = new OptField[/* oid */ Long, Row](prefix, "datid", None, Some("oid"))(x => extract(x).datid, (row, value) => merge(row, extract(row).copy(datid = value)))
+  override val pid = new Field[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
+  override val datid = new Field[/* oid */ Long, Row](prefix, "datid", None, Some("oid"))(x => extract(x).datid, (row, value) => merge(row, extract(row).copy(datid = value)))
   override val datname = new OptField[String, Row](prefix, "datname", None, Some("name"))(x => extract(x).datname, (row, value) => merge(row, extract(row).copy(datname = value)))
-  override val relid = new OptField[/* oid */ Long, Row](prefix, "relid", None, Some("oid"))(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
-  override val phase = new OptField[String, Row](prefix, "phase", None, None)(x => extract(x).phase, (row, value) => merge(row, extract(row).copy(phase = value)))
-  override val heapBlksTotal = new OptField[Long, Row](prefix, "heap_blks_total", None, Some("int8"))(x => extract(x).heapBlksTotal, (row, value) => merge(row, extract(row).copy(heapBlksTotal = value)))
-  override val heapBlksScanned = new OptField[Long, Row](prefix, "heap_blks_scanned", None, Some("int8"))(x => extract(x).heapBlksScanned, (row, value) => merge(row, extract(row).copy(heapBlksScanned = value)))
-  override val heapBlksVacuumed = new OptField[Long, Row](prefix, "heap_blks_vacuumed", None, Some("int8"))(x => extract(x).heapBlksVacuumed, (row, value) => merge(row, extract(row).copy(heapBlksVacuumed = value)))
-  override val indexVacuumCount = new OptField[Long, Row](prefix, "index_vacuum_count", None, Some("int8"))(x => extract(x).indexVacuumCount, (row, value) => merge(row, extract(row).copy(indexVacuumCount = value)))
-  override val maxDeadTuples = new OptField[Long, Row](prefix, "max_dead_tuples", None, Some("int8"))(x => extract(x).maxDeadTuples, (row, value) => merge(row, extract(row).copy(maxDeadTuples = value)))
-  override val numDeadTuples = new OptField[Long, Row](prefix, "num_dead_tuples", None, Some("int8"))(x => extract(x).numDeadTuples, (row, value) => merge(row, extract(row).copy(numDeadTuples = value)))
+  override val relid = new Field[/* oid */ Long, Row](prefix, "relid", None, Some("oid"))(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
+  override val phase = new Field[String, Row](prefix, "phase", None, None)(x => extract(x).phase, (row, value) => merge(row, extract(row).copy(phase = value)))
+  override val heapBlksTotal = new Field[Long, Row](prefix, "heap_blks_total", None, Some("int8"))(x => extract(x).heapBlksTotal, (row, value) => merge(row, extract(row).copy(heapBlksTotal = value)))
+  override val heapBlksScanned = new Field[Long, Row](prefix, "heap_blks_scanned", None, Some("int8"))(x => extract(x).heapBlksScanned, (row, value) => merge(row, extract(row).copy(heapBlksScanned = value)))
+  override val heapBlksVacuumed = new Field[Long, Row](prefix, "heap_blks_vacuumed", None, Some("int8"))(x => extract(x).heapBlksVacuumed, (row, value) => merge(row, extract(row).copy(heapBlksVacuumed = value)))
+  override val indexVacuumCount = new Field[Long, Row](prefix, "index_vacuum_count", None, Some("int8"))(x => extract(x).indexVacuumCount, (row, value) => merge(row, extract(row).copy(indexVacuumCount = value)))
+  override val maxDeadTuples = new Field[Long, Row](prefix, "max_dead_tuples", None, Some("int8"))(x => extract(x).maxDeadTuples, (row, value) => merge(row, extract(row).copy(maxDeadTuples = value)))
+  override val numDeadTuples = new Field[Long, Row](prefix, "num_dead_tuples", None, Some("int8"))(x => extract(x).numDeadTuples, (row, value) => merge(row, extract(row).copy(numDeadTuples = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](pid, datid, datname, relid, phase, heapBlksTotal, heapBlksScanned, heapBlksVacuumed, indexVacuumCount, maxDeadTuples, numDeadTuples)

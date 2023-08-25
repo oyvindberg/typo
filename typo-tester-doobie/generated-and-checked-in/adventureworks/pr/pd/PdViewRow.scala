@@ -18,34 +18,34 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class PdViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productdescription.ProductdescriptionRow.productdescriptionid]] */
-  productdescriptionid: Option[ProductdescriptionId],
+  productdescriptionid: ProductdescriptionId,
   /** Points to [[production.productdescription.ProductdescriptionRow.description]] */
-  description: Option[/* max 400 chars */ String],
+  description: /* max 400 chars */ String,
   /** Points to [[production.productdescription.ProductdescriptionRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[production.productdescription.ProductdescriptionRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PdViewRow {
-  implicit lazy val decoder: Decoder[PdViewRow] = Decoder.forProduct5[PdViewRow, Option[Int], Option[ProductdescriptionId], Option[/* max 400 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(PdViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductdescriptionId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PdViewRow] = Encoder.forProduct5[PdViewRow, Option[Int], Option[ProductdescriptionId], Option[/* max 400 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(x => (x.id, x.productdescriptionid, x.description, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductdescriptionId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PdViewRow] = Decoder.forProduct5[PdViewRow, Int, ProductdescriptionId, /* max 400 chars */ String, UUID, TypoLocalDateTime]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(PdViewRow.apply)(Decoder.decodeInt, ProductdescriptionId.decoder, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PdViewRow] = Encoder.forProduct5[PdViewRow, Int, ProductdescriptionId, /* max 400 chars */ String, UUID, TypoLocalDateTime]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(x => (x.id, x.productdescriptionid, x.description, x.rowguid, x.modifieddate))(Encoder.encodeInt, ProductdescriptionId.encoder, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PdViewRow] = new Read[PdViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ProductdescriptionId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductdescriptionId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PdViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      productdescriptionid = ProductdescriptionId.get.unsafeGetNullable(rs, i + 1),
-      description = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      productdescriptionid = ProductdescriptionId.get.unsafeGetNonNullable(rs, i + 1),
+      description = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

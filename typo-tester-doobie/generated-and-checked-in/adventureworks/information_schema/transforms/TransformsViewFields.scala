@@ -9,17 +9,17 @@ package transforms
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait TransformsViewFields[Row] {
-  val udtCatalog: OptField[SqlIdentifier, Row]
-  val udtSchema: OptField[SqlIdentifier, Row]
-  val udtName: OptField[SqlIdentifier, Row]
-  val specificCatalog: OptField[SqlIdentifier, Row]
-  val specificSchema: OptField[SqlIdentifier, Row]
-  val specificName: OptField[SqlIdentifier, Row]
-  val groupName: OptField[SqlIdentifier, Row]
-  val transformType: OptField[CharacterData, Row]
+  val udtCatalog: Field[SqlIdentifier, Row]
+  val udtSchema: Field[SqlIdentifier, Row]
+  val udtName: Field[SqlIdentifier, Row]
+  val specificCatalog: Field[SqlIdentifier, Row]
+  val specificSchema: Field[SqlIdentifier, Row]
+  val specificName: Field[SqlIdentifier, Row]
+  val groupName: Field[SqlIdentifier, Row]
+  val transformType: Field[CharacterData, Row]
 }
 object TransformsViewFields extends TransformsViewStructure[TransformsViewRow](None, identity, (_, x) => x)
 

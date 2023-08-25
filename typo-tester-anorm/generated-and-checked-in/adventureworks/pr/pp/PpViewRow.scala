@@ -22,32 +22,32 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PpViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productphoto.ProductphotoRow.productphotoid]] */
-  productphotoid: Option[ProductphotoId],
+  productphotoid: ProductphotoId,
   /** Points to [[production.productphoto.ProductphotoRow.thumbnailphoto]] */
-  thumbnailphoto: Option[Byte],
+  thumbnailphoto: Byte,
   /** Points to [[production.productphoto.ProductphotoRow.thumbnailphotofilename]] */
-  thumbnailphotofilename: Option[/* max 50 chars */ String],
+  thumbnailphotofilename: /* max 50 chars */ String,
   /** Points to [[production.productphoto.ProductphotoRow.largephoto]] */
-  largephoto: Option[Byte],
+  largephoto: Byte,
   /** Points to [[production.productphoto.ProductphotoRow.largephotofilename]] */
-  largephotofilename: Option[/* max 50 chars */ String],
+  largephotofilename: /* max 50 chars */ String,
   /** Points to [[production.productphoto.ProductphotoRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PpViewRow {
   implicit lazy val reads: Reads[PpViewRow] = Reads[PpViewRow](json => JsResult.fromTry(
       Try(
         PpViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          productphotoid = json.\("productphotoid").toOption.map(_.as(ProductphotoId.reads)),
-          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as(Reads.ByteReads)),
-          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as(Reads.StringReads)),
-          largephoto = json.\("largephoto").toOption.map(_.as(Reads.ByteReads)),
-          largephotofilename = json.\("largephotofilename").toOption.map(_.as(Reads.StringReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          productphotoid = json.\("productphotoid").as(ProductphotoId.reads),
+          thumbnailphoto = json.\("thumbnailphoto").as(Reads.ByteReads),
+          thumbnailphotofilename = json.\("thumbnailphotofilename").as(Reads.StringReads),
+          largephoto = json.\("largephoto").as(Reads.ByteReads),
+          largephotofilename = json.\("largephotofilename").as(Reads.StringReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -55,25 +55,25 @@ object PpViewRow {
   def rowParser(idx: Int): RowParser[PpViewRow] = RowParser[PpViewRow] { row =>
     Success(
       PpViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        productphotoid = row(idx + 1)(Column.columnToOption(ProductphotoId.column)),
-        thumbnailphoto = row(idx + 2)(Column.columnToOption(Column.columnToByte)),
-        thumbnailphotofilename = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        largephoto = row(idx + 4)(Column.columnToOption(Column.columnToByte)),
-        largephotofilename = row(idx + 5)(Column.columnToOption(Column.columnToString)),
-        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        productphotoid = row(idx + 1)(ProductphotoId.column),
+        thumbnailphoto = row(idx + 2)(Column.columnToByte),
+        thumbnailphotofilename = row(idx + 3)(Column.columnToString),
+        largephoto = row(idx + 4)(Column.columnToByte),
+        largephotofilename = row(idx + 5)(Column.columnToString),
+        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PpViewRow] = OWrites[PpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "productphotoid" -> Writes.OptionWrites(ProductphotoId.writes).writes(o.productphotoid),
-      "thumbnailphoto" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.thumbnailphoto),
-      "thumbnailphotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.thumbnailphotofilename),
-      "largephoto" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.largephoto),
-      "largephotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.largephotofilename),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "productphotoid" -> ProductphotoId.writes.writes(o.productphotoid),
+      "thumbnailphoto" -> Writes.ByteWrites.writes(o.thumbnailphoto),
+      "thumbnailphotofilename" -> Writes.StringWrites.writes(o.thumbnailphotofilename),
+      "largephoto" -> Writes.ByteWrites.writes(o.largephoto),
+      "largephotofilename" -> Writes.StringWrites.writes(o.largephotofilename),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -25,59 +25,59 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[humanresources.employee.EmployeeRow.nationalidnumber]] */
-  nationalidnumber: Option[/* max 15 chars */ String],
+  nationalidnumber: /* max 15 chars */ String,
   /** Points to [[humanresources.employee.EmployeeRow.loginid]] */
-  loginid: Option[/* max 256 chars */ String],
+  loginid: /* max 256 chars */ String,
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
-  jobtitle: Option[/* max 50 chars */ String],
+  jobtitle: /* max 50 chars */ String,
   /** Points to [[humanresources.employee.EmployeeRow.birthdate]] */
-  birthdate: Option[TypoLocalDate],
+  birthdate: TypoLocalDate,
   /** Points to [[humanresources.employee.EmployeeRow.maritalstatus]] */
-  maritalstatus: Option[/* bpchar, max 1 chars */ String],
+  maritalstatus: /* bpchar, max 1 chars */ String,
   /** Points to [[humanresources.employee.EmployeeRow.gender]] */
-  gender: Option[/* bpchar, max 1 chars */ String],
+  gender: /* bpchar, max 1 chars */ String,
   /** Points to [[humanresources.employee.EmployeeRow.hiredate]] */
-  hiredate: Option[TypoLocalDate],
+  hiredate: TypoLocalDate,
   /** Points to [[humanresources.employee.EmployeeRow.salariedflag]] */
   salariedflag: Flag,
   /** Points to [[humanresources.employee.EmployeeRow.vacationhours]] */
-  vacationhours: Option[Int],
+  vacationhours: Int,
   /** Points to [[humanresources.employee.EmployeeRow.sickleavehours]] */
-  sickleavehours: Option[Int],
+  sickleavehours: Int,
   /** Points to [[humanresources.employee.EmployeeRow.currentflag]] */
   currentflag: Flag,
   /** Points to [[humanresources.employee.EmployeeRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[humanresources.employee.EmployeeRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime],
+  modifieddate: TypoLocalDateTime,
   /** Points to [[humanresources.employee.EmployeeRow.organizationnode]] */
-  organizationnode: Option[String]
+  organizationnode: String
 )
 
 object EViewRow {
   implicit lazy val reads: Reads[EViewRow] = Reads[EViewRow](json => JsResult.fromTry(
       Try(
         EViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          nationalidnumber = json.\("nationalidnumber").toOption.map(_.as(Reads.StringReads)),
-          loginid = json.\("loginid").toOption.map(_.as(Reads.StringReads)),
-          jobtitle = json.\("jobtitle").toOption.map(_.as(Reads.StringReads)),
-          birthdate = json.\("birthdate").toOption.map(_.as(TypoLocalDate.reads)),
-          maritalstatus = json.\("maritalstatus").toOption.map(_.as(Reads.StringReads)),
-          gender = json.\("gender").toOption.map(_.as(Reads.StringReads)),
-          hiredate = json.\("hiredate").toOption.map(_.as(TypoLocalDate.reads)),
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          nationalidnumber = json.\("nationalidnumber").as(Reads.StringReads),
+          loginid = json.\("loginid").as(Reads.StringReads),
+          jobtitle = json.\("jobtitle").as(Reads.StringReads),
+          birthdate = json.\("birthdate").as(TypoLocalDate.reads),
+          maritalstatus = json.\("maritalstatus").as(Reads.StringReads),
+          gender = json.\("gender").as(Reads.StringReads),
+          hiredate = json.\("hiredate").as(TypoLocalDate.reads),
           salariedflag = json.\("salariedflag").as(Flag.reads),
-          vacationhours = json.\("vacationhours").toOption.map(_.as(Reads.IntReads)),
-          sickleavehours = json.\("sickleavehours").toOption.map(_.as(Reads.IntReads)),
+          vacationhours = json.\("vacationhours").as(Reads.IntReads),
+          sickleavehours = json.\("sickleavehours").as(Reads.IntReads),
           currentflag = json.\("currentflag").as(Flag.reads),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          organizationnode = json.\("organizationnode").toOption.map(_.as(Reads.StringReads))
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
+          organizationnode = json.\("organizationnode").as(Reads.StringReads)
         )
       )
     ),
@@ -85,43 +85,43 @@ object EViewRow {
   def rowParser(idx: Int): RowParser[EViewRow] = RowParser[EViewRow] { row =>
     Success(
       EViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        nationalidnumber = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        loginid = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        jobtitle = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        birthdate = row(idx + 5)(Column.columnToOption(TypoLocalDate.column)),
-        maritalstatus = row(idx + 6)(Column.columnToOption(Column.columnToString)),
-        gender = row(idx + 7)(Column.columnToOption(Column.columnToString)),
-        hiredate = row(idx + 8)(Column.columnToOption(TypoLocalDate.column)),
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        nationalidnumber = row(idx + 2)(Column.columnToString),
+        loginid = row(idx + 3)(Column.columnToString),
+        jobtitle = row(idx + 4)(Column.columnToString),
+        birthdate = row(idx + 5)(TypoLocalDate.column),
+        maritalstatus = row(idx + 6)(Column.columnToString),
+        gender = row(idx + 7)(Column.columnToString),
+        hiredate = row(idx + 8)(TypoLocalDate.column),
         salariedflag = row(idx + 9)(Flag.column),
-        vacationhours = row(idx + 10)(Column.columnToOption(Column.columnToInt)),
-        sickleavehours = row(idx + 11)(Column.columnToOption(Column.columnToInt)),
+        vacationhours = row(idx + 10)(Column.columnToInt),
+        sickleavehours = row(idx + 11)(Column.columnToInt),
         currentflag = row(idx + 12)(Flag.column),
-        rowguid = row(idx + 13)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 14)(Column.columnToOption(TypoLocalDateTime.column)),
-        organizationnode = row(idx + 15)(Column.columnToOption(Column.columnToString))
+        rowguid = row(idx + 13)(Column.columnToUUID),
+        modifieddate = row(idx + 14)(TypoLocalDateTime.column),
+        organizationnode = row(idx + 15)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[EViewRow] = OWrites[EViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "nationalidnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.nationalidnumber),
-      "loginid" -> Writes.OptionWrites(Writes.StringWrites).writes(o.loginid),
-      "jobtitle" -> Writes.OptionWrites(Writes.StringWrites).writes(o.jobtitle),
-      "birthdate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.birthdate),
-      "maritalstatus" -> Writes.OptionWrites(Writes.StringWrites).writes(o.maritalstatus),
-      "gender" -> Writes.OptionWrites(Writes.StringWrites).writes(o.gender),
-      "hiredate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.hiredate),
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "nationalidnumber" -> Writes.StringWrites.writes(o.nationalidnumber),
+      "loginid" -> Writes.StringWrites.writes(o.loginid),
+      "jobtitle" -> Writes.StringWrites.writes(o.jobtitle),
+      "birthdate" -> TypoLocalDate.writes.writes(o.birthdate),
+      "maritalstatus" -> Writes.StringWrites.writes(o.maritalstatus),
+      "gender" -> Writes.StringWrites.writes(o.gender),
+      "hiredate" -> TypoLocalDate.writes.writes(o.hiredate),
       "salariedflag" -> Flag.writes.writes(o.salariedflag),
-      "vacationhours" -> Writes.OptionWrites(Writes.IntWrites).writes(o.vacationhours),
-      "sickleavehours" -> Writes.OptionWrites(Writes.IntWrites).writes(o.sickleavehours),
+      "vacationhours" -> Writes.IntWrites.writes(o.vacationhours),
+      "sickleavehours" -> Writes.IntWrites.writes(o.sickleavehours),
       "currentflag" -> Flag.writes.writes(o.currentflag),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate),
-      "organizationnode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.organizationnode)
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
+      "organizationnode" -> Writes.StringWrites.writes(o.organizationnode)
     ))
   )
 }

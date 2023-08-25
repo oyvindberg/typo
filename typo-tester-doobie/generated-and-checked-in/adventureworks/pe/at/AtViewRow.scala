@@ -19,34 +19,34 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class AtViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
-  addresstypeid: Option[AddresstypeId],
+  addresstypeid: AddresstypeId,
   /** Points to [[person.addresstype.AddresstypeRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[person.addresstype.AddresstypeRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.addresstype.AddresstypeRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object AtViewRow {
-  implicit lazy val decoder: Decoder[AtViewRow] = Decoder.forProduct5[AtViewRow, Option[Int], Option[AddresstypeId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "addresstypeid", "name", "rowguid", "modifieddate")(AtViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(AddresstypeId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[AtViewRow] = Encoder.forProduct5[AtViewRow, Option[Int], Option[AddresstypeId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "addresstypeid", "name", "rowguid", "modifieddate")(x => (x.id, x.addresstypeid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(AddresstypeId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[AtViewRow] = Decoder.forProduct5[AtViewRow, Int, AddresstypeId, Name, UUID, TypoLocalDateTime]("id", "addresstypeid", "name", "rowguid", "modifieddate")(AtViewRow.apply)(Decoder.decodeInt, AddresstypeId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[AtViewRow] = Encoder.forProduct5[AtViewRow, Int, AddresstypeId, Name, UUID, TypoLocalDateTime]("id", "addresstypeid", "name", "rowguid", "modifieddate")(x => (x.id, x.addresstypeid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeInt, AddresstypeId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[AtViewRow] = new Read[AtViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (AddresstypeId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (AddresstypeId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => AtViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      addresstypeid = AddresstypeId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

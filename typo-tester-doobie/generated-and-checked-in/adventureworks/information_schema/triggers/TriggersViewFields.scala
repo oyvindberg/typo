@@ -11,26 +11,26 @@ import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.TimeStamp
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait TriggersViewFields[Row] {
-  val triggerCatalog: OptField[SqlIdentifier, Row]
-  val triggerSchema: OptField[SqlIdentifier, Row]
-  val triggerName: OptField[SqlIdentifier, Row]
-  val eventManipulation: OptField[CharacterData, Row]
-  val eventObjectCatalog: OptField[SqlIdentifier, Row]
-  val eventObjectSchema: OptField[SqlIdentifier, Row]
-  val eventObjectTable: OptField[SqlIdentifier, Row]
-  val actionOrder: OptField[CardinalNumber, Row]
-  val actionCondition: OptField[CharacterData, Row]
-  val actionStatement: OptField[CharacterData, Row]
-  val actionOrientation: OptField[CharacterData, Row]
-  val actionTiming: OptField[CharacterData, Row]
-  val actionReferenceOldTable: OptField[SqlIdentifier, Row]
-  val actionReferenceNewTable: OptField[SqlIdentifier, Row]
-  val actionReferenceOldRow: OptField[SqlIdentifier, Row]
-  val actionReferenceNewRow: OptField[SqlIdentifier, Row]
-  val created: OptField[TimeStamp, Row]
+  val triggerCatalog: Field[SqlIdentifier, Row]
+  val triggerSchema: Field[SqlIdentifier, Row]
+  val triggerName: Field[SqlIdentifier, Row]
+  val eventManipulation: Field[CharacterData, Row]
+  val eventObjectCatalog: Field[SqlIdentifier, Row]
+  val eventObjectSchema: Field[SqlIdentifier, Row]
+  val eventObjectTable: Field[SqlIdentifier, Row]
+  val actionOrder: Field[CardinalNumber, Row]
+  val actionCondition: Field[CharacterData, Row]
+  val actionStatement: Field[CharacterData, Row]
+  val actionOrientation: Field[CharacterData, Row]
+  val actionTiming: Field[CharacterData, Row]
+  val actionReferenceOldTable: Field[SqlIdentifier, Row]
+  val actionReferenceNewTable: Field[SqlIdentifier, Row]
+  val actionReferenceOldRow: Field[SqlIdentifier, Row]
+  val actionReferenceNewRow: Field[SqlIdentifier, Row]
+  val created: Field[TimeStamp, Row]
 }
 object TriggersViewFields extends TriggersViewStructure[TriggersViewRow](None, identity, (_, x) => x)
 

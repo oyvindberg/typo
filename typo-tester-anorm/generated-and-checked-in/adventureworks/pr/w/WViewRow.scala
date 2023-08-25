@@ -24,41 +24,41 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class WViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.workorder.WorkorderRow.workorderid]] */
-  workorderid: Option[WorkorderId],
+  workorderid: WorkorderId,
   /** Points to [[production.workorder.WorkorderRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[production.workorder.WorkorderRow.orderqty]] */
-  orderqty: Option[Int],
+  orderqty: Int,
   /** Points to [[production.workorder.WorkorderRow.scrappedqty]] */
-  scrappedqty: Option[Int],
+  scrappedqty: Int,
   /** Points to [[production.workorder.WorkorderRow.startdate]] */
-  startdate: Option[TypoLocalDateTime],
+  startdate: TypoLocalDateTime,
   /** Points to [[production.workorder.WorkorderRow.enddate]] */
-  enddate: Option[TypoLocalDateTime],
+  enddate: TypoLocalDateTime,
   /** Points to [[production.workorder.WorkorderRow.duedate]] */
-  duedate: Option[TypoLocalDateTime],
+  duedate: TypoLocalDateTime,
   /** Points to [[production.workorder.WorkorderRow.scrapreasonid]] */
-  scrapreasonid: Option[ScrapreasonId],
+  scrapreasonid: ScrapreasonId,
   /** Points to [[production.workorder.WorkorderRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object WViewRow {
   implicit lazy val reads: Reads[WViewRow] = Reads[WViewRow](json => JsResult.fromTry(
       Try(
         WViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          workorderid = json.\("workorderid").toOption.map(_.as(WorkorderId.reads)),
-          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
-          orderqty = json.\("orderqty").toOption.map(_.as(Reads.IntReads)),
-          scrappedqty = json.\("scrappedqty").toOption.map(_.as(Reads.IntReads)),
-          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          duedate = json.\("duedate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          scrapreasonid = json.\("scrapreasonid").toOption.map(_.as(ScrapreasonId.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          workorderid = json.\("workorderid").as(WorkorderId.reads),
+          productid = json.\("productid").as(ProductId.reads),
+          orderqty = json.\("orderqty").as(Reads.IntReads),
+          scrappedqty = json.\("scrappedqty").as(Reads.IntReads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").as(TypoLocalDateTime.reads),
+          duedate = json.\("duedate").as(TypoLocalDateTime.reads),
+          scrapreasonid = json.\("scrapreasonid").as(ScrapreasonId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -66,31 +66,31 @@ object WViewRow {
   def rowParser(idx: Int): RowParser[WViewRow] = RowParser[WViewRow] { row =>
     Success(
       WViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        workorderid = row(idx + 1)(Column.columnToOption(WorkorderId.column)),
-        productid = row(idx + 2)(Column.columnToOption(ProductId.column)),
-        orderqty = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
-        scrappedqty = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
-        startdate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
-        enddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column)),
-        duedate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column)),
-        scrapreasonid = row(idx + 8)(Column.columnToOption(ScrapreasonId.column)),
-        modifieddate = row(idx + 9)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        workorderid = row(idx + 1)(WorkorderId.column),
+        productid = row(idx + 2)(ProductId.column),
+        orderqty = row(idx + 3)(Column.columnToInt),
+        scrappedqty = row(idx + 4)(Column.columnToInt),
+        startdate = row(idx + 5)(TypoLocalDateTime.column),
+        enddate = row(idx + 6)(TypoLocalDateTime.column),
+        duedate = row(idx + 7)(TypoLocalDateTime.column),
+        scrapreasonid = row(idx + 8)(ScrapreasonId.column),
+        modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[WViewRow] = OWrites[WViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "workorderid" -> Writes.OptionWrites(WorkorderId.writes).writes(o.workorderid),
-      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
-      "orderqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.orderqty),
-      "scrappedqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.scrappedqty),
-      "startdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.startdate),
-      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
-      "duedate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.duedate),
-      "scrapreasonid" -> Writes.OptionWrites(ScrapreasonId.writes).writes(o.scrapreasonid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "workorderid" -> WorkorderId.writes.writes(o.workorderid),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "orderqty" -> Writes.IntWrites.writes(o.orderqty),
+      "scrappedqty" -> Writes.IntWrites.writes(o.scrappedqty),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+      "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
+      "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
+      "scrapreasonid" -> ScrapreasonId.writes.writes(o.scrapreasonid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

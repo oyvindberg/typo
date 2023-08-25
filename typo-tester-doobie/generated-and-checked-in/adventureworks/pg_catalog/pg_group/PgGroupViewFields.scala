@@ -7,12 +7,12 @@ package adventureworks
 package pg_catalog
 package pg_group
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgGroupViewFields[Row] {
-  val groname: OptField[String, Row]
-  val grosysid: OptField[/* oid */ Long, Row]
-  val grolist: OptField[Array[/* oid */ Long], Row]
+  val groname: Field[String, Row]
+  val grosysid: Field[/* oid */ Long, Row]
+  val grolist: Field[Array[/* oid */ Long], Row]
 }
 object PgGroupViewFields extends PgGroupViewStructure[PgGroupViewRow](None, identity, (_, x) => x)
 

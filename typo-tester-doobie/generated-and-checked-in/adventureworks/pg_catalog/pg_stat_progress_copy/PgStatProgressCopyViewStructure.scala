@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_copy
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -15,16 +16,16 @@ class PgStatProgressCopyViewStructure[Row](val prefix: Option[String], val extra
   extends Relation[PgStatProgressCopyViewFields, PgStatProgressCopyViewRow, Row]
     with PgStatProgressCopyViewFields[Row] { outer =>
 
-  override val pid = new OptField[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
-  override val datid = new OptField[/* oid */ Long, Row](prefix, "datid", None, Some("oid"))(x => extract(x).datid, (row, value) => merge(row, extract(row).copy(datid = value)))
+  override val pid = new Field[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
+  override val datid = new Field[/* oid */ Long, Row](prefix, "datid", None, Some("oid"))(x => extract(x).datid, (row, value) => merge(row, extract(row).copy(datid = value)))
   override val datname = new OptField[String, Row](prefix, "datname", None, Some("name"))(x => extract(x).datname, (row, value) => merge(row, extract(row).copy(datname = value)))
-  override val relid = new OptField[/* oid */ Long, Row](prefix, "relid", None, Some("oid"))(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
-  override val command = new OptField[String, Row](prefix, "command", None, None)(x => extract(x).command, (row, value) => merge(row, extract(row).copy(command = value)))
-  override val `type` = new OptField[String, Row](prefix, "type", None, None)(x => extract(x).`type`, (row, value) => merge(row, extract(row).copy(`type` = value)))
-  override val bytesProcessed = new OptField[Long, Row](prefix, "bytes_processed", None, Some("int8"))(x => extract(x).bytesProcessed, (row, value) => merge(row, extract(row).copy(bytesProcessed = value)))
-  override val bytesTotal = new OptField[Long, Row](prefix, "bytes_total", None, Some("int8"))(x => extract(x).bytesTotal, (row, value) => merge(row, extract(row).copy(bytesTotal = value)))
-  override val tuplesProcessed = new OptField[Long, Row](prefix, "tuples_processed", None, Some("int8"))(x => extract(x).tuplesProcessed, (row, value) => merge(row, extract(row).copy(tuplesProcessed = value)))
-  override val tuplesExcluded = new OptField[Long, Row](prefix, "tuples_excluded", None, Some("int8"))(x => extract(x).tuplesExcluded, (row, value) => merge(row, extract(row).copy(tuplesExcluded = value)))
+  override val relid = new Field[/* oid */ Long, Row](prefix, "relid", None, Some("oid"))(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
+  override val command = new Field[String, Row](prefix, "command", None, None)(x => extract(x).command, (row, value) => merge(row, extract(row).copy(command = value)))
+  override val `type` = new Field[String, Row](prefix, "type", None, None)(x => extract(x).`type`, (row, value) => merge(row, extract(row).copy(`type` = value)))
+  override val bytesProcessed = new Field[Long, Row](prefix, "bytes_processed", None, Some("int8"))(x => extract(x).bytesProcessed, (row, value) => merge(row, extract(row).copy(bytesProcessed = value)))
+  override val bytesTotal = new Field[Long, Row](prefix, "bytes_total", None, Some("int8"))(x => extract(x).bytesTotal, (row, value) => merge(row, extract(row).copy(bytesTotal = value)))
+  override val tuplesProcessed = new Field[Long, Row](prefix, "tuples_processed", None, Some("int8"))(x => extract(x).tuplesProcessed, (row, value) => merge(row, extract(row).copy(tuplesProcessed = value)))
+  override val tuplesExcluded = new Field[Long, Row](prefix, "tuples_excluded", None, Some("int8"))(x => extract(x).tuplesExcluded, (row, value) => merge(row, extract(row).copy(tuplesExcluded = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](pid, datid, datname, relid, command, `type`, bytesProcessed, bytesTotal, tuplesProcessed, tuplesExcluded)

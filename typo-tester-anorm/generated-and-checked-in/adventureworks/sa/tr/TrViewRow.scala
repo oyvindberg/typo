@@ -25,35 +25,35 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TrViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.salestaxrateid]] */
-  salestaxrateid: Option[SalestaxrateId],
+  salestaxrateid: SalestaxrateId,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.stateprovinceid]] */
-  stateprovinceid: Option[StateprovinceId],
+  stateprovinceid: StateprovinceId,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.taxtype]] */
-  taxtype: Option[Int],
+  taxtype: Int,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.taxrate]] */
-  taxrate: Option[BigDecimal],
+  taxrate: BigDecimal,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object TrViewRow {
   implicit lazy val reads: Reads[TrViewRow] = Reads[TrViewRow](json => JsResult.fromTry(
       Try(
         TrViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          salestaxrateid = json.\("salestaxrateid").toOption.map(_.as(SalestaxrateId.reads)),
-          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as(StateprovinceId.reads)),
-          taxtype = json.\("taxtype").toOption.map(_.as(Reads.IntReads)),
-          taxrate = json.\("taxrate").toOption.map(_.as(Reads.bigDecReads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          salestaxrateid = json.\("salestaxrateid").as(SalestaxrateId.reads),
+          stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
+          taxtype = json.\("taxtype").as(Reads.IntReads),
+          taxrate = json.\("taxrate").as(Reads.bigDecReads),
+          name = json.\("name").as(Name.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -61,27 +61,27 @@ object TrViewRow {
   def rowParser(idx: Int): RowParser[TrViewRow] = RowParser[TrViewRow] { row =>
     Success(
       TrViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        salestaxrateid = row(idx + 1)(Column.columnToOption(SalestaxrateId.column)),
-        stateprovinceid = row(idx + 2)(Column.columnToOption(StateprovinceId.column)),
-        taxtype = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
-        taxrate = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        name = row(idx + 5)(Column.columnToOption(Name.column)),
-        rowguid = row(idx + 6)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        salestaxrateid = row(idx + 1)(SalestaxrateId.column),
+        stateprovinceid = row(idx + 2)(StateprovinceId.column),
+        taxtype = row(idx + 3)(Column.columnToInt),
+        taxrate = row(idx + 4)(Column.columnToScalaBigDecimal),
+        name = row(idx + 5)(Name.column),
+        rowguid = row(idx + 6)(Column.columnToUUID),
+        modifieddate = row(idx + 7)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[TrViewRow] = OWrites[TrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "salestaxrateid" -> Writes.OptionWrites(SalestaxrateId.writes).writes(o.salestaxrateid),
-      "stateprovinceid" -> Writes.OptionWrites(StateprovinceId.writes).writes(o.stateprovinceid),
-      "taxtype" -> Writes.OptionWrites(Writes.IntWrites).writes(o.taxtype),
-      "taxrate" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.taxrate),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "salestaxrateid" -> SalestaxrateId.writes.writes(o.salestaxrateid),
+      "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
+      "taxtype" -> Writes.IntWrites.writes(o.taxtype),
+      "taxrate" -> Writes.BigDecimalWrites.writes(o.taxrate),
+      "name" -> Name.writes.writes(o.name),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

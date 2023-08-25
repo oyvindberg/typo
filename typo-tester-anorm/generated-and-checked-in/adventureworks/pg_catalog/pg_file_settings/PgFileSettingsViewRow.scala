@@ -20,26 +20,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgFileSettingsViewRow(
-  sourcefile: Option[String],
-  sourceline: Option[Int],
-  seqno: Option[Int],
-  name: Option[String],
-  setting: Option[String],
-  applied: Option[Boolean],
-  error: Option[String]
+  sourcefile: String,
+  sourceline: Int,
+  seqno: Int,
+  name: String,
+  setting: String,
+  applied: Boolean,
+  error: String
 )
 
 object PgFileSettingsViewRow {
   implicit lazy val reads: Reads[PgFileSettingsViewRow] = Reads[PgFileSettingsViewRow](json => JsResult.fromTry(
       Try(
         PgFileSettingsViewRow(
-          sourcefile = json.\("sourcefile").toOption.map(_.as(Reads.StringReads)),
-          sourceline = json.\("sourceline").toOption.map(_.as(Reads.IntReads)),
-          seqno = json.\("seqno").toOption.map(_.as(Reads.IntReads)),
-          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
-          setting = json.\("setting").toOption.map(_.as(Reads.StringReads)),
-          applied = json.\("applied").toOption.map(_.as(Reads.BooleanReads)),
-          error = json.\("error").toOption.map(_.as(Reads.StringReads))
+          sourcefile = json.\("sourcefile").as(Reads.StringReads),
+          sourceline = json.\("sourceline").as(Reads.IntReads),
+          seqno = json.\("seqno").as(Reads.IntReads),
+          name = json.\("name").as(Reads.StringReads),
+          setting = json.\("setting").as(Reads.StringReads),
+          applied = json.\("applied").as(Reads.BooleanReads),
+          error = json.\("error").as(Reads.StringReads)
         )
       )
     ),
@@ -47,25 +47,25 @@ object PgFileSettingsViewRow {
   def rowParser(idx: Int): RowParser[PgFileSettingsViewRow] = RowParser[PgFileSettingsViewRow] { row =>
     Success(
       PgFileSettingsViewRow(
-        sourcefile = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        sourceline = row(idx + 1)(Column.columnToOption(Column.columnToInt)),
-        seqno = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
-        name = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        setting = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        applied = row(idx + 5)(Column.columnToOption(Column.columnToBoolean)),
-        error = row(idx + 6)(Column.columnToOption(Column.columnToString))
+        sourcefile = row(idx + 0)(Column.columnToString),
+        sourceline = row(idx + 1)(Column.columnToInt),
+        seqno = row(idx + 2)(Column.columnToInt),
+        name = row(idx + 3)(Column.columnToString),
+        setting = row(idx + 4)(Column.columnToString),
+        applied = row(idx + 5)(Column.columnToBoolean),
+        error = row(idx + 6)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[PgFileSettingsViewRow] = OWrites[PgFileSettingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "sourcefile" -> Writes.OptionWrites(Writes.StringWrites).writes(o.sourcefile),
-      "sourceline" -> Writes.OptionWrites(Writes.IntWrites).writes(o.sourceline),
-      "seqno" -> Writes.OptionWrites(Writes.IntWrites).writes(o.seqno),
-      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
-      "setting" -> Writes.OptionWrites(Writes.StringWrites).writes(o.setting),
-      "applied" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.applied),
-      "error" -> Writes.OptionWrites(Writes.StringWrites).writes(o.error)
+      "sourcefile" -> Writes.StringWrites.writes(o.sourcefile),
+      "sourceline" -> Writes.IntWrites.writes(o.sourceline),
+      "seqno" -> Writes.IntWrites.writes(o.seqno),
+      "name" -> Writes.StringWrites.writes(o.name),
+      "setting" -> Writes.StringWrites.writes(o.setting),
+      "applied" -> Writes.BooleanWrites.writes(o.applied),
+      "error" -> Writes.StringWrites.writes(o.error)
     ))
   )
 }

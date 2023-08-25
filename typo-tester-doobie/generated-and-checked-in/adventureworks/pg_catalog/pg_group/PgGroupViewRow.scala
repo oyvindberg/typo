@@ -15,24 +15,24 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgGroupViewRow(
-  groname: Option[String],
-  grosysid: Option[/* oid */ Long],
-  grolist: Option[Array[/* oid */ Long]]
+  groname: String,
+  grosysid: /* oid */ Long,
+  grolist: Array[/* oid */ Long]
 )
 
 object PgGroupViewRow {
-  implicit lazy val decoder: Decoder[PgGroupViewRow] = Decoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(PgGroupViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))
-  implicit lazy val encoder: Encoder[PgGroupViewRow] = Encoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(x => (x.groname, x.grosysid, x.grolist))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)))
+  implicit lazy val decoder: Decoder[PgGroupViewRow] = Decoder.forProduct3[PgGroupViewRow, String, /* oid */ Long, Array[/* oid */ Long]]("groname", "grosysid", "grolist")(PgGroupViewRow.apply)(Decoder.decodeString, Decoder.decodeLong, Decoder.decodeArray[Long](Decoder.decodeLong, implicitly))
+  implicit lazy val encoder: Encoder[PgGroupViewRow] = Encoder.forProduct3[PgGroupViewRow, String, /* oid */ Long, Array[/* oid */ Long]]("groname", "grosysid", "grolist")(x => (x.groname, x.grosysid, x.grolist))(Encoder.encodeString, Encoder.encodeLong, Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly))
   implicit lazy val read: Read[PgGroupViewRow] = new Read[PgGroupViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (adventureworks.LongArrayMeta.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (adventureworks.LongArrayMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgGroupViewRow(
-      groname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
-      grosysid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
-      grolist = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 2)
+      groname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      grosysid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      grolist = adventureworks.LongArrayMeta.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

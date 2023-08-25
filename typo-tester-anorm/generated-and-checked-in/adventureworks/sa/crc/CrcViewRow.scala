@@ -10,7 +10,6 @@ package crc
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,26 +17,25 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CrcViewRow(
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.countryregioncode]] */
-  countryregioncode: Option[CountryregionId],
+  countryregioncode: CountryregionId,
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.currencycode]] */
-  currencycode: Option[CurrencyId],
+  currencycode: CurrencyId,
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CrcViewRow {
   implicit lazy val reads: Reads[CrcViewRow] = Reads[CrcViewRow](json => JsResult.fromTry(
       Try(
         CrcViewRow(
-          countryregioncode = json.\("countryregioncode").toOption.map(_.as(CountryregionId.reads)),
-          currencycode = json.\("currencycode").toOption.map(_.as(CurrencyId.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          currencycode = json.\("currencycode").as(CurrencyId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -45,17 +43,17 @@ object CrcViewRow {
   def rowParser(idx: Int): RowParser[CrcViewRow] = RowParser[CrcViewRow] { row =>
     Success(
       CrcViewRow(
-        countryregioncode = row(idx + 0)(Column.columnToOption(CountryregionId.column)),
-        currencycode = row(idx + 1)(Column.columnToOption(CurrencyId.column)),
-        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column))
+        countryregioncode = row(idx + 0)(CountryregionId.column),
+        currencycode = row(idx + 1)(CurrencyId.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[CrcViewRow] = OWrites[CrcViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "countryregioncode" -> Writes.OptionWrites(CountryregionId.writes).writes(o.countryregioncode),
-      "currencycode" -> Writes.OptionWrites(CurrencyId.writes).writes(o.currencycode),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "currencycode" -> CurrencyId.writes.writes(o.currencycode),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

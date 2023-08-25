@@ -20,20 +20,20 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAvailableExtensionsViewRow(
-  name: Option[String],
-  defaultVersion: Option[String],
+  name: String,
+  defaultVersion: String,
   installedVersion: Option[String],
-  comment: Option[String]
+  comment: String
 )
 
 object PgAvailableExtensionsViewRow {
   implicit lazy val reads: Reads[PgAvailableExtensionsViewRow] = Reads[PgAvailableExtensionsViewRow](json => JsResult.fromTry(
       Try(
         PgAvailableExtensionsViewRow(
-          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
-          defaultVersion = json.\("default_version").toOption.map(_.as(Reads.StringReads)),
+          name = json.\("name").as(Reads.StringReads),
+          defaultVersion = json.\("default_version").as(Reads.StringReads),
           installedVersion = json.\("installed_version").toOption.map(_.as(Reads.StringReads)),
-          comment = json.\("comment").toOption.map(_.as(Reads.StringReads))
+          comment = json.\("comment").as(Reads.StringReads)
         )
       )
     ),
@@ -41,19 +41,19 @@ object PgAvailableExtensionsViewRow {
   def rowParser(idx: Int): RowParser[PgAvailableExtensionsViewRow] = RowParser[PgAvailableExtensionsViewRow] { row =>
     Success(
       PgAvailableExtensionsViewRow(
-        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        defaultVersion = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        name = row(idx + 0)(Column.columnToString),
+        defaultVersion = row(idx + 1)(Column.columnToString),
         installedVersion = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        comment = row(idx + 3)(Column.columnToOption(Column.columnToString))
+        comment = row(idx + 3)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[PgAvailableExtensionsViewRow] = OWrites[PgAvailableExtensionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
-      "default_version" -> Writes.OptionWrites(Writes.StringWrites).writes(o.defaultVersion),
+      "name" -> Writes.StringWrites.writes(o.name),
+      "default_version" -> Writes.StringWrites.writes(o.defaultVersion),
       "installed_version" -> Writes.OptionWrites(Writes.StringWrites).writes(o.installedVersion),
-      "comment" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comment)
+      "comment" -> Writes.StringWrites.writes(o.comment)
     ))
   )
 }

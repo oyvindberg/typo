@@ -7,20 +7,20 @@ package adventureworks
 package pg_catalog
 package pg_statio_sys_tables
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgStatioSysTablesViewFields[Row] {
-  val relid: OptField[/* oid */ Long, Row]
-  val schemaname: OptField[String, Row]
-  val relname: OptField[String, Row]
-  val heapBlksRead: OptField[Long, Row]
-  val heapBlksHit: OptField[Long, Row]
-  val idxBlksRead: OptField[Long, Row]
-  val idxBlksHit: OptField[Long, Row]
-  val toastBlksRead: OptField[Long, Row]
-  val toastBlksHit: OptField[Long, Row]
-  val tidxBlksRead: OptField[Long, Row]
-  val tidxBlksHit: OptField[Long, Row]
+  val relid: Field[/* oid */ Long, Row]
+  val schemaname: Field[String, Row]
+  val relname: Field[String, Row]
+  val heapBlksRead: Field[Long, Row]
+  val heapBlksHit: Field[Long, Row]
+  val idxBlksRead: Field[Long, Row]
+  val idxBlksHit: Field[Long, Row]
+  val toastBlksRead: Field[Long, Row]
+  val toastBlksHit: Field[Long, Row]
+  val tidxBlksRead: Field[Long, Row]
+  val tidxBlksHit: Field[Long, Row]
 }
 object PgStatioSysTablesViewFields extends PgStatioSysTablesViewStructure[PgStatioSysTablesViewRow](None, identity, (_, x) => x)
 

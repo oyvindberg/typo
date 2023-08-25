@@ -8,12 +8,12 @@ package pg_catalog
 package pg_timezone_abbrevs
 
 import adventureworks.customtypes.TypoInterval
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgTimezoneAbbrevsViewFields[Row] {
-  val abbrev: OptField[String, Row]
-  val utcOffset: OptField[TypoInterval, Row]
-  val isDst: OptField[Boolean, Row]
+  val abbrev: Field[String, Row]
+  val utcOffset: Field[TypoInterval, Row]
+  val isDst: Field[Boolean, Row]
 }
 object PgTimezoneAbbrevsViewFields extends PgTimezoneAbbrevsViewStructure[PgTimezoneAbbrevsViewRow](None, identity, (_, x) => x)
 

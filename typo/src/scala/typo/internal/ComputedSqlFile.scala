@@ -32,7 +32,7 @@ case class ComputedSqlFile(
       metadataCols.zipWithIndex.map { case (col, idx) =>
         val nullability: Nullability =
           col.parsedColumnName.nullability.getOrElse {
-            if (sqlFile.nullableColumnsFromJoins.exists(_.nullableIndices.contains(idx))) Nullability.Nullable
+            if (sqlFile.nullableColumnsFromJoins.exists(_.values(idx))) Nullability.Nullable
             else col.isNullable.toNullability
           }
 

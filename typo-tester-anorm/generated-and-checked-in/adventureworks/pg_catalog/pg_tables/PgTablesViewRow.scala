@@ -21,13 +21,13 @@ import scala.util.Try
 
 case class PgTablesViewRow(
   schemaname: Option[String],
-  tablename: Option[String],
-  tableowner: Option[String],
+  tablename: String,
+  tableowner: String,
   tablespace: Option[String],
-  hasindexes: Option[Boolean],
-  hasrules: Option[Boolean],
-  hastriggers: Option[Boolean],
-  rowsecurity: Option[Boolean]
+  hasindexes: Boolean,
+  hasrules: Boolean,
+  hastriggers: Boolean,
+  rowsecurity: Boolean
 )
 
 object PgTablesViewRow {
@@ -35,13 +35,13 @@ object PgTablesViewRow {
       Try(
         PgTablesViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
-          tableowner = json.\("tableowner").toOption.map(_.as(Reads.StringReads)),
+          tablename = json.\("tablename").as(Reads.StringReads),
+          tableowner = json.\("tableowner").as(Reads.StringReads),
           tablespace = json.\("tablespace").toOption.map(_.as(Reads.StringReads)),
-          hasindexes = json.\("hasindexes").toOption.map(_.as(Reads.BooleanReads)),
-          hasrules = json.\("hasrules").toOption.map(_.as(Reads.BooleanReads)),
-          hastriggers = json.\("hastriggers").toOption.map(_.as(Reads.BooleanReads)),
-          rowsecurity = json.\("rowsecurity").toOption.map(_.as(Reads.BooleanReads))
+          hasindexes = json.\("hasindexes").as(Reads.BooleanReads),
+          hasrules = json.\("hasrules").as(Reads.BooleanReads),
+          hastriggers = json.\("hastriggers").as(Reads.BooleanReads),
+          rowsecurity = json.\("rowsecurity").as(Reads.BooleanReads)
         )
       )
     ),
@@ -50,26 +50,26 @@ object PgTablesViewRow {
     Success(
       PgTablesViewRow(
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        tableowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tablename = row(idx + 1)(Column.columnToString),
+        tableowner = row(idx + 2)(Column.columnToString),
         tablespace = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        hasindexes = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
-        hasrules = row(idx + 5)(Column.columnToOption(Column.columnToBoolean)),
-        hastriggers = row(idx + 6)(Column.columnToOption(Column.columnToBoolean)),
-        rowsecurity = row(idx + 7)(Column.columnToOption(Column.columnToBoolean))
+        hasindexes = row(idx + 4)(Column.columnToBoolean),
+        hasrules = row(idx + 5)(Column.columnToBoolean),
+        hastriggers = row(idx + 6)(Column.columnToBoolean),
+        rowsecurity = row(idx + 7)(Column.columnToBoolean)
       )
     )
   }
   implicit lazy val writes: OWrites[PgTablesViewRow] = OWrites[PgTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
-      "tableowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableowner),
+      "tablename" -> Writes.StringWrites.writes(o.tablename),
+      "tableowner" -> Writes.StringWrites.writes(o.tableowner),
       "tablespace" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablespace),
-      "hasindexes" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.hasindexes),
-      "hasrules" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.hasrules),
-      "hastriggers" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.hastriggers),
-      "rowsecurity" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rowsecurity)
+      "hasindexes" -> Writes.BooleanWrites.writes(o.hasindexes),
+      "hasrules" -> Writes.BooleanWrites.writes(o.hasrules),
+      "hastriggers" -> Writes.BooleanWrites.writes(o.hastriggers),
+      "rowsecurity" -> Writes.BooleanWrites.writes(o.rowsecurity)
     ))
   )
 }

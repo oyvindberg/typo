@@ -19,34 +19,34 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class JcViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.jobcandidateid]] */
-  jobcandidateid: Option[JobcandidateId],
+  jobcandidateid: JobcandidateId,
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.resume]] */
-  resume: Option[TypoXml],
+  resume: TypoXml,
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object JcViewRow {
-  implicit lazy val decoder: Decoder[JcViewRow] = Decoder.forProduct5[JcViewRow, Option[Int], Option[JobcandidateId], Option[BusinessentityId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "jobcandidateid", "businessentityid", "resume", "modifieddate")(JcViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(JobcandidateId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[JcViewRow] = Encoder.forProduct5[JcViewRow, Option[Int], Option[JobcandidateId], Option[BusinessentityId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "jobcandidateid", "businessentityid", "resume", "modifieddate")(x => (x.id, x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(JobcandidateId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[JcViewRow] = Decoder.forProduct5[JcViewRow, Int, JobcandidateId, BusinessentityId, TypoXml, TypoLocalDateTime]("id", "jobcandidateid", "businessentityid", "resume", "modifieddate")(JcViewRow.apply)(Decoder.decodeInt, JobcandidateId.decoder, BusinessentityId.decoder, TypoXml.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[JcViewRow] = Encoder.forProduct5[JcViewRow, Int, JobcandidateId, BusinessentityId, TypoXml, TypoLocalDateTime]("id", "jobcandidateid", "businessentityid", "resume", "modifieddate")(x => (x.id, x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate))(Encoder.encodeInt, JobcandidateId.encoder, BusinessentityId.encoder, TypoXml.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[JcViewRow] = new Read[JcViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (JobcandidateId.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (JobcandidateId.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (TypoXml.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => JcViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      jobcandidateid = JobcandidateId.get.unsafeGetNullable(rs, i + 1),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
-      resume = TypoXml.get.unsafeGetNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      jobcandidateid = JobcandidateId.get.unsafeGetNonNullable(rs, i + 1),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 2),
+      resume = TypoXml.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

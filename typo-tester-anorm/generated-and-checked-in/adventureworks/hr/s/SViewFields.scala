@@ -11,15 +11,15 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SViewFields[Row] {
-  val id: OptField[Int, Row]
-  val shiftid: OptField[ShiftId, Row]
-  val name: OptField[Name, Row]
-  val starttime: OptField[TypoLocalTime, Row]
-  val endtime: OptField[TypoLocalTime, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val shiftid: Field[ShiftId, Row]
+  val name: Field[Name, Row]
+  val starttime: Field[TypoLocalTime, Row]
+  val endtime: Field[TypoLocalTime, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SViewFields extends SViewStructure[SViewRow](None, identity, (_, x) => x)
 

@@ -9,13 +9,13 @@ package foreign_data_wrapper_options
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ForeignDataWrapperOptionsViewFields[Row] {
-  val foreignDataWrapperCatalog: OptField[SqlIdentifier, Row]
-  val foreignDataWrapperName: OptField[SqlIdentifier, Row]
-  val optionName: OptField[SqlIdentifier, Row]
-  val optionValue: OptField[CharacterData, Row]
+  val foreignDataWrapperCatalog: Field[SqlIdentifier, Row]
+  val foreignDataWrapperName: Field[SqlIdentifier, Row]
+  val optionName: Field[SqlIdentifier, Row]
+  val optionValue: Field[CharacterData, Row]
 }
 object ForeignDataWrapperOptionsViewFields extends ForeignDataWrapperOptionsViewStructure[ForeignDataWrapperOptionsViewRow](None, identity, (_, x) => x)
 

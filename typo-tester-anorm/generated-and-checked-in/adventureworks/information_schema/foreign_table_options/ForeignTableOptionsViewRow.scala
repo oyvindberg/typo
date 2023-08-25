@@ -9,7 +9,6 @@ package foreign_table_options
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -17,30 +16,29 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ForeignTableOptionsViewRow(
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableCatalog]] */
-  foreignTableCatalog: Option[SqlIdentifier],
+  foreignTableCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableSchema]] */
-  foreignTableSchema: Option[SqlIdentifier],
+  foreignTableSchema: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableName]] */
-  foreignTableName: Option[SqlIdentifier],
-  optionName: Option[SqlIdentifier],
-  optionValue: Option[CharacterData]
+  foreignTableName: SqlIdentifier,
+  optionName: SqlIdentifier,
+  optionValue: CharacterData
 )
 
 object ForeignTableOptionsViewRow {
   implicit lazy val reads: Reads[ForeignTableOptionsViewRow] = Reads[ForeignTableOptionsViewRow](json => JsResult.fromTry(
       Try(
         ForeignTableOptionsViewRow(
-          foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignTableName = json.\("foreign_table_name").toOption.map(_.as(SqlIdentifier.reads)),
-          optionName = json.\("option_name").toOption.map(_.as(SqlIdentifier.reads)),
-          optionValue = json.\("option_value").toOption.map(_.as(CharacterData.reads))
+          foreignTableCatalog = json.\("foreign_table_catalog").as(SqlIdentifier.reads),
+          foreignTableSchema = json.\("foreign_table_schema").as(SqlIdentifier.reads),
+          foreignTableName = json.\("foreign_table_name").as(SqlIdentifier.reads),
+          optionName = json.\("option_name").as(SqlIdentifier.reads),
+          optionValue = json.\("option_value").as(CharacterData.reads)
         )
       )
     ),
@@ -48,21 +46,21 @@ object ForeignTableOptionsViewRow {
   def rowParser(idx: Int): RowParser[ForeignTableOptionsViewRow] = RowParser[ForeignTableOptionsViewRow] { row =>
     Success(
       ForeignTableOptionsViewRow(
-        foreignTableCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        foreignTableSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        foreignTableName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        optionName = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        optionValue = row(idx + 4)(Column.columnToOption(CharacterData.column))
+        foreignTableCatalog = row(idx + 0)(SqlIdentifier.column),
+        foreignTableSchema = row(idx + 1)(SqlIdentifier.column),
+        foreignTableName = row(idx + 2)(SqlIdentifier.column),
+        optionName = row(idx + 3)(SqlIdentifier.column),
+        optionValue = row(idx + 4)(CharacterData.column)
       )
     )
   }
   implicit lazy val writes: OWrites[ForeignTableOptionsViewRow] = OWrites[ForeignTableOptionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableCatalog),
-      "foreign_table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableSchema),
-      "foreign_table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableName),
-      "option_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.optionName),
-      "option_value" -> Writes.OptionWrites(CharacterData.writes).writes(o.optionValue)
+      "foreign_table_catalog" -> SqlIdentifier.writes.writes(o.foreignTableCatalog),
+      "foreign_table_schema" -> SqlIdentifier.writes.writes(o.foreignTableSchema),
+      "foreign_table_name" -> SqlIdentifier.writes.writes(o.foreignTableName),
+      "option_name" -> SqlIdentifier.writes.writes(o.optionName),
+      "option_value" -> CharacterData.writes.writes(o.optionValue)
     ))
   )
 }

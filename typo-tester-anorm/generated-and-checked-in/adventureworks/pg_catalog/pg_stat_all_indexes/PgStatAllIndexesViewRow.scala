@@ -20,28 +20,28 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatAllIndexesViewRow(
-  relid: Option[/* oid */ Long],
-  indexrelid: Option[/* oid */ Long],
+  relid: /* oid */ Long,
+  indexrelid: /* oid */ Long,
   schemaname: Option[String],
-  relname: Option[String],
-  indexrelname: Option[String],
-  idxScan: Option[Long],
-  idxTupRead: Option[Long],
-  idxTupFetch: Option[Long]
+  relname: String,
+  indexrelname: String,
+  idxScan: Long,
+  idxTupRead: Long,
+  idxTupFetch: Long
 )
 
 object PgStatAllIndexesViewRow {
   implicit lazy val reads: Reads[PgStatAllIndexesViewRow] = Reads[PgStatAllIndexesViewRow](json => JsResult.fromTry(
       Try(
         PgStatAllIndexesViewRow(
-          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
-          indexrelid = json.\("indexrelid").toOption.map(_.as(Reads.LongReads)),
+          relid = json.\("relid").as(Reads.LongReads),
+          indexrelid = json.\("indexrelid").as(Reads.LongReads),
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          relname = json.\("relname").toOption.map(_.as(Reads.StringReads)),
-          indexrelname = json.\("indexrelname").toOption.map(_.as(Reads.StringReads)),
-          idxScan = json.\("idx_scan").toOption.map(_.as(Reads.LongReads)),
-          idxTupRead = json.\("idx_tup_read").toOption.map(_.as(Reads.LongReads)),
-          idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as(Reads.LongReads))
+          relname = json.\("relname").as(Reads.StringReads),
+          indexrelname = json.\("indexrelname").as(Reads.StringReads),
+          idxScan = json.\("idx_scan").as(Reads.LongReads),
+          idxTupRead = json.\("idx_tup_read").as(Reads.LongReads),
+          idxTupFetch = json.\("idx_tup_fetch").as(Reads.LongReads)
         )
       )
     ),
@@ -49,27 +49,27 @@ object PgStatAllIndexesViewRow {
   def rowParser(idx: Int): RowParser[PgStatAllIndexesViewRow] = RowParser[PgStatAllIndexesViewRow] { row =>
     Success(
       PgStatAllIndexesViewRow(
-        relid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
-        indexrelid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        relid = row(idx + 0)(Column.columnToLong),
+        indexrelid = row(idx + 1)(Column.columnToLong),
         schemaname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        relname = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        indexrelname = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        idxScan = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
-        idxTupRead = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
-        idxTupFetch = row(idx + 7)(Column.columnToOption(Column.columnToLong))
+        relname = row(idx + 3)(Column.columnToString),
+        indexrelname = row(idx + 4)(Column.columnToString),
+        idxScan = row(idx + 5)(Column.columnToLong),
+        idxTupRead = row(idx + 6)(Column.columnToLong),
+        idxTupFetch = row(idx + 7)(Column.columnToLong)
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatAllIndexesViewRow] = OWrites[PgStatAllIndexesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
-      "indexrelid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.indexrelid),
+      "relid" -> Writes.LongWrites.writes(o.relid),
+      "indexrelid" -> Writes.LongWrites.writes(o.indexrelid),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "relname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.relname),
-      "indexrelname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.indexrelname),
-      "idx_scan" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxScan),
-      "idx_tup_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxTupRead),
-      "idx_tup_fetch" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxTupFetch)
+      "relname" -> Writes.StringWrites.writes(o.relname),
+      "indexrelname" -> Writes.StringWrites.writes(o.indexrelname),
+      "idx_scan" -> Writes.LongWrites.writes(o.idxScan),
+      "idx_tup_read" -> Writes.LongWrites.writes(o.idxTupRead),
+      "idx_tup_fetch" -> Writes.LongWrites.writes(o.idxTupFetch)
     ))
   )
 }

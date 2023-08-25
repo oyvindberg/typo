@@ -12,13 +12,12 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.OptField
 
 trait PppViewFields[Row] {
-  val productid: OptField[ProductId, Row]
-  val productphotoid: OptField[ProductphotoId, Row]
+  val productid: Field[ProductId, Row]
+  val productphotoid: Field[ProductphotoId, Row]
   val primary: Field[Flag, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PppViewFields extends PppViewStructure[PppViewRow](None, identity, (_, x) => x)
 

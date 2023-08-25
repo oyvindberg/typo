@@ -10,13 +10,13 @@ package pdoc
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PdocViewFields[Row] {
-  val id: OptField[Int, Row]
-  val productid: OptField[ProductId, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
-  val documentnode: OptField[DocumentId, Row]
+  val id: Field[Int, Row]
+  val productid: Field[ProductId, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
+  val documentnode: Field[DocumentId, Row]
 }
 object PdocViewFields extends PdocViewStructure[PdocViewRow](None, identity, (_, x) => x)
 

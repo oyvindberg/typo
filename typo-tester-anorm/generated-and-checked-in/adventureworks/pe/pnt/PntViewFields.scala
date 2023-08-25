@@ -10,13 +10,13 @@ package pnt
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PntViewFields[Row] {
-  val id: OptField[Int, Row]
-  val phonenumbertypeid: OptField[PhonenumbertypeId, Row]
-  val name: OptField[Name, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val phonenumbertypeid: Field[PhonenumbertypeId, Row]
+  val name: Field[Name, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PntViewFields extends PntViewStructure[PntViewRow](None, identity, (_, x) => x)
 

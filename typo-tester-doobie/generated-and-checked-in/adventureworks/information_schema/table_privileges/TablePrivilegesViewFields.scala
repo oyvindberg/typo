@@ -10,17 +10,17 @@ package table_privileges
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait TablePrivilegesViewFields[Row] {
-  val grantor: OptField[SqlIdentifier, Row]
-  val grantee: OptField[SqlIdentifier, Row]
-  val tableCatalog: OptField[SqlIdentifier, Row]
-  val tableSchema: OptField[SqlIdentifier, Row]
-  val tableName: OptField[SqlIdentifier, Row]
-  val privilegeType: OptField[CharacterData, Row]
-  val isGrantable: OptField[YesOrNo, Row]
-  val withHierarchy: OptField[YesOrNo, Row]
+  val grantor: Field[SqlIdentifier, Row]
+  val grantee: Field[SqlIdentifier, Row]
+  val tableCatalog: Field[SqlIdentifier, Row]
+  val tableSchema: Field[SqlIdentifier, Row]
+  val tableName: Field[SqlIdentifier, Row]
+  val privilegeType: Field[CharacterData, Row]
+  val isGrantable: Field[YesOrNo, Row]
+  val withHierarchy: Field[YesOrNo, Row]
 }
 object TablePrivilegesViewFields extends TablePrivilegesViewStructure[TablePrivilegesViewRow](None, identity, (_, x) => x)
 

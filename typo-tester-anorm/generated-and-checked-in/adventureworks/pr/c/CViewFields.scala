@@ -10,13 +10,13 @@ package c
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CViewFields[Row] {
-  val id: OptField[/* bpchar, max 6 chars */ String, Row]
-  val cultureid: OptField[CultureId, Row]
-  val name: OptField[Name, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[/* bpchar, max 6 chars */ String, Row]
+  val cultureid: Field[CultureId, Row]
+  val name: Field[Name, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object CViewFields extends CViewStructure[CViewRow](None, identity, (_, x) => x)
 

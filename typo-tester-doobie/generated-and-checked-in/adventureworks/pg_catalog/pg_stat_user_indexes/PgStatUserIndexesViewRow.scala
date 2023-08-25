@@ -16,46 +16,46 @@ import java.sql.ResultSet
 
 case class PgStatUserIndexesViewRow(
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.relid]] */
-  relid: Option[/* oid */ Long],
+  relid: /* oid */ Long,
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.indexrelid]] */
-  indexrelid: Option[/* oid */ Long],
+  indexrelid: /* oid */ Long,
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.schemaname]] */
-  schemaname: Option[String],
+  schemaname: String,
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.relname]] */
-  relname: Option[String],
+  relname: String,
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.indexrelname]] */
-  indexrelname: Option[String],
+  indexrelname: String,
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.idxScan]] */
-  idxScan: Option[Long],
+  idxScan: Long,
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.idxTupRead]] */
-  idxTupRead: Option[Long],
+  idxTupRead: Long,
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.idxTupFetch]] */
-  idxTupFetch: Option[Long]
+  idxTupFetch: Long
 )
 
 object PgStatUserIndexesViewRow {
-  implicit lazy val decoder: Decoder[PgStatUserIndexesViewRow] = Decoder.forProduct8[PgStatUserIndexesViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[String], Option[Long], Option[Long], Option[Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(PgStatUserIndexesViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit lazy val encoder: Encoder[PgStatUserIndexesViewRow] = Encoder.forProduct8[PgStatUserIndexesViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[String], Option[Long], Option[Long], Option[Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxScan, x.idxTupRead, x.idxTupFetch))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val decoder: Decoder[PgStatUserIndexesViewRow] = Decoder.forProduct8[PgStatUserIndexesViewRow, /* oid */ Long, /* oid */ Long, String, String, String, Long, Long, Long]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(PgStatUserIndexesViewRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgStatUserIndexesViewRow] = Encoder.forProduct8[PgStatUserIndexesViewRow, /* oid */ Long, /* oid */ Long, String, String, String, Long, Long, Long]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxScan, x.idxTupRead, x.idxTupFetch))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgStatUserIndexesViewRow] = new Read[PgStatUserIndexesViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatUserIndexesViewRow(
-      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
-      indexrelid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
-      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      indexrelname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      idxScan = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
-      idxTupRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
-      idxTupFetch = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7)
+      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      indexrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      schemaname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      relname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      indexrelname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      idxScan = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      idxTupRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
+      idxTupFetch = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7)
     )
   )
 }

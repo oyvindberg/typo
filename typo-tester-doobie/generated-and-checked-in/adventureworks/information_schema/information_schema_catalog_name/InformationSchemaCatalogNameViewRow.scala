@@ -15,18 +15,18 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class InformationSchemaCatalogNameViewRow(
-  catalogName: Option[SqlIdentifier]
+  catalogName: SqlIdentifier
 )
 
 object InformationSchemaCatalogNameViewRow {
-  implicit lazy val decoder: Decoder[InformationSchemaCatalogNameViewRow] = Decoder.forProduct1[InformationSchemaCatalogNameViewRow, Option[SqlIdentifier]]("catalog_name")(InformationSchemaCatalogNameViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[InformationSchemaCatalogNameViewRow] = Encoder.forProduct1[InformationSchemaCatalogNameViewRow, Option[SqlIdentifier]]("catalog_name")(x => (x.catalogName))(Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[InformationSchemaCatalogNameViewRow] = Decoder.forProduct1[InformationSchemaCatalogNameViewRow, SqlIdentifier]("catalog_name")(InformationSchemaCatalogNameViewRow.apply)(SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[InformationSchemaCatalogNameViewRow] = Encoder.forProduct1[InformationSchemaCatalogNameViewRow, SqlIdentifier]("catalog_name")(x => (x.catalogName))(SqlIdentifier.encoder)
   implicit lazy val read: Read[InformationSchemaCatalogNameViewRow] = new Read[InformationSchemaCatalogNameViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => InformationSchemaCatalogNameViewRow(
-      catalogName = SqlIdentifier.get.unsafeGetNullable(rs, i + 0)
+      catalogName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0)
     )
   )
 }

@@ -15,33 +15,33 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CollationCharacterSetApplicabilityViewRow(
-  collationCatalog: Option[SqlIdentifier],
-  collationSchema: Option[SqlIdentifier],
-  collationName: Option[SqlIdentifier],
-  characterSetCatalog: Option[SqlIdentifier],
-  characterSetSchema: Option[SqlIdentifier],
-  characterSetName: Option[SqlIdentifier]
+  collationCatalog: SqlIdentifier,
+  collationSchema: SqlIdentifier,
+  collationName: SqlIdentifier,
+  characterSetCatalog: SqlIdentifier,
+  characterSetSchema: SqlIdentifier,
+  characterSetName: SqlIdentifier
 )
 
 object CollationCharacterSetApplicabilityViewRow {
-  implicit lazy val decoder: Decoder[CollationCharacterSetApplicabilityViewRow] = Decoder.forProduct6[CollationCharacterSetApplicabilityViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name")(CollationCharacterSetApplicabilityViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[CollationCharacterSetApplicabilityViewRow] = Encoder.forProduct6[CollationCharacterSetApplicabilityViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.characterSetCatalog, x.characterSetSchema, x.characterSetName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[CollationCharacterSetApplicabilityViewRow] = Decoder.forProduct6[CollationCharacterSetApplicabilityViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name")(CollationCharacterSetApplicabilityViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[CollationCharacterSetApplicabilityViewRow] = Encoder.forProduct6[CollationCharacterSetApplicabilityViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.characterSetCatalog, x.characterSetSchema, x.characterSetName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
   implicit lazy val read: Read[CollationCharacterSetApplicabilityViewRow] = new Read[CollationCharacterSetApplicabilityViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CollationCharacterSetApplicabilityViewRow(
-      collationCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      collationSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      collationName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      characterSetCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      characterSetSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      characterSetName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5)
+      collationCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      collationSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      collationName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      characterSetCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      characterSetSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      characterSetName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

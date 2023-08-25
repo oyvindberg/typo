@@ -10,12 +10,12 @@ package pmi
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PmiViewFields[Row] {
-  val productmodelid: OptField[ProductmodelId, Row]
-  val illustrationid: OptField[IllustrationId, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val productmodelid: Field[ProductmodelId, Row]
+  val illustrationid: Field[IllustrationId, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PmiViewFields extends PmiViewStructure[PmiViewRow](None, identity, (_, x) => x)
 

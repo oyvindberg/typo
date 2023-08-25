@@ -24,26 +24,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class AtViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
-  addresstypeid: Option[AddresstypeId],
+  addresstypeid: AddresstypeId,
   /** Points to [[person.addresstype.AddresstypeRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[person.addresstype.AddresstypeRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.addresstype.AddresstypeRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object AtViewRow {
   implicit lazy val reads: Reads[AtViewRow] = Reads[AtViewRow](json => JsResult.fromTry(
       Try(
         AtViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          addresstypeid = json.\("addresstypeid").toOption.map(_.as(AddresstypeId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
+          name = json.\("name").as(Name.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,21 +51,21 @@ object AtViewRow {
   def rowParser(idx: Int): RowParser[AtViewRow] = RowParser[AtViewRow] { row =>
     Success(
       AtViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        addresstypeid = row(idx + 1)(Column.columnToOption(AddresstypeId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        rowguid = row(idx + 3)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        addresstypeid = row(idx + 1)(AddresstypeId.column),
+        name = row(idx + 2)(Name.column),
+        rowguid = row(idx + 3)(Column.columnToUUID),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[AtViewRow] = OWrites[AtViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "addresstypeid" -> Writes.OptionWrites(AddresstypeId.writes).writes(o.addresstypeid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),
+      "name" -> Name.writes.writes(o.name),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

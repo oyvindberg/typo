@@ -23,23 +23,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CuViewRow(
-  id: Option[/* bpchar, max 3 chars */ String],
+  id: /* bpchar, max 3 chars */ String,
   /** Points to [[sales.currency.CurrencyRow.currencycode]] */
-  currencycode: Option[CurrencyId],
+  currencycode: CurrencyId,
   /** Points to [[sales.currency.CurrencyRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[sales.currency.CurrencyRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CuViewRow {
   implicit lazy val reads: Reads[CuViewRow] = Reads[CuViewRow](json => JsResult.fromTry(
       Try(
         CuViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.StringReads)),
-          currencycode = json.\("currencycode").toOption.map(_.as(CurrencyId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.StringReads),
+          currencycode = json.\("currencycode").as(CurrencyId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,19 +47,19 @@ object CuViewRow {
   def rowParser(idx: Int): RowParser[CuViewRow] = RowParser[CuViewRow] { row =>
     Success(
       CuViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        currencycode = row(idx + 1)(Column.columnToOption(CurrencyId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToString),
+        currencycode = row(idx + 1)(CurrencyId.column),
+        name = row(idx + 2)(Name.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[CuViewRow] = OWrites[CuViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.StringWrites).writes(o.id),
-      "currencycode" -> Writes.OptionWrites(CurrencyId.writes).writes(o.currencycode),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.StringWrites.writes(o.id),
+      "currencycode" -> CurrencyId.writes.writes(o.currencycode),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

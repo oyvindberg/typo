@@ -21,44 +21,44 @@ import scala.util.Try
 
 case class PgStatXactUserTablesViewRow(
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.relid]] */
-  relid: Option[/* oid */ Long],
+  relid: /* oid */ Long,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.schemaname]] */
-  schemaname: Option[String],
+  schemaname: String,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.relname]] */
-  relname: Option[String],
+  relname: String,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.seqScan]] */
-  seqScan: Option[Long],
+  seqScan: Long,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.seqTupRead]] */
-  seqTupRead: Option[Long],
+  seqTupRead: Long,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.idxScan]] */
-  idxScan: Option[Long],
+  idxScan: Long,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.idxTupFetch]] */
-  idxTupFetch: Option[Long],
+  idxTupFetch: Long,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.nTupIns]] */
-  nTupIns: Option[Long],
+  nTupIns: Long,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.nTupUpd]] */
-  nTupUpd: Option[Long],
+  nTupUpd: Long,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.nTupDel]] */
-  nTupDel: Option[Long],
+  nTupDel: Long,
   /** Points to [[pg_stat_xact_all_tables.PgStatXactAllTablesViewRow.nTupHotUpd]] */
-  nTupHotUpd: Option[Long]
+  nTupHotUpd: Long
 )
 
 object PgStatXactUserTablesViewRow {
   implicit lazy val reads: Reads[PgStatXactUserTablesViewRow] = Reads[PgStatXactUserTablesViewRow](json => JsResult.fromTry(
       Try(
         PgStatXactUserTablesViewRow(
-          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
-          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          relname = json.\("relname").toOption.map(_.as(Reads.StringReads)),
-          seqScan = json.\("seq_scan").toOption.map(_.as(Reads.LongReads)),
-          seqTupRead = json.\("seq_tup_read").toOption.map(_.as(Reads.LongReads)),
-          idxScan = json.\("idx_scan").toOption.map(_.as(Reads.LongReads)),
-          idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as(Reads.LongReads)),
-          nTupIns = json.\("n_tup_ins").toOption.map(_.as(Reads.LongReads)),
-          nTupUpd = json.\("n_tup_upd").toOption.map(_.as(Reads.LongReads)),
-          nTupDel = json.\("n_tup_del").toOption.map(_.as(Reads.LongReads)),
-          nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as(Reads.LongReads))
+          relid = json.\("relid").as(Reads.LongReads),
+          schemaname = json.\("schemaname").as(Reads.StringReads),
+          relname = json.\("relname").as(Reads.StringReads),
+          seqScan = json.\("seq_scan").as(Reads.LongReads),
+          seqTupRead = json.\("seq_tup_read").as(Reads.LongReads),
+          idxScan = json.\("idx_scan").as(Reads.LongReads),
+          idxTupFetch = json.\("idx_tup_fetch").as(Reads.LongReads),
+          nTupIns = json.\("n_tup_ins").as(Reads.LongReads),
+          nTupUpd = json.\("n_tup_upd").as(Reads.LongReads),
+          nTupDel = json.\("n_tup_del").as(Reads.LongReads),
+          nTupHotUpd = json.\("n_tup_hot_upd").as(Reads.LongReads)
         )
       )
     ),
@@ -66,33 +66,33 @@ object PgStatXactUserTablesViewRow {
   def rowParser(idx: Int): RowParser[PgStatXactUserTablesViewRow] = RowParser[PgStatXactUserTablesViewRow] { row =>
     Success(
       PgStatXactUserTablesViewRow(
-        relid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
-        schemaname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        relname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        seqScan = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
-        seqTupRead = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
-        idxScan = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
-        idxTupFetch = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
-        nTupIns = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
-        nTupUpd = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
-        nTupDel = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
-        nTupHotUpd = row(idx + 10)(Column.columnToOption(Column.columnToLong))
+        relid = row(idx + 0)(Column.columnToLong),
+        schemaname = row(idx + 1)(Column.columnToString),
+        relname = row(idx + 2)(Column.columnToString),
+        seqScan = row(idx + 3)(Column.columnToLong),
+        seqTupRead = row(idx + 4)(Column.columnToLong),
+        idxScan = row(idx + 5)(Column.columnToLong),
+        idxTupFetch = row(idx + 6)(Column.columnToLong),
+        nTupIns = row(idx + 7)(Column.columnToLong),
+        nTupUpd = row(idx + 8)(Column.columnToLong),
+        nTupDel = row(idx + 9)(Column.columnToLong),
+        nTupHotUpd = row(idx + 10)(Column.columnToLong)
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatXactUserTablesViewRow] = OWrites[PgStatXactUserTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
-      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "relname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.relname),
-      "seq_scan" -> Writes.OptionWrites(Writes.LongWrites).writes(o.seqScan),
-      "seq_tup_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.seqTupRead),
-      "idx_scan" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxScan),
-      "idx_tup_fetch" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxTupFetch),
-      "n_tup_ins" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nTupIns),
-      "n_tup_upd" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nTupUpd),
-      "n_tup_del" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nTupDel),
-      "n_tup_hot_upd" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nTupHotUpd)
+      "relid" -> Writes.LongWrites.writes(o.relid),
+      "schemaname" -> Writes.StringWrites.writes(o.schemaname),
+      "relname" -> Writes.StringWrites.writes(o.relname),
+      "seq_scan" -> Writes.LongWrites.writes(o.seqScan),
+      "seq_tup_read" -> Writes.LongWrites.writes(o.seqTupRead),
+      "idx_scan" -> Writes.LongWrites.writes(o.idxScan),
+      "idx_tup_fetch" -> Writes.LongWrites.writes(o.idxTupFetch),
+      "n_tup_ins" -> Writes.LongWrites.writes(o.nTupIns),
+      "n_tup_upd" -> Writes.LongWrites.writes(o.nTupUpd),
+      "n_tup_del" -> Writes.LongWrites.writes(o.nTupDel),
+      "n_tup_hot_upd" -> Writes.LongWrites.writes(o.nTupHotUpd)
     ))
   )
 }

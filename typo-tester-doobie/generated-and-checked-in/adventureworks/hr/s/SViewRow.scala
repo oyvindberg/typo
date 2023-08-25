@@ -19,38 +19,38 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class SViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
-  shiftid: Option[ShiftId],
+  shiftid: ShiftId,
   /** Points to [[humanresources.shift.ShiftRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[humanresources.shift.ShiftRow.starttime]] */
-  starttime: Option[TypoLocalTime],
+  starttime: TypoLocalTime,
   /** Points to [[humanresources.shift.ShiftRow.endtime]] */
-  endtime: Option[TypoLocalTime],
+  endtime: TypoLocalTime,
   /** Points to [[humanresources.shift.ShiftRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SViewRow {
-  implicit lazy val decoder: Decoder[SViewRow] = Decoder.forProduct6[SViewRow, Option[Int], Option[ShiftId], Option[Name], Option[TypoLocalTime], Option[TypoLocalTime], Option[TypoLocalDateTime]]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(SViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ShiftId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalTime.decoder), Decoder.decodeOption(TypoLocalTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SViewRow] = Encoder.forProduct6[SViewRow, Option[Int], Option[ShiftId], Option[Name], Option[TypoLocalTime], Option[TypoLocalTime], Option[TypoLocalDateTime]]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.id, x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ShiftId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalTime.encoder), Encoder.encodeOption(TypoLocalTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SViewRow] = Decoder.forProduct6[SViewRow, Int, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(SViewRow.apply)(Decoder.decodeInt, ShiftId.decoder, Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SViewRow] = Encoder.forProduct6[SViewRow, Int, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.id, x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(Encoder.encodeInt, ShiftId.encoder, Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SViewRow] = new Read[SViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ShiftId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoLocalTime.get, Nullability.Nullable),
-      (TypoLocalTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ShiftId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalTime.get, Nullability.NoNulls),
+      (TypoLocalTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      shiftid = ShiftId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      starttime = TypoLocalTime.get.unsafeGetNullable(rs, i + 3),
-      endtime = TypoLocalTime.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      starttime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 3),
+      endtime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

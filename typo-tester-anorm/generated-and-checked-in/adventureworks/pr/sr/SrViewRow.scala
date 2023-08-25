@@ -23,23 +23,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SrViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
-  scrapreasonid: Option[ScrapreasonId],
+  scrapreasonid: ScrapreasonId,
   /** Points to [[production.scrapreason.ScrapreasonRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[production.scrapreason.ScrapreasonRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SrViewRow {
   implicit lazy val reads: Reads[SrViewRow] = Reads[SrViewRow](json => JsResult.fromTry(
       Try(
         SrViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          scrapreasonid = json.\("scrapreasonid").toOption.map(_.as(ScrapreasonId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          scrapreasonid = json.\("scrapreasonid").as(ScrapreasonId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,19 +47,19 @@ object SrViewRow {
   def rowParser(idx: Int): RowParser[SrViewRow] = RowParser[SrViewRow] { row =>
     Success(
       SrViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        scrapreasonid = row(idx + 1)(Column.columnToOption(ScrapreasonId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        scrapreasonid = row(idx + 1)(ScrapreasonId.column),
+        name = row(idx + 2)(Name.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SrViewRow] = OWrites[SrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "scrapreasonid" -> Writes.OptionWrites(ScrapreasonId.writes).writes(o.scrapreasonid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "scrapreasonid" -> ScrapreasonId.writes.writes(o.scrapreasonid),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

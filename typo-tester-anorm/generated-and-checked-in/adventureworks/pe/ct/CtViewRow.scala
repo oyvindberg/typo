@@ -23,23 +23,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CtViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.contacttype.ContacttypeRow.contacttypeid]] */
-  contacttypeid: Option[ContacttypeId],
+  contacttypeid: ContacttypeId,
   /** Points to [[person.contacttype.ContacttypeRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[person.contacttype.ContacttypeRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CtViewRow {
   implicit lazy val reads: Reads[CtViewRow] = Reads[CtViewRow](json => JsResult.fromTry(
       Try(
         CtViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          contacttypeid = json.\("contacttypeid").toOption.map(_.as(ContacttypeId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          contacttypeid = json.\("contacttypeid").as(ContacttypeId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,19 +47,19 @@ object CtViewRow {
   def rowParser(idx: Int): RowParser[CtViewRow] = RowParser[CtViewRow] { row =>
     Success(
       CtViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        contacttypeid = row(idx + 1)(Column.columnToOption(ContacttypeId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        contacttypeid = row(idx + 1)(ContacttypeId.column),
+        name = row(idx + 2)(Name.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[CtViewRow] = OWrites[CtViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "contacttypeid" -> Writes.OptionWrites(ContacttypeId.writes).writes(o.contacttypeid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "contacttypeid" -> ContacttypeId.writes.writes(o.contacttypeid),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

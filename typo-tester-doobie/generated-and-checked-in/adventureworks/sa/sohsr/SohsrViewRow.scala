@@ -18,26 +18,26 @@ import java.sql.ResultSet
 
 case class SohsrViewRow(
   /** Points to [[sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesorderid]] */
-  salesorderid: Option[SalesorderheaderId],
+  salesorderid: SalesorderheaderId,
   /** Points to [[sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesreasonid]] */
-  salesreasonid: Option[SalesreasonId],
+  salesreasonid: SalesreasonId,
   /** Points to [[sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SohsrViewRow {
-  implicit lazy val decoder: Decoder[SohsrViewRow] = Decoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(SohsrViewRow.apply)(Decoder.decodeOption(SalesorderheaderId.decoder), Decoder.decodeOption(SalesreasonId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SohsrViewRow] = Encoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(Encoder.encodeOption(SalesorderheaderId.encoder), Encoder.encodeOption(SalesreasonId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SohsrViewRow] = Decoder.forProduct3[SohsrViewRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(SohsrViewRow.apply)(SalesorderheaderId.decoder, SalesreasonId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SohsrViewRow] = Encoder.forProduct3[SohsrViewRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(SalesorderheaderId.encoder, SalesreasonId.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SohsrViewRow] = new Read[SohsrViewRow](
     gets = List(
-      (SalesorderheaderId.get, Nullability.Nullable),
-      (SalesreasonId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (SalesorderheaderId.get, Nullability.NoNulls),
+      (SalesreasonId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SohsrViewRow(
-      salesorderid = SalesorderheaderId.get.unsafeGetNullable(rs, i + 0),
-      salesreasonid = SalesreasonId.get.unsafeGetNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2)
+      salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
+      salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

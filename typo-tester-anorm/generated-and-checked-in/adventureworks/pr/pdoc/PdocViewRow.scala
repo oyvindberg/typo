@@ -23,23 +23,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PdocViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productdocument.ProductdocumentRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[production.productdocument.ProductdocumentRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime],
+  modifieddate: TypoLocalDateTime,
   /** Points to [[production.productdocument.ProductdocumentRow.documentnode]] */
-  documentnode: Option[DocumentId]
+  documentnode: DocumentId
 )
 
 object PdocViewRow {
   implicit lazy val reads: Reads[PdocViewRow] = Reads[PdocViewRow](json => JsResult.fromTry(
       Try(
         PdocViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          documentnode = json.\("documentnode").toOption.map(_.as(DocumentId.reads))
+          id = json.\("id").as(Reads.IntReads),
+          productid = json.\("productid").as(ProductId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
+          documentnode = json.\("documentnode").as(DocumentId.reads)
         )
       )
     ),
@@ -47,19 +47,19 @@ object PdocViewRow {
   def rowParser(idx: Int): RowParser[PdocViewRow] = RowParser[PdocViewRow] { row =>
     Success(
       PdocViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        productid = row(idx + 1)(Column.columnToOption(ProductId.column)),
-        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
-        documentnode = row(idx + 3)(Column.columnToOption(DocumentId.column))
+        id = row(idx + 0)(Column.columnToInt),
+        productid = row(idx + 1)(ProductId.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column),
+        documentnode = row(idx + 3)(DocumentId.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PdocViewRow] = OWrites[PdocViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate),
-      "documentnode" -> Writes.OptionWrites(DocumentId.writes).writes(o.documentnode)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
+      "documentnode" -> DocumentId.writes.writes(o.documentnode)
     ))
   )
 }

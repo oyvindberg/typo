@@ -21,10 +21,10 @@ import scala.util.Try
 
 case class PgIndexesViewRow(
   schemaname: Option[String],
-  tablename: Option[String],
-  indexname: Option[String],
+  tablename: String,
+  indexname: String,
   tablespace: Option[String],
-  indexdef: Option[String]
+  indexdef: String
 )
 
 object PgIndexesViewRow {
@@ -32,10 +32,10 @@ object PgIndexesViewRow {
       Try(
         PgIndexesViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
-          indexname = json.\("indexname").toOption.map(_.as(Reads.StringReads)),
+          tablename = json.\("tablename").as(Reads.StringReads),
+          indexname = json.\("indexname").as(Reads.StringReads),
           tablespace = json.\("tablespace").toOption.map(_.as(Reads.StringReads)),
-          indexdef = json.\("indexdef").toOption.map(_.as(Reads.StringReads))
+          indexdef = json.\("indexdef").as(Reads.StringReads)
         )
       )
     ),
@@ -44,20 +44,20 @@ object PgIndexesViewRow {
     Success(
       PgIndexesViewRow(
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        indexname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tablename = row(idx + 1)(Column.columnToString),
+        indexname = row(idx + 2)(Column.columnToString),
         tablespace = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        indexdef = row(idx + 4)(Column.columnToOption(Column.columnToString))
+        indexdef = row(idx + 4)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[PgIndexesViewRow] = OWrites[PgIndexesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
-      "indexname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.indexname),
+      "tablename" -> Writes.StringWrites.writes(o.tablename),
+      "indexname" -> Writes.StringWrites.writes(o.indexname),
       "tablespace" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablespace),
-      "indexdef" -> Writes.OptionWrites(Writes.StringWrites).writes(o.indexdef)
+      "indexdef" -> Writes.StringWrites.writes(o.indexdef)
     ))
   )
 }

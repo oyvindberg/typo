@@ -7,20 +7,20 @@ package adventureworks
 package pg_catalog
 package pg_user_mappings
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgUserMappingsViewStructure[Row](val prefix: Option[String], val extract: Row => PgUserMappingsViewRow, val merge: (Row, PgUserMappingsViewRow) => Row)
   extends Relation[PgUserMappingsViewFields, PgUserMappingsViewRow, Row]
     with PgUserMappingsViewFields[Row] { outer =>
 
-  override val umid = new OptField[/* oid */ Long, Row](prefix, "umid", None, Some("oid"))(x => extract(x).umid, (row, value) => merge(row, extract(row).copy(umid = value)))
-  override val srvid = new OptField[/* oid */ Long, Row](prefix, "srvid", None, Some("oid"))(x => extract(x).srvid, (row, value) => merge(row, extract(row).copy(srvid = value)))
-  override val srvname = new OptField[String, Row](prefix, "srvname", None, Some("name"))(x => extract(x).srvname, (row, value) => merge(row, extract(row).copy(srvname = value)))
-  override val umuser = new OptField[/* oid */ Long, Row](prefix, "umuser", None, Some("oid"))(x => extract(x).umuser, (row, value) => merge(row, extract(row).copy(umuser = value)))
-  override val usename = new OptField[String, Row](prefix, "usename", None, Some("name"))(x => extract(x).usename, (row, value) => merge(row, extract(row).copy(usename = value)))
-  override val umoptions = new OptField[Array[String], Row](prefix, "umoptions", None, Some("_text"))(x => extract(x).umoptions, (row, value) => merge(row, extract(row).copy(umoptions = value)))
+  override val umid = new Field[/* oid */ Long, Row](prefix, "umid", None, Some("oid"))(x => extract(x).umid, (row, value) => merge(row, extract(row).copy(umid = value)))
+  override val srvid = new Field[/* oid */ Long, Row](prefix, "srvid", None, Some("oid"))(x => extract(x).srvid, (row, value) => merge(row, extract(row).copy(srvid = value)))
+  override val srvname = new Field[String, Row](prefix, "srvname", None, Some("name"))(x => extract(x).srvname, (row, value) => merge(row, extract(row).copy(srvname = value)))
+  override val umuser = new Field[/* oid */ Long, Row](prefix, "umuser", None, Some("oid"))(x => extract(x).umuser, (row, value) => merge(row, extract(row).copy(umuser = value)))
+  override val usename = new Field[String, Row](prefix, "usename", None, Some("name"))(x => extract(x).usename, (row, value) => merge(row, extract(row).copy(usename = value)))
+  override val umoptions = new Field[Array[String], Row](prefix, "umoptions", None, Some("_text"))(x => extract(x).umoptions, (row, value) => merge(row, extract(row).copy(umoptions = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](umid, srvid, srvname, umuser, usename, umoptions)

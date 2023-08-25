@@ -23,32 +23,32 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SciViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartitemid]] */
-  shoppingcartitemid: Option[ShoppingcartitemId],
+  shoppingcartitemid: ShoppingcartitemId,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartid]] */
-  shoppingcartid: Option[/* max 50 chars */ String],
+  shoppingcartid: /* max 50 chars */ String,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.quantity]] */
-  quantity: Option[Int],
+  quantity: Int,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.datecreated]] */
-  datecreated: Option[TypoLocalDateTime],
+  datecreated: TypoLocalDateTime,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SciViewRow {
   implicit lazy val reads: Reads[SciViewRow] = Reads[SciViewRow](json => JsResult.fromTry(
       Try(
         SciViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          shoppingcartitemid = json.\("shoppingcartitemid").toOption.map(_.as(ShoppingcartitemId.reads)),
-          shoppingcartid = json.\("shoppingcartid").toOption.map(_.as(Reads.StringReads)),
-          quantity = json.\("quantity").toOption.map(_.as(Reads.IntReads)),
-          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
-          datecreated = json.\("datecreated").toOption.map(_.as(TypoLocalDateTime.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          shoppingcartitemid = json.\("shoppingcartitemid").as(ShoppingcartitemId.reads),
+          shoppingcartid = json.\("shoppingcartid").as(Reads.StringReads),
+          quantity = json.\("quantity").as(Reads.IntReads),
+          productid = json.\("productid").as(ProductId.reads),
+          datecreated = json.\("datecreated").as(TypoLocalDateTime.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -56,25 +56,25 @@ object SciViewRow {
   def rowParser(idx: Int): RowParser[SciViewRow] = RowParser[SciViewRow] { row =>
     Success(
       SciViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        shoppingcartitemid = row(idx + 1)(Column.columnToOption(ShoppingcartitemId.column)),
-        shoppingcartid = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        quantity = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
-        productid = row(idx + 4)(Column.columnToOption(ProductId.column)),
-        datecreated = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
-        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        shoppingcartitemid = row(idx + 1)(ShoppingcartitemId.column),
+        shoppingcartid = row(idx + 2)(Column.columnToString),
+        quantity = row(idx + 3)(Column.columnToInt),
+        productid = row(idx + 4)(ProductId.column),
+        datecreated = row(idx + 5)(TypoLocalDateTime.column),
+        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SciViewRow] = OWrites[SciViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "shoppingcartitemid" -> Writes.OptionWrites(ShoppingcartitemId.writes).writes(o.shoppingcartitemid),
-      "shoppingcartid" -> Writes.OptionWrites(Writes.StringWrites).writes(o.shoppingcartid),
-      "quantity" -> Writes.OptionWrites(Writes.IntWrites).writes(o.quantity),
-      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
-      "datecreated" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.datecreated),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "shoppingcartitemid" -> ShoppingcartitemId.writes.writes(o.shoppingcartitemid),
+      "shoppingcartid" -> Writes.StringWrites.writes(o.shoppingcartid),
+      "quantity" -> Writes.IntWrites.writes(o.quantity),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "datecreated" -> TypoLocalDateTime.writes.writes(o.datecreated),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -11,22 +11,22 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PohViewFields[Row] {
-  val id: OptField[Int, Row]
-  val purchaseorderid: OptField[PurchaseorderheaderId, Row]
-  val revisionnumber: OptField[Int, Row]
-  val status: OptField[Int, Row]
-  val employeeid: OptField[BusinessentityId, Row]
-  val vendorid: OptField[BusinessentityId, Row]
-  val shipmethodid: OptField[ShipmethodId, Row]
-  val orderdate: OptField[TypoLocalDateTime, Row]
-  val shipdate: OptField[TypoLocalDateTime, Row]
-  val subtotal: OptField[BigDecimal, Row]
-  val taxamt: OptField[BigDecimal, Row]
-  val freight: OptField[BigDecimal, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val purchaseorderid: Field[PurchaseorderheaderId, Row]
+  val revisionnumber: Field[Int, Row]
+  val status: Field[Int, Row]
+  val employeeid: Field[BusinessentityId, Row]
+  val vendorid: Field[BusinessentityId, Row]
+  val shipmethodid: Field[ShipmethodId, Row]
+  val orderdate: Field[TypoLocalDateTime, Row]
+  val shipdate: Field[TypoLocalDateTime, Row]
+  val subtotal: Field[BigDecimal, Row]
+  val taxamt: Field[BigDecimal, Row]
+  val freight: Field[BigDecimal, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PohViewFields extends PohViewStructure[PohViewRow](None, identity, (_, x) => x)
 

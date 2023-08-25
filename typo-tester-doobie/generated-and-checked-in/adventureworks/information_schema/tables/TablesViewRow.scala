@@ -17,51 +17,51 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class TablesViewRow(
-  tableCatalog: Option[SqlIdentifier],
-  tableSchema: Option[SqlIdentifier],
-  tableName: Option[SqlIdentifier],
-  tableType: Option[CharacterData],
-  selfReferencingColumnName: Option[SqlIdentifier],
-  referenceGeneration: Option[CharacterData],
-  userDefinedTypeCatalog: Option[SqlIdentifier],
-  userDefinedTypeSchema: Option[SqlIdentifier],
-  userDefinedTypeName: Option[SqlIdentifier],
-  isInsertableInto: Option[YesOrNo],
-  isTyped: Option[YesOrNo],
-  commitAction: Option[CharacterData]
+  tableCatalog: SqlIdentifier,
+  tableSchema: SqlIdentifier,
+  tableName: SqlIdentifier,
+  tableType: CharacterData,
+  selfReferencingColumnName: SqlIdentifier,
+  referenceGeneration: CharacterData,
+  userDefinedTypeCatalog: SqlIdentifier,
+  userDefinedTypeSchema: SqlIdentifier,
+  userDefinedTypeName: SqlIdentifier,
+  isInsertableInto: YesOrNo,
+  isTyped: YesOrNo,
+  commitAction: CharacterData
 )
 
 object TablesViewRow {
-  implicit lazy val decoder: Decoder[TablesViewRow] = Decoder.forProduct12[TablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo], Option[YesOrNo], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "table_type", "self_referencing_column_name", "reference_generation", "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", "is_insertable_into", "is_typed", "commit_action")(TablesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit lazy val encoder: Encoder[TablesViewRow] = Encoder.forProduct12[TablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo], Option[YesOrNo], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "table_type", "self_referencing_column_name", "reference_generation", "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", "is_insertable_into", "is_typed", "commit_action")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.tableType, x.selfReferencingColumnName, x.referenceGeneration, x.userDefinedTypeCatalog, x.userDefinedTypeSchema, x.userDefinedTypeName, x.isInsertableInto, x.isTyped, x.commitAction))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val decoder: Decoder[TablesViewRow] = Decoder.forProduct12[TablesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, SqlIdentifier, CharacterData, SqlIdentifier, SqlIdentifier, SqlIdentifier, YesOrNo, YesOrNo, CharacterData]("table_catalog", "table_schema", "table_name", "table_type", "self_referencing_column_name", "reference_generation", "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", "is_insertable_into", "is_typed", "commit_action")(TablesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, SqlIdentifier.decoder, CharacterData.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, YesOrNo.decoder, YesOrNo.decoder, CharacterData.decoder)
+  implicit lazy val encoder: Encoder[TablesViewRow] = Encoder.forProduct12[TablesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, SqlIdentifier, CharacterData, SqlIdentifier, SqlIdentifier, SqlIdentifier, YesOrNo, YesOrNo, CharacterData]("table_catalog", "table_schema", "table_name", "table_type", "self_referencing_column_name", "reference_generation", "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", "is_insertable_into", "is_typed", "commit_action")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.tableType, x.selfReferencingColumnName, x.referenceGeneration, x.userDefinedTypeCatalog, x.userDefinedTypeSchema, x.userDefinedTypeName, x.isInsertableInto, x.isTyped, x.commitAction))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, SqlIdentifier.encoder, CharacterData.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, YesOrNo.encoder, YesOrNo.encoder, CharacterData.encoder)
   implicit lazy val read: Read[TablesViewRow] = new Read[TablesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (YesOrNo.get, Nullability.NoNulls),
+      (YesOrNo.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TablesViewRow(
-      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      tableType = CharacterData.get.unsafeGetNullable(rs, i + 3),
-      selfReferencingColumnName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      referenceGeneration = CharacterData.get.unsafeGetNullable(rs, i + 5),
-      userDefinedTypeCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 6),
-      userDefinedTypeSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 7),
-      userDefinedTypeName = SqlIdentifier.get.unsafeGetNullable(rs, i + 8),
-      isInsertableInto = YesOrNo.get.unsafeGetNullable(rs, i + 9),
-      isTyped = YesOrNo.get.unsafeGetNullable(rs, i + 10),
-      commitAction = CharacterData.get.unsafeGetNullable(rs, i + 11)
+      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      tableType = CharacterData.get.unsafeGetNonNullable(rs, i + 3),
+      selfReferencingColumnName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      referenceGeneration = CharacterData.get.unsafeGetNonNullable(rs, i + 5),
+      userDefinedTypeCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6),
+      userDefinedTypeSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 7),
+      userDefinedTypeName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 8),
+      isInsertableInto = YesOrNo.get.unsafeGetNonNullable(rs, i + 9),
+      isTyped = YesOrNo.get.unsafeGetNonNullable(rs, i + 10),
+      commitAction = CharacterData.get.unsafeGetNonNullable(rs, i + 11)
     )
   )
 }

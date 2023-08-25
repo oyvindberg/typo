@@ -24,41 +24,41 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[sales.salesperson.SalespersonRow.territoryid]] */
-  territoryid: Option[SalesterritoryId],
+  territoryid: SalesterritoryId,
   /** Points to [[sales.salesperson.SalespersonRow.salesquota]] */
-  salesquota: Option[BigDecimal],
+  salesquota: BigDecimal,
   /** Points to [[sales.salesperson.SalespersonRow.bonus]] */
-  bonus: Option[BigDecimal],
+  bonus: BigDecimal,
   /** Points to [[sales.salesperson.SalespersonRow.commissionpct]] */
-  commissionpct: Option[BigDecimal],
+  commissionpct: BigDecimal,
   /** Points to [[sales.salesperson.SalespersonRow.salesytd]] */
-  salesytd: Option[BigDecimal],
+  salesytd: BigDecimal,
   /** Points to [[sales.salesperson.SalespersonRow.saleslastyear]] */
-  saleslastyear: Option[BigDecimal],
+  saleslastyear: BigDecimal,
   /** Points to [[sales.salesperson.SalespersonRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.salesperson.SalespersonRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SpViewRow {
   implicit lazy val reads: Reads[SpViewRow] = Reads[SpViewRow](json => JsResult.fromTry(
       Try(
         SpViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
-          salesquota = json.\("salesquota").toOption.map(_.as(Reads.bigDecReads)),
-          bonus = json.\("bonus").toOption.map(_.as(Reads.bigDecReads)),
-          commissionpct = json.\("commissionpct").toOption.map(_.as(Reads.bigDecReads)),
-          salesytd = json.\("salesytd").toOption.map(_.as(Reads.bigDecReads)),
-          saleslastyear = json.\("saleslastyear").toOption.map(_.as(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
+          salesquota = json.\("salesquota").as(Reads.bigDecReads),
+          bonus = json.\("bonus").as(Reads.bigDecReads),
+          commissionpct = json.\("commissionpct").as(Reads.bigDecReads),
+          salesytd = json.\("salesytd").as(Reads.bigDecReads),
+          saleslastyear = json.\("saleslastyear").as(Reads.bigDecReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -66,31 +66,31 @@ object SpViewRow {
   def rowParser(idx: Int): RowParser[SpViewRow] = RowParser[SpViewRow] { row =>
     Success(
       SpViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        territoryid = row(idx + 2)(Column.columnToOption(SalesterritoryId.column)),
-        salesquota = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        bonus = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        commissionpct = row(idx + 5)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        salesytd = row(idx + 6)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        saleslastyear = row(idx + 7)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        rowguid = row(idx + 8)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 9)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        territoryid = row(idx + 2)(SalesterritoryId.column),
+        salesquota = row(idx + 3)(Column.columnToScalaBigDecimal),
+        bonus = row(idx + 4)(Column.columnToScalaBigDecimal),
+        commissionpct = row(idx + 5)(Column.columnToScalaBigDecimal),
+        salesytd = row(idx + 6)(Column.columnToScalaBigDecimal),
+        saleslastyear = row(idx + 7)(Column.columnToScalaBigDecimal),
+        rowguid = row(idx + 8)(Column.columnToUUID),
+        modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SpViewRow] = OWrites[SpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
-      "salesquota" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesquota),
-      "bonus" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.bonus),
-      "commissionpct" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.commissionpct),
-      "salesytd" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesytd),
-      "saleslastyear" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.saleslastyear),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
+      "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),
+      "bonus" -> Writes.BigDecimalWrites.writes(o.bonus),
+      "commissionpct" -> Writes.BigDecimalWrites.writes(o.commissionpct),
+      "salesytd" -> Writes.BigDecimalWrites.writes(o.salesytd),
+      "saleslastyear" -> Writes.BigDecimalWrites.writes(o.saleslastyear),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

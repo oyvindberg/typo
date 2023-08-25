@@ -20,18 +20,18 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPublicationTablesViewRow(
-  pubname: Option[String],
-  schemaname: Option[String],
-  tablename: Option[String]
+  pubname: String,
+  schemaname: String,
+  tablename: String
 )
 
 object PgPublicationTablesViewRow {
   implicit lazy val reads: Reads[PgPublicationTablesViewRow] = Reads[PgPublicationTablesViewRow](json => JsResult.fromTry(
       Try(
         PgPublicationTablesViewRow(
-          pubname = json.\("pubname").toOption.map(_.as(Reads.StringReads)),
-          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads))
+          pubname = json.\("pubname").as(Reads.StringReads),
+          schemaname = json.\("schemaname").as(Reads.StringReads),
+          tablename = json.\("tablename").as(Reads.StringReads)
         )
       )
     ),
@@ -39,17 +39,17 @@ object PgPublicationTablesViewRow {
   def rowParser(idx: Int): RowParser[PgPublicationTablesViewRow] = RowParser[PgPublicationTablesViewRow] { row =>
     Success(
       PgPublicationTablesViewRow(
-        pubname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        schemaname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        tablename = row(idx + 2)(Column.columnToOption(Column.columnToString))
+        pubname = row(idx + 0)(Column.columnToString),
+        schemaname = row(idx + 1)(Column.columnToString),
+        tablename = row(idx + 2)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[PgPublicationTablesViewRow] = OWrites[PgPublicationTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pubname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.pubname),
-      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename)
+      "pubname" -> Writes.StringWrites.writes(o.pubname),
+      "schemaname" -> Writes.StringWrites.writes(o.schemaname),
+      "tablename" -> Writes.StringWrites.writes(o.tablename)
     ))
   )
 }

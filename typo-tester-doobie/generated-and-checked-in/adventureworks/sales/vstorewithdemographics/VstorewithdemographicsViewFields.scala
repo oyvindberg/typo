@@ -10,21 +10,21 @@ package vstorewithdemographics
 import adventureworks.customtypes.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait VstorewithdemographicsViewFields[Row] {
-  val businessentityid: OptField[BusinessentityId, Row]
-  val name: OptField[Name, Row]
-  val AnnualSales: OptField[TypoMoney, Row]
-  val AnnualRevenue: OptField[TypoMoney, Row]
-  val BankName: OptField[/* max 50 chars */ String, Row]
-  val BusinessType: OptField[/* max 5 chars */ String, Row]
-  val YearOpened: OptField[Int, Row]
-  val Specialty: OptField[/* max 50 chars */ String, Row]
-  val SquareFeet: OptField[Int, Row]
-  val Brands: OptField[/* max 30 chars */ String, Row]
-  val Internet: OptField[/* max 30 chars */ String, Row]
-  val NumberEmployees: OptField[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val name: Field[Name, Row]
+  val AnnualSales: Field[TypoMoney, Row]
+  val AnnualRevenue: Field[TypoMoney, Row]
+  val BankName: Field[/* max 50 chars */ String, Row]
+  val BusinessType: Field[/* max 5 chars */ String, Row]
+  val YearOpened: Field[Int, Row]
+  val Specialty: Field[/* max 50 chars */ String, Row]
+  val SquareFeet: Field[Int, Row]
+  val Brands: Field[/* max 30 chars */ String, Row]
+  val Internet: Field[/* max 30 chars */ String, Row]
+  val NumberEmployees: Field[Int, Row]
 }
 object VstorewithdemographicsViewFields extends VstorewithdemographicsViewStructure[VstorewithdemographicsViewRow](None, identity, (_, x) => x)
 

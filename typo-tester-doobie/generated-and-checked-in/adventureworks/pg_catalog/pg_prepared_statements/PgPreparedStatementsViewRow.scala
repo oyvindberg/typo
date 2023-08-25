@@ -17,36 +17,36 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgPreparedStatementsViewRow(
-  name: Option[String],
-  statement: Option[String],
-  prepareTime: Option[TypoOffsetDateTime],
-  parameterTypes: Option[Array[TypoRegtype]],
-  fromSql: Option[Boolean],
-  genericPlans: Option[Long],
-  customPlans: Option[Long]
+  name: String,
+  statement: String,
+  prepareTime: TypoOffsetDateTime,
+  parameterTypes: Array[TypoRegtype],
+  fromSql: Boolean,
+  genericPlans: Long,
+  customPlans: Long
 )
 
 object PgPreparedStatementsViewRow {
-  implicit lazy val decoder: Decoder[PgPreparedStatementsViewRow] = Decoder.forProduct7[PgPreparedStatementsViewRow, Option[String], Option[String], Option[TypoOffsetDateTime], Option[Array[TypoRegtype]], Option[Boolean], Option[Long], Option[Long]]("name", "statement", "prepare_time", "parameter_types", "from_sql", "generic_plans", "custom_plans")(PgPreparedStatementsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(Decoder.decodeArray[TypoRegtype](TypoRegtype.decoder, implicitly)), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit lazy val encoder: Encoder[PgPreparedStatementsViewRow] = Encoder.forProduct7[PgPreparedStatementsViewRow, Option[String], Option[String], Option[TypoOffsetDateTime], Option[Array[TypoRegtype]], Option[Boolean], Option[Long], Option[Long]]("name", "statement", "prepare_time", "parameter_types", "from_sql", "generic_plans", "custom_plans")(x => (x.name, x.statement, x.prepareTime, x.parameterTypes, x.fromSql, x.genericPlans, x.customPlans))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(Encoder.encodeIterable[TypoRegtype, Array](TypoRegtype.encoder, implicitly)), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val decoder: Decoder[PgPreparedStatementsViewRow] = Decoder.forProduct7[PgPreparedStatementsViewRow, String, String, TypoOffsetDateTime, Array[TypoRegtype], Boolean, Long, Long]("name", "statement", "prepare_time", "parameter_types", "from_sql", "generic_plans", "custom_plans")(PgPreparedStatementsViewRow.apply)(Decoder.decodeString, Decoder.decodeString, TypoOffsetDateTime.decoder, Decoder.decodeArray[TypoRegtype](TypoRegtype.decoder, implicitly), Decoder.decodeBoolean, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgPreparedStatementsViewRow] = Encoder.forProduct7[PgPreparedStatementsViewRow, String, String, TypoOffsetDateTime, Array[TypoRegtype], Boolean, Long, Long]("name", "statement", "prepare_time", "parameter_types", "from_sql", "generic_plans", "custom_plans")(x => (x.name, x.statement, x.prepareTime, x.parameterTypes, x.fromSql, x.genericPlans, x.customPlans))(Encoder.encodeString, Encoder.encodeString, TypoOffsetDateTime.encoder, Encoder.encodeIterable[TypoRegtype, Array](TypoRegtype.encoder, implicitly), Encoder.encodeBoolean, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgPreparedStatementsViewRow] = new Read[PgPreparedStatementsViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable),
-      (TypoRegtype.arrayGet, Nullability.Nullable),
-      (Meta.BooleanMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (TypoOffsetDateTime.get, Nullability.NoNulls),
+      (TypoRegtype.arrayGet, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgPreparedStatementsViewRow(
-      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
-      statement = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      prepareTime = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 2),
-      parameterTypes = TypoRegtype.arrayGet.unsafeGetNullable(rs, i + 3),
-      fromSql = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 4),
-      genericPlans = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
-      customPlans = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6)
+      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      statement = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      prepareTime = TypoOffsetDateTime.get.unsafeGetNonNullable(rs, i + 2),
+      parameterTypes = TypoRegtype.arrayGet.unsafeGetNonNullable(rs, i + 3),
+      fromSql = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 4),
+      genericPlans = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      customPlans = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

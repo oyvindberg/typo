@@ -11,19 +11,19 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait WViewFields[Row] {
-  val id: OptField[Int, Row]
-  val workorderid: OptField[WorkorderId, Row]
-  val productid: OptField[ProductId, Row]
-  val orderqty: OptField[Int, Row]
-  val scrappedqty: OptField[Int, Row]
-  val startdate: OptField[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val duedate: OptField[TypoLocalDateTime, Row]
-  val scrapreasonid: OptField[ScrapreasonId, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val workorderid: Field[WorkorderId, Row]
+  val productid: Field[ProductId, Row]
+  val orderqty: Field[Int, Row]
+  val scrappedqty: Field[Int, Row]
+  val startdate: Field[TypoLocalDateTime, Row]
+  val enddate: Field[TypoLocalDateTime, Row]
+  val duedate: Field[TypoLocalDateTime, Row]
+  val scrapreasonid: Field[ScrapreasonId, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object WViewFields extends WViewStructure[WViewRow](None, identity, (_, x) => x)
 

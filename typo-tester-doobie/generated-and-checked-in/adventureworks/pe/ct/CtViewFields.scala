@@ -10,13 +10,13 @@ package ct
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.contacttype.ContacttypeId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait CtViewFields[Row] {
-  val id: OptField[Int, Row]
-  val contacttypeid: OptField[ContacttypeId, Row]
-  val name: OptField[Name, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val contacttypeid: Field[ContacttypeId, Row]
+  val name: Field[Name, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object CtViewFields extends CtViewStructure[CtViewRow](None, identity, (_, x) => x)
 

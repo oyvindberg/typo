@@ -18,47 +18,47 @@ import java.sql.ResultSet
 
 case class VstorewithaddressesViewRow(
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.stateprovince.StateprovinceRow.name]] */
-  name: Option[Name],
-  addresstype: Option[Name],
+  name: Name,
+  addresstype: Name,
   /** Points to [[person.address.AddressRow.addressline1]] */
-  addressline1: Option[/* max 60 chars */ String],
+  addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: Option[/* max 60 chars */ String],
+  addressline2: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.city]] */
-  city: Option[/* max 30 chars */ String],
-  stateprovincename: Option[Name],
+  city: /* max 30 chars */ String,
+  stateprovincename: Name,
   /** Points to [[person.address.AddressRow.postalcode]] */
-  postalcode: Option[/* max 15 chars */ String],
-  countryregionname: Option[Name]
+  postalcode: /* max 15 chars */ String,
+  countryregionname: Name
 )
 
 object VstorewithaddressesViewRow {
-  implicit lazy val decoder: Decoder[VstorewithaddressesViewRow] = Decoder.forProduct9[VstorewithaddressesViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name]]("businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname")(VstorewithaddressesViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder))
-  implicit lazy val encoder: Encoder[VstorewithaddressesViewRow] = Encoder.forProduct9[VstorewithaddressesViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name]]("businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname")(x => (x.businessentityid, x.name, x.addresstype, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder))
+  implicit lazy val decoder: Decoder[VstorewithaddressesViewRow] = Decoder.forProduct9[VstorewithaddressesViewRow, BusinessentityId, Name, Name, /* max 60 chars */ String, /* max 60 chars */ String, /* max 30 chars */ String, Name, /* max 15 chars */ String, Name]("businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname")(VstorewithaddressesViewRow.apply)(BusinessentityId.decoder, Name.decoder, Name.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Name.decoder, Decoder.decodeString, Name.decoder)
+  implicit lazy val encoder: Encoder[VstorewithaddressesViewRow] = Encoder.forProduct9[VstorewithaddressesViewRow, BusinessentityId, Name, Name, /* max 60 chars */ String, /* max 60 chars */ String, /* max 30 chars */ String, Name, /* max 15 chars */ String, Name]("businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname")(x => (x.businessentityid, x.name, x.addresstype, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname))(BusinessentityId.encoder, Name.encoder, Name.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Name.encoder, Encoder.encodeString, Name.encoder)
   implicit lazy val read: Read[VstorewithaddressesViewRow] = new Read[VstorewithaddressesViewRow](
     gets = List(
-      (BusinessentityId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VstorewithaddressesViewRow(
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 0),
-      name = Name.get.unsafeGetNullable(rs, i + 1),
-      addresstype = Name.get.unsafeGetNullable(rs, i + 2),
-      addressline1 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      addressline2 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      city = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      stateprovincename = Name.get.unsafeGetNullable(rs, i + 6),
-      postalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      countryregionname = Name.get.unsafeGetNullable(rs, i + 8)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      addresstype = Name.get.unsafeGetNonNullable(rs, i + 2),
+      addressline1 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      addressline2 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      city = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      stateprovincename = Name.get.unsafeGetNonNullable(rs, i + 6),
+      postalcode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 7),
+      countryregionname = Name.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

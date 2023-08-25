@@ -41,7 +41,7 @@ object readSqlFileDirectories {
                   }
                 val nullableColumnsFromJoins =
                   queryType match {
-                    case SqlCommandType.SELECT => Some(NullabilityFromExplain.from(decomposedSql, jdbcMetadata.params))
+                    case SqlCommandType.SELECT => NullabilityFromExplain.from(decomposedSql, jdbcMetadata.params).nullableIndices
                     case _                     => None
                   }
 

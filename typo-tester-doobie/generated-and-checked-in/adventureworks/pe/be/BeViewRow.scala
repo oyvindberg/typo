@@ -18,30 +18,30 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class BeViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.businessentity.BusinessentityRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.businessentity.BusinessentityRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[person.businessentity.BusinessentityRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object BeViewRow {
-  implicit lazy val decoder: Decoder[BeViewRow] = Decoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(BeViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[BeViewRow] = Encoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[BeViewRow] = Decoder.forProduct4[BeViewRow, Int, BusinessentityId, UUID, TypoLocalDateTime]("id", "businessentityid", "rowguid", "modifieddate")(BeViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BeViewRow] = Encoder.forProduct4[BeViewRow, Int, BusinessentityId, UUID, TypoLocalDateTime]("id", "businessentityid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BeViewRow] = new Read[BeViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BeViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

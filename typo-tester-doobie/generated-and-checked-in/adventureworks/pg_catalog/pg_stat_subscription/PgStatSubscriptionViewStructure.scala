@@ -8,6 +8,7 @@ package pg_catalog
 package pg_stat_subscription
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -16,8 +17,8 @@ class PgStatSubscriptionViewStructure[Row](val prefix: Option[String], val extra
   extends Relation[PgStatSubscriptionViewFields, PgStatSubscriptionViewRow, Row]
     with PgStatSubscriptionViewFields[Row] { outer =>
 
-  override val subid = new OptField[/* oid */ Long, Row](prefix, "subid", None, Some("oid"))(x => extract(x).subid, (row, value) => merge(row, extract(row).copy(subid = value)))
-  override val subname = new OptField[String, Row](prefix, "subname", None, Some("name"))(x => extract(x).subname, (row, value) => merge(row, extract(row).copy(subname = value)))
+  override val subid = new Field[/* oid */ Long, Row](prefix, "subid", None, Some("oid"))(x => extract(x).subid, (row, value) => merge(row, extract(row).copy(subid = value)))
+  override val subname = new Field[String, Row](prefix, "subname", None, Some("name"))(x => extract(x).subname, (row, value) => merge(row, extract(row).copy(subname = value)))
   override val pid = new OptField[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
   override val relid = new OptField[/* oid */ Long, Row](prefix, "relid", None, Some("oid"))(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
   override val receivedLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "received_lsn", None, Some("pg_lsn"))(x => extract(x).receivedLsn, (row, value) => merge(row, extract(row).copy(receivedLsn = value)))

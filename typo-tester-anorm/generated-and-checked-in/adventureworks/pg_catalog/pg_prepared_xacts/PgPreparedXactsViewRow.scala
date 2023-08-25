@@ -22,9 +22,9 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPreparedXactsViewRow(
-  transaction: Option[TypoXid],
-  gid: Option[String],
-  prepared: Option[TypoOffsetDateTime],
+  transaction: TypoXid,
+  gid: String,
+  prepared: TypoOffsetDateTime,
   owner: Option[String],
   database: Option[String]
 )
@@ -33,9 +33,9 @@ object PgPreparedXactsViewRow {
   implicit lazy val reads: Reads[PgPreparedXactsViewRow] = Reads[PgPreparedXactsViewRow](json => JsResult.fromTry(
       Try(
         PgPreparedXactsViewRow(
-          transaction = json.\("transaction").toOption.map(_.as(TypoXid.reads)),
-          gid = json.\("gid").toOption.map(_.as(Reads.StringReads)),
-          prepared = json.\("prepared").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          transaction = json.\("transaction").as(TypoXid.reads),
+          gid = json.\("gid").as(Reads.StringReads),
+          prepared = json.\("prepared").as(TypoOffsetDateTime.reads),
           owner = json.\("owner").toOption.map(_.as(Reads.StringReads)),
           database = json.\("database").toOption.map(_.as(Reads.StringReads))
         )
@@ -45,9 +45,9 @@ object PgPreparedXactsViewRow {
   def rowParser(idx: Int): RowParser[PgPreparedXactsViewRow] = RowParser[PgPreparedXactsViewRow] { row =>
     Success(
       PgPreparedXactsViewRow(
-        transaction = row(idx + 0)(Column.columnToOption(TypoXid.column)),
-        gid = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        prepared = row(idx + 2)(Column.columnToOption(TypoOffsetDateTime.column)),
+        transaction = row(idx + 0)(TypoXid.column),
+        gid = row(idx + 1)(Column.columnToString),
+        prepared = row(idx + 2)(TypoOffsetDateTime.column),
         owner = row(idx + 3)(Column.columnToOption(Column.columnToString)),
         database = row(idx + 4)(Column.columnToOption(Column.columnToString))
       )
@@ -55,9 +55,9 @@ object PgPreparedXactsViewRow {
   }
   implicit lazy val writes: OWrites[PgPreparedXactsViewRow] = OWrites[PgPreparedXactsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "transaction" -> Writes.OptionWrites(TypoXid.writes).writes(o.transaction),
-      "gid" -> Writes.OptionWrites(Writes.StringWrites).writes(o.gid),
-      "prepared" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.prepared),
+      "transaction" -> TypoXid.writes.writes(o.transaction),
+      "gid" -> Writes.StringWrites.writes(o.gid),
+      "prepared" -> TypoOffsetDateTime.writes.writes(o.prepared),
       "owner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.owner),
       "database" -> Writes.OptionWrites(Writes.StringWrites).writes(o.database)
     ))

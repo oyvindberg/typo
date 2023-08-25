@@ -8,15 +8,15 @@ package information_schema
 package view_routine_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ViewRoutineUsageViewFields[Row] {
-  val tableCatalog: OptField[SqlIdentifier, Row]
-  val tableSchema: OptField[SqlIdentifier, Row]
-  val tableName: OptField[SqlIdentifier, Row]
-  val specificCatalog: OptField[SqlIdentifier, Row]
-  val specificSchema: OptField[SqlIdentifier, Row]
-  val specificName: OptField[SqlIdentifier, Row]
+  val tableCatalog: Field[SqlIdentifier, Row]
+  val tableSchema: Field[SqlIdentifier, Row]
+  val tableName: Field[SqlIdentifier, Row]
+  val specificCatalog: Field[SqlIdentifier, Row]
+  val specificSchema: Field[SqlIdentifier, Row]
+  val specificName: Field[SqlIdentifier, Row]
 }
 object ViewRoutineUsageViewFields extends ViewRoutineUsageViewStructure[ViewRoutineUsageViewRow](None, identity, (_, x) => x)
 

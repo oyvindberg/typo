@@ -10,12 +10,12 @@ package sohsr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SohsrViewFields[Row] {
-  val salesorderid: OptField[SalesorderheaderId, Row]
-  val salesreasonid: OptField[SalesreasonId, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val salesorderid: Field[SalesorderheaderId, Row]
+  val salesreasonid: Field[SalesreasonId, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SohsrViewFields extends SohsrViewStructure[SohsrViewRow](None, identity, (_, x) => x)
 

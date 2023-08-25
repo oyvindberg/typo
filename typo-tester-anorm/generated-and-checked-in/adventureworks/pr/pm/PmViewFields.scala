@@ -12,16 +12,16 @@ import adventureworks.customtypes.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PmViewFields[Row] {
-  val id: OptField[Int, Row]
-  val productmodelid: OptField[ProductmodelId, Row]
-  val name: OptField[Name, Row]
-  val catalogdescription: OptField[TypoXml, Row]
-  val instructions: OptField[TypoXml, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val productmodelid: Field[ProductmodelId, Row]
+  val name: Field[Name, Row]
+  val catalogdescription: Field[TypoXml, Row]
+  val instructions: Field[TypoXml, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PmViewFields extends PmViewStructure[PmViewRow](None, identity, (_, x) => x)
 

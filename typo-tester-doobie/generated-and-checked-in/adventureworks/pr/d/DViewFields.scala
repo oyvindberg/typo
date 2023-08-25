@@ -13,22 +13,21 @@ import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.OptField
 
 trait DViewFields[Row] {
-  val title: OptField[/* max 50 chars */ String, Row]
-  val owner: OptField[BusinessentityId, Row]
+  val title: Field[/* max 50 chars */ String, Row]
+  val owner: Field[BusinessentityId, Row]
   val folderflag: Field[Flag, Row]
-  val filename: OptField[/* max 400 chars */ String, Row]
-  val fileextension: OptField[/* max 8 chars */ String, Row]
-  val revision: OptField[/* bpchar, max 5 chars */ String, Row]
-  val changenumber: OptField[Int, Row]
-  val status: OptField[Int, Row]
-  val documentsummary: OptField[String, Row]
-  val document: OptField[Byte, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
-  val documentnode: OptField[DocumentId, Row]
+  val filename: Field[/* max 400 chars */ String, Row]
+  val fileextension: Field[/* max 8 chars */ String, Row]
+  val revision: Field[/* bpchar, max 5 chars */ String, Row]
+  val changenumber: Field[Int, Row]
+  val status: Field[Int, Row]
+  val documentsummary: Field[String, Row]
+  val document: Field[Byte, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
+  val documentnode: Field[DocumentId, Row]
 }
 object DViewFields extends DViewStructure[DViewRow](None, identity, (_, x) => x)
 

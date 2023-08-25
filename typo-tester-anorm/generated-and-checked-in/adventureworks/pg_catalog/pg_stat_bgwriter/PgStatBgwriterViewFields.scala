@@ -8,20 +8,20 @@ package pg_catalog
 package pg_stat_bgwriter
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgStatBgwriterViewFields[Row] {
-  val checkpointsTimed: OptField[Long, Row]
-  val checkpointsReq: OptField[Long, Row]
-  val checkpointWriteTime: OptField[Double, Row]
-  val checkpointSyncTime: OptField[Double, Row]
-  val buffersCheckpoint: OptField[Long, Row]
-  val buffersClean: OptField[Long, Row]
-  val maxwrittenClean: OptField[Long, Row]
-  val buffersBackend: OptField[Long, Row]
-  val buffersBackendFsync: OptField[Long, Row]
-  val buffersAlloc: OptField[Long, Row]
-  val statsReset: OptField[TypoOffsetDateTime, Row]
+  val checkpointsTimed: Field[Long, Row]
+  val checkpointsReq: Field[Long, Row]
+  val checkpointWriteTime: Field[Double, Row]
+  val checkpointSyncTime: Field[Double, Row]
+  val buffersCheckpoint: Field[Long, Row]
+  val buffersClean: Field[Long, Row]
+  val maxwrittenClean: Field[Long, Row]
+  val buffersBackend: Field[Long, Row]
+  val buffersBackendFsync: Field[Long, Row]
+  val buffersAlloc: Field[Long, Row]
+  val statsReset: Field[TypoOffsetDateTime, Row]
 }
 object PgStatBgwriterViewFields extends PgStatBgwriterViewStructure[PgStatBgwriterViewRow](None, identity, (_, x) => x)
 

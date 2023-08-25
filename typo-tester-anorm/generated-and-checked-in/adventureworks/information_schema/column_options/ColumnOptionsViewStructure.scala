@@ -9,20 +9,20 @@ package column_options
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class ColumnOptionsViewStructure[Row](val prefix: Option[String], val extract: Row => ColumnOptionsViewRow, val merge: (Row, ColumnOptionsViewRow) => Row)
   extends Relation[ColumnOptionsViewFields, ColumnOptionsViewRow, Row]
     with ColumnOptionsViewFields[Row] { outer =>
 
-  override val tableCatalog = new OptField[SqlIdentifier, Row](prefix, "table_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
-  override val tableSchema = new OptField[SqlIdentifier, Row](prefix, "table_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
-  override val tableName = new OptField[SqlIdentifier, Row](prefix, "table_name", None, Some("information_schema.sql_identifier"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
-  override val columnName = new OptField[SqlIdentifier, Row](prefix, "column_name", None, Some("information_schema.sql_identifier"))(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
-  override val optionName = new OptField[SqlIdentifier, Row](prefix, "option_name", None, Some("information_schema.sql_identifier"))(x => extract(x).optionName, (row, value) => merge(row, extract(row).copy(optionName = value)))
-  override val optionValue = new OptField[CharacterData, Row](prefix, "option_value", None, Some("information_schema.character_data"))(x => extract(x).optionValue, (row, value) => merge(row, extract(row).copy(optionValue = value)))
+  override val tableCatalog = new Field[SqlIdentifier, Row](prefix, "table_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
+  override val tableSchema = new Field[SqlIdentifier, Row](prefix, "table_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
+  override val tableName = new Field[SqlIdentifier, Row](prefix, "table_name", None, Some("information_schema.sql_identifier"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
+  override val columnName = new Field[SqlIdentifier, Row](prefix, "column_name", None, Some("information_schema.sql_identifier"))(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
+  override val optionName = new Field[SqlIdentifier, Row](prefix, "option_name", None, Some("information_schema.sql_identifier"))(x => extract(x).optionName, (row, value) => merge(row, extract(row).copy(optionName = value)))
+  override val optionValue = new Field[CharacterData, Row](prefix, "option_value", None, Some("information_schema.character_data"))(x => extract(x).optionValue, (row, value) => merge(row, extract(row).copy(optionValue = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](tableCatalog, tableSchema, tableName, columnName, optionName, optionValue)

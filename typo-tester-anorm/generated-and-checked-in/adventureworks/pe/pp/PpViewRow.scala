@@ -24,26 +24,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PpViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.personphone.PersonphoneRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
-  phonenumber: Option[Phone],
+  phonenumber: Phone,
   /** Points to [[person.personphone.PersonphoneRow.phonenumbertypeid]] */
-  phonenumbertypeid: Option[PhonenumbertypeId],
+  phonenumbertypeid: PhonenumbertypeId,
   /** Points to [[person.personphone.PersonphoneRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PpViewRow {
   implicit lazy val reads: Reads[PpViewRow] = Reads[PpViewRow](json => JsResult.fromTry(
       Try(
         PpViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          phonenumber = json.\("phonenumber").toOption.map(_.as(Phone.reads)),
-          phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as(PhonenumbertypeId.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          phonenumber = json.\("phonenumber").as(Phone.reads),
+          phonenumbertypeid = json.\("phonenumbertypeid").as(PhonenumbertypeId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,21 +51,21 @@ object PpViewRow {
   def rowParser(idx: Int): RowParser[PpViewRow] = RowParser[PpViewRow] { row =>
     Success(
       PpViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        phonenumber = row(idx + 2)(Column.columnToOption(Phone.column)),
-        phonenumbertypeid = row(idx + 3)(Column.columnToOption(PhonenumbertypeId.column)),
-        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        phonenumber = row(idx + 2)(Phone.column),
+        phonenumbertypeid = row(idx + 3)(PhonenumbertypeId.column),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PpViewRow] = OWrites[PpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "phonenumber" -> Writes.OptionWrites(Phone.writes).writes(o.phonenumber),
-      "phonenumbertypeid" -> Writes.OptionWrites(PhonenumbertypeId.writes).writes(o.phonenumbertypeid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "phonenumber" -> Phone.writes.writes(o.phonenumber),
+      "phonenumbertypeid" -> PhonenumbertypeId.writes.writes(o.phonenumbertypeid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -2,6 +2,7 @@ package typo.internal.sqlfiles
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
+import typo.internal.sqlfiles.NullabilityFromExplain.NullableIndices
 
 import java.sql.{Connection, DriverManager}
 
@@ -31,6 +32,6 @@ class NullabilityFromExplainTest extends AnyFunSuite with TypeCheckedTripleEqual
 
     val planWithNullability = NullabilityFromExplain.from(sql, Nil)
     assert(planWithNullability.nullableOutputs === List("a.addressline1", "a.city", "a.postalcode"))
-    assert(planWithNullability.nullableIndices === List(6, 7, 8))
+    assert(planWithNullability.nullableIndices === Some(NullableIndices(Set(6, 7, 8))))
   }
 }

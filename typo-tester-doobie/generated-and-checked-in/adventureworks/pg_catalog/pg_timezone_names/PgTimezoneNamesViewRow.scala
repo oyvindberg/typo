@@ -16,27 +16,27 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgTimezoneNamesViewRow(
-  name: Option[String],
-  abbrev: Option[String],
-  utcOffset: Option[TypoInterval],
-  isDst: Option[Boolean]
+  name: String,
+  abbrev: String,
+  utcOffset: TypoInterval,
+  isDst: Boolean
 )
 
 object PgTimezoneNamesViewRow {
-  implicit lazy val decoder: Decoder[PgTimezoneNamesViewRow] = Decoder.forProduct4[PgTimezoneNamesViewRow, Option[String], Option[String], Option[TypoInterval], Option[Boolean]]("name", "abbrev", "utc_offset", "is_dst")(PgTimezoneNamesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(Decoder.decodeBoolean))
-  implicit lazy val encoder: Encoder[PgTimezoneNamesViewRow] = Encoder.forProduct4[PgTimezoneNamesViewRow, Option[String], Option[String], Option[TypoInterval], Option[Boolean]]("name", "abbrev", "utc_offset", "is_dst")(x => (x.name, x.abbrev, x.utcOffset, x.isDst))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(Encoder.encodeBoolean))
+  implicit lazy val decoder: Decoder[PgTimezoneNamesViewRow] = Decoder.forProduct4[PgTimezoneNamesViewRow, String, String, TypoInterval, Boolean]("name", "abbrev", "utc_offset", "is_dst")(PgTimezoneNamesViewRow.apply)(Decoder.decodeString, Decoder.decodeString, TypoInterval.decoder, Decoder.decodeBoolean)
+  implicit lazy val encoder: Encoder[PgTimezoneNamesViewRow] = Encoder.forProduct4[PgTimezoneNamesViewRow, String, String, TypoInterval, Boolean]("name", "abbrev", "utc_offset", "is_dst")(x => (x.name, x.abbrev, x.utcOffset, x.isDst))(Encoder.encodeString, Encoder.encodeString, TypoInterval.encoder, Encoder.encodeBoolean)
   implicit lazy val read: Read[PgTimezoneNamesViewRow] = new Read[PgTimezoneNamesViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoInterval.get, Nullability.Nullable),
-      (Meta.BooleanMeta.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (TypoInterval.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTimezoneNamesViewRow(
-      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
-      abbrev = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      utcOffset = TypoInterval.get.unsafeGetNullable(rs, i + 2),
-      isDst = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 3)
+      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      abbrev = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      utcOffset = TypoInterval.get.unsafeGetNonNullable(rs, i + 2),
+      isDst = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

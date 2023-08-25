@@ -15,36 +15,36 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ColumnUdtUsageViewRow(
-  udtCatalog: Option[SqlIdentifier],
-  udtSchema: Option[SqlIdentifier],
-  udtName: Option[SqlIdentifier],
-  tableCatalog: Option[SqlIdentifier],
-  tableSchema: Option[SqlIdentifier],
-  tableName: Option[SqlIdentifier],
-  columnName: Option[SqlIdentifier]
+  udtCatalog: SqlIdentifier,
+  udtSchema: SqlIdentifier,
+  udtName: SqlIdentifier,
+  tableCatalog: SqlIdentifier,
+  tableSchema: SqlIdentifier,
+  tableName: SqlIdentifier,
+  columnName: SqlIdentifier
 )
 
 object ColumnUdtUsageViewRow {
-  implicit lazy val decoder: Decoder[ColumnUdtUsageViewRow] = Decoder.forProduct7[ColumnUdtUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("udt_catalog", "udt_schema", "udt_name", "table_catalog", "table_schema", "table_name", "column_name")(ColumnUdtUsageViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[ColumnUdtUsageViewRow] = Encoder.forProduct7[ColumnUdtUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("udt_catalog", "udt_schema", "udt_name", "table_catalog", "table_schema", "table_name", "column_name")(x => (x.udtCatalog, x.udtSchema, x.udtName, x.tableCatalog, x.tableSchema, x.tableName, x.columnName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[ColumnUdtUsageViewRow] = Decoder.forProduct7[ColumnUdtUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("udt_catalog", "udt_schema", "udt_name", "table_catalog", "table_schema", "table_name", "column_name")(ColumnUdtUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[ColumnUdtUsageViewRow] = Encoder.forProduct7[ColumnUdtUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("udt_catalog", "udt_schema", "udt_name", "table_catalog", "table_schema", "table_name", "column_name")(x => (x.udtCatalog, x.udtSchema, x.udtName, x.tableCatalog, x.tableSchema, x.tableName, x.columnName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
   implicit lazy val read: Read[ColumnUdtUsageViewRow] = new Read[ColumnUdtUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ColumnUdtUsageViewRow(
-      udtCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      udtSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      udtName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
-      columnName = SqlIdentifier.get.unsafeGetNullable(rs, i + 6)
+      udtCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      udtSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      udtName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
+      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
+      columnName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

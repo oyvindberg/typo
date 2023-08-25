@@ -23,29 +23,29 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpqhViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.quotadate]] */
-  quotadate: Option[TypoLocalDateTime],
+  quotadate: TypoLocalDateTime,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.salesquota]] */
-  salesquota: Option[BigDecimal],
+  salesquota: BigDecimal,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SpqhViewRow {
   implicit lazy val reads: Reads[SpqhViewRow] = Reads[SpqhViewRow](json => JsResult.fromTry(
       Try(
         SpqhViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          quotadate = json.\("quotadate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          salesquota = json.\("salesquota").toOption.map(_.as(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          quotadate = json.\("quotadate").as(TypoLocalDateTime.reads),
+          salesquota = json.\("salesquota").as(Reads.bigDecReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -53,23 +53,23 @@ object SpqhViewRow {
   def rowParser(idx: Int): RowParser[SpqhViewRow] = RowParser[SpqhViewRow] { row =>
     Success(
       SpqhViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        quotadate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
-        salesquota = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        rowguid = row(idx + 4)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        quotadate = row(idx + 2)(TypoLocalDateTime.column),
+        salesquota = row(idx + 3)(Column.columnToScalaBigDecimal),
+        rowguid = row(idx + 4)(Column.columnToUUID),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SpqhViewRow] = OWrites[SpqhViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "quotadate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.quotadate),
-      "salesquota" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesquota),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "quotadate" -> TypoLocalDateTime.writes.writes(o.quotadate),
+      "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -9,18 +9,18 @@ package vvendorwithaddresses
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait VvendorwithaddressesViewFields[Row] {
-  val businessentityid: OptField[BusinessentityId, Row]
-  val name: OptField[Name, Row]
-  val addresstype: OptField[Name, Row]
-  val addressline1: OptField[/* max 60 chars */ String, Row]
-  val addressline2: OptField[/* max 60 chars */ String, Row]
-  val city: OptField[/* max 30 chars */ String, Row]
-  val stateprovincename: OptField[Name, Row]
-  val postalcode: OptField[/* max 15 chars */ String, Row]
-  val countryregionname: OptField[Name, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val name: Field[Name, Row]
+  val addresstype: Field[Name, Row]
+  val addressline1: Field[/* max 60 chars */ String, Row]
+  val addressline2: Field[/* max 60 chars */ String, Row]
+  val city: Field[/* max 30 chars */ String, Row]
+  val stateprovincename: Field[Name, Row]
+  val postalcode: Field[/* max 15 chars */ String, Row]
+  val countryregionname: Field[Name, Row]
 }
 object VvendorwithaddressesViewFields extends VvendorwithaddressesViewStructure[VvendorwithaddressesViewRow](None, identity, (_, x) => x)
 

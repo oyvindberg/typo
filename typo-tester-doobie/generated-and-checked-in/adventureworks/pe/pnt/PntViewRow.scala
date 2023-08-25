@@ -18,30 +18,30 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PntViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
-  phonenumbertypeid: Option[PhonenumbertypeId],
+  phonenumbertypeid: PhonenumbertypeId,
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PntViewRow {
-  implicit lazy val decoder: Decoder[PntViewRow] = Decoder.forProduct4[PntViewRow, Option[Int], Option[PhonenumbertypeId], Option[Name], Option[TypoLocalDateTime]]("id", "phonenumbertypeid", "name", "modifieddate")(PntViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(PhonenumbertypeId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PntViewRow] = Encoder.forProduct4[PntViewRow, Option[Int], Option[PhonenumbertypeId], Option[Name], Option[TypoLocalDateTime]]("id", "phonenumbertypeid", "name", "modifieddate")(x => (x.id, x.phonenumbertypeid, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(PhonenumbertypeId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PntViewRow] = Decoder.forProduct4[PntViewRow, Int, PhonenumbertypeId, Name, TypoLocalDateTime]("id", "phonenumbertypeid", "name", "modifieddate")(PntViewRow.apply)(Decoder.decodeInt, PhonenumbertypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PntViewRow] = Encoder.forProduct4[PntViewRow, Int, PhonenumbertypeId, Name, TypoLocalDateTime]("id", "phonenumbertypeid", "name", "modifieddate")(x => (x.id, x.phonenumbertypeid, x.name, x.modifieddate))(Encoder.encodeInt, PhonenumbertypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PntViewRow] = new Read[PntViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (PhonenumbertypeId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (PhonenumbertypeId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PntViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

@@ -11,13 +11,13 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PmpdcViewFields[Row] {
-  val productmodelid: OptField[ProductmodelId, Row]
-  val productdescriptionid: OptField[ProductdescriptionId, Row]
-  val cultureid: OptField[CultureId, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val productmodelid: Field[ProductmodelId, Row]
+  val productdescriptionid: Field[ProductdescriptionId, Row]
+  val cultureid: Field[CultureId, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PmpdcViewFields extends PmpdcViewStructure[PmpdcViewRow](None, identity, (_, x) => x)
 

@@ -10,19 +10,19 @@ package th
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.transactionhistory.TransactionhistoryId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ThViewFields[Row] {
-  val id: OptField[Int, Row]
-  val transactionid: OptField[TransactionhistoryId, Row]
-  val productid: OptField[ProductId, Row]
-  val referenceorderid: OptField[Int, Row]
-  val referenceorderlineid: OptField[Int, Row]
-  val transactiondate: OptField[TypoLocalDateTime, Row]
-  val transactiontype: OptField[/* bpchar, max 1 chars */ String, Row]
-  val quantity: OptField[Int, Row]
-  val actualcost: OptField[BigDecimal, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val transactionid: Field[TransactionhistoryId, Row]
+  val productid: Field[ProductId, Row]
+  val referenceorderid: Field[Int, Row]
+  val referenceorderlineid: Field[Int, Row]
+  val transactiondate: Field[TypoLocalDateTime, Row]
+  val transactiontype: Field[/* bpchar, max 1 chars */ String, Row]
+  val quantity: Field[Int, Row]
+  val actualcost: Field[BigDecimal, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object ThViewFields extends ThViewStructure[ThViewRow](None, identity, (_, x) => x)
 

@@ -20,18 +20,18 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgGroupViewRow(
-  groname: Option[String],
-  grosysid: Option[/* oid */ Long],
-  grolist: Option[Array[/* oid */ Long]]
+  groname: String,
+  grosysid: /* oid */ Long,
+  grolist: Array[/* oid */ Long]
 )
 
 object PgGroupViewRow {
   implicit lazy val reads: Reads[PgGroupViewRow] = Reads[PgGroupViewRow](json => JsResult.fromTry(
       Try(
         PgGroupViewRow(
-          groname = json.\("groname").toOption.map(_.as(Reads.StringReads)),
-          grosysid = json.\("grosysid").toOption.map(_.as(Reads.LongReads)),
-          grolist = json.\("grolist").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly)))
+          groname = json.\("groname").as(Reads.StringReads),
+          grosysid = json.\("grosysid").as(Reads.LongReads),
+          grolist = json.\("grolist").as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))
         )
       )
     ),
@@ -39,17 +39,17 @@ object PgGroupViewRow {
   def rowParser(idx: Int): RowParser[PgGroupViewRow] = RowParser[PgGroupViewRow] { row =>
     Success(
       PgGroupViewRow(
-        groname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
-        grosysid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
-        grolist = row(idx + 2)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly)))
+        groname = row(idx + 0)(Column.columnToString),
+        grosysid = row(idx + 1)(Column.columnToLong),
+        grolist = row(idx + 2)(Column.columnToArray[Long](Column.columnToLong, implicitly))
       )
     )
   }
   implicit lazy val writes: OWrites[PgGroupViewRow] = OWrites[PgGroupViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "groname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.groname),
-      "grosysid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.grosysid),
-      "grolist" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.grolist)
+      "groname" -> Writes.StringWrites.writes(o.groname),
+      "grosysid" -> Writes.LongWrites.writes(o.grosysid),
+      "grolist" -> Writes.arrayWrites[Long](implicitly, Writes.LongWrites).writes(o.grolist)
     ))
   )
 }

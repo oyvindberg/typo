@@ -7,21 +7,22 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_cluster
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatProgressClusterViewFields[Row] {
-  val pid: OptField[Int, Row]
-  val datid: OptField[/* oid */ Long, Row]
+  val pid: Field[Int, Row]
+  val datid: Field[/* oid */ Long, Row]
   val datname: OptField[String, Row]
-  val relid: OptField[/* oid */ Long, Row]
-  val command: OptField[String, Row]
-  val phase: OptField[String, Row]
-  val clusterIndexRelid: OptField[/* oid */ Long, Row]
-  val heapTuplesScanned: OptField[Long, Row]
-  val heapTuplesWritten: OptField[Long, Row]
-  val heapBlksTotal: OptField[Long, Row]
-  val heapBlksScanned: OptField[Long, Row]
-  val indexRebuildCount: OptField[Long, Row]
+  val relid: Field[/* oid */ Long, Row]
+  val command: Field[String, Row]
+  val phase: Field[String, Row]
+  val clusterIndexRelid: Field[/* oid */ Long, Row]
+  val heapTuplesScanned: Field[Long, Row]
+  val heapTuplesWritten: Field[Long, Row]
+  val heapBlksTotal: Field[Long, Row]
+  val heapBlksScanned: Field[Long, Row]
+  val indexRebuildCount: Field[Long, Row]
 }
 object PgStatProgressClusterViewFields extends PgStatProgressClusterViewStructure[PgStatProgressClusterViewRow](None, identity, (_, x) => x)
 

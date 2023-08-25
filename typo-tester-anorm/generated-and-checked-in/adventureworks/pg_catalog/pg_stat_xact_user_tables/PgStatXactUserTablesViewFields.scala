@@ -7,20 +7,20 @@ package adventureworks
 package pg_catalog
 package pg_stat_xact_user_tables
 
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgStatXactUserTablesViewFields[Row] {
-  val relid: OptField[/* oid */ Long, Row]
-  val schemaname: OptField[String, Row]
-  val relname: OptField[String, Row]
-  val seqScan: OptField[Long, Row]
-  val seqTupRead: OptField[Long, Row]
-  val idxScan: OptField[Long, Row]
-  val idxTupFetch: OptField[Long, Row]
-  val nTupIns: OptField[Long, Row]
-  val nTupUpd: OptField[Long, Row]
-  val nTupDel: OptField[Long, Row]
-  val nTupHotUpd: OptField[Long, Row]
+  val relid: Field[/* oid */ Long, Row]
+  val schemaname: Field[String, Row]
+  val relname: Field[String, Row]
+  val seqScan: Field[Long, Row]
+  val seqTupRead: Field[Long, Row]
+  val idxScan: Field[Long, Row]
+  val idxTupFetch: Field[Long, Row]
+  val nTupIns: Field[Long, Row]
+  val nTupUpd: Field[Long, Row]
+  val nTupDel: Field[Long, Row]
+  val nTupHotUpd: Field[Long, Row]
 }
 object PgStatXactUserTablesViewFields extends PgStatXactUserTablesViewStructure[PgStatXactUserTablesViewRow](None, identity, (_, x) => x)
 

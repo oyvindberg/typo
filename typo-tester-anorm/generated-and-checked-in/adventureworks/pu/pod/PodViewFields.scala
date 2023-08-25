@@ -10,19 +10,19 @@ package pod
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PodViewFields[Row] {
-  val id: OptField[Int, Row]
-  val purchaseorderid: OptField[PurchaseorderheaderId, Row]
-  val purchaseorderdetailid: OptField[Int, Row]
-  val duedate: OptField[TypoLocalDateTime, Row]
-  val orderqty: OptField[Int, Row]
-  val productid: OptField[ProductId, Row]
-  val unitprice: OptField[BigDecimal, Row]
-  val receivedqty: OptField[BigDecimal, Row]
-  val rejectedqty: OptField[BigDecimal, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val purchaseorderid: Field[PurchaseorderheaderId, Row]
+  val purchaseorderdetailid: Field[Int, Row]
+  val duedate: Field[TypoLocalDateTime, Row]
+  val orderqty: Field[Int, Row]
+  val productid: Field[ProductId, Row]
+  val unitprice: Field[BigDecimal, Row]
+  val receivedqty: Field[BigDecimal, Row]
+  val rejectedqty: Field[BigDecimal, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PodViewFields extends PodViewStructure[PodViewRow](None, identity, (_, x) => x)
 

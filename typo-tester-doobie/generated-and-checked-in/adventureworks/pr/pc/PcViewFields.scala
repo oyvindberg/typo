@@ -11,14 +11,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PcViewFields[Row] {
-  val id: OptField[Int, Row]
-  val productcategoryid: OptField[ProductcategoryId, Row]
-  val name: OptField[Name, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val productcategoryid: Field[ProductcategoryId, Row]
+  val name: Field[Name, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PcViewFields extends PcViewStructure[PcViewRow](None, identity, (_, x) => x)
 

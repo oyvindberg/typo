@@ -10,7 +10,6 @@ package sohsr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,26 +17,25 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SohsrViewRow(
   /** Points to [[sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesorderid]] */
-  salesorderid: Option[SalesorderheaderId],
+  salesorderid: SalesorderheaderId,
   /** Points to [[sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesreasonid]] */
-  salesreasonid: Option[SalesreasonId],
+  salesreasonid: SalesreasonId,
   /** Points to [[sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SohsrViewRow {
   implicit lazy val reads: Reads[SohsrViewRow] = Reads[SohsrViewRow](json => JsResult.fromTry(
       Try(
         SohsrViewRow(
-          salesorderid = json.\("salesorderid").toOption.map(_.as(SalesorderheaderId.reads)),
-          salesreasonid = json.\("salesreasonid").toOption.map(_.as(SalesreasonId.reads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
+          salesreasonid = json.\("salesreasonid").as(SalesreasonId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -45,17 +43,17 @@ object SohsrViewRow {
   def rowParser(idx: Int): RowParser[SohsrViewRow] = RowParser[SohsrViewRow] { row =>
     Success(
       SohsrViewRow(
-        salesorderid = row(idx + 0)(Column.columnToOption(SalesorderheaderId.column)),
-        salesreasonid = row(idx + 1)(Column.columnToOption(SalesreasonId.column)),
-        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column))
+        salesorderid = row(idx + 0)(SalesorderheaderId.column),
+        salesreasonid = row(idx + 1)(SalesreasonId.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SohsrViewRow] = OWrites[SohsrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "salesorderid" -> Writes.OptionWrites(SalesorderheaderId.writes).writes(o.salesorderid),
-      "salesreasonid" -> Writes.OptionWrites(SalesreasonId.writes).writes(o.salesreasonid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
+      "salesreasonid" -> SalesreasonId.writes.writes(o.salesreasonid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

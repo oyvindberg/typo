@@ -25,44 +25,44 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class StViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
-  territoryid: Option[SalesterritoryId],
+  territoryid: SalesterritoryId,
   /** Points to [[sales.salesterritory.SalesterritoryRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[sales.salesterritory.SalesterritoryRow.countryregioncode]] */
-  countryregioncode: Option[CountryregionId],
+  countryregioncode: CountryregionId,
   /** Points to [[sales.salesterritory.SalesterritoryRow.group]] */
-  group: Option[/* max 50 chars */ String],
+  group: /* max 50 chars */ String,
   /** Points to [[sales.salesterritory.SalesterritoryRow.salesytd]] */
-  salesytd: Option[BigDecimal],
+  salesytd: BigDecimal,
   /** Points to [[sales.salesterritory.SalesterritoryRow.saleslastyear]] */
-  saleslastyear: Option[BigDecimal],
+  saleslastyear: BigDecimal,
   /** Points to [[sales.salesterritory.SalesterritoryRow.costytd]] */
-  costytd: Option[BigDecimal],
+  costytd: BigDecimal,
   /** Points to [[sales.salesterritory.SalesterritoryRow.costlastyear]] */
-  costlastyear: Option[BigDecimal],
+  costlastyear: BigDecimal,
   /** Points to [[sales.salesterritory.SalesterritoryRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.salesterritory.SalesterritoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object StViewRow {
   implicit lazy val reads: Reads[StViewRow] = Reads[StViewRow](json => JsResult.fromTry(
       Try(
         StViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          countryregioncode = json.\("countryregioncode").toOption.map(_.as(CountryregionId.reads)),
-          group = json.\("group").toOption.map(_.as(Reads.StringReads)),
-          salesytd = json.\("salesytd").toOption.map(_.as(Reads.bigDecReads)),
-          saleslastyear = json.\("saleslastyear").toOption.map(_.as(Reads.bigDecReads)),
-          costytd = json.\("costytd").toOption.map(_.as(Reads.bigDecReads)),
-          costlastyear = json.\("costlastyear").toOption.map(_.as(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
+          name = json.\("name").as(Name.reads),
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          group = json.\("group").as(Reads.StringReads),
+          salesytd = json.\("salesytd").as(Reads.bigDecReads),
+          saleslastyear = json.\("saleslastyear").as(Reads.bigDecReads),
+          costytd = json.\("costytd").as(Reads.bigDecReads),
+          costlastyear = json.\("costlastyear").as(Reads.bigDecReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -70,33 +70,33 @@ object StViewRow {
   def rowParser(idx: Int): RowParser[StViewRow] = RowParser[StViewRow] { row =>
     Success(
       StViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        territoryid = row(idx + 1)(Column.columnToOption(SalesterritoryId.column)),
-        name = row(idx + 2)(Column.columnToOption(Name.column)),
-        countryregioncode = row(idx + 3)(Column.columnToOption(CountryregionId.column)),
-        group = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        salesytd = row(idx + 5)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        saleslastyear = row(idx + 6)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        costytd = row(idx + 7)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        costlastyear = row(idx + 8)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        rowguid = row(idx + 9)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 10)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        territoryid = row(idx + 1)(SalesterritoryId.column),
+        name = row(idx + 2)(Name.column),
+        countryregioncode = row(idx + 3)(CountryregionId.column),
+        group = row(idx + 4)(Column.columnToString),
+        salesytd = row(idx + 5)(Column.columnToScalaBigDecimal),
+        saleslastyear = row(idx + 6)(Column.columnToScalaBigDecimal),
+        costytd = row(idx + 7)(Column.columnToScalaBigDecimal),
+        costlastyear = row(idx + 8)(Column.columnToScalaBigDecimal),
+        rowguid = row(idx + 9)(Column.columnToUUID),
+        modifieddate = row(idx + 10)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[StViewRow] = OWrites[StViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "countryregioncode" -> Writes.OptionWrites(CountryregionId.writes).writes(o.countryregioncode),
-      "group" -> Writes.OptionWrites(Writes.StringWrites).writes(o.group),
-      "salesytd" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesytd),
-      "saleslastyear" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.saleslastyear),
-      "costytd" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.costytd),
-      "costlastyear" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.costlastyear),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
+      "name" -> Name.writes.writes(o.name),
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "group" -> Writes.StringWrites.writes(o.group),
+      "salesytd" -> Writes.BigDecimalWrites.writes(o.salesytd),
+      "saleslastyear" -> Writes.BigDecimalWrites.writes(o.saleslastyear),
+      "costytd" -> Writes.BigDecimalWrites.writes(o.costytd),
+      "costlastyear" -> Writes.BigDecimalWrites.writes(o.costlastyear),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

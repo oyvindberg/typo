@@ -19,34 +19,34 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class PcViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productcategory.ProductcategoryRow.productcategoryid]] */
-  productcategoryid: Option[ProductcategoryId],
+  productcategoryid: ProductcategoryId,
   /** Points to [[production.productcategory.ProductcategoryRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[production.productcategory.ProductcategoryRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[production.productcategory.ProductcategoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PcViewRow {
-  implicit lazy val decoder: Decoder[PcViewRow] = Decoder.forProduct5[PcViewRow, Option[Int], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productcategoryid", "name", "rowguid", "modifieddate")(PcViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductcategoryId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PcViewRow] = Encoder.forProduct5[PcViewRow, Option[Int], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductcategoryId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PcViewRow] = Decoder.forProduct5[PcViewRow, Int, ProductcategoryId, Name, UUID, TypoLocalDateTime]("id", "productcategoryid", "name", "rowguid", "modifieddate")(PcViewRow.apply)(Decoder.decodeInt, ProductcategoryId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PcViewRow] = Encoder.forProduct5[PcViewRow, Int, ProductcategoryId, Name, UUID, TypoLocalDateTime]("id", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeInt, ProductcategoryId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PcViewRow] = new Read[PcViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (ProductcategoryId.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductcategoryId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PcViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      productcategoryid = ProductcategoryId.get.unsafeGetNullable(rs, i + 1),
-      name = Name.get.unsafeGetNullable(rs, i + 2),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      productcategoryid = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

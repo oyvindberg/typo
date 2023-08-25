@@ -18,30 +18,30 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class IViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.illustration.IllustrationRow.illustrationid]] */
-  illustrationid: Option[IllustrationId],
+  illustrationid: IllustrationId,
   /** Points to [[production.illustration.IllustrationRow.diagram]] */
-  diagram: Option[TypoXml],
+  diagram: TypoXml,
   /** Points to [[production.illustration.IllustrationRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object IViewRow {
-  implicit lazy val decoder: Decoder[IViewRow] = Decoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(IViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(IllustrationId.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[IViewRow] = Encoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(x => (x.id, x.illustrationid, x.diagram, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(IllustrationId.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[IViewRow] = Decoder.forProduct4[IViewRow, Int, IllustrationId, TypoXml, TypoLocalDateTime]("id", "illustrationid", "diagram", "modifieddate")(IViewRow.apply)(Decoder.decodeInt, IllustrationId.decoder, TypoXml.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[IViewRow] = Encoder.forProduct4[IViewRow, Int, IllustrationId, TypoXml, TypoLocalDateTime]("id", "illustrationid", "diagram", "modifieddate")(x => (x.id, x.illustrationid, x.diagram, x.modifieddate))(Encoder.encodeInt, IllustrationId.encoder, TypoXml.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[IViewRow] = new Read[IViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (IllustrationId.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (IllustrationId.get, Nullability.NoNulls),
+      (TypoXml.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => IViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      illustrationid = IllustrationId.get.unsafeGetNullable(rs, i + 1),
-      diagram = TypoXml.get.unsafeGetNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 1),
+      diagram = TypoXml.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

@@ -17,42 +17,42 @@ import java.sql.ResultSet
 
 case class ForeignServersViewRow(
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: Option[SqlIdentifier],
+  foreignServerCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerName]] */
-  foreignServerName: Option[SqlIdentifier],
+  foreignServerName: SqlIdentifier,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignDataWrapperCatalog]] */
-  foreignDataWrapperCatalog: Option[SqlIdentifier],
+  foreignDataWrapperCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignDataWrapperName]] */
-  foreignDataWrapperName: Option[SqlIdentifier],
+  foreignDataWrapperName: SqlIdentifier,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerType]] */
-  foreignServerType: Option[CharacterData],
+  foreignServerType: CharacterData,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerVersion]] */
-  foreignServerVersion: Option[CharacterData],
+  foreignServerVersion: CharacterData,
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.authorizationIdentifier]] */
-  authorizationIdentifier: Option[SqlIdentifier]
+  authorizationIdentifier: SqlIdentifier
 )
 
 object ForeignServersViewRow {
-  implicit lazy val decoder: Decoder[ForeignServersViewRow] = Decoder.forProduct7[ForeignServersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[SqlIdentifier]]("foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(ForeignServersViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit lazy val encoder: Encoder[ForeignServersViewRow] = Encoder.forProduct7[ForeignServersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[SqlIdentifier]]("foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(x => (x.foreignServerCatalog, x.foreignServerName, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.foreignServerType, x.foreignServerVersion, x.authorizationIdentifier))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val decoder: Decoder[ForeignServersViewRow] = Decoder.forProduct7[ForeignServersViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CharacterData, SqlIdentifier]("foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(ForeignServersViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, CharacterData.decoder, SqlIdentifier.decoder)
+  implicit lazy val encoder: Encoder[ForeignServersViewRow] = Encoder.forProduct7[ForeignServersViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CharacterData, SqlIdentifier]("foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(x => (x.foreignServerCatalog, x.foreignServerName, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.foreignServerType, x.foreignServerVersion, x.authorizationIdentifier))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, CharacterData.encoder, SqlIdentifier.encoder)
   implicit lazy val read: Read[ForeignServersViewRow] = new Read[ForeignServersViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (CharacterData.get, Nullability.NoNulls),
+      (SqlIdentifier.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ForeignServersViewRow(
-      foreignServerCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      foreignServerName = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      foreignServerType = CharacterData.get.unsafeGetNullable(rs, i + 4),
-      foreignServerVersion = CharacterData.get.unsafeGetNullable(rs, i + 5),
-      authorizationIdentifier = SqlIdentifier.get.unsafeGetNullable(rs, i + 6)
+      foreignServerCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
+      foreignServerName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
+      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
+      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
+      foreignServerType = CharacterData.get.unsafeGetNonNullable(rs, i + 4),
+      foreignServerVersion = CharacterData.get.unsafeGetNonNullable(rs, i + 5),
+      authorizationIdentifier = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

@@ -20,42 +20,42 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class CViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.customer.CustomerRow.customerid]] */
-  customerid: Option[CustomerId],
+  customerid: CustomerId,
   /** Points to [[sales.customer.CustomerRow.personid]] */
-  personid: Option[BusinessentityId],
+  personid: BusinessentityId,
   /** Points to [[sales.customer.CustomerRow.storeid]] */
-  storeid: Option[BusinessentityId],
+  storeid: BusinessentityId,
   /** Points to [[sales.customer.CustomerRow.territoryid]] */
-  territoryid: Option[SalesterritoryId],
+  territoryid: SalesterritoryId,
   /** Points to [[sales.customer.CustomerRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.customer.CustomerRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CViewRow {
-  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct7[CViewRow, Option[Int], Option[CustomerId], Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Option[UUID], Option[TypoLocalDateTime]]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(CustomerId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct7[CViewRow, Option[Int], Option[CustomerId], Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Option[UUID], Option[TypoLocalDateTime]]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(CustomerId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct7[CViewRow, Int, CustomerId, BusinessentityId, BusinessentityId, SalesterritoryId, UUID, TypoLocalDateTime]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CViewRow.apply)(Decoder.decodeInt, CustomerId.decoder, BusinessentityId.decoder, BusinessentityId.decoder, SalesterritoryId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct7[CViewRow, Int, CustomerId, BusinessentityId, BusinessentityId, SalesterritoryId, UUID, TypoLocalDateTime]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(Encoder.encodeInt, CustomerId.encoder, BusinessentityId.encoder, BusinessentityId.encoder, SalesterritoryId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CViewRow] = new Read[CViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (CustomerId.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (SalesterritoryId.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (CustomerId.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (SalesterritoryId.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      customerid = CustomerId.get.unsafeGetNullable(rs, i + 1),
-      personid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
-      storeid = BusinessentityId.get.unsafeGetNullable(rs, i + 3),
-      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 4),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      customerid = CustomerId.get.unsafeGetNonNullable(rs, i + 1),
+      personid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 2),
+      storeid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 3),
+      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 4),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

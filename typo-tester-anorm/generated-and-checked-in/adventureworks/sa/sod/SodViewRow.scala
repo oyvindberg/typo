@@ -25,44 +25,44 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SodViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderid]] */
-  salesorderid: Option[SalesorderheaderId],
+  salesorderid: SalesorderheaderId,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]] */
-  salesorderdetailid: Option[Int],
+  salesorderdetailid: Int,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.carriertrackingnumber]] */
-  carriertrackingnumber: Option[/* max 25 chars */ String],
+  carriertrackingnumber: /* max 25 chars */ String,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.orderqty]] */
-  orderqty: Option[Int],
+  orderqty: Int,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.productid]] */
-  productid: Option[ProductId],
+  productid: ProductId,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.specialofferid]] */
-  specialofferid: Option[SpecialofferId],
+  specialofferid: SpecialofferId,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.unitprice]] */
-  unitprice: Option[BigDecimal],
+  unitprice: BigDecimal,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.unitpricediscount]] */
-  unitpricediscount: Option[BigDecimal],
+  unitpricediscount: BigDecimal,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SodViewRow {
   implicit lazy val reads: Reads[SodViewRow] = Reads[SodViewRow](json => JsResult.fromTry(
       Try(
         SodViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          salesorderid = json.\("salesorderid").toOption.map(_.as(SalesorderheaderId.reads)),
-          salesorderdetailid = json.\("salesorderdetailid").toOption.map(_.as(Reads.IntReads)),
-          carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as(Reads.StringReads)),
-          orderqty = json.\("orderqty").toOption.map(_.as(Reads.IntReads)),
-          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
-          specialofferid = json.\("specialofferid").toOption.map(_.as(SpecialofferId.reads)),
-          unitprice = json.\("unitprice").toOption.map(_.as(Reads.bigDecReads)),
-          unitpricediscount = json.\("unitpricediscount").toOption.map(_.as(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
+          salesorderdetailid = json.\("salesorderdetailid").as(Reads.IntReads),
+          carriertrackingnumber = json.\("carriertrackingnumber").as(Reads.StringReads),
+          orderqty = json.\("orderqty").as(Reads.IntReads),
+          productid = json.\("productid").as(ProductId.reads),
+          specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
+          unitprice = json.\("unitprice").as(Reads.bigDecReads),
+          unitpricediscount = json.\("unitpricediscount").as(Reads.bigDecReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -70,33 +70,33 @@ object SodViewRow {
   def rowParser(idx: Int): RowParser[SodViewRow] = RowParser[SodViewRow] { row =>
     Success(
       SodViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        salesorderid = row(idx + 1)(Column.columnToOption(SalesorderheaderId.column)),
-        salesorderdetailid = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
-        carriertrackingnumber = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        orderqty = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
-        productid = row(idx + 5)(Column.columnToOption(ProductId.column)),
-        specialofferid = row(idx + 6)(Column.columnToOption(SpecialofferId.column)),
-        unitprice = row(idx + 7)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        unitpricediscount = row(idx + 8)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        rowguid = row(idx + 9)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 10)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        salesorderid = row(idx + 1)(SalesorderheaderId.column),
+        salesorderdetailid = row(idx + 2)(Column.columnToInt),
+        carriertrackingnumber = row(idx + 3)(Column.columnToString),
+        orderqty = row(idx + 4)(Column.columnToInt),
+        productid = row(idx + 5)(ProductId.column),
+        specialofferid = row(idx + 6)(SpecialofferId.column),
+        unitprice = row(idx + 7)(Column.columnToScalaBigDecimal),
+        unitpricediscount = row(idx + 8)(Column.columnToScalaBigDecimal),
+        rowguid = row(idx + 9)(Column.columnToUUID),
+        modifieddate = row(idx + 10)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SodViewRow] = OWrites[SodViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "salesorderid" -> Writes.OptionWrites(SalesorderheaderId.writes).writes(o.salesorderid),
-      "salesorderdetailid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.salesorderdetailid),
-      "carriertrackingnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.carriertrackingnumber),
-      "orderqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.orderqty),
-      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
-      "specialofferid" -> Writes.OptionWrites(SpecialofferId.writes).writes(o.specialofferid),
-      "unitprice" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.unitprice),
-      "unitpricediscount" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.unitpricediscount),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
+      "salesorderdetailid" -> Writes.IntWrites.writes(o.salesorderdetailid),
+      "carriertrackingnumber" -> Writes.StringWrites.writes(o.carriertrackingnumber),
+      "orderqty" -> Writes.IntWrites.writes(o.orderqty),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
+      "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),
+      "unitpricediscount" -> Writes.BigDecimalWrites.writes(o.unitpricediscount),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

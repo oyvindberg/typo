@@ -10,18 +10,18 @@ package c
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class CViewStructure[Row](val prefix: Option[String], val extract: Row => CViewRow, val merge: (Row, CViewRow) => Row)
   extends Relation[CViewFields, CViewRow, Row]
     with CViewFields[Row] { outer =>
 
-  override val id = new OptField[/* bpchar, max 6 chars */ String, Row](prefix, "id", None, Some("bpchar"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val cultureid = new OptField[CultureId, Row](prefix, "cultureid", None, Some("bpchar"))(x => extract(x).cultureid, (row, value) => merge(row, extract(row).copy(cultureid = value)))
-  override val name = new OptField[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[/* bpchar, max 6 chars */ String, Row](prefix, "id", None, Some("bpchar"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val cultureid = new Field[CultureId, Row](prefix, "cultureid", None, Some("bpchar"))(x => extract(x).cultureid, (row, value) => merge(row, extract(row).copy(cultureid = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, cultureid, name, modifieddate)

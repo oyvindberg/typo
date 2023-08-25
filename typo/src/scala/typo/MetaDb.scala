@@ -12,6 +12,7 @@ import typo.generated.information_schema.table_constraints.{TableConstraintsView
 import typo.generated.information_schema.tables.{TablesViewRepoImpl, TablesViewRow}
 import typo.generated.information_schema.{SqlIdentifier, YesOrNo}
 import typo.internal.metadb.{Enums, ForeignKeys, PrimaryKeys, UniqueKeys}
+import typo.internal.sqlfiles.{DecomposedSql, NullabilityFromExplain}
 import typo.internal.{DebugJson, TypeMapperDb}
 
 import java.sql.Connection
@@ -102,29 +103,37 @@ object MetaDb {
       .groupBy(c => (c.tableCatalog, c.tableSchema, c.tableName))
 
     val relations: List[db.Relation] = {
-      input.tablesViewRows.flatMap { table =>
+      input.tablesViewRows.flatMap { relation =>
         val relationName = db.RelationName(
-          schema = table.tableSchema.map(_.value),
-          name = table.tableName.get.value
+          schema = relation.tableSchema.map(_.value),
+          name = relation.tableName.get.value
         )
 
-        val columns = columnsByTable((table.tableCatalog, table.tableSchema, table.tableName))
+        val columns = columnsByTable((relation.tableCatalog, relation.tableSchema, relation.tableName))
           .sortBy(_.ordinalPosition)
 
-        def mappedCols: List[db.Col] =
-          columns.map { c =>
+        def mappedCols(maybeNullability: Option[NullabilityFromExplain.NullableIndices]): List[db.Col] =
+          columns.zipWithIndex.map { case (c, idx) =>
             val jsonDescription = DebugJson(c)
 
             val colName = db.ColName(c.columnName.get.value)
+            val nullability =
+              maybeNullability match {
+                case Some(nullableIndices) =>
+                  if (nullableIndices.values.contains(idx)) Nullability.Nullable else Nullability.NoNulls
+
+                case None =>
+                  c.isNullable match {
+                    case Some(YesOrNo("YES")) => Nullability.Nullable
+                    case Some(YesOrNo("NO"))  => Nullability.NoNulls
+                    case None                 => Nullability.NullableUnknown
+                    case other                => throw new Exception(s"Unknown nullability: $other")
+                  }
+              }
             db.Col(
               name = colName,
               columnDefault = c.columnDefault.map(_.value),
-              nullability = c.isNullable match {
-                case Some(YesOrNo("YES")) => Nullability.Nullable
-                case Some(YesOrNo("NO"))  => Nullability.NoNulls
-                case None                 => Nullability.NullableUnknown
-                case other                => throw new Exception(s"Unknown nullability: $other")
-              },
+              nullability = nullability,
               tpe = typeMapperDb.col(c).getOrElse {
                 System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${colName.value}. Falling back to text")
                 db.Type.Text
@@ -147,13 +156,20 @@ object MetaDb {
                   (colName, (relName, colName))
               }.toMap
 
+            val nullabilityInfo = view.viewDefinition match {
+              case Some(sqlContent) =>
+                val decomposedSql = DecomposedSql.parse(sqlContent)
+                NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
+              case None => None
+            }
+
             for {
-              mappedCols <- NonEmptyList.fromList(mappedCols)
+              mappedCols <- NonEmptyList.fromList(mappedCols(nullabilityInfo))
             } yield db.View(relationName, mappedCols, view.viewDefinition, isMaterialized = view.relkind == "m", deps)
 
           case None =>
             for {
-              mappedCols <- NonEmptyList.fromList(mappedCols)
+              mappedCols <- NonEmptyList.fromList(mappedCols(None))
             } yield db.Table(
               name = relationName,
               cols = mappedCols,

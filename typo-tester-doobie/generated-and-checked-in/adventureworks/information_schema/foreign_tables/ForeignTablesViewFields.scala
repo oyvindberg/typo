@@ -8,14 +8,14 @@ package information_schema
 package foreign_tables
 
 import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait ForeignTablesViewFields[Row] {
-  val foreignTableCatalog: OptField[SqlIdentifier, Row]
-  val foreignTableSchema: OptField[SqlIdentifier, Row]
-  val foreignTableName: OptField[SqlIdentifier, Row]
-  val foreignServerCatalog: OptField[SqlIdentifier, Row]
-  val foreignServerName: OptField[SqlIdentifier, Row]
+  val foreignTableCatalog: Field[SqlIdentifier, Row]
+  val foreignTableSchema: Field[SqlIdentifier, Row]
+  val foreignTableName: Field[SqlIdentifier, Row]
+  val foreignServerCatalog: Field[SqlIdentifier, Row]
+  val foreignServerName: Field[SqlIdentifier, Row]
 }
 object ForeignTablesViewFields extends ForeignTablesViewStructure[ForeignTablesViewRow](None, identity, (_, x) => x)
 

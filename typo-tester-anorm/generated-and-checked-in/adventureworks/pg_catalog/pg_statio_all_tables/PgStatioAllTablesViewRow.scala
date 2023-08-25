@@ -20,34 +20,34 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatioAllTablesViewRow(
-  relid: Option[/* oid */ Long],
+  relid: /* oid */ Long,
   schemaname: Option[String],
-  relname: Option[String],
-  heapBlksRead: Option[Long],
-  heapBlksHit: Option[Long],
-  idxBlksRead: Option[Long],
-  idxBlksHit: Option[Long],
-  toastBlksRead: Option[Long],
-  toastBlksHit: Option[Long],
-  tidxBlksRead: Option[Long],
-  tidxBlksHit: Option[Long]
+  relname: String,
+  heapBlksRead: Long,
+  heapBlksHit: Long,
+  idxBlksRead: Long,
+  idxBlksHit: Long,
+  toastBlksRead: Long,
+  toastBlksHit: Long,
+  tidxBlksRead: Long,
+  tidxBlksHit: Long
 )
 
 object PgStatioAllTablesViewRow {
   implicit lazy val reads: Reads[PgStatioAllTablesViewRow] = Reads[PgStatioAllTablesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioAllTablesViewRow(
-          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          relid = json.\("relid").as(Reads.LongReads),
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
-          relname = json.\("relname").toOption.map(_.as(Reads.StringReads)),
-          heapBlksRead = json.\("heap_blks_read").toOption.map(_.as(Reads.LongReads)),
-          heapBlksHit = json.\("heap_blks_hit").toOption.map(_.as(Reads.LongReads)),
-          idxBlksRead = json.\("idx_blks_read").toOption.map(_.as(Reads.LongReads)),
-          idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as(Reads.LongReads)),
-          toastBlksRead = json.\("toast_blks_read").toOption.map(_.as(Reads.LongReads)),
-          toastBlksHit = json.\("toast_blks_hit").toOption.map(_.as(Reads.LongReads)),
-          tidxBlksRead = json.\("tidx_blks_read").toOption.map(_.as(Reads.LongReads)),
-          tidxBlksHit = json.\("tidx_blks_hit").toOption.map(_.as(Reads.LongReads))
+          relname = json.\("relname").as(Reads.StringReads),
+          heapBlksRead = json.\("heap_blks_read").as(Reads.LongReads),
+          heapBlksHit = json.\("heap_blks_hit").as(Reads.LongReads),
+          idxBlksRead = json.\("idx_blks_read").as(Reads.LongReads),
+          idxBlksHit = json.\("idx_blks_hit").as(Reads.LongReads),
+          toastBlksRead = json.\("toast_blks_read").as(Reads.LongReads),
+          toastBlksHit = json.\("toast_blks_hit").as(Reads.LongReads),
+          tidxBlksRead = json.\("tidx_blks_read").as(Reads.LongReads),
+          tidxBlksHit = json.\("tidx_blks_hit").as(Reads.LongReads)
         )
       )
     ),
@@ -55,33 +55,33 @@ object PgStatioAllTablesViewRow {
   def rowParser(idx: Int): RowParser[PgStatioAllTablesViewRow] = RowParser[PgStatioAllTablesViewRow] { row =>
     Success(
       PgStatioAllTablesViewRow(
-        relid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        relid = row(idx + 0)(Column.columnToLong),
         schemaname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        relname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        heapBlksRead = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
-        heapBlksHit = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
-        idxBlksRead = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
-        idxBlksHit = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
-        toastBlksRead = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
-        toastBlksHit = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
-        tidxBlksRead = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
-        tidxBlksHit = row(idx + 10)(Column.columnToOption(Column.columnToLong))
+        relname = row(idx + 2)(Column.columnToString),
+        heapBlksRead = row(idx + 3)(Column.columnToLong),
+        heapBlksHit = row(idx + 4)(Column.columnToLong),
+        idxBlksRead = row(idx + 5)(Column.columnToLong),
+        idxBlksHit = row(idx + 6)(Column.columnToLong),
+        toastBlksRead = row(idx + 7)(Column.columnToLong),
+        toastBlksHit = row(idx + 8)(Column.columnToLong),
+        tidxBlksRead = row(idx + 9)(Column.columnToLong),
+        tidxBlksHit = row(idx + 10)(Column.columnToLong)
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatioAllTablesViewRow] = OWrites[PgStatioAllTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "relid" -> Writes.LongWrites.writes(o.relid),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
-      "relname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.relname),
-      "heap_blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapBlksRead),
-      "heap_blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapBlksHit),
-      "idx_blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxBlksRead),
-      "idx_blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxBlksHit),
-      "toast_blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.toastBlksRead),
-      "toast_blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.toastBlksHit),
-      "tidx_blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tidxBlksRead),
-      "tidx_blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tidxBlksHit)
+      "relname" -> Writes.StringWrites.writes(o.relname),
+      "heap_blks_read" -> Writes.LongWrites.writes(o.heapBlksRead),
+      "heap_blks_hit" -> Writes.LongWrites.writes(o.heapBlksHit),
+      "idx_blks_read" -> Writes.LongWrites.writes(o.idxBlksRead),
+      "idx_blks_hit" -> Writes.LongWrites.writes(o.idxBlksHit),
+      "toast_blks_read" -> Writes.LongWrites.writes(o.toastBlksRead),
+      "toast_blks_hit" -> Writes.LongWrites.writes(o.toastBlksHit),
+      "tidx_blks_read" -> Writes.LongWrites.writes(o.tidxBlksRead),
+      "tidx_blks_hit" -> Writes.LongWrites.writes(o.tidxBlksHit)
     ))
   )
 }

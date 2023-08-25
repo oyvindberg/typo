@@ -11,7 +11,6 @@ import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -19,41 +18,40 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SequencesViewRow(
-  sequenceCatalog: Option[SqlIdentifier],
-  sequenceSchema: Option[SqlIdentifier],
-  sequenceName: Option[SqlIdentifier],
-  dataType: Option[CharacterData],
-  numericPrecision: Option[CardinalNumber],
-  numericPrecisionRadix: Option[CardinalNumber],
-  numericScale: Option[CardinalNumber],
-  startValue: Option[CharacterData],
-  minimumValue: Option[CharacterData],
-  maximumValue: Option[CharacterData],
-  increment: Option[CharacterData],
-  cycleOption: Option[YesOrNo]
+  sequenceCatalog: SqlIdentifier,
+  sequenceSchema: SqlIdentifier,
+  sequenceName: SqlIdentifier,
+  dataType: CharacterData,
+  numericPrecision: CardinalNumber,
+  numericPrecisionRadix: CardinalNumber,
+  numericScale: CardinalNumber,
+  startValue: CharacterData,
+  minimumValue: CharacterData,
+  maximumValue: CharacterData,
+  increment: CharacterData,
+  cycleOption: YesOrNo
 )
 
 object SequencesViewRow {
   implicit lazy val reads: Reads[SequencesViewRow] = Reads[SequencesViewRow](json => JsResult.fromTry(
       Try(
         SequencesViewRow(
-          sequenceCatalog = json.\("sequence_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          sequenceSchema = json.\("sequence_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          sequenceName = json.\("sequence_name").toOption.map(_.as(SqlIdentifier.reads)),
-          dataType = json.\("data_type").toOption.map(_.as(CharacterData.reads)),
-          numericPrecision = json.\("numeric_precision").toOption.map(_.as(CardinalNumber.reads)),
-          numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as(CardinalNumber.reads)),
-          numericScale = json.\("numeric_scale").toOption.map(_.as(CardinalNumber.reads)),
-          startValue = json.\("start_value").toOption.map(_.as(CharacterData.reads)),
-          minimumValue = json.\("minimum_value").toOption.map(_.as(CharacterData.reads)),
-          maximumValue = json.\("maximum_value").toOption.map(_.as(CharacterData.reads)),
-          increment = json.\("increment").toOption.map(_.as(CharacterData.reads)),
-          cycleOption = json.\("cycle_option").toOption.map(_.as(YesOrNo.reads))
+          sequenceCatalog = json.\("sequence_catalog").as(SqlIdentifier.reads),
+          sequenceSchema = json.\("sequence_schema").as(SqlIdentifier.reads),
+          sequenceName = json.\("sequence_name").as(SqlIdentifier.reads),
+          dataType = json.\("data_type").as(CharacterData.reads),
+          numericPrecision = json.\("numeric_precision").as(CardinalNumber.reads),
+          numericPrecisionRadix = json.\("numeric_precision_radix").as(CardinalNumber.reads),
+          numericScale = json.\("numeric_scale").as(CardinalNumber.reads),
+          startValue = json.\("start_value").as(CharacterData.reads),
+          minimumValue = json.\("minimum_value").as(CharacterData.reads),
+          maximumValue = json.\("maximum_value").as(CharacterData.reads),
+          increment = json.\("increment").as(CharacterData.reads),
+          cycleOption = json.\("cycle_option").as(YesOrNo.reads)
         )
       )
     ),
@@ -61,35 +59,35 @@ object SequencesViewRow {
   def rowParser(idx: Int): RowParser[SequencesViewRow] = RowParser[SequencesViewRow] { row =>
     Success(
       SequencesViewRow(
-        sequenceCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        sequenceSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        sequenceName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        dataType = row(idx + 3)(Column.columnToOption(CharacterData.column)),
-        numericPrecision = row(idx + 4)(Column.columnToOption(CardinalNumber.column)),
-        numericPrecisionRadix = row(idx + 5)(Column.columnToOption(CardinalNumber.column)),
-        numericScale = row(idx + 6)(Column.columnToOption(CardinalNumber.column)),
-        startValue = row(idx + 7)(Column.columnToOption(CharacterData.column)),
-        minimumValue = row(idx + 8)(Column.columnToOption(CharacterData.column)),
-        maximumValue = row(idx + 9)(Column.columnToOption(CharacterData.column)),
-        increment = row(idx + 10)(Column.columnToOption(CharacterData.column)),
-        cycleOption = row(idx + 11)(Column.columnToOption(YesOrNo.column))
+        sequenceCatalog = row(idx + 0)(SqlIdentifier.column),
+        sequenceSchema = row(idx + 1)(SqlIdentifier.column),
+        sequenceName = row(idx + 2)(SqlIdentifier.column),
+        dataType = row(idx + 3)(CharacterData.column),
+        numericPrecision = row(idx + 4)(CardinalNumber.column),
+        numericPrecisionRadix = row(idx + 5)(CardinalNumber.column),
+        numericScale = row(idx + 6)(CardinalNumber.column),
+        startValue = row(idx + 7)(CharacterData.column),
+        minimumValue = row(idx + 8)(CharacterData.column),
+        maximumValue = row(idx + 9)(CharacterData.column),
+        increment = row(idx + 10)(CharacterData.column),
+        cycleOption = row(idx + 11)(YesOrNo.column)
       )
     )
   }
   implicit lazy val writes: OWrites[SequencesViewRow] = OWrites[SequencesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "sequence_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.sequenceCatalog),
-      "sequence_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.sequenceSchema),
-      "sequence_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.sequenceName),
-      "data_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.dataType),
-      "numeric_precision" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericPrecision),
-      "numeric_precision_radix" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericPrecisionRadix),
-      "numeric_scale" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericScale),
-      "start_value" -> Writes.OptionWrites(CharacterData.writes).writes(o.startValue),
-      "minimum_value" -> Writes.OptionWrites(CharacterData.writes).writes(o.minimumValue),
-      "maximum_value" -> Writes.OptionWrites(CharacterData.writes).writes(o.maximumValue),
-      "increment" -> Writes.OptionWrites(CharacterData.writes).writes(o.increment),
-      "cycle_option" -> Writes.OptionWrites(YesOrNo.writes).writes(o.cycleOption)
+      "sequence_catalog" -> SqlIdentifier.writes.writes(o.sequenceCatalog),
+      "sequence_schema" -> SqlIdentifier.writes.writes(o.sequenceSchema),
+      "sequence_name" -> SqlIdentifier.writes.writes(o.sequenceName),
+      "data_type" -> CharacterData.writes.writes(o.dataType),
+      "numeric_precision" -> CardinalNumber.writes.writes(o.numericPrecision),
+      "numeric_precision_radix" -> CardinalNumber.writes.writes(o.numericPrecisionRadix),
+      "numeric_scale" -> CardinalNumber.writes.writes(o.numericScale),
+      "start_value" -> CharacterData.writes.writes(o.startValue),
+      "minimum_value" -> CharacterData.writes.writes(o.minimumValue),
+      "maximum_value" -> CharacterData.writes.writes(o.maximumValue),
+      "increment" -> CharacterData.writes.writes(o.increment),
+      "cycle_option" -> YesOrNo.writes.writes(o.cycleOption)
     ))
   )
 }

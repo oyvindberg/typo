@@ -12,17 +12,17 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait TrViewFields[Row] {
-  val id: OptField[Int, Row]
-  val salestaxrateid: OptField[SalestaxrateId, Row]
-  val stateprovinceid: OptField[StateprovinceId, Row]
-  val taxtype: OptField[Int, Row]
-  val taxrate: OptField[BigDecimal, Row]
-  val name: OptField[Name, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val salestaxrateid: Field[SalestaxrateId, Row]
+  val stateprovinceid: Field[StateprovinceId, Row]
+  val taxtype: Field[Int, Row]
+  val taxrate: Field[BigDecimal, Row]
+  val name: Field[Name, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object TrViewFields extends TrViewStructure[TrViewRow](None, identity, (_, x) => x)
 

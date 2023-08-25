@@ -10,14 +10,14 @@ package pd
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.productdescription.ProductdescriptionId
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PdViewFields[Row] {
-  val id: OptField[Int, Row]
-  val productdescriptionid: OptField[ProductdescriptionId, Row]
-  val description: OptField[/* max 400 chars */ String, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val productdescriptionid: Field[ProductdescriptionId, Row]
+  val description: Field[/* max 400 chars */ String, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PdViewFields extends PdViewStructure[PdViewRow](None, identity, (_, x) => x)
 

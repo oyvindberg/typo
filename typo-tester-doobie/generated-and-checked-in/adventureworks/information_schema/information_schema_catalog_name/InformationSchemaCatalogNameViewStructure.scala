@@ -8,15 +8,15 @@ package information_schema
 package information_schema_catalog_name
 
 import adventureworks.information_schema.SqlIdentifier
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class InformationSchemaCatalogNameViewStructure[Row](val prefix: Option[String], val extract: Row => InformationSchemaCatalogNameViewRow, val merge: (Row, InformationSchemaCatalogNameViewRow) => Row)
   extends Relation[InformationSchemaCatalogNameViewFields, InformationSchemaCatalogNameViewRow, Row]
     with InformationSchemaCatalogNameViewFields[Row] { outer =>
 
-  override val catalogName = new OptField[SqlIdentifier, Row](prefix, "catalog_name", None, Some("information_schema.sql_identifier"))(x => extract(x).catalogName, (row, value) => merge(row, extract(row).copy(catalogName = value)))
+  override val catalogName = new Field[SqlIdentifier, Row](prefix, "catalog_name", None, Some("information_schema.sql_identifier"))(x => extract(x).catalogName, (row, value) => merge(row, extract(row).copy(catalogName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](catalogName)

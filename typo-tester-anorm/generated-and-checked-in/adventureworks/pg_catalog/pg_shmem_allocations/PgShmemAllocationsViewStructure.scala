@@ -7,18 +7,18 @@ package adventureworks
 package pg_catalog
 package pg_shmem_allocations
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgShmemAllocationsViewStructure[Row](val prefix: Option[String], val extract: Row => PgShmemAllocationsViewRow, val merge: (Row, PgShmemAllocationsViewRow) => Row)
   extends Relation[PgShmemAllocationsViewFields, PgShmemAllocationsViewRow, Row]
     with PgShmemAllocationsViewFields[Row] { outer =>
 
-  override val name = new OptField[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val off = new OptField[Long, Row](prefix, "off", None, Some("int8"))(x => extract(x).off, (row, value) => merge(row, extract(row).copy(off = value)))
-  override val size = new OptField[Long, Row](prefix, "size", None, Some("int8"))(x => extract(x).size, (row, value) => merge(row, extract(row).copy(size = value)))
-  override val allocatedSize = new OptField[Long, Row](prefix, "allocated_size", None, Some("int8"))(x => extract(x).allocatedSize, (row, value) => merge(row, extract(row).copy(allocatedSize = value)))
+  override val name = new Field[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val off = new Field[Long, Row](prefix, "off", None, Some("int8"))(x => extract(x).off, (row, value) => merge(row, extract(row).copy(off = value)))
+  override val size = new Field[Long, Row](prefix, "size", None, Some("int8"))(x => extract(x).size, (row, value) => merge(row, extract(row).copy(size = value)))
+  override val allocatedSize = new Field[Long, Row](prefix, "allocated_size", None, Some("int8"))(x => extract(x).allocatedSize, (row, value) => merge(row, extract(row).copy(allocatedSize = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](name, off, size, allocatedSize)

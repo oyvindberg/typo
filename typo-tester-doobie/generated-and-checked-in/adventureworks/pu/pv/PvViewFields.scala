@@ -11,21 +11,21 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PvViewFields[Row] {
-  val id: OptField[Int, Row]
-  val productid: OptField[ProductId, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val averageleadtime: OptField[Int, Row]
-  val standardprice: OptField[BigDecimal, Row]
-  val lastreceiptcost: OptField[BigDecimal, Row]
-  val lastreceiptdate: OptField[TypoLocalDateTime, Row]
-  val minorderqty: OptField[Int, Row]
-  val maxorderqty: OptField[Int, Row]
-  val onorderqty: OptField[Int, Row]
-  val unitmeasurecode: OptField[UnitmeasureId, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val productid: Field[ProductId, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val averageleadtime: Field[Int, Row]
+  val standardprice: Field[BigDecimal, Row]
+  val lastreceiptcost: Field[BigDecimal, Row]
+  val lastreceiptdate: Field[TypoLocalDateTime, Row]
+  val minorderqty: Field[Int, Row]
+  val maxorderqty: Field[Int, Row]
+  val onorderqty: Field[Int, Row]
+  val unitmeasurecode: Field[UnitmeasureId, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PvViewFields extends PvViewStructure[PvViewRow](None, identity, (_, x) => x)
 

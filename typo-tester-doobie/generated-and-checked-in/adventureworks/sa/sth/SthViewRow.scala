@@ -19,42 +19,42 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class SthViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.territoryid]] */
-  territoryid: Option[SalesterritoryId],
+  territoryid: SalesterritoryId,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.startdate]] */
-  startdate: Option[TypoLocalDateTime],
+  startdate: TypoLocalDateTime,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.enddate]] */
-  enddate: Option[TypoLocalDateTime],
+  enddate: TypoLocalDateTime,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object SthViewRow {
-  implicit lazy val decoder: Decoder[SthViewRow] = Decoder.forProduct7[SthViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SthViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SthViewRow] = Encoder.forProduct7[SthViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SthViewRow] = Decoder.forProduct7[SthViewRow, Int, BusinessentityId, SalesterritoryId, TypoLocalDateTime, TypoLocalDateTime, UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SthViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, SalesterritoryId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SthViewRow] = Encoder.forProduct7[SthViewRow, Int, BusinessentityId, SalesterritoryId, TypoLocalDateTime, TypoLocalDateTime, UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, SalesterritoryId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SthViewRow] = new Read[SthViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (SalesterritoryId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (SalesterritoryId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SthViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 2),
-      startdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 2),
+      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
+      enddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

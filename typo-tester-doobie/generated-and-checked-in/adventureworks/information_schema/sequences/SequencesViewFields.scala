@@ -11,21 +11,21 @@ import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SequencesViewFields[Row] {
-  val sequenceCatalog: OptField[SqlIdentifier, Row]
-  val sequenceSchema: OptField[SqlIdentifier, Row]
-  val sequenceName: OptField[SqlIdentifier, Row]
-  val dataType: OptField[CharacterData, Row]
-  val numericPrecision: OptField[CardinalNumber, Row]
-  val numericPrecisionRadix: OptField[CardinalNumber, Row]
-  val numericScale: OptField[CardinalNumber, Row]
-  val startValue: OptField[CharacterData, Row]
-  val minimumValue: OptField[CharacterData, Row]
-  val maximumValue: OptField[CharacterData, Row]
-  val increment: OptField[CharacterData, Row]
-  val cycleOption: OptField[YesOrNo, Row]
+  val sequenceCatalog: Field[SqlIdentifier, Row]
+  val sequenceSchema: Field[SqlIdentifier, Row]
+  val sequenceName: Field[SqlIdentifier, Row]
+  val dataType: Field[CharacterData, Row]
+  val numericPrecision: Field[CardinalNumber, Row]
+  val numericPrecisionRadix: Field[CardinalNumber, Row]
+  val numericScale: Field[CardinalNumber, Row]
+  val startValue: Field[CharacterData, Row]
+  val minimumValue: Field[CharacterData, Row]
+  val maximumValue: Field[CharacterData, Row]
+  val increment: Field[CharacterData, Row]
+  val cycleOption: Field[YesOrNo, Row]
 }
 object SequencesViewFields extends SequencesViewStructure[SequencesViewRow](None, identity, (_, x) => x)
 

@@ -12,16 +12,16 @@ import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.util.UUID
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SViewFields[Row] {
-  val id: OptField[Int, Row]
-  val businessentityid: OptField[BusinessentityId, Row]
-  val name: OptField[Name, Row]
-  val salespersonid: OptField[BusinessentityId, Row]
-  val demographics: OptField[TypoXml, Row]
-  val rowguid: OptField[UUID, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val businessentityid: Field[BusinessentityId, Row]
+  val name: Field[Name, Row]
+  val salespersonid: Field[BusinessentityId, Row]
+  val demographics: Field[TypoXml, Row]
+  val rowguid: Field[UUID, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SViewFields extends SViewStructure[SViewRow](None, identity, (_, x) => x)
 

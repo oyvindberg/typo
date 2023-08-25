@@ -15,21 +15,21 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgConfigViewRow(
-  name: Option[String],
-  setting: Option[String]
+  name: String,
+  setting: String
 )
 
 object PgConfigViewRow {
-  implicit lazy val decoder: Decoder[PgConfigViewRow] = Decoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(PgConfigViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit lazy val encoder: Encoder[PgConfigViewRow] = Encoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(x => (x.name, x.setting))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val decoder: Decoder[PgConfigViewRow] = Decoder.forProduct2[PgConfigViewRow, String, String]("name", "setting")(PgConfigViewRow.apply)(Decoder.decodeString, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[PgConfigViewRow] = Encoder.forProduct2[PgConfigViewRow, String, String]("name", "setting")(x => (x.name, x.setting))(Encoder.encodeString, Encoder.encodeString)
   implicit lazy val read: Read[PgConfigViewRow] = new Read[PgConfigViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgConfigViewRow(
-      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
-      setting = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1)
+      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      setting = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1)
     )
   )
 }

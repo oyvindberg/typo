@@ -10,14 +10,14 @@ package sr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.salesreason.SalesreasonId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait SrViewFields[Row] {
-  val id: OptField[Int, Row]
-  val salesreasonid: OptField[SalesreasonId, Row]
-  val name: OptField[Name, Row]
-  val reasontype: OptField[Name, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val salesreasonid: Field[SalesreasonId, Row]
+  val name: Field[Name, Row]
+  val reasontype: Field[Name, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SrViewFields extends SrViewStructure[SrViewRow](None, identity, (_, x) => x)
 

@@ -8,7 +8,6 @@ package information_schema
 package foreign_tables
 
 import adventureworks.information_schema.SqlIdentifier
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,32 +15,31 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ForeignTablesViewRow(
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableCatalog]] */
-  foreignTableCatalog: Option[SqlIdentifier],
+  foreignTableCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableSchema]] */
-  foreignTableSchema: Option[SqlIdentifier],
+  foreignTableSchema: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableName]] */
-  foreignTableName: Option[SqlIdentifier],
+  foreignTableName: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: Option[SqlIdentifier],
+  foreignServerCatalog: SqlIdentifier,
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignServerName]] */
-  foreignServerName: Option[SqlIdentifier]
+  foreignServerName: SqlIdentifier
 )
 
 object ForeignTablesViewRow {
   implicit lazy val reads: Reads[ForeignTablesViewRow] = Reads[ForeignTablesViewRow](json => JsResult.fromTry(
       Try(
         ForeignTablesViewRow(
-          foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignTableName = json.\("foreign_table_name").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(SqlIdentifier.reads))
+          foreignTableCatalog = json.\("foreign_table_catalog").as(SqlIdentifier.reads),
+          foreignTableSchema = json.\("foreign_table_schema").as(SqlIdentifier.reads),
+          foreignTableName = json.\("foreign_table_name").as(SqlIdentifier.reads),
+          foreignServerCatalog = json.\("foreign_server_catalog").as(SqlIdentifier.reads),
+          foreignServerName = json.\("foreign_server_name").as(SqlIdentifier.reads)
         )
       )
     ),
@@ -49,21 +47,21 @@ object ForeignTablesViewRow {
   def rowParser(idx: Int): RowParser[ForeignTablesViewRow] = RowParser[ForeignTablesViewRow] { row =>
     Success(
       ForeignTablesViewRow(
-        foreignTableCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        foreignTableSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        foreignTableName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        foreignServerCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        foreignServerName = row(idx + 4)(Column.columnToOption(SqlIdentifier.column))
+        foreignTableCatalog = row(idx + 0)(SqlIdentifier.column),
+        foreignTableSchema = row(idx + 1)(SqlIdentifier.column),
+        foreignTableName = row(idx + 2)(SqlIdentifier.column),
+        foreignServerCatalog = row(idx + 3)(SqlIdentifier.column),
+        foreignServerName = row(idx + 4)(SqlIdentifier.column)
       )
     )
   }
   implicit lazy val writes: OWrites[ForeignTablesViewRow] = OWrites[ForeignTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableCatalog),
-      "foreign_table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableSchema),
-      "foreign_table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableName),
-      "foreign_server_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerCatalog),
-      "foreign_server_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerName)
+      "foreign_table_catalog" -> SqlIdentifier.writes.writes(o.foreignTableCatalog),
+      "foreign_table_schema" -> SqlIdentifier.writes.writes(o.foreignTableSchema),
+      "foreign_table_name" -> SqlIdentifier.writes.writes(o.foreignTableName),
+      "foreign_server_catalog" -> SqlIdentifier.writes.writes(o.foreignServerCatalog),
+      "foreign_server_name" -> SqlIdentifier.writes.writes(o.foreignServerName)
     ))
   )
 }

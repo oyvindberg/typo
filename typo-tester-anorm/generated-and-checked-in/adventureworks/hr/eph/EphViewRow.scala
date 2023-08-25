@@ -22,29 +22,29 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EphViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.ratechangedate]] */
-  ratechangedate: Option[TypoLocalDateTime],
+  ratechangedate: TypoLocalDateTime,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.rate]] */
-  rate: Option[BigDecimal],
+  rate: BigDecimal,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.payfrequency]] */
-  payfrequency: Option[Int],
+  payfrequency: Int,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object EphViewRow {
   implicit lazy val reads: Reads[EphViewRow] = Reads[EphViewRow](json => JsResult.fromTry(
       Try(
         EphViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          ratechangedate = json.\("ratechangedate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          rate = json.\("rate").toOption.map(_.as(Reads.bigDecReads)),
-          payfrequency = json.\("payfrequency").toOption.map(_.as(Reads.IntReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          ratechangedate = json.\("ratechangedate").as(TypoLocalDateTime.reads),
+          rate = json.\("rate").as(Reads.bigDecReads),
+          payfrequency = json.\("payfrequency").as(Reads.IntReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -52,23 +52,23 @@ object EphViewRow {
   def rowParser(idx: Int): RowParser[EphViewRow] = RowParser[EphViewRow] { row =>
     Success(
       EphViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        ratechangedate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
-        rate = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        payfrequency = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
-        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        ratechangedate = row(idx + 2)(TypoLocalDateTime.column),
+        rate = row(idx + 3)(Column.columnToScalaBigDecimal),
+        payfrequency = row(idx + 4)(Column.columnToInt),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[EphViewRow] = OWrites[EphViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "ratechangedate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.ratechangedate),
-      "rate" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.rate),
-      "payfrequency" -> Writes.OptionWrites(Writes.IntWrites).writes(o.payfrequency),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "ratechangedate" -> TypoLocalDateTime.writes.writes(o.ratechangedate),
+      "rate" -> Writes.BigDecimalWrites.writes(o.rate),
+      "payfrequency" -> Writes.IntWrites.writes(o.payfrequency),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

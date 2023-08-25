@@ -8,18 +8,18 @@ package pg_catalog
 package pg_stat_wal
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PgStatWalViewFields[Row] {
-  val walRecords: OptField[Long, Row]
-  val walFpi: OptField[Long, Row]
-  val walBytes: OptField[BigDecimal, Row]
-  val walBuffersFull: OptField[Long, Row]
-  val walWrite: OptField[Long, Row]
-  val walSync: OptField[Long, Row]
-  val walWriteTime: OptField[Double, Row]
-  val walSyncTime: OptField[Double, Row]
-  val statsReset: OptField[TypoOffsetDateTime, Row]
+  val walRecords: Field[Long, Row]
+  val walFpi: Field[Long, Row]
+  val walBytes: Field[BigDecimal, Row]
+  val walBuffersFull: Field[Long, Row]
+  val walWrite: Field[Long, Row]
+  val walSync: Field[Long, Row]
+  val walWriteTime: Field[Double, Row]
+  val walSyncTime: Field[Double, Row]
+  val statsReset: Field[TypoOffsetDateTime, Row]
 }
 object PgStatWalViewFields extends PgStatWalViewStructure[PgStatWalViewRow](None, identity, (_, x) => x)
 

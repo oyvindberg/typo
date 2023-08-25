@@ -23,26 +23,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PdViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.productdescription.ProductdescriptionRow.productdescriptionid]] */
-  productdescriptionid: Option[ProductdescriptionId],
+  productdescriptionid: ProductdescriptionId,
   /** Points to [[production.productdescription.ProductdescriptionRow.description]] */
-  description: Option[/* max 400 chars */ String],
+  description: /* max 400 chars */ String,
   /** Points to [[production.productdescription.ProductdescriptionRow.rowguid]] */
-  rowguid: Option[UUID],
+  rowguid: UUID,
   /** Points to [[production.productdescription.ProductdescriptionRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object PdViewRow {
   implicit lazy val reads: Reads[PdViewRow] = Reads[PdViewRow](json => JsResult.fromTry(
       Try(
         PdViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          productdescriptionid = json.\("productdescriptionid").toOption.map(_.as(ProductdescriptionId.reads)),
-          description = json.\("description").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
+          description = json.\("description").as(Reads.StringReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -50,21 +50,21 @@ object PdViewRow {
   def rowParser(idx: Int): RowParser[PdViewRow] = RowParser[PdViewRow] { row =>
     Success(
       PdViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        productdescriptionid = row(idx + 1)(Column.columnToOption(ProductdescriptionId.column)),
-        description = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 3)(Column.columnToOption(Column.columnToUUID)),
-        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        productdescriptionid = row(idx + 1)(ProductdescriptionId.column),
+        description = row(idx + 2)(Column.columnToString),
+        rowguid = row(idx + 3)(Column.columnToUUID),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[PdViewRow] = OWrites[PdViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "productdescriptionid" -> Writes.OptionWrites(ProductdescriptionId.writes).writes(o.productdescriptionid),
-      "description" -> Writes.OptionWrites(Writes.StringWrites).writes(o.description),
-      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
+      "description" -> Writes.StringWrites.writes(o.description),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -16,34 +16,34 @@ import java.sql.ResultSet
 
 case class PgStatioUserSequencesViewRow(
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.relid]] */
-  relid: Option[/* oid */ Long],
+  relid: /* oid */ Long,
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.schemaname]] */
-  schemaname: Option[String],
+  schemaname: String,
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.relname]] */
-  relname: Option[String],
+  relname: String,
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.blksRead]] */
-  blksRead: Option[Long],
+  blksRead: Long,
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.blksHit]] */
-  blksHit: Option[Long]
+  blksHit: Long
 )
 
 object PgStatioUserSequencesViewRow {
-  implicit lazy val decoder: Decoder[PgStatioUserSequencesViewRow] = Decoder.forProduct5[PgStatioUserSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(PgStatioUserSequencesViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit lazy val encoder: Encoder[PgStatioUserSequencesViewRow] = Encoder.forProduct5[PgStatioUserSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(x => (x.relid, x.schemaname, x.relname, x.blksRead, x.blksHit))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val decoder: Decoder[PgStatioUserSequencesViewRow] = Decoder.forProduct5[PgStatioUserSequencesViewRow, /* oid */ Long, String, String, Long, Long]("relid", "schemaname", "relname", "blks_read", "blks_hit")(PgStatioUserSequencesViewRow.apply)(Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgStatioUserSequencesViewRow] = Encoder.forProduct5[PgStatioUserSequencesViewRow, /* oid */ Long, String, String, Long, Long]("relid", "schemaname", "relname", "blks_read", "blks_hit")(x => (x.relid, x.schemaname, x.relname, x.blksRead, x.blksHit))(Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgStatioUserSequencesViewRow] = new Read[PgStatioUserSequencesViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatioUserSequencesViewRow(
-      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
-      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      blksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
-      blksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4)
+      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      schemaname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      relname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      blksRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      blksHit = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

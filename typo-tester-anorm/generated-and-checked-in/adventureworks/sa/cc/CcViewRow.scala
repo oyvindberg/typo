@@ -22,32 +22,32 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CcViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
-  creditcardid: Option[/* user-picked */ CustomCreditcardId],
+  creditcardid: /* user-picked */ CustomCreditcardId,
   /** Points to [[sales.creditcard.CreditcardRow.cardtype]] */
-  cardtype: Option[/* max 50 chars */ String],
+  cardtype: /* max 50 chars */ String,
   /** Points to [[sales.creditcard.CreditcardRow.cardnumber]] */
-  cardnumber: Option[/* max 25 chars */ String],
+  cardnumber: /* max 25 chars */ String,
   /** Points to [[sales.creditcard.CreditcardRow.expmonth]] */
-  expmonth: Option[Int],
+  expmonth: Int,
   /** Points to [[sales.creditcard.CreditcardRow.expyear]] */
-  expyear: Option[Int],
+  expyear: Int,
   /** Points to [[sales.creditcard.CreditcardRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object CcViewRow {
   implicit lazy val reads: Reads[CcViewRow] = Reads[CcViewRow](json => JsResult.fromTry(
       Try(
         CcViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          creditcardid = json.\("creditcardid").toOption.map(_.as(CustomCreditcardId.reads)),
-          cardtype = json.\("cardtype").toOption.map(_.as(Reads.StringReads)),
-          cardnumber = json.\("cardnumber").toOption.map(_.as(Reads.StringReads)),
-          expmonth = json.\("expmonth").toOption.map(_.as(Reads.IntReads)),
-          expyear = json.\("expyear").toOption.map(_.as(Reads.IntReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads),
+          cardtype = json.\("cardtype").as(Reads.StringReads),
+          cardnumber = json.\("cardnumber").as(Reads.StringReads),
+          expmonth = json.\("expmonth").as(Reads.IntReads),
+          expyear = json.\("expyear").as(Reads.IntReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -55,25 +55,25 @@ object CcViewRow {
   def rowParser(idx: Int): RowParser[CcViewRow] = RowParser[CcViewRow] { row =>
     Success(
       CcViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        creditcardid = row(idx + 1)(Column.columnToOption(CustomCreditcardId.column)),
-        cardtype = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        cardnumber = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        expmonth = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
-        expyear = row(idx + 5)(Column.columnToOption(Column.columnToInt)),
-        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        creditcardid = row(idx + 1)(/* user-picked */ CustomCreditcardId.column),
+        cardtype = row(idx + 2)(Column.columnToString),
+        cardnumber = row(idx + 3)(Column.columnToString),
+        expmonth = row(idx + 4)(Column.columnToInt),
+        expyear = row(idx + 5)(Column.columnToInt),
+        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[CcViewRow] = OWrites[CcViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "creditcardid" -> Writes.OptionWrites(CustomCreditcardId.writes).writes(o.creditcardid),
-      "cardtype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cardtype),
-      "cardnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cardnumber),
-      "expmonth" -> Writes.OptionWrites(Writes.IntWrites).writes(o.expmonth),
-      "expyear" -> Writes.OptionWrites(Writes.IntWrites).writes(o.expyear),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid),
+      "cardtype" -> Writes.StringWrites.writes(o.cardtype),
+      "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
+      "expmonth" -> Writes.IntWrites.writes(o.expmonth),
+      "expyear" -> Writes.IntWrites.writes(o.expyear),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

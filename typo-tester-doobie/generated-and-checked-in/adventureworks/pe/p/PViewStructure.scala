@@ -16,27 +16,26 @@ import adventureworks.userdefined.FirstName
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PViewStructure[Row](val prefix: Option[String], val extract: Row => PViewRow, val merge: (Row, PViewRow) => Row)
   extends Relation[PViewFields, PViewRow, Row]
     with PViewFields[Row] { outer =>
 
-  override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val businessentityid = new OptField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val persontype = new OptField[/* bpchar, max 2 chars */ String, Row](prefix, "persontype", None, Some("bpchar"))(x => extract(x).persontype, (row, value) => merge(row, extract(row).copy(persontype = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+  override val persontype = new Field[/* bpchar, max 2 chars */ String, Row](prefix, "persontype", None, Some("bpchar"))(x => extract(x).persontype, (row, value) => merge(row, extract(row).copy(persontype = value)))
   override val namestyle = new Field[NameStyle, Row](prefix, "namestyle", None, Some(""""public".NameStyle"""))(x => extract(x).namestyle, (row, value) => merge(row, extract(row).copy(namestyle = value)))
-  override val title = new OptField[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
-  override val firstname = new OptField[/* user-picked */ FirstName, Row](prefix, "firstname", None, Some(""""public"."Name""""))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
-  override val middlename = new OptField[Name, Row](prefix, "middlename", None, Some(""""public"."Name""""))(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
-  override val lastname = new OptField[Name, Row](prefix, "lastname", None, Some(""""public"."Name""""))(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
-  override val suffix = new OptField[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
-  override val emailpromotion = new OptField[Int, Row](prefix, "emailpromotion", None, Some("int4"))(x => extract(x).emailpromotion, (row, value) => merge(row, extract(row).copy(emailpromotion = value)))
-  override val additionalcontactinfo = new OptField[TypoXml, Row](prefix, "additionalcontactinfo", None, Some("xml"))(x => extract(x).additionalcontactinfo, (row, value) => merge(row, extract(row).copy(additionalcontactinfo = value)))
-  override val demographics = new OptField[TypoXml, Row](prefix, "demographics", None, Some("xml"))(x => extract(x).demographics, (row, value) => merge(row, extract(row).copy(demographics = value)))
-  override val rowguid = new OptField[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-  override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val title = new Field[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
+  override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, Some(""""public"."Name""""))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
+  override val middlename = new Field[Name, Row](prefix, "middlename", None, Some(""""public"."Name""""))(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
+  override val lastname = new Field[Name, Row](prefix, "lastname", None, Some(""""public"."Name""""))(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
+  override val suffix = new Field[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
+  override val emailpromotion = new Field[Int, Row](prefix, "emailpromotion", None, Some("int4"))(x => extract(x).emailpromotion, (row, value) => merge(row, extract(row).copy(emailpromotion = value)))
+  override val additionalcontactinfo = new Field[TypoXml, Row](prefix, "additionalcontactinfo", None, Some("xml"))(x => extract(x).additionalcontactinfo, (row, value) => merge(row, extract(row).copy(additionalcontactinfo = value)))
+  override val demographics = new Field[TypoXml, Row](prefix, "demographics", None, Some("xml"))(x => extract(x).demographics, (row, value) => merge(row, extract(row).copy(demographics = value)))
+  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)

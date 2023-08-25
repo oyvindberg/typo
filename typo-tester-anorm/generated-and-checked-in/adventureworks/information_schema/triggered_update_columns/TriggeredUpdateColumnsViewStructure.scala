@@ -8,21 +8,21 @@ package information_schema
 package triggered_update_columns
 
 import adventureworks.information_schema.SqlIdentifier
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class TriggeredUpdateColumnsViewStructure[Row](val prefix: Option[String], val extract: Row => TriggeredUpdateColumnsViewRow, val merge: (Row, TriggeredUpdateColumnsViewRow) => Row)
   extends Relation[TriggeredUpdateColumnsViewFields, TriggeredUpdateColumnsViewRow, Row]
     with TriggeredUpdateColumnsViewFields[Row] { outer =>
 
-  override val triggerCatalog = new OptField[SqlIdentifier, Row](prefix, "trigger_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).triggerCatalog, (row, value) => merge(row, extract(row).copy(triggerCatalog = value)))
-  override val triggerSchema = new OptField[SqlIdentifier, Row](prefix, "trigger_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).triggerSchema, (row, value) => merge(row, extract(row).copy(triggerSchema = value)))
-  override val triggerName = new OptField[SqlIdentifier, Row](prefix, "trigger_name", None, Some("information_schema.sql_identifier"))(x => extract(x).triggerName, (row, value) => merge(row, extract(row).copy(triggerName = value)))
-  override val eventObjectCatalog = new OptField[SqlIdentifier, Row](prefix, "event_object_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).eventObjectCatalog, (row, value) => merge(row, extract(row).copy(eventObjectCatalog = value)))
-  override val eventObjectSchema = new OptField[SqlIdentifier, Row](prefix, "event_object_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).eventObjectSchema, (row, value) => merge(row, extract(row).copy(eventObjectSchema = value)))
-  override val eventObjectTable = new OptField[SqlIdentifier, Row](prefix, "event_object_table", None, Some("information_schema.sql_identifier"))(x => extract(x).eventObjectTable, (row, value) => merge(row, extract(row).copy(eventObjectTable = value)))
-  override val eventObjectColumn = new OptField[SqlIdentifier, Row](prefix, "event_object_column", None, Some("information_schema.sql_identifier"))(x => extract(x).eventObjectColumn, (row, value) => merge(row, extract(row).copy(eventObjectColumn = value)))
+  override val triggerCatalog = new Field[SqlIdentifier, Row](prefix, "trigger_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).triggerCatalog, (row, value) => merge(row, extract(row).copy(triggerCatalog = value)))
+  override val triggerSchema = new Field[SqlIdentifier, Row](prefix, "trigger_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).triggerSchema, (row, value) => merge(row, extract(row).copy(triggerSchema = value)))
+  override val triggerName = new Field[SqlIdentifier, Row](prefix, "trigger_name", None, Some("information_schema.sql_identifier"))(x => extract(x).triggerName, (row, value) => merge(row, extract(row).copy(triggerName = value)))
+  override val eventObjectCatalog = new Field[SqlIdentifier, Row](prefix, "event_object_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).eventObjectCatalog, (row, value) => merge(row, extract(row).copy(eventObjectCatalog = value)))
+  override val eventObjectSchema = new Field[SqlIdentifier, Row](prefix, "event_object_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).eventObjectSchema, (row, value) => merge(row, extract(row).copy(eventObjectSchema = value)))
+  override val eventObjectTable = new Field[SqlIdentifier, Row](prefix, "event_object_table", None, Some("information_schema.sql_identifier"))(x => extract(x).eventObjectTable, (row, value) => merge(row, extract(row).copy(eventObjectTable = value)))
+  override val eventObjectColumn = new Field[SqlIdentifier, Row](prefix, "event_object_column", None, Some("information_schema.sql_identifier"))(x => extract(x).eventObjectColumn, (row, value) => merge(row, extract(row).copy(eventObjectColumn = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](triggerCatalog, triggerSchema, triggerName, eventObjectCatalog, eventObjectSchema, eventObjectTable, eventObjectColumn)

@@ -17,38 +17,38 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class EphViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.ratechangedate]] */
-  ratechangedate: Option[TypoLocalDateTime],
+  ratechangedate: TypoLocalDateTime,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.rate]] */
-  rate: Option[BigDecimal],
+  rate: BigDecimal,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.payfrequency]] */
-  payfrequency: Option[Int],
+  payfrequency: Int,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object EphViewRow {
-  implicit lazy val decoder: Decoder[EphViewRow] = Decoder.forProduct6[EphViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[Int], Option[TypoLocalDateTime]]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EphViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[EphViewRow] = Encoder.forProduct6[EphViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[Int], Option[TypoLocalDateTime]]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.id, x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[EphViewRow] = Decoder.forProduct6[EphViewRow, Int, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EphViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeInt, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[EphViewRow] = Encoder.forProduct6[EphViewRow, Int, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.id, x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeInt, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[EphViewRow] = new Read[EphViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EphViewRow(
-      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      ratechangedate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2),
-      rate = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
-      payfrequency = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      ratechangedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
+      rate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      payfrequency = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

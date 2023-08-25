@@ -25,38 +25,38 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[purchasing.vendor.VendorRow.businessentityid]] */
-  businessentityid: Option[BusinessentityId],
+  businessentityid: BusinessentityId,
   /** Points to [[purchasing.vendor.VendorRow.accountnumber]] */
-  accountnumber: Option[AccountNumber],
+  accountnumber: AccountNumber,
   /** Points to [[purchasing.vendor.VendorRow.name]] */
-  name: Option[Name],
+  name: Name,
   /** Points to [[purchasing.vendor.VendorRow.creditrating]] */
-  creditrating: Option[Int],
+  creditrating: Int,
   /** Points to [[purchasing.vendor.VendorRow.preferredvendorstatus]] */
   preferredvendorstatus: Flag,
   /** Points to [[purchasing.vendor.VendorRow.activeflag]] */
   activeflag: Flag,
   /** Points to [[purchasing.vendor.VendorRow.purchasingwebserviceurl]] */
-  purchasingwebserviceurl: Option[/* max 1024 chars */ String],
+  purchasingwebserviceurl: /* max 1024 chars */ String,
   /** Points to [[purchasing.vendor.VendorRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object VViewRow {
   implicit lazy val reads: Reads[VViewRow] = Reads[VViewRow](json => JsResult.fromTry(
       Try(
         VViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
-          accountnumber = json.\("accountnumber").toOption.map(_.as(AccountNumber.reads)),
-          name = json.\("name").toOption.map(_.as(Name.reads)),
-          creditrating = json.\("creditrating").toOption.map(_.as(Reads.IntReads)),
+          id = json.\("id").as(Reads.IntReads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          accountnumber = json.\("accountnumber").as(AccountNumber.reads),
+          name = json.\("name").as(Name.reads),
+          creditrating = json.\("creditrating").as(Reads.IntReads),
           preferredvendorstatus = json.\("preferredvendorstatus").as(Flag.reads),
           activeflag = json.\("activeflag").as(Flag.reads),
-          purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as(Reads.StringReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          purchasingwebserviceurl = json.\("purchasingwebserviceurl").as(Reads.StringReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -64,29 +64,29 @@ object VViewRow {
   def rowParser(idx: Int): RowParser[VViewRow] = RowParser[VViewRow] { row =>
     Success(
       VViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
-        accountnumber = row(idx + 2)(Column.columnToOption(AccountNumber.column)),
-        name = row(idx + 3)(Column.columnToOption(Name.column)),
-        creditrating = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
+        id = row(idx + 0)(Column.columnToInt),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        accountnumber = row(idx + 2)(AccountNumber.column),
+        name = row(idx + 3)(Name.column),
+        creditrating = row(idx + 4)(Column.columnToInt),
         preferredvendorstatus = row(idx + 5)(Flag.column),
         activeflag = row(idx + 6)(Flag.column),
-        purchasingwebserviceurl = row(idx + 7)(Column.columnToOption(Column.columnToString)),
-        modifieddate = row(idx + 8)(Column.columnToOption(TypoLocalDateTime.column))
+        purchasingwebserviceurl = row(idx + 7)(Column.columnToString),
+        modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[VViewRow] = OWrites[VViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
-      "accountnumber" -> Writes.OptionWrites(AccountNumber.writes).writes(o.accountnumber),
-      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
-      "creditrating" -> Writes.OptionWrites(Writes.IntWrites).writes(o.creditrating),
+      "id" -> Writes.IntWrites.writes(o.id),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "accountnumber" -> AccountNumber.writes.writes(o.accountnumber),
+      "name" -> Name.writes.writes(o.name),
+      "creditrating" -> Writes.IntWrites.writes(o.creditrating),
       "preferredvendorstatus" -> Flag.writes.writes(o.preferredvendorstatus),
       "activeflag" -> Flag.writes.writes(o.activeflag),
-      "purchasingwebserviceurl" -> Writes.OptionWrites(Writes.StringWrites).writes(o.purchasingwebserviceurl),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "purchasingwebserviceurl" -> Writes.StringWrites.writes(o.purchasingwebserviceurl),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

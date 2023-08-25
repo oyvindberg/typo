@@ -7,16 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_config
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgConfigViewStructure[Row](val prefix: Option[String], val extract: Row => PgConfigViewRow, val merge: (Row, PgConfigViewRow) => Row)
   extends Relation[PgConfigViewFields, PgConfigViewRow, Row]
     with PgConfigViewFields[Row] { outer =>
 
-  override val name = new OptField[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val setting = new OptField[String, Row](prefix, "setting", None, None)(x => extract(x).setting, (row, value) => merge(row, extract(row).copy(setting = value)))
+  override val name = new Field[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val setting = new Field[String, Row](prefix, "setting", None, None)(x => extract(x).setting, (row, value) => merge(row, extract(row).copy(setting = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](name, setting)

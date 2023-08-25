@@ -8,32 +8,33 @@ package pg_catalog
 package pg_stat_all_tables
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatAllTablesViewFields[Row] {
-  val relid: OptField[/* oid */ Long, Row]
+  val relid: Field[/* oid */ Long, Row]
   val schemaname: OptField[String, Row]
-  val relname: OptField[String, Row]
-  val seqScan: OptField[Long, Row]
-  val seqTupRead: OptField[Long, Row]
-  val idxScan: OptField[Long, Row]
-  val idxTupFetch: OptField[Long, Row]
-  val nTupIns: OptField[Long, Row]
-  val nTupUpd: OptField[Long, Row]
-  val nTupDel: OptField[Long, Row]
-  val nTupHotUpd: OptField[Long, Row]
-  val nLiveTup: OptField[Long, Row]
-  val nDeadTup: OptField[Long, Row]
-  val nModSinceAnalyze: OptField[Long, Row]
-  val nInsSinceVacuum: OptField[Long, Row]
-  val lastVacuum: OptField[TypoOffsetDateTime, Row]
-  val lastAutovacuum: OptField[TypoOffsetDateTime, Row]
-  val lastAnalyze: OptField[TypoOffsetDateTime, Row]
-  val lastAutoanalyze: OptField[TypoOffsetDateTime, Row]
-  val vacuumCount: OptField[Long, Row]
-  val autovacuumCount: OptField[Long, Row]
-  val analyzeCount: OptField[Long, Row]
-  val autoanalyzeCount: OptField[Long, Row]
+  val relname: Field[String, Row]
+  val seqScan: Field[Long, Row]
+  val seqTupRead: Field[Long, Row]
+  val idxScan: Field[Long, Row]
+  val idxTupFetch: Field[Long, Row]
+  val nTupIns: Field[Long, Row]
+  val nTupUpd: Field[Long, Row]
+  val nTupDel: Field[Long, Row]
+  val nTupHotUpd: Field[Long, Row]
+  val nLiveTup: Field[Long, Row]
+  val nDeadTup: Field[Long, Row]
+  val nModSinceAnalyze: Field[Long, Row]
+  val nInsSinceVacuum: Field[Long, Row]
+  val lastVacuum: Field[TypoOffsetDateTime, Row]
+  val lastAutovacuum: Field[TypoOffsetDateTime, Row]
+  val lastAnalyze: Field[TypoOffsetDateTime, Row]
+  val lastAutoanalyze: Field[TypoOffsetDateTime, Row]
+  val vacuumCount: Field[Long, Row]
+  val autovacuumCount: Field[Long, Row]
+  val analyzeCount: Field[Long, Row]
+  val autoanalyzeCount: Field[Long, Row]
 }
 object PgStatAllTablesViewFields extends PgStatAllTablesViewStructure[PgStatAllTablesViewRow](None, identity, (_, x) => x)
 

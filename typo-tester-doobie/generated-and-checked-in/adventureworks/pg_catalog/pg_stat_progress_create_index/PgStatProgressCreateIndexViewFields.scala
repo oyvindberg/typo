@@ -7,25 +7,26 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_create_index
 
+import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatProgressCreateIndexViewFields[Row] {
-  val pid: OptField[Int, Row]
-  val datid: OptField[/* oid */ Long, Row]
+  val pid: Field[Int, Row]
+  val datid: Field[/* oid */ Long, Row]
   val datname: OptField[String, Row]
-  val relid: OptField[/* oid */ Long, Row]
-  val indexRelid: OptField[/* oid */ Long, Row]
-  val command: OptField[String, Row]
-  val phase: OptField[String, Row]
-  val lockersTotal: OptField[Long, Row]
-  val lockersDone: OptField[Long, Row]
-  val currentLockerPid: OptField[Long, Row]
-  val blocksTotal: OptField[Long, Row]
-  val blocksDone: OptField[Long, Row]
-  val tuplesTotal: OptField[Long, Row]
-  val tuplesDone: OptField[Long, Row]
-  val partitionsTotal: OptField[Long, Row]
-  val partitionsDone: OptField[Long, Row]
+  val relid: Field[/* oid */ Long, Row]
+  val indexRelid: Field[/* oid */ Long, Row]
+  val command: Field[String, Row]
+  val phase: Field[String, Row]
+  val lockersTotal: Field[Long, Row]
+  val lockersDone: Field[Long, Row]
+  val currentLockerPid: Field[Long, Row]
+  val blocksTotal: Field[Long, Row]
+  val blocksDone: Field[Long, Row]
+  val tuplesTotal: Field[Long, Row]
+  val tuplesDone: Field[Long, Row]
+  val partitionsTotal: Field[Long, Row]
+  val partitionsDone: Field[Long, Row]
 }
 object PgStatProgressCreateIndexViewFields extends PgStatProgressCreateIndexViewStructure[PgStatProgressCreateIndexViewRow](None, identity, (_, x) => x)
 

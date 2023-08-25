@@ -24,41 +24,41 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BomViewRow(
-  id: Option[Int],
+  id: Int,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
-  billofmaterialsid: Option[BillofmaterialsId],
+  billofmaterialsid: BillofmaterialsId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.productassemblyid]] */
-  productassemblyid: Option[ProductId],
+  productassemblyid: ProductId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.componentid]] */
-  componentid: Option[ProductId],
+  componentid: ProductId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.startdate]] */
-  startdate: Option[TypoLocalDateTime],
+  startdate: TypoLocalDateTime,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.enddate]] */
-  enddate: Option[TypoLocalDateTime],
+  enddate: TypoLocalDateTime,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.unitmeasurecode]] */
-  unitmeasurecode: Option[UnitmeasureId],
+  unitmeasurecode: UnitmeasureId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.bomlevel]] */
-  bomlevel: Option[Int],
+  bomlevel: Int,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.perassemblyqty]] */
-  perassemblyqty: Option[BigDecimal],
+  perassemblyqty: BigDecimal,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.modifieddate]] */
-  modifieddate: Option[TypoLocalDateTime]
+  modifieddate: TypoLocalDateTime
 )
 
 object BomViewRow {
   implicit lazy val reads: Reads[BomViewRow] = Reads[BomViewRow](json => JsResult.fromTry(
       Try(
         BomViewRow(
-          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
-          billofmaterialsid = json.\("billofmaterialsid").toOption.map(_.as(BillofmaterialsId.reads)),
-          productassemblyid = json.\("productassemblyid").toOption.map(_.as(ProductId.reads)),
-          componentid = json.\("componentid").toOption.map(_.as(ProductId.reads)),
-          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          unitmeasurecode = json.\("unitmeasurecode").toOption.map(_.as(UnitmeasureId.reads)),
-          bomlevel = json.\("bomlevel").toOption.map(_.as(Reads.IntReads)),
-          perassemblyqty = json.\("perassemblyqty").toOption.map(_.as(Reads.bigDecReads)),
-          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
+          id = json.\("id").as(Reads.IntReads),
+          billofmaterialsid = json.\("billofmaterialsid").as(BillofmaterialsId.reads),
+          productassemblyid = json.\("productassemblyid").as(ProductId.reads),
+          componentid = json.\("componentid").as(ProductId.reads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").as(TypoLocalDateTime.reads),
+          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+          bomlevel = json.\("bomlevel").as(Reads.IntReads),
+          perassemblyqty = json.\("perassemblyqty").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -66,31 +66,31 @@ object BomViewRow {
   def rowParser(idx: Int): RowParser[BomViewRow] = RowParser[BomViewRow] { row =>
     Success(
       BomViewRow(
-        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
-        billofmaterialsid = row(idx + 1)(Column.columnToOption(BillofmaterialsId.column)),
-        productassemblyid = row(idx + 2)(Column.columnToOption(ProductId.column)),
-        componentid = row(idx + 3)(Column.columnToOption(ProductId.column)),
-        startdate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
-        enddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
-        unitmeasurecode = row(idx + 6)(Column.columnToOption(UnitmeasureId.column)),
-        bomlevel = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
-        perassemblyqty = row(idx + 8)(Column.columnToOption(Column.columnToScalaBigDecimal)),
-        modifieddate = row(idx + 9)(Column.columnToOption(TypoLocalDateTime.column))
+        id = row(idx + 0)(Column.columnToInt),
+        billofmaterialsid = row(idx + 1)(BillofmaterialsId.column),
+        productassemblyid = row(idx + 2)(ProductId.column),
+        componentid = row(idx + 3)(ProductId.column),
+        startdate = row(idx + 4)(TypoLocalDateTime.column),
+        enddate = row(idx + 5)(TypoLocalDateTime.column),
+        unitmeasurecode = row(idx + 6)(UnitmeasureId.column),
+        bomlevel = row(idx + 7)(Column.columnToInt),
+        perassemblyqty = row(idx + 8)(Column.columnToScalaBigDecimal),
+        modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[BomViewRow] = OWrites[BomViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
-      "billofmaterialsid" -> Writes.OptionWrites(BillofmaterialsId.writes).writes(o.billofmaterialsid),
-      "productassemblyid" -> Writes.OptionWrites(ProductId.writes).writes(o.productassemblyid),
-      "componentid" -> Writes.OptionWrites(ProductId.writes).writes(o.componentid),
-      "startdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.startdate),
-      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
-      "unitmeasurecode" -> Writes.OptionWrites(UnitmeasureId.writes).writes(o.unitmeasurecode),
-      "bomlevel" -> Writes.OptionWrites(Writes.IntWrites).writes(o.bomlevel),
-      "perassemblyqty" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.perassemblyqty),
-      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
+      "id" -> Writes.IntWrites.writes(o.id),
+      "billofmaterialsid" -> BillofmaterialsId.writes.writes(o.billofmaterialsid),
+      "productassemblyid" -> ProductId.writes.writes(o.productassemblyid),
+      "componentid" -> ProductId.writes.writes(o.componentid),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+      "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
+      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+      "bomlevel" -> Writes.IntWrites.writes(o.bomlevel),
+      "perassemblyqty" -> Writes.BigDecimalWrites.writes(o.perassemblyqty),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

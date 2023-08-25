@@ -9,15 +9,15 @@ package pch
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import typo.dsl.SqlExpr.OptField
+import typo.dsl.SqlExpr.Field
 
 trait PchViewFields[Row] {
-  val id: OptField[Int, Row]
-  val productid: OptField[ProductId, Row]
-  val startdate: OptField[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val standardcost: OptField[BigDecimal, Row]
-  val modifieddate: OptField[TypoLocalDateTime, Row]
+  val id: Field[Int, Row]
+  val productid: Field[ProductId, Row]
+  val startdate: Field[TypoLocalDateTime, Row]
+  val enddate: Field[TypoLocalDateTime, Row]
+  val standardcost: Field[BigDecimal, Row]
+  val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PchViewFields extends PchViewStructure[PchViewRow](None, identity, (_, x) => x)
 
