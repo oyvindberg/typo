@@ -2,7 +2,8 @@ package scripts
 
 import bleep.logging.{Formatter, LogLevel, Loggers}
 import bleep.{FileWatching, LogPatterns, cli}
-import typo.internal.FileSync
+import typo.internal.sqlfiles.readSqlFileDirectories
+import typo.internal.{FileSync, generate}
 
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
@@ -23,10 +24,10 @@ object GeneratedAdventureWorks {
           "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
         )
         val scriptsPath = buildDir.resolve("adventureworks_sql")
-        val metadb = typo.MetaDb.fromDbAndScripts(scriptsPath)
+        val metadb = typo.MetaDb.fromDb
 
-        def go() = {
-          val newSqlScripts = typo.internal.sqlfiles.Load(scriptsPath)
+        def go(): Unit = {
+          val newSqlScripts = readSqlFileDirectories(scriptsPath)
 
           List(
             (typo.DbLibName.Anorm, typo.JsonLibName.PlayJson, "typo-tester-anorm"),
@@ -45,8 +46,7 @@ object GeneratedAdventureWorks {
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
-            typo
-              .fromMetaDb(options, metadb.copy(sqlFiles = newSqlScripts), typo.Selector.All)
+            generate(options, metadb, newSqlScripts, typo.Selector.All)
               .overwriteFolder(targetSources, soft = true)
               .filter { case (_, synced) => synced != FileSync.Synced.Unchanged }
               .foreach { case (path, synced) => logger.withContext(path).warn(synced.toString) }
@@ -67,11 +67,8 @@ object GeneratedAdventureWorks {
         // note that this does not listen to changes in db schema naturally, though I'm sure that's possible to do as well
         if (args.contains("--watch")) {
           logger.warn(s"watching for changes in .sql files under $scriptsPath")
-          bleep
-            .FileWatching(logger, Map(scriptsPath -> List("sql scripts"))) { changed =>
-              go()
-            }
-            .run(bleep.FileWatching.StopWhen.OnStdInput)
+          FileWatching(logger, Map(scriptsPath -> List("sql scripts")))(_ => go())
+            .run(FileWatching.StopWhen.OnStdInput)
         }
       }
 }

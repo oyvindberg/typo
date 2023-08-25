@@ -1,24 +1,14 @@
-import typo.internal.*
-import typo.internal.codegen.*
-import typo.internal.metadb.load
+package typo
+package internal
 
-import java.nio.file.Path
-import java.sql.Connection
+import typo.internal.codegen.*
+import typo.internal.sqlfiles.SqlFile
+
 import scala.collection.immutable.SortedMap
 
-package object typo {
-  def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated = {
-    Banner.maybePrint(options)
-    fromMetaDb(options, load(maybeScriptPath = Some(scriptsPath)), selector)
-  }
-
-  def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated = {
-    Banner.maybePrint(options)
-    fromMetaDb(options, load(maybeScriptPath = None), selector)
-  }
-
+object generate {
   // use this constructor if you need to run `typo` multiple times with different options but same database/scripts
-  def fromMetaDb(publicOptions: Options, metaDb: MetaDb, selector: Selector): Generated = {
+  def apply(publicOptions: Options, metaDb: MetaDb, sqlFiles: List[SqlFile], selector: Selector): Generated = {
     Banner.maybePrint(publicOptions)
 
     val pkg = sc.Type.Qualified(publicOptions.pkg).value
@@ -61,7 +51,7 @@ package object typo {
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, metaDb.typeMapperDb, scalaTypeMapper, computeds.get))
+    val computedSqlFiles = sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, metaDb.typeMapperDb, scalaTypeMapper, computeds.get))
     computeds.foreach { case (relName, lazyValue) =>
       if (selector.include(relName)) lazyValue.get
     }

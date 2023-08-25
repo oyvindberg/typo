@@ -12,7 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import java.sql.Connection
 
-object Load {
+object readSqlFileDirectories {
   def apply(scriptsPath: Path)(implicit c: Connection): List[SqlFile] =
     findSqlFilesUnder(scriptsPath).flatMap { sqlFile =>
       val sqlContent = Files.readString(sqlFile)

@@ -2,6 +2,9 @@ package scripts
 
 import bleep.*
 import bleep.commands.SourceGen
+import typo.*
+import typo.internal.generate
+import typo.internal.sqlfiles.readSqlFileDirectories
 
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
@@ -15,14 +18,14 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
     implicit val c: Connection = DriverManager.getConnection(
       "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
     )
-    val metadb = typo.MetaDb.fromDbAndScripts(buildDir.resolve("adventureworks_sql"))
+    val metadb = MetaDb.fromDb
 
     val crossIds = List("jvm212", "jvm213", "jvm3").map(str => model.CrossId(str))
     val variants = List(
-      (Some(typo.DbLibName.Doobie), Nil, "typo-tester-doobie"),
-      (Some(typo.DbLibName.Anorm), Nil, "typo-tester-anorm"),
-      (None, List(typo.JsonLibName.Circe), "typo-tester-doobie"),
-      (None, List(typo.JsonLibName.PlayJson), "typo-tester-anorm")
+      (Some(DbLibName.Doobie), Nil, "typo-tester-doobie"),
+      (Some(DbLibName.Anorm), Nil, "typo-tester-anorm"),
+      (None, List(JsonLibName.Circe), "typo-tester-doobie"),
+      (None, List(JsonLibName.PlayJson), "typo-tester-anorm")
     )
 
     val results: List[Result] =
@@ -30,12 +33,12 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
         val lib = (dbLib ++ jsonLib).mkString
         val targetSources = buildDir.resolve(s"$projectName/generated-and-checked-in")
         List(false, true).flatMap { inlineImplicits =>
-          typo
-            .fromMetaDb(
-              typo.Options(pkg = "adventureworks", dbLib, jsonLib, enableDsl = true, enableTestInserts = true, inlineImplicits = inlineImplicits),
-              metadb,
-              typo.Selector.All
-            )
+          generate(
+            Options(pkg = "adventureworks", dbLib, jsonLib, enableDsl = true, enableTestInserts = true, inlineImplicits = inlineImplicits),
+            metadb,
+            readSqlFileDirectories(buildDir.resolve("adventureworks_sql")),
+            Selector.All
+          )
             .overwriteFolder(targetSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
 
           crossIds.map { crossId =>

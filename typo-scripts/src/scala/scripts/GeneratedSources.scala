@@ -1,6 +1,6 @@
 package scripts
 
-import typo.{Nullability, NullabilityOverride, Source, RelPath, db}
+import typo.*
 
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
@@ -29,33 +29,31 @@ object GeneratedSources {
 
     val buildDir = Path.of(sys.props("user.dir"))
     val typoSources = buildDir.resolve("typo/generated-and-checked-in")
-    val sqlScriptDir = buildDir.resolve("sql")
 
-    val selector = typo.Selector.relationNames(
-      "columns",
-      "key_column_usage",
-      "pg_namespace",
-      "referential_constraints",
-      "table_constraints",
-      "tables",
-      "foo",
-      "pg_prepared_statements"
-    )
-
-    val files: typo.Generated = {
-      val options = typo.Options(
+    val files = generateFromDb(
+      Options(
         pkg = "typo.generated",
-        jsonLibs = List(typo.JsonLibName.PlayJson),
-        dbLib = Some(typo.DbLibName.Anorm),
+        jsonLibs = List(JsonLibName.PlayJson),
+        dbLib = Some(DbLibName.Anorm),
         header = header,
         debugTypes = true
-      )
-      typo.fromDbAndScripts(options, sqlScriptDir, selector)
-    }
+      ),
+      Selector.relationNames(
+        "columns",
+        "key_column_usage",
+        "pg_namespace",
+        "referential_constraints",
+        "table_constraints",
+        "tables",
+        "foo",
+        "pg_prepared_statements"
+      ),
+      List(buildDir.resolve("sql"))
+    )
 
     files.overwriteFolder(typoSources, soft = true)
 
-    import scala.sys.process._
+    import scala.sys.process.*
     List("git", "add", "-f", typoSources.toString).!!
     ()
   }
