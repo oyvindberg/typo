@@ -51,7 +51,7 @@ object GeneratedSources {
       List(buildDir.resolve("sql"))
     )
 
-    files.overwriteFolder(typoSources, soft = true)
+    files.overwriteFolder(typoSources)
 
     import scala.sys.process.*
     List("git", "add", "-f", typoSources.toString).!!

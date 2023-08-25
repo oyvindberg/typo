@@ -24,26 +24,24 @@ object FileSync {
     case class Yes(maxDepth: Option[Int]) extends DeleteUnknowns
   }
 
-  def syncPaths(folder: Path, fileMap: Map[Path, String], deleteUnknowns: DeleteUnknowns, soft: Boolean): Map[Path, Synced] = {
-    val fileRelMap = fileMap.map { case (path, content) =>
-      require(path.startsWith(folder), s"$path not within $folder")
-      RelPath.relativeTo(folder, path) -> content
-    }
-    syncStrings(folder, fileRelMap, deleteUnknowns, soft)
+  sealed trait SoftWrite
+  object SoftWrite {
+    case class Yes(knownUnchanged: Set[RelPath]) extends SoftWrite
+    case object No extends SoftWrite
   }
 
   /** @param soft
     *   compare to existing content in order to not change timestamps. tooling may care a lot about this
     */
-  def syncStrings(folder: Path, fileRelMap: Map[RelPath, String], deleteUnknowns: DeleteUnknowns, soft: Boolean): Map[Path, Synced] =
-    syncBytes(folder, fileRelMap.map { case (k, v) => (k, v.getBytes(StandardCharsets.UTF_8)) }, deleteUnknowns, soft)
+  def syncStrings(folder: Path, fileRelMap: Map[RelPath, String], deleteUnknowns: DeleteUnknowns, softWrite: SoftWrite): Map[Path, Synced] =
+    syncBytes(folder, fileRelMap.map { case (k, v) => (k, v.getBytes(StandardCharsets.UTF_8)) }, deleteUnknowns, softWrite)
 
   val longestFirst: Ordering[Path] = Ordering.by[Path, Int](_.getNameCount).reverse
 
   /** @param soft
     *   compare to existing content in order to not change timestamps. tooling may care a lot about this
     */
-  def syncBytes(folder: Path, fileRelMap: Map[RelPath, Array[Byte]], deleteUnknowns: DeleteUnknowns, soft: Boolean): Map[Path, Synced] = {
+  def syncBytes(folder: Path, fileRelMap: Map[RelPath, Array[Byte]], deleteUnknowns: DeleteUnknowns, softWrite: SoftWrite): Map[Path, Synced] = {
     val ret = scala.collection.mutable.Map.empty[Path, Synced]
     val fileMap = fileRelMap.map { case (relPath, content) => (folder / relPath, content) }
 
@@ -68,17 +66,21 @@ object FileSync {
 
       case _ => ()
     }
-
-    fileMap.foreach { case (file, bytes) =>
-      val synced =
-        if (soft) softWriteBytes(file, bytes)
-        else {
-          writeBytes(file, bytes)
-          Synced.New
+    softWrite match {
+      case SoftWrite.Yes(knownUnchanged) =>
+        val knownUnchanged1 = knownUnchanged.map(folder / _)
+        fileMap.foreach { case (file, bytes) =>
+          ret(file) =
+            if (knownUnchanged1(file)) Synced.Unchanged
+            else softWriteBytes(file, bytes)
         }
-      ret(file) = synced
-    }
 
+      case SoftWrite.No =>
+        fileMap.foreach { case (file, bytes) =>
+          writeBytes(file, bytes)
+          ret(file) = Synced.New
+        }
+    }
     ret.toMap
   }
 

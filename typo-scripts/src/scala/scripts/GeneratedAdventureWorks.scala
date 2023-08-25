@@ -4,9 +4,11 @@ import bleep.logging.{Formatter, LogLevel, Loggers}
 import bleep.{FileWatching, LogPatterns, cli}
 import typo.internal.sqlfiles.readSqlFileDirectories
 import typo.internal.{FileSync, generate}
+import typo.*
 
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
+import java.util.concurrent.atomic.AtomicReference
 
 object GeneratedAdventureWorks {
   val buildDir = Path.of(sys.props("user.dir"))
@@ -24,20 +26,22 @@ object GeneratedAdventureWorks {
           "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
         )
         val scriptsPath = buildDir.resolve("adventureworks_sql")
-        val metadb = typo.MetaDb.fromDb
+        val metadb = MetaDb.fromDb
+
+        val variants = List(
+          (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, String])),
+          (DbLibName.Doobie, JsonLibName.Circe, "typo-tester-doobie", new AtomicReference(Map.empty[RelPath, String]))
+        )
 
         def go(): Unit = {
           val newSqlScripts = readSqlFileDirectories(scriptsPath)
 
-          List(
-            (typo.DbLibName.Anorm, typo.JsonLibName.PlayJson, "typo-tester-anorm"),
-            (typo.DbLibName.Doobie, typo.JsonLibName.Circe, "typo-tester-doobie")
-          ).foreach { case (dbLib, jsonLib, projectPath) =>
-            val options = typo.Options(
+          variants.foreach { case (dbLib, jsonLib, projectPath, oldFilesRef) =>
+            val options = Options(
               pkg = "adventureworks",
               Some(dbLib),
               List(jsonLib),
-              typeOverride = typo.TypeOverride.relation {
+              typeOverride = TypeOverride.relation {
                 case (_, "firstname")                     => "adventureworks.userdefined.FirstName"
                 case ("sales.creditcard", "creditcardid") => "adventureworks.userdefined.CustomCreditcardId"
               },
@@ -46,8 +50,17 @@ object GeneratedAdventureWorks {
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
-            generate(options, metadb, newSqlScripts, typo.Selector.All)
-              .overwriteFolder(targetSources, soft = true)
+            val newFiles: Generated =
+              generate(options, metadb, newSqlScripts, Selector.All)
+
+            val knownUnchanged: Set[RelPath] = {
+              val oldFiles = oldFilesRef.get()
+              newFiles.files.iterator.collect { case (relPath, contents) if oldFiles.get(relPath).contains(contents) => relPath }.toSet
+            }
+            oldFilesRef.set(newFiles.files)
+
+            newFiles
+              .overwriteFolder(targetSources, softWrite = FileSync.SoftWrite.Yes(knownUnchanged))
               .filter { case (_, synced) => synced != FileSync.Synced.Unchanged }
               .foreach { case (path, synced) => logger.withContext(path).warn(synced.toString) }
 

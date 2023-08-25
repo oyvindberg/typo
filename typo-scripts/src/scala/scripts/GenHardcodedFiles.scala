@@ -3,6 +3,7 @@ package scripts
 import bleep.*
 import bleep.logging.Logger
 import typo.*
+import typo.internal.FileSync.SoftWrite
 import typo.internal.{DebugJson, TypeMapperDb, generate}
 
 // this runs automatically at build time to instantly see results.
@@ -153,7 +154,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
       generated.overwriteFolder(
         target.sources,
         // todo: bleep should use something better than timestamps
-        soft = false
+        softWrite = SoftWrite.No
       )
       cli("add to git", target.sources, List("git", "add", "-f", target.sources.toString), Logger.DevNull, cli.Out.Raw)
     }

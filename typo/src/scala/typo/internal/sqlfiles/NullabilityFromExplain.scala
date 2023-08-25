@@ -90,10 +90,10 @@ object NullabilityFromExplain {
           val rightPlan = go(right)
           val newNullables =
             joinType match {
-              case "Inner" => Nil
-              case "Right" => leftPlan.plan.output
-              case "Left"  => rightPlan.plan.output
-              case "Full" | "Anti"  => leftPlan.plan.output ++ rightPlan.plan.output
+              case "Inner"         => Nil
+              case "Right"         => leftPlan.plan.output
+              case "Left"          => rightPlan.plan.output
+              case "Full" | "Anti" => leftPlan.plan.output ++ rightPlan.plan.output
             }
 
           val allNullables = leftPlan.nullableOutputs ++ rightPlan.nullableOutputs ++ newNullables
