@@ -47,7 +47,7 @@ object GeneratedAdventureWorks {
 
             typo
               .fromMetaDb(options, metadb.copy(sqlFiles = newSqlScripts), typo.Selector.All)
-              .overwriteFolder(targetSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
+              .overwriteFolder(targetSources, soft = true)
               .filter { case (_, synced) => synced != FileSync.Synced.Unchanged }
               .foreach { case (path, synced) => logger.withContext(path).warn(synced.toString) }
 
