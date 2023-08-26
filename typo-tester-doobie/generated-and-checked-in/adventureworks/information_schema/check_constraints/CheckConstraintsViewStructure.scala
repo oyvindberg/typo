@@ -17,10 +17,10 @@ class CheckConstraintsViewStructure[Row](val prefix: Option[String], val extract
   extends Relation[CheckConstraintsViewFields, CheckConstraintsViewRow, Row]
     with CheckConstraintsViewFields[Row] { outer =>
 
-  override val constraintCatalog = new Field[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
-  override val constraintSchema = new Field[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
-  override val constraintName = new Field[SqlIdentifier, Row](prefix, "constraint_name", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
-  override val checkClause = new Field[CharacterData, Row](prefix, "check_clause", None, Some("information_schema.character_data"))(x => extract(x).checkClause, (row, value) => merge(row, extract(row).copy(checkClause = value)))
+  override val constraintCatalog = new Field[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("name"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
+  override val constraintSchema = new Field[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("name"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
+  override val constraintName = new Field[SqlIdentifier, Row](prefix, "constraint_name", None, Some("name"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
+  override val checkClause = new Field[CharacterData, Row](prefix, "check_clause", None, Some("varchar"))(x => extract(x).checkClause, (row, value) => merge(row, extract(row).copy(checkClause = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](constraintCatalog, constraintSchema, constraintName, checkClause)

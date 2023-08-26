@@ -17,13 +17,13 @@ class SchemataViewStructure[Row](val prefix: Option[String], val extract: Row =>
   extends Relation[SchemataViewFields, SchemataViewRow, Row]
     with SchemataViewFields[Row] { outer =>
 
-  override val catalogName = new Field[SqlIdentifier, Row](prefix, "catalog_name", None, Some("information_schema.sql_identifier"))(x => extract(x).catalogName, (row, value) => merge(row, extract(row).copy(catalogName = value)))
-  override val schemaName = new Field[SqlIdentifier, Row](prefix, "schema_name", None, Some("information_schema.sql_identifier"))(x => extract(x).schemaName, (row, value) => merge(row, extract(row).copy(schemaName = value)))
-  override val schemaOwner = new Field[SqlIdentifier, Row](prefix, "schema_owner", None, Some("information_schema.sql_identifier"))(x => extract(x).schemaOwner, (row, value) => merge(row, extract(row).copy(schemaOwner = value)))
-  override val defaultCharacterSetCatalog = new Field[SqlIdentifier, Row](prefix, "default_character_set_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).defaultCharacterSetCatalog, (row, value) => merge(row, extract(row).copy(defaultCharacterSetCatalog = value)))
-  override val defaultCharacterSetSchema = new Field[SqlIdentifier, Row](prefix, "default_character_set_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).defaultCharacterSetSchema, (row, value) => merge(row, extract(row).copy(defaultCharacterSetSchema = value)))
-  override val defaultCharacterSetName = new Field[SqlIdentifier, Row](prefix, "default_character_set_name", None, Some("information_schema.sql_identifier"))(x => extract(x).defaultCharacterSetName, (row, value) => merge(row, extract(row).copy(defaultCharacterSetName = value)))
-  override val sqlPath = new Field[CharacterData, Row](prefix, "sql_path", None, Some("information_schema.character_data"))(x => extract(x).sqlPath, (row, value) => merge(row, extract(row).copy(sqlPath = value)))
+  override val catalogName = new Field[SqlIdentifier, Row](prefix, "catalog_name", None, Some("name"))(x => extract(x).catalogName, (row, value) => merge(row, extract(row).copy(catalogName = value)))
+  override val schemaName = new Field[SqlIdentifier, Row](prefix, "schema_name", None, Some("name"))(x => extract(x).schemaName, (row, value) => merge(row, extract(row).copy(schemaName = value)))
+  override val schemaOwner = new Field[SqlIdentifier, Row](prefix, "schema_owner", None, Some("name"))(x => extract(x).schemaOwner, (row, value) => merge(row, extract(row).copy(schemaOwner = value)))
+  override val defaultCharacterSetCatalog = new Field[SqlIdentifier, Row](prefix, "default_character_set_catalog", None, Some("name"))(x => extract(x).defaultCharacterSetCatalog, (row, value) => merge(row, extract(row).copy(defaultCharacterSetCatalog = value)))
+  override val defaultCharacterSetSchema = new Field[SqlIdentifier, Row](prefix, "default_character_set_schema", None, Some("name"))(x => extract(x).defaultCharacterSetSchema, (row, value) => merge(row, extract(row).copy(defaultCharacterSetSchema = value)))
+  override val defaultCharacterSetName = new Field[SqlIdentifier, Row](prefix, "default_character_set_name", None, Some("name"))(x => extract(x).defaultCharacterSetName, (row, value) => merge(row, extract(row).copy(defaultCharacterSetName = value)))
+  override val sqlPath = new Field[CharacterData, Row](prefix, "sql_path", None, Some("varchar"))(x => extract(x).sqlPath, (row, value) => merge(row, extract(row).copy(sqlPath = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](catalogName, schemaName, schemaOwner, defaultCharacterSetCatalog, defaultCharacterSetSchema, defaultCharacterSetName, sqlPath)

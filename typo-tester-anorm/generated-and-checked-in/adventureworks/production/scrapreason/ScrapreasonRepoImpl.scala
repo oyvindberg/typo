@@ -31,7 +31,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   }
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
-          values (${ParameterValue(unsaved.scrapreasonid, null, ScrapreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.scrapreasonid, null, ScrapreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning scrapreasonid, "name", modifieddate::text
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
@@ -39,7 +39,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.scrapreasonid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("scrapreasonid", ParameterValue(value, null, ScrapreasonId.toStatement)), "::int4"))
@@ -89,7 +89,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
     val scrapreasonid = row.scrapreasonid
     SQL"""update production.scrapreason
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where scrapreasonid = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
        """.executeUpdate() > 0
@@ -101,7 +101,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
           values (
             ${ParameterValue(unsaved.scrapreasonid, null, ScrapreasonId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (scrapreasonid)

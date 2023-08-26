@@ -21,15 +21,15 @@ class VvendorwithcontactsViewStructure[Row](val prefix: Option[String], val extr
     with VvendorwithcontactsViewFields[Row] { outer =>
 
   override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val contacttype = new Field[Name, Row](prefix, "contacttype", None, Some(""""public"."Name""""))(x => extract(x).contacttype, (row, value) => merge(row, extract(row).copy(contacttype = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val contacttype = new Field[Name, Row](prefix, "contacttype", None, Some("varchar"))(x => extract(x).contacttype, (row, value) => merge(row, extract(row).copy(contacttype = value)))
   override val title = new Field[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
-  override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, Some(""""public"."Name""""))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
-  override val middlename = new Field[Name, Row](prefix, "middlename", None, Some(""""public"."Name""""))(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
-  override val lastname = new Field[Name, Row](prefix, "lastname", None, Some(""""public"."Name""""))(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
+  override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, Some("varchar"))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
+  override val middlename = new Field[Name, Row](prefix, "middlename", None, Some("varchar"))(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
+  override val lastname = new Field[Name, Row](prefix, "lastname", None, Some("varchar"))(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
   override val suffix = new Field[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
-  override val phonenumber = new OptField[Phone, Row](prefix, "phonenumber", None, Some(""""public".Phone"""))(x => extract(x).phonenumber, (row, value) => merge(row, extract(row).copy(phonenumber = value)))
-  override val phonenumbertype = new OptField[Name, Row](prefix, "phonenumbertype", None, Some(""""public"."Name""""))(x => extract(x).phonenumbertype, (row, value) => merge(row, extract(row).copy(phonenumbertype = value)))
+  override val phonenumber = new OptField[Phone, Row](prefix, "phonenumber", None, Some("varchar"))(x => extract(x).phonenumber, (row, value) => merge(row, extract(row).copy(phonenumber = value)))
+  override val phonenumbertype = new OptField[Name, Row](prefix, "phonenumbertype", None, Some("varchar"))(x => extract(x).phonenumbertype, (row, value) => merge(row, extract(row).copy(phonenumbertype = value)))
   override val emailaddress = new OptField[/* max 50 chars */ String, Row](prefix, "emailaddress", None, None)(x => extract(x).emailaddress, (row, value) => merge(row, extract(row).copy(emailaddress = value)))
   override val emailpromotion = new Field[Int, Row](prefix, "emailpromotion", None, Some("int4"))(x => extract(x).emailpromotion, (row, value) => merge(row, extract(row).copy(emailpromotion = value)))
 

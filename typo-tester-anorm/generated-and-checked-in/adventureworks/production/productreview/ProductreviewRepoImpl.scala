@@ -34,7 +34,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
-          values (${ParameterValue(unsaved.productreviewid, null, ProductreviewId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.reviewername, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.emailaddress, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rating, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.productreviewid, null, ProductreviewId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.reviewername, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.emailaddress, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rating, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
        """
       .executeInsert(ProductreviewRow.rowParser(1).single)
@@ -43,7 +43,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
     val namedParameters = List(
       Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
-      Some((NamedParameter("reviewername", ParameterValue(unsaved.reviewername, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("reviewername", ParameterValue(unsaved.reviewername, null, Name.toStatement)), "::varchar")),
       Some((NamedParameter("emailaddress", ParameterValue(unsaved.emailaddress, null, ToStatement.stringToStatement)), "")),
       Some((NamedParameter("rating", ParameterValue(unsaved.rating, null, ToStatement.intToStatement)), "::int4")),
       Some((NamedParameter("comments", ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
@@ -101,7 +101,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     val productreviewid = row.productreviewid
     SQL"""update production.productreview
           set productid = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
-              reviewername = ${ParameterValue(row.reviewername, null, Name.toStatement)}::"public"."Name",
+              reviewername = ${ParameterValue(row.reviewername, null, Name.toStatement)}::varchar,
               reviewdate = ${ParameterValue(row.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp,
               emailaddress = ${ParameterValue(row.emailaddress, null, ToStatement.stringToStatement)},
               rating = ${ParameterValue(row.rating, null, ToStatement.intToStatement)}::int4,
@@ -118,7 +118,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           values (
             ${ParameterValue(unsaved.productreviewid, null, ProductreviewId.toStatement)}::int4,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
-            ${ParameterValue(unsaved.reviewername, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.reviewername, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.emailaddress, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.rating, null, ToStatement.intToStatement)}::int4,

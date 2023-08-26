@@ -20,8 +20,8 @@ class SrViewStructure[Row](val prefix: Option[String], val extract: Row => SrVie
 
   override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
   override val salesreasonid = new Field[SalesreasonId, Row](prefix, "salesreasonid", None, Some("int4"))(x => extract(x).salesreasonid, (row, value) => merge(row, extract(row).copy(salesreasonid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val reasontype = new Field[Name, Row](prefix, "reasontype", None, Some(""""public"."Name""""))(x => extract(x).reasontype, (row, value) => merge(row, extract(row).copy(reasontype = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val reasontype = new Field[Name, Row](prefix, "reasontype", None, Some("varchar"))(x => extract(x).reasontype, (row, value) => merge(row, extract(row).copy(reasontype = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

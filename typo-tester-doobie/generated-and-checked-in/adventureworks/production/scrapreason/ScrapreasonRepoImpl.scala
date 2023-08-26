@@ -30,13 +30,13 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
-          values (${fromWrite(unsaved.scrapreasonid)(Write.fromPut(ScrapreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.scrapreasonid)(Write.fromPut(ScrapreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning scrapreasonid, "name", modifieddate::text
        """.query(ScrapreasonRow.read).unique
   }
   override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.scrapreasonid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"scrapreasonid"), fr"${fromWrite(value: ScrapreasonId)(Write.fromPut(ScrapreasonId.put))}::int4"))
@@ -76,7 +76,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     val scrapreasonid = row.scrapreasonid
     sql"""update production.scrapreason
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where scrapreasonid = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}"""
       .update
@@ -90,7 +90,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
           values (
             ${fromWrite(unsaved.scrapreasonid)(Write.fromPut(ScrapreasonId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (scrapreasonid)

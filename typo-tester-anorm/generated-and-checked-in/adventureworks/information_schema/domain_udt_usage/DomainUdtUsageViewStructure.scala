@@ -16,12 +16,12 @@ class DomainUdtUsageViewStructure[Row](val prefix: Option[String], val extract: 
   extends Relation[DomainUdtUsageViewFields, DomainUdtUsageViewRow, Row]
     with DomainUdtUsageViewFields[Row] { outer =>
 
-  override val udtCatalog = new Field[SqlIdentifier, Row](prefix, "udt_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).udtCatalog, (row, value) => merge(row, extract(row).copy(udtCatalog = value)))
-  override val udtSchema = new Field[SqlIdentifier, Row](prefix, "udt_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).udtSchema, (row, value) => merge(row, extract(row).copy(udtSchema = value)))
-  override val udtName = new Field[SqlIdentifier, Row](prefix, "udt_name", None, Some("information_schema.sql_identifier"))(x => extract(x).udtName, (row, value) => merge(row, extract(row).copy(udtName = value)))
-  override val domainCatalog = new Field[SqlIdentifier, Row](prefix, "domain_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).domainCatalog, (row, value) => merge(row, extract(row).copy(domainCatalog = value)))
-  override val domainSchema = new Field[SqlIdentifier, Row](prefix, "domain_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).domainSchema, (row, value) => merge(row, extract(row).copy(domainSchema = value)))
-  override val domainName = new Field[SqlIdentifier, Row](prefix, "domain_name", None, Some("information_schema.sql_identifier"))(x => extract(x).domainName, (row, value) => merge(row, extract(row).copy(domainName = value)))
+  override val udtCatalog = new Field[SqlIdentifier, Row](prefix, "udt_catalog", None, Some("name"))(x => extract(x).udtCatalog, (row, value) => merge(row, extract(row).copy(udtCatalog = value)))
+  override val udtSchema = new Field[SqlIdentifier, Row](prefix, "udt_schema", None, Some("name"))(x => extract(x).udtSchema, (row, value) => merge(row, extract(row).copy(udtSchema = value)))
+  override val udtName = new Field[SqlIdentifier, Row](prefix, "udt_name", None, Some("name"))(x => extract(x).udtName, (row, value) => merge(row, extract(row).copy(udtName = value)))
+  override val domainCatalog = new Field[SqlIdentifier, Row](prefix, "domain_catalog", None, Some("name"))(x => extract(x).domainCatalog, (row, value) => merge(row, extract(row).copy(domainCatalog = value)))
+  override val domainSchema = new Field[SqlIdentifier, Row](prefix, "domain_schema", None, Some("name"))(x => extract(x).domainSchema, (row, value) => merge(row, extract(row).copy(domainSchema = value)))
+  override val domainName = new Field[SqlIdentifier, Row](prefix, "domain_name", None, Some("name"))(x => extract(x).domainName, (row, value) => merge(row, extract(row).copy(domainName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](udtCatalog, udtSchema, udtName, domainCatalog, domainSchema, domainName)

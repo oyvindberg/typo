@@ -30,14 +30,14 @@ object CountryregionRepoImpl extends CountryregionRepo {
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
-          values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning countryregioncode, "name", modifieddate::text
        """.query(CountryregionRow.read).unique
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
       Some((Fragment.const(s"countryregioncode"), fr"${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}")),
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
@@ -73,7 +73,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode
     sql"""update person.countryregion
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where countryregioncode = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}"""
       .update
@@ -87,7 +87,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
           values (
             ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))},
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (countryregioncode)

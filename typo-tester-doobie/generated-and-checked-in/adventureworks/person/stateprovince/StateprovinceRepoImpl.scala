@@ -35,7 +35,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   }
   override def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     sql"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
-          values (${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.stateprovincecode)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.isonlystateprovinceflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.stateprovincecode)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.isonlystateprovinceflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
        """.query(StateprovinceRow.read).unique
   }
@@ -43,7 +43,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     val fs = List(
       Some((Fragment.const(s"stateprovincecode"), fr"${fromWrite(unsaved.stateprovincecode)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
       Some((Fragment.const(s"countryregioncode"), fr"${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}")),
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       Some((Fragment.const(s"territoryid"), fr"${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4")),
       unsaved.stateprovinceid match {
         case Defaulted.UseDefault => None
@@ -51,7 +51,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       },
       unsaved.isonlystateprovinceflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"isonlystateprovinceflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"isonlystateprovinceflag"), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
@@ -94,8 +94,8 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""update person.stateprovince
           set stateprovincecode = ${fromWrite(row.stateprovincecode)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
               countryregioncode = ${fromWrite(row.countryregioncode)(Write.fromPut(CountryregionId.put))},
-              isonlystateprovinceflag = ${fromWrite(row.isonlystateprovinceflag)(Write.fromPut(Flag.put))}::"public"."Flag",
-              "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              isonlystateprovinceflag = ${fromWrite(row.isonlystateprovinceflag)(Write.fromPut(Flag.put))}::bool,
+              "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               territoryid = ${fromWrite(row.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
@@ -113,8 +113,8 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
             ${fromWrite(unsaved.stateprovincecode)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
             ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))},
-            ${fromWrite(unsaved.isonlystateprovinceflag)(Write.fromPut(Flag.put))}::"public"."Flag",
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.isonlystateprovinceflag)(Write.fromPut(Flag.put))}::bool,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp

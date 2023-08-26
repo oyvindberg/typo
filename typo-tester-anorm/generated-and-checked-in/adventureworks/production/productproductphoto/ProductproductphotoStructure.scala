@@ -22,7 +22,7 @@ class ProductproductphotoStructure[Row](val prefix: Option[String], val extract:
 
   override val productid = new IdField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
   override val productphotoid = new IdField[ProductphotoId, Row](prefix, "productphotoid", None, Some("int4"))(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
-  override val primary = new Field[Flag, Row](prefix, "primary", None, Some(""""public"."Flag""""))(x => extract(x).primary, (row, value) => merge(row, extract(row).copy(primary = value)))
+  override val primary = new Field[Flag, Row](prefix, "primary", None, Some("bool"))(x => extract(x).primary, (row, value) => merge(row, extract(row).copy(primary = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

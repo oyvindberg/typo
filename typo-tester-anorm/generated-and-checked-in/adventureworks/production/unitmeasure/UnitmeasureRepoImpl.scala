@@ -31,7 +31,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
-          values (${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning unitmeasurecode, "name", modifieddate::text
        """
       .executeInsert(UnitmeasureRow.rowParser(1).single)
@@ -40,7 +40,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
     val namedParameters = List(
       Some((NamedParameter("unitmeasurecode", ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)), "::bpchar")),
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
@@ -86,7 +86,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
     val unitmeasurecode = row.unitmeasurecode
     SQL"""update production.unitmeasure
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where unitmeasurecode = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}
        """.executeUpdate() > 0
@@ -98,7 +98,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
           values (
             ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (unitmeasurecode)

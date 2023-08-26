@@ -33,7 +33,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   }
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
-          values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
        """
       .executeInsert(ProductmodelRow.rowParser(1).single)
@@ -41,7 +41,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   }
   override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       Some((NamedParameter("catalogdescription", ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))), "::xml")),
       Some((NamedParameter("instructions", ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))), "::xml")),
       unsaved.productmodelid match {
@@ -97,7 +97,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
     val productmodelid = row.productmodelid
     SQL"""update production.productmodel
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               catalogdescription = ${ParameterValue(row.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
               instructions = ${ParameterValue(row.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
               rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
@@ -112,7 +112,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     SQL"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
           values (
             ${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
             ${ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,

@@ -30,14 +30,14 @@ object DepartmentRepoImpl extends DepartmentRepo {
   }
   override def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
-          values (${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning departmentid, "name", groupname, modifieddate::text
        """.query(DepartmentRow.read).unique
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
-      Some((Fragment.const(s"groupname"), fr"""${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const(s"groupname"), fr"${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::varchar")),
       unsaved.departmentid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"departmentid"), fr"${fromWrite(value: DepartmentId)(Write.fromPut(DepartmentId.put))}::int4"))
@@ -77,8 +77,8 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
     val departmentid = row.departmentid
     sql"""update humanresources.department
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
-              groupname = ${fromWrite(row.groupname)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
+              groupname = ${fromWrite(row.groupname)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where departmentid = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}"""
       .update
@@ -92,8 +92,8 @@ object DepartmentRepoImpl extends DepartmentRepo {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
           values (
             ${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
-            ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
+            ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (departmentid)

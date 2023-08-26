@@ -31,7 +31,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
   }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
-          values (${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning departmentid, "name", groupname, modifieddate::text
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
@@ -39,8 +39,8 @@ object DepartmentRepoImpl extends DepartmentRepo {
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
-      Some((NamedParameter("groupname", ParameterValue(unsaved.groupname, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
+      Some((NamedParameter("groupname", ParameterValue(unsaved.groupname, null, Name.toStatement)), "::varchar")),
       unsaved.departmentid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("departmentid", ParameterValue(value, null, DepartmentId.toStatement)), "::int4"))
@@ -90,8 +90,8 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
     val departmentid = row.departmentid
     SQL"""update humanresources.department
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
-              groupname = ${ParameterValue(row.groupname, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
+              groupname = ${ParameterValue(row.groupname, null, Name.toStatement)}::varchar,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where departmentid = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
        """.executeUpdate() > 0
@@ -103,8 +103,8 @@ object DepartmentRepoImpl extends DepartmentRepo {
     SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
           values (
             ${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
-            ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
+            ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (departmentid)

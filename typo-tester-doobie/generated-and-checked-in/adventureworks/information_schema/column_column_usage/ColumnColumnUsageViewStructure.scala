@@ -16,11 +16,11 @@ class ColumnColumnUsageViewStructure[Row](val prefix: Option[String], val extrac
   extends Relation[ColumnColumnUsageViewFields, ColumnColumnUsageViewRow, Row]
     with ColumnColumnUsageViewFields[Row] { outer =>
 
-  override val tableCatalog = new Field[SqlIdentifier, Row](prefix, "table_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
-  override val tableSchema = new Field[SqlIdentifier, Row](prefix, "table_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
-  override val tableName = new Field[SqlIdentifier, Row](prefix, "table_name", None, Some("information_schema.sql_identifier"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
-  override val columnName = new Field[SqlIdentifier, Row](prefix, "column_name", None, Some("information_schema.sql_identifier"))(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
-  override val dependentColumn = new Field[SqlIdentifier, Row](prefix, "dependent_column", None, Some("information_schema.sql_identifier"))(x => extract(x).dependentColumn, (row, value) => merge(row, extract(row).copy(dependentColumn = value)))
+  override val tableCatalog = new Field[SqlIdentifier, Row](prefix, "table_catalog", None, Some("name"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
+  override val tableSchema = new Field[SqlIdentifier, Row](prefix, "table_schema", None, Some("name"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
+  override val tableName = new Field[SqlIdentifier, Row](prefix, "table_name", None, Some("name"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
+  override val columnName = new Field[SqlIdentifier, Row](prefix, "column_name", None, Some("name"))(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
+  override val dependentColumn = new Field[SqlIdentifier, Row](prefix, "dependent_column", None, Some("name"))(x => extract(x).dependentColumn, (row, value) => merge(row, extract(row).copy(dependentColumn = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](tableCatalog, tableSchema, tableName, columnName, dependentColumn)

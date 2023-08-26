@@ -17,14 +17,14 @@ class DomainConstraintsViewStructure[Row](val prefix: Option[String], val extrac
   extends Relation[DomainConstraintsViewFields, DomainConstraintsViewRow, Row]
     with DomainConstraintsViewFields[Row] { outer =>
 
-  override val constraintCatalog = new Field[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
-  override val constraintSchema = new Field[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
-  override val constraintName = new Field[SqlIdentifier, Row](prefix, "constraint_name", None, Some("information_schema.sql_identifier"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
-  override val domainCatalog = new Field[SqlIdentifier, Row](prefix, "domain_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).domainCatalog, (row, value) => merge(row, extract(row).copy(domainCatalog = value)))
-  override val domainSchema = new Field[SqlIdentifier, Row](prefix, "domain_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).domainSchema, (row, value) => merge(row, extract(row).copy(domainSchema = value)))
-  override val domainName = new Field[SqlIdentifier, Row](prefix, "domain_name", None, Some("information_schema.sql_identifier"))(x => extract(x).domainName, (row, value) => merge(row, extract(row).copy(domainName = value)))
-  override val isDeferrable = new Field[YesOrNo, Row](prefix, "is_deferrable", None, Some("information_schema.yes_or_no"))(x => extract(x).isDeferrable, (row, value) => merge(row, extract(row).copy(isDeferrable = value)))
-  override val initiallyDeferred = new Field[YesOrNo, Row](prefix, "initially_deferred", None, Some("information_schema.yes_or_no"))(x => extract(x).initiallyDeferred, (row, value) => merge(row, extract(row).copy(initiallyDeferred = value)))
+  override val constraintCatalog = new Field[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("name"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
+  override val constraintSchema = new Field[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("name"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
+  override val constraintName = new Field[SqlIdentifier, Row](prefix, "constraint_name", None, Some("name"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
+  override val domainCatalog = new Field[SqlIdentifier, Row](prefix, "domain_catalog", None, Some("name"))(x => extract(x).domainCatalog, (row, value) => merge(row, extract(row).copy(domainCatalog = value)))
+  override val domainSchema = new Field[SqlIdentifier, Row](prefix, "domain_schema", None, Some("name"))(x => extract(x).domainSchema, (row, value) => merge(row, extract(row).copy(domainSchema = value)))
+  override val domainName = new Field[SqlIdentifier, Row](prefix, "domain_name", None, Some("name"))(x => extract(x).domainName, (row, value) => merge(row, extract(row).copy(domainName = value)))
+  override val isDeferrable = new Field[YesOrNo, Row](prefix, "is_deferrable", None, Some("varchar"))(x => extract(x).isDeferrable, (row, value) => merge(row, extract(row).copy(isDeferrable = value)))
+  override val initiallyDeferred = new Field[YesOrNo, Row](prefix, "initially_deferred", None, Some("varchar"))(x => extract(x).initiallyDeferred, (row, value) => merge(row, extract(row).copy(initiallyDeferred = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](constraintCatalog, constraintSchema, constraintName, domainCatalog, domainSchema, domainName, isDeferrable, initiallyDeferred)

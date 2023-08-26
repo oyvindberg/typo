@@ -17,9 +17,9 @@ class AdministrableRoleAuthorizationsViewStructure[Row](val prefix: Option[Strin
   extends Relation[AdministrableRoleAuthorizationsViewFields, AdministrableRoleAuthorizationsViewRow, Row]
     with AdministrableRoleAuthorizationsViewFields[Row] { outer =>
 
-  override val grantee = new Field[SqlIdentifier, Row](prefix, "grantee", None, Some("information_schema.sql_identifier"))(x => extract(x).grantee, (row, value) => merge(row, extract(row).copy(grantee = value)))
-  override val roleName = new Field[SqlIdentifier, Row](prefix, "role_name", None, Some("information_schema.sql_identifier"))(x => extract(x).roleName, (row, value) => merge(row, extract(row).copy(roleName = value)))
-  override val isGrantable = new Field[YesOrNo, Row](prefix, "is_grantable", None, Some("information_schema.yes_or_no"))(x => extract(x).isGrantable, (row, value) => merge(row, extract(row).copy(isGrantable = value)))
+  override val grantee = new Field[SqlIdentifier, Row](prefix, "grantee", None, Some("name"))(x => extract(x).grantee, (row, value) => merge(row, extract(row).copy(grantee = value)))
+  override val roleName = new Field[SqlIdentifier, Row](prefix, "role_name", None, Some("name"))(x => extract(x).roleName, (row, value) => merge(row, extract(row).copy(roleName = value)))
+  override val isGrantable = new Field[YesOrNo, Row](prefix, "is_grantable", None, Some("varchar"))(x => extract(x).isGrantable, (row, value) => merge(row, extract(row).copy(isGrantable = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](grantee, roleName, isGrantable)

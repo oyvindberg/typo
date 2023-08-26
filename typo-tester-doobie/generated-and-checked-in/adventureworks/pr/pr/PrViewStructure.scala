@@ -22,7 +22,7 @@ class PrViewStructure[Row](val prefix: Option[String], val extract: Row => PrVie
   override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
   override val productreviewid = new Field[ProductreviewId, Row](prefix, "productreviewid", None, Some("int4"))(x => extract(x).productreviewid, (row, value) => merge(row, extract(row).copy(productreviewid = value)))
   override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val reviewername = new Field[Name, Row](prefix, "reviewername", None, Some(""""public"."Name""""))(x => extract(x).reviewername, (row, value) => merge(row, extract(row).copy(reviewername = value)))
+  override val reviewername = new Field[Name, Row](prefix, "reviewername", None, Some("varchar"))(x => extract(x).reviewername, (row, value) => merge(row, extract(row).copy(reviewername = value)))
   override val reviewdate = new Field[TypoLocalDateTime, Row](prefix, "reviewdate", Some("text"), Some("timestamp"))(x => extract(x).reviewdate, (row, value) => merge(row, extract(row).copy(reviewdate = value)))
   override val emailaddress = new Field[/* max 50 chars */ String, Row](prefix, "emailaddress", None, None)(x => extract(x).emailaddress, (row, value) => merge(row, extract(row).copy(emailaddress = value)))
   override val rating = new Field[Int, Row](prefix, "rating", None, Some("int4"))(x => extract(x).rating, (row, value) => merge(row, extract(row).copy(rating = value)))

@@ -17,11 +17,11 @@ class SqlImplementationInfoStructure[Row](val prefix: Option[String], val extrac
   extends Relation[SqlImplementationInfoFields, SqlImplementationInfoRow, Row]
     with SqlImplementationInfoFields[Row] { outer =>
 
-  override val implementationInfoId = new OptField[CharacterData, Row](prefix, "implementation_info_id", None, Some("information_schema.character_data"))(x => extract(x).implementationInfoId, (row, value) => merge(row, extract(row).copy(implementationInfoId = value)))
-  override val implementationInfoName = new OptField[CharacterData, Row](prefix, "implementation_info_name", None, Some("information_schema.character_data"))(x => extract(x).implementationInfoName, (row, value) => merge(row, extract(row).copy(implementationInfoName = value)))
-  override val integerValue = new OptField[CardinalNumber, Row](prefix, "integer_value", None, Some("information_schema.cardinal_number"))(x => extract(x).integerValue, (row, value) => merge(row, extract(row).copy(integerValue = value)))
-  override val characterValue = new OptField[CharacterData, Row](prefix, "character_value", None, Some("information_schema.character_data"))(x => extract(x).characterValue, (row, value) => merge(row, extract(row).copy(characterValue = value)))
-  override val comments = new OptField[CharacterData, Row](prefix, "comments", None, Some("information_schema.character_data"))(x => extract(x).comments, (row, value) => merge(row, extract(row).copy(comments = value)))
+  override val implementationInfoId = new OptField[CharacterData, Row](prefix, "implementation_info_id", None, Some("varchar"))(x => extract(x).implementationInfoId, (row, value) => merge(row, extract(row).copy(implementationInfoId = value)))
+  override val implementationInfoName = new OptField[CharacterData, Row](prefix, "implementation_info_name", None, Some("varchar"))(x => extract(x).implementationInfoName, (row, value) => merge(row, extract(row).copy(implementationInfoName = value)))
+  override val integerValue = new OptField[CardinalNumber, Row](prefix, "integer_value", None, Some("int4"))(x => extract(x).integerValue, (row, value) => merge(row, extract(row).copy(integerValue = value)))
+  override val characterValue = new OptField[CharacterData, Row](prefix, "character_value", None, Some("varchar"))(x => extract(x).characterValue, (row, value) => merge(row, extract(row).copy(characterValue = value)))
+  override val comments = new OptField[CharacterData, Row](prefix, "comments", None, Some("varchar"))(x => extract(x).comments, (row, value) => merge(row, extract(row).copy(comments = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](implementationInfoId, implementationInfoName, integerValue, characterValue, comments)

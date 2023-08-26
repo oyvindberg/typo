@@ -31,7 +31,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   }
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype(contacttypeid, "name", modifieddate)
-          values (${ParameterValue(unsaved.contacttypeid, null, ContacttypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.contacttypeid, null, ContacttypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning contacttypeid, "name", modifieddate::text
        """
       .executeInsert(ContacttypeRow.rowParser(1).single)
@@ -39,7 +39,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.contacttypeid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("contacttypeid", ParameterValue(value, null, ContacttypeId.toStatement)), "::int4"))
@@ -89,7 +89,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
     val contacttypeid = row.contacttypeid
     SQL"""update person.contacttype
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where contacttypeid = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}
        """.executeUpdate() > 0
@@ -101,7 +101,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     SQL"""insert into person.contacttype(contacttypeid, "name", modifieddate)
           values (
             ${ParameterValue(unsaved.contacttypeid, null, ContacttypeId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (contacttypeid)

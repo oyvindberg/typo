@@ -32,7 +32,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   }
   override def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
-          values (${ParameterValue(unsaved.addresstypeid, null, AddresstypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.addresstypeid, null, AddresstypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning addresstypeid, "name", rowguid, modifieddate::text
        """
       .executeInsert(AddresstypeRow.rowParser(1).single)
@@ -40,7 +40,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   }
   override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.addresstypeid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("addresstypeid", ParameterValue(value, null, AddresstypeId.toStatement)), "::int4"))
@@ -94,7 +94,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
     val addresstypeid = row.addresstypeid
     SQL"""update person.addresstype
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where addresstypeid = ${ParameterValue(addresstypeid, null, AddresstypeId.toStatement)}
@@ -107,7 +107,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     SQL"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
           values (
             ${ParameterValue(unsaved.addresstypeid, null, AddresstypeId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )

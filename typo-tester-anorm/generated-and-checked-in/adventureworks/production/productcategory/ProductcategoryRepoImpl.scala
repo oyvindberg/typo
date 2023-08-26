@@ -32,7 +32,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   }
   override def insert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
-          values (${ParameterValue(unsaved.productcategoryid, null, ProductcategoryId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.productcategoryid, null, ProductcategoryId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productcategoryid, "name", rowguid, modifieddate::text
        """
       .executeInsert(ProductcategoryRow.rowParser(1).single)
@@ -40,7 +40,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   }
   override def insert(unsaved: ProductcategoryRowUnsaved)(implicit c: Connection): ProductcategoryRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.productcategoryid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("productcategoryid", ParameterValue(value, null, ProductcategoryId.toStatement)), "::int4"))
@@ -94,7 +94,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def update(row: ProductcategoryRow)(implicit c: Connection): Boolean = {
     val productcategoryid = row.productcategoryid
     SQL"""update production.productcategory
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where productcategoryid = ${ParameterValue(productcategoryid, null, ProductcategoryId.toStatement)}
@@ -107,7 +107,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     SQL"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
           values (
             ${ParameterValue(unsaved.productcategoryid, null, ProductcategoryId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )

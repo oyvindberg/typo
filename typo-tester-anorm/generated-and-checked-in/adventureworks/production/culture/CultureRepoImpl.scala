@@ -31,7 +31,7 @@ object CultureRepoImpl extends CultureRepo {
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture(cultureid, "name", modifieddate)
-          values (${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning cultureid, "name", modifieddate::text
        """
       .executeInsert(CultureRow.rowParser(1).single)
@@ -40,7 +40,7 @@ object CultureRepoImpl extends CultureRepo {
   override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
     val namedParameters = List(
       Some((NamedParameter("cultureid", ParameterValue(unsaved.cultureid, null, CultureId.toStatement)), "::bpchar")),
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
@@ -86,7 +86,7 @@ object CultureRepoImpl extends CultureRepo {
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     val cultureid = row.cultureid
     SQL"""update production.culture
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where cultureid = ${ParameterValue(cultureid, null, CultureId.toStatement)}
        """.executeUpdate() > 0
@@ -98,7 +98,7 @@ object CultureRepoImpl extends CultureRepo {
     SQL"""insert into production.culture(cultureid, "name", modifieddate)
           values (
             ${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (cultureid)

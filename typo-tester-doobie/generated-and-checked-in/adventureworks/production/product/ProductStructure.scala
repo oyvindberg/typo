@@ -25,10 +25,10 @@ class ProductStructure[Row](val prefix: Option[String], val extract: Row => Prod
     with ProductFields[Row] { outer =>
 
   override val productid = new IdField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val productnumber = new Field[/* max 25 chars */ String, Row](prefix, "productnumber", None, None)(x => extract(x).productnumber, (row, value) => merge(row, extract(row).copy(productnumber = value)))
-  override val makeflag = new Field[Flag, Row](prefix, "makeflag", None, Some(""""public"."Flag""""))(x => extract(x).makeflag, (row, value) => merge(row, extract(row).copy(makeflag = value)))
-  override val finishedgoodsflag = new Field[Flag, Row](prefix, "finishedgoodsflag", None, Some(""""public"."Flag""""))(x => extract(x).finishedgoodsflag, (row, value) => merge(row, extract(row).copy(finishedgoodsflag = value)))
+  override val makeflag = new Field[Flag, Row](prefix, "makeflag", None, Some("bool"))(x => extract(x).makeflag, (row, value) => merge(row, extract(row).copy(makeflag = value)))
+  override val finishedgoodsflag = new Field[Flag, Row](prefix, "finishedgoodsflag", None, Some("bool"))(x => extract(x).finishedgoodsflag, (row, value) => merge(row, extract(row).copy(finishedgoodsflag = value)))
   override val color = new OptField[/* max 15 chars */ String, Row](prefix, "color", None, None)(x => extract(x).color, (row, value) => merge(row, extract(row).copy(color = value)))
   override val safetystocklevel = new Field[Int, Row](prefix, "safetystocklevel", None, Some("int2"))(x => extract(x).safetystocklevel, (row, value) => merge(row, extract(row).copy(safetystocklevel = value)))
   override val reorderpoint = new Field[Int, Row](prefix, "reorderpoint", None, Some("int2"))(x => extract(x).reorderpoint, (row, value) => merge(row, extract(row).copy(reorderpoint = value)))

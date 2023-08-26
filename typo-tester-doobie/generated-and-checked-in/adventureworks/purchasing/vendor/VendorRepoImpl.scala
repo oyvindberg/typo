@@ -34,24 +34,24 @@ object VendorRepoImpl extends VendorRepo {
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::"public".AccountNumber, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.preferredvendorstatus)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.activeflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.preferredvendorstatus)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.activeflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
        """.query(VendorRow.read).unique
   }
   override def insert(unsaved: VendorRowUnsaved): ConnectionIO[VendorRow] = {
     val fs = List(
       Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s"accountnumber"), fr"""${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::"public".AccountNumber""")),
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s"accountnumber"), fr"${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       Some((Fragment.const(s"creditrating"), fr"${fromWrite(unsaved.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2")),
       Some((Fragment.const(s"purchasingwebserviceurl"), fr"${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.preferredvendorstatus match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"preferredvendorstatus"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"preferredvendorstatus"), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.activeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"activeflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"activeflag"), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -88,11 +88,11 @@ object VendorRepoImpl extends VendorRepo {
   override def update(row: VendorRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update purchasing.vendor
-          set accountnumber = ${fromWrite(row.accountnumber)(Write.fromPut(AccountNumber.put))}::"public".AccountNumber,
-              "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set accountnumber = ${fromWrite(row.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar,
+              "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               creditrating = ${fromWrite(row.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2,
-              preferredvendorstatus = ${fromWrite(row.preferredvendorstatus)(Write.fromPut(Flag.put))}::"public"."Flag",
-              activeflag = ${fromWrite(row.activeflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+              preferredvendorstatus = ${fromWrite(row.preferredvendorstatus)(Write.fromPut(Flag.put))}::bool,
+              activeflag = ${fromWrite(row.activeflag)(Write.fromPut(Flag.put))}::bool,
               purchasingwebserviceurl = ${fromWrite(row.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))},
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
@@ -107,11 +107,11 @@ object VendorRepoImpl extends VendorRepo {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::"public".AccountNumber,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2,
-            ${fromWrite(unsaved.preferredvendorstatus)(Write.fromPut(Flag.put))}::"public"."Flag",
-            ${fromWrite(unsaved.activeflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.preferredvendorstatus)(Write.fromPut(Flag.put))}::bool,
+            ${fromWrite(unsaved.activeflag)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))},
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )

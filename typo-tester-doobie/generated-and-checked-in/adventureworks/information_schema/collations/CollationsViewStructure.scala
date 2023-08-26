@@ -17,10 +17,10 @@ class CollationsViewStructure[Row](val prefix: Option[String], val extract: Row 
   extends Relation[CollationsViewFields, CollationsViewRow, Row]
     with CollationsViewFields[Row] { outer =>
 
-  override val collationCatalog = new Field[SqlIdentifier, Row](prefix, "collation_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).collationCatalog, (row, value) => merge(row, extract(row).copy(collationCatalog = value)))
-  override val collationSchema = new Field[SqlIdentifier, Row](prefix, "collation_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).collationSchema, (row, value) => merge(row, extract(row).copy(collationSchema = value)))
-  override val collationName = new Field[SqlIdentifier, Row](prefix, "collation_name", None, Some("information_schema.sql_identifier"))(x => extract(x).collationName, (row, value) => merge(row, extract(row).copy(collationName = value)))
-  override val padAttribute = new Field[CharacterData, Row](prefix, "pad_attribute", None, Some("information_schema.character_data"))(x => extract(x).padAttribute, (row, value) => merge(row, extract(row).copy(padAttribute = value)))
+  override val collationCatalog = new Field[SqlIdentifier, Row](prefix, "collation_catalog", None, Some("name"))(x => extract(x).collationCatalog, (row, value) => merge(row, extract(row).copy(collationCatalog = value)))
+  override val collationSchema = new Field[SqlIdentifier, Row](prefix, "collation_schema", None, Some("name"))(x => extract(x).collationSchema, (row, value) => merge(row, extract(row).copy(collationSchema = value)))
+  override val collationName = new Field[SqlIdentifier, Row](prefix, "collation_name", None, Some("name"))(x => extract(x).collationName, (row, value) => merge(row, extract(row).copy(collationName = value)))
+  override val padAttribute = new Field[CharacterData, Row](prefix, "pad_attribute", None, Some("varchar"))(x => extract(x).padAttribute, (row, value) => merge(row, extract(row).copy(padAttribute = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](collationCatalog, collationSchema, collationName, padAttribute)

@@ -16,7 +16,7 @@ class EnabledRolesViewStructure[Row](val prefix: Option[String], val extract: Ro
   extends Relation[EnabledRolesViewFields, EnabledRolesViewRow, Row]
     with EnabledRolesViewFields[Row] { outer =>
 
-  override val roleName = new Field[SqlIdentifier, Row](prefix, "role_name", None, Some("information_schema.sql_identifier"))(x => extract(x).roleName, (row, value) => merge(row, extract(row).copy(roleName = value)))
+  override val roleName = new Field[SqlIdentifier, Row](prefix, "role_name", None, Some("name"))(x => extract(x).roleName, (row, value) => merge(row, extract(row).copy(roleName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](roleName)

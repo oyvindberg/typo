@@ -20,7 +20,7 @@ class VsalespersonsalesbyfiscalyearsdataViewStructure[Row](val prefix: Option[St
   override val salespersonid = new Field[BusinessentityId, Row](prefix, "salespersonid", None, Some("int4"))(x => extract(x).salespersonid, (row, value) => merge(row, extract(row).copy(salespersonid = value)))
   override val fullname = new Field[String, Row](prefix, "fullname", None, None)(x => extract(x).fullname, (row, value) => merge(row, extract(row).copy(fullname = value)))
   override val jobtitle = new Field[/* max 50 chars */ String, Row](prefix, "jobtitle", None, None)(x => extract(x).jobtitle, (row, value) => merge(row, extract(row).copy(jobtitle = value)))
-  override val salesterritory = new Field[Name, Row](prefix, "salesterritory", None, Some(""""public"."Name""""))(x => extract(x).salesterritory, (row, value) => merge(row, extract(row).copy(salesterritory = value)))
+  override val salesterritory = new Field[Name, Row](prefix, "salesterritory", None, Some("varchar"))(x => extract(x).salesterritory, (row, value) => merge(row, extract(row).copy(salesterritory = value)))
   override val salestotal = new Field[BigDecimal, Row](prefix, "salestotal", None, Some("numeric"))(x => extract(x).salestotal, (row, value) => merge(row, extract(row).copy(salestotal = value)))
   override val fiscalyear = new Field[BigDecimal, Row](prefix, "fiscalyear", None, Some("numeric"))(x => extract(x).fiscalyear, (row, value) => merge(row, extract(row).copy(fiscalyear = value)))
 

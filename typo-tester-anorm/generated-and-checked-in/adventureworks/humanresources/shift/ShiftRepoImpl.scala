@@ -32,7 +32,7 @@ object ShiftRepoImpl extends ShiftRepo {
   }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
-          values (${ParameterValue(unsaved.shiftid, null, ShiftId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.starttime, null, TypoLocalTime.toStatement)}::time, ${ParameterValue(unsaved.endtime, null, TypoLocalTime.toStatement)}::time, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.shiftid, null, ShiftId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.starttime, null, TypoLocalTime.toStatement)}::time, ${ParameterValue(unsaved.endtime, null, TypoLocalTime.toStatement)}::time, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """
       .executeInsert(ShiftRow.rowParser(1).single)
@@ -40,7 +40,7 @@ object ShiftRepoImpl extends ShiftRepo {
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       Some((NamedParameter("starttime", ParameterValue(unsaved.starttime, null, TypoLocalTime.toStatement)), "::time")),
       Some((NamedParameter("endtime", ParameterValue(unsaved.endtime, null, TypoLocalTime.toStatement)), "::time")),
       unsaved.shiftid match {
@@ -92,7 +92,7 @@ object ShiftRepoImpl extends ShiftRepo {
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
     val shiftid = row.shiftid
     SQL"""update humanresources.shift
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               starttime = ${ParameterValue(row.starttime, null, TypoLocalTime.toStatement)}::time,
               endtime = ${ParameterValue(row.endtime, null, TypoLocalTime.toStatement)}::time,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
@@ -106,7 +106,7 @@ object ShiftRepoImpl extends ShiftRepo {
     SQL"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
           values (
             ${ParameterValue(unsaved.shiftid, null, ShiftId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.starttime, null, TypoLocalTime.toStatement)}::time,
             ${ParameterValue(unsaved.endtime, null, TypoLocalTime.toStatement)}::time,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp

@@ -19,8 +19,8 @@ class DepartmentStructure[Row](val prefix: Option[String], val extract: Row => D
     with DepartmentFields[Row] { outer =>
 
   override val departmentid = new IdField[DepartmentId, Row](prefix, "departmentid", None, Some("int4"))(x => extract(x).departmentid, (row, value) => merge(row, extract(row).copy(departmentid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val groupname = new Field[Name, Row](prefix, "groupname", None, Some(""""public"."Name""""))(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val groupname = new Field[Name, Row](prefix, "groupname", None, Some("varchar"))(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

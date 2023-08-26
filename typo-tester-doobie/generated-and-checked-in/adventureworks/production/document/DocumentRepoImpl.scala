@@ -33,7 +33,7 @@ object DocumentRepoImpl extends DocumentRepo {
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
-          values (${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.status)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.document)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
+          values (${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.status)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.document)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
        """.query(DocumentRow.read).unique
   }
@@ -49,7 +49,7 @@ object DocumentRepoImpl extends DocumentRepo {
       Some((Fragment.const(s""""document""""), fr"${fromWrite(unsaved.document)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"folderflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"folderflag"), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.changenumber match {
         case Defaulted.UseDefault => None
@@ -106,7 +106,7 @@ object DocumentRepoImpl extends DocumentRepo {
     sql"""update production."document"
           set title = ${fromWrite(row.title)(Write.fromPut(Meta.StringMeta.put))},
               "owner" = ${fromWrite(row.owner)(Write.fromPut(BusinessentityId.put))}::int4,
-              folderflag = ${fromWrite(row.folderflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+              folderflag = ${fromWrite(row.folderflag)(Write.fromPut(Flag.put))}::bool,
               filename = ${fromWrite(row.filename)(Write.fromPut(Meta.StringMeta.put))},
               fileextension = ${fromWrite(row.fileextension)(Write.fromPutOption(Meta.StringMeta.put))},
               revision = ${fromWrite(row.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
@@ -129,7 +129,7 @@ object DocumentRepoImpl extends DocumentRepo {
           values (
             ${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))},
             ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))},
             ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))},
             ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar,

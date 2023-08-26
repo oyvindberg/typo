@@ -22,7 +22,7 @@ class PmViewStructure[Row](val prefix: Option[String], val extract: Row => PmVie
 
   override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
   override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, Some("int4"))(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val catalogdescription = new Field[TypoXml, Row](prefix, "catalogdescription", None, Some("xml"))(x => extract(x).catalogdescription, (row, value) => merge(row, extract(row).copy(catalogdescription = value)))
   override val instructions = new Field[TypoXml, Row](prefix, "instructions", None, Some("xml"))(x => extract(x).instructions, (row, value) => merge(row, extract(row).copy(instructions = value)))
   override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))

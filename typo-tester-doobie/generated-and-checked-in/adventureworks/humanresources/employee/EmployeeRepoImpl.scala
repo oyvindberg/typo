@@ -34,7 +34,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
   }
   override def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.nationalidnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.loginid)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.jobtitle)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.birthdate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.salariedflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.vacationhours)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.sickleavehours)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.currentflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.organizationnode)(Write.fromPutOption(Meta.StringMeta.put))})
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.nationalidnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.loginid)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.jobtitle)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.birthdate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.salariedflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.vacationhours)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.sickleavehours)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.currentflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.organizationnode)(Write.fromPutOption(Meta.StringMeta.put))})
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
        """.query(EmployeeRow.read).unique
   }
@@ -50,7 +50,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
       Some((Fragment.const(s"hiredate"), fr"${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date")),
       unsaved.salariedflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salariedflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salariedflag"), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.vacationhours match {
         case Defaulted.UseDefault => None
@@ -62,7 +62,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
       },
       unsaved.currentflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"currentflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"currentflag"), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
@@ -114,10 +114,10 @@ object EmployeeRepoImpl extends EmployeeRepo {
               maritalstatus = ${fromWrite(row.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
               gender = ${fromWrite(row.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
               hiredate = ${fromWrite(row.hiredate)(Write.fromPut(TypoLocalDate.put))}::date,
-              salariedflag = ${fromWrite(row.salariedflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+              salariedflag = ${fromWrite(row.salariedflag)(Write.fromPut(Flag.put))}::bool,
               vacationhours = ${fromWrite(row.vacationhours)(Write.fromPut(Meta.IntMeta.put))}::int2,
               sickleavehours = ${fromWrite(row.sickleavehours)(Write.fromPut(Meta.IntMeta.put))}::int2,
-              currentflag = ${fromWrite(row.currentflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+              currentflag = ${fromWrite(row.currentflag)(Write.fromPut(Flag.put))}::bool,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
               organizationnode = ${fromWrite(row.organizationnode)(Write.fromPutOption(Meta.StringMeta.put))}
@@ -140,10 +140,10 @@ object EmployeeRepoImpl extends EmployeeRepo {
             ${fromWrite(unsaved.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
             ${fromWrite(unsaved.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
             ${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date,
-            ${fromWrite(unsaved.salariedflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.salariedflag)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.vacationhours)(Write.fromPut(Meta.IntMeta.put))}::int2,
             ${fromWrite(unsaved.sickleavehours)(Write.fromPut(Meta.IntMeta.put))}::int2,
-            ${fromWrite(unsaved.currentflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.currentflag)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
             ${fromWrite(unsaved.organizationnode)(Write.fromPutOption(Meta.StringMeta.put))}

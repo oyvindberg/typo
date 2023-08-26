@@ -25,7 +25,7 @@ object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
   }
   override def insert(unsaved: SqlImplementationInfoRow): ConnectionIO[SqlImplementationInfoRow] = {
     sql"""insert into information_schema.sql_implementation_info(implementation_info_id, implementation_info_name, integer_value, character_value, "comments")
-          values (${fromWrite(unsaved.implementationInfoId)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.implementationInfoName)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.integerValue)(Write.fromPutOption(CardinalNumber.put))}::information_schema.cardinal_number, ${fromWrite(unsaved.characterValue)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data)
+          values (${fromWrite(unsaved.implementationInfoId)(Write.fromPutOption(CharacterData.put))}::varchar, ${fromWrite(unsaved.implementationInfoName)(Write.fromPutOption(CharacterData.put))}::varchar, ${fromWrite(unsaved.integerValue)(Write.fromPutOption(CardinalNumber.put))}::int4, ${fromWrite(unsaved.characterValue)(Write.fromPutOption(CharacterData.put))}::varchar, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::varchar)
           returning implementation_info_id, implementation_info_name, integer_value, character_value, "comments"
        """.query(SqlImplementationInfoRow.read).unique
   }

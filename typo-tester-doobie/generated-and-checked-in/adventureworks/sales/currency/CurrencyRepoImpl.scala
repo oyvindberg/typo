@@ -30,14 +30,14 @@ object CurrencyRepoImpl extends CurrencyRepo {
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
-          values (${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning currencycode, "name", modifieddate::text
        """.query(CurrencyRow.read).unique
   }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
     val fs = List(
       Some((Fragment.const(s"currencycode"), fr"${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
@@ -73,7 +73,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     val currencycode = row.currencycode
     sql"""update sales.currency
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where currencycode = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}"""
       .update
@@ -87,7 +87,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
           values (
             ${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (currencycode)

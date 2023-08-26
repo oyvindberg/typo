@@ -18,8 +18,6 @@ object sqlCast {
     dbType match {
       case db.Type.EnumRef(name) =>
         Some(tableName.toCode(name).render.asString)
-      case db.Type.DomainRef(name) =>
-        Some(tableName.toCode(name).render.asString)
       case db.Type.Boolean | db.Type.Text | db.Type.VarChar(_) => None
       case _                                                   => udtName
     }

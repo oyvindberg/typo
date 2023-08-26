@@ -32,7 +32,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
-          values (${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
@@ -40,7 +40,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.shipmethodid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("shipmethodid", ParameterValue(value, null, ShipmethodId.toStatement)), "::int4"))
@@ -102,7 +102,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
     val shipmethodid = row.shipmethodid
     SQL"""update purchasing.shipmethod
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               shipbase = ${ParameterValue(row.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               shiprate = ${ParameterValue(row.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
@@ -117,7 +117,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
           values (
             ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,

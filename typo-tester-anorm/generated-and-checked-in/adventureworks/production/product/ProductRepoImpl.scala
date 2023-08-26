@@ -37,7 +37,7 @@ object ProductRepoImpl extends ProductRepo {
   }
   override def insert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
-          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.productnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.makeflag, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.finishedgoodsflag, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.color, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.safetystocklevel, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.reorderpoint, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.listprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.size, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.sizeunitmeasurecode, null, ToStatement.optionToStatement(UnitmeasureId.toStatement, UnitmeasureId.parameterMetadata))}::bpchar, ${ParameterValue(unsaved.weightunitmeasurecode, null, ToStatement.optionToStatement(UnitmeasureId.toStatement, UnitmeasureId.parameterMetadata))}::bpchar, ${ParameterValue(unsaved.weight, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.daystomanufacture, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.productline, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.`class`, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.style, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.productsubcategoryid, null, ToStatement.optionToStatement(ProductsubcategoryId.toStatement, ProductsubcategoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.productmodelid, null, ToStatement.optionToStatement(ProductmodelId.toStatement, ProductmodelId.parameterMetadata))}::int4, ${ParameterValue(unsaved.sellstartdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.sellenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.discontinueddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.productnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.makeflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.finishedgoodsflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.color, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.safetystocklevel, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.reorderpoint, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.listprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.size, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.sizeunitmeasurecode, null, ToStatement.optionToStatement(UnitmeasureId.toStatement, UnitmeasureId.parameterMetadata))}::bpchar, ${ParameterValue(unsaved.weightunitmeasurecode, null, ToStatement.optionToStatement(UnitmeasureId.toStatement, UnitmeasureId.parameterMetadata))}::bpchar, ${ParameterValue(unsaved.weight, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.daystomanufacture, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.productline, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.`class`, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.style, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.productsubcategoryid, null, ToStatement.optionToStatement(ProductsubcategoryId.toStatement, ProductsubcategoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.productmodelid, null, ToStatement.optionToStatement(ProductmodelId.toStatement, ProductmodelId.parameterMetadata))}::int4, ${ParameterValue(unsaved.sellstartdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.sellenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.discontinueddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text
        """
       .executeInsert(ProductRow.rowParser(1).single)
@@ -45,7 +45,7 @@ object ProductRepoImpl extends ProductRepo {
   }
   override def insert(unsaved: ProductRowUnsaved)(implicit c: Connection): ProductRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       Some((NamedParameter("productnumber", ParameterValue(unsaved.productnumber, null, ToStatement.stringToStatement)), "")),
       Some((NamedParameter("color", ParameterValue(unsaved.color, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
       Some((NamedParameter("safetystocklevel", ParameterValue(unsaved.safetystocklevel, null, ToStatement.intToStatement)), "::int2")),
@@ -71,11 +71,11 @@ object ProductRepoImpl extends ProductRepo {
       },
       unsaved.makeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("makeflag", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("makeflag", ParameterValue(value, null, Flag.toStatement)), "::bool"))
       },
       unsaved.finishedgoodsflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("finishedgoodsflag", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("finishedgoodsflag", ParameterValue(value, null, Flag.toStatement)), "::bool"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
@@ -126,10 +126,10 @@ object ProductRepoImpl extends ProductRepo {
   override def update(row: ProductRow)(implicit c: Connection): Boolean = {
     val productid = row.productid
     SQL"""update production.product
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               productnumber = ${ParameterValue(row.productnumber, null, ToStatement.stringToStatement)},
-              makeflag = ${ParameterValue(row.makeflag, null, Flag.toStatement)}::"public"."Flag",
-              finishedgoodsflag = ${ParameterValue(row.finishedgoodsflag, null, Flag.toStatement)}::"public"."Flag",
+              makeflag = ${ParameterValue(row.makeflag, null, Flag.toStatement)}::bool,
+              finishedgoodsflag = ${ParameterValue(row.finishedgoodsflag, null, Flag.toStatement)}::bool,
               color = ${ParameterValue(row.color, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               safetystocklevel = ${ParameterValue(row.safetystocklevel, null, ToStatement.intToStatement)}::int2,
               reorderpoint = ${ParameterValue(row.reorderpoint, null, ToStatement.intToStatement)}::int2,
@@ -160,10 +160,10 @@ object ProductRepoImpl extends ProductRepo {
     SQL"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
           values (
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.productnumber, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.makeflag, null, Flag.toStatement)}::"public"."Flag",
-            ${ParameterValue(unsaved.finishedgoodsflag, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.makeflag, null, Flag.toStatement)}::bool,
+            ${ParameterValue(unsaved.finishedgoodsflag, null, Flag.toStatement)}::bool,
             ${ParameterValue(unsaved.color, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
             ${ParameterValue(unsaved.safetystocklevel, null, ToStatement.intToStatement)}::int2,
             ${ParameterValue(unsaved.reorderpoint, null, ToStatement.intToStatement)}::int2,

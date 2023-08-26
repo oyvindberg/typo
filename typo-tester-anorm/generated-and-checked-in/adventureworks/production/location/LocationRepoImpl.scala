@@ -32,7 +32,7 @@ object LocationRepoImpl extends LocationRepo {
   }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
-          values (${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning locationid, "name", costrate, availability, modifieddate::text
        """
       .executeInsert(LocationRow.rowParser(1).single)
@@ -40,7 +40,7 @@ object LocationRepoImpl extends LocationRepo {
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.locationid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("locationid", ParameterValue(value, null, LocationId.toStatement)), "::int4"))
@@ -98,7 +98,7 @@ object LocationRepoImpl extends LocationRepo {
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
     val locationid = row.locationid
     SQL"""update production."location"
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               costrate = ${ParameterValue(row.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               availability = ${ParameterValue(row.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
@@ -112,7 +112,7 @@ object LocationRepoImpl extends LocationRepo {
     SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
           values (
             ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp

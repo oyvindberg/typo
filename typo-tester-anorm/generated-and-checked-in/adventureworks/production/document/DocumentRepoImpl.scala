@@ -35,7 +35,7 @@ object DocumentRepoImpl extends DocumentRepo {
   }
   override def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     SQL"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
-          values (${ParameterValue(unsaved.title, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.owner, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.folderflag, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.filename, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.fileextension, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.revision, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.changenumber, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.documentsummary, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.document, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.documentnode, null, DocumentId.toStatement)})
+          values (${ParameterValue(unsaved.title, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.owner, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.folderflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.filename, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.fileextension, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.revision, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.changenumber, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.documentsummary, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.document, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.documentnode, null, DocumentId.toStatement)})
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
        """
       .executeInsert(DocumentRow.rowParser(1).single)
@@ -53,7 +53,7 @@ object DocumentRepoImpl extends DocumentRepo {
       Some((NamedParameter("document", ParameterValue(unsaved.document, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))), "::bytea")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("folderflag", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("folderflag", ParameterValue(value, null, Flag.toStatement)), "::bool"))
       },
       unsaved.changenumber match {
         case Defaulted.UseDefault => None
@@ -121,7 +121,7 @@ object DocumentRepoImpl extends DocumentRepo {
     SQL"""update production."document"
           set title = ${ParameterValue(row.title, null, ToStatement.stringToStatement)},
               "owner" = ${ParameterValue(row.owner, null, BusinessentityId.toStatement)}::int4,
-              folderflag = ${ParameterValue(row.folderflag, null, Flag.toStatement)}::"public"."Flag",
+              folderflag = ${ParameterValue(row.folderflag, null, Flag.toStatement)}::bool,
               filename = ${ParameterValue(row.filename, null, ToStatement.stringToStatement)},
               fileextension = ${ParameterValue(row.fileextension, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               revision = ${ParameterValue(row.revision, null, ToStatement.stringToStatement)}::bpchar,
@@ -142,7 +142,7 @@ object DocumentRepoImpl extends DocumentRepo {
           values (
             ${ParameterValue(unsaved.title, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.owner, null, BusinessentityId.toStatement)}::int4,
-            ${ParameterValue(unsaved.folderflag, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.folderflag, null, Flag.toStatement)}::bool,
             ${ParameterValue(unsaved.filename, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.fileextension, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
             ${ParameterValue(unsaved.revision, null, ToStatement.stringToStatement)}::bpchar,

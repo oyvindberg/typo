@@ -32,14 +32,14 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::"public".Phone, ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::varchar, ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """.query(PersonphoneRow.read).unique
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     val fs = List(
       Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s"phonenumber"), fr"""${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::"public".Phone""")),
+      Some((Fragment.const(s"phonenumber"), fr"${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::varchar")),
       Some((Fragment.const(s"phonenumbertypeid"), fr"${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -86,7 +86,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::"public".Phone,
+            ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::varchar,
             ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )

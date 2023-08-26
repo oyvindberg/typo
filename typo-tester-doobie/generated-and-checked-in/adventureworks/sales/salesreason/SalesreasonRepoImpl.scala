@@ -30,14 +30,14 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   }
   override def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
-          values (${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning salesreasonid, "name", reasontype, modifieddate::text
        """.query(SalesreasonRow.read).unique
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
-      Some((Fragment.const(s"reasontype"), fr"""${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const(s"reasontype"), fr"${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar")),
       unsaved.salesreasonid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"salesreasonid"), fr"${fromWrite(value: SalesreasonId)(Write.fromPut(SalesreasonId.put))}::int4"))
@@ -77,8 +77,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def update(row: SalesreasonRow): ConnectionIO[Boolean] = {
     val salesreasonid = row.salesreasonid
     sql"""update sales.salesreason
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
-              reasontype = ${fromWrite(row.reasontype)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
+              reasontype = ${fromWrite(row.reasontype)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where salesreasonid = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}"""
       .update
@@ -92,8 +92,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
           values (
             ${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
-            ${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
+            ${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (salesreasonid)

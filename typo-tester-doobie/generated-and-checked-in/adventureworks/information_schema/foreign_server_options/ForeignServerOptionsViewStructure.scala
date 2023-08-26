@@ -17,10 +17,10 @@ class ForeignServerOptionsViewStructure[Row](val prefix: Option[String], val ext
   extends Relation[ForeignServerOptionsViewFields, ForeignServerOptionsViewRow, Row]
     with ForeignServerOptionsViewFields[Row] { outer =>
 
-  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
-  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
-  override val optionName = new Field[SqlIdentifier, Row](prefix, "option_name", None, Some("information_schema.sql_identifier"))(x => extract(x).optionName, (row, value) => merge(row, extract(row).copy(optionName = value)))
-  override val optionValue = new Field[CharacterData, Row](prefix, "option_value", None, Some("information_schema.character_data"))(x => extract(x).optionValue, (row, value) => merge(row, extract(row).copy(optionValue = value)))
+  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("name"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
+  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("name"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
+  override val optionName = new Field[SqlIdentifier, Row](prefix, "option_name", None, Some("name"))(x => extract(x).optionName, (row, value) => merge(row, extract(row).copy(optionName = value)))
+  override val optionValue = new Field[CharacterData, Row](prefix, "option_value", None, Some("varchar"))(x => extract(x).optionValue, (row, value) => merge(row, extract(row).copy(optionValue = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](foreignServerCatalog, foreignServerName, optionName, optionValue)

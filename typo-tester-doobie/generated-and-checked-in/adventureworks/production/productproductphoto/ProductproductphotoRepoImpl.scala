@@ -32,7 +32,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   }
   override def insert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
-          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning productid, productphotoid, "primary", modifieddate::text
        """.query(ProductproductphotoRow.read).unique
   }
@@ -42,7 +42,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       Some((Fragment.const(s"productphotoid"), fr"${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4")),
       unsaved.primary match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""primary""""), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""primary""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -76,7 +76,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def update(row: ProductproductphotoRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productproductphoto
-          set "primary" = ${fromWrite(row.primary)(Write.fromPut(Flag.put))}::"public"."Flag",
+          set "primary" = ${fromWrite(row.primary)(Write.fromPut(Flag.put))}::bool,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND productphotoid = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}"""
       .update
@@ -91,7 +91,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           values (
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4,
-            ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (productid, productphotoid)

@@ -35,7 +35,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   }
   override def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
-          values (${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.isonlystateprovinceflag, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.isonlystateprovinceflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
@@ -45,7 +45,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     val namedParameters = List(
       Some((NamedParameter("stateprovincecode", ParameterValue(unsaved.stateprovincecode, null, ToStatement.stringToStatement)), "::bpchar")),
       Some((NamedParameter("countryregioncode", ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)), "")),
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       Some((NamedParameter("territoryid", ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)), "::int4")),
       unsaved.stateprovinceid match {
         case Defaulted.UseDefault => None
@@ -53,7 +53,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       },
       unsaved.isonlystateprovinceflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("isonlystateprovinceflag", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("isonlystateprovinceflag", ParameterValue(value, null, Flag.toStatement)), "::bool"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
@@ -106,8 +106,8 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     SQL"""update person.stateprovince
           set stateprovincecode = ${ParameterValue(row.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar,
               countryregioncode = ${ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)},
-              isonlystateprovinceflag = ${ParameterValue(row.isonlystateprovinceflag, null, Flag.toStatement)}::"public"."Flag",
-              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              isonlystateprovinceflag = ${ParameterValue(row.isonlystateprovinceflag, null, Flag.toStatement)}::bool,
+              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               territoryid = ${ParameterValue(row.territoryid, null, SalesterritoryId.toStatement)}::int4,
               rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
@@ -123,8 +123,8 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
             ${ParameterValue(unsaved.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar,
             ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)},
-            ${ParameterValue(unsaved.isonlystateprovinceflag, null, Flag.toStatement)}::"public"."Flag",
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.isonlystateprovinceflag, null, Flag.toStatement)}::bool,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp

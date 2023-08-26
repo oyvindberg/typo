@@ -17,11 +17,11 @@ class DataTypePrivilegesViewStructure[Row](val prefix: Option[String], val extra
   extends Relation[DataTypePrivilegesViewFields, DataTypePrivilegesViewRow, Row]
     with DataTypePrivilegesViewFields[Row] { outer =>
 
-  override val objectCatalog = new Field[SqlIdentifier, Row](prefix, "object_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).objectCatalog, (row, value) => merge(row, extract(row).copy(objectCatalog = value)))
-  override val objectSchema = new Field[SqlIdentifier, Row](prefix, "object_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).objectSchema, (row, value) => merge(row, extract(row).copy(objectSchema = value)))
-  override val objectName = new Field[SqlIdentifier, Row](prefix, "object_name", None, Some("information_schema.sql_identifier"))(x => extract(x).objectName, (row, value) => merge(row, extract(row).copy(objectName = value)))
-  override val objectType = new Field[CharacterData, Row](prefix, "object_type", None, Some("information_schema.character_data"))(x => extract(x).objectType, (row, value) => merge(row, extract(row).copy(objectType = value)))
-  override val dtdIdentifier = new Field[SqlIdentifier, Row](prefix, "dtd_identifier", None, Some("information_schema.sql_identifier"))(x => extract(x).dtdIdentifier, (row, value) => merge(row, extract(row).copy(dtdIdentifier = value)))
+  override val objectCatalog = new Field[SqlIdentifier, Row](prefix, "object_catalog", None, Some("name"))(x => extract(x).objectCatalog, (row, value) => merge(row, extract(row).copy(objectCatalog = value)))
+  override val objectSchema = new Field[SqlIdentifier, Row](prefix, "object_schema", None, Some("name"))(x => extract(x).objectSchema, (row, value) => merge(row, extract(row).copy(objectSchema = value)))
+  override val objectName = new Field[SqlIdentifier, Row](prefix, "object_name", None, Some("name"))(x => extract(x).objectName, (row, value) => merge(row, extract(row).copy(objectName = value)))
+  override val objectType = new Field[CharacterData, Row](prefix, "object_type", None, Some("varchar"))(x => extract(x).objectType, (row, value) => merge(row, extract(row).copy(objectType = value)))
+  override val dtdIdentifier = new Field[SqlIdentifier, Row](prefix, "dtd_identifier", None, Some("name"))(x => extract(x).dtdIdentifier, (row, value) => merge(row, extract(row).copy(dtdIdentifier = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](objectCatalog, objectSchema, objectName, objectType, dtdIdentifier)

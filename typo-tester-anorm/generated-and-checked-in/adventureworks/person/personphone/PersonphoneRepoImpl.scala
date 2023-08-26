@@ -33,7 +33,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   }
   override def insert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
-          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.phonenumber, null, Phone.toStatement)}::"public".Phone, ${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.phonenumber, null, Phone.toStatement)}::varchar, ${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """
       .executeInsert(PersonphoneRow.rowParser(1).single)
@@ -42,7 +42,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def insert(unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
-      Some((NamedParameter("phonenumber", ParameterValue(unsaved.phonenumber, null, Phone.toStatement)), """::"public".Phone""")),
+      Some((NamedParameter("phonenumber", ParameterValue(unsaved.phonenumber, null, Phone.toStatement)), "::varchar")),
       Some((NamedParameter("phonenumbertypeid", ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -93,7 +93,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
-            ${ParameterValue(unsaved.phonenumber, null, Phone.toStatement)}::"public".Phone,
+            ${ParameterValue(unsaved.phonenumber, null, Phone.toStatement)}::varchar,
             ${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )

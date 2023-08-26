@@ -32,13 +32,13 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
-          values (${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.shipbase)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.shipbase)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """.query(ShipmethodRow.read).unique
   }
   override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.shipmethodid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"shipmethodid"), fr"${fromWrite(value: ShipmethodId)(Write.fromPut(ShipmethodId.put))}::int4"))
@@ -90,7 +90,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
     val shipmethodid = row.shipmethodid
     sql"""update purchasing.shipmethod
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               shipbase = ${fromWrite(row.shipbase)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               shiprate = ${fromWrite(row.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
@@ -107,7 +107,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
           values (
             ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.shipbase)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
             ${fromWrite(unsaved.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,

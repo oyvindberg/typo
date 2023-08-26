@@ -30,14 +30,14 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   }
   override def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
-          values (${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning unitmeasurecode, "name", modifieddate::text
        """.query(UnitmeasureRow.read).unique
   }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
       Some((Fragment.const(s"unitmeasurecode"), fr"${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar")),
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
@@ -73,7 +73,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
     val unitmeasurecode = row.unitmeasurecode
     sql"""update production.unitmeasure
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where unitmeasurecode = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}"""
       .update
@@ -87,7 +87,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
           values (
             ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (unitmeasurecode)

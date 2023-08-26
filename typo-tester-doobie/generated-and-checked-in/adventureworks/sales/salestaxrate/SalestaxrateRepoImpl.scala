@@ -33,7 +33,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   override def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
-          values (${fromWrite(unsaved.salestaxrateid)(Write.fromPut(SalestaxrateId.put))}::int4, ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.taxtype)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.salestaxrateid)(Write.fromPut(SalestaxrateId.put))}::int4, ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.taxtype)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """.query(SalestaxrateRow.read).unique
   }
@@ -41,7 +41,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     val fs = List(
       Some((Fragment.const(s"stateprovinceid"), fr"${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4")),
       Some((Fragment.const(s"taxtype"), fr"${fromWrite(unsaved.taxtype)(Write.fromPut(Meta.IntMeta.put))}::int2")),
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.salestaxrateid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"salestaxrateid"), fr"${fromWrite(value: SalestaxrateId)(Write.fromPut(SalestaxrateId.put))}::int4"))
@@ -92,7 +92,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           set stateprovinceid = ${fromWrite(row.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
               taxtype = ${fromWrite(row.taxtype)(Write.fromPut(Meta.IntMeta.put))}::int2,
               taxrate = ${fromWrite(row.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where salestaxrateid = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}"""
@@ -110,7 +110,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
             ${fromWrite(unsaved.taxtype)(Write.fromPut(Meta.IntMeta.put))}::int2,
             ${fromWrite(unsaved.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )

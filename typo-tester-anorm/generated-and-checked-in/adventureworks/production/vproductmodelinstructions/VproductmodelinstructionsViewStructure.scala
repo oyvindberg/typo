@@ -21,7 +21,7 @@ class VproductmodelinstructionsViewStructure[Row](val prefix: Option[String], va
     with VproductmodelinstructionsViewFields[Row] { outer =>
 
   override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, Some("int4"))(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val instructions = new Field[TypoXml, Row](prefix, "instructions", None, None)(x => extract(x).instructions, (row, value) => merge(row, extract(row).copy(instructions = value)))
   override val LocationID = new Field[Int, Row](prefix, "LocationID", None, Some("int4"))(x => extract(x).LocationID, (row, value) => merge(row, extract(row).copy(LocationID = value)))
   override val SetupHours = new Field[BigDecimal, Row](prefix, "SetupHours", None, Some("numeric"))(x => extract(x).SetupHours, (row, value) => merge(row, extract(row).copy(SetupHours = value)))

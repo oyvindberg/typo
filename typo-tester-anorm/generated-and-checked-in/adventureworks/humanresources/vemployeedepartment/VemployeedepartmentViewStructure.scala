@@ -21,13 +21,13 @@ class VemployeedepartmentViewStructure[Row](val prefix: Option[String], val extr
 
   override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
   override val title = new Field[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
-  override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, Some(""""public"."Name""""))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
-  override val middlename = new Field[Name, Row](prefix, "middlename", None, Some(""""public"."Name""""))(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
-  override val lastname = new Field[Name, Row](prefix, "lastname", None, Some(""""public"."Name""""))(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
+  override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, Some("varchar"))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
+  override val middlename = new Field[Name, Row](prefix, "middlename", None, Some("varchar"))(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
+  override val lastname = new Field[Name, Row](prefix, "lastname", None, Some("varchar"))(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
   override val suffix = new Field[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
   override val jobtitle = new Field[/* max 50 chars */ String, Row](prefix, "jobtitle", None, None)(x => extract(x).jobtitle, (row, value) => merge(row, extract(row).copy(jobtitle = value)))
-  override val department = new Field[Name, Row](prefix, "department", None, Some(""""public"."Name""""))(x => extract(x).department, (row, value) => merge(row, extract(row).copy(department = value)))
-  override val groupname = new Field[Name, Row](prefix, "groupname", None, Some(""""public"."Name""""))(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
+  override val department = new Field[Name, Row](prefix, "department", None, Some("varchar"))(x => extract(x).department, (row, value) => merge(row, extract(row).copy(department = value)))
+  override val groupname = new Field[Name, Row](prefix, "groupname", None, Some("varchar"))(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
   override val startdate = new Field[TypoLocalDate, Row](prefix, "startdate", Some("text"), Some("date"))(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

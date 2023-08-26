@@ -30,13 +30,13 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)
-          values (${fromWrite(unsaved.contacttypeid)(Write.fromPut(ContacttypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.contacttypeid)(Write.fromPut(ContacttypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning contacttypeid, "name", modifieddate::text
        """.query(ContacttypeRow.read).unique
   }
   override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.contacttypeid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"contacttypeid"), fr"${fromWrite(value: ContacttypeId)(Write.fromPut(ContacttypeId.put))}::int4"))
@@ -76,7 +76,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
     val contacttypeid = row.contacttypeid
     sql"""update person.contacttype
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where contacttypeid = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}"""
       .update
@@ -90,7 +90,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)
           values (
             ${fromWrite(unsaved.contacttypeid)(Write.fromPut(ContacttypeId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (contacttypeid)

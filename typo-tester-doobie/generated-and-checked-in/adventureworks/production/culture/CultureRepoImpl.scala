@@ -30,14 +30,14 @@ object CultureRepoImpl extends CultureRepo {
   }
   override def insert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture(cultureid, "name", modifieddate)
-          values (${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning cultureid, "name", modifieddate::text
        """.query(CultureRow.read).unique
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
       Some((Fragment.const(s"cultureid"), fr"${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar")),
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
@@ -73,7 +73,7 @@ object CultureRepoImpl extends CultureRepo {
   override def update(row: CultureRow): ConnectionIO[Boolean] = {
     val cultureid = row.cultureid
     sql"""update production.culture
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where cultureid = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}"""
       .update
@@ -87,7 +87,7 @@ object CultureRepoImpl extends CultureRepo {
     sql"""insert into production.culture(cultureid, "name", modifieddate)
           values (
             ${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (cultureid)

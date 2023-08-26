@@ -17,10 +17,10 @@ class SqlSizingStructure[Row](val prefix: Option[String], val extract: Row => Sq
   extends Relation[SqlSizingFields, SqlSizingRow, Row]
     with SqlSizingFields[Row] { outer =>
 
-  override val sizingId = new OptField[CardinalNumber, Row](prefix, "sizing_id", None, Some("information_schema.cardinal_number"))(x => extract(x).sizingId, (row, value) => merge(row, extract(row).copy(sizingId = value)))
-  override val sizingName = new OptField[CharacterData, Row](prefix, "sizing_name", None, Some("information_schema.character_data"))(x => extract(x).sizingName, (row, value) => merge(row, extract(row).copy(sizingName = value)))
-  override val supportedValue = new OptField[CardinalNumber, Row](prefix, "supported_value", None, Some("information_schema.cardinal_number"))(x => extract(x).supportedValue, (row, value) => merge(row, extract(row).copy(supportedValue = value)))
-  override val comments = new OptField[CharacterData, Row](prefix, "comments", None, Some("information_schema.character_data"))(x => extract(x).comments, (row, value) => merge(row, extract(row).copy(comments = value)))
+  override val sizingId = new OptField[CardinalNumber, Row](prefix, "sizing_id", None, Some("int4"))(x => extract(x).sizingId, (row, value) => merge(row, extract(row).copy(sizingId = value)))
+  override val sizingName = new OptField[CharacterData, Row](prefix, "sizing_name", None, Some("varchar"))(x => extract(x).sizingName, (row, value) => merge(row, extract(row).copy(sizingName = value)))
+  override val supportedValue = new OptField[CardinalNumber, Row](prefix, "supported_value", None, Some("int4"))(x => extract(x).supportedValue, (row, value) => merge(row, extract(row).copy(supportedValue = value)))
+  override val comments = new OptField[CharacterData, Row](prefix, "comments", None, Some("varchar"))(x => extract(x).comments, (row, value) => merge(row, extract(row).copy(comments = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](sizingId, sizingName, supportedValue, comments)

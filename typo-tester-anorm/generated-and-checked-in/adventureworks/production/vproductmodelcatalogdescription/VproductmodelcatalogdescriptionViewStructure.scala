@@ -20,7 +20,7 @@ class VproductmodelcatalogdescriptionViewStructure[Row](val prefix: Option[Strin
     with VproductmodelcatalogdescriptionViewFields[Row] { outer =>
 
   override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, Some("int4"))(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val Summary = new Field[String, Row](prefix, "Summary", None, None)(x => extract(x).Summary, (row, value) => merge(row, extract(row).copy(Summary = value)))
   override val manufacturer = new Field[String, Row](prefix, "manufacturer", None, None)(x => extract(x).manufacturer, (row, value) => merge(row, extract(row).copy(manufacturer = value)))
   override val copyright = new Field[/* max 30 chars */ String, Row](prefix, "copyright", None, None)(x => extract(x).copyright, (row, value) => merge(row, extract(row).copy(copyright = value)))

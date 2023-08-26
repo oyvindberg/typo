@@ -33,14 +33,14 @@ object StoreRepoImpl extends StoreRepo {
   }
   override def insert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
        """.query(StoreRow.read).unique
   }
   override def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow] = {
     val fs = List(
       Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       Some((Fragment.const(s"salespersonid"), fr"${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
       Some((Fragment.const(s"demographics"), fr"${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml")),
       unsaved.rowguid match {
@@ -82,7 +82,7 @@ object StoreRepoImpl extends StoreRepo {
   override def update(row: StoreRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update sales.store
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               salespersonid = ${fromWrite(row.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4,
               demographics = ${fromWrite(row.demographics)(Write.fromPutOption(TypoXml.put))}::xml,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
@@ -99,7 +99,7 @@ object StoreRepoImpl extends StoreRepo {
     sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,

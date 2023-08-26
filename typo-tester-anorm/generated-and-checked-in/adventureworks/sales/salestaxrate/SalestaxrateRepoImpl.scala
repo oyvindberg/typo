@@ -33,7 +33,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
-          values (${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
@@ -43,7 +43,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     val namedParameters = List(
       Some((NamedParameter("stateprovinceid", ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)), "::int4")),
       Some((NamedParameter("taxtype", ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)), "::int2")),
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.salestaxrateid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("salestaxrateid", ParameterValue(value, null, SalestaxrateId.toStatement)), "::int4"))
@@ -104,7 +104,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           set stateprovinceid = ${ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
               taxtype = ${ParameterValue(row.taxtype, null, ToStatement.intToStatement)}::int2,
               taxrate = ${ParameterValue(row.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where salestaxrateid = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
@@ -120,7 +120,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
             ${ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)}::int2,
             ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )

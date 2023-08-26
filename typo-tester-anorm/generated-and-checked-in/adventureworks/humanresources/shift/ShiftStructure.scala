@@ -20,7 +20,7 @@ class ShiftStructure[Row](val prefix: Option[String], val extract: Row => ShiftR
     with ShiftFields[Row] { outer =>
 
   override val shiftid = new IdField[ShiftId, Row](prefix, "shiftid", None, Some("int4"))(x => extract(x).shiftid, (row, value) => merge(row, extract(row).copy(shiftid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val starttime = new Field[TypoLocalTime, Row](prefix, "starttime", Some("text"), Some("time"))(x => extract(x).starttime, (row, value) => merge(row, extract(row).copy(starttime = value)))
   override val endtime = new Field[TypoLocalTime, Row](prefix, "endtime", Some("text"), Some("time"))(x => extract(x).endtime, (row, value) => merge(row, extract(row).copy(endtime = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))

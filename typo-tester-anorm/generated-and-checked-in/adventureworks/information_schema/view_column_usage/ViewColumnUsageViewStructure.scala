@@ -16,13 +16,13 @@ class ViewColumnUsageViewStructure[Row](val prefix: Option[String], val extract:
   extends Relation[ViewColumnUsageViewFields, ViewColumnUsageViewRow, Row]
     with ViewColumnUsageViewFields[Row] { outer =>
 
-  override val viewCatalog = new Field[SqlIdentifier, Row](prefix, "view_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).viewCatalog, (row, value) => merge(row, extract(row).copy(viewCatalog = value)))
-  override val viewSchema = new Field[SqlIdentifier, Row](prefix, "view_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).viewSchema, (row, value) => merge(row, extract(row).copy(viewSchema = value)))
-  override val viewName = new Field[SqlIdentifier, Row](prefix, "view_name", None, Some("information_schema.sql_identifier"))(x => extract(x).viewName, (row, value) => merge(row, extract(row).copy(viewName = value)))
-  override val tableCatalog = new Field[SqlIdentifier, Row](prefix, "table_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
-  override val tableSchema = new Field[SqlIdentifier, Row](prefix, "table_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
-  override val tableName = new Field[SqlIdentifier, Row](prefix, "table_name", None, Some("information_schema.sql_identifier"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
-  override val columnName = new Field[SqlIdentifier, Row](prefix, "column_name", None, Some("information_schema.sql_identifier"))(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
+  override val viewCatalog = new Field[SqlIdentifier, Row](prefix, "view_catalog", None, Some("name"))(x => extract(x).viewCatalog, (row, value) => merge(row, extract(row).copy(viewCatalog = value)))
+  override val viewSchema = new Field[SqlIdentifier, Row](prefix, "view_schema", None, Some("name"))(x => extract(x).viewSchema, (row, value) => merge(row, extract(row).copy(viewSchema = value)))
+  override val viewName = new Field[SqlIdentifier, Row](prefix, "view_name", None, Some("name"))(x => extract(x).viewName, (row, value) => merge(row, extract(row).copy(viewName = value)))
+  override val tableCatalog = new Field[SqlIdentifier, Row](prefix, "table_catalog", None, Some("name"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
+  override val tableSchema = new Field[SqlIdentifier, Row](prefix, "table_schema", None, Some("name"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
+  override val tableName = new Field[SqlIdentifier, Row](prefix, "table_name", None, Some("name"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
+  override val columnName = new Field[SqlIdentifier, Row](prefix, "column_name", None, Some("name"))(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](viewCatalog, viewSchema, viewName, tableCatalog, tableSchema, tableName, columnName)

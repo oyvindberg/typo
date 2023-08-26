@@ -17,13 +17,13 @@ class ForeignServersViewStructure[Row](val prefix: Option[String], val extract: 
   extends Relation[ForeignServersViewFields, ForeignServersViewRow, Row]
     with ForeignServersViewFields[Row] { outer =>
 
-  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
-  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
-  override val foreignDataWrapperCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignDataWrapperCatalog, (row, value) => merge(row, extract(row).copy(foreignDataWrapperCatalog = value)))
-  override val foreignDataWrapperName = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_name", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignDataWrapperName, (row, value) => merge(row, extract(row).copy(foreignDataWrapperName = value)))
-  override val foreignServerType = new Field[CharacterData, Row](prefix, "foreign_server_type", None, Some("information_schema.character_data"))(x => extract(x).foreignServerType, (row, value) => merge(row, extract(row).copy(foreignServerType = value)))
-  override val foreignServerVersion = new Field[CharacterData, Row](prefix, "foreign_server_version", None, Some("information_schema.character_data"))(x => extract(x).foreignServerVersion, (row, value) => merge(row, extract(row).copy(foreignServerVersion = value)))
-  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("information_schema.sql_identifier"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
+  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("name"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
+  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("name"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
+  override val foreignDataWrapperCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_catalog", None, Some("name"))(x => extract(x).foreignDataWrapperCatalog, (row, value) => merge(row, extract(row).copy(foreignDataWrapperCatalog = value)))
+  override val foreignDataWrapperName = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_name", None, Some("name"))(x => extract(x).foreignDataWrapperName, (row, value) => merge(row, extract(row).copy(foreignDataWrapperName = value)))
+  override val foreignServerType = new Field[CharacterData, Row](prefix, "foreign_server_type", None, Some("varchar"))(x => extract(x).foreignServerType, (row, value) => merge(row, extract(row).copy(foreignServerType = value)))
+  override val foreignServerVersion = new Field[CharacterData, Row](prefix, "foreign_server_version", None, Some("varchar"))(x => extract(x).foreignServerVersion, (row, value) => merge(row, extract(row).copy(foreignServerVersion = value)))
+  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("name"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](foreignServerCatalog, foreignServerName, foreignDataWrapperCatalog, foreignDataWrapperName, foreignServerType, foreignServerVersion, authorizationIdentifier)

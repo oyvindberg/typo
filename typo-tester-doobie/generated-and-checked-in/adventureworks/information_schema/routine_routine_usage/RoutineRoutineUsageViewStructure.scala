@@ -16,12 +16,12 @@ class RoutineRoutineUsageViewStructure[Row](val prefix: Option[String], val extr
   extends Relation[RoutineRoutineUsageViewFields, RoutineRoutineUsageViewRow, Row]
     with RoutineRoutineUsageViewFields[Row] { outer =>
 
-  override val specificCatalog = new Field[SqlIdentifier, Row](prefix, "specific_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).specificCatalog, (row, value) => merge(row, extract(row).copy(specificCatalog = value)))
-  override val specificSchema = new Field[SqlIdentifier, Row](prefix, "specific_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).specificSchema, (row, value) => merge(row, extract(row).copy(specificSchema = value)))
-  override val specificName = new Field[SqlIdentifier, Row](prefix, "specific_name", None, Some("information_schema.sql_identifier"))(x => extract(x).specificName, (row, value) => merge(row, extract(row).copy(specificName = value)))
-  override val routineCatalog = new Field[SqlIdentifier, Row](prefix, "routine_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).routineCatalog, (row, value) => merge(row, extract(row).copy(routineCatalog = value)))
-  override val routineSchema = new Field[SqlIdentifier, Row](prefix, "routine_schema", None, Some("information_schema.sql_identifier"))(x => extract(x).routineSchema, (row, value) => merge(row, extract(row).copy(routineSchema = value)))
-  override val routineName = new Field[SqlIdentifier, Row](prefix, "routine_name", None, Some("information_schema.sql_identifier"))(x => extract(x).routineName, (row, value) => merge(row, extract(row).copy(routineName = value)))
+  override val specificCatalog = new Field[SqlIdentifier, Row](prefix, "specific_catalog", None, Some("name"))(x => extract(x).specificCatalog, (row, value) => merge(row, extract(row).copy(specificCatalog = value)))
+  override val specificSchema = new Field[SqlIdentifier, Row](prefix, "specific_schema", None, Some("name"))(x => extract(x).specificSchema, (row, value) => merge(row, extract(row).copy(specificSchema = value)))
+  override val specificName = new Field[SqlIdentifier, Row](prefix, "specific_name", None, Some("name"))(x => extract(x).specificName, (row, value) => merge(row, extract(row).copy(specificName = value)))
+  override val routineCatalog = new Field[SqlIdentifier, Row](prefix, "routine_catalog", None, Some("name"))(x => extract(x).routineCatalog, (row, value) => merge(row, extract(row).copy(routineCatalog = value)))
+  override val routineSchema = new Field[SqlIdentifier, Row](prefix, "routine_schema", None, Some("name"))(x => extract(x).routineSchema, (row, value) => merge(row, extract(row).copy(routineSchema = value)))
+  override val routineName = new Field[SqlIdentifier, Row](prefix, "routine_name", None, Some("name"))(x => extract(x).routineName, (row, value) => merge(row, extract(row).copy(routineName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](specificCatalog, specificSchema, specificName, routineCatalog, routineSchema, routineName)

@@ -17,11 +17,11 @@ class SqlPartsStructure[Row](val prefix: Option[String], val extract: Row => Sql
   extends Relation[SqlPartsFields, SqlPartsRow, Row]
     with SqlPartsFields[Row] { outer =>
 
-  override val featureId = new OptField[CharacterData, Row](prefix, "feature_id", None, Some("information_schema.character_data"))(x => extract(x).featureId, (row, value) => merge(row, extract(row).copy(featureId = value)))
-  override val featureName = new OptField[CharacterData, Row](prefix, "feature_name", None, Some("information_schema.character_data"))(x => extract(x).featureName, (row, value) => merge(row, extract(row).copy(featureName = value)))
-  override val isSupported = new OptField[YesOrNo, Row](prefix, "is_supported", None, Some("information_schema.yes_or_no"))(x => extract(x).isSupported, (row, value) => merge(row, extract(row).copy(isSupported = value)))
-  override val isVerifiedBy = new OptField[CharacterData, Row](prefix, "is_verified_by", None, Some("information_schema.character_data"))(x => extract(x).isVerifiedBy, (row, value) => merge(row, extract(row).copy(isVerifiedBy = value)))
-  override val comments = new OptField[CharacterData, Row](prefix, "comments", None, Some("information_schema.character_data"))(x => extract(x).comments, (row, value) => merge(row, extract(row).copy(comments = value)))
+  override val featureId = new OptField[CharacterData, Row](prefix, "feature_id", None, Some("varchar"))(x => extract(x).featureId, (row, value) => merge(row, extract(row).copy(featureId = value)))
+  override val featureName = new OptField[CharacterData, Row](prefix, "feature_name", None, Some("varchar"))(x => extract(x).featureName, (row, value) => merge(row, extract(row).copy(featureName = value)))
+  override val isSupported = new OptField[YesOrNo, Row](prefix, "is_supported", None, Some("varchar"))(x => extract(x).isSupported, (row, value) => merge(row, extract(row).copy(isSupported = value)))
+  override val isVerifiedBy = new OptField[CharacterData, Row](prefix, "is_verified_by", None, Some("varchar"))(x => extract(x).isVerifiedBy, (row, value) => merge(row, extract(row).copy(isVerifiedBy = value)))
+  override val comments = new OptField[CharacterData, Row](prefix, "comments", None, Some("varchar"))(x => extract(x).comments, (row, value) => merge(row, extract(row).copy(comments = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](featureId, featureName, isSupported, isVerifiedBy, comments)

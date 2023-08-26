@@ -30,13 +30,13 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   }
   override def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
-          values (${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning phonenumbertypeid, "name", modifieddate::text
        """.query(PhonenumbertypeRow.read).unique
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.phonenumbertypeid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"phonenumbertypeid"), fr"${fromWrite(value: PhonenumbertypeId)(Write.fromPut(PhonenumbertypeId.put))}::int4"))
@@ -76,7 +76,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
     val phonenumbertypeid = row.phonenumbertypeid
     sql"""update person.phonenumbertype
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where phonenumbertypeid = ${fromWrite(phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}"""
       .update
@@ -90,7 +90,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
           values (
             ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (phonenumbertypeid)

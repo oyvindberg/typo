@@ -22,7 +22,7 @@ class DViewStructure[Row](val prefix: Option[String], val extract: Row => DViewR
 
   override val title = new Field[/* max 50 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
   override val owner = new Field[BusinessentityId, Row](prefix, "owner", None, Some("int4"))(x => extract(x).owner, (row, value) => merge(row, extract(row).copy(owner = value)))
-  override val folderflag = new Field[Flag, Row](prefix, "folderflag", None, Some(""""public"."Flag""""))(x => extract(x).folderflag, (row, value) => merge(row, extract(row).copy(folderflag = value)))
+  override val folderflag = new Field[Flag, Row](prefix, "folderflag", None, Some("bool"))(x => extract(x).folderflag, (row, value) => merge(row, extract(row).copy(folderflag = value)))
   override val filename = new Field[/* max 400 chars */ String, Row](prefix, "filename", None, None)(x => extract(x).filename, (row, value) => merge(row, extract(row).copy(filename = value)))
   override val fileextension = new Field[/* max 8 chars */ String, Row](prefix, "fileextension", None, None)(x => extract(x).fileextension, (row, value) => merge(row, extract(row).copy(fileextension = value)))
   override val revision = new Field[/* bpchar, max 5 chars */ String, Row](prefix, "revision", None, Some("bpchar"))(x => extract(x).revision, (row, value) => merge(row, extract(row).copy(revision = value)))

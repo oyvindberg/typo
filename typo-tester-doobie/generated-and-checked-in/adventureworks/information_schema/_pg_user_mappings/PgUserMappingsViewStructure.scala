@@ -19,10 +19,10 @@ class PgUserMappingsViewStructure[Row](val prefix: Option[String], val extract: 
   override val oid = new Field[/* oid */ Long, Row](prefix, "oid", None, Some("oid"))(x => extract(x).oid, (row, value) => merge(row, extract(row).copy(oid = value)))
   override val umoptions = new Field[Array[String], Row](prefix, "umoptions", None, Some("_text"))(x => extract(x).umoptions, (row, value) => merge(row, extract(row).copy(umoptions = value)))
   override val umuser = new Field[/* oid */ Long, Row](prefix, "umuser", None, Some("oid"))(x => extract(x).umuser, (row, value) => merge(row, extract(row).copy(umuser = value)))
-  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("information_schema.sql_identifier"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
-  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
-  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
-  override val srvowner = new Field[SqlIdentifier, Row](prefix, "srvowner", None, Some("information_schema.sql_identifier"))(x => extract(x).srvowner, (row, value) => merge(row, extract(row).copy(srvowner = value)))
+  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("name"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
+  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("name"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
+  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("name"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
+  override val srvowner = new Field[SqlIdentifier, Row](prefix, "srvowner", None, Some("name"))(x => extract(x).srvowner, (row, value) => merge(row, extract(row).copy(srvowner = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](oid, umoptions, umuser, authorizationIdentifier, foreignServerCatalog, foreignServerName, srvowner)

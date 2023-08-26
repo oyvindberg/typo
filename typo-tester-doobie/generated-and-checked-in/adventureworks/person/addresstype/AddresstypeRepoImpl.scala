@@ -31,13 +31,13 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
-          values (${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning addresstypeid, "name", rowguid, modifieddate::text
        """.query(AddresstypeRow.read).unique
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.addresstypeid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"addresstypeid"), fr"${fromWrite(value: AddresstypeId)(Write.fromPut(AddresstypeId.put))}::int4"))
@@ -81,7 +81,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid
     sql"""update person.addresstype
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where addresstypeid = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}"""
@@ -96,7 +96,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
           values (
             ${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )

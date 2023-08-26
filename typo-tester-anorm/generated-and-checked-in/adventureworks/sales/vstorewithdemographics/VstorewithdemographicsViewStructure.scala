@@ -19,7 +19,7 @@ class VstorewithdemographicsViewStructure[Row](val prefix: Option[String], val e
     with VstorewithdemographicsViewFields[Row] { outer =>
 
   override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val AnnualSales = new Field[TypoMoney, Row](prefix, "AnnualSales", Some("numeric"), Some("money"))(x => extract(x).AnnualSales, (row, value) => merge(row, extract(row).copy(AnnualSales = value)))
   override val AnnualRevenue = new Field[TypoMoney, Row](prefix, "AnnualRevenue", Some("numeric"), Some("money"))(x => extract(x).AnnualRevenue, (row, value) => merge(row, extract(row).copy(AnnualRevenue = value)))
   override val BankName = new Field[/* max 50 chars */ String, Row](prefix, "BankName", None, None)(x => extract(x).BankName, (row, value) => merge(row, extract(row).copy(BankName = value)))

@@ -25,7 +25,7 @@ class TrViewStructure[Row](val prefix: Option[String], val extract: Row => TrVie
   override val stateprovinceid = new Field[StateprovinceId, Row](prefix, "stateprovinceid", None, Some("int4"))(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
   override val taxtype = new Field[Int, Row](prefix, "taxtype", None, Some("int2"))(x => extract(x).taxtype, (row, value) => merge(row, extract(row).copy(taxtype = value)))
   override val taxrate = new Field[BigDecimal, Row](prefix, "taxrate", None, Some("numeric"))(x => extract(x).taxrate, (row, value) => merge(row, extract(row).copy(taxrate = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 

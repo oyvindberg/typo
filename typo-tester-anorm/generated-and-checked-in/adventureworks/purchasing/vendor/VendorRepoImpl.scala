@@ -36,7 +36,7 @@ object VendorRepoImpl extends VendorRepo {
   }
   override def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
-          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::"public".AccountNumber, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.creditrating, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.preferredvendorstatus, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.activeflag, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::varchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.creditrating, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.preferredvendorstatus, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.activeflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
        """
       .executeInsert(VendorRow.rowParser(1).single)
@@ -45,17 +45,17 @@ object VendorRepoImpl extends VendorRepo {
   override def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
-      Some((NamedParameter("accountnumber", ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)), """::"public".AccountNumber""")),
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("accountnumber", ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)), "::varchar")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       Some((NamedParameter("creditrating", ParameterValue(unsaved.creditrating, null, ToStatement.intToStatement)), "::int2")),
       Some((NamedParameter("purchasingwebserviceurl", ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
       unsaved.preferredvendorstatus match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("preferredvendorstatus", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("preferredvendorstatus", ParameterValue(value, null, Flag.toStatement)), "::bool"))
       },
       unsaved.activeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("activeflag", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("activeflag", ParameterValue(value, null, Flag.toStatement)), "::bool"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -102,11 +102,11 @@ object VendorRepoImpl extends VendorRepo {
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update purchasing.vendor
-          set accountnumber = ${ParameterValue(row.accountnumber, null, AccountNumber.toStatement)}::"public".AccountNumber,
-              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set accountnumber = ${ParameterValue(row.accountnumber, null, AccountNumber.toStatement)}::varchar,
+              "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               creditrating = ${ParameterValue(row.creditrating, null, ToStatement.intToStatement)}::int2,
-              preferredvendorstatus = ${ParameterValue(row.preferredvendorstatus, null, Flag.toStatement)}::"public"."Flag",
-              activeflag = ${ParameterValue(row.activeflag, null, Flag.toStatement)}::"public"."Flag",
+              preferredvendorstatus = ${ParameterValue(row.preferredvendorstatus, null, Flag.toStatement)}::bool,
+              activeflag = ${ParameterValue(row.activeflag, null, Flag.toStatement)}::bool,
               purchasingwebserviceurl = ${ParameterValue(row.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
@@ -119,11 +119,11 @@ object VendorRepoImpl extends VendorRepo {
     SQL"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
-            ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::"public".AccountNumber,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::varchar,
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.creditrating, null, ToStatement.intToStatement)}::int2,
-            ${ParameterValue(unsaved.preferredvendorstatus, null, Flag.toStatement)}::"public"."Flag",
-            ${ParameterValue(unsaved.activeflag, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.preferredvendorstatus, null, Flag.toStatement)}::bool,
+            ${ParameterValue(unsaved.activeflag, null, Flag.toStatement)}::bool,
             ${ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )

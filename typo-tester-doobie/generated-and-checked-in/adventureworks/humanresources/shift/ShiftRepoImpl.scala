@@ -31,13 +31,13 @@ object ShiftRepoImpl extends ShiftRepo {
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
-          values (${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """.query(ShiftRow.read).unique
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       Some((Fragment.const(s"starttime"), fr"${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time")),
       Some((Fragment.const(s"endtime"), fr"${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time")),
       unsaved.shiftid match {
@@ -79,7 +79,7 @@ object ShiftRepoImpl extends ShiftRepo {
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid
     sql"""update humanresources.shift
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               starttime = ${fromWrite(row.starttime)(Write.fromPut(TypoLocalTime.put))}::time,
               endtime = ${fromWrite(row.endtime)(Write.fromPut(TypoLocalTime.put))}::time,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
@@ -95,7 +95,7 @@ object ShiftRepoImpl extends ShiftRepo {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
           values (
             ${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time,
             ${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp

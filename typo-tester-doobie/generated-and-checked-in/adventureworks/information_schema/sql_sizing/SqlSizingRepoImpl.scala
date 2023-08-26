@@ -25,7 +25,7 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
   }
   override def insert(unsaved: SqlSizingRow): ConnectionIO[SqlSizingRow] = {
     sql"""insert into information_schema.sql_sizing(sizing_id, sizing_name, supported_value, "comments")
-          values (${fromWrite(unsaved.sizingId)(Write.fromPutOption(CardinalNumber.put))}::information_schema.cardinal_number, ${fromWrite(unsaved.sizingName)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.supportedValue)(Write.fromPutOption(CardinalNumber.put))}::information_schema.cardinal_number, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data)
+          values (${fromWrite(unsaved.sizingId)(Write.fromPutOption(CardinalNumber.put))}::int4, ${fromWrite(unsaved.sizingName)(Write.fromPutOption(CharacterData.put))}::varchar, ${fromWrite(unsaved.supportedValue)(Write.fromPutOption(CardinalNumber.put))}::int4, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::varchar)
           returning sizing_id, sizing_name, supported_value, "comments"
        """.query(SqlSizingRow.read).unique
   }

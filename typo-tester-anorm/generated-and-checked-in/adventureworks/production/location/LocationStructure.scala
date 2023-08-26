@@ -19,7 +19,7 @@ class LocationStructure[Row](val prefix: Option[String], val extract: Row => Loc
     with LocationFields[Row] { outer =>
 
   override val locationid = new IdField[LocationId, Row](prefix, "locationid", None, Some("int4"))(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val costrate = new Field[BigDecimal, Row](prefix, "costrate", None, Some("numeric"))(x => extract(x).costrate, (row, value) => merge(row, extract(row).copy(costrate = value)))
   override val availability = new Field[BigDecimal, Row](prefix, "availability", None, Some("numeric"))(x => extract(x).availability, (row, value) => merge(row, extract(row).copy(availability = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))

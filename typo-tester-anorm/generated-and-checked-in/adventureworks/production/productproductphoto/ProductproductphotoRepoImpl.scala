@@ -33,7 +33,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   }
   override def insert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
-          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4, ${ParameterValue(unsaved.primary, null, Flag.toStatement)}::"public"."Flag", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4, ${ParameterValue(unsaved.primary, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning productid, productphotoid, "primary", modifieddate::text
        """
       .executeInsert(ProductproductphotoRow.rowParser(1).single)
@@ -45,7 +45,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       Some((NamedParameter("productphotoid", ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)), "::int4")),
       unsaved.primary match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("primary", ParameterValue(value, null, Flag.toStatement)), """::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((NamedParameter("primary", ParameterValue(value, null, Flag.toStatement)), "::bool"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -85,7 +85,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def update(row: ProductproductphotoRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productproductphoto
-          set "primary" = ${ParameterValue(row.primary, null, Flag.toStatement)}::"public"."Flag",
+          set "primary" = ${ParameterValue(row.primary, null, Flag.toStatement)}::bool,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND productphotoid = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}
        """.executeUpdate() > 0
@@ -98,7 +98,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           values (
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4,
-            ${ParameterValue(unsaved.primary, null, Flag.toStatement)}::"public"."Flag",
+            ${ParameterValue(unsaved.primary, null, Flag.toStatement)}::bool,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (productid, productphotoid)

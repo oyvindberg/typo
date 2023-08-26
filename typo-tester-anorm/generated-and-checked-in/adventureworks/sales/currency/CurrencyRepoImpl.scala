@@ -31,7 +31,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
   }
   override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency(currencycode, "name", modifieddate)
-          values (${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning currencycode, "name", modifieddate::text
        """
       .executeInsert(CurrencyRow.rowParser(1).single)
@@ -40,7 +40,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
     val namedParameters = List(
       Some((NamedParameter("currencycode", ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)), "::bpchar")),
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
@@ -86,7 +86,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
     val currencycode = row.currencycode
     SQL"""update sales.currency
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where currencycode = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
        """.executeUpdate() > 0
@@ -98,7 +98,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     SQL"""insert into sales.currency(currencycode, "name", modifieddate)
           values (
             ${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (currencycode)

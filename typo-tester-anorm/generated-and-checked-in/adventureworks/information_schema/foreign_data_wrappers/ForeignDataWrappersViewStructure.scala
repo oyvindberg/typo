@@ -17,11 +17,11 @@ class ForeignDataWrappersViewStructure[Row](val prefix: Option[String], val extr
   extends Relation[ForeignDataWrappersViewFields, ForeignDataWrappersViewRow, Row]
     with ForeignDataWrappersViewFields[Row] { outer =>
 
-  override val foreignDataWrapperCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_catalog", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignDataWrapperCatalog, (row, value) => merge(row, extract(row).copy(foreignDataWrapperCatalog = value)))
-  override val foreignDataWrapperName = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_name", None, Some("information_schema.sql_identifier"))(x => extract(x).foreignDataWrapperName, (row, value) => merge(row, extract(row).copy(foreignDataWrapperName = value)))
-  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("information_schema.sql_identifier"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
-  override val libraryName = new Field[CharacterData, Row](prefix, "library_name", None, Some("information_schema.character_data"))(x => extract(x).libraryName, (row, value) => merge(row, extract(row).copy(libraryName = value)))
-  override val foreignDataWrapperLanguage = new Field[CharacterData, Row](prefix, "foreign_data_wrapper_language", None, Some("information_schema.character_data"))(x => extract(x).foreignDataWrapperLanguage, (row, value) => merge(row, extract(row).copy(foreignDataWrapperLanguage = value)))
+  override val foreignDataWrapperCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_catalog", None, Some("name"))(x => extract(x).foreignDataWrapperCatalog, (row, value) => merge(row, extract(row).copy(foreignDataWrapperCatalog = value)))
+  override val foreignDataWrapperName = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_name", None, Some("name"))(x => extract(x).foreignDataWrapperName, (row, value) => merge(row, extract(row).copy(foreignDataWrapperName = value)))
+  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("name"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
+  override val libraryName = new Field[CharacterData, Row](prefix, "library_name", None, Some("varchar"))(x => extract(x).libraryName, (row, value) => merge(row, extract(row).copy(libraryName = value)))
+  override val foreignDataWrapperLanguage = new Field[CharacterData, Row](prefix, "foreign_data_wrapper_language", None, Some("varchar"))(x => extract(x).foreignDataWrapperLanguage, (row, value) => merge(row, extract(row).copy(foreignDataWrapperLanguage = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](foreignDataWrapperCatalog, foreignDataWrapperName, authorizationIdentifier, libraryName, foreignDataWrapperLanguage)

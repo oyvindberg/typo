@@ -31,7 +31,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   }
   override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
-          values (${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::"public"."Name", ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning salesreasonid, "name", reasontype, modifieddate::text
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
@@ -39,8 +39,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   }
   override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow = {
     val namedParameters = List(
-      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), """::"public"."Name"""")),
-      Some((NamedParameter("reasontype", ParameterValue(unsaved.reasontype, null, Name.toStatement)), """::"public"."Name"""")),
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
+      Some((NamedParameter("reasontype", ParameterValue(unsaved.reasontype, null, Name.toStatement)), "::varchar")),
       unsaved.salesreasonid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("salesreasonid", ParameterValue(value, null, SalesreasonId.toStatement)), "::int4"))
@@ -90,8 +90,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
     val salesreasonid = row.salesreasonid
     SQL"""update sales.salesreason
-          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::"public"."Name",
-              reasontype = ${ParameterValue(row.reasontype, null, Name.toStatement)}::"public"."Name",
+          set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
+              reasontype = ${ParameterValue(row.reasontype, null, Name.toStatement)}::varchar,
               modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where salesreasonid = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
        """.executeUpdate() > 0
@@ -103,8 +103,8 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
           values (
             ${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4,
-            ${ParameterValue(unsaved.name, null, Name.toStatement)}::"public"."Name",
-            ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::"public"."Name",
+            ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
+            ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict (salesreasonid)

@@ -22,9 +22,9 @@ class VadditionalcontactinfoViewStructure[Row](val prefix: Option[String], val e
     with VadditionalcontactinfoViewFields[Row] { outer =>
 
   override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, Some(""""public"."Name""""))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
-  override val middlename = new Field[Name, Row](prefix, "middlename", None, Some(""""public"."Name""""))(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
-  override val lastname = new Field[Name, Row](prefix, "lastname", None, Some(""""public"."Name""""))(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
+  override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, Some("varchar"))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
+  override val middlename = new Field[Name, Row](prefix, "middlename", None, Some("varchar"))(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
+  override val lastname = new Field[Name, Row](prefix, "lastname", None, Some("varchar"))(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
   override val telephonenumber = new Field[TypoXml, Row](prefix, "telephonenumber", None, Some("xml"))(x => extract(x).telephonenumber, (row, value) => merge(row, extract(row).copy(telephonenumber = value)))
   override val telephonespecialinstructions = new Field[String, Row](prefix, "telephonespecialinstructions", None, None)(x => extract(x).telephonespecialinstructions, (row, value) => merge(row, extract(row).copy(telephonespecialinstructions = value)))
   override val street = new Field[TypoXml, Row](prefix, "street", None, Some("xml"))(x => extract(x).street, (row, value) => merge(row, extract(row).copy(street = value)))
