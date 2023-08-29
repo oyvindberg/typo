@@ -13,7 +13,7 @@ import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 
 trait CViewFields[Row] {
-  val id: Field[/* bpchar, max 6 chars */ String, Row]
+  val id: Field[CultureId, Row]
   val cultureid: Field[CultureId, Row]
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

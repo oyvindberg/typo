@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class LViewRow(
-  id: Int,
+  /** Points to [[production.location.LocationRow.locationid]] */
+  id: LocationId,
   /** Points to [[production.location.LocationRow.locationid]] */
   locationid: LocationId,
   /** Points to [[production.location.LocationRow.name]] */
@@ -40,7 +41,7 @@ object LViewRow {
   implicit lazy val reads: Reads[LViewRow] = Reads[LViewRow](json => JsResult.fromTry(
       Try(
         LViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(LocationId.reads),
           locationid = json.\("locationid").as(LocationId.reads),
           name = json.\("name").as(Name.reads),
           costrate = json.\("costrate").as(Reads.bigDecReads),
@@ -53,7 +54,7 @@ object LViewRow {
   def rowParser(idx: Int): RowParser[LViewRow] = RowParser[LViewRow] { row =>
     Success(
       LViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(LocationId.column),
         locationid = row(idx + 1)(LocationId.column),
         name = row(idx + 2)(Name.column),
         costrate = row(idx + 3)(Column.columnToScalaBigDecimal),
@@ -64,7 +65,7 @@ object LViewRow {
   }
   implicit lazy val writes: OWrites[LViewRow] = OWrites[LViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> LocationId.writes.writes(o.id),
       "locationid" -> LocationId.writes.writes(o.locationid),
       "name" -> Name.writes.writes(o.name),
       "costrate" -> Writes.BigDecimalWrites.writes(o.costrate),

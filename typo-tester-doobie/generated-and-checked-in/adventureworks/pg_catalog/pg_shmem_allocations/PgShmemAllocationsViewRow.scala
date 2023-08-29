@@ -15,27 +15,27 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgShmemAllocationsViewRow(
-  name: String,
-  off: Long,
-  size: Long,
-  allocatedSize: Long
+  name: /* nullability unknown */ Option[String],
+  off: /* nullability unknown */ Option[Long],
+  size: /* nullability unknown */ Option[Long],
+  allocatedSize: /* nullability unknown */ Option[Long]
 )
 
 object PgShmemAllocationsViewRow {
-  implicit lazy val decoder: Decoder[PgShmemAllocationsViewRow] = Decoder.forProduct4[PgShmemAllocationsViewRow, String, Long, Long, Long]("name", "off", "size", "allocated_size")(PgShmemAllocationsViewRow.apply)(Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgShmemAllocationsViewRow] = Encoder.forProduct4[PgShmemAllocationsViewRow, String, Long, Long, Long]("name", "off", "size", "allocated_size")(x => (x.name, x.off, x.size, x.allocatedSize))(Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgShmemAllocationsViewRow] = Decoder.forProduct4[PgShmemAllocationsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long]]("name", "off", "size", "allocated_size")(PgShmemAllocationsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgShmemAllocationsViewRow] = Encoder.forProduct4[PgShmemAllocationsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long]]("name", "off", "size", "allocated_size")(x => (x.name, x.off, x.size, x.allocatedSize))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit lazy val read: Read[PgShmemAllocationsViewRow] = new Read[PgShmemAllocationsViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgShmemAllocationsViewRow(
-      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
-      off = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
-      size = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
-      allocatedSize = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3)
+      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      off = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      size = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
+      allocatedSize = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

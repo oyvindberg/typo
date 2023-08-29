@@ -7,20 +7,17 @@ package adventureworks
 package information_schema
 package role_usage_grants
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import typo.dsl.SqlExpr.OptField
 
 trait RoleUsageGrantsViewFields[Row] {
-  val grantor: OptField[SqlIdentifier, Row]
-  val grantee: OptField[SqlIdentifier, Row]
-  val objectCatalog: OptField[SqlIdentifier, Row]
-  val objectSchema: OptField[SqlIdentifier, Row]
-  val objectName: OptField[SqlIdentifier, Row]
-  val objectType: OptField[CharacterData, Row]
-  val privilegeType: OptField[CharacterData, Row]
-  val isGrantable: OptField[YesOrNo, Row]
+  val grantor: OptField[/* nullability unknown */ String, Row]
+  val grantee: OptField[/* nullability unknown */ String, Row]
+  val objectCatalog: OptField[/* nullability unknown */ String, Row]
+  val objectSchema: OptField[/* nullability unknown */ String, Row]
+  val objectName: OptField[/* nullability unknown */ String, Row]
+  val objectType: OptField[/* nullability unknown */ String, Row]
+  val privilegeType: OptField[/* nullability unknown */ String, Row]
+  val isGrantable: OptField[/* nullability unknown */ /* max 3 chars */ String, Row]
 }
 object RoleUsageGrantsViewFields extends RoleUsageGrantsViewStructure[RoleUsageGrantsViewRow](None, identity, (_, x) => x)
 

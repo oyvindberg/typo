@@ -7,55 +7,53 @@ package adventureworks
 package information_schema
 package table_constraints
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class TableConstraintsViewRow(
-  constraintCatalog: Option[SqlIdentifier],
-  constraintSchema: Option[SqlIdentifier],
-  constraintName: Option[SqlIdentifier],
-  tableCatalog: Option[SqlIdentifier],
-  tableSchema: Option[SqlIdentifier],
-  tableName: Option[SqlIdentifier],
-  constraintType: Option[CharacterData],
-  isDeferrable: Option[YesOrNo],
-  initiallyDeferred: Option[YesOrNo],
-  enforced: Option[YesOrNo]
+  constraintCatalog: /* nullability unknown */ Option[String],
+  constraintSchema: /* nullability unknown */ Option[String],
+  constraintName: /* nullability unknown */ Option[String],
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  constraintType: /* nullability unknown */ Option[String],
+  isDeferrable: /* nullability unknown */ Option[/* max 3 chars */ String],
+  initiallyDeferred: /* nullability unknown */ Option[/* max 3 chars */ String],
+  enforced: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object TableConstraintsViewRow {
-  implicit lazy val decoder: Decoder[TableConstraintsViewRow] = Decoder.forProduct10[TableConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced")(TableConstraintsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder))
-  implicit lazy val encoder: Encoder[TableConstraintsViewRow] = Encoder.forProduct10[TableConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.tableCatalog, x.tableSchema, x.tableName, x.constraintType, x.isDeferrable, x.initiallyDeferred, x.enforced))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder))
+  implicit lazy val decoder: Decoder[TableConstraintsViewRow] = Decoder.forProduct10[TableConstraintsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String], /* nullability unknown */ Option[/* max 3 chars */ String], /* nullability unknown */ Option[/* max 3 chars */ String]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced")(TableConstraintsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[TableConstraintsViewRow] = Encoder.forProduct10[TableConstraintsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String], /* nullability unknown */ Option[/* max 3 chars */ String], /* nullability unknown */ Option[/* max 3 chars */ String]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.tableCatalog, x.tableSchema, x.tableName, x.constraintType, x.isDeferrable, x.initiallyDeferred, x.enforced))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[TableConstraintsViewRow] = new Read[TableConstraintsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TableConstraintsViewRow(
-      constraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      constraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      constraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
-      constraintType = CharacterData.get.unsafeGetNullable(rs, i + 6),
-      isDeferrable = YesOrNo.get.unsafeGetNullable(rs, i + 7),
-      initiallyDeferred = YesOrNo.get.unsafeGetNullable(rs, i + 8),
-      enforced = YesOrNo.get.unsafeGetNullable(rs, i + 9)
+      constraintCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      constraintSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      constraintName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      tableCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      tableSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      tableName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      constraintType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      isDeferrable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+      initiallyDeferred = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      enforced = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

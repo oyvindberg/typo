@@ -17,12 +17,12 @@ class EphViewStructure[Row](val prefix: Option[String], val extract: Row => EphV
   extends Relation[EphViewFields, EphViewRow, Row]
     with EphViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val ratechangedate = new Field[TypoLocalDateTime, Row](prefix, "ratechangedate", Some("text"), Some("timestamp"))(x => extract(x).ratechangedate, (row, value) => merge(row, extract(row).copy(ratechangedate = value)))
-  override val rate = new Field[BigDecimal, Row](prefix, "rate", None, Some("numeric"))(x => extract(x).rate, (row, value) => merge(row, extract(row).copy(rate = value)))
-  override val payfrequency = new Field[Int, Row](prefix, "payfrequency", None, Some("int2"))(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+  override val ratechangedate = new Field[TypoLocalDateTime, Row](prefix, "ratechangedate", Some("text"), None)(x => extract(x).ratechangedate, (row, value) => merge(row, extract(row).copy(ratechangedate = value)))
+  override val rate = new Field[BigDecimal, Row](prefix, "rate", None, None)(x => extract(x).rate, (row, value) => merge(row, extract(row).copy(rate = value)))
+  override val payfrequency = new Field[Int, Row](prefix, "payfrequency", None, None)(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, businessentityid, ratechangedate, rate, payfrequency, modifieddate)

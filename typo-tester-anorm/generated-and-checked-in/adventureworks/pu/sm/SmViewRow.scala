@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SmViewRow(
-  id: Int,
+  /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
+  id: ShipmethodId,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.name]] */
@@ -43,7 +44,7 @@ object SmViewRow {
   implicit lazy val reads: Reads[SmViewRow] = Reads[SmViewRow](json => JsResult.fromTry(
       Try(
         SmViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(ShipmethodId.reads),
           shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
           name = json.\("name").as(Name.reads),
           shipbase = json.\("shipbase").as(Reads.bigDecReads),
@@ -57,7 +58,7 @@ object SmViewRow {
   def rowParser(idx: Int): RowParser[SmViewRow] = RowParser[SmViewRow] { row =>
     Success(
       SmViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(ShipmethodId.column),
         shipmethodid = row(idx + 1)(ShipmethodId.column),
         name = row(idx + 2)(Name.column),
         shipbase = row(idx + 3)(Column.columnToScalaBigDecimal),
@@ -69,7 +70,7 @@ object SmViewRow {
   }
   implicit lazy val writes: OWrites[SmViewRow] = OWrites[SmViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> ShipmethodId.writes.writes(o.id),
       "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
       "name" -> Name.writes.writes(o.name),
       "shipbase" -> Writes.BigDecimalWrites.writes(o.shipbase),

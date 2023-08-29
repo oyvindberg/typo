@@ -7,9 +7,6 @@ package adventureworks
 package information_schema
 package usage_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -23,28 +20,28 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UsagePrivilegesViewRow(
-  grantor: Option[SqlIdentifier],
-  grantee: Option[SqlIdentifier],
-  objectCatalog: Option[SqlIdentifier],
-  objectSchema: Option[SqlIdentifier],
-  objectName: Option[SqlIdentifier],
-  objectType: Option[CharacterData],
-  privilegeType: Option[CharacterData],
-  isGrantable: Option[YesOrNo]
+  grantor: /* nullability unknown */ Option[String],
+  grantee: /* nullability unknown */ Option[String],
+  objectCatalog: /* nullability unknown */ Option[String],
+  objectSchema: /* nullability unknown */ Option[String],
+  objectName: /* nullability unknown */ Option[String],
+  objectType: /* nullability unknown */ Option[String],
+  privilegeType: /* nullability unknown */ Option[String],
+  isGrantable: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object UsagePrivilegesViewRow {
   implicit lazy val reads: Reads[UsagePrivilegesViewRow] = Reads[UsagePrivilegesViewRow](json => JsResult.fromTry(
       Try(
         UsagePrivilegesViewRow(
-          grantor = json.\("grantor").toOption.map(_.as(SqlIdentifier.reads)),
-          grantee = json.\("grantee").toOption.map(_.as(SqlIdentifier.reads)),
-          objectCatalog = json.\("object_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          objectSchema = json.\("object_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          objectName = json.\("object_name").toOption.map(_.as(SqlIdentifier.reads)),
-          objectType = json.\("object_type").toOption.map(_.as(CharacterData.reads)),
-          privilegeType = json.\("privilege_type").toOption.map(_.as(CharacterData.reads)),
-          isGrantable = json.\("is_grantable").toOption.map(_.as(YesOrNo.reads))
+          grantor = json.\("grantor").toOption.map(_.as(Reads.StringReads)),
+          grantee = json.\("grantee").toOption.map(_.as(Reads.StringReads)),
+          objectCatalog = json.\("object_catalog").toOption.map(_.as(Reads.StringReads)),
+          objectSchema = json.\("object_schema").toOption.map(_.as(Reads.StringReads)),
+          objectName = json.\("object_name").toOption.map(_.as(Reads.StringReads)),
+          objectType = json.\("object_type").toOption.map(_.as(Reads.StringReads)),
+          privilegeType = json.\("privilege_type").toOption.map(_.as(Reads.StringReads)),
+          isGrantable = json.\("is_grantable").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -52,27 +49,27 @@ object UsagePrivilegesViewRow {
   def rowParser(idx: Int): RowParser[UsagePrivilegesViewRow] = RowParser[UsagePrivilegesViewRow] { row =>
     Success(
       UsagePrivilegesViewRow(
-        grantor = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        grantee = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        objectCatalog = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        objectSchema = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        objectName = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        objectType = row(idx + 5)(Column.columnToOption(CharacterData.column)),
-        privilegeType = row(idx + 6)(Column.columnToOption(CharacterData.column)),
-        isGrantable = row(idx + 7)(Column.columnToOption(YesOrNo.column))
+        grantor = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        grantee = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        objectCatalog = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        objectSchema = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        objectName = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        objectType = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        privilegeType = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        isGrantable = row(idx + 7)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[UsagePrivilegesViewRow] = OWrites[UsagePrivilegesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "grantor" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.grantor),
-      "grantee" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.grantee),
-      "object_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.objectCatalog),
-      "object_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.objectSchema),
-      "object_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.objectName),
-      "object_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.objectType),
-      "privilege_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.privilegeType),
-      "is_grantable" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isGrantable)
+      "grantor" -> Writes.OptionWrites(Writes.StringWrites).writes(o.grantor),
+      "grantee" -> Writes.OptionWrites(Writes.StringWrites).writes(o.grantee),
+      "object_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.objectCatalog),
+      "object_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.objectSchema),
+      "object_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.objectName),
+      "object_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.objectType),
+      "privilege_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.privilegeType),
+      "is_grantable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isGrantable)
     ))
   )
 }

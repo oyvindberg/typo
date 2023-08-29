@@ -15,7 +15,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait StViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[SalesterritoryId, Row]
   val territoryid: Field[SalesterritoryId, Row]
   val name: Field[Name, Row]
   val countryregioncode: Field[CountryregionId, Row]

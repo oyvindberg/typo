@@ -14,7 +14,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait AtViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[AddresstypeId, Row]
   val addresstypeid: Field[AddresstypeId, Row]
   val name: Field[Name, Row]
   val rowguid: Field[UUID, Row]

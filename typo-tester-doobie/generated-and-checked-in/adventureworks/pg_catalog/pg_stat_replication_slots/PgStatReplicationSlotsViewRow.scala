@@ -16,46 +16,45 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatReplicationSlotsViewRow(
-  /** Points to [[pg_replication_slots.PgReplicationSlotsViewRow.slotName]] */
-  slotName: String,
-  spillTxns: Long,
-  spillCount: Long,
-  spillBytes: Long,
-  streamTxns: Long,
-  streamCount: Long,
-  streamBytes: Long,
-  totalTxns: Long,
-  totalBytes: Long,
-  statsReset: TypoOffsetDateTime
+  slotName: /* nullability unknown */ Option[String],
+  spillTxns: /* nullability unknown */ Option[Long],
+  spillCount: /* nullability unknown */ Option[Long],
+  spillBytes: /* nullability unknown */ Option[Long],
+  streamTxns: /* nullability unknown */ Option[Long],
+  streamCount: /* nullability unknown */ Option[Long],
+  streamBytes: /* nullability unknown */ Option[Long],
+  totalTxns: /* nullability unknown */ Option[Long],
+  totalBytes: /* nullability unknown */ Option[Long],
+  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
 )
 
 object PgStatReplicationSlotsViewRow {
-  implicit lazy val decoder: Decoder[PgStatReplicationSlotsViewRow] = Decoder.forProduct10[PgStatReplicationSlotsViewRow, String, Long, Long, Long, Long, Long, Long, Long, Long, TypoOffsetDateTime]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(PgStatReplicationSlotsViewRow.apply)(Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, TypoOffsetDateTime.decoder)
-  implicit lazy val encoder: Encoder[PgStatReplicationSlotsViewRow] = Encoder.forProduct10[PgStatReplicationSlotsViewRow, String, Long, Long, Long, Long, Long, Long, Long, Long, TypoOffsetDateTime]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(x => (x.slotName, x.spillTxns, x.spillCount, x.spillBytes, x.streamTxns, x.streamCount, x.streamBytes, x.totalTxns, x.totalBytes, x.statsReset))(Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, TypoOffsetDateTime.encoder)
+  implicit lazy val decoder: Decoder[PgStatReplicationSlotsViewRow] = Decoder.forProduct10[PgStatReplicationSlotsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoOffsetDateTime]]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(PgStatReplicationSlotsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoOffsetDateTime.decoder))
+  implicit lazy val encoder: Encoder[PgStatReplicationSlotsViewRow] = Encoder.forProduct10[PgStatReplicationSlotsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoOffsetDateTime]]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(x => (x.slotName, x.spillTxns, x.spillCount, x.spillBytes, x.streamTxns, x.streamCount, x.streamBytes, x.totalTxns, x.totalBytes, x.statsReset))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoOffsetDateTime.encoder))
   implicit lazy val read: Read[PgStatReplicationSlotsViewRow] = new Read[PgStatReplicationSlotsViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (TypoOffsetDateTime.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatReplicationSlotsViewRow(
-      slotName = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
-      spillTxns = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
-      spillCount = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
-      spillBytes = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      streamTxns = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
-      streamCount = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
-      streamBytes = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
-      totalTxns = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
-      totalBytes = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 8),
-      statsReset = TypoOffsetDateTime.get.unsafeGetNonNullable(rs, i + 9)
+      slotName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      spillTxns = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      spillCount = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
+      spillBytes = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      streamTxns = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
+      streamCount = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
+      streamBytes = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
+      totalTxns = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
+      totalBytes = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
+      statsReset = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

@@ -7,9 +7,7 @@ package adventureworks
 package information_schema
 package role_udt_grants
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -17,37 +15,38 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class RoleUdtGrantsViewRow(
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.grantor]] */
-  grantor: SqlIdentifier,
+  grantor: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.grantee]] */
-  grantee: SqlIdentifier,
+  grantee: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.udtCatalog]] */
-  udtCatalog: SqlIdentifier,
+  udtCatalog: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.udtSchema]] */
-  udtSchema: SqlIdentifier,
+  udtSchema: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.udtName]] */
-  udtName: SqlIdentifier,
+  udtName: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.privilegeType]] */
-  privilegeType: CharacterData,
+  privilegeType: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.isGrantable]] */
-  isGrantable: YesOrNo
+  isGrantable: Option[/* nullability unknown */ /* max 3 chars */ String]
 )
 
 object RoleUdtGrantsViewRow {
   implicit lazy val reads: Reads[RoleUdtGrantsViewRow] = Reads[RoleUdtGrantsViewRow](json => JsResult.fromTry(
       Try(
         RoleUdtGrantsViewRow(
-          grantor = json.\("grantor").as(SqlIdentifier.reads),
-          grantee = json.\("grantee").as(SqlIdentifier.reads),
-          udtCatalog = json.\("udt_catalog").as(SqlIdentifier.reads),
-          udtSchema = json.\("udt_schema").as(SqlIdentifier.reads),
-          udtName = json.\("udt_name").as(SqlIdentifier.reads),
-          privilegeType = json.\("privilege_type").as(CharacterData.reads),
-          isGrantable = json.\("is_grantable").as(YesOrNo.reads)
+          grantor = json.\("grantor").toOption.map(_.as(Reads.StringReads)),
+          grantee = json.\("grantee").toOption.map(_.as(Reads.StringReads)),
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as(Reads.StringReads)),
+          udtSchema = json.\("udt_schema").toOption.map(_.as(Reads.StringReads)),
+          udtName = json.\("udt_name").toOption.map(_.as(Reads.StringReads)),
+          privilegeType = json.\("privilege_type").toOption.map(_.as(Reads.StringReads)),
+          isGrantable = json.\("is_grantable").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -55,25 +54,25 @@ object RoleUdtGrantsViewRow {
   def rowParser(idx: Int): RowParser[RoleUdtGrantsViewRow] = RowParser[RoleUdtGrantsViewRow] { row =>
     Success(
       RoleUdtGrantsViewRow(
-        grantor = row(idx + 0)(SqlIdentifier.column),
-        grantee = row(idx + 1)(SqlIdentifier.column),
-        udtCatalog = row(idx + 2)(SqlIdentifier.column),
-        udtSchema = row(idx + 3)(SqlIdentifier.column),
-        udtName = row(idx + 4)(SqlIdentifier.column),
-        privilegeType = row(idx + 5)(CharacterData.column),
-        isGrantable = row(idx + 6)(YesOrNo.column)
+        grantor = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        grantee = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        udtCatalog = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        udtSchema = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        udtName = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        privilegeType = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        isGrantable = row(idx + 6)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[RoleUdtGrantsViewRow] = OWrites[RoleUdtGrantsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "grantor" -> SqlIdentifier.writes.writes(o.grantor),
-      "grantee" -> SqlIdentifier.writes.writes(o.grantee),
-      "udt_catalog" -> SqlIdentifier.writes.writes(o.udtCatalog),
-      "udt_schema" -> SqlIdentifier.writes.writes(o.udtSchema),
-      "udt_name" -> SqlIdentifier.writes.writes(o.udtName),
-      "privilege_type" -> CharacterData.writes.writes(o.privilegeType),
-      "is_grantable" -> YesOrNo.writes.writes(o.isGrantable)
+      "grantor" -> Writes.OptionWrites(Writes.StringWrites).writes(o.grantor),
+      "grantee" -> Writes.OptionWrites(Writes.StringWrites).writes(o.grantee),
+      "udt_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.udtCatalog),
+      "udt_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.udtSchema),
+      "udt_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.udtName),
+      "privilege_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.privilegeType),
+      "is_grantable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isGrantable)
     ))
   )
 }

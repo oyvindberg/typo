@@ -23,6 +23,7 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PodViewRow(
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderdetailid]] */
   id: Int,
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderid]] */
   purchaseorderid: PurchaseorderheaderId,

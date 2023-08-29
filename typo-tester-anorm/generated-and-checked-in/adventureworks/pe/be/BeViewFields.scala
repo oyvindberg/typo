@@ -13,7 +13,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait BeViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BusinessentityId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

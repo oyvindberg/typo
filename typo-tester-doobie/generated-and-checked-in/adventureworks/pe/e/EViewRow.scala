@@ -18,13 +18,14 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class EViewRow(
+  /** Points to [[person.emailaddress.EmailaddressRow.emailaddressid]] */
   id: Int,
   /** Points to [[person.emailaddress.EmailaddressRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddressid]] */
   emailaddressid: Int,
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
-  emailaddress: /* max 50 chars */ String,
+  emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[person.emailaddress.EmailaddressRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[person.emailaddress.EmailaddressRow.modifieddate]] */
@@ -32,14 +33,14 @@ case class EViewRow(
 )
 
 object EViewRow {
-  implicit lazy val decoder: Decoder[EViewRow] = Decoder.forProduct6[EViewRow, Int, BusinessentityId, Int, /* max 50 chars */ String, UUID, TypoLocalDateTime]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[EViewRow] = Encoder.forProduct6[EViewRow, Int, BusinessentityId, Int, /* max 50 chars */ String, UUID, TypoLocalDateTime]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[EViewRow] = Decoder.forProduct6[EViewRow, Int, BusinessentityId, Int, Option[/* max 50 chars */ String], UUID, TypoLocalDateTime]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[EViewRow] = Encoder.forProduct6[EViewRow, Int, BusinessentityId, Int, Option[/* max 50 chars */ String], UUID, TypoLocalDateTime]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[EViewRow] = new Read[EViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
@@ -47,7 +48,7 @@ object EViewRow {
       id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       emailaddressid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      emailaddress = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      emailaddress = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
       rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )

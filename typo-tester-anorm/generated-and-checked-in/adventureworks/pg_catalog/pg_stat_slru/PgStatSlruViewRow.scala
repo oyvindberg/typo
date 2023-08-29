@@ -21,30 +21,30 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatSlruViewRow(
-  name: String,
-  blksZeroed: Long,
-  blksHit: Long,
-  blksRead: Long,
-  blksWritten: Long,
-  blksExists: Long,
-  flushes: Long,
-  truncates: Long,
-  statsReset: TypoOffsetDateTime
+  name: /* nullability unknown */ Option[String],
+  blksZeroed: /* nullability unknown */ Option[Long],
+  blksHit: /* nullability unknown */ Option[Long],
+  blksRead: /* nullability unknown */ Option[Long],
+  blksWritten: /* nullability unknown */ Option[Long],
+  blksExists: /* nullability unknown */ Option[Long],
+  flushes: /* nullability unknown */ Option[Long],
+  truncates: /* nullability unknown */ Option[Long],
+  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
 )
 
 object PgStatSlruViewRow {
   implicit lazy val reads: Reads[PgStatSlruViewRow] = Reads[PgStatSlruViewRow](json => JsResult.fromTry(
       Try(
         PgStatSlruViewRow(
-          name = json.\("name").as(Reads.StringReads),
-          blksZeroed = json.\("blks_zeroed").as(Reads.LongReads),
-          blksHit = json.\("blks_hit").as(Reads.LongReads),
-          blksRead = json.\("blks_read").as(Reads.LongReads),
-          blksWritten = json.\("blks_written").as(Reads.LongReads),
-          blksExists = json.\("blks_exists").as(Reads.LongReads),
-          flushes = json.\("flushes").as(Reads.LongReads),
-          truncates = json.\("truncates").as(Reads.LongReads),
-          statsReset = json.\("stats_reset").as(TypoOffsetDateTime.reads)
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          blksZeroed = json.\("blks_zeroed").toOption.map(_.as(Reads.LongReads)),
+          blksHit = json.\("blks_hit").toOption.map(_.as(Reads.LongReads)),
+          blksRead = json.\("blks_read").toOption.map(_.as(Reads.LongReads)),
+          blksWritten = json.\("blks_written").toOption.map(_.as(Reads.LongReads)),
+          blksExists = json.\("blks_exists").toOption.map(_.as(Reads.LongReads)),
+          flushes = json.\("flushes").toOption.map(_.as(Reads.LongReads)),
+          truncates = json.\("truncates").toOption.map(_.as(Reads.LongReads)),
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -52,29 +52,29 @@ object PgStatSlruViewRow {
   def rowParser(idx: Int): RowParser[PgStatSlruViewRow] = RowParser[PgStatSlruViewRow] { row =>
     Success(
       PgStatSlruViewRow(
-        name = row(idx + 0)(Column.columnToString),
-        blksZeroed = row(idx + 1)(Column.columnToLong),
-        blksHit = row(idx + 2)(Column.columnToLong),
-        blksRead = row(idx + 3)(Column.columnToLong),
-        blksWritten = row(idx + 4)(Column.columnToLong),
-        blksExists = row(idx + 5)(Column.columnToLong),
-        flushes = row(idx + 6)(Column.columnToLong),
-        truncates = row(idx + 7)(Column.columnToLong),
-        statsReset = row(idx + 8)(TypoOffsetDateTime.column)
+        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        blksZeroed = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        blksHit = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
+        blksRead = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        blksWritten = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        blksExists = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        flushes = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        truncates = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        statsReset = row(idx + 8)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatSlruViewRow] = OWrites[PgStatSlruViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Writes.StringWrites.writes(o.name),
-      "blks_zeroed" -> Writes.LongWrites.writes(o.blksZeroed),
-      "blks_hit" -> Writes.LongWrites.writes(o.blksHit),
-      "blks_read" -> Writes.LongWrites.writes(o.blksRead),
-      "blks_written" -> Writes.LongWrites.writes(o.blksWritten),
-      "blks_exists" -> Writes.LongWrites.writes(o.blksExists),
-      "flushes" -> Writes.LongWrites.writes(o.flushes),
-      "truncates" -> Writes.LongWrites.writes(o.truncates),
-      "stats_reset" -> TypoOffsetDateTime.writes.writes(o.statsReset)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "blks_zeroed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksZeroed),
+      "blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksHit),
+      "blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksRead),
+      "blks_written" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksWritten),
+      "blks_exists" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksExists),
+      "flushes" -> Writes.OptionWrites(Writes.LongWrites).writes(o.flushes),
+      "truncates" -> Writes.OptionWrites(Writes.LongWrites).writes(o.truncates),
+      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
     ))
   )
 }

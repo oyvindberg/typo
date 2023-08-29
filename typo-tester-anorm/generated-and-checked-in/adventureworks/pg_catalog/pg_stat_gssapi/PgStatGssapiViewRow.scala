@@ -20,20 +20,20 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatGssapiViewRow(
-  pid: Int,
-  gssAuthenticated: Boolean,
-  principal: String,
-  encrypted: Boolean
+  pid: /* nullability unknown */ Option[Int],
+  gssAuthenticated: /* nullability unknown */ Option[Boolean],
+  principal: /* nullability unknown */ Option[String],
+  encrypted: /* nullability unknown */ Option[Boolean]
 )
 
 object PgStatGssapiViewRow {
   implicit lazy val reads: Reads[PgStatGssapiViewRow] = Reads[PgStatGssapiViewRow](json => JsResult.fromTry(
       Try(
         PgStatGssapiViewRow(
-          pid = json.\("pid").as(Reads.IntReads),
-          gssAuthenticated = json.\("gss_authenticated").as(Reads.BooleanReads),
-          principal = json.\("principal").as(Reads.StringReads),
-          encrypted = json.\("encrypted").as(Reads.BooleanReads)
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          gssAuthenticated = json.\("gss_authenticated").toOption.map(_.as(Reads.BooleanReads)),
+          principal = json.\("principal").toOption.map(_.as(Reads.StringReads)),
+          encrypted = json.\("encrypted").toOption.map(_.as(Reads.BooleanReads))
         )
       )
     ),
@@ -41,19 +41,19 @@ object PgStatGssapiViewRow {
   def rowParser(idx: Int): RowParser[PgStatGssapiViewRow] = RowParser[PgStatGssapiViewRow] { row =>
     Success(
       PgStatGssapiViewRow(
-        pid = row(idx + 0)(Column.columnToInt),
-        gssAuthenticated = row(idx + 1)(Column.columnToBoolean),
-        principal = row(idx + 2)(Column.columnToString),
-        encrypted = row(idx + 3)(Column.columnToBoolean)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        gssAuthenticated = row(idx + 1)(Column.columnToOption(Column.columnToBoolean)),
+        principal = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        encrypted = row(idx + 3)(Column.columnToOption(Column.columnToBoolean))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatGssapiViewRow] = OWrites[PgStatGssapiViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Writes.IntWrites.writes(o.pid),
-      "gss_authenticated" -> Writes.BooleanWrites.writes(o.gssAuthenticated),
-      "principal" -> Writes.StringWrites.writes(o.principal),
-      "encrypted" -> Writes.BooleanWrites.writes(o.encrypted)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "gss_authenticated" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.gssAuthenticated),
+      "principal" -> Writes.OptionWrites(Writes.StringWrites).writes(o.principal),
+      "encrypted" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.encrypted)
     ))
   )
 }

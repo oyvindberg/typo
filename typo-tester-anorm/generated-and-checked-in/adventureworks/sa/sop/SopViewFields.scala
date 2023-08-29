@@ -14,7 +14,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait SopViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[SpecialofferId, Row]
   val specialofferid: Field[SpecialofferId, Row]
   val productid: Field[ProductId, Row]
   val rowguid: Field[UUID, Row]

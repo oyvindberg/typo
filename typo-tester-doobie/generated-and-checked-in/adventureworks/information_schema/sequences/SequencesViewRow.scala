@@ -7,62 +7,59 @@ package adventureworks
 package information_schema
 package sequences
 
-import adventureworks.information_schema.CardinalNumber
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class SequencesViewRow(
-  sequenceCatalog: SqlIdentifier,
-  sequenceSchema: SqlIdentifier,
-  sequenceName: SqlIdentifier,
-  dataType: CharacterData,
-  numericPrecision: CardinalNumber,
-  numericPrecisionRadix: CardinalNumber,
-  numericScale: CardinalNumber,
-  startValue: CharacterData,
-  minimumValue: CharacterData,
-  maximumValue: CharacterData,
-  increment: CharacterData,
-  cycleOption: YesOrNo
+  sequenceCatalog: /* nullability unknown */ Option[String],
+  sequenceSchema: /* nullability unknown */ Option[String],
+  sequenceName: /* nullability unknown */ Option[String],
+  dataType: /* nullability unknown */ Option[String],
+  numericPrecision: /* nullability unknown */ Option[Int],
+  numericPrecisionRadix: /* nullability unknown */ Option[Int],
+  numericScale: /* nullability unknown */ Option[Int],
+  startValue: /* nullability unknown */ Option[String],
+  minimumValue: /* nullability unknown */ Option[String],
+  maximumValue: /* nullability unknown */ Option[String],
+  increment: /* nullability unknown */ Option[String],
+  cycleOption: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object SequencesViewRow {
-  implicit lazy val decoder: Decoder[SequencesViewRow] = Decoder.forProduct12[SequencesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CardinalNumber, CardinalNumber, CardinalNumber, CharacterData, CharacterData, CharacterData, CharacterData, YesOrNo]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(SequencesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, CardinalNumber.decoder, CardinalNumber.decoder, CardinalNumber.decoder, CharacterData.decoder, CharacterData.decoder, CharacterData.decoder, CharacterData.decoder, YesOrNo.decoder)
-  implicit lazy val encoder: Encoder[SequencesViewRow] = Encoder.forProduct12[SequencesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CardinalNumber, CardinalNumber, CardinalNumber, CharacterData, CharacterData, CharacterData, CharacterData, YesOrNo]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(x => (x.sequenceCatalog, x.sequenceSchema, x.sequenceName, x.dataType, x.numericPrecision, x.numericPrecisionRadix, x.numericScale, x.startValue, x.minimumValue, x.maximumValue, x.increment, x.cycleOption))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, CardinalNumber.encoder, CardinalNumber.encoder, CardinalNumber.encoder, CharacterData.encoder, CharacterData.encoder, CharacterData.encoder, CharacterData.encoder, YesOrNo.encoder)
+  implicit lazy val decoder: Decoder[SequencesViewRow] = Decoder.forProduct12[SequencesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String]]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(SequencesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[SequencesViewRow] = Encoder.forProduct12[SequencesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String]]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(x => (x.sequenceCatalog, x.sequenceSchema, x.sequenceName, x.dataType, x.numericPrecision, x.numericPrecisionRadix, x.numericScale, x.startValue, x.minimumValue, x.maximumValue, x.increment, x.cycleOption))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[SequencesViewRow] = new Read[SequencesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (CardinalNumber.get, Nullability.NoNulls),
-      (CardinalNumber.get, Nullability.NoNulls),
-      (CardinalNumber.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SequencesViewRow(
-      sequenceCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      sequenceSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      sequenceName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      dataType = CharacterData.get.unsafeGetNonNullable(rs, i + 3),
-      numericPrecision = CardinalNumber.get.unsafeGetNonNullable(rs, i + 4),
-      numericPrecisionRadix = CardinalNumber.get.unsafeGetNonNullable(rs, i + 5),
-      numericScale = CardinalNumber.get.unsafeGetNonNullable(rs, i + 6),
-      startValue = CharacterData.get.unsafeGetNonNullable(rs, i + 7),
-      minimumValue = CharacterData.get.unsafeGetNonNullable(rs, i + 8),
-      maximumValue = CharacterData.get.unsafeGetNonNullable(rs, i + 9),
-      increment = CharacterData.get.unsafeGetNonNullable(rs, i + 10),
-      cycleOption = YesOrNo.get.unsafeGetNonNullable(rs, i + 11)
+      sequenceCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      sequenceSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      sequenceName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      dataType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      numericPrecision = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      numericPrecisionRadix = Meta.IntMeta.get.unsafeGetNullable(rs, i + 5),
+      numericScale = Meta.IntMeta.get.unsafeGetNullable(rs, i + 6),
+      startValue = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+      minimumValue = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      maximumValue = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      increment = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
+      cycleOption = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11)
     )
   )
 }

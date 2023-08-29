@@ -17,7 +17,8 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ThaViewRow(
-  id: Int,
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]] */
+  id: TransactionhistoryarchiveId,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]] */
   transactionid: TransactionhistoryarchiveId,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.productid]] */
@@ -39,11 +40,11 @@ case class ThaViewRow(
 )
 
 object ThaViewRow {
-  implicit lazy val decoder: Decoder[ThaViewRow] = Decoder.forProduct10[ThaViewRow, Int, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(ThaViewRow.apply)(Decoder.decodeInt, TransactionhistoryarchiveId.decoder, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[ThaViewRow] = Encoder.forProduct10[ThaViewRow, Int, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.id, x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))(Encoder.encodeInt, TransactionhistoryarchiveId.encoder, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[ThaViewRow] = Decoder.forProduct10[ThaViewRow, TransactionhistoryarchiveId, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(ThaViewRow.apply)(TransactionhistoryarchiveId.decoder, TransactionhistoryarchiveId.decoder, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ThaViewRow] = Encoder.forProduct10[ThaViewRow, TransactionhistoryarchiveId, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.id, x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))(TransactionhistoryarchiveId.encoder, TransactionhistoryarchiveId.encoder, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[ThaViewRow] = new Read[ThaViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TransactionhistoryarchiveId.get, Nullability.NoNulls),
       (TransactionhistoryarchiveId.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
@@ -55,7 +56,7 @@ object ThaViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ThaViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = TransactionhistoryarchiveId.get.unsafeGetNonNullable(rs, i + 0),
       transactionid = TransactionhistoryarchiveId.get.unsafeGetNonNullable(rs, i + 1),
       productid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
       referenceorderid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),

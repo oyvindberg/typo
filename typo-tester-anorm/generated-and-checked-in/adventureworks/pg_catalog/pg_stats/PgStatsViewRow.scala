@@ -21,20 +21,27 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatsViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[pg_attribute.PgAttributeRow.attname]] */
   attname: String,
+  /** Points to [[pg_statistic.PgStatisticRow.stainherit]] */
   inherited: Boolean,
+  /** Points to [[pg_statistic.PgStatisticRow.stanullfrac]] */
   nullFrac: Float,
+  /** Points to [[pg_statistic.PgStatisticRow.stawidth]] */
   avgWidth: Int,
+  /** Points to [[pg_statistic.PgStatisticRow.stadistinct]] */
   nDistinct: Float,
-  mostCommonVals: TypoAnyArray,
-  mostCommonFreqs: Array[Float],
-  histogramBounds: TypoAnyArray,
-  correlation: Float,
-  mostCommonElems: TypoAnyArray,
-  mostCommonElemFreqs: Array[Float],
-  elemCountHistogram: Array[Float]
+  mostCommonVals: /* nullability unknown */ Option[TypoAnyArray],
+  mostCommonFreqs: /* nullability unknown */ Option[Array[Float]],
+  histogramBounds: /* nullability unknown */ Option[TypoAnyArray],
+  correlation: /* nullability unknown */ Option[Float],
+  mostCommonElems: /* nullability unknown */ Option[TypoAnyArray],
+  mostCommonElemFreqs: /* nullability unknown */ Option[Array[Float]],
+  elemCountHistogram: /* nullability unknown */ Option[Array[Float]]
 )
 
 object PgStatsViewRow {
@@ -48,13 +55,13 @@ object PgStatsViewRow {
           nullFrac = json.\("null_frac").as(Reads.FloatReads),
           avgWidth = json.\("avg_width").as(Reads.IntReads),
           nDistinct = json.\("n_distinct").as(Reads.FloatReads),
-          mostCommonVals = json.\("most_common_vals").as(TypoAnyArray.reads),
-          mostCommonFreqs = json.\("most_common_freqs").as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly)),
-          histogramBounds = json.\("histogram_bounds").as(TypoAnyArray.reads),
-          correlation = json.\("correlation").as(Reads.FloatReads),
-          mostCommonElems = json.\("most_common_elems").as(TypoAnyArray.reads),
-          mostCommonElemFreqs = json.\("most_common_elem_freqs").as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly)),
-          elemCountHistogram = json.\("elem_count_histogram").as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly))
+          mostCommonVals = json.\("most_common_vals").toOption.map(_.as(TypoAnyArray.reads)),
+          mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly))),
+          histogramBounds = json.\("histogram_bounds").toOption.map(_.as(TypoAnyArray.reads)),
+          correlation = json.\("correlation").toOption.map(_.as(Reads.FloatReads)),
+          mostCommonElems = json.\("most_common_elems").toOption.map(_.as(TypoAnyArray.reads)),
+          mostCommonElemFreqs = json.\("most_common_elem_freqs").toOption.map(_.as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly))),
+          elemCountHistogram = json.\("elem_count_histogram").toOption.map(_.as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly)))
         )
       )
     ),
@@ -69,13 +76,13 @@ object PgStatsViewRow {
         nullFrac = row(idx + 4)(Column.columnToFloat),
         avgWidth = row(idx + 5)(Column.columnToInt),
         nDistinct = row(idx + 6)(Column.columnToFloat),
-        mostCommonVals = row(idx + 7)(TypoAnyArray.column),
-        mostCommonFreqs = row(idx + 8)(Column.columnToArray[Float](Column.columnToFloat, implicitly)),
-        histogramBounds = row(idx + 9)(TypoAnyArray.column),
-        correlation = row(idx + 10)(Column.columnToFloat),
-        mostCommonElems = row(idx + 11)(TypoAnyArray.column),
-        mostCommonElemFreqs = row(idx + 12)(Column.columnToArray[Float](Column.columnToFloat, implicitly)),
-        elemCountHistogram = row(idx + 13)(Column.columnToArray[Float](Column.columnToFloat, implicitly))
+        mostCommonVals = row(idx + 7)(Column.columnToOption(TypoAnyArray.column)),
+        mostCommonFreqs = row(idx + 8)(Column.columnToOption(Column.columnToArray[Float](Column.columnToFloat, implicitly))),
+        histogramBounds = row(idx + 9)(Column.columnToOption(TypoAnyArray.column)),
+        correlation = row(idx + 10)(Column.columnToOption(Column.columnToFloat)),
+        mostCommonElems = row(idx + 11)(Column.columnToOption(TypoAnyArray.column)),
+        mostCommonElemFreqs = row(idx + 12)(Column.columnToOption(Column.columnToArray[Float](Column.columnToFloat, implicitly))),
+        elemCountHistogram = row(idx + 13)(Column.columnToOption(Column.columnToArray[Float](Column.columnToFloat, implicitly)))
       )
     )
   }
@@ -88,13 +95,13 @@ object PgStatsViewRow {
       "null_frac" -> Writes.FloatWrites.writes(o.nullFrac),
       "avg_width" -> Writes.IntWrites.writes(o.avgWidth),
       "n_distinct" -> Writes.FloatWrites.writes(o.nDistinct),
-      "most_common_vals" -> TypoAnyArray.writes.writes(o.mostCommonVals),
-      "most_common_freqs" -> Writes.arrayWrites[Float](implicitly, Writes.FloatWrites).writes(o.mostCommonFreqs),
-      "histogram_bounds" -> TypoAnyArray.writes.writes(o.histogramBounds),
-      "correlation" -> Writes.FloatWrites.writes(o.correlation),
-      "most_common_elems" -> TypoAnyArray.writes.writes(o.mostCommonElems),
-      "most_common_elem_freqs" -> Writes.arrayWrites[Float](implicitly, Writes.FloatWrites).writes(o.mostCommonElemFreqs),
-      "elem_count_histogram" -> Writes.arrayWrites[Float](implicitly, Writes.FloatWrites).writes(o.elemCountHistogram)
+      "most_common_vals" -> Writes.OptionWrites(TypoAnyArray.writes).writes(o.mostCommonVals),
+      "most_common_freqs" -> Writes.OptionWrites(Writes.arrayWrites[Float](implicitly, Writes.FloatWrites)).writes(o.mostCommonFreqs),
+      "histogram_bounds" -> Writes.OptionWrites(TypoAnyArray.writes).writes(o.histogramBounds),
+      "correlation" -> Writes.OptionWrites(Writes.FloatWrites).writes(o.correlation),
+      "most_common_elems" -> Writes.OptionWrites(TypoAnyArray.writes).writes(o.mostCommonElems),
+      "most_common_elem_freqs" -> Writes.OptionWrites(Writes.arrayWrites[Float](implicitly, Writes.FloatWrites)).writes(o.mostCommonElemFreqs),
+      "elem_count_histogram" -> Writes.OptionWrites(Writes.arrayWrites[Float](implicitly, Writes.FloatWrites)).writes(o.elemCountHistogram)
     ))
   )
 }

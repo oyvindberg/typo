@@ -7,26 +7,26 @@ package adventureworks
 package information_schema
 package information_schema_catalog_name
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class InformationSchemaCatalogNameViewRow(
-  catalogName: SqlIdentifier
+  catalogName: /* nullability unknown */ Option[String]
 )
 
 object InformationSchemaCatalogNameViewRow {
-  implicit lazy val decoder: Decoder[InformationSchemaCatalogNameViewRow] = Decoder.forProduct1[InformationSchemaCatalogNameViewRow, SqlIdentifier]("catalog_name")(InformationSchemaCatalogNameViewRow.apply)(SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[InformationSchemaCatalogNameViewRow] = Encoder.forProduct1[InformationSchemaCatalogNameViewRow, SqlIdentifier]("catalog_name")(x => (x.catalogName))(SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[InformationSchemaCatalogNameViewRow] = Decoder.forProduct1[InformationSchemaCatalogNameViewRow, /* nullability unknown */ Option[String]]("catalog_name")(InformationSchemaCatalogNameViewRow.apply)(Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[InformationSchemaCatalogNameViewRow] = Encoder.forProduct1[InformationSchemaCatalogNameViewRow, /* nullability unknown */ Option[String]]("catalog_name")(x => (x.catalogName))(Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[InformationSchemaCatalogNameViewRow] = new Read[InformationSchemaCatalogNameViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => InformationSchemaCatalogNameViewRow(
-      catalogName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0)
+      catalogName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0)
     )
   )
 }

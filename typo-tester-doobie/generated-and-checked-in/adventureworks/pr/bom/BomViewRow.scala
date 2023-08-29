@@ -19,17 +19,18 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class BomViewRow(
-  id: Int,
+  /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
+  id: BillofmaterialsId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
   billofmaterialsid: BillofmaterialsId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.productassemblyid]] */
-  productassemblyid: ProductId,
+  productassemblyid: Option[ProductId],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.componentid]] */
   componentid: ProductId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.startdate]] */
   startdate: TypoLocalDateTime,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.enddate]] */
-  enddate: TypoLocalDateTime,
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.bomlevel]] */
@@ -41,28 +42,28 @@ case class BomViewRow(
 )
 
 object BomViewRow {
-  implicit lazy val decoder: Decoder[BomViewRow] = Decoder.forProduct10[BomViewRow, Int, BillofmaterialsId, ProductId, ProductId, TypoLocalDateTime, TypoLocalDateTime, UnitmeasureId, Int, BigDecimal, TypoLocalDateTime]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BomViewRow.apply)(Decoder.decodeInt, BillofmaterialsId.decoder, ProductId.decoder, ProductId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, UnitmeasureId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[BomViewRow] = Encoder.forProduct10[BomViewRow, Int, BillofmaterialsId, ProductId, ProductId, TypoLocalDateTime, TypoLocalDateTime, UnitmeasureId, Int, BigDecimal, TypoLocalDateTime]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.id, x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(Encoder.encodeInt, BillofmaterialsId.encoder, ProductId.encoder, ProductId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, UnitmeasureId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[BomViewRow] = Decoder.forProduct10[BomViewRow, BillofmaterialsId, BillofmaterialsId, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, Int, BigDecimal, TypoLocalDateTime]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BomViewRow.apply)(BillofmaterialsId.decoder, BillofmaterialsId.decoder, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BomViewRow] = Encoder.forProduct10[BomViewRow, BillofmaterialsId, BillofmaterialsId, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, Int, BigDecimal, TypoLocalDateTime]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.id, x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(BillofmaterialsId.encoder, BillofmaterialsId.encoder, Encoder.encodeOption(ProductId.encoder), ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BomViewRow] = new Read[BomViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
       (BillofmaterialsId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
+      (BillofmaterialsId.get, Nullability.NoNulls),
+      (ProductId.get, Nullability.Nullable),
       (ProductId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.Nullable),
       (UnitmeasureId.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BomViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = BillofmaterialsId.get.unsafeGetNonNullable(rs, i + 0),
       billofmaterialsid = BillofmaterialsId.get.unsafeGetNonNullable(rs, i + 1),
-      productassemblyid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
+      productassemblyid = ProductId.get.unsafeGetNullable(rs, i + 2),
       componentid = ProductId.get.unsafeGetNonNullable(rs, i + 3),
       startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      enddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
+      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
       unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 6),
       bomlevel = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
       perassemblyqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),

@@ -2,7 +2,7 @@
 // This software is licensed under the MIT License (MIT).
 // For more information see LICENSE or https://opensource.org/licenses/MIT
 
-package typo.internal.sqlfiles
+package typo.internal.analysis
 
 import java.sql.Types
 

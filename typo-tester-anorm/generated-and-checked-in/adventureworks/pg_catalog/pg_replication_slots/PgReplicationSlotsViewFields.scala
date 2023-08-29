@@ -8,25 +8,24 @@ package pg_catalog
 package pg_replication_slots
 
 import adventureworks.customtypes.TypoXid
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgReplicationSlotsViewFields[Row] {
-  val slotName: Field[String, Row]
-  val plugin: Field[String, Row]
-  val slotType: Field[String, Row]
-  val datoid: Field[/* oid */ Long, Row]
+  val slotName: OptField[String, Row]
+  val plugin: OptField[String, Row]
+  val slotType: OptField[String, Row]
+  val datoid: OptField[/* oid */ Long, Row]
   val database: OptField[String, Row]
-  val temporary: Field[Boolean, Row]
-  val active: Field[Boolean, Row]
-  val activePid: Field[Int, Row]
-  val xmin: Field[TypoXid, Row]
-  val catalogXmin: Field[TypoXid, Row]
-  val restartLsn: Field[/* pg_lsn */ Long, Row]
-  val confirmedFlushLsn: Field[/* pg_lsn */ Long, Row]
-  val walStatus: Field[String, Row]
-  val safeWalSize: Field[Long, Row]
-  val twoPhase: Field[Boolean, Row]
+  val temporary: OptField[Boolean, Row]
+  val active: OptField[Boolean, Row]
+  val activePid: OptField[Int, Row]
+  val xmin: OptField[TypoXid, Row]
+  val catalogXmin: OptField[TypoXid, Row]
+  val restartLsn: OptField[/* pg_lsn */ Long, Row]
+  val confirmedFlushLsn: OptField[/* pg_lsn */ Long, Row]
+  val walStatus: OptField[String, Row]
+  val safeWalSize: OptField[Long, Row]
+  val twoPhase: OptField[Boolean, Row]
 }
 object PgReplicationSlotsViewFields extends PgReplicationSlotsViewStructure[PgReplicationSlotsViewRow](None, identity, (_, x) => x)
 

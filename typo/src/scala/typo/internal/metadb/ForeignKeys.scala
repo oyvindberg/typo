@@ -2,7 +2,6 @@ package typo
 package internal
 package metadb
 
-import typo.generated.information_schema.CharacterData
 import typo.generated.information_schema.key_column_usage.KeyColumnUsageViewRow
 import typo.generated.information_schema.referential_constraints.ReferentialConstraintsViewRow
 import typo.generated.information_schema.table_constraints.TableConstraintsViewRow
@@ -24,7 +23,7 @@ object ForeignKeys {
 
       kcus
         .sortBy(_.ordinalPosition)
-        .map(kcu => db.ColName(kcu.columnName.get.value))
+        .map(kcu => db.ColName(kcu.columnName.get))
     }
 
     def getReferredTable(fk: TableConstraintsViewRow): Option[db.RelationName] = {
@@ -42,7 +41,7 @@ object ForeignKeys {
           }
         }
         .map { tc =>
-          db.RelationName(tc.tableSchema.map(_.value), tc.tableName.get.value)
+          db.RelationName(tc.tableSchema, tc.tableName.get)
         }
     }
 
@@ -61,19 +60,19 @@ object ForeignKeys {
               kcu.constraintName == rc.uniqueConstraintName
             }
             .sortBy(_.ordinalPosition)
-            .map(kcu => db.ColName(kcu.columnName.get.value))
+            .map(kcu => db.ColName(kcu.columnName.get))
         }
     }
 
     tableConstraints
-      .filter(_.constraintType.contains(CharacterData("FOREIGN KEY")))
+      .filter(_.constraintType.contains("FOREIGN KEY"))
       .map { fk =>
         (
-          db.RelationName(fk.tableSchema.map(_.value), fk.tableName.get.value),
+          db.RelationName(fk.tableSchema, fk.tableName.get),
           getReferringColumns(fk),
           getReferredTable(fk),
           getReferredColumns(fk),
-          db.RelationName(fk.constraintSchema.map(_.value), fk.constraintName.get.value)
+          db.RelationName(fk.constraintSchema, fk.constraintName.get)
         )
       }
       .collect { case (tableName, referringColumns, Some(referredTable), referredColumns, constraintName) =>

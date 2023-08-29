@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_statio_all_sequences
 
+import adventureworks.pg_catalog.pg_class.PgClassId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -20,22 +21,25 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatioAllSequencesViewRow(
-  relid: /* oid */ Long,
+  /** Points to [[pg_class.PgClassRow.oid]] */
+  relid: PgClassId,
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   relname: String,
-  blksRead: Long,
-  blksHit: Long
+  blksRead: /* nullability unknown */ Option[Long],
+  blksHit: /* nullability unknown */ Option[Long]
 )
 
 object PgStatioAllSequencesViewRow {
   implicit lazy val reads: Reads[PgStatioAllSequencesViewRow] = Reads[PgStatioAllSequencesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioAllSequencesViewRow(
-          relid = json.\("relid").as(Reads.LongReads),
+          relid = json.\("relid").as(PgClassId.reads),
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
           relname = json.\("relname").as(Reads.StringReads),
-          blksRead = json.\("blks_read").as(Reads.LongReads),
-          blksHit = json.\("blks_hit").as(Reads.LongReads)
+          blksRead = json.\("blks_read").toOption.map(_.as(Reads.LongReads)),
+          blksHit = json.\("blks_hit").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -43,21 +47,21 @@ object PgStatioAllSequencesViewRow {
   def rowParser(idx: Int): RowParser[PgStatioAllSequencesViewRow] = RowParser[PgStatioAllSequencesViewRow] { row =>
     Success(
       PgStatioAllSequencesViewRow(
-        relid = row(idx + 0)(Column.columnToLong),
+        relid = row(idx + 0)(PgClassId.column),
         schemaname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
         relname = row(idx + 2)(Column.columnToString),
-        blksRead = row(idx + 3)(Column.columnToLong),
-        blksHit = row(idx + 4)(Column.columnToLong)
+        blksRead = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        blksHit = row(idx + 4)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatioAllSequencesViewRow] = OWrites[PgStatioAllSequencesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Writes.LongWrites.writes(o.relid),
+      "relid" -> PgClassId.writes.writes(o.relid),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "relname" -> Writes.StringWrites.writes(o.relname),
-      "blks_read" -> Writes.LongWrites.writes(o.blksRead),
-      "blks_hit" -> Writes.LongWrites.writes(o.blksHit)
+      "blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksRead),
+      "blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksHit)
     ))
   )
 }

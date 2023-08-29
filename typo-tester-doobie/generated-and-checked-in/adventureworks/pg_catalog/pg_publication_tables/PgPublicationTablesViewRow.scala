@@ -15,8 +15,11 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgPublicationTablesViewRow(
+  /** Points to [[pg_publication.PgPublicationRow.pubname]] */
   pubname: String,
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[pg_class.PgClassRow.relname]] */
   tablename: String
 )
 

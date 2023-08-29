@@ -7,13 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_replication_origin_status
 
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgReplicationOriginStatusViewFields[Row] {
-  val localId: Field[/* oid */ Long, Row]
-  val externalId: Field[String, Row]
-  val remoteLsn: Field[/* pg_lsn */ Long, Row]
-  val localLsn: Field[/* pg_lsn */ Long, Row]
+  val localId: OptField[/* oid */ Long, Row]
+  val externalId: OptField[String, Row]
+  val remoteLsn: OptField[/* pg_lsn */ Long, Row]
+  val localLsn: OptField[/* pg_lsn */ Long, Row]
 }
 object PgReplicationOriginStatusViewFields extends PgReplicationOriginStatusViewStructure[PgReplicationOriginStatusViewRow](None, identity, (_, x) => x)
 

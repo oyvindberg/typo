@@ -7,21 +7,22 @@ package adventureworks
 package pg_catalog
 package pg_stat_xact_all_tables
 
+import adventureworks.pg_catalog.pg_class.PgClassId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatXactAllTablesViewFields[Row] {
-  val relid: Field[/* oid */ Long, Row]
+  val relid: Field[PgClassId, Row]
   val schemaname: OptField[String, Row]
   val relname: Field[String, Row]
-  val seqScan: Field[Long, Row]
-  val seqTupRead: Field[Long, Row]
-  val idxScan: Field[Long, Row]
-  val idxTupFetch: Field[Long, Row]
-  val nTupIns: Field[Long, Row]
-  val nTupUpd: Field[Long, Row]
-  val nTupDel: Field[Long, Row]
-  val nTupHotUpd: Field[Long, Row]
+  val seqScan: OptField[Long, Row]
+  val seqTupRead: OptField[Long, Row]
+  val idxScan: OptField[Long, Row]
+  val idxTupFetch: OptField[Long, Row]
+  val nTupIns: OptField[Long, Row]
+  val nTupUpd: OptField[Long, Row]
+  val nTupDel: OptField[Long, Row]
+  val nTupHotUpd: OptField[Long, Row]
 }
 object PgStatXactAllTablesViewFields extends PgStatXactAllTablesViewStructure[PgStatXactAllTablesViewRow](None, identity, (_, x) => x)
 

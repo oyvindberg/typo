@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package foreign_table_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,29 +15,30 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ForeignTableOptionsViewRow(
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableCatalog]] */
-  foreignTableCatalog: SqlIdentifier,
+  foreignTableCatalog: Option[/* nullability unknown */ String],
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableSchema]] */
-  foreignTableSchema: SqlIdentifier,
+  foreignTableSchema: Option[/* nullability unknown */ String],
   /** Points to [[`_pg_foreign_tables`.PgForeignTablesViewRow.foreignTableName]] */
-  foreignTableName: SqlIdentifier,
-  optionName: SqlIdentifier,
-  optionValue: CharacterData
+  foreignTableName: Option[/* nullability unknown */ String],
+  optionName: /* nullability unknown */ Option[String],
+  optionValue: /* nullability unknown */ Option[String]
 )
 
 object ForeignTableOptionsViewRow {
   implicit lazy val reads: Reads[ForeignTableOptionsViewRow] = Reads[ForeignTableOptionsViewRow](json => JsResult.fromTry(
       Try(
         ForeignTableOptionsViewRow(
-          foreignTableCatalog = json.\("foreign_table_catalog").as(SqlIdentifier.reads),
-          foreignTableSchema = json.\("foreign_table_schema").as(SqlIdentifier.reads),
-          foreignTableName = json.\("foreign_table_name").as(SqlIdentifier.reads),
-          optionName = json.\("option_name").as(SqlIdentifier.reads),
-          optionValue = json.\("option_value").as(CharacterData.reads)
+          foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as(Reads.StringReads)),
+          foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as(Reads.StringReads)),
+          foreignTableName = json.\("foreign_table_name").toOption.map(_.as(Reads.StringReads)),
+          optionName = json.\("option_name").toOption.map(_.as(Reads.StringReads)),
+          optionValue = json.\("option_value").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -46,21 +46,21 @@ object ForeignTableOptionsViewRow {
   def rowParser(idx: Int): RowParser[ForeignTableOptionsViewRow] = RowParser[ForeignTableOptionsViewRow] { row =>
     Success(
       ForeignTableOptionsViewRow(
-        foreignTableCatalog = row(idx + 0)(SqlIdentifier.column),
-        foreignTableSchema = row(idx + 1)(SqlIdentifier.column),
-        foreignTableName = row(idx + 2)(SqlIdentifier.column),
-        optionName = row(idx + 3)(SqlIdentifier.column),
-        optionValue = row(idx + 4)(CharacterData.column)
+        foreignTableCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        foreignTableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        foreignTableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        optionName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        optionValue = row(idx + 4)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ForeignTableOptionsViewRow] = OWrites[ForeignTableOptionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_table_catalog" -> SqlIdentifier.writes.writes(o.foreignTableCatalog),
-      "foreign_table_schema" -> SqlIdentifier.writes.writes(o.foreignTableSchema),
-      "foreign_table_name" -> SqlIdentifier.writes.writes(o.foreignTableName),
-      "option_name" -> SqlIdentifier.writes.writes(o.optionName),
-      "option_value" -> CharacterData.writes.writes(o.optionValue)
+      "foreign_table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignTableCatalog),
+      "foreign_table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignTableSchema),
+      "foreign_table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignTableName),
+      "option_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.optionName),
+      "option_value" -> Writes.OptionWrites(Writes.StringWrites).writes(o.optionValue)
     ))
   )
 }

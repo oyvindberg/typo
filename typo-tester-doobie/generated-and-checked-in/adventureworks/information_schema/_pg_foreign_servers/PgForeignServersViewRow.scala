@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package `_pg_foreign_servers`
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
+import adventureworks.pg_catalog.pg_foreign_server.PgForeignServerId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -17,42 +16,44 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgForeignServersViewRow(
-  oid: /* oid */ Long,
-  srvoptions: Array[String],
-  foreignServerCatalog: SqlIdentifier,
-  foreignServerName: SqlIdentifier,
-  foreignDataWrapperCatalog: SqlIdentifier,
-  foreignDataWrapperName: SqlIdentifier,
-  foreignServerType: CharacterData,
-  foreignServerVersion: CharacterData,
-  authorizationIdentifier: SqlIdentifier
+  /** Points to [[pg_catalog.pg_foreign_server.PgForeignServerRow.oid]] */
+  oid: PgForeignServerId,
+  /** Points to [[pg_catalog.pg_foreign_server.PgForeignServerRow.srvoptions]] */
+  srvoptions: Option[Array[String]],
+  foreignServerCatalog: /* nullability unknown */ Option[String],
+  foreignServerName: /* nullability unknown */ Option[String],
+  foreignDataWrapperCatalog: /* nullability unknown */ Option[String],
+  foreignDataWrapperName: /* nullability unknown */ Option[String],
+  foreignServerType: /* nullability unknown */ Option[String],
+  foreignServerVersion: /* nullability unknown */ Option[String],
+  authorizationIdentifier: /* nullability unknown */ Option[String]
 )
 
 object PgForeignServersViewRow {
-  implicit lazy val decoder: Decoder[PgForeignServersViewRow] = Decoder.forProduct9[PgForeignServersViewRow, /* oid */ Long, Array[String], SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CharacterData, SqlIdentifier]("oid", "srvoptions", "foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(PgForeignServersViewRow.apply)(Decoder.decodeLong, Decoder.decodeArray[String](Decoder.decodeString, implicitly), SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, CharacterData.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[PgForeignServersViewRow] = Encoder.forProduct9[PgForeignServersViewRow, /* oid */ Long, Array[String], SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, CharacterData, SqlIdentifier]("oid", "srvoptions", "foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(x => (x.oid, x.srvoptions, x.foreignServerCatalog, x.foreignServerName, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.foreignServerType, x.foreignServerVersion, x.authorizationIdentifier))(Encoder.encodeLong, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, CharacterData.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[PgForeignServersViewRow] = Decoder.forProduct9[PgForeignServersViewRow, PgForeignServerId, Option[Array[String]], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("oid", "srvoptions", "foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(PgForeignServersViewRow.apply)(PgForeignServerId.decoder, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgForeignServersViewRow] = Encoder.forProduct9[PgForeignServersViewRow, PgForeignServerId, Option[Array[String]], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("oid", "srvoptions", "foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(x => (x.oid, x.srvoptions, x.foreignServerCatalog, x.foreignServerName, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.foreignServerType, x.foreignServerVersion, x.authorizationIdentifier))(PgForeignServerId.encoder, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgForeignServersViewRow] = new Read[PgForeignServersViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (PgForeignServerId.get, Nullability.NoNulls),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgForeignServersViewRow(
-      oid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
-      srvoptions = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 1),
-      foreignServerCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      foreignServerName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      foreignServerType = CharacterData.get.unsafeGetNonNullable(rs, i + 6),
-      foreignServerVersion = CharacterData.get.unsafeGetNonNullable(rs, i + 7),
-      authorizationIdentifier = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 8)
+      oid = PgForeignServerId.get.unsafeGetNonNullable(rs, i + 0),
+      srvoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 1),
+      foreignServerCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      foreignServerName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      foreignDataWrapperCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      foreignDataWrapperName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      foreignServerType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      foreignServerVersion = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+      authorizationIdentifier = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

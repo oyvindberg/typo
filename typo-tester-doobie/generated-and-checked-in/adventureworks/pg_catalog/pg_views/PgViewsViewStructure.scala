@@ -16,10 +16,10 @@ class PgViewsViewStructure[Row](val prefix: Option[String], val extract: Row => 
   extends Relation[PgViewsViewFields, PgViewsViewRow, Row]
     with PgViewsViewFields[Row] { outer =>
 
-  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val viewname = new Field[String, Row](prefix, "viewname", None, Some("name"))(x => extract(x).viewname, (row, value) => merge(row, extract(row).copy(viewname = value)))
-  override val viewowner = new Field[String, Row](prefix, "viewowner", None, Some("name"))(x => extract(x).viewowner, (row, value) => merge(row, extract(row).copy(viewowner = value)))
-  override val definition = new Field[String, Row](prefix, "definition", None, None)(x => extract(x).definition, (row, value) => merge(row, extract(row).copy(definition = value)))
+  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, None)(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
+  override val viewname = new Field[String, Row](prefix, "viewname", None, None)(x => extract(x).viewname, (row, value) => merge(row, extract(row).copy(viewname = value)))
+  override val viewowner = new OptField[String, Row](prefix, "viewowner", None, None)(x => extract(x).viewowner, (row, value) => merge(row, extract(row).copy(viewowner = value)))
+  override val definition = new OptField[String, Row](prefix, "definition", None, None)(x => extract(x).definition, (row, value) => merge(row, extract(row).copy(definition = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](schemaname, viewname, viewowner, definition)

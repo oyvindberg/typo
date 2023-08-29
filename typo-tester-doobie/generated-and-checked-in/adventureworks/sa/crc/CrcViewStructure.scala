@@ -19,8 +19,8 @@ class CrcViewStructure[Row](val prefix: Option[String], val extract: Row => CrcV
     with CrcViewFields[Row] { outer =>
 
   override val countryregioncode = new Field[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
-  override val currencycode = new Field[CurrencyId, Row](prefix, "currencycode", None, Some("bpchar"))(x => extract(x).currencycode, (row, value) => merge(row, extract(row).copy(currencycode = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val currencycode = new Field[CurrencyId, Row](prefix, "currencycode", None, None)(x => extract(x).currencycode, (row, value) => merge(row, extract(row).copy(currencycode = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](countryregioncode, currencycode, modifieddate)

@@ -7,22 +7,19 @@ package adventureworks
 package information_schema
 package table_constraints
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import typo.dsl.SqlExpr.OptField
 
 trait TableConstraintsViewFields[Row] {
-  val constraintCatalog: OptField[SqlIdentifier, Row]
-  val constraintSchema: OptField[SqlIdentifier, Row]
-  val constraintName: OptField[SqlIdentifier, Row]
-  val tableCatalog: OptField[SqlIdentifier, Row]
-  val tableSchema: OptField[SqlIdentifier, Row]
-  val tableName: OptField[SqlIdentifier, Row]
-  val constraintType: OptField[CharacterData, Row]
-  val isDeferrable: OptField[YesOrNo, Row]
-  val initiallyDeferred: OptField[YesOrNo, Row]
-  val enforced: OptField[YesOrNo, Row]
+  val constraintCatalog: OptField[String, Row]
+  val constraintSchema: OptField[String, Row]
+  val constraintName: OptField[String, Row]
+  val tableCatalog: OptField[String, Row]
+  val tableSchema: OptField[String, Row]
+  val tableName: OptField[String, Row]
+  val constraintType: OptField[String, Row]
+  val isDeferrable: OptField[/* max 3 chars */ String, Row]
+  val initiallyDeferred: OptField[/* max 3 chars */ String, Row]
+  val enforced: OptField[/* max 3 chars */ String, Row]
 }
 object TableConstraintsViewFields extends TableConstraintsViewStructure[TableConstraintsViewRow](None, identity, (_, x) => x)
 

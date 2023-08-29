@@ -7,9 +7,6 @@ package adventureworks
 package information_schema
 package table_constraints
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -18,16 +15,16 @@ class TableConstraintsViewStructure[Row](val prefix: Option[String], val extract
   extends Relation[TableConstraintsViewFields, TableConstraintsViewRow, Row]
     with TableConstraintsViewFields[Row] { outer =>
 
-  override val constraintCatalog = new OptField[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("name"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
-  override val constraintSchema = new OptField[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("name"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
-  override val constraintName = new OptField[SqlIdentifier, Row](prefix, "constraint_name", None, Some("name"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
-  override val tableCatalog = new OptField[SqlIdentifier, Row](prefix, "table_catalog", None, Some("name"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
-  override val tableSchema = new OptField[SqlIdentifier, Row](prefix, "table_schema", None, Some("name"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
-  override val tableName = new OptField[SqlIdentifier, Row](prefix, "table_name", None, Some("name"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
-  override val constraintType = new OptField[CharacterData, Row](prefix, "constraint_type", None, Some("varchar"))(x => extract(x).constraintType, (row, value) => merge(row, extract(row).copy(constraintType = value)))
-  override val isDeferrable = new OptField[YesOrNo, Row](prefix, "is_deferrable", None, Some("varchar"))(x => extract(x).isDeferrable, (row, value) => merge(row, extract(row).copy(isDeferrable = value)))
-  override val initiallyDeferred = new OptField[YesOrNo, Row](prefix, "initially_deferred", None, Some("varchar"))(x => extract(x).initiallyDeferred, (row, value) => merge(row, extract(row).copy(initiallyDeferred = value)))
-  override val enforced = new OptField[YesOrNo, Row](prefix, "enforced", None, Some("varchar"))(x => extract(x).enforced, (row, value) => merge(row, extract(row).copy(enforced = value)))
+  override val constraintCatalog = new OptField[String, Row](prefix, "constraint_catalog", None, None)(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
+  override val constraintSchema = new OptField[String, Row](prefix, "constraint_schema", None, None)(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
+  override val constraintName = new OptField[String, Row](prefix, "constraint_name", None, None)(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
+  override val tableCatalog = new OptField[String, Row](prefix, "table_catalog", None, None)(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
+  override val tableSchema = new OptField[String, Row](prefix, "table_schema", None, None)(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
+  override val tableName = new OptField[String, Row](prefix, "table_name", None, None)(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
+  override val constraintType = new OptField[String, Row](prefix, "constraint_type", None, None)(x => extract(x).constraintType, (row, value) => merge(row, extract(row).copy(constraintType = value)))
+  override val isDeferrable = new OptField[/* max 3 chars */ String, Row](prefix, "is_deferrable", None, None)(x => extract(x).isDeferrable, (row, value) => merge(row, extract(row).copy(isDeferrable = value)))
+  override val initiallyDeferred = new OptField[/* max 3 chars */ String, Row](prefix, "initially_deferred", None, None)(x => extract(x).initiallyDeferred, (row, value) => merge(row, extract(row).copy(initiallyDeferred = value)))
+  override val enforced = new OptField[/* max 3 chars */ String, Row](prefix, "enforced", None, None)(x => extract(x).enforced, (row, value) => merge(row, extract(row).copy(enforced = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](constraintCatalog, constraintSchema, constraintName, tableCatalog, tableSchema, tableName, constraintType, isDeferrable, initiallyDeferred, enforced)

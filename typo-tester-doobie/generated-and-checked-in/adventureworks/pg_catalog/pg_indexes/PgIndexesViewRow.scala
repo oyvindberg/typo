@@ -15,30 +15,34 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgIndexesViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[pg_class.PgClassRow.relname]] */
   indexname: String,
+  /** Points to [[pg_tablespace.PgTablespaceRow.spcname]] */
   tablespace: Option[String],
-  indexdef: String
+  indexdef: /* nullability unknown */ Option[String]
 )
 
 object PgIndexesViewRow {
-  implicit lazy val decoder: Decoder[PgIndexesViewRow] = Decoder.forProduct5[PgIndexesViewRow, Option[String], String, String, Option[String], String]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(PgIndexesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString)
-  implicit lazy val encoder: Encoder[PgIndexesViewRow] = Encoder.forProduct5[PgIndexesViewRow, Option[String], String, String, Option[String], String]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(x => (x.schemaname, x.tablename, x.indexname, x.tablespace, x.indexdef))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString)
+  implicit lazy val decoder: Decoder[PgIndexesViewRow] = Decoder.forProduct5[PgIndexesViewRow, Option[String], String, String, Option[String], /* nullability unknown */ Option[String]]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(PgIndexesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgIndexesViewRow] = Encoder.forProduct5[PgIndexesViewRow, Option[String], String, String, Option[String], /* nullability unknown */ Option[String]]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(x => (x.schemaname, x.tablename, x.indexname, x.tablespace, x.indexdef))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgIndexesViewRow] = new Read[PgIndexesViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgIndexesViewRow(
       schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
       tablename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
       indexname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
       tablespace = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      indexdef = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4)
+      indexdef = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

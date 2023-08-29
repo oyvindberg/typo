@@ -13,7 +13,7 @@ import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.SqlExpr.Field
 
 trait PccViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BusinessentityId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val creditcardid: Field[/* user-picked */ CustomCreditcardId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

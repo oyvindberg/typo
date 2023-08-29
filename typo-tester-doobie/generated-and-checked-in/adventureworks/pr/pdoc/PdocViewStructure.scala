@@ -18,9 +18,9 @@ class PdocViewStructure[Row](val prefix: Option[String], val extract: Row => Pdo
   extends Relation[PdocViewFields, PdocViewRow, Row]
     with PdocViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[ProductId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
   override val documentnode = new Field[DocumentId, Row](prefix, "documentnode", None, None)(x => extract(x).documentnode, (row, value) => merge(row, extract(row).copy(documentnode = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

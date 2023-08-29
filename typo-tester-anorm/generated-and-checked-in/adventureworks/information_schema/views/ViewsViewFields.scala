@@ -7,22 +7,19 @@ package adventureworks
 package information_schema
 package views
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ViewsViewFields[Row] {
-  val tableCatalog: Field[SqlIdentifier, Row]
-  val tableSchema: Field[SqlIdentifier, Row]
-  val tableName: Field[SqlIdentifier, Row]
-  val viewDefinition: Field[CharacterData, Row]
-  val checkOption: Field[CharacterData, Row]
-  val isUpdatable: Field[YesOrNo, Row]
-  val isInsertableInto: Field[YesOrNo, Row]
-  val isTriggerUpdatable: Field[YesOrNo, Row]
-  val isTriggerDeletable: Field[YesOrNo, Row]
-  val isTriggerInsertableInto: Field[YesOrNo, Row]
+  val tableCatalog: OptField[String, Row]
+  val tableSchema: OptField[String, Row]
+  val tableName: OptField[String, Row]
+  val viewDefinition: OptField[String, Row]
+  val checkOption: OptField[String, Row]
+  val isUpdatable: OptField[/* max 3 chars */ String, Row]
+  val isInsertableInto: OptField[/* max 3 chars */ String, Row]
+  val isTriggerUpdatable: OptField[/* max 3 chars */ String, Row]
+  val isTriggerDeletable: OptField[/* max 3 chars */ String, Row]
+  val isTriggerInsertableInto: OptField[/* max 3 chars */ String, Row]
 }
 object ViewsViewFields extends ViewsViewStructure[ViewsViewRow](None, identity, (_, x) => x)
 

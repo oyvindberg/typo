@@ -13,7 +13,7 @@ import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 
 trait PntViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[PhonenumbertypeId, Row]
   val phonenumbertypeid: Field[PhonenumbertypeId, Row]
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

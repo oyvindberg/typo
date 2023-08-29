@@ -7,20 +7,17 @@ package adventureworks
 package information_schema
 package usage_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import typo.dsl.SqlExpr.OptField
 
 trait UsagePrivilegesViewFields[Row] {
-  val grantor: OptField[SqlIdentifier, Row]
-  val grantee: OptField[SqlIdentifier, Row]
-  val objectCatalog: OptField[SqlIdentifier, Row]
-  val objectSchema: OptField[SqlIdentifier, Row]
-  val objectName: OptField[SqlIdentifier, Row]
-  val objectType: OptField[CharacterData, Row]
-  val privilegeType: OptField[CharacterData, Row]
-  val isGrantable: OptField[YesOrNo, Row]
+  val grantor: OptField[String, Row]
+  val grantee: OptField[String, Row]
+  val objectCatalog: OptField[String, Row]
+  val objectSchema: OptField[String, Row]
+  val objectName: OptField[String, Row]
+  val objectType: OptField[String, Row]
+  val privilegeType: OptField[String, Row]
+  val isGrantable: OptField[/* max 3 chars */ String, Row]
 }
 object UsagePrivilegesViewFields extends UsagePrivilegesViewStructure[UsagePrivilegesViewRow](None, identity, (_, x) => x)
 

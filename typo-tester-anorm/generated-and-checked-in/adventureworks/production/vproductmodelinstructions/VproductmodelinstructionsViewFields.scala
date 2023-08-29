@@ -8,22 +8,22 @@ package production
 package vproductmodelinstructions
 
 import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait VproductmodelinstructionsViewFields[Row] {
   val productmodelid: Field[ProductmodelId, Row]
   val name: Field[Name, Row]
-  val instructions: Field[TypoXml, Row]
-  val LocationID: Field[Int, Row]
-  val SetupHours: Field[BigDecimal, Row]
-  val MachineHours: Field[BigDecimal, Row]
-  val LaborHours: Field[BigDecimal, Row]
-  val LotSize: Field[Int, Row]
-  val Step: Field[/* max 1024 chars */ String, Row]
+  val instructions: OptField[String, Row]
+  val LocationID: OptField[Int, Row]
+  val SetupHours: OptField[BigDecimal, Row]
+  val MachineHours: OptField[BigDecimal, Row]
+  val LaborHours: OptField[BigDecimal, Row]
+  val LotSize: OptField[Int, Row]
+  val Step: OptField[/* max 1024 chars */ String, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

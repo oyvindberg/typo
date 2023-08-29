@@ -21,18 +21,18 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTimezoneAbbrevsViewRow(
-  abbrev: String,
-  utcOffset: TypoInterval,
-  isDst: Boolean
+  abbrev: /* nullability unknown */ Option[String],
+  utcOffset: /* nullability unknown */ Option[TypoInterval],
+  isDst: /* nullability unknown */ Option[Boolean]
 )
 
 object PgTimezoneAbbrevsViewRow {
   implicit lazy val reads: Reads[PgTimezoneAbbrevsViewRow] = Reads[PgTimezoneAbbrevsViewRow](json => JsResult.fromTry(
       Try(
         PgTimezoneAbbrevsViewRow(
-          abbrev = json.\("abbrev").as(Reads.StringReads),
-          utcOffset = json.\("utc_offset").as(TypoInterval.reads),
-          isDst = json.\("is_dst").as(Reads.BooleanReads)
+          abbrev = json.\("abbrev").toOption.map(_.as(Reads.StringReads)),
+          utcOffset = json.\("utc_offset").toOption.map(_.as(TypoInterval.reads)),
+          isDst = json.\("is_dst").toOption.map(_.as(Reads.BooleanReads))
         )
       )
     ),
@@ -40,17 +40,17 @@ object PgTimezoneAbbrevsViewRow {
   def rowParser(idx: Int): RowParser[PgTimezoneAbbrevsViewRow] = RowParser[PgTimezoneAbbrevsViewRow] { row =>
     Success(
       PgTimezoneAbbrevsViewRow(
-        abbrev = row(idx + 0)(Column.columnToString),
-        utcOffset = row(idx + 1)(TypoInterval.column),
-        isDst = row(idx + 2)(Column.columnToBoolean)
+        abbrev = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        utcOffset = row(idx + 1)(Column.columnToOption(TypoInterval.column)),
+        isDst = row(idx + 2)(Column.columnToOption(Column.columnToBoolean))
       )
     )
   }
   implicit lazy val writes: OWrites[PgTimezoneAbbrevsViewRow] = OWrites[PgTimezoneAbbrevsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "abbrev" -> Writes.StringWrites.writes(o.abbrev),
-      "utc_offset" -> TypoInterval.writes.writes(o.utcOffset),
-      "is_dst" -> Writes.BooleanWrites.writes(o.isDst)
+      "abbrev" -> Writes.OptionWrites(Writes.StringWrites).writes(o.abbrev),
+      "utc_offset" -> Writes.OptionWrites(TypoInterval.writes).writes(o.utcOffset),
+      "is_dst" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isDst)
     ))
   )
 }

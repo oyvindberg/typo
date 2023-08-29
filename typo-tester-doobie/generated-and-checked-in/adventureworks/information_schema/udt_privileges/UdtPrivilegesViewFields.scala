@@ -7,19 +7,16 @@ package adventureworks
 package information_schema
 package udt_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait UdtPrivilegesViewFields[Row] {
-  val grantor: Field[SqlIdentifier, Row]
-  val grantee: Field[SqlIdentifier, Row]
-  val udtCatalog: Field[SqlIdentifier, Row]
-  val udtSchema: Field[SqlIdentifier, Row]
-  val udtName: Field[SqlIdentifier, Row]
-  val privilegeType: Field[CharacterData, Row]
-  val isGrantable: Field[YesOrNo, Row]
+  val grantor: OptField[String, Row]
+  val grantee: OptField[String, Row]
+  val udtCatalog: OptField[String, Row]
+  val udtSchema: OptField[String, Row]
+  val udtName: OptField[String, Row]
+  val privilegeType: OptField[String, Row]
+  val isGrantable: OptField[/* max 3 chars */ String, Row]
 }
 object UdtPrivilegesViewFields extends UdtPrivilegesViewStructure[UdtPrivilegesViewRow](None, identity, (_, x) => x)
 

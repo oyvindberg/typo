@@ -12,13 +12,13 @@ import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class DViewRow(
-  id: Int,
+  /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
+  id: DepartmentId,
   /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
   departmentid: DepartmentId,
   /** Points to [[humanresources.department.DepartmentRow.name]] */
@@ -30,18 +30,18 @@ case class DViewRow(
 )
 
 object DViewRow {
-  implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, Int, DepartmentId, Name, Name, TypoLocalDateTime]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)(Decoder.decodeInt, DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, Int, DepartmentId, Name, Name, TypoLocalDateTime]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))(Encoder.encodeInt, DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, DepartmentId, DepartmentId, Name, Name, TypoLocalDateTime]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)(DepartmentId.decoder, DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, DepartmentId, DepartmentId, Name, Name, TypoLocalDateTime]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))(DepartmentId.encoder, DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[DViewRow] = new Read[DViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (DepartmentId.get, Nullability.NoNulls),
       (DepartmentId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = DepartmentId.get.unsafeGetNonNullable(rs, i + 0),
       departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
       groupname = Name.get.unsafeGetNonNullable(rs, i + 3),

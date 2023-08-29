@@ -12,16 +12,17 @@ import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait AViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[AddressId, Row]
   val addressid: Field[AddressId, Row]
   val addressline1: Field[/* max 60 chars */ String, Row]
-  val addressline2: Field[/* max 60 chars */ String, Row]
+  val addressline2: OptField[/* max 60 chars */ String, Row]
   val city: Field[/* max 30 chars */ String, Row]
   val stateprovinceid: Field[StateprovinceId, Row]
   val postalcode: Field[/* max 15 chars */ String, Row]
-  val spatiallocation: Field[Byte, Row]
+  val spatiallocation: OptField[Byte, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

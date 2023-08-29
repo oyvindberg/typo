@@ -7,49 +7,45 @@ package adventureworks
 package information_schema
 package attributes
 
-import adventureworks.information_schema.CardinalNumber
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class AttributesViewStructure[Row](val prefix: Option[String], val extract: Row => AttributesViewRow, val merge: (Row, AttributesViewRow) => Row)
   extends Relation[AttributesViewFields, AttributesViewRow, Row]
     with AttributesViewFields[Row] { outer =>
 
-  override val udtCatalog = new Field[SqlIdentifier, Row](prefix, "udt_catalog", None, Some("name"))(x => extract(x).udtCatalog, (row, value) => merge(row, extract(row).copy(udtCatalog = value)))
-  override val udtSchema = new Field[SqlIdentifier, Row](prefix, "udt_schema", None, Some("name"))(x => extract(x).udtSchema, (row, value) => merge(row, extract(row).copy(udtSchema = value)))
-  override val udtName = new Field[SqlIdentifier, Row](prefix, "udt_name", None, Some("name"))(x => extract(x).udtName, (row, value) => merge(row, extract(row).copy(udtName = value)))
-  override val attributeName = new Field[SqlIdentifier, Row](prefix, "attribute_name", None, Some("name"))(x => extract(x).attributeName, (row, value) => merge(row, extract(row).copy(attributeName = value)))
-  override val ordinalPosition = new Field[CardinalNumber, Row](prefix, "ordinal_position", None, Some("int4"))(x => extract(x).ordinalPosition, (row, value) => merge(row, extract(row).copy(ordinalPosition = value)))
-  override val attributeDefault = new Field[CharacterData, Row](prefix, "attribute_default", None, Some("varchar"))(x => extract(x).attributeDefault, (row, value) => merge(row, extract(row).copy(attributeDefault = value)))
-  override val isNullable = new Field[YesOrNo, Row](prefix, "is_nullable", None, Some("varchar"))(x => extract(x).isNullable, (row, value) => merge(row, extract(row).copy(isNullable = value)))
-  override val dataType = new Field[CharacterData, Row](prefix, "data_type", None, Some("varchar"))(x => extract(x).dataType, (row, value) => merge(row, extract(row).copy(dataType = value)))
-  override val characterMaximumLength = new Field[CardinalNumber, Row](prefix, "character_maximum_length", None, Some("int4"))(x => extract(x).characterMaximumLength, (row, value) => merge(row, extract(row).copy(characterMaximumLength = value)))
-  override val characterOctetLength = new Field[CardinalNumber, Row](prefix, "character_octet_length", None, Some("int4"))(x => extract(x).characterOctetLength, (row, value) => merge(row, extract(row).copy(characterOctetLength = value)))
-  override val characterSetCatalog = new Field[SqlIdentifier, Row](prefix, "character_set_catalog", None, Some("name"))(x => extract(x).characterSetCatalog, (row, value) => merge(row, extract(row).copy(characterSetCatalog = value)))
-  override val characterSetSchema = new Field[SqlIdentifier, Row](prefix, "character_set_schema", None, Some("name"))(x => extract(x).characterSetSchema, (row, value) => merge(row, extract(row).copy(characterSetSchema = value)))
-  override val characterSetName = new Field[SqlIdentifier, Row](prefix, "character_set_name", None, Some("name"))(x => extract(x).characterSetName, (row, value) => merge(row, extract(row).copy(characterSetName = value)))
-  override val collationCatalog = new Field[SqlIdentifier, Row](prefix, "collation_catalog", None, Some("name"))(x => extract(x).collationCatalog, (row, value) => merge(row, extract(row).copy(collationCatalog = value)))
-  override val collationSchema = new Field[SqlIdentifier, Row](prefix, "collation_schema", None, Some("name"))(x => extract(x).collationSchema, (row, value) => merge(row, extract(row).copy(collationSchema = value)))
-  override val collationName = new Field[SqlIdentifier, Row](prefix, "collation_name", None, Some("name"))(x => extract(x).collationName, (row, value) => merge(row, extract(row).copy(collationName = value)))
-  override val numericPrecision = new Field[CardinalNumber, Row](prefix, "numeric_precision", None, Some("int4"))(x => extract(x).numericPrecision, (row, value) => merge(row, extract(row).copy(numericPrecision = value)))
-  override val numericPrecisionRadix = new Field[CardinalNumber, Row](prefix, "numeric_precision_radix", None, Some("int4"))(x => extract(x).numericPrecisionRadix, (row, value) => merge(row, extract(row).copy(numericPrecisionRadix = value)))
-  override val numericScale = new Field[CardinalNumber, Row](prefix, "numeric_scale", None, Some("int4"))(x => extract(x).numericScale, (row, value) => merge(row, extract(row).copy(numericScale = value)))
-  override val datetimePrecision = new Field[CardinalNumber, Row](prefix, "datetime_precision", None, Some("int4"))(x => extract(x).datetimePrecision, (row, value) => merge(row, extract(row).copy(datetimePrecision = value)))
-  override val intervalType = new Field[CharacterData, Row](prefix, "interval_type", None, Some("varchar"))(x => extract(x).intervalType, (row, value) => merge(row, extract(row).copy(intervalType = value)))
-  override val intervalPrecision = new Field[CardinalNumber, Row](prefix, "interval_precision", None, Some("int4"))(x => extract(x).intervalPrecision, (row, value) => merge(row, extract(row).copy(intervalPrecision = value)))
-  override val attributeUdtCatalog = new Field[SqlIdentifier, Row](prefix, "attribute_udt_catalog", None, Some("name"))(x => extract(x).attributeUdtCatalog, (row, value) => merge(row, extract(row).copy(attributeUdtCatalog = value)))
-  override val attributeUdtSchema = new Field[SqlIdentifier, Row](prefix, "attribute_udt_schema", None, Some("name"))(x => extract(x).attributeUdtSchema, (row, value) => merge(row, extract(row).copy(attributeUdtSchema = value)))
-  override val attributeUdtName = new Field[SqlIdentifier, Row](prefix, "attribute_udt_name", None, Some("name"))(x => extract(x).attributeUdtName, (row, value) => merge(row, extract(row).copy(attributeUdtName = value)))
-  override val scopeCatalog = new Field[SqlIdentifier, Row](prefix, "scope_catalog", None, Some("name"))(x => extract(x).scopeCatalog, (row, value) => merge(row, extract(row).copy(scopeCatalog = value)))
-  override val scopeSchema = new Field[SqlIdentifier, Row](prefix, "scope_schema", None, Some("name"))(x => extract(x).scopeSchema, (row, value) => merge(row, extract(row).copy(scopeSchema = value)))
-  override val scopeName = new Field[SqlIdentifier, Row](prefix, "scope_name", None, Some("name"))(x => extract(x).scopeName, (row, value) => merge(row, extract(row).copy(scopeName = value)))
-  override val maximumCardinality = new Field[CardinalNumber, Row](prefix, "maximum_cardinality", None, Some("int4"))(x => extract(x).maximumCardinality, (row, value) => merge(row, extract(row).copy(maximumCardinality = value)))
-  override val dtdIdentifier = new Field[SqlIdentifier, Row](prefix, "dtd_identifier", None, Some("name"))(x => extract(x).dtdIdentifier, (row, value) => merge(row, extract(row).copy(dtdIdentifier = value)))
-  override val isDerivedReferenceAttribute = new Field[YesOrNo, Row](prefix, "is_derived_reference_attribute", None, Some("varchar"))(x => extract(x).isDerivedReferenceAttribute, (row, value) => merge(row, extract(row).copy(isDerivedReferenceAttribute = value)))
+  override val udtCatalog = new OptField[String, Row](prefix, "udt_catalog", None, None)(x => extract(x).udtCatalog, (row, value) => merge(row, extract(row).copy(udtCatalog = value)))
+  override val udtSchema = new OptField[String, Row](prefix, "udt_schema", None, None)(x => extract(x).udtSchema, (row, value) => merge(row, extract(row).copy(udtSchema = value)))
+  override val udtName = new OptField[String, Row](prefix, "udt_name", None, None)(x => extract(x).udtName, (row, value) => merge(row, extract(row).copy(udtName = value)))
+  override val attributeName = new OptField[String, Row](prefix, "attribute_name", None, None)(x => extract(x).attributeName, (row, value) => merge(row, extract(row).copy(attributeName = value)))
+  override val ordinalPosition = new OptField[Int, Row](prefix, "ordinal_position", None, None)(x => extract(x).ordinalPosition, (row, value) => merge(row, extract(row).copy(ordinalPosition = value)))
+  override val attributeDefault = new OptField[String, Row](prefix, "attribute_default", None, None)(x => extract(x).attributeDefault, (row, value) => merge(row, extract(row).copy(attributeDefault = value)))
+  override val isNullable = new OptField[/* max 3 chars */ String, Row](prefix, "is_nullable", None, None)(x => extract(x).isNullable, (row, value) => merge(row, extract(row).copy(isNullable = value)))
+  override val dataType = new OptField[String, Row](prefix, "data_type", None, None)(x => extract(x).dataType, (row, value) => merge(row, extract(row).copy(dataType = value)))
+  override val characterMaximumLength = new OptField[Int, Row](prefix, "character_maximum_length", None, None)(x => extract(x).characterMaximumLength, (row, value) => merge(row, extract(row).copy(characterMaximumLength = value)))
+  override val characterOctetLength = new OptField[Int, Row](prefix, "character_octet_length", None, None)(x => extract(x).characterOctetLength, (row, value) => merge(row, extract(row).copy(characterOctetLength = value)))
+  override val characterSetCatalog = new OptField[String, Row](prefix, "character_set_catalog", None, None)(x => extract(x).characterSetCatalog, (row, value) => merge(row, extract(row).copy(characterSetCatalog = value)))
+  override val characterSetSchema = new OptField[String, Row](prefix, "character_set_schema", None, None)(x => extract(x).characterSetSchema, (row, value) => merge(row, extract(row).copy(characterSetSchema = value)))
+  override val characterSetName = new OptField[String, Row](prefix, "character_set_name", None, None)(x => extract(x).characterSetName, (row, value) => merge(row, extract(row).copy(characterSetName = value)))
+  override val collationCatalog = new OptField[String, Row](prefix, "collation_catalog", None, None)(x => extract(x).collationCatalog, (row, value) => merge(row, extract(row).copy(collationCatalog = value)))
+  override val collationSchema = new OptField[String, Row](prefix, "collation_schema", None, None)(x => extract(x).collationSchema, (row, value) => merge(row, extract(row).copy(collationSchema = value)))
+  override val collationName = new OptField[String, Row](prefix, "collation_name", None, None)(x => extract(x).collationName, (row, value) => merge(row, extract(row).copy(collationName = value)))
+  override val numericPrecision = new OptField[Int, Row](prefix, "numeric_precision", None, None)(x => extract(x).numericPrecision, (row, value) => merge(row, extract(row).copy(numericPrecision = value)))
+  override val numericPrecisionRadix = new OptField[Int, Row](prefix, "numeric_precision_radix", None, None)(x => extract(x).numericPrecisionRadix, (row, value) => merge(row, extract(row).copy(numericPrecisionRadix = value)))
+  override val numericScale = new OptField[Int, Row](prefix, "numeric_scale", None, None)(x => extract(x).numericScale, (row, value) => merge(row, extract(row).copy(numericScale = value)))
+  override val datetimePrecision = new OptField[Int, Row](prefix, "datetime_precision", None, None)(x => extract(x).datetimePrecision, (row, value) => merge(row, extract(row).copy(datetimePrecision = value)))
+  override val intervalType = new OptField[String, Row](prefix, "interval_type", None, None)(x => extract(x).intervalType, (row, value) => merge(row, extract(row).copy(intervalType = value)))
+  override val intervalPrecision = new OptField[Int, Row](prefix, "interval_precision", None, None)(x => extract(x).intervalPrecision, (row, value) => merge(row, extract(row).copy(intervalPrecision = value)))
+  override val attributeUdtCatalog = new OptField[String, Row](prefix, "attribute_udt_catalog", None, None)(x => extract(x).attributeUdtCatalog, (row, value) => merge(row, extract(row).copy(attributeUdtCatalog = value)))
+  override val attributeUdtSchema = new OptField[String, Row](prefix, "attribute_udt_schema", None, None)(x => extract(x).attributeUdtSchema, (row, value) => merge(row, extract(row).copy(attributeUdtSchema = value)))
+  override val attributeUdtName = new OptField[String, Row](prefix, "attribute_udt_name", None, None)(x => extract(x).attributeUdtName, (row, value) => merge(row, extract(row).copy(attributeUdtName = value)))
+  override val scopeCatalog = new OptField[String, Row](prefix, "scope_catalog", None, None)(x => extract(x).scopeCatalog, (row, value) => merge(row, extract(row).copy(scopeCatalog = value)))
+  override val scopeSchema = new OptField[String, Row](prefix, "scope_schema", None, None)(x => extract(x).scopeSchema, (row, value) => merge(row, extract(row).copy(scopeSchema = value)))
+  override val scopeName = new OptField[String, Row](prefix, "scope_name", None, None)(x => extract(x).scopeName, (row, value) => merge(row, extract(row).copy(scopeName = value)))
+  override val maximumCardinality = new OptField[Int, Row](prefix, "maximum_cardinality", None, None)(x => extract(x).maximumCardinality, (row, value) => merge(row, extract(row).copy(maximumCardinality = value)))
+  override val dtdIdentifier = new OptField[String, Row](prefix, "dtd_identifier", None, None)(x => extract(x).dtdIdentifier, (row, value) => merge(row, extract(row).copy(dtdIdentifier = value)))
+  override val isDerivedReferenceAttribute = new OptField[/* max 3 chars */ String, Row](prefix, "is_derived_reference_attribute", None, None)(x => extract(x).isDerivedReferenceAttribute, (row, value) => merge(row, extract(row).copy(isDerivedReferenceAttribute = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](udtCatalog, udtSchema, udtName, attributeName, ordinalPosition, attributeDefault, isNullable, dataType, characterMaximumLength, characterOctetLength, characterSetCatalog, characterSetSchema, characterSetName, collationCatalog, collationSchema, collationName, numericPrecision, numericPrecisionRadix, numericScale, datetimePrecision, intervalType, intervalPrecision, attributeUdtCatalog, attributeUdtSchema, attributeUdtName, scopeCatalog, scopeSchema, scopeName, maximumCardinality, dtdIdentifier, isDerivedReferenceAttribute)

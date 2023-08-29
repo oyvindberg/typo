@@ -19,11 +19,11 @@ class PpViewStructure[Row](val prefix: Option[String], val extract: Row => PpVie
   extends Relation[PpViewFields, PpViewRow, Row]
     with PpViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val phonenumber = new Field[Phone, Row](prefix, "phonenumber", None, Some("varchar"))(x => extract(x).phonenumber, (row, value) => merge(row, extract(row).copy(phonenumber = value)))
-  override val phonenumbertypeid = new Field[PhonenumbertypeId, Row](prefix, "phonenumbertypeid", None, Some("int4"))(x => extract(x).phonenumbertypeid, (row, value) => merge(row, extract(row).copy(phonenumbertypeid = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+  override val phonenumber = new Field[Phone, Row](prefix, "phonenumber", None, None)(x => extract(x).phonenumber, (row, value) => merge(row, extract(row).copy(phonenumber = value)))
+  override val phonenumbertypeid = new Field[PhonenumbertypeId, Row](prefix, "phonenumbertypeid", None, None)(x => extract(x).phonenumbertypeid, (row, value) => merge(row, extract(row).copy(phonenumbertypeid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, businessentityid, phonenumber, phonenumbertypeid, modifieddate)

@@ -1,8 +1,9 @@
 package typo
 package internal
 
+import typo.internal.analysis.{DecomposedSql, MaybeReturnsRows, ParsedName}
 import typo.internal.rewriteDependentData.EvalMaybe
-import typo.internal.sqlfiles.{DecomposedSql, MaybeReturnsRows, ParsedName, SqlFile}
+import typo.internal.sqlfiles.SqlFile
 import typo.sc.Type
 
 case class ComputedSqlFile(

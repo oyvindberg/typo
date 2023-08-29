@@ -15,19 +15,19 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgSeclabelsViewRow(
-  objoid: Option[/* oid */ Long],
-  classoid: Option[/* oid */ Long],
-  objsubid: Option[Int],
-  objtype: Option[String],
-  objnamespace: Option[/* oid */ Long],
-  objname: Option[String],
-  provider: Option[String],
-  label: Option[String]
+  objoid: /* nullability unknown */ Option[/* oid */ Long],
+  classoid: /* nullability unknown */ Option[/* oid */ Long],
+  objsubid: /* nullability unknown */ Option[Int],
+  objtype: /* nullability unknown */ Option[String],
+  objnamespace: /* nullability unknown */ Option[/* oid */ Long],
+  objname: /* nullability unknown */ Option[String],
+  provider: /* nullability unknown */ Option[String],
+  label: /* nullability unknown */ Option[String]
 )
 
 object PgSeclabelsViewRow {
-  implicit lazy val decoder: Decoder[PgSeclabelsViewRow] = Decoder.forProduct8[PgSeclabelsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[String]]("objoid", "classoid", "objsubid", "objtype", "objnamespace", "objname", "provider", "label")(PgSeclabelsViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit lazy val encoder: Encoder[PgSeclabelsViewRow] = Encoder.forProduct8[PgSeclabelsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[String]]("objoid", "classoid", "objsubid", "objtype", "objnamespace", "objname", "provider", "label")(x => (x.objoid, x.classoid, x.objsubid, x.objtype, x.objnamespace, x.objname, x.provider, x.label))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val decoder: Decoder[PgSeclabelsViewRow] = Decoder.forProduct8[PgSeclabelsViewRow, /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("objoid", "classoid", "objsubid", "objtype", "objnamespace", "objname", "provider", "label")(PgSeclabelsViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgSeclabelsViewRow] = Encoder.forProduct8[PgSeclabelsViewRow, /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("objoid", "classoid", "objsubid", "objtype", "objnamespace", "objname", "provider", "label")(x => (x.objoid, x.classoid, x.objsubid, x.objtype, x.objnamespace, x.objname, x.provider, x.label))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgSeclabelsViewRow] = new Read[PgSeclabelsViewRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.Nullable),

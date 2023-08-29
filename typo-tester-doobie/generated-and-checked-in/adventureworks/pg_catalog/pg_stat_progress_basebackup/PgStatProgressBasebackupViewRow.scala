@@ -15,33 +15,33 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatProgressBasebackupViewRow(
-  pid: Int,
-  phase: String,
-  backupTotal: Long,
-  backupStreamed: Long,
-  tablespacesTotal: Long,
-  tablespacesStreamed: Long
+  pid: /* nullability unknown */ Option[Int],
+  phase: /* nullability unknown */ Option[String],
+  backupTotal: /* nullability unknown */ Option[Long],
+  backupStreamed: /* nullability unknown */ Option[Long],
+  tablespacesTotal: /* nullability unknown */ Option[Long],
+  tablespacesStreamed: /* nullability unknown */ Option[Long]
 )
 
 object PgStatProgressBasebackupViewRow {
-  implicit lazy val decoder: Decoder[PgStatProgressBasebackupViewRow] = Decoder.forProduct6[PgStatProgressBasebackupViewRow, Int, String, Long, Long, Long, Long]("pid", "phase", "backup_total", "backup_streamed", "tablespaces_total", "tablespaces_streamed")(PgStatProgressBasebackupViewRow.apply)(Decoder.decodeInt, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgStatProgressBasebackupViewRow] = Encoder.forProduct6[PgStatProgressBasebackupViewRow, Int, String, Long, Long, Long, Long]("pid", "phase", "backup_total", "backup_streamed", "tablespaces_total", "tablespaces_streamed")(x => (x.pid, x.phase, x.backupTotal, x.backupStreamed, x.tablespacesTotal, x.tablespacesStreamed))(Encoder.encodeInt, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgStatProgressBasebackupViewRow] = Decoder.forProduct6[PgStatProgressBasebackupViewRow, /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long]]("pid", "phase", "backup_total", "backup_streamed", "tablespaces_total", "tablespaces_streamed")(PgStatProgressBasebackupViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgStatProgressBasebackupViewRow] = Encoder.forProduct6[PgStatProgressBasebackupViewRow, /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long]]("pid", "phase", "backup_total", "backup_streamed", "tablespaces_total", "tablespaces_streamed")(x => (x.pid, x.phase, x.backupTotal, x.backupStreamed, x.tablespacesTotal, x.tablespacesStreamed))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit lazy val read: Read[PgStatProgressBasebackupViewRow] = new Read[PgStatProgressBasebackupViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressBasebackupViewRow(
-      pid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      phase = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      backupTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
-      backupStreamed = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      tablespacesTotal = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
-      tablespacesStreamed = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5)
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      phase = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      backupTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
+      backupStreamed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      tablespacesTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
+      tablespacesStreamed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

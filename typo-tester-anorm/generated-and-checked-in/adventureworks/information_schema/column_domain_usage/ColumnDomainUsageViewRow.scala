@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package column_domain_usage
 
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -15,30 +15,31 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ColumnDomainUsageViewRow(
-  domainCatalog: SqlIdentifier,
-  domainSchema: SqlIdentifier,
-  domainName: SqlIdentifier,
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  columnName: SqlIdentifier
+  domainCatalog: /* nullability unknown */ Option[String],
+  domainSchema: /* nullability unknown */ Option[String],
+  domainName: /* nullability unknown */ Option[String],
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  columnName: /* nullability unknown */ Option[String]
 )
 
 object ColumnDomainUsageViewRow {
   implicit lazy val reads: Reads[ColumnDomainUsageViewRow] = Reads[ColumnDomainUsageViewRow](json => JsResult.fromTry(
       Try(
         ColumnDomainUsageViewRow(
-          domainCatalog = json.\("domain_catalog").as(SqlIdentifier.reads),
-          domainSchema = json.\("domain_schema").as(SqlIdentifier.reads),
-          domainName = json.\("domain_name").as(SqlIdentifier.reads),
-          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
-          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
-          tableName = json.\("table_name").as(SqlIdentifier.reads),
-          columnName = json.\("column_name").as(SqlIdentifier.reads)
+          domainCatalog = json.\("domain_catalog").toOption.map(_.as(Reads.StringReads)),
+          domainSchema = json.\("domain_schema").toOption.map(_.as(Reads.StringReads)),
+          domainName = json.\("domain_name").toOption.map(_.as(Reads.StringReads)),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          columnName = json.\("column_name").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -46,25 +47,25 @@ object ColumnDomainUsageViewRow {
   def rowParser(idx: Int): RowParser[ColumnDomainUsageViewRow] = RowParser[ColumnDomainUsageViewRow] { row =>
     Success(
       ColumnDomainUsageViewRow(
-        domainCatalog = row(idx + 0)(SqlIdentifier.column),
-        domainSchema = row(idx + 1)(SqlIdentifier.column),
-        domainName = row(idx + 2)(SqlIdentifier.column),
-        tableCatalog = row(idx + 3)(SqlIdentifier.column),
-        tableSchema = row(idx + 4)(SqlIdentifier.column),
-        tableName = row(idx + 5)(SqlIdentifier.column),
-        columnName = row(idx + 6)(SqlIdentifier.column)
+        domainCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        domainSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        domainName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tableCatalog = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        columnName = row(idx + 6)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ColumnDomainUsageViewRow] = OWrites[ColumnDomainUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "domain_catalog" -> SqlIdentifier.writes.writes(o.domainCatalog),
-      "domain_schema" -> SqlIdentifier.writes.writes(o.domainSchema),
-      "domain_name" -> SqlIdentifier.writes.writes(o.domainName),
-      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
-      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
-      "table_name" -> SqlIdentifier.writes.writes(o.tableName),
-      "column_name" -> SqlIdentifier.writes.writes(o.columnName)
+      "domain_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.domainCatalog),
+      "domain_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.domainSchema),
+      "domain_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.domainName),
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "column_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.columnName)
     ))
   )
 }

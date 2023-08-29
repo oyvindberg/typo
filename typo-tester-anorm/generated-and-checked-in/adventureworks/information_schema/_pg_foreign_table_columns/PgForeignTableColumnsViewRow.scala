@@ -20,10 +20,14 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgForeignTableColumnsViewRow(
+  /** Points to [[pg_catalog.pg_namespace.PgNamespaceRow.nspname]] */
   nspname: String,
+  /** Points to [[pg_catalog.pg_class.PgClassRow.relname]] */
   relname: String,
+  /** Points to [[pg_catalog.pg_attribute.PgAttributeRow.attname]] */
   attname: String,
-  attfdwoptions: Array[String]
+  /** Points to [[pg_catalog.pg_attribute.PgAttributeRow.attfdwoptions]] */
+  attfdwoptions: Option[Array[String]]
 )
 
 object PgForeignTableColumnsViewRow {
@@ -33,7 +37,7 @@ object PgForeignTableColumnsViewRow {
           nspname = json.\("nspname").as(Reads.StringReads),
           relname = json.\("relname").as(Reads.StringReads),
           attname = json.\("attname").as(Reads.StringReads),
-          attfdwoptions = json.\("attfdwoptions").as(Reads.ArrayReads[String](Reads.StringReads, implicitly))
+          attfdwoptions = json.\("attfdwoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -44,7 +48,7 @@ object PgForeignTableColumnsViewRow {
         nspname = row(idx + 0)(Column.columnToString),
         relname = row(idx + 1)(Column.columnToString),
         attname = row(idx + 2)(Column.columnToString),
-        attfdwoptions = row(idx + 3)(Column.columnToArray[String](Column.columnToString, implicitly))
+        attfdwoptions = row(idx + 3)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
@@ -53,7 +57,7 @@ object PgForeignTableColumnsViewRow {
       "nspname" -> Writes.StringWrites.writes(o.nspname),
       "relname" -> Writes.StringWrites.writes(o.relname),
       "attname" -> Writes.StringWrites.writes(o.attname),
-      "attfdwoptions" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.attfdwoptions)
+      "attfdwoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.attfdwoptions)
     ))
   )
 }

@@ -21,47 +21,44 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import typo.generated.information_schema.CharacterData
-import typo.generated.information_schema.SqlIdentifier
-import typo.generated.information_schema.YesOrNo
 
 case class TableConstraintsViewRow(
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"constraint_catalog","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  constraintCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"constraint_schema","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  constraintSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"constraint_name","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  constraintName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"table_catalog","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"table_schema","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"table_name","ordinal_position":6,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"constraint_type","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  constraintType: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"is_deferrable","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  isDeferrable: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"initially_deferred","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  initiallyDeferred: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"table_constraints","column_name":"enforced","ordinal_position":10,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  enforced: Option[YesOrNo]
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_catalog"},"columnName":"constraint_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  constraintCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_schema"},"columnName":"constraint_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  constraintSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_name"},"columnName":"constraint_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  constraintName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_catalog"},"columnName":"table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_schema"},"columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_name"},"columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_type"},"columnName":"constraint_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  constraintType: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"is_deferrable"},"columnName":"is_deferrable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  isDeferrable: /* nullability unknown */ Option[/* max 3 chars */ String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"initially_deferred"},"columnName":"initially_deferred","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  initiallyDeferred: /* nullability unknown */ Option[/* max 3 chars */ String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"enforced"},"columnName":"enforced","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  enforced: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object TableConstraintsViewRow {
   implicit lazy val reads: Reads[TableConstraintsViewRow] = Reads[TableConstraintsViewRow](json => JsResult.fromTry(
       Try(
         TableConstraintsViewRow(
-          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          constraintSchema = json.\("constraint_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          constraintName = json.\("constraint_name").toOption.map(_.as(SqlIdentifier.reads)),
-          tableCatalog = json.\("table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          tableSchema = json.\("table_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          tableName = json.\("table_name").toOption.map(_.as(SqlIdentifier.reads)),
-          constraintType = json.\("constraint_type").toOption.map(_.as(CharacterData.reads)),
-          isDeferrable = json.\("is_deferrable").toOption.map(_.as(YesOrNo.reads)),
-          initiallyDeferred = json.\("initially_deferred").toOption.map(_.as(YesOrNo.reads)),
-          enforced = json.\("enforced").toOption.map(_.as(YesOrNo.reads))
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(Reads.StringReads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(Reads.StringReads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(Reads.StringReads)),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          constraintType = json.\("constraint_type").toOption.map(_.as(Reads.StringReads)),
+          isDeferrable = json.\("is_deferrable").toOption.map(_.as(Reads.StringReads)),
+          initiallyDeferred = json.\("initially_deferred").toOption.map(_.as(Reads.StringReads)),
+          enforced = json.\("enforced").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -69,31 +66,31 @@ object TableConstraintsViewRow {
   def rowParser(idx: Int): RowParser[TableConstraintsViewRow] = RowParser[TableConstraintsViewRow] { row =>
     Success(
       TableConstraintsViewRow(
-        constraintCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        constraintSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        constraintName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        tableCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        tableSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        tableName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
-        constraintType = row(idx + 6)(Column.columnToOption(CharacterData.column)),
-        isDeferrable = row(idx + 7)(Column.columnToOption(YesOrNo.column)),
-        initiallyDeferred = row(idx + 8)(Column.columnToOption(YesOrNo.column)),
-        enforced = row(idx + 9)(Column.columnToOption(YesOrNo.column))
+        constraintCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        constraintSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        constraintName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tableCatalog = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        constraintType = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        isDeferrable = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        initiallyDeferred = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        enforced = row(idx + 9)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[TableConstraintsViewRow] = OWrites[TableConstraintsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
-      "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),
-      "constraint_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintName),
-      "table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableCatalog),
-      "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),
-      "table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableName),
-      "constraint_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.constraintType),
-      "is_deferrable" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isDeferrable),
-      "initially_deferred" -> Writes.OptionWrites(YesOrNo.writes).writes(o.initiallyDeferred),
-      "enforced" -> Writes.OptionWrites(YesOrNo.writes).writes(o.enforced)
+      "constraint_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintName),
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "constraint_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintType),
+      "is_deferrable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isDeferrable),
+      "initially_deferred" -> Writes.OptionWrites(Writes.StringWrites).writes(o.initiallyDeferred),
+      "enforced" -> Writes.OptionWrites(Writes.StringWrites).writes(o.enforced)
     ))
   )
 }

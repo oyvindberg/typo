@@ -27,7 +27,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpViewRow(
-  id: Int,
+  /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
+  id: StateprovinceId,
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovincecode]] */
@@ -50,7 +51,7 @@ object SpViewRow {
   implicit lazy val reads: Reads[SpViewRow] = Reads[SpViewRow](json => JsResult.fromTry(
       Try(
         SpViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(StateprovinceId.reads),
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
           stateprovincecode = json.\("stateprovincecode").as(Reads.StringReads),
           countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
@@ -66,7 +67,7 @@ object SpViewRow {
   def rowParser(idx: Int): RowParser[SpViewRow] = RowParser[SpViewRow] { row =>
     Success(
       SpViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(StateprovinceId.column),
         stateprovinceid = row(idx + 1)(StateprovinceId.column),
         stateprovincecode = row(idx + 2)(Column.columnToString),
         countryregioncode = row(idx + 3)(CountryregionId.column),
@@ -80,7 +81,7 @@ object SpViewRow {
   }
   implicit lazy val writes: OWrites[SpViewRow] = OWrites[SpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> StateprovinceId.writes.writes(o.id),
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
       "stateprovincecode" -> Writes.StringWrites.writes(o.stateprovincecode),
       "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),

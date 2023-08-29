@@ -7,23 +7,21 @@ package adventureworks
 package information_schema
 package foreign_servers
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class ForeignServersViewStructure[Row](val prefix: Option[String], val extract: Row => ForeignServersViewRow, val merge: (Row, ForeignServersViewRow) => Row)
   extends Relation[ForeignServersViewFields, ForeignServersViewRow, Row]
     with ForeignServersViewFields[Row] { outer =>
 
-  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("name"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
-  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("name"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
-  override val foreignDataWrapperCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_catalog", None, Some("name"))(x => extract(x).foreignDataWrapperCatalog, (row, value) => merge(row, extract(row).copy(foreignDataWrapperCatalog = value)))
-  override val foreignDataWrapperName = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_name", None, Some("name"))(x => extract(x).foreignDataWrapperName, (row, value) => merge(row, extract(row).copy(foreignDataWrapperName = value)))
-  override val foreignServerType = new Field[CharacterData, Row](prefix, "foreign_server_type", None, Some("varchar"))(x => extract(x).foreignServerType, (row, value) => merge(row, extract(row).copy(foreignServerType = value)))
-  override val foreignServerVersion = new Field[CharacterData, Row](prefix, "foreign_server_version", None, Some("varchar"))(x => extract(x).foreignServerVersion, (row, value) => merge(row, extract(row).copy(foreignServerVersion = value)))
-  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("name"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
+  override val foreignServerCatalog = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_server_catalog", None, None)(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
+  override val foreignServerName = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_server_name", None, None)(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
+  override val foreignDataWrapperCatalog = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_data_wrapper_catalog", None, None)(x => extract(x).foreignDataWrapperCatalog, (row, value) => merge(row, extract(row).copy(foreignDataWrapperCatalog = value)))
+  override val foreignDataWrapperName = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_data_wrapper_name", None, None)(x => extract(x).foreignDataWrapperName, (row, value) => merge(row, extract(row).copy(foreignDataWrapperName = value)))
+  override val foreignServerType = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_server_type", None, None)(x => extract(x).foreignServerType, (row, value) => merge(row, extract(row).copy(foreignServerType = value)))
+  override val foreignServerVersion = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_server_version", None, None)(x => extract(x).foreignServerVersion, (row, value) => merge(row, extract(row).copy(foreignServerVersion = value)))
+  override val authorizationIdentifier = new OptField[/* nullability unknown */ String, Row](prefix, "authorization_identifier", None, None)(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](foreignServerCatalog, foreignServerName, foreignDataWrapperCatalog, foreignDataWrapperName, foreignServerType, foreignServerVersion, authorizationIdentifier)

@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package foreign_server_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,26 +15,27 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ForeignServerOptionsViewRow(
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: SqlIdentifier,
+  foreignServerCatalog: Option[/* nullability unknown */ String],
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerName]] */
-  foreignServerName: SqlIdentifier,
-  optionName: SqlIdentifier,
-  optionValue: CharacterData
+  foreignServerName: Option[/* nullability unknown */ String],
+  optionName: /* nullability unknown */ Option[String],
+  optionValue: /* nullability unknown */ Option[String]
 )
 
 object ForeignServerOptionsViewRow {
   implicit lazy val reads: Reads[ForeignServerOptionsViewRow] = Reads[ForeignServerOptionsViewRow](json => JsResult.fromTry(
       Try(
         ForeignServerOptionsViewRow(
-          foreignServerCatalog = json.\("foreign_server_catalog").as(SqlIdentifier.reads),
-          foreignServerName = json.\("foreign_server_name").as(SqlIdentifier.reads),
-          optionName = json.\("option_name").as(SqlIdentifier.reads),
-          optionValue = json.\("option_value").as(CharacterData.reads)
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(Reads.StringReads)),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(Reads.StringReads)),
+          optionName = json.\("option_name").toOption.map(_.as(Reads.StringReads)),
+          optionValue = json.\("option_value").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -43,19 +43,19 @@ object ForeignServerOptionsViewRow {
   def rowParser(idx: Int): RowParser[ForeignServerOptionsViewRow] = RowParser[ForeignServerOptionsViewRow] { row =>
     Success(
       ForeignServerOptionsViewRow(
-        foreignServerCatalog = row(idx + 0)(SqlIdentifier.column),
-        foreignServerName = row(idx + 1)(SqlIdentifier.column),
-        optionName = row(idx + 2)(SqlIdentifier.column),
-        optionValue = row(idx + 3)(CharacterData.column)
+        foreignServerCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        foreignServerName = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        optionName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        optionValue = row(idx + 3)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ForeignServerOptionsViewRow] = OWrites[ForeignServerOptionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_server_catalog" -> SqlIdentifier.writes.writes(o.foreignServerCatalog),
-      "foreign_server_name" -> SqlIdentifier.writes.writes(o.foreignServerName),
-      "option_name" -> SqlIdentifier.writes.writes(o.optionName),
-      "option_value" -> CharacterData.writes.writes(o.optionValue)
+      "foreign_server_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignServerCatalog),
+      "foreign_server_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignServerName),
+      "option_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.optionName),
+      "option_value" -> Writes.OptionWrites(Writes.StringWrites).writes(o.optionValue)
     ))
   )
 }

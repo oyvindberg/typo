@@ -22,20 +22,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VstorewithaddressesViewRow(
-  /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
+  /** Points to [[store.StoreRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  /** Points to [[person.stateprovince.StateprovinceRow.name]] */
+  /** Points to [[store.StoreRow.name]] */
   name: Name,
+  /** Points to [[person.addresstype.AddresstypeRow.name]] */
   addresstype: Name,
   /** Points to [[person.address.AddressRow.addressline1]] */
   addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: /* max 60 chars */ String,
+  addressline2: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.city]] */
   city: /* max 30 chars */ String,
+  /** Points to [[person.stateprovince.StateprovinceRow.name]] */
   stateprovincename: Name,
   /** Points to [[person.address.AddressRow.postalcode]] */
   postalcode: /* max 15 chars */ String,
+  /** Points to [[person.countryregion.CountryregionRow.name]] */
   countryregionname: Name
 )
 
@@ -47,7 +50,7 @@ object VstorewithaddressesViewRow {
           name = json.\("name").as(Name.reads),
           addresstype = json.\("addresstype").as(Name.reads),
           addressline1 = json.\("addressline1").as(Reads.StringReads),
-          addressline2 = json.\("addressline2").as(Reads.StringReads),
+          addressline2 = json.\("addressline2").toOption.map(_.as(Reads.StringReads)),
           city = json.\("city").as(Reads.StringReads),
           stateprovincename = json.\("stateprovincename").as(Name.reads),
           postalcode = json.\("postalcode").as(Reads.StringReads),
@@ -63,7 +66,7 @@ object VstorewithaddressesViewRow {
         name = row(idx + 1)(Name.column),
         addresstype = row(idx + 2)(Name.column),
         addressline1 = row(idx + 3)(Column.columnToString),
-        addressline2 = row(idx + 4)(Column.columnToString),
+        addressline2 = row(idx + 4)(Column.columnToOption(Column.columnToString)),
         city = row(idx + 5)(Column.columnToString),
         stateprovincename = row(idx + 6)(Name.column),
         postalcode = row(idx + 7)(Column.columnToString),
@@ -77,7 +80,7 @@ object VstorewithaddressesViewRow {
       "name" -> Name.writes.writes(o.name),
       "addresstype" -> Name.writes.writes(o.addresstype),
       "addressline1" -> Writes.StringWrites.writes(o.addressline1),
-      "addressline2" -> Writes.StringWrites.writes(o.addressline2),
+      "addressline2" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline2),
       "city" -> Writes.StringWrites.writes(o.city),
       "stateprovincename" -> Name.writes.writes(o.stateprovincename),
       "postalcode" -> Writes.StringWrites.writes(o.postalcode),

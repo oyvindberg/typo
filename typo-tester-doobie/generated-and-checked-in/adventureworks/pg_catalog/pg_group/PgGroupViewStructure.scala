@@ -7,17 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_group
 
+import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgGroupViewStructure[Row](val prefix: Option[String], val extract: Row => PgGroupViewRow, val merge: (Row, PgGroupViewRow) => Row)
   extends Relation[PgGroupViewFields, PgGroupViewRow, Row]
     with PgGroupViewFields[Row] { outer =>
 
-  override val groname = new Field[String, Row](prefix, "groname", None, Some("name"))(x => extract(x).groname, (row, value) => merge(row, extract(row).copy(groname = value)))
-  override val grosysid = new Field[/* oid */ Long, Row](prefix, "grosysid", None, Some("oid"))(x => extract(x).grosysid, (row, value) => merge(row, extract(row).copy(grosysid = value)))
-  override val grolist = new Field[Array[/* oid */ Long], Row](prefix, "grolist", None, Some("_oid"))(x => extract(x).grolist, (row, value) => merge(row, extract(row).copy(grolist = value)))
+  override val groname = new Field[String, Row](prefix, "groname", None, None)(x => extract(x).groname, (row, value) => merge(row, extract(row).copy(groname = value)))
+  override val grosysid = new Field[PgAuthidId, Row](prefix, "grosysid", None, None)(x => extract(x).grosysid, (row, value) => merge(row, extract(row).copy(grosysid = value)))
+  override val grolist = new OptField[Array[/* oid */ Long], Row](prefix, "grolist", None, None)(x => extract(x).grolist, (row, value) => merge(row, extract(row).copy(grolist = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](groname, grosysid, grolist)

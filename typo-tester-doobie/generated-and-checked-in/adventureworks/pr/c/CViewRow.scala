@@ -12,13 +12,13 @@ import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CViewRow(
-  id: /* bpchar, max 6 chars */ String,
+  /** Points to [[production.culture.CultureRow.cultureid]] */
+  id: CultureId,
   /** Points to [[production.culture.CultureRow.cultureid]] */
   cultureid: CultureId,
   /** Points to [[production.culture.CultureRow.name]] */
@@ -28,17 +28,17 @@ case class CViewRow(
 )
 
 object CViewRow {
-  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct4[CViewRow, /* bpchar, max 6 chars */ String, CultureId, Name, TypoLocalDateTime]("id", "cultureid", "name", "modifieddate")(CViewRow.apply)(Decoder.decodeString, CultureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct4[CViewRow, /* bpchar, max 6 chars */ String, CultureId, Name, TypoLocalDateTime]("id", "cultureid", "name", "modifieddate")(x => (x.id, x.cultureid, x.name, x.modifieddate))(Encoder.encodeString, CultureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct4[CViewRow, CultureId, CultureId, Name, TypoLocalDateTime]("id", "cultureid", "name", "modifieddate")(CViewRow.apply)(CultureId.decoder, CultureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct4[CViewRow, CultureId, CultureId, Name, TypoLocalDateTime]("id", "cultureid", "name", "modifieddate")(x => (x.id, x.cultureid, x.name, x.modifieddate))(CultureId.encoder, CultureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CViewRow] = new Read[CViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.NoNulls),
+      (CultureId.get, Nullability.NoNulls),
       (CultureId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CViewRow(
-      id = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = CultureId.get.unsafeGetNonNullable(rs, i + 0),
       cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)

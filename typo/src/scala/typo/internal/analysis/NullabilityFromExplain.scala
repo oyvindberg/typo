@@ -1,4 +1,4 @@
-package typo.internal.sqlfiles
+package typo.internal.analysis
 
 import anorm.{Column, SqlParser, SqlStringInterpolation, TypeDoesNotMatch}
 import org.postgresql.util.PGobject

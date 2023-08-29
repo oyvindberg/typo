@@ -7,18 +7,16 @@ package adventureworks
 package information_schema
 package schemata
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait SchemataViewFields[Row] {
-  val catalogName: Field[SqlIdentifier, Row]
-  val schemaName: Field[SqlIdentifier, Row]
-  val schemaOwner: Field[SqlIdentifier, Row]
-  val defaultCharacterSetCatalog: Field[SqlIdentifier, Row]
-  val defaultCharacterSetSchema: Field[SqlIdentifier, Row]
-  val defaultCharacterSetName: Field[SqlIdentifier, Row]
-  val sqlPath: Field[CharacterData, Row]
+  val catalogName: OptField[String, Row]
+  val schemaName: OptField[String, Row]
+  val schemaOwner: OptField[String, Row]
+  val defaultCharacterSetCatalog: OptField[String, Row]
+  val defaultCharacterSetSchema: OptField[String, Row]
+  val defaultCharacterSetName: OptField[String, Row]
+  val sqlPath: OptField[String, Row]
 }
 object SchemataViewFields extends SchemataViewStructure[SchemataViewRow](None, identity, (_, x) => x)
 

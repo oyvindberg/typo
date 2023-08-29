@@ -8,11 +8,12 @@ package pg_catalog
 package pg_stat_subscription
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.pg_catalog.pg_subscription.PgSubscriptionId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatSubscriptionViewFields[Row] {
-  val subid: Field[/* oid */ Long, Row]
+  val subid: Field[PgSubscriptionId, Row]
   val subname: Field[String, Row]
   val pid: OptField[Int, Row]
   val relid: OptField[/* oid */ Long, Row]

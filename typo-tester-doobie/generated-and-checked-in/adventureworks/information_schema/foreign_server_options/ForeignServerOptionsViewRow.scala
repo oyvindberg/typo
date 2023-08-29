@@ -7,38 +7,37 @@ package adventureworks
 package information_schema
 package foreign_server_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ForeignServerOptionsViewRow(
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: SqlIdentifier,
+  foreignServerCatalog: Option[/* nullability unknown */ String],
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerName]] */
-  foreignServerName: SqlIdentifier,
-  optionName: SqlIdentifier,
-  optionValue: CharacterData
+  foreignServerName: Option[/* nullability unknown */ String],
+  optionName: /* nullability unknown */ Option[String],
+  optionValue: /* nullability unknown */ Option[String]
 )
 
 object ForeignServerOptionsViewRow {
-  implicit lazy val decoder: Decoder[ForeignServerOptionsViewRow] = Decoder.forProduct4[ForeignServerOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(ForeignServerOptionsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
-  implicit lazy val encoder: Encoder[ForeignServerOptionsViewRow] = Encoder.forProduct4[ForeignServerOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(x => (x.foreignServerCatalog, x.foreignServerName, x.optionName, x.optionValue))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
+  implicit lazy val decoder: Decoder[ForeignServerOptionsViewRow] = Decoder.forProduct4[ForeignServerOptionsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(ForeignServerOptionsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[ForeignServerOptionsViewRow] = Encoder.forProduct4[ForeignServerOptionsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(x => (x.foreignServerCatalog, x.foreignServerName, x.optionName, x.optionValue))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[ForeignServerOptionsViewRow] = new Read[ForeignServerOptionsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ForeignServerOptionsViewRow(
-      foreignServerCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      foreignServerName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      optionName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      optionValue = CharacterData.get.unsafeGetNonNullable(rs, i + 3)
+      foreignServerCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      foreignServerName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      optionName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      optionValue = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

@@ -7,44 +7,44 @@ package adventureworks
 package information_schema
 package triggered_update_columns
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class TriggeredUpdateColumnsViewRow(
-  triggerCatalog: SqlIdentifier,
-  triggerSchema: SqlIdentifier,
-  triggerName: SqlIdentifier,
-  eventObjectCatalog: SqlIdentifier,
-  eventObjectSchema: SqlIdentifier,
-  eventObjectTable: SqlIdentifier,
-  eventObjectColumn: SqlIdentifier
+  triggerCatalog: /* nullability unknown */ Option[String],
+  triggerSchema: /* nullability unknown */ Option[String],
+  triggerName: /* nullability unknown */ Option[String],
+  eventObjectCatalog: /* nullability unknown */ Option[String],
+  eventObjectSchema: /* nullability unknown */ Option[String],
+  eventObjectTable: /* nullability unknown */ Option[String],
+  eventObjectColumn: /* nullability unknown */ Option[String]
 )
 
 object TriggeredUpdateColumnsViewRow {
-  implicit lazy val decoder: Decoder[TriggeredUpdateColumnsViewRow] = Decoder.forProduct7[TriggeredUpdateColumnsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("trigger_catalog", "trigger_schema", "trigger_name", "event_object_catalog", "event_object_schema", "event_object_table", "event_object_column")(TriggeredUpdateColumnsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[TriggeredUpdateColumnsViewRow] = Encoder.forProduct7[TriggeredUpdateColumnsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("trigger_catalog", "trigger_schema", "trigger_name", "event_object_catalog", "event_object_schema", "event_object_table", "event_object_column")(x => (x.triggerCatalog, x.triggerSchema, x.triggerName, x.eventObjectCatalog, x.eventObjectSchema, x.eventObjectTable, x.eventObjectColumn))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[TriggeredUpdateColumnsViewRow] = Decoder.forProduct7[TriggeredUpdateColumnsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("trigger_catalog", "trigger_schema", "trigger_name", "event_object_catalog", "event_object_schema", "event_object_table", "event_object_column")(TriggeredUpdateColumnsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[TriggeredUpdateColumnsViewRow] = Encoder.forProduct7[TriggeredUpdateColumnsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("trigger_catalog", "trigger_schema", "trigger_name", "event_object_catalog", "event_object_schema", "event_object_table", "event_object_column")(x => (x.triggerCatalog, x.triggerSchema, x.triggerName, x.eventObjectCatalog, x.eventObjectSchema, x.eventObjectTable, x.eventObjectColumn))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[TriggeredUpdateColumnsViewRow] = new Read[TriggeredUpdateColumnsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TriggeredUpdateColumnsViewRow(
-      triggerCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      triggerSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      triggerName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      eventObjectCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      eventObjectSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      eventObjectTable = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      eventObjectColumn = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6)
+      triggerCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      triggerSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      triggerName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      eventObjectCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      eventObjectSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      eventObjectTable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      eventObjectColumn = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

@@ -7,47 +7,47 @@ package adventureworks
 package information_schema
 package character_sets
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CharacterSetsViewRow(
-  characterSetCatalog: SqlIdentifier,
-  characterSetSchema: SqlIdentifier,
-  characterSetName: SqlIdentifier,
-  characterRepertoire: SqlIdentifier,
-  formOfUse: SqlIdentifier,
-  defaultCollateCatalog: SqlIdentifier,
-  defaultCollateSchema: SqlIdentifier,
-  defaultCollateName: SqlIdentifier
+  characterSetCatalog: /* nullability unknown */ Option[String],
+  characterSetSchema: /* nullability unknown */ Option[String],
+  characterSetName: /* nullability unknown */ Option[String],
+  characterRepertoire: /* nullability unknown */ Option[String],
+  formOfUse: /* nullability unknown */ Option[String],
+  defaultCollateCatalog: /* nullability unknown */ Option[String],
+  defaultCollateSchema: /* nullability unknown */ Option[String],
+  defaultCollateName: /* nullability unknown */ Option[String]
 )
 
 object CharacterSetsViewRow {
-  implicit lazy val decoder: Decoder[CharacterSetsViewRow] = Decoder.forProduct8[CharacterSetsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name")(CharacterSetsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[CharacterSetsViewRow] = Encoder.forProduct8[CharacterSetsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name")(x => (x.characterSetCatalog, x.characterSetSchema, x.characterSetName, x.characterRepertoire, x.formOfUse, x.defaultCollateCatalog, x.defaultCollateSchema, x.defaultCollateName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[CharacterSetsViewRow] = Decoder.forProduct8[CharacterSetsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name")(CharacterSetsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[CharacterSetsViewRow] = Encoder.forProduct8[CharacterSetsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name")(x => (x.characterSetCatalog, x.characterSetSchema, x.characterSetName, x.characterRepertoire, x.formOfUse, x.defaultCollateCatalog, x.defaultCollateSchema, x.defaultCollateName))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[CharacterSetsViewRow] = new Read[CharacterSetsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CharacterSetsViewRow(
-      characterSetCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      characterSetSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      characterSetName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      characterRepertoire = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      formOfUse = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      defaultCollateCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      defaultCollateSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6),
-      defaultCollateName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 7)
+      characterSetCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      characterSetSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      characterSetName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      characterRepertoire = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      formOfUse = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      defaultCollateCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      defaultCollateSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      defaultCollateName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

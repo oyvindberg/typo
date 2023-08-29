@@ -25,7 +25,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EViewRow(
-  id: Int,
+  /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[humanresources.employee.EmployeeRow.nationalidnumber]] */
@@ -55,14 +56,14 @@ case class EViewRow(
   /** Points to [[humanresources.employee.EmployeeRow.modifieddate]] */
   modifieddate: TypoLocalDateTime,
   /** Points to [[humanresources.employee.EmployeeRow.organizationnode]] */
-  organizationnode: String
+  organizationnode: Option[String]
 )
 
 object EViewRow {
   implicit lazy val reads: Reads[EViewRow] = Reads[EViewRow](json => JsResult.fromTry(
       Try(
         EViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           nationalidnumber = json.\("nationalidnumber").as(Reads.StringReads),
           loginid = json.\("loginid").as(Reads.StringReads),
@@ -77,7 +78,7 @@ object EViewRow {
           currentflag = json.\("currentflag").as(Flag.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
-          organizationnode = json.\("organizationnode").as(Reads.StringReads)
+          organizationnode = json.\("organizationnode").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -85,7 +86,7 @@ object EViewRow {
   def rowParser(idx: Int): RowParser[EViewRow] = RowParser[EViewRow] { row =>
     Success(
       EViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         nationalidnumber = row(idx + 2)(Column.columnToString),
         loginid = row(idx + 3)(Column.columnToString),
@@ -100,13 +101,13 @@ object EViewRow {
         currentflag = row(idx + 12)(Flag.column),
         rowguid = row(idx + 13)(Column.columnToUUID),
         modifieddate = row(idx + 14)(TypoLocalDateTime.column),
-        organizationnode = row(idx + 15)(Column.columnToString)
+        organizationnode = row(idx + 15)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[EViewRow] = OWrites[EViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "nationalidnumber" -> Writes.StringWrites.writes(o.nationalidnumber),
       "loginid" -> Writes.StringWrites.writes(o.loginid),
@@ -121,7 +122,7 @@ object EViewRow {
       "currentflag" -> Flag.writes.writes(o.currentflag),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
-      "organizationnode" -> Writes.StringWrites.writes(o.organizationnode)
+      "organizationnode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.organizationnode)
     ))
   )
 }

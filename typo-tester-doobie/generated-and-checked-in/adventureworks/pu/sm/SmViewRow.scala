@@ -19,7 +19,8 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class SmViewRow(
-  id: Int,
+  /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
+  id: ShipmethodId,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.name]] */
@@ -35,11 +36,11 @@ case class SmViewRow(
 )
 
 object SmViewRow {
-  implicit lazy val decoder: Decoder[SmViewRow] = Decoder.forProduct7[SmViewRow, Int, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(SmViewRow.apply)(Decoder.decodeInt, ShipmethodId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SmViewRow] = Encoder.forProduct7[SmViewRow, Int, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.id, x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(Encoder.encodeInt, ShipmethodId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SmViewRow] = Decoder.forProduct7[SmViewRow, ShipmethodId, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(SmViewRow.apply)(ShipmethodId.decoder, ShipmethodId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SmViewRow] = Encoder.forProduct7[SmViewRow, ShipmethodId, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.id, x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(ShipmethodId.encoder, ShipmethodId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SmViewRow] = new Read[SmViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ShipmethodId.get, Nullability.NoNulls),
       (ShipmethodId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
@@ -48,7 +49,7 @@ object SmViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SmViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = ShipmethodId.get.unsafeGetNonNullable(rs, i + 0),
       shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
       shipbase = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),

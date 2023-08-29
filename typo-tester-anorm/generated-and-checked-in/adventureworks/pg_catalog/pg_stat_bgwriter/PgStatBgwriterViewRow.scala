@@ -21,34 +21,34 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatBgwriterViewRow(
-  checkpointsTimed: Long,
-  checkpointsReq: Long,
-  checkpointWriteTime: Double,
-  checkpointSyncTime: Double,
-  buffersCheckpoint: Long,
-  buffersClean: Long,
-  maxwrittenClean: Long,
-  buffersBackend: Long,
-  buffersBackendFsync: Long,
-  buffersAlloc: Long,
-  statsReset: TypoOffsetDateTime
+  checkpointsTimed: /* nullability unknown */ Option[Long],
+  checkpointsReq: /* nullability unknown */ Option[Long],
+  checkpointWriteTime: /* nullability unknown */ Option[Double],
+  checkpointSyncTime: /* nullability unknown */ Option[Double],
+  buffersCheckpoint: /* nullability unknown */ Option[Long],
+  buffersClean: /* nullability unknown */ Option[Long],
+  maxwrittenClean: /* nullability unknown */ Option[Long],
+  buffersBackend: /* nullability unknown */ Option[Long],
+  buffersBackendFsync: /* nullability unknown */ Option[Long],
+  buffersAlloc: /* nullability unknown */ Option[Long],
+  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
 )
 
 object PgStatBgwriterViewRow {
   implicit lazy val reads: Reads[PgStatBgwriterViewRow] = Reads[PgStatBgwriterViewRow](json => JsResult.fromTry(
       Try(
         PgStatBgwriterViewRow(
-          checkpointsTimed = json.\("checkpoints_timed").as(Reads.LongReads),
-          checkpointsReq = json.\("checkpoints_req").as(Reads.LongReads),
-          checkpointWriteTime = json.\("checkpoint_write_time").as(Reads.DoubleReads),
-          checkpointSyncTime = json.\("checkpoint_sync_time").as(Reads.DoubleReads),
-          buffersCheckpoint = json.\("buffers_checkpoint").as(Reads.LongReads),
-          buffersClean = json.\("buffers_clean").as(Reads.LongReads),
-          maxwrittenClean = json.\("maxwritten_clean").as(Reads.LongReads),
-          buffersBackend = json.\("buffers_backend").as(Reads.LongReads),
-          buffersBackendFsync = json.\("buffers_backend_fsync").as(Reads.LongReads),
-          buffersAlloc = json.\("buffers_alloc").as(Reads.LongReads),
-          statsReset = json.\("stats_reset").as(TypoOffsetDateTime.reads)
+          checkpointsTimed = json.\("checkpoints_timed").toOption.map(_.as(Reads.LongReads)),
+          checkpointsReq = json.\("checkpoints_req").toOption.map(_.as(Reads.LongReads)),
+          checkpointWriteTime = json.\("checkpoint_write_time").toOption.map(_.as(Reads.DoubleReads)),
+          checkpointSyncTime = json.\("checkpoint_sync_time").toOption.map(_.as(Reads.DoubleReads)),
+          buffersCheckpoint = json.\("buffers_checkpoint").toOption.map(_.as(Reads.LongReads)),
+          buffersClean = json.\("buffers_clean").toOption.map(_.as(Reads.LongReads)),
+          maxwrittenClean = json.\("maxwritten_clean").toOption.map(_.as(Reads.LongReads)),
+          buffersBackend = json.\("buffers_backend").toOption.map(_.as(Reads.LongReads)),
+          buffersBackendFsync = json.\("buffers_backend_fsync").toOption.map(_.as(Reads.LongReads)),
+          buffersAlloc = json.\("buffers_alloc").toOption.map(_.as(Reads.LongReads)),
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -56,33 +56,33 @@ object PgStatBgwriterViewRow {
   def rowParser(idx: Int): RowParser[PgStatBgwriterViewRow] = RowParser[PgStatBgwriterViewRow] { row =>
     Success(
       PgStatBgwriterViewRow(
-        checkpointsTimed = row(idx + 0)(Column.columnToLong),
-        checkpointsReq = row(idx + 1)(Column.columnToLong),
-        checkpointWriteTime = row(idx + 2)(Column.columnToDouble),
-        checkpointSyncTime = row(idx + 3)(Column.columnToDouble),
-        buffersCheckpoint = row(idx + 4)(Column.columnToLong),
-        buffersClean = row(idx + 5)(Column.columnToLong),
-        maxwrittenClean = row(idx + 6)(Column.columnToLong),
-        buffersBackend = row(idx + 7)(Column.columnToLong),
-        buffersBackendFsync = row(idx + 8)(Column.columnToLong),
-        buffersAlloc = row(idx + 9)(Column.columnToLong),
-        statsReset = row(idx + 10)(TypoOffsetDateTime.column)
+        checkpointsTimed = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        checkpointsReq = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        checkpointWriteTime = row(idx + 2)(Column.columnToOption(Column.columnToDouble)),
+        checkpointSyncTime = row(idx + 3)(Column.columnToOption(Column.columnToDouble)),
+        buffersCheckpoint = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        buffersClean = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        maxwrittenClean = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        buffersBackend = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        buffersBackendFsync = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
+        buffersAlloc = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        statsReset = row(idx + 10)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatBgwriterViewRow] = OWrites[PgStatBgwriterViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "checkpoints_timed" -> Writes.LongWrites.writes(o.checkpointsTimed),
-      "checkpoints_req" -> Writes.LongWrites.writes(o.checkpointsReq),
-      "checkpoint_write_time" -> Writes.DoubleWrites.writes(o.checkpointWriteTime),
-      "checkpoint_sync_time" -> Writes.DoubleWrites.writes(o.checkpointSyncTime),
-      "buffers_checkpoint" -> Writes.LongWrites.writes(o.buffersCheckpoint),
-      "buffers_clean" -> Writes.LongWrites.writes(o.buffersClean),
-      "maxwritten_clean" -> Writes.LongWrites.writes(o.maxwrittenClean),
-      "buffers_backend" -> Writes.LongWrites.writes(o.buffersBackend),
-      "buffers_backend_fsync" -> Writes.LongWrites.writes(o.buffersBackendFsync),
-      "buffers_alloc" -> Writes.LongWrites.writes(o.buffersAlloc),
-      "stats_reset" -> TypoOffsetDateTime.writes.writes(o.statsReset)
+      "checkpoints_timed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.checkpointsTimed),
+      "checkpoints_req" -> Writes.OptionWrites(Writes.LongWrites).writes(o.checkpointsReq),
+      "checkpoint_write_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.checkpointWriteTime),
+      "checkpoint_sync_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.checkpointSyncTime),
+      "buffers_checkpoint" -> Writes.OptionWrites(Writes.LongWrites).writes(o.buffersCheckpoint),
+      "buffers_clean" -> Writes.OptionWrites(Writes.LongWrites).writes(o.buffersClean),
+      "maxwritten_clean" -> Writes.OptionWrites(Writes.LongWrites).writes(o.maxwrittenClean),
+      "buffers_backend" -> Writes.OptionWrites(Writes.LongWrites).writes(o.buffersBackend),
+      "buffers_backend_fsync" -> Writes.OptionWrites(Writes.LongWrites).writes(o.buffersBackendFsync),
+      "buffers_alloc" -> Writes.OptionWrites(Writes.LongWrites).writes(o.buffersAlloc),
+      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
     ))
   )
 }

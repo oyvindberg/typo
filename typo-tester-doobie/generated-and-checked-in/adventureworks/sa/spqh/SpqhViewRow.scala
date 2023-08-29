@@ -18,7 +18,8 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class SpqhViewRow(
-  id: Int,
+  /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.quotadate]] */
@@ -32,11 +33,11 @@ case class SpqhViewRow(
 )
 
 object SpqhViewRow {
-  implicit lazy val decoder: Decoder[SpqhViewRow] = Decoder.forProduct6[SpqhViewRow, Int, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SpqhViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SpqhViewRow] = Encoder.forProduct6[SpqhViewRow, Int, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SpqhViewRow] = Decoder.forProduct6[SpqhViewRow, BusinessentityId, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SpqhViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SpqhViewRow] = Encoder.forProduct6[SpqhViewRow, BusinessentityId, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SpqhViewRow] = new Read[SpqhViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
@@ -44,7 +45,7 @@ object SpqhViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SpqhViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       quotadate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
       salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),

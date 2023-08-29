@@ -15,39 +15,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgPoliciesViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[pg_class.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[pg_policy.PgPolicyRow.polname]] */
   policyname: String,
-  permissive: String,
-  roles: Array[String],
-  cmd: String,
-  qual: String,
-  withCheck: String
+  permissive: /* nullability unknown */ Option[String],
+  roles: /* nullability unknown */ Option[Array[String]],
+  cmd: /* nullability unknown */ Option[String],
+  qual: /* nullability unknown */ Option[String],
+  withCheck: /* nullability unknown */ Option[String]
 )
 
 object PgPoliciesViewRow {
-  implicit lazy val decoder: Decoder[PgPoliciesViewRow] = Decoder.forProduct8[PgPoliciesViewRow, String, String, String, String, Array[String], String, String, String]("schemaname", "tablename", "policyname", "permissive", "roles", "cmd", "qual", "with_check")(PgPoliciesViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeArray[String](Decoder.decodeString, implicitly), Decoder.decodeString, Decoder.decodeString, Decoder.decodeString)
-  implicit lazy val encoder: Encoder[PgPoliciesViewRow] = Encoder.forProduct8[PgPoliciesViewRow, String, String, String, String, Array[String], String, String, String]("schemaname", "tablename", "policyname", "permissive", "roles", "cmd", "qual", "with_check")(x => (x.schemaname, x.tablename, x.policyname, x.permissive, x.roles, x.cmd, x.qual, x.withCheck))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), Encoder.encodeString, Encoder.encodeString, Encoder.encodeString)
+  implicit lazy val decoder: Decoder[PgPoliciesViewRow] = Decoder.forProduct8[PgPoliciesViewRow, String, String, String, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("schemaname", "tablename", "policyname", "permissive", "roles", "cmd", "qual", "with_check")(PgPoliciesViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgPoliciesViewRow] = Encoder.forProduct8[PgPoliciesViewRow, String, String, String, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("schemaname", "tablename", "policyname", "permissive", "roles", "cmd", "qual", "with_check")(x => (x.schemaname, x.tablename, x.policyname, x.permissive, x.roles, x.cmd, x.qual, x.withCheck))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgPoliciesViewRow] = new Read[PgPoliciesViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgPoliciesViewRow(
       schemaname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
       tablename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
       policyname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      permissive = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      roles = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 4),
-      cmd = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      qual = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
-      withCheck = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 7)
+      permissive = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      roles = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 4),
+      cmd = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      qual = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      withCheck = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

@@ -18,7 +18,8 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class PaViewRow(
-  id: Int,
+  /** Points to [[person.password.PasswordRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[person.password.PasswordRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.password.PasswordRow.passwordhash]] */
@@ -32,11 +33,11 @@ case class PaViewRow(
 )
 
 object PaViewRow {
-  implicit lazy val decoder: Decoder[PaViewRow] = Decoder.forProduct6[PaViewRow, Int, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PaViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[PaViewRow] = Encoder.forProduct6[PaViewRow, Int, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[PaViewRow] = Decoder.forProduct6[PaViewRow, BusinessentityId, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PaViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PaViewRow] = Encoder.forProduct6[PaViewRow, BusinessentityId, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PaViewRow] = new Read[PaViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
@@ -44,7 +45,7 @@ object PaViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PaViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       passwordhash = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
       passwordsalt = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),

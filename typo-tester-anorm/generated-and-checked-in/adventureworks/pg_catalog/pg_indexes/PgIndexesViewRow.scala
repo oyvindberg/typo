@@ -20,11 +20,15 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgIndexesViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[pg_class.PgClassRow.relname]] */
   indexname: String,
+  /** Points to [[pg_tablespace.PgTablespaceRow.spcname]] */
   tablespace: Option[String],
-  indexdef: String
+  indexdef: /* nullability unknown */ Option[String]
 )
 
 object PgIndexesViewRow {
@@ -35,7 +39,7 @@ object PgIndexesViewRow {
           tablename = json.\("tablename").as(Reads.StringReads),
           indexname = json.\("indexname").as(Reads.StringReads),
           tablespace = json.\("tablespace").toOption.map(_.as(Reads.StringReads)),
-          indexdef = json.\("indexdef").as(Reads.StringReads)
+          indexdef = json.\("indexdef").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -47,7 +51,7 @@ object PgIndexesViewRow {
         tablename = row(idx + 1)(Column.columnToString),
         indexname = row(idx + 2)(Column.columnToString),
         tablespace = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        indexdef = row(idx + 4)(Column.columnToString)
+        indexdef = row(idx + 4)(Column.columnToOption(Column.columnToString))
       )
     )
   }
@@ -57,7 +61,7 @@ object PgIndexesViewRow {
       "tablename" -> Writes.StringWrites.writes(o.tablename),
       "indexname" -> Writes.StringWrites.writes(o.indexname),
       "tablespace" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablespace),
-      "indexdef" -> Writes.StringWrites.writes(o.indexdef)
+      "indexdef" -> Writes.OptionWrites(Writes.StringWrites).writes(o.indexdef)
     ))
   )
 }

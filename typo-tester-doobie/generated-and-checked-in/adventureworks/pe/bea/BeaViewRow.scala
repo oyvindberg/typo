@@ -13,14 +13,14 @@ import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 import java.util.UUID
 
 case class BeaViewRow(
-  id: Int,
+  /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.addressid]] */
@@ -34,11 +34,11 @@ case class BeaViewRow(
 )
 
 object BeaViewRow {
-  implicit lazy val decoder: Decoder[BeaViewRow] = Decoder.forProduct6[BeaViewRow, Int, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BeaViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[BeaViewRow] = Encoder.forProduct6[BeaViewRow, Int, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[BeaViewRow] = Decoder.forProduct6[BeaViewRow, BusinessentityId, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BeaViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BeaViewRow] = Encoder.forProduct6[BeaViewRow, BusinessentityId, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BeaViewRow] = new Read[BeaViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (AddressId.get, Nullability.NoNulls),
       (AddresstypeId.get, Nullability.NoNulls),
@@ -46,7 +46,7 @@ object BeaViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BeaViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       addressid = AddressId.get.unsafeGetNonNullable(rs, i + 2),
       addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 3),

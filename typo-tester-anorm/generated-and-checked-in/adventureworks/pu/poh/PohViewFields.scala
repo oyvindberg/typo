@@ -12,9 +12,10 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PohViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[PurchaseorderheaderId, Row]
   val purchaseorderid: Field[PurchaseorderheaderId, Row]
   val revisionnumber: Field[Int, Row]
   val status: Field[Int, Row]
@@ -22,7 +23,7 @@ trait PohViewFields[Row] {
   val vendorid: Field[BusinessentityId, Row]
   val shipmethodid: Field[ShipmethodId, Row]
   val orderdate: Field[TypoLocalDateTime, Row]
-  val shipdate: Field[TypoLocalDateTime, Row]
+  val shipdate: OptField[TypoLocalDateTime, Row]
   val subtotal: Field[BigDecimal, Row]
   val taxamt: Field[BigDecimal, Row]
   val freight: Field[BigDecimal, Row]

@@ -12,7 +12,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.Field
 
 trait EphViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BusinessentityId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val ratechangedate: Field[TypoLocalDateTime, Row]
   val rate: Field[BigDecimal, Row]

@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package triggered_update_columns
 
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -15,30 +15,31 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TriggeredUpdateColumnsViewRow(
-  triggerCatalog: SqlIdentifier,
-  triggerSchema: SqlIdentifier,
-  triggerName: SqlIdentifier,
-  eventObjectCatalog: SqlIdentifier,
-  eventObjectSchema: SqlIdentifier,
-  eventObjectTable: SqlIdentifier,
-  eventObjectColumn: SqlIdentifier
+  triggerCatalog: /* nullability unknown */ Option[String],
+  triggerSchema: /* nullability unknown */ Option[String],
+  triggerName: /* nullability unknown */ Option[String],
+  eventObjectCatalog: /* nullability unknown */ Option[String],
+  eventObjectSchema: /* nullability unknown */ Option[String],
+  eventObjectTable: /* nullability unknown */ Option[String],
+  eventObjectColumn: /* nullability unknown */ Option[String]
 )
 
 object TriggeredUpdateColumnsViewRow {
   implicit lazy val reads: Reads[TriggeredUpdateColumnsViewRow] = Reads[TriggeredUpdateColumnsViewRow](json => JsResult.fromTry(
       Try(
         TriggeredUpdateColumnsViewRow(
-          triggerCatalog = json.\("trigger_catalog").as(SqlIdentifier.reads),
-          triggerSchema = json.\("trigger_schema").as(SqlIdentifier.reads),
-          triggerName = json.\("trigger_name").as(SqlIdentifier.reads),
-          eventObjectCatalog = json.\("event_object_catalog").as(SqlIdentifier.reads),
-          eventObjectSchema = json.\("event_object_schema").as(SqlIdentifier.reads),
-          eventObjectTable = json.\("event_object_table").as(SqlIdentifier.reads),
-          eventObjectColumn = json.\("event_object_column").as(SqlIdentifier.reads)
+          triggerCatalog = json.\("trigger_catalog").toOption.map(_.as(Reads.StringReads)),
+          triggerSchema = json.\("trigger_schema").toOption.map(_.as(Reads.StringReads)),
+          triggerName = json.\("trigger_name").toOption.map(_.as(Reads.StringReads)),
+          eventObjectCatalog = json.\("event_object_catalog").toOption.map(_.as(Reads.StringReads)),
+          eventObjectSchema = json.\("event_object_schema").toOption.map(_.as(Reads.StringReads)),
+          eventObjectTable = json.\("event_object_table").toOption.map(_.as(Reads.StringReads)),
+          eventObjectColumn = json.\("event_object_column").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -46,25 +47,25 @@ object TriggeredUpdateColumnsViewRow {
   def rowParser(idx: Int): RowParser[TriggeredUpdateColumnsViewRow] = RowParser[TriggeredUpdateColumnsViewRow] { row =>
     Success(
       TriggeredUpdateColumnsViewRow(
-        triggerCatalog = row(idx + 0)(SqlIdentifier.column),
-        triggerSchema = row(idx + 1)(SqlIdentifier.column),
-        triggerName = row(idx + 2)(SqlIdentifier.column),
-        eventObjectCatalog = row(idx + 3)(SqlIdentifier.column),
-        eventObjectSchema = row(idx + 4)(SqlIdentifier.column),
-        eventObjectTable = row(idx + 5)(SqlIdentifier.column),
-        eventObjectColumn = row(idx + 6)(SqlIdentifier.column)
+        triggerCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        triggerSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        triggerName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        eventObjectCatalog = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        eventObjectSchema = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        eventObjectTable = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        eventObjectColumn = row(idx + 6)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[TriggeredUpdateColumnsViewRow] = OWrites[TriggeredUpdateColumnsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "trigger_catalog" -> SqlIdentifier.writes.writes(o.triggerCatalog),
-      "trigger_schema" -> SqlIdentifier.writes.writes(o.triggerSchema),
-      "trigger_name" -> SqlIdentifier.writes.writes(o.triggerName),
-      "event_object_catalog" -> SqlIdentifier.writes.writes(o.eventObjectCatalog),
-      "event_object_schema" -> SqlIdentifier.writes.writes(o.eventObjectSchema),
-      "event_object_table" -> SqlIdentifier.writes.writes(o.eventObjectTable),
-      "event_object_column" -> SqlIdentifier.writes.writes(o.eventObjectColumn)
+      "trigger_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.triggerCatalog),
+      "trigger_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.triggerSchema),
+      "trigger_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.triggerName),
+      "event_object_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.eventObjectCatalog),
+      "event_object_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.eventObjectSchema),
+      "event_object_table" -> Writes.OptionWrites(Writes.StringWrites).writes(o.eventObjectTable),
+      "event_object_column" -> Writes.OptionWrites(Writes.StringWrites).writes(o.eventObjectColumn)
     ))
   )
 }

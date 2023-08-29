@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PaViewRow(
-  id: Int,
+  /** Points to [[person.password.PasswordRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[person.password.PasswordRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.password.PasswordRow.passwordhash]] */
@@ -40,7 +41,7 @@ object PaViewRow {
   implicit lazy val reads: Reads[PaViewRow] = Reads[PaViewRow](json => JsResult.fromTry(
       Try(
         PaViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           passwordhash = json.\("passwordhash").as(Reads.StringReads),
           passwordsalt = json.\("passwordsalt").as(Reads.StringReads),
@@ -53,7 +54,7 @@ object PaViewRow {
   def rowParser(idx: Int): RowParser[PaViewRow] = RowParser[PaViewRow] { row =>
     Success(
       PaViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         passwordhash = row(idx + 2)(Column.columnToString),
         passwordsalt = row(idx + 3)(Column.columnToString),
@@ -64,7 +65,7 @@ object PaViewRow {
   }
   implicit lazy val writes: OWrites[PaViewRow] = OWrites[PaViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "passwordhash" -> Writes.StringWrites.writes(o.passwordhash),
       "passwordsalt" -> Writes.StringWrites.writes(o.passwordsalt),

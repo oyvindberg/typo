@@ -15,27 +15,27 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatGssapiViewRow(
-  pid: Int,
-  gssAuthenticated: Boolean,
-  principal: String,
-  encrypted: Boolean
+  pid: /* nullability unknown */ Option[Int],
+  gssAuthenticated: /* nullability unknown */ Option[Boolean],
+  principal: /* nullability unknown */ Option[String],
+  encrypted: /* nullability unknown */ Option[Boolean]
 )
 
 object PgStatGssapiViewRow {
-  implicit lazy val decoder: Decoder[PgStatGssapiViewRow] = Decoder.forProduct4[PgStatGssapiViewRow, Int, Boolean, String, Boolean]("pid", "gss_authenticated", "principal", "encrypted")(PgStatGssapiViewRow.apply)(Decoder.decodeInt, Decoder.decodeBoolean, Decoder.decodeString, Decoder.decodeBoolean)
-  implicit lazy val encoder: Encoder[PgStatGssapiViewRow] = Encoder.forProduct4[PgStatGssapiViewRow, Int, Boolean, String, Boolean]("pid", "gss_authenticated", "principal", "encrypted")(x => (x.pid, x.gssAuthenticated, x.principal, x.encrypted))(Encoder.encodeInt, Encoder.encodeBoolean, Encoder.encodeString, Encoder.encodeBoolean)
+  implicit lazy val decoder: Decoder[PgStatGssapiViewRow] = Decoder.forProduct4[PgStatGssapiViewRow, /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean]]("pid", "gss_authenticated", "principal", "encrypted")(PgStatGssapiViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean))
+  implicit lazy val encoder: Encoder[PgStatGssapiViewRow] = Encoder.forProduct4[PgStatGssapiViewRow, /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean]]("pid", "gss_authenticated", "principal", "encrypted")(x => (x.pid, x.gssAuthenticated, x.principal, x.encrypted))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean))
   implicit lazy val read: Read[PgStatGssapiViewRow] = new Read[PgStatGssapiViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.BooleanMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.BooleanMeta.get, Nullability.NoNulls)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatGssapiViewRow(
-      pid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      gssAuthenticated = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 1),
-      principal = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      encrypted = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 3)
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      gssAuthenticated = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 1),
+      principal = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      encrypted = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

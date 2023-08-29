@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PcViewRow(
-  id: Int,
+  /** Points to [[production.productcategory.ProductcategoryRow.productcategoryid]] */
+  id: ProductcategoryId,
   /** Points to [[production.productcategory.ProductcategoryRow.productcategoryid]] */
   productcategoryid: ProductcategoryId,
   /** Points to [[production.productcategory.ProductcategoryRow.name]] */
@@ -39,7 +40,7 @@ object PcViewRow {
   implicit lazy val reads: Reads[PcViewRow] = Reads[PcViewRow](json => JsResult.fromTry(
       Try(
         PcViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(ProductcategoryId.reads),
           productcategoryid = json.\("productcategoryid").as(ProductcategoryId.reads),
           name = json.\("name").as(Name.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
@@ -51,7 +52,7 @@ object PcViewRow {
   def rowParser(idx: Int): RowParser[PcViewRow] = RowParser[PcViewRow] { row =>
     Success(
       PcViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(ProductcategoryId.column),
         productcategoryid = row(idx + 1)(ProductcategoryId.column),
         name = row(idx + 2)(Name.column),
         rowguid = row(idx + 3)(Column.columnToUUID),
@@ -61,7 +62,7 @@ object PcViewRow {
   }
   implicit lazy val writes: OWrites[PcViewRow] = OWrites[PcViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> ProductcategoryId.writes.writes(o.id),
       "productcategoryid" -> ProductcategoryId.writes.writes(o.productcategoryid),
       "name" -> Name.writes.writes(o.name),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),

@@ -10,14 +10,15 @@ package pp
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PpViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ProductphotoId, Row]
   val productphotoid: Field[ProductphotoId, Row]
-  val thumbnailphoto: Field[Byte, Row]
-  val thumbnailphotofilename: Field[/* max 50 chars */ String, Row]
-  val largephoto: Field[Byte, Row]
-  val largephotofilename: Field[/* max 50 chars */ String, Row]
+  val thumbnailphoto: OptField[Byte, Row]
+  val thumbnailphotofilename: OptField[/* max 50 chars */ String, Row]
+  val largephoto: OptField[Byte, Row]
+  val largephotofilename: OptField[/* max 50 chars */ String, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PpViewFields extends PpViewStructure[PpViewRow](None, identity, (_, x) => x)

@@ -1,4 +1,4 @@
-package typo.internal.sqlfiles
+package typo.internal.analysis
 
 /** A type that represents whether a query returns rows or not.
   */

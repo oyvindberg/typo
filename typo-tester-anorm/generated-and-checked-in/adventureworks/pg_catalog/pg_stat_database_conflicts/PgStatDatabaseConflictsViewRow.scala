@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_database_conflicts
 
+import adventureworks.pg_catalog.pg_database.PgDatabaseId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -20,26 +21,28 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatDatabaseConflictsViewRow(
-  datid: /* oid */ Long,
+  /** Points to [[pg_database.PgDatabaseRow.oid]] */
+  datid: PgDatabaseId,
+  /** Points to [[pg_database.PgDatabaseRow.datname]] */
   datname: String,
-  conflTablespace: Long,
-  conflLock: Long,
-  conflSnapshot: Long,
-  conflBufferpin: Long,
-  conflDeadlock: Long
+  conflTablespace: /* nullability unknown */ Option[Long],
+  conflLock: /* nullability unknown */ Option[Long],
+  conflSnapshot: /* nullability unknown */ Option[Long],
+  conflBufferpin: /* nullability unknown */ Option[Long],
+  conflDeadlock: /* nullability unknown */ Option[Long]
 )
 
 object PgStatDatabaseConflictsViewRow {
   implicit lazy val reads: Reads[PgStatDatabaseConflictsViewRow] = Reads[PgStatDatabaseConflictsViewRow](json => JsResult.fromTry(
       Try(
         PgStatDatabaseConflictsViewRow(
-          datid = json.\("datid").as(Reads.LongReads),
+          datid = json.\("datid").as(PgDatabaseId.reads),
           datname = json.\("datname").as(Reads.StringReads),
-          conflTablespace = json.\("confl_tablespace").as(Reads.LongReads),
-          conflLock = json.\("confl_lock").as(Reads.LongReads),
-          conflSnapshot = json.\("confl_snapshot").as(Reads.LongReads),
-          conflBufferpin = json.\("confl_bufferpin").as(Reads.LongReads),
-          conflDeadlock = json.\("confl_deadlock").as(Reads.LongReads)
+          conflTablespace = json.\("confl_tablespace").toOption.map(_.as(Reads.LongReads)),
+          conflLock = json.\("confl_lock").toOption.map(_.as(Reads.LongReads)),
+          conflSnapshot = json.\("confl_snapshot").toOption.map(_.as(Reads.LongReads)),
+          conflBufferpin = json.\("confl_bufferpin").toOption.map(_.as(Reads.LongReads)),
+          conflDeadlock = json.\("confl_deadlock").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -47,25 +50,25 @@ object PgStatDatabaseConflictsViewRow {
   def rowParser(idx: Int): RowParser[PgStatDatabaseConflictsViewRow] = RowParser[PgStatDatabaseConflictsViewRow] { row =>
     Success(
       PgStatDatabaseConflictsViewRow(
-        datid = row(idx + 0)(Column.columnToLong),
+        datid = row(idx + 0)(PgDatabaseId.column),
         datname = row(idx + 1)(Column.columnToString),
-        conflTablespace = row(idx + 2)(Column.columnToLong),
-        conflLock = row(idx + 3)(Column.columnToLong),
-        conflSnapshot = row(idx + 4)(Column.columnToLong),
-        conflBufferpin = row(idx + 5)(Column.columnToLong),
-        conflDeadlock = row(idx + 6)(Column.columnToLong)
+        conflTablespace = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
+        conflLock = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        conflSnapshot = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        conflBufferpin = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        conflDeadlock = row(idx + 6)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatDatabaseConflictsViewRow] = OWrites[PgStatDatabaseConflictsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "datid" -> Writes.LongWrites.writes(o.datid),
+      "datid" -> PgDatabaseId.writes.writes(o.datid),
       "datname" -> Writes.StringWrites.writes(o.datname),
-      "confl_tablespace" -> Writes.LongWrites.writes(o.conflTablespace),
-      "confl_lock" -> Writes.LongWrites.writes(o.conflLock),
-      "confl_snapshot" -> Writes.LongWrites.writes(o.conflSnapshot),
-      "confl_bufferpin" -> Writes.LongWrites.writes(o.conflBufferpin),
-      "confl_deadlock" -> Writes.LongWrites.writes(o.conflDeadlock)
+      "confl_tablespace" -> Writes.OptionWrites(Writes.LongWrites).writes(o.conflTablespace),
+      "confl_lock" -> Writes.OptionWrites(Writes.LongWrites).writes(o.conflLock),
+      "confl_snapshot" -> Writes.OptionWrites(Writes.LongWrites).writes(o.conflSnapshot),
+      "confl_bufferpin" -> Writes.OptionWrites(Writes.LongWrites).writes(o.conflBufferpin),
+      "confl_deadlock" -> Writes.OptionWrites(Writes.LongWrites).writes(o.conflDeadlock)
     ))
   )
 }

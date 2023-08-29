@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_statio_sys_tables
 
+import adventureworks.pg_catalog.pg_class.PgClassId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -16,58 +17,58 @@ import java.sql.ResultSet
 
 case class PgStatioSysTablesViewRow(
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.relid]] */
-  relid: /* oid */ Long,
+  relid: Option[PgClassId],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.schemaname]] */
-  schemaname: String,
+  schemaname: Option[String],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.relname]] */
-  relname: String,
+  relname: Option[String],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.heapBlksRead]] */
-  heapBlksRead: Long,
+  heapBlksRead: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.heapBlksHit]] */
-  heapBlksHit: Long,
+  heapBlksHit: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.idxBlksRead]] */
-  idxBlksRead: Long,
+  idxBlksRead: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.idxBlksHit]] */
-  idxBlksHit: Long,
+  idxBlksHit: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.toastBlksRead]] */
-  toastBlksRead: Long,
+  toastBlksRead: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.toastBlksHit]] */
-  toastBlksHit: Long,
+  toastBlksHit: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.tidxBlksRead]] */
-  tidxBlksRead: Long,
+  tidxBlksRead: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_tables.PgStatioAllTablesViewRow.tidxBlksHit]] */
-  tidxBlksHit: Long
+  tidxBlksHit: Option[/* nullability unknown */ Long]
 )
 
 object PgStatioSysTablesViewRow {
-  implicit lazy val decoder: Decoder[PgStatioSysTablesViewRow] = Decoder.forProduct11[PgStatioSysTablesViewRow, /* oid */ Long, String, String, Long, Long, Long, Long, Long, Long, Long, Long]("relid", "schemaname", "relname", "heap_blks_read", "heap_blks_hit", "idx_blks_read", "idx_blks_hit", "toast_blks_read", "toast_blks_hit", "tidx_blks_read", "tidx_blks_hit")(PgStatioSysTablesViewRow.apply)(Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgStatioSysTablesViewRow] = Encoder.forProduct11[PgStatioSysTablesViewRow, /* oid */ Long, String, String, Long, Long, Long, Long, Long, Long, Long, Long]("relid", "schemaname", "relname", "heap_blks_read", "heap_blks_hit", "idx_blks_read", "idx_blks_hit", "toast_blks_read", "toast_blks_hit", "tidx_blks_read", "tidx_blks_hit")(x => (x.relid, x.schemaname, x.relname, x.heapBlksRead, x.heapBlksHit, x.idxBlksRead, x.idxBlksHit, x.toastBlksRead, x.toastBlksHit, x.tidxBlksRead, x.tidxBlksHit))(Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgStatioSysTablesViewRow] = Decoder.forProduct11[PgStatioSysTablesViewRow, Option[PgClassId], Option[String], Option[String], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long]]("relid", "schemaname", "relname", "heap_blks_read", "heap_blks_hit", "idx_blks_read", "idx_blks_hit", "toast_blks_read", "toast_blks_hit", "tidx_blks_read", "tidx_blks_hit")(PgStatioSysTablesViewRow.apply)(Decoder.decodeOption(PgClassId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgStatioSysTablesViewRow] = Encoder.forProduct11[PgStatioSysTablesViewRow, Option[PgClassId], Option[String], Option[String], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long]]("relid", "schemaname", "relname", "heap_blks_read", "heap_blks_hit", "idx_blks_read", "idx_blks_hit", "toast_blks_read", "toast_blks_hit", "tidx_blks_read", "tidx_blks_hit")(x => (x.relid, x.schemaname, x.relname, x.heapBlksRead, x.heapBlksHit, x.idxBlksRead, x.idxBlksHit, x.toastBlksRead, x.toastBlksHit, x.tidxBlksRead, x.tidxBlksHit))(Encoder.encodeOption(PgClassId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit lazy val read: Read[PgStatioSysTablesViewRow] = new Read[PgStatioSysTablesViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls)
+      (PgClassId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatioSysTablesViewRow(
-      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
-      schemaname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      relname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      heapBlksRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      heapBlksHit = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
-      idxBlksRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
-      idxBlksHit = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
-      toastBlksRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
-      toastBlksHit = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 8),
-      tidxBlksRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 9),
-      tidxBlksHit = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 10)
+      relid = PgClassId.get.unsafeGetNullable(rs, i + 0),
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      heapBlksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      heapBlksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
+      idxBlksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
+      idxBlksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
+      toastBlksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
+      toastBlksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
+      tidxBlksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
+      tidxBlksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }

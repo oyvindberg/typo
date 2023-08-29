@@ -13,7 +13,7 @@ import adventureworks.production.product.ProductId
 import typo.dsl.SqlExpr.Field
 
 trait PdocViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ProductId, Row]
   val productid: Field[ProductId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
   val documentnode: Field[DocumentId, Row]

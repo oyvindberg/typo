@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class AtViewRow(
-  id: Int,
+  /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
+  id: AddresstypeId,
   /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
   addresstypeid: AddresstypeId,
   /** Points to [[person.addresstype.AddresstypeRow.name]] */
@@ -39,7 +40,7 @@ object AtViewRow {
   implicit lazy val reads: Reads[AtViewRow] = Reads[AtViewRow](json => JsResult.fromTry(
       Try(
         AtViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(AddresstypeId.reads),
           addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
           name = json.\("name").as(Name.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
@@ -51,7 +52,7 @@ object AtViewRow {
   def rowParser(idx: Int): RowParser[AtViewRow] = RowParser[AtViewRow] { row =>
     Success(
       AtViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(AddresstypeId.column),
         addresstypeid = row(idx + 1)(AddresstypeId.column),
         name = row(idx + 2)(Name.column),
         rowguid = row(idx + 3)(Column.columnToUUID),
@@ -61,7 +62,7 @@ object AtViewRow {
   }
   implicit lazy val writes: OWrites[AtViewRow] = OWrites[AtViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> AddresstypeId.writes.writes(o.id),
       "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),
       "name" -> Name.writes.writes(o.name),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),

@@ -7,26 +7,26 @@ package adventureworks
 package information_schema
 package enabled_roles
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class EnabledRolesViewRow(
-  roleName: SqlIdentifier
+  roleName: /* nullability unknown */ Option[String]
 )
 
 object EnabledRolesViewRow {
-  implicit lazy val decoder: Decoder[EnabledRolesViewRow] = Decoder.forProduct1[EnabledRolesViewRow, SqlIdentifier]("role_name")(EnabledRolesViewRow.apply)(SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[EnabledRolesViewRow] = Encoder.forProduct1[EnabledRolesViewRow, SqlIdentifier]("role_name")(x => (x.roleName))(SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[EnabledRolesViewRow] = Decoder.forProduct1[EnabledRolesViewRow, /* nullability unknown */ Option[String]]("role_name")(EnabledRolesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[EnabledRolesViewRow] = Encoder.forProduct1[EnabledRolesViewRow, /* nullability unknown */ Option[String]]("role_name")(x => (x.roleName))(Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[EnabledRolesViewRow] = new Read[EnabledRolesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EnabledRolesViewRow(
-      roleName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0)
+      roleName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0)
     )
   )
 }

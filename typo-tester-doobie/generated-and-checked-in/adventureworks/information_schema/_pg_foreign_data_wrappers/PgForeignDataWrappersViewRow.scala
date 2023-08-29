@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package `_pg_foreign_data_wrappers`
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
+import adventureworks.pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -17,36 +16,39 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgForeignDataWrappersViewRow(
-  oid: /* oid */ Long,
+  /** Points to [[pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperRow.oid]] */
+  oid: PgForeignDataWrapperId,
+  /** Points to [[pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperRow.fdwowner]] */
   fdwowner: /* oid */ Long,
-  fdwoptions: Array[String],
-  foreignDataWrapperCatalog: SqlIdentifier,
-  foreignDataWrapperName: SqlIdentifier,
-  authorizationIdentifier: SqlIdentifier,
-  foreignDataWrapperLanguage: CharacterData
+  /** Points to [[pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperRow.fdwoptions]] */
+  fdwoptions: Option[Array[String]],
+  foreignDataWrapperCatalog: /* nullability unknown */ Option[String],
+  foreignDataWrapperName: /* nullability unknown */ Option[String],
+  authorizationIdentifier: /* nullability unknown */ Option[String],
+  foreignDataWrapperLanguage: /* nullability unknown */ Option[String]
 )
 
 object PgForeignDataWrappersViewRow {
-  implicit lazy val decoder: Decoder[PgForeignDataWrappersViewRow] = Decoder.forProduct7[PgForeignDataWrappersViewRow, /* oid */ Long, /* oid */ Long, Array[String], SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("oid", "fdwowner", "fdwoptions", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "foreign_data_wrapper_language")(PgForeignDataWrappersViewRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeArray[String](Decoder.decodeString, implicitly), SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
-  implicit lazy val encoder: Encoder[PgForeignDataWrappersViewRow] = Encoder.forProduct7[PgForeignDataWrappersViewRow, /* oid */ Long, /* oid */ Long, Array[String], SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("oid", "fdwowner", "fdwoptions", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "foreign_data_wrapper_language")(x => (x.oid, x.fdwowner, x.fdwoptions, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.authorizationIdentifier, x.foreignDataWrapperLanguage))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
+  implicit lazy val decoder: Decoder[PgForeignDataWrappersViewRow] = Decoder.forProduct7[PgForeignDataWrappersViewRow, PgForeignDataWrapperId, /* oid */ Long, Option[Array[String]], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("oid", "fdwowner", "fdwoptions", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "foreign_data_wrapper_language")(PgForeignDataWrappersViewRow.apply)(PgForeignDataWrapperId.decoder, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgForeignDataWrappersViewRow] = Encoder.forProduct7[PgForeignDataWrappersViewRow, PgForeignDataWrapperId, /* oid */ Long, Option[Array[String]], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("oid", "fdwowner", "fdwoptions", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "foreign_data_wrapper_language")(x => (x.oid, x.fdwowner, x.fdwoptions, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.authorizationIdentifier, x.foreignDataWrapperLanguage))(PgForeignDataWrapperId.encoder, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgForeignDataWrappersViewRow] = new Read[PgForeignDataWrappersViewRow](
     gets = List(
+      (PgForeignDataWrapperId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls)
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgForeignDataWrappersViewRow(
-      oid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      oid = PgForeignDataWrapperId.get.unsafeGetNonNullable(rs, i + 0),
       fdwowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
-      fdwoptions = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 2),
-      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      authorizationIdentifier = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      foreignDataWrapperLanguage = CharacterData.get.unsafeGetNonNullable(rs, i + 6)
+      fdwoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 2),
+      foreignDataWrapperCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      foreignDataWrapperName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      authorizationIdentifier = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      foreignDataWrapperLanguage = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

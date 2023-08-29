@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BeViewRow(
-  id: Int,
+  /** Points to [[person.businessentity.BusinessentityRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[person.businessentity.BusinessentityRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.businessentity.BusinessentityRow.rowguid]] */
@@ -36,7 +37,7 @@ object BeViewRow {
   implicit lazy val reads: Reads[BeViewRow] = Reads[BeViewRow](json => JsResult.fromTry(
       Try(
         BeViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
@@ -47,7 +48,7 @@ object BeViewRow {
   def rowParser(idx: Int): RowParser[BeViewRow] = RowParser[BeViewRow] { row =>
     Success(
       BeViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         rowguid = row(idx + 2)(Column.columnToUUID),
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
@@ -56,7 +57,7 @@ object BeViewRow {
   }
   implicit lazy val writes: OWrites[BeViewRow] = OWrites[BeViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)

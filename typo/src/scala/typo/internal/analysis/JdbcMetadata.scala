@@ -1,6 +1,6 @@
 package typo
 package internal
-package sqlfiles
+package analysis
 
 import java.sql.{Connection, PreparedStatement}
 
@@ -52,7 +52,7 @@ object JdbcMetadata {
               columnDisplaySize = metadata.getColumnDisplaySize(n),
               parsedColumnName = parseName(metadata.getColumnLabel(n)),
               columnName = db.ColName(metadata.getColumnName(n)),
-              columnType = sqlfiles.JdbcType.fromInt(metadata.getColumnType(n)),
+              columnType = JdbcType.fromInt(metadata.getColumnType(n)),
               columnTypeName = metadata.getColumnTypeName(n),
               format = metadata.getFormat(n),
               isAutoIncrement = metadata.isAutoIncrement(n),

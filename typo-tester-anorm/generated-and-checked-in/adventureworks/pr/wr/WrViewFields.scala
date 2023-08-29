@@ -11,20 +11,21 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait WrViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[WorkorderId, Row]
   val workorderid: Field[WorkorderId, Row]
   val productid: Field[Int, Row]
   val operationsequence: Field[Int, Row]
   val locationid: Field[LocationId, Row]
   val scheduledstartdate: Field[TypoLocalDateTime, Row]
   val scheduledenddate: Field[TypoLocalDateTime, Row]
-  val actualstartdate: Field[TypoLocalDateTime, Row]
-  val actualenddate: Field[TypoLocalDateTime, Row]
-  val actualresourcehrs: Field[BigDecimal, Row]
+  val actualstartdate: OptField[TypoLocalDateTime, Row]
+  val actualenddate: OptField[TypoLocalDateTime, Row]
+  val actualresourcehrs: OptField[BigDecimal, Row]
   val plannedcost: Field[BigDecimal, Row]
-  val actualcost: Field[BigDecimal, Row]
+  val actualcost: OptField[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object WrViewFields extends WrViewStructure[WrViewRow](None, identity, (_, x) => x)

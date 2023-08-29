@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package routine_table_usage
 
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -15,34 +15,35 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class RoutineTableUsageViewRow(
-  specificCatalog: SqlIdentifier,
-  specificSchema: SqlIdentifier,
-  specificName: SqlIdentifier,
-  routineCatalog: SqlIdentifier,
-  routineSchema: SqlIdentifier,
-  routineName: SqlIdentifier,
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier
+  specificCatalog: /* nullability unknown */ Option[String],
+  specificSchema: /* nullability unknown */ Option[String],
+  specificName: /* nullability unknown */ Option[String],
+  routineCatalog: /* nullability unknown */ Option[String],
+  routineSchema: /* nullability unknown */ Option[String],
+  routineName: /* nullability unknown */ Option[String],
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String]
 )
 
 object RoutineTableUsageViewRow {
   implicit lazy val reads: Reads[RoutineTableUsageViewRow] = Reads[RoutineTableUsageViewRow](json => JsResult.fromTry(
       Try(
         RoutineTableUsageViewRow(
-          specificCatalog = json.\("specific_catalog").as(SqlIdentifier.reads),
-          specificSchema = json.\("specific_schema").as(SqlIdentifier.reads),
-          specificName = json.\("specific_name").as(SqlIdentifier.reads),
-          routineCatalog = json.\("routine_catalog").as(SqlIdentifier.reads),
-          routineSchema = json.\("routine_schema").as(SqlIdentifier.reads),
-          routineName = json.\("routine_name").as(SqlIdentifier.reads),
-          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
-          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
-          tableName = json.\("table_name").as(SqlIdentifier.reads)
+          specificCatalog = json.\("specific_catalog").toOption.map(_.as(Reads.StringReads)),
+          specificSchema = json.\("specific_schema").toOption.map(_.as(Reads.StringReads)),
+          specificName = json.\("specific_name").toOption.map(_.as(Reads.StringReads)),
+          routineCatalog = json.\("routine_catalog").toOption.map(_.as(Reads.StringReads)),
+          routineSchema = json.\("routine_schema").toOption.map(_.as(Reads.StringReads)),
+          routineName = json.\("routine_name").toOption.map(_.as(Reads.StringReads)),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -50,29 +51,29 @@ object RoutineTableUsageViewRow {
   def rowParser(idx: Int): RowParser[RoutineTableUsageViewRow] = RowParser[RoutineTableUsageViewRow] { row =>
     Success(
       RoutineTableUsageViewRow(
-        specificCatalog = row(idx + 0)(SqlIdentifier.column),
-        specificSchema = row(idx + 1)(SqlIdentifier.column),
-        specificName = row(idx + 2)(SqlIdentifier.column),
-        routineCatalog = row(idx + 3)(SqlIdentifier.column),
-        routineSchema = row(idx + 4)(SqlIdentifier.column),
-        routineName = row(idx + 5)(SqlIdentifier.column),
-        tableCatalog = row(idx + 6)(SqlIdentifier.column),
-        tableSchema = row(idx + 7)(SqlIdentifier.column),
-        tableName = row(idx + 8)(SqlIdentifier.column)
+        specificCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        specificSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        specificName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        routineCatalog = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        routineSchema = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        routineName = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        tableCatalog = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 8)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[RoutineTableUsageViewRow] = OWrites[RoutineTableUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "specific_catalog" -> SqlIdentifier.writes.writes(o.specificCatalog),
-      "specific_schema" -> SqlIdentifier.writes.writes(o.specificSchema),
-      "specific_name" -> SqlIdentifier.writes.writes(o.specificName),
-      "routine_catalog" -> SqlIdentifier.writes.writes(o.routineCatalog),
-      "routine_schema" -> SqlIdentifier.writes.writes(o.routineSchema),
-      "routine_name" -> SqlIdentifier.writes.writes(o.routineName),
-      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
-      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
-      "table_name" -> SqlIdentifier.writes.writes(o.tableName)
+      "specific_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.specificCatalog),
+      "specific_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.specificSchema),
+      "specific_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.specificName),
+      "routine_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.routineCatalog),
+      "routine_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.routineSchema),
+      "routine_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.routineName),
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName)
     ))
   )
 }

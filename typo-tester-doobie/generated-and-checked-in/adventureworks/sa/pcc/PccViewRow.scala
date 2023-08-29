@@ -12,13 +12,13 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PccViewRow(
-  id: Int,
+  /** Points to [[sales.personcreditcard.PersoncreditcardRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.creditcardid]] */
@@ -28,17 +28,17 @@ case class PccViewRow(
 )
 
 object PccViewRow {
-  implicit lazy val decoder: Decoder[PccViewRow] = Decoder.forProduct4[PccViewRow, Int, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("id", "businessentityid", "creditcardid", "modifieddate")(PccViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, CustomCreditcardId.decoder, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[PccViewRow] = Encoder.forProduct4[PccViewRow, Int, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("id", "businessentityid", "creditcardid", "modifieddate")(x => (x.id, x.businessentityid, x.creditcardid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, CustomCreditcardId.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[PccViewRow] = Decoder.forProduct4[PccViewRow, BusinessentityId, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("id", "businessentityid", "creditcardid", "modifieddate")(PccViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, CustomCreditcardId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PccViewRow] = Encoder.forProduct4[PccViewRow, BusinessentityId, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("id", "businessentityid", "creditcardid", "modifieddate")(x => (x.id, x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, CustomCreditcardId.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PccViewRow] = new Read[PccViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PccViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 2),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)

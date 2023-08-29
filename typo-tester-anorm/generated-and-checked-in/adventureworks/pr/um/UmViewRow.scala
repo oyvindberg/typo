@@ -10,7 +10,6 @@ package um
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Name
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,12 +17,12 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UmViewRow(
-  id: /* bpchar, max 3 chars */ String,
+  /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
+  id: UnitmeasureId,
   /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Points to [[production.unitmeasure.UnitmeasureRow.name]] */
@@ -36,7 +35,7 @@ object UmViewRow {
   implicit lazy val reads: Reads[UmViewRow] = Reads[UmViewRow](json => JsResult.fromTry(
       Try(
         UmViewRow(
-          id = json.\("id").as(Reads.StringReads),
+          id = json.\("id").as(UnitmeasureId.reads),
           unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
           name = json.\("name").as(Name.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
@@ -47,7 +46,7 @@ object UmViewRow {
   def rowParser(idx: Int): RowParser[UmViewRow] = RowParser[UmViewRow] { row =>
     Success(
       UmViewRow(
-        id = row(idx + 0)(Column.columnToString),
+        id = row(idx + 0)(UnitmeasureId.column),
         unitmeasurecode = row(idx + 1)(UnitmeasureId.column),
         name = row(idx + 2)(Name.column),
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
@@ -56,7 +55,7 @@ object UmViewRow {
   }
   implicit lazy val writes: OWrites[UmViewRow] = OWrites[UmViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.StringWrites.writes(o.id),
+      "id" -> UnitmeasureId.writes.writes(o.id),
       "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
       "name" -> Name.writes.writes(o.name),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)

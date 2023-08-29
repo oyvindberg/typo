@@ -13,13 +13,14 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait SViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BusinessentityId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val name: Field[Name, Row]
-  val salespersonid: Field[BusinessentityId, Row]
-  val demographics: Field[TypoXml, Row]
+  val salespersonid: OptField[BusinessentityId, Row]
+  val demographics: OptField[TypoXml, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

@@ -7,48 +7,47 @@ package adventureworks
 package information_schema
 package domain_constraints
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class DomainConstraintsViewRow(
-  constraintCatalog: SqlIdentifier,
-  constraintSchema: SqlIdentifier,
-  constraintName: SqlIdentifier,
-  domainCatalog: SqlIdentifier,
-  domainSchema: SqlIdentifier,
-  domainName: SqlIdentifier,
-  isDeferrable: YesOrNo,
-  initiallyDeferred: YesOrNo
+  constraintCatalog: /* nullability unknown */ Option[String],
+  constraintSchema: /* nullability unknown */ Option[String],
+  constraintName: /* nullability unknown */ Option[String],
+  domainCatalog: /* nullability unknown */ Option[String],
+  domainSchema: /* nullability unknown */ Option[String],
+  domainName: /* nullability unknown */ Option[String],
+  isDeferrable: /* nullability unknown */ Option[/* max 3 chars */ String],
+  initiallyDeferred: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object DomainConstraintsViewRow {
-  implicit lazy val decoder: Decoder[DomainConstraintsViewRow] = Decoder.forProduct8[DomainConstraintsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, YesOrNo, YesOrNo]("constraint_catalog", "constraint_schema", "constraint_name", "domain_catalog", "domain_schema", "domain_name", "is_deferrable", "initially_deferred")(DomainConstraintsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, YesOrNo.decoder, YesOrNo.decoder)
-  implicit lazy val encoder: Encoder[DomainConstraintsViewRow] = Encoder.forProduct8[DomainConstraintsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, YesOrNo, YesOrNo]("constraint_catalog", "constraint_schema", "constraint_name", "domain_catalog", "domain_schema", "domain_name", "is_deferrable", "initially_deferred")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.domainCatalog, x.domainSchema, x.domainName, x.isDeferrable, x.initiallyDeferred))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, YesOrNo.encoder, YesOrNo.encoder)
+  implicit lazy val decoder: Decoder[DomainConstraintsViewRow] = Decoder.forProduct8[DomainConstraintsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String], /* nullability unknown */ Option[/* max 3 chars */ String]]("constraint_catalog", "constraint_schema", "constraint_name", "domain_catalog", "domain_schema", "domain_name", "is_deferrable", "initially_deferred")(DomainConstraintsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[DomainConstraintsViewRow] = Encoder.forProduct8[DomainConstraintsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String], /* nullability unknown */ Option[/* max 3 chars */ String]]("constraint_catalog", "constraint_schema", "constraint_name", "domain_catalog", "domain_schema", "domain_name", "is_deferrable", "initially_deferred")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.domainCatalog, x.domainSchema, x.domainName, x.isDeferrable, x.initiallyDeferred))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[DomainConstraintsViewRow] = new Read[DomainConstraintsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => DomainConstraintsViewRow(
-      constraintCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      constraintSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      constraintName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      domainCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      domainSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      domainName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      isDeferrable = YesOrNo.get.unsafeGetNonNullable(rs, i + 6),
-      initiallyDeferred = YesOrNo.get.unsafeGetNonNullable(rs, i + 7)
+      constraintCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      constraintSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      constraintName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      domainCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      domainSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      domainName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      isDeferrable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      initiallyDeferred = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

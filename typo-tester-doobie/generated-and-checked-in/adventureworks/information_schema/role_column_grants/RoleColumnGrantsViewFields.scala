@@ -7,20 +7,17 @@ package adventureworks
 package information_schema
 package role_column_grants
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait RoleColumnGrantsViewFields[Row] {
-  val grantor: Field[SqlIdentifier, Row]
-  val grantee: Field[SqlIdentifier, Row]
-  val tableCatalog: Field[SqlIdentifier, Row]
-  val tableSchema: Field[SqlIdentifier, Row]
-  val tableName: Field[SqlIdentifier, Row]
-  val columnName: Field[SqlIdentifier, Row]
-  val privilegeType: Field[CharacterData, Row]
-  val isGrantable: Field[YesOrNo, Row]
+  val grantor: OptField[/* nullability unknown */ String, Row]
+  val grantee: OptField[/* nullability unknown */ String, Row]
+  val tableCatalog: OptField[/* nullability unknown */ String, Row]
+  val tableSchema: OptField[/* nullability unknown */ String, Row]
+  val tableName: OptField[/* nullability unknown */ String, Row]
+  val columnName: OptField[/* nullability unknown */ String, Row]
+  val privilegeType: OptField[/* nullability unknown */ String, Row]
+  val isGrantable: OptField[/* nullability unknown */ /* max 3 chars */ String, Row]
 }
 object RoleColumnGrantsViewFields extends RoleColumnGrantsViewStructure[RoleColumnGrantsViewRow](None, identity, (_, x) => x)
 

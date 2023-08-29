@@ -7,16 +7,15 @@ package adventureworks
 package information_schema
 package enabled_roles
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class EnabledRolesViewStructure[Row](val prefix: Option[String], val extract: Row => EnabledRolesViewRow, val merge: (Row, EnabledRolesViewRow) => Row)
   extends Relation[EnabledRolesViewFields, EnabledRolesViewRow, Row]
     with EnabledRolesViewFields[Row] { outer =>
 
-  override val roleName = new Field[SqlIdentifier, Row](prefix, "role_name", None, Some("name"))(x => extract(x).roleName, (row, value) => merge(row, extract(row).copy(roleName = value)))
+  override val roleName = new OptField[String, Row](prefix, "role_name", None, None)(x => extract(x).roleName, (row, value) => merge(row, extract(row).copy(roleName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](roleName)

@@ -18,10 +18,10 @@ class CuViewStructure[Row](val prefix: Option[String], val extract: Row => CuVie
   extends Relation[CuViewFields, CuViewRow, Row]
     with CuViewFields[Row] { outer =>
 
-  override val id = new Field[/* bpchar, max 3 chars */ String, Row](prefix, "id", None, Some("bpchar"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val currencycode = new Field[CurrencyId, Row](prefix, "currencycode", None, Some("bpchar"))(x => extract(x).currencycode, (row, value) => merge(row, extract(row).copy(currencycode = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[CurrencyId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val currencycode = new Field[CurrencyId, Row](prefix, "currencycode", None, None)(x => extract(x).currencycode, (row, value) => merge(row, extract(row).copy(currencycode = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, currencycode, name, modifieddate)

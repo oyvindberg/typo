@@ -7,17 +7,17 @@ package adventureworks
 package pg_catalog
 package pg_stat_ssl
 
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgStatSslViewFields[Row] {
-  val pid: Field[Int, Row]
-  val ssl: Field[Boolean, Row]
-  val version: Field[String, Row]
-  val cipher: Field[String, Row]
-  val bits: Field[Int, Row]
-  val clientDn: Field[String, Row]
-  val clientSerial: Field[BigDecimal, Row]
-  val issuerDn: Field[String, Row]
+  val pid: OptField[Int, Row]
+  val ssl: OptField[Boolean, Row]
+  val version: OptField[String, Row]
+  val cipher: OptField[String, Row]
+  val bits: OptField[Int, Row]
+  val clientDn: OptField[String, Row]
+  val clientSerial: OptField[BigDecimal, Row]
+  val issuerDn: OptField[String, Row]
 }
 object PgStatSslViewFields extends PgStatSslViewStructure[PgStatSslViewRow](None, identity, (_, x) => x)
 

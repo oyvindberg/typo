@@ -18,13 +18,13 @@ class SciViewStructure[Row](val prefix: Option[String], val extract: Row => SciV
   extends Relation[SciViewFields, SciViewRow, Row]
     with SciViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val shoppingcartitemid = new Field[ShoppingcartitemId, Row](prefix, "shoppingcartitemid", None, Some("int4"))(x => extract(x).shoppingcartitemid, (row, value) => merge(row, extract(row).copy(shoppingcartitemid = value)))
+  override val id = new Field[ShoppingcartitemId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val shoppingcartitemid = new Field[ShoppingcartitemId, Row](prefix, "shoppingcartitemid", None, None)(x => extract(x).shoppingcartitemid, (row, value) => merge(row, extract(row).copy(shoppingcartitemid = value)))
   override val shoppingcartid = new Field[/* max 50 chars */ String, Row](prefix, "shoppingcartid", None, None)(x => extract(x).shoppingcartid, (row, value) => merge(row, extract(row).copy(shoppingcartid = value)))
-  override val quantity = new Field[Int, Row](prefix, "quantity", None, Some("int4"))(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
-  override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val datecreated = new Field[TypoLocalDateTime, Row](prefix, "datecreated", Some("text"), Some("timestamp"))(x => extract(x).datecreated, (row, value) => merge(row, extract(row).copy(datecreated = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val quantity = new Field[Int, Row](prefix, "quantity", None, None)(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
+  override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+  override val datecreated = new Field[TypoLocalDateTime, Row](prefix, "datecreated", Some("text"), None)(x => extract(x).datecreated, (row, value) => merge(row, extract(row).copy(datecreated = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)

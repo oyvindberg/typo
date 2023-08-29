@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PdViewRow(
-  id: Int,
+  /** Points to [[production.productdescription.ProductdescriptionRow.productdescriptionid]] */
+  id: ProductdescriptionId,
   /** Points to [[production.productdescription.ProductdescriptionRow.productdescriptionid]] */
   productdescriptionid: ProductdescriptionId,
   /** Points to [[production.productdescription.ProductdescriptionRow.description]] */
@@ -38,7 +39,7 @@ object PdViewRow {
   implicit lazy val reads: Reads[PdViewRow] = Reads[PdViewRow](json => JsResult.fromTry(
       Try(
         PdViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(ProductdescriptionId.reads),
           productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
           description = json.\("description").as(Reads.StringReads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
@@ -50,7 +51,7 @@ object PdViewRow {
   def rowParser(idx: Int): RowParser[PdViewRow] = RowParser[PdViewRow] { row =>
     Success(
       PdViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(ProductdescriptionId.column),
         productdescriptionid = row(idx + 1)(ProductdescriptionId.column),
         description = row(idx + 2)(Column.columnToString),
         rowguid = row(idx + 3)(Column.columnToUUID),
@@ -60,7 +61,7 @@ object PdViewRow {
   }
   implicit lazy val writes: OWrites[PdViewRow] = OWrites[PdViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> ProductdescriptionId.writes.writes(o.id),
       "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
       "description" -> Writes.StringWrites.writes(o.description),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),

@@ -3,16 +3,14 @@ package typo
 import typo.generated.custom.comments.{CommentsSqlRepoImpl, CommentsSqlRow}
 import typo.generated.custom.domains.{DomainsSqlRepoImpl, DomainsSqlRow}
 import typo.generated.custom.enums.{EnumsSqlRepoImpl, EnumsSqlRow}
-import typo.generated.custom.view_column_dependencies.*
 import typo.generated.custom.view_find_all.*
 import typo.generated.information_schema.columns.{ColumnsViewRepoImpl, ColumnsViewRow}
 import typo.generated.information_schema.key_column_usage.{KeyColumnUsageViewRepoImpl, KeyColumnUsageViewRow}
 import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsViewRepoImpl, ReferentialConstraintsViewRow}
 import typo.generated.information_schema.table_constraints.{TableConstraintsViewRepoImpl, TableConstraintsViewRow}
 import typo.generated.information_schema.tables.{TablesViewRepoImpl, TablesViewRow}
-import typo.generated.information_schema.{SqlIdentifier, YesOrNo}
+import typo.internal.analysis.{DecomposedSql, JdbcMetadata, NullabilityFromExplain}
 import typo.internal.metadb.{Enums, ForeignKeys, PrimaryKeys, UniqueKeys}
-import typo.internal.sqlfiles.{DecomposedSql, NullabilityFromExplain}
 import typo.internal.{DebugJson, TypeMapperDb}
 
 import java.sql.Connection
@@ -23,6 +21,7 @@ case class MetaDb(
     domains: List[db.Domain],
     typeMapperDb: TypeMapperDb
 )
+
 object MetaDb {
   case class Input(
       tableConstraints: List[TableConstraintsViewRow],
@@ -32,7 +31,6 @@ object MetaDb {
       tablesViewRows: List[TablesViewRow],
       columnsViewRows: List[ColumnsViewRow],
       viewRows: List[ViewFindAllSqlRow],
-      viewColumnDeps: List[ViewColumnDependenciesSqlRow],
       domains: List[DomainsSqlRow],
       comments: List[CommentsSqlRow]
   )
@@ -55,7 +53,6 @@ object MetaDb {
         tablesViewRows = timed("tablesViewRows")(TablesViewRepoImpl.selectAll),
         columnsViewRows = timed("columnsViewRows")(ColumnsViewRepoImpl.selectAll),
         viewRows = timed("viewRows")(ViewFindAllSqlRepoImpl()),
-        viewColumnDeps = timed("viewColumnDeps")(ViewColumnDependenciesSqlRepoImpl(None)),
         domains = timed("domains")(DomainsSqlRepoImpl()),
         comments = timed("comments")(CommentsSqlRepoImpl())
       )
@@ -95,81 +92,61 @@ object MetaDb {
     val typeMapperDb = TypeMapperDb(enums, domains)
 
     val comments: Map[(db.RelationName, db.ColName), String] =
-      input.comments.collect { case CommentsSqlRow(maybeSchema, Some(SqlIdentifier(table)), Some(SqlIdentifier(column)), description) =>
-        (db.RelationName(maybeSchema.map(_.value), table), db.ColName(column)) -> description
+      input.comments.collect { case CommentsSqlRow(maybeSchema, Some(table), Some(column), description) =>
+        (db.RelationName(maybeSchema, table), db.ColName(column)) -> description
       }.toMap
 
-    val columnsByTable: Map[(Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]), List[ColumnsViewRow]] = input.columnsViewRows
+    val columnsByTable: Map[(Option[String], Option[String], Option[String]), List[ColumnsViewRow]] = input.columnsViewRows
       .groupBy(c => (c.tableCatalog, c.tableSchema, c.tableName))
 
     val relations: List[db.Relation] = {
       input.tablesViewRows.flatMap { relation =>
         val relationName = db.RelationName(
-          schema = relation.tableSchema.map(_.value),
-          name = relation.tableName.get.value
+          schema = relation.tableSchema,
+          name = relation.tableName.get
         )
 
         val columns = columnsByTable((relation.tableCatalog, relation.tableSchema, relation.tableName))
           .sortBy(_.ordinalPosition)
 
-        def mappedCols(maybeNullability: Option[NullabilityFromExplain.NullableIndices]): List[db.Col] =
-          columns.zipWithIndex.map { case (c, idx) =>
-            val jsonDescription = DebugJson(c)
-
-            val colName = db.ColName(c.columnName.get.value)
-            val nullability =
-              maybeNullability match {
-                case Some(nullableIndices) =>
-                  if (nullableIndices.values.contains(idx)) Nullability.Nullable else Nullability.NoNulls
-
-                case None =>
-                  c.isNullable match {
-                    case Some(YesOrNo("YES")) => Nullability.Nullable
-                    case Some(YesOrNo("NO"))  => Nullability.NoNulls
-                    case None                 => Nullability.NullableUnknown
-                    case other                => throw new Exception(s"Unknown nullability: $other")
-                  }
-              }
-            db.Col(
-              name = colName,
-              columnDefault = c.columnDefault.map(_.value),
-              nullability = nullability,
-              tpe = typeMapperDb.col(c).getOrElse {
-                System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${colName.value}. Falling back to text")
-                db.Type.Text
-              },
-              udtName = c.udtName.map(_.value),
-              comment = comments.get((relationName, colName)),
-              jsonDescription = jsonDescription
-            )
-          }
-
         groupedViewRows.get(relationName) match {
           case Some(view) =>
-            val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
-              input.viewColumnDeps.collect {
-                case x if x.viewSchema.map(_.value) == relationName.schema && x.viewName == relationName.name =>
-                  // TODO: I'm only able to get the column name from one of the two tables involved in the dependency.
-                  // I suppose this means that we'll only find the dependency if the column name is the same in both tables.
-                  val colName = db.ColName(x.columnName)
-                  val relName = db.RelationName(x.tableSchema.map(_.value), x.tableName)
-                  (colName, (relName, colName))
-              }.toMap
-
-            val nullabilityInfo = view.viewDefinition match {
-              case Some(sqlContent) =>
-                val decomposedSql = DecomposedSql.parse(sqlContent)
-                NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
-              case None => None
+            view.viewDefinition.map { sqlContent =>
+              val decomposedSql = DecomposedSql.parse(sqlContent)
+              val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked
+              val nullabilityInfo = NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
+              db.View(relationName, decomposedSql, jdbcMetadata, nullabilityInfo, isMaterialized = view.relkind == "m")
             }
 
-            for {
-              mappedCols <- NonEmptyList.fromList(mappedCols(nullabilityInfo))
-            } yield db.View(relationName, mappedCols, view.viewDefinition, isMaterialized = view.relkind == "m", deps)
-
           case None =>
+            val mappedCols: List[db.Col] =
+              columns.map { c =>
+                val jsonDescription = DebugJson(c)
+
+                val colName = db.ColName(c.columnName.get)
+                val nullability =
+                  c.isNullable match {
+                    case Some("YES") => Nullability.Nullable
+                    case Some("NO")  => Nullability.NoNulls
+                    case None        => Nullability.NullableUnknown
+                    case other       => throw new Exception(s"Unknown nullability: $other")
+                  }
+                db.Col(
+                  name = colName,
+                  columnDefault = c.columnDefault,
+                  nullability = nullability,
+                  tpe = typeMapperDb.col(c).getOrElse {
+                    System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${colName.value}. Falling back to text")
+                    db.Type.Text
+                  },
+                  udtName = c.udtName,
+                  comment = comments.get((relationName, colName)),
+                  jsonDescription = jsonDescription
+                )
+              }
+
             for {
-              mappedCols <- NonEmptyList.fromList(mappedCols(None))
+              mappedCols <- NonEmptyList.fromList(mappedCols)
             } yield db.Table(
               name = relationName,
               cols = mappedCols,

@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-import typo.internal.sqlfiles.MaybeReturnsRows
+import typo.internal.analysis.MaybeReturnsRows
 
 class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 

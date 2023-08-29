@@ -7,15 +7,14 @@ package adventureworks
 package information_schema
 package column_column_usage
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ColumnColumnUsageViewFields[Row] {
-  val tableCatalog: Field[SqlIdentifier, Row]
-  val tableSchema: Field[SqlIdentifier, Row]
-  val tableName: Field[SqlIdentifier, Row]
-  val columnName: Field[SqlIdentifier, Row]
-  val dependentColumn: Field[SqlIdentifier, Row]
+  val tableCatalog: OptField[String, Row]
+  val tableSchema: OptField[String, Row]
+  val tableName: OptField[String, Row]
+  val columnName: OptField[String, Row]
+  val dependentColumn: OptField[String, Row]
 }
 object ColumnColumnUsageViewFields extends ColumnColumnUsageViewStructure[ColumnColumnUsageViewRow](None, identity, (_, x) => x)
 

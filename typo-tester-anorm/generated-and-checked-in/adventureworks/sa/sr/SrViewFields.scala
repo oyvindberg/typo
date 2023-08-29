@@ -13,7 +13,7 @@ import adventureworks.sales.salesreason.SalesreasonId
 import typo.dsl.SqlExpr.Field
 
 trait SrViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[SalesreasonId, Row]
   val salesreasonid: Field[SalesreasonId, Row]
   val name: Field[Name, Row]
   val reasontype: Field[Name, Row]

@@ -7,14 +7,12 @@ package adventureworks
 package information_schema
 package administrable_role_authorizations
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait AdministrableRoleAuthorizationsViewFields[Row] {
-  val grantee: Field[SqlIdentifier, Row]
-  val roleName: Field[SqlIdentifier, Row]
-  val isGrantable: Field[YesOrNo, Row]
+  val grantee: OptField[/* nullability unknown */ String, Row]
+  val roleName: OptField[/* nullability unknown */ String, Row]
+  val isGrantable: OptField[/* nullability unknown */ /* max 3 chars */ String, Row]
 }
 object AdministrableRoleAuthorizationsViewFields extends AdministrableRoleAuthorizationsViewStructure[AdministrableRoleAuthorizationsViewRow](None, identity, (_, x) => x)
 

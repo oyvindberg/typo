@@ -22,7 +22,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CcViewRow(
-  id: Int,
+  /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
+  id: /* user-picked */ CustomCreditcardId,
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
   creditcardid: /* user-picked */ CustomCreditcardId,
   /** Points to [[sales.creditcard.CreditcardRow.cardtype]] */
@@ -41,7 +42,7 @@ object CcViewRow {
   implicit lazy val reads: Reads[CcViewRow] = Reads[CcViewRow](json => JsResult.fromTry(
       Try(
         CcViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(CustomCreditcardId.reads),
           creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads),
           cardtype = json.\("cardtype").as(Reads.StringReads),
           cardnumber = json.\("cardnumber").as(Reads.StringReads),
@@ -55,7 +56,7 @@ object CcViewRow {
   def rowParser(idx: Int): RowParser[CcViewRow] = RowParser[CcViewRow] { row =>
     Success(
       CcViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(/* user-picked */ CustomCreditcardId.column),
         creditcardid = row(idx + 1)(/* user-picked */ CustomCreditcardId.column),
         cardtype = row(idx + 2)(Column.columnToString),
         cardnumber = row(idx + 3)(Column.columnToString),
@@ -67,7 +68,7 @@ object CcViewRow {
   }
   implicit lazy val writes: OWrites[CcViewRow] = OWrites[CcViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> CustomCreditcardId.writes.writes(o.id),
       "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid),
       "cardtype" -> Writes.StringWrites.writes(o.cardtype),
       "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),

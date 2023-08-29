@@ -20,13 +20,18 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgMatviewsViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   matviewname: String,
-  matviewowner: String,
+  matviewowner: /* nullability unknown */ Option[String],
+  /** Points to [[pg_tablespace.PgTablespaceRow.spcname]] */
   tablespace: Option[String],
+  /** Points to [[pg_class.PgClassRow.relhasindex]] */
   hasindexes: Boolean,
+  /** Points to [[pg_class.PgClassRow.relispopulated]] */
   ispopulated: Boolean,
-  definition: String
+  definition: /* nullability unknown */ Option[String]
 )
 
 object PgMatviewsViewRow {
@@ -35,11 +40,11 @@ object PgMatviewsViewRow {
         PgMatviewsViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
           matviewname = json.\("matviewname").as(Reads.StringReads),
-          matviewowner = json.\("matviewowner").as(Reads.StringReads),
+          matviewowner = json.\("matviewowner").toOption.map(_.as(Reads.StringReads)),
           tablespace = json.\("tablespace").toOption.map(_.as(Reads.StringReads)),
           hasindexes = json.\("hasindexes").as(Reads.BooleanReads),
           ispopulated = json.\("ispopulated").as(Reads.BooleanReads),
-          definition = json.\("definition").as(Reads.StringReads)
+          definition = json.\("definition").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -49,11 +54,11 @@ object PgMatviewsViewRow {
       PgMatviewsViewRow(
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
         matviewname = row(idx + 1)(Column.columnToString),
-        matviewowner = row(idx + 2)(Column.columnToString),
+        matviewowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
         tablespace = row(idx + 3)(Column.columnToOption(Column.columnToString)),
         hasindexes = row(idx + 4)(Column.columnToBoolean),
         ispopulated = row(idx + 5)(Column.columnToBoolean),
-        definition = row(idx + 6)(Column.columnToString)
+        definition = row(idx + 6)(Column.columnToOption(Column.columnToString))
       )
     )
   }
@@ -61,11 +66,11 @@ object PgMatviewsViewRow {
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "matviewname" -> Writes.StringWrites.writes(o.matviewname),
-      "matviewowner" -> Writes.StringWrites.writes(o.matviewowner),
+      "matviewowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.matviewowner),
       "tablespace" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablespace),
       "hasindexes" -> Writes.BooleanWrites.writes(o.hasindexes),
       "ispopulated" -> Writes.BooleanWrites.writes(o.ispopulated),
-      "definition" -> Writes.StringWrites.writes(o.definition)
+      "definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.definition)
     ))
   )
 }

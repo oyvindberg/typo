@@ -7,29 +7,26 @@ package adventureworks
 package information_schema
 package tables
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class TablesViewStructure[Row](val prefix: Option[String], val extract: Row => TablesViewRow, val merge: (Row, TablesViewRow) => Row)
   extends Relation[TablesViewFields, TablesViewRow, Row]
     with TablesViewFields[Row] { outer =>
 
-  override val tableCatalog = new Field[SqlIdentifier, Row](prefix, "table_catalog", None, Some("name"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
-  override val tableSchema = new Field[SqlIdentifier, Row](prefix, "table_schema", None, Some("name"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
-  override val tableName = new Field[SqlIdentifier, Row](prefix, "table_name", None, Some("name"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
-  override val tableType = new Field[CharacterData, Row](prefix, "table_type", None, Some("varchar"))(x => extract(x).tableType, (row, value) => merge(row, extract(row).copy(tableType = value)))
-  override val selfReferencingColumnName = new Field[SqlIdentifier, Row](prefix, "self_referencing_column_name", None, Some("name"))(x => extract(x).selfReferencingColumnName, (row, value) => merge(row, extract(row).copy(selfReferencingColumnName = value)))
-  override val referenceGeneration = new Field[CharacterData, Row](prefix, "reference_generation", None, Some("varchar"))(x => extract(x).referenceGeneration, (row, value) => merge(row, extract(row).copy(referenceGeneration = value)))
-  override val userDefinedTypeCatalog = new Field[SqlIdentifier, Row](prefix, "user_defined_type_catalog", None, Some("name"))(x => extract(x).userDefinedTypeCatalog, (row, value) => merge(row, extract(row).copy(userDefinedTypeCatalog = value)))
-  override val userDefinedTypeSchema = new Field[SqlIdentifier, Row](prefix, "user_defined_type_schema", None, Some("name"))(x => extract(x).userDefinedTypeSchema, (row, value) => merge(row, extract(row).copy(userDefinedTypeSchema = value)))
-  override val userDefinedTypeName = new Field[SqlIdentifier, Row](prefix, "user_defined_type_name", None, Some("name"))(x => extract(x).userDefinedTypeName, (row, value) => merge(row, extract(row).copy(userDefinedTypeName = value)))
-  override val isInsertableInto = new Field[YesOrNo, Row](prefix, "is_insertable_into", None, Some("varchar"))(x => extract(x).isInsertableInto, (row, value) => merge(row, extract(row).copy(isInsertableInto = value)))
-  override val isTyped = new Field[YesOrNo, Row](prefix, "is_typed", None, Some("varchar"))(x => extract(x).isTyped, (row, value) => merge(row, extract(row).copy(isTyped = value)))
-  override val commitAction = new Field[CharacterData, Row](prefix, "commit_action", None, Some("varchar"))(x => extract(x).commitAction, (row, value) => merge(row, extract(row).copy(commitAction = value)))
+  override val tableCatalog = new OptField[String, Row](prefix, "table_catalog", None, None)(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
+  override val tableSchema = new OptField[String, Row](prefix, "table_schema", None, None)(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
+  override val tableName = new OptField[String, Row](prefix, "table_name", None, None)(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
+  override val tableType = new OptField[String, Row](prefix, "table_type", None, None)(x => extract(x).tableType, (row, value) => merge(row, extract(row).copy(tableType = value)))
+  override val selfReferencingColumnName = new OptField[String, Row](prefix, "self_referencing_column_name", None, None)(x => extract(x).selfReferencingColumnName, (row, value) => merge(row, extract(row).copy(selfReferencingColumnName = value)))
+  override val referenceGeneration = new OptField[String, Row](prefix, "reference_generation", None, None)(x => extract(x).referenceGeneration, (row, value) => merge(row, extract(row).copy(referenceGeneration = value)))
+  override val userDefinedTypeCatalog = new OptField[String, Row](prefix, "user_defined_type_catalog", None, None)(x => extract(x).userDefinedTypeCatalog, (row, value) => merge(row, extract(row).copy(userDefinedTypeCatalog = value)))
+  override val userDefinedTypeSchema = new OptField[String, Row](prefix, "user_defined_type_schema", None, None)(x => extract(x).userDefinedTypeSchema, (row, value) => merge(row, extract(row).copy(userDefinedTypeSchema = value)))
+  override val userDefinedTypeName = new OptField[String, Row](prefix, "user_defined_type_name", None, None)(x => extract(x).userDefinedTypeName, (row, value) => merge(row, extract(row).copy(userDefinedTypeName = value)))
+  override val isInsertableInto = new OptField[/* max 3 chars */ String, Row](prefix, "is_insertable_into", None, None)(x => extract(x).isInsertableInto, (row, value) => merge(row, extract(row).copy(isInsertableInto = value)))
+  override val isTyped = new OptField[/* max 3 chars */ String, Row](prefix, "is_typed", None, None)(x => extract(x).isTyped, (row, value) => merge(row, extract(row).copy(isTyped = value)))
+  override val commitAction = new OptField[String, Row](prefix, "commit_action", None, None)(x => extract(x).commitAction, (row, value) => merge(row, extract(row).copy(commitAction = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](tableCatalog, tableSchema, tableName, tableType, selfReferencingColumnName, referenceGeneration, userDefinedTypeCatalog, userDefinedTypeSchema, userDefinedTypeName, isInsertableInto, isTyped, commitAction)

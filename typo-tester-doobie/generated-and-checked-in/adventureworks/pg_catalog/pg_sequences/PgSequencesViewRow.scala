@@ -16,48 +16,56 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgSequencesViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[pg_class.PgClassRow.relname]] */
   sequencename: String,
-  sequenceowner: String,
-  dataType: TypoRegtype,
+  sequenceowner: /* nullability unknown */ Option[String],
+  dataType: /* nullability unknown */ Option[TypoRegtype],
+  /** Points to [[pg_sequence.PgSequenceRow.seqstart]] */
   startValue: Long,
+  /** Points to [[pg_sequence.PgSequenceRow.seqmin]] */
   minValue: Long,
+  /** Points to [[pg_sequence.PgSequenceRow.seqmax]] */
   maxValue: Long,
+  /** Points to [[pg_sequence.PgSequenceRow.seqincrement]] */
   incrementBy: Long,
+  /** Points to [[pg_sequence.PgSequenceRow.seqcycle]] */
   cycle: Boolean,
+  /** Points to [[pg_sequence.PgSequenceRow.seqcache]] */
   cacheSize: Long,
-  lastValue: Long
+  lastValue: /* nullability unknown */ Option[Long]
 )
 
 object PgSequencesViewRow {
-  implicit lazy val decoder: Decoder[PgSequencesViewRow] = Decoder.forProduct11[PgSequencesViewRow, String, String, String, TypoRegtype, Long, Long, Long, Long, Boolean, Long, Long]("schemaname", "sequencename", "sequenceowner", "data_type", "start_value", "min_value", "max_value", "increment_by", "cycle", "cache_size", "last_value")(PgSequencesViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoRegtype.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgSequencesViewRow] = Encoder.forProduct11[PgSequencesViewRow, String, String, String, TypoRegtype, Long, Long, Long, Long, Boolean, Long, Long]("schemaname", "sequencename", "sequenceowner", "data_type", "start_value", "min_value", "max_value", "increment_by", "cycle", "cache_size", "last_value")(x => (x.schemaname, x.sequencename, x.sequenceowner, x.dataType, x.startValue, x.minValue, x.maxValue, x.incrementBy, x.cycle, x.cacheSize, x.lastValue))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoRegtype.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgSequencesViewRow] = Decoder.forProduct11[PgSequencesViewRow, String, String, /* nullability unknown */ Option[String], /* nullability unknown */ Option[TypoRegtype], Long, Long, Long, Long, Boolean, Long, /* nullability unknown */ Option[Long]]("schemaname", "sequencename", "sequenceowner", "data_type", "start_value", "min_value", "max_value", "increment_by", "cycle", "cache_size", "last_value")(PgSequencesViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoRegtype.decoder), Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgSequencesViewRow] = Encoder.forProduct11[PgSequencesViewRow, String, String, /* nullability unknown */ Option[String], /* nullability unknown */ Option[TypoRegtype], Long, Long, Long, Long, Boolean, Long, /* nullability unknown */ Option[Long]]("schemaname", "sequencename", "sequenceowner", "data_type", "start_value", "min_value", "max_value", "increment_by", "cycle", "cache_size", "last_value")(x => (x.schemaname, x.sequencename, x.sequenceowner, x.dataType, x.startValue, x.minValue, x.maxValue, x.incrementBy, x.cycle, x.cacheSize, x.lastValue))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoRegtype.encoder), Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeLong))
   implicit lazy val read: Read[PgSequencesViewRow] = new Read[PgSequencesViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoRegtype.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoRegtype.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls)
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgSequencesViewRow(
       schemaname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
       sequencename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      sequenceowner = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      dataType = TypoRegtype.get.unsafeGetNonNullable(rs, i + 3),
+      sequenceowner = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      dataType = TypoRegtype.get.unsafeGetNullable(rs, i + 3),
       startValue = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
       minValue = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
       maxValue = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
       incrementBy = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
       cycle = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 8),
       cacheSize = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 9),
-      lastValue = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 10)
+      lastValue = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }

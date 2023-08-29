@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PohViewRow(
-  id: Int,
+  /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
+  id: PurchaseorderheaderId,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
   purchaseorderid: PurchaseorderheaderId,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.revisionnumber]] */
@@ -40,7 +41,7 @@ case class PohViewRow(
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.orderdate]] */
   orderdate: TypoLocalDateTime,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.shipdate]] */
-  shipdate: TypoLocalDateTime,
+  shipdate: Option[TypoLocalDateTime],
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.subtotal]] */
   subtotal: BigDecimal,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.taxamt]] */
@@ -55,7 +56,7 @@ object PohViewRow {
   implicit lazy val reads: Reads[PohViewRow] = Reads[PohViewRow](json => JsResult.fromTry(
       Try(
         PohViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(PurchaseorderheaderId.reads),
           purchaseorderid = json.\("purchaseorderid").as(PurchaseorderheaderId.reads),
           revisionnumber = json.\("revisionnumber").as(Reads.IntReads),
           status = json.\("status").as(Reads.IntReads),
@@ -63,7 +64,7 @@ object PohViewRow {
           vendorid = json.\("vendorid").as(BusinessentityId.reads),
           shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
           orderdate = json.\("orderdate").as(TypoLocalDateTime.reads),
-          shipdate = json.\("shipdate").as(TypoLocalDateTime.reads),
+          shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
           subtotal = json.\("subtotal").as(Reads.bigDecReads),
           taxamt = json.\("taxamt").as(Reads.bigDecReads),
           freight = json.\("freight").as(Reads.bigDecReads),
@@ -75,7 +76,7 @@ object PohViewRow {
   def rowParser(idx: Int): RowParser[PohViewRow] = RowParser[PohViewRow] { row =>
     Success(
       PohViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(PurchaseorderheaderId.column),
         purchaseorderid = row(idx + 1)(PurchaseorderheaderId.column),
         revisionnumber = row(idx + 2)(Column.columnToInt),
         status = row(idx + 3)(Column.columnToInt),
@@ -83,7 +84,7 @@ object PohViewRow {
         vendorid = row(idx + 5)(BusinessentityId.column),
         shipmethodid = row(idx + 6)(ShipmethodId.column),
         orderdate = row(idx + 7)(TypoLocalDateTime.column),
-        shipdate = row(idx + 8)(TypoLocalDateTime.column),
+        shipdate = row(idx + 8)(Column.columnToOption(TypoLocalDateTime.column)),
         subtotal = row(idx + 9)(Column.columnToScalaBigDecimal),
         taxamt = row(idx + 10)(Column.columnToScalaBigDecimal),
         freight = row(idx + 11)(Column.columnToScalaBigDecimal),
@@ -93,7 +94,7 @@ object PohViewRow {
   }
   implicit lazy val writes: OWrites[PohViewRow] = OWrites[PohViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> PurchaseorderheaderId.writes.writes(o.id),
       "purchaseorderid" -> PurchaseorderheaderId.writes.writes(o.purchaseorderid),
       "revisionnumber" -> Writes.IntWrites.writes(o.revisionnumber),
       "status" -> Writes.IntWrites.writes(o.status),
@@ -101,7 +102,7 @@ object PohViewRow {
       "vendorid" -> BusinessentityId.writes.writes(o.vendorid),
       "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
       "orderdate" -> TypoLocalDateTime.writes.writes(o.orderdate),
-      "shipdate" -> TypoLocalDateTime.writes.writes(o.shipdate),
+      "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
       "subtotal" -> Writes.BigDecimalWrites.writes(o.subtotal),
       "taxamt" -> Writes.BigDecimalWrites.writes(o.taxamt),
       "freight" -> Writes.BigDecimalWrites.writes(o.freight),

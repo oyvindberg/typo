@@ -22,7 +22,8 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class SpViewRow(
-  id: Int,
+  /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
+  id: StateprovinceId,
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovincecode]] */
@@ -42,11 +43,11 @@ case class SpViewRow(
 )
 
 object SpViewRow {
-  implicit lazy val decoder: Decoder[SpViewRow] = Decoder.forProduct9[SpViewRow, Int, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(SpViewRow.apply)(Decoder.decodeInt, StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SpViewRow] = Encoder.forProduct9[SpViewRow, Int, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(Encoder.encodeInt, StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SpViewRow] = Decoder.forProduct9[SpViewRow, StateprovinceId, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(SpViewRow.apply)(StateprovinceId.decoder, StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SpViewRow] = Encoder.forProduct9[SpViewRow, StateprovinceId, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(StateprovinceId.encoder, StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SpViewRow] = new Read[SpViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (StateprovinceId.get, Nullability.NoNulls),
       (StateprovinceId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (CountryregionId.get, Nullability.NoNulls),
@@ -57,7 +58,7 @@ object SpViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = StateprovinceId.get.unsafeGetNonNullable(rs, i + 0),
       stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 1),
       stateprovincecode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
       countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 3),

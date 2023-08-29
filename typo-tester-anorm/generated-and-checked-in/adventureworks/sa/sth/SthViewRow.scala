@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SthViewRow(
-  id: Int,
+  /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.territoryid]] */
+  id: SalesterritoryId,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.territoryid]] */
@@ -32,7 +33,7 @@ case class SthViewRow(
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.startdate]] */
   startdate: TypoLocalDateTime,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.enddate]] */
-  enddate: TypoLocalDateTime,
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.modifieddate]] */
@@ -43,11 +44,11 @@ object SthViewRow {
   implicit lazy val reads: Reads[SthViewRow] = Reads[SthViewRow](json => JsResult.fromTry(
       Try(
         SthViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(SalesterritoryId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           territoryid = json.\("territoryid").as(SalesterritoryId.reads),
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
-          enddate = json.\("enddate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -57,11 +58,11 @@ object SthViewRow {
   def rowParser(idx: Int): RowParser[SthViewRow] = RowParser[SthViewRow] { row =>
     Success(
       SthViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(SalesterritoryId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         territoryid = row(idx + 2)(SalesterritoryId.column),
         startdate = row(idx + 3)(TypoLocalDateTime.column),
-        enddate = row(idx + 4)(TypoLocalDateTime.column),
+        enddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
         rowguid = row(idx + 5)(Column.columnToUUID),
         modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
@@ -69,11 +70,11 @@ object SthViewRow {
   }
   implicit lazy val writes: OWrites[SthViewRow] = OWrites[SthViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> SalesterritoryId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
-      "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

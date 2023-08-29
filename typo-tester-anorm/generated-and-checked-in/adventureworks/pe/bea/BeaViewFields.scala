@@ -15,7 +15,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait BeaViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BusinessentityId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val addressid: Field[AddressId, Row]
   val addresstypeid: Field[AddresstypeId, Row]

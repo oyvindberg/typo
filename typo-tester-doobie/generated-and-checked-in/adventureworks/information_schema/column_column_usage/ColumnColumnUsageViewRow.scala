@@ -7,38 +7,38 @@ package adventureworks
 package information_schema
 package column_column_usage
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ColumnColumnUsageViewRow(
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  columnName: SqlIdentifier,
-  dependentColumn: SqlIdentifier
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  columnName: /* nullability unknown */ Option[String],
+  dependentColumn: /* nullability unknown */ Option[String]
 )
 
 object ColumnColumnUsageViewRow {
-  implicit lazy val decoder: Decoder[ColumnColumnUsageViewRow] = Decoder.forProduct5[ColumnColumnUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(ColumnColumnUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[ColumnColumnUsageViewRow] = Encoder.forProduct5[ColumnColumnUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.dependentColumn))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[ColumnColumnUsageViewRow] = Decoder.forProduct5[ColumnColumnUsageViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(ColumnColumnUsageViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[ColumnColumnUsageViewRow] = Encoder.forProduct5[ColumnColumnUsageViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.dependentColumn))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[ColumnColumnUsageViewRow] = new Read[ColumnColumnUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ColumnColumnUsageViewRow(
-      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      columnName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      dependentColumn = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4)
+      tableCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      tableSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      tableName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      columnName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      dependentColumn = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

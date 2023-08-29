@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package applicable_roles
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,22 +15,23 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ApplicableRolesViewRow(
-  grantee: SqlIdentifier,
-  roleName: SqlIdentifier,
-  isGrantable: YesOrNo
+  grantee: /* nullability unknown */ Option[String],
+  roleName: /* nullability unknown */ Option[String],
+  isGrantable: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object ApplicableRolesViewRow {
   implicit lazy val reads: Reads[ApplicableRolesViewRow] = Reads[ApplicableRolesViewRow](json => JsResult.fromTry(
       Try(
         ApplicableRolesViewRow(
-          grantee = json.\("grantee").as(SqlIdentifier.reads),
-          roleName = json.\("role_name").as(SqlIdentifier.reads),
-          isGrantable = json.\("is_grantable").as(YesOrNo.reads)
+          grantee = json.\("grantee").toOption.map(_.as(Reads.StringReads)),
+          roleName = json.\("role_name").toOption.map(_.as(Reads.StringReads)),
+          isGrantable = json.\("is_grantable").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -39,17 +39,17 @@ object ApplicableRolesViewRow {
   def rowParser(idx: Int): RowParser[ApplicableRolesViewRow] = RowParser[ApplicableRolesViewRow] { row =>
     Success(
       ApplicableRolesViewRow(
-        grantee = row(idx + 0)(SqlIdentifier.column),
-        roleName = row(idx + 1)(SqlIdentifier.column),
-        isGrantable = row(idx + 2)(YesOrNo.column)
+        grantee = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        roleName = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        isGrantable = row(idx + 2)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ApplicableRolesViewRow] = OWrites[ApplicableRolesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "grantee" -> SqlIdentifier.writes.writes(o.grantee),
-      "role_name" -> SqlIdentifier.writes.writes(o.roleName),
-      "is_grantable" -> YesOrNo.writes.writes(o.isGrantable)
+      "grantee" -> Writes.OptionWrites(Writes.StringWrites).writes(o.grantee),
+      "role_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.roleName),
+      "is_grantable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isGrantable)
     ))
   )
 }

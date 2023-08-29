@@ -24,22 +24,23 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VsalespersonViewRow(
-  /** Points to [[person.person.PersonRow.businessentityid]] */
+  /** Points to [[salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.person.PersonRow.title]] */
-  title: /* max 8 chars */ String,
+  title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: /* user-picked */ FirstName,
   /** Points to [[person.person.PersonRow.middlename]] */
-  middlename: Name,
+  middlename: Option[Name],
   /** Points to [[person.person.PersonRow.lastname]] */
   lastname: Name,
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: /* max 10 chars */ String,
+  suffix: Option[/* max 10 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
   jobtitle: /* max 50 chars */ String,
   /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
   phonenumber: Option[Phone],
+  /** Points to [[person.phonenumbertype.PhonenumbertypeRow.name]] */
   phonenumbertype: Option[Name],
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
   emailaddress: Option[/* max 50 chars */ String],
@@ -48,17 +49,21 @@ case class VsalespersonViewRow(
   /** Points to [[person.address.AddressRow.addressline1]] */
   addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: /* max 60 chars */ String,
+  addressline2: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.city]] */
   city: /* max 30 chars */ String,
+  /** Points to [[person.stateprovince.StateprovinceRow.name]] */
   stateprovincename: Name,
   /** Points to [[person.address.AddressRow.postalcode]] */
   postalcode: /* max 15 chars */ String,
+  /** Points to [[person.countryregion.CountryregionRow.name]] */
   countryregionname: Name,
+  /** Points to [[salesterritory.SalesterritoryRow.name]] */
   territoryname: Option[Name],
+  /** Points to [[salesterritory.SalesterritoryRow.group]] */
   territorygroup: Option[/* max 50 chars */ String],
   /** Points to [[salesperson.SalespersonRow.salesquota]] */
-  salesquota: BigDecimal,
+  salesquota: Option[BigDecimal],
   /** Points to [[salesperson.SalespersonRow.salesytd]] */
   salesytd: BigDecimal,
   /** Points to [[salesperson.SalespersonRow.saleslastyear]] */
@@ -70,25 +75,25 @@ object VsalespersonViewRow {
       Try(
         VsalespersonViewRow(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          title = json.\("title").as(Reads.StringReads),
+          title = json.\("title").toOption.map(_.as(Reads.StringReads)),
           firstname = json.\("firstname").as(FirstName.reads),
-          middlename = json.\("middlename").as(Name.reads),
+          middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
           lastname = json.\("lastname").as(Name.reads),
-          suffix = json.\("suffix").as(Reads.StringReads),
+          suffix = json.\("suffix").toOption.map(_.as(Reads.StringReads)),
           jobtitle = json.\("jobtitle").as(Reads.StringReads),
           phonenumber = json.\("phonenumber").toOption.map(_.as(Phone.reads)),
           phonenumbertype = json.\("phonenumbertype").toOption.map(_.as(Name.reads)),
           emailaddress = json.\("emailaddress").toOption.map(_.as(Reads.StringReads)),
           emailpromotion = json.\("emailpromotion").as(Reads.IntReads),
           addressline1 = json.\("addressline1").as(Reads.StringReads),
-          addressline2 = json.\("addressline2").as(Reads.StringReads),
+          addressline2 = json.\("addressline2").toOption.map(_.as(Reads.StringReads)),
           city = json.\("city").as(Reads.StringReads),
           stateprovincename = json.\("stateprovincename").as(Name.reads),
           postalcode = json.\("postalcode").as(Reads.StringReads),
           countryregionname = json.\("countryregionname").as(Name.reads),
           territoryname = json.\("territoryname").toOption.map(_.as(Name.reads)),
           territorygroup = json.\("territorygroup").toOption.map(_.as(Reads.StringReads)),
-          salesquota = json.\("salesquota").as(Reads.bigDecReads),
+          salesquota = json.\("salesquota").toOption.map(_.as(Reads.bigDecReads)),
           salesytd = json.\("salesytd").as(Reads.bigDecReads),
           saleslastyear = json.\("saleslastyear").as(Reads.bigDecReads)
         )
@@ -99,25 +104,25 @@ object VsalespersonViewRow {
     Success(
       VsalespersonViewRow(
         businessentityid = row(idx + 0)(BusinessentityId.column),
-        title = row(idx + 1)(Column.columnToString),
+        title = row(idx + 1)(Column.columnToOption(Column.columnToString)),
         firstname = row(idx + 2)(/* user-picked */ FirstName.column),
-        middlename = row(idx + 3)(Name.column),
+        middlename = row(idx + 3)(Column.columnToOption(Name.column)),
         lastname = row(idx + 4)(Name.column),
-        suffix = row(idx + 5)(Column.columnToString),
+        suffix = row(idx + 5)(Column.columnToOption(Column.columnToString)),
         jobtitle = row(idx + 6)(Column.columnToString),
         phonenumber = row(idx + 7)(Column.columnToOption(Phone.column)),
         phonenumbertype = row(idx + 8)(Column.columnToOption(Name.column)),
         emailaddress = row(idx + 9)(Column.columnToOption(Column.columnToString)),
         emailpromotion = row(idx + 10)(Column.columnToInt),
         addressline1 = row(idx + 11)(Column.columnToString),
-        addressline2 = row(idx + 12)(Column.columnToString),
+        addressline2 = row(idx + 12)(Column.columnToOption(Column.columnToString)),
         city = row(idx + 13)(Column.columnToString),
         stateprovincename = row(idx + 14)(Name.column),
         postalcode = row(idx + 15)(Column.columnToString),
         countryregionname = row(idx + 16)(Name.column),
         territoryname = row(idx + 17)(Column.columnToOption(Name.column)),
         territorygroup = row(idx + 18)(Column.columnToOption(Column.columnToString)),
-        salesquota = row(idx + 19)(Column.columnToScalaBigDecimal),
+        salesquota = row(idx + 19)(Column.columnToOption(Column.columnToScalaBigDecimal)),
         salesytd = row(idx + 20)(Column.columnToScalaBigDecimal),
         saleslastyear = row(idx + 21)(Column.columnToScalaBigDecimal)
       )
@@ -126,25 +131,25 @@ object VsalespersonViewRow {
   implicit lazy val writes: OWrites[VsalespersonViewRow] = OWrites[VsalespersonViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "title" -> Writes.StringWrites.writes(o.title),
+      "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
       "firstname" -> FirstName.writes.writes(o.firstname),
-      "middlename" -> Name.writes.writes(o.middlename),
+      "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
       "lastname" -> Name.writes.writes(o.lastname),
-      "suffix" -> Writes.StringWrites.writes(o.suffix),
+      "suffix" -> Writes.OptionWrites(Writes.StringWrites).writes(o.suffix),
       "jobtitle" -> Writes.StringWrites.writes(o.jobtitle),
       "phonenumber" -> Writes.OptionWrites(Phone.writes).writes(o.phonenumber),
       "phonenumbertype" -> Writes.OptionWrites(Name.writes).writes(o.phonenumbertype),
       "emailaddress" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailaddress),
       "emailpromotion" -> Writes.IntWrites.writes(o.emailpromotion),
       "addressline1" -> Writes.StringWrites.writes(o.addressline1),
-      "addressline2" -> Writes.StringWrites.writes(o.addressline2),
+      "addressline2" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline2),
       "city" -> Writes.StringWrites.writes(o.city),
       "stateprovincename" -> Name.writes.writes(o.stateprovincename),
       "postalcode" -> Writes.StringWrites.writes(o.postalcode),
       "countryregionname" -> Name.writes.writes(o.countryregionname),
       "territoryname" -> Writes.OptionWrites(Name.writes).writes(o.territoryname),
       "territorygroup" -> Writes.OptionWrites(Writes.StringWrites).writes(o.territorygroup),
-      "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),
+      "salesquota" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesquota),
       "salesytd" -> Writes.BigDecimalWrites.writes(o.salesytd),
       "saleslastyear" -> Writes.BigDecimalWrites.writes(o.saleslastyear)
     ))

@@ -7,17 +7,18 @@ package adventureworks
 package information_schema
 package `_pg_user_mappings`
 
-import adventureworks.information_schema.SqlIdentifier
+import adventureworks.pg_catalog.pg_user_mapping.PgUserMappingId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgUserMappingsViewFields[Row] {
-  val oid: Field[/* oid */ Long, Row]
-  val umoptions: Field[Array[String], Row]
+  val oid: Field[PgUserMappingId, Row]
+  val umoptions: OptField[Array[String], Row]
   val umuser: Field[/* oid */ Long, Row]
-  val authorizationIdentifier: Field[SqlIdentifier, Row]
-  val foreignServerCatalog: Field[SqlIdentifier, Row]
-  val foreignServerName: Field[SqlIdentifier, Row]
-  val srvowner: Field[SqlIdentifier, Row]
+  val authorizationIdentifier: OptField[String, Row]
+  val foreignServerCatalog: OptField[/* nullability unknown */ String, Row]
+  val foreignServerName: OptField[/* nullability unknown */ String, Row]
+  val srvowner: OptField[/* nullability unknown */ String, Row]
 }
 object PgUserMappingsViewFields extends PgUserMappingsViewStructure[PgUserMappingsViewRow](None, identity, (_, x) => x)
 

@@ -13,7 +13,7 @@ import typo.dsl.SqlExpr.OptField
 trait PgTablesViewFields[Row] {
   val schemaname: OptField[String, Row]
   val tablename: Field[String, Row]
-  val tableowner: Field[String, Row]
+  val tableowner: OptField[String, Row]
   val tablespace: OptField[String, Row]
   val hasindexes: Field[Boolean, Row]
   val hasrules: Field[Boolean, Row]

@@ -13,7 +13,7 @@ import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
 import typo.dsl.SqlExpr.Field
 
 trait SciViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ShoppingcartitemId, Row]
   val shoppingcartitemid: Field[ShoppingcartitemId, Row]
   val shoppingcartid: Field[/* max 50 chars */ String, Row]
   val quantity: Field[Int, Row]

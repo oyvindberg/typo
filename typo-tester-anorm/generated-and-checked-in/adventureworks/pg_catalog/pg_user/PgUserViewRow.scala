@@ -8,6 +8,7 @@ package pg_catalog
 package pg_user
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -22,20 +23,20 @@ import scala.util.Try
 
 case class PgUserViewRow(
   /** Points to [[pg_shadow.PgShadowViewRow.usename]] */
-  usename: String,
+  usename: Option[String],
   /** Points to [[pg_shadow.PgShadowViewRow.usesysid]] */
-  usesysid: /* oid */ Long,
+  usesysid: Option[PgAuthidId],
   /** Points to [[pg_shadow.PgShadowViewRow.usecreatedb]] */
-  usecreatedb: Boolean,
+  usecreatedb: Option[Boolean],
   /** Points to [[pg_shadow.PgShadowViewRow.usesuper]] */
-  usesuper: Boolean,
+  usesuper: Option[Boolean],
   /** Points to [[pg_shadow.PgShadowViewRow.userepl]] */
-  userepl: Boolean,
+  userepl: Option[Boolean],
   /** Points to [[pg_shadow.PgShadowViewRow.usebypassrls]] */
-  usebypassrls: Boolean,
-  passwd: String,
+  usebypassrls: Option[Boolean],
+  passwd: /* nullability unknown */ Option[String],
   /** Points to [[pg_shadow.PgShadowViewRow.valuntil]] */
-  valuntil: TypoOffsetDateTime,
+  valuntil: Option[TypoOffsetDateTime],
   /** Points to [[pg_shadow.PgShadowViewRow.useconfig]] */
   useconfig: Option[Array[String]]
 )
@@ -44,14 +45,14 @@ object PgUserViewRow {
   implicit lazy val reads: Reads[PgUserViewRow] = Reads[PgUserViewRow](json => JsResult.fromTry(
       Try(
         PgUserViewRow(
-          usename = json.\("usename").as(Reads.StringReads),
-          usesysid = json.\("usesysid").as(Reads.LongReads),
-          usecreatedb = json.\("usecreatedb").as(Reads.BooleanReads),
-          usesuper = json.\("usesuper").as(Reads.BooleanReads),
-          userepl = json.\("userepl").as(Reads.BooleanReads),
-          usebypassrls = json.\("usebypassrls").as(Reads.BooleanReads),
-          passwd = json.\("passwd").as(Reads.StringReads),
-          valuntil = json.\("valuntil").as(TypoOffsetDateTime.reads),
+          usename = json.\("usename").toOption.map(_.as(Reads.StringReads)),
+          usesysid = json.\("usesysid").toOption.map(_.as(PgAuthidId.reads)),
+          usecreatedb = json.\("usecreatedb").toOption.map(_.as(Reads.BooleanReads)),
+          usesuper = json.\("usesuper").toOption.map(_.as(Reads.BooleanReads)),
+          userepl = json.\("userepl").toOption.map(_.as(Reads.BooleanReads)),
+          usebypassrls = json.\("usebypassrls").toOption.map(_.as(Reads.BooleanReads)),
+          passwd = json.\("passwd").toOption.map(_.as(Reads.StringReads)),
+          valuntil = json.\("valuntil").toOption.map(_.as(TypoOffsetDateTime.reads)),
           useconfig = json.\("useconfig").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
@@ -60,28 +61,28 @@ object PgUserViewRow {
   def rowParser(idx: Int): RowParser[PgUserViewRow] = RowParser[PgUserViewRow] { row =>
     Success(
       PgUserViewRow(
-        usename = row(idx + 0)(Column.columnToString),
-        usesysid = row(idx + 1)(Column.columnToLong),
-        usecreatedb = row(idx + 2)(Column.columnToBoolean),
-        usesuper = row(idx + 3)(Column.columnToBoolean),
-        userepl = row(idx + 4)(Column.columnToBoolean),
-        usebypassrls = row(idx + 5)(Column.columnToBoolean),
-        passwd = row(idx + 6)(Column.columnToString),
-        valuntil = row(idx + 7)(TypoOffsetDateTime.column),
+        usename = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        usesysid = row(idx + 1)(Column.columnToOption(PgAuthidId.column)),
+        usecreatedb = row(idx + 2)(Column.columnToOption(Column.columnToBoolean)),
+        usesuper = row(idx + 3)(Column.columnToOption(Column.columnToBoolean)),
+        userepl = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
+        usebypassrls = row(idx + 5)(Column.columnToOption(Column.columnToBoolean)),
+        passwd = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        valuntil = row(idx + 7)(Column.columnToOption(TypoOffsetDateTime.column)),
         useconfig = row(idx + 8)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit lazy val writes: OWrites[PgUserViewRow] = OWrites[PgUserViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "usename" -> Writes.StringWrites.writes(o.usename),
-      "usesysid" -> Writes.LongWrites.writes(o.usesysid),
-      "usecreatedb" -> Writes.BooleanWrites.writes(o.usecreatedb),
-      "usesuper" -> Writes.BooleanWrites.writes(o.usesuper),
-      "userepl" -> Writes.BooleanWrites.writes(o.userepl),
-      "usebypassrls" -> Writes.BooleanWrites.writes(o.usebypassrls),
-      "passwd" -> Writes.StringWrites.writes(o.passwd),
-      "valuntil" -> TypoOffsetDateTime.writes.writes(o.valuntil),
+      "usename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.usename),
+      "usesysid" -> Writes.OptionWrites(PgAuthidId.writes).writes(o.usesysid),
+      "usecreatedb" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.usecreatedb),
+      "usesuper" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.usesuper),
+      "userepl" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.userepl),
+      "usebypassrls" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.usebypassrls),
+      "passwd" -> Writes.OptionWrites(Writes.StringWrites).writes(o.passwd),
+      "valuntil" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.valuntil),
       "useconfig" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.useconfig)
     ))
   )

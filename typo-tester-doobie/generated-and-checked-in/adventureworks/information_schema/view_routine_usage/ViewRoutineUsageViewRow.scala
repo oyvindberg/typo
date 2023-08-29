@@ -7,41 +7,41 @@ package adventureworks
 package information_schema
 package view_routine_usage
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ViewRoutineUsageViewRow(
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  specificCatalog: SqlIdentifier,
-  specificSchema: SqlIdentifier,
-  specificName: SqlIdentifier
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  specificCatalog: /* nullability unknown */ Option[String],
+  specificSchema: /* nullability unknown */ Option[String],
+  specificName: /* nullability unknown */ Option[String]
 )
 
 object ViewRoutineUsageViewRow {
-  implicit lazy val decoder: Decoder[ViewRoutineUsageViewRow] = Decoder.forProduct6[ViewRoutineUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("table_catalog", "table_schema", "table_name", "specific_catalog", "specific_schema", "specific_name")(ViewRoutineUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[ViewRoutineUsageViewRow] = Encoder.forProduct6[ViewRoutineUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("table_catalog", "table_schema", "table_name", "specific_catalog", "specific_schema", "specific_name")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.specificCatalog, x.specificSchema, x.specificName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[ViewRoutineUsageViewRow] = Decoder.forProduct6[ViewRoutineUsageViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("table_catalog", "table_schema", "table_name", "specific_catalog", "specific_schema", "specific_name")(ViewRoutineUsageViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[ViewRoutineUsageViewRow] = Encoder.forProduct6[ViewRoutineUsageViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("table_catalog", "table_schema", "table_name", "specific_catalog", "specific_schema", "specific_name")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.specificCatalog, x.specificSchema, x.specificName))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[ViewRoutineUsageViewRow] = new Read[ViewRoutineUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ViewRoutineUsageViewRow(
-      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      specificCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      specificSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      specificName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5)
+      tableCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      tableSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      tableName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      specificCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      specificSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      specificName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package `_pg_user_mappings`
 
-import adventureworks.information_schema.SqlIdentifier
+import adventureworks.pg_catalog.pg_user_mapping.PgUserMappingId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -16,40 +16,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgUserMappingsViewRow(
-  /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.oid]] */
-  oid: /* oid */ Long,
-  umoptions: Array[String],
+  /** Points to [[pg_catalog.pg_user_mapping.PgUserMappingRow.oid]] */
+  oid: PgUserMappingId,
+  /** Points to [[pg_catalog.pg_user_mapping.PgUserMappingRow.umoptions]] */
+  umoptions: Option[Array[String]],
+  /** Points to [[pg_catalog.pg_user_mapping.PgUserMappingRow.umuser]] */
   umuser: /* oid */ Long,
-  /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.authorizationIdentifier]] */
-  authorizationIdentifier: SqlIdentifier,
+  authorizationIdentifier: /* nullability unknown */ Option[String],
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: SqlIdentifier,
+  foreignServerCatalog: Option[/* nullability unknown */ String],
   /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.foreignServerName]] */
-  foreignServerName: SqlIdentifier,
-  srvowner: SqlIdentifier
+  foreignServerName: Option[/* nullability unknown */ String],
+  /** Points to [[`_pg_foreign_servers`.PgForeignServersViewRow.authorizationIdentifier]] */
+  srvowner: Option[/* nullability unknown */ String]
 )
 
 object PgUserMappingsViewRow {
-  implicit lazy val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct7[PgUserMappingsViewRow, /* oid */ Long, Array[String], /* oid */ Long, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("oid", "umoptions", "umuser", "authorization_identifier", "foreign_server_catalog", "foreign_server_name", "srvowner")(PgUserMappingsViewRow.apply)(Decoder.decodeLong, Decoder.decodeArray[String](Decoder.decodeString, implicitly), Decoder.decodeLong, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct7[PgUserMappingsViewRow, /* oid */ Long, Array[String], /* oid */ Long, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("oid", "umoptions", "umuser", "authorization_identifier", "foreign_server_catalog", "foreign_server_name", "srvowner")(x => (x.oid, x.umoptions, x.umuser, x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName, x.srvowner))(Encoder.encodeLong, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), Encoder.encodeLong, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct7[PgUserMappingsViewRow, PgUserMappingId, Option[Array[String]], /* oid */ Long, /* nullability unknown */ Option[String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String]]("oid", "umoptions", "umuser", "authorization_identifier", "foreign_server_catalog", "foreign_server_name", "srvowner")(PgUserMappingsViewRow.apply)(PgUserMappingId.decoder, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct7[PgUserMappingsViewRow, PgUserMappingId, Option[Array[String]], /* oid */ Long, /* nullability unknown */ Option[String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String]]("oid", "umoptions", "umuser", "authorization_identifier", "foreign_server_catalog", "foreign_server_name", "srvowner")(x => (x.oid, x.umoptions, x.umuser, x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName, x.srvowner))(PgUserMappingId.encoder, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgUserMappingsViewRow] = new Read[PgUserMappingsViewRow](
     gets = List(
+      (PgUserMappingId.get, Nullability.NoNulls),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgUserMappingsViewRow(
-      oid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
-      umoptions = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 1),
+      oid = PgUserMappingId.get.unsafeGetNonNullable(rs, i + 0),
+      umoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 1),
       umuser = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
-      authorizationIdentifier = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      foreignServerCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      foreignServerName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      srvowner = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6)
+      authorizationIdentifier = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      foreignServerCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      foreignServerName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      srvowner = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

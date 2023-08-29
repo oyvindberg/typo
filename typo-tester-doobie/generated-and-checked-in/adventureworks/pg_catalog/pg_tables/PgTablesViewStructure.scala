@@ -16,10 +16,10 @@ class PgTablesViewStructure[Row](val prefix: Option[String], val extract: Row =>
   extends Relation[PgTablesViewFields, PgTablesViewRow, Row]
     with PgTablesViewFields[Row] { outer =>
 
-  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val tablename = new Field[String, Row](prefix, "tablename", None, Some("name"))(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
-  override val tableowner = new Field[String, Row](prefix, "tableowner", None, Some("name"))(x => extract(x).tableowner, (row, value) => merge(row, extract(row).copy(tableowner = value)))
-  override val tablespace = new OptField[String, Row](prefix, "tablespace", None, Some("name"))(x => extract(x).tablespace, (row, value) => merge(row, extract(row).copy(tablespace = value)))
+  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, None)(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
+  override val tablename = new Field[String, Row](prefix, "tablename", None, None)(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
+  override val tableowner = new OptField[String, Row](prefix, "tableowner", None, None)(x => extract(x).tableowner, (row, value) => merge(row, extract(row).copy(tableowner = value)))
+  override val tablespace = new OptField[String, Row](prefix, "tablespace", None, None)(x => extract(x).tablespace, (row, value) => merge(row, extract(row).copy(tablespace = value)))
   override val hasindexes = new Field[Boolean, Row](prefix, "hasindexes", None, None)(x => extract(x).hasindexes, (row, value) => merge(row, extract(row).copy(hasindexes = value)))
   override val hasrules = new Field[Boolean, Row](prefix, "hasrules", None, None)(x => extract(x).hasrules, (row, value) => merge(row, extract(row).copy(hasrules = value)))
   override val hastriggers = new Field[Boolean, Row](prefix, "hastriggers", None, None)(x => extract(x).hastriggers, (row, value) => merge(row, extract(row).copy(hastriggers = value)))

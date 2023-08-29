@@ -15,27 +15,31 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgForeignTableColumnsViewRow(
+  /** Points to [[pg_catalog.pg_namespace.PgNamespaceRow.nspname]] */
   nspname: String,
+  /** Points to [[pg_catalog.pg_class.PgClassRow.relname]] */
   relname: String,
+  /** Points to [[pg_catalog.pg_attribute.PgAttributeRow.attname]] */
   attname: String,
-  attfdwoptions: Array[String]
+  /** Points to [[pg_catalog.pg_attribute.PgAttributeRow.attfdwoptions]] */
+  attfdwoptions: Option[Array[String]]
 )
 
 object PgForeignTableColumnsViewRow {
-  implicit lazy val decoder: Decoder[PgForeignTableColumnsViewRow] = Decoder.forProduct4[PgForeignTableColumnsViewRow, String, String, String, Array[String]]("nspname", "relname", "attname", "attfdwoptions")(PgForeignTableColumnsViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeArray[String](Decoder.decodeString, implicitly))
-  implicit lazy val encoder: Encoder[PgForeignTableColumnsViewRow] = Encoder.forProduct4[PgForeignTableColumnsViewRow, String, String, String, Array[String]]("nspname", "relname", "attname", "attfdwoptions")(x => (x.nspname, x.relname, x.attname, x.attfdwoptions))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly))
+  implicit lazy val decoder: Decoder[PgForeignTableColumnsViewRow] = Decoder.forProduct4[PgForeignTableColumnsViewRow, String, String, String, Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(PgForeignTableColumnsViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgForeignTableColumnsViewRow] = Encoder.forProduct4[PgForeignTableColumnsViewRow, String, String, String, Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(x => (x.nspname, x.relname, x.attname, x.attfdwoptions))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit lazy val read: Read[PgForeignTableColumnsViewRow] = new Read[PgForeignTableColumnsViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls)
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgForeignTableColumnsViewRow(
       nspname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
       relname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
       attname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      attfdwoptions = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 3)
+      attfdwoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

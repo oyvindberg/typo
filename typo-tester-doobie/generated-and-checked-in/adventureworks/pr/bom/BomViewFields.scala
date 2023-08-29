@@ -12,14 +12,15 @@ import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait BomViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BillofmaterialsId, Row]
   val billofmaterialsid: Field[BillofmaterialsId, Row]
-  val productassemblyid: Field[ProductId, Row]
+  val productassemblyid: OptField[ProductId, Row]
   val componentid: Field[ProductId, Row]
   val startdate: Field[TypoLocalDateTime, Row]
-  val enddate: Field[TypoLocalDateTime, Row]
+  val enddate: OptField[TypoLocalDateTime, Row]
   val unitmeasurecode: Field[UnitmeasureId, Row]
   val bomlevel: Field[Int, Row]
   val perassemblyqty: Field[BigDecimal, Row]

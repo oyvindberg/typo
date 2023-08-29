@@ -15,42 +15,42 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgHbaFileRulesViewRow(
-  lineNumber: Int,
-  `type`: String,
-  database: Array[String],
-  userName: Array[String],
-  address: String,
-  netmask: String,
-  authMethod: String,
-  options: Array[String],
-  error: String
+  lineNumber: /* nullability unknown */ Option[Int],
+  `type`: /* nullability unknown */ Option[String],
+  database: /* nullability unknown */ Option[Array[String]],
+  userName: /* nullability unknown */ Option[Array[String]],
+  address: /* nullability unknown */ Option[String],
+  netmask: /* nullability unknown */ Option[String],
+  authMethod: /* nullability unknown */ Option[String],
+  options: /* nullability unknown */ Option[Array[String]],
+  error: /* nullability unknown */ Option[String]
 )
 
 object PgHbaFileRulesViewRow {
-  implicit lazy val decoder: Decoder[PgHbaFileRulesViewRow] = Decoder.forProduct9[PgHbaFileRulesViewRow, Int, String, Array[String], Array[String], String, String, String, Array[String], String]("line_number", "type", "database", "user_name", "address", "netmask", "auth_method", "options", "error")(PgHbaFileRulesViewRow.apply)(Decoder.decodeInt, Decoder.decodeString, Decoder.decodeArray[String](Decoder.decodeString, implicitly), Decoder.decodeArray[String](Decoder.decodeString, implicitly), Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeArray[String](Decoder.decodeString, implicitly), Decoder.decodeString)
-  implicit lazy val encoder: Encoder[PgHbaFileRulesViewRow] = Encoder.forProduct9[PgHbaFileRulesViewRow, Int, String, Array[String], Array[String], String, String, String, Array[String], String]("line_number", "type", "database", "user_name", "address", "netmask", "auth_method", "options", "error")(x => (x.lineNumber, x.`type`, x.database, x.userName, x.address, x.netmask, x.authMethod, x.options, x.error))(Encoder.encodeInt, Encoder.encodeString, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), Encoder.encodeString)
+  implicit lazy val decoder: Decoder[PgHbaFileRulesViewRow] = Decoder.forProduct9[PgHbaFileRulesViewRow, /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[String]]("line_number", "type", "database", "user_name", "address", "netmask", "auth_method", "options", "error")(PgHbaFileRulesViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgHbaFileRulesViewRow] = Encoder.forProduct9[PgHbaFileRulesViewRow, /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[String]]("line_number", "type", "database", "user_name", "address", "netmask", "auth_method", "options", "error")(x => (x.lineNumber, x.`type`, x.database, x.userName, x.address, x.netmask, x.authMethod, x.options, x.error))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgHbaFileRulesViewRow] = new Read[PgHbaFileRulesViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgHbaFileRulesViewRow(
-      lineNumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      `type` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      database = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 2),
-      userName = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 3),
-      address = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      netmask = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      authMethod = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
-      options = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 7),
-      error = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 8)
+      lineNumber = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      `type` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      database = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 2),
+      userName = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 3),
+      address = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      netmask = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      authMethod = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      options = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 7),
+      error = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

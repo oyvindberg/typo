@@ -7,11 +7,10 @@ package adventureworks
 package information_schema
 package enabled_roles
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait EnabledRolesViewFields[Row] {
-  val roleName: Field[SqlIdentifier, Row]
+  val roleName: OptField[String, Row]
 }
 object EnabledRolesViewFields extends EnabledRolesViewStructure[EnabledRolesViewRow](None, identity, (_, x) => x)
 

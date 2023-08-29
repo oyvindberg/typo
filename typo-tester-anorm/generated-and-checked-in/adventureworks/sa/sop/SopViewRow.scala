@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SopViewRow(
-  id: Int,
+  /** Points to [[sales.specialofferproduct.SpecialofferproductRow.specialofferid]] */
+  id: SpecialofferId,
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.specialofferid]] */
   specialofferid: SpecialofferId,
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.productid]] */
@@ -39,7 +40,7 @@ object SopViewRow {
   implicit lazy val reads: Reads[SopViewRow] = Reads[SopViewRow](json => JsResult.fromTry(
       Try(
         SopViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(SpecialofferId.reads),
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
           productid = json.\("productid").as(ProductId.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
@@ -51,7 +52,7 @@ object SopViewRow {
   def rowParser(idx: Int): RowParser[SopViewRow] = RowParser[SopViewRow] { row =>
     Success(
       SopViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(SpecialofferId.column),
         specialofferid = row(idx + 1)(SpecialofferId.column),
         productid = row(idx + 2)(ProductId.column),
         rowguid = row(idx + 3)(Column.columnToUUID),
@@ -61,7 +62,7 @@ object SopViewRow {
   }
   implicit lazy val writes: OWrites[SopViewRow] = OWrites[SopViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> SpecialofferId.writes.writes(o.id),
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
       "productid" -> ProductId.writes.writes(o.productid),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),

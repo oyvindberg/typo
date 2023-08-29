@@ -1,5 +1,6 @@
 package typo
-package internal.sqlfiles
+package internal
+package analysis
 
 object parseName {
   def apply(name: String): ParsedName = {

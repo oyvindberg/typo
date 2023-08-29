@@ -21,24 +21,24 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import typo.generated.TypoOffsetDateTime
-import typo.generated.TypoRegtype
+import typo.generated.customtypes.TypoOffsetDateTime
+import typo.generated.customtypes.TypoRegtype
 
 case class PgPreparedStatementsViewRow(
-  /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"name","ordinal_position":1,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  name: Option[String],
-  /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"statement","ordinal_position":2,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  statement: Option[String],
-  /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"prepare_time","ordinal_position":3,"is_nullable":"YES","data_type":"timestamp with time zone","datetime_precision":6,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"timestamptz","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  prepareTime: Option[TypoOffsetDateTime],
-  /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"parameter_types","ordinal_position":4,"is_nullable":"YES","data_type":"ARRAY","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"_regtype","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  parameterTypes: Option[Array[TypoRegtype]],
-  /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"from_sql","ordinal_position":5,"is_nullable":"YES","data_type":"boolean","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"bool","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  fromSql: Option[Boolean],
-  /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"generic_plans","ordinal_position":6,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  genericPlans: Option[Long],
-  /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"custom_plans","ordinal_position":7,"is_nullable":"YES","data_type":"bigint","numeric_precision":64,"numeric_precision_radix":2,"numeric_scale":0,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int8","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  customPlans: Option[Long]
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"name"},"columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  name: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"statement"},"columnName":"statement","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  statement: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.sql.Timestamp","columnDisplaySize":35,"parsedColumnName":{"name":"prepare_time"},"columnName":"prepare_time","columnType":"Timestamp","columnTypeName":"timestamptz","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":35,"scale":6} */
+  prepareTime: /* nullability unknown */ Option[TypoOffsetDateTime],
+  /** debug: {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"parsedColumnName":{"name":"parameter_types"},"columnName":"parameter_types","columnType":"Array","columnTypeName":"_regtype","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  parameterTypes: /* nullability unknown */ Option[Array[TypoRegtype]],
+  /** debug: {"columnClassName":"java.lang.Boolean","columnDisplaySize":1,"parsedColumnName":{"name":"from_sql"},"columnName":"from_sql","columnType":"Bit","columnTypeName":"bool","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":1,"scale":0} */
+  fromSql: /* nullability unknown */ Option[Boolean],
+  /** debug: {"columnClassName":"java.lang.Long","columnDisplaySize":20,"parsedColumnName":{"name":"generic_plans"},"columnName":"generic_plans","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
+  genericPlans: /* nullability unknown */ Option[Long],
+  /** debug: {"columnClassName":"java.lang.Long","columnDisplaySize":20,"parsedColumnName":{"name":"custom_plans"},"columnName":"custom_plans","columnType":"BigInt","columnTypeName":"int8","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":19,"scale":0} */
+  customPlans: /* nullability unknown */ Option[Long]
 )
 
 object PgPreparedStatementsViewRow {

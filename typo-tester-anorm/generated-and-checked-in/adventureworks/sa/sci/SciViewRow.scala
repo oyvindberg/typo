@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SciViewRow(
-  id: Int,
+  /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartitemid]] */
+  id: ShoppingcartitemId,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartitemid]] */
   shoppingcartitemid: ShoppingcartitemId,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartid]] */
@@ -42,7 +43,7 @@ object SciViewRow {
   implicit lazy val reads: Reads[SciViewRow] = Reads[SciViewRow](json => JsResult.fromTry(
       Try(
         SciViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(ShoppingcartitemId.reads),
           shoppingcartitemid = json.\("shoppingcartitemid").as(ShoppingcartitemId.reads),
           shoppingcartid = json.\("shoppingcartid").as(Reads.StringReads),
           quantity = json.\("quantity").as(Reads.IntReads),
@@ -56,7 +57,7 @@ object SciViewRow {
   def rowParser(idx: Int): RowParser[SciViewRow] = RowParser[SciViewRow] { row =>
     Success(
       SciViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(ShoppingcartitemId.column),
         shoppingcartitemid = row(idx + 1)(ShoppingcartitemId.column),
         shoppingcartid = row(idx + 2)(Column.columnToString),
         quantity = row(idx + 3)(Column.columnToInt),
@@ -68,7 +69,7 @@ object SciViewRow {
   }
   implicit lazy val writes: OWrites[SciViewRow] = OWrites[SciViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> ShoppingcartitemId.writes.writes(o.id),
       "shoppingcartitemid" -> ShoppingcartitemId.writes.writes(o.shoppingcartitemid),
       "shoppingcartid" -> Writes.StringWrites.writes(o.shoppingcartid),
       "quantity" -> Writes.IntWrites.writes(o.quantity),

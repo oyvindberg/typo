@@ -19,13 +19,14 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class SpViewRow(
-  id: Int,
+  /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[sales.salesperson.SalespersonRow.territoryid]] */
-  territoryid: SalesterritoryId,
+  territoryid: Option[SalesterritoryId],
   /** Points to [[sales.salesperson.SalespersonRow.salesquota]] */
-  salesquota: BigDecimal,
+  salesquota: Option[BigDecimal],
   /** Points to [[sales.salesperson.SalespersonRow.bonus]] */
   bonus: BigDecimal,
   /** Points to [[sales.salesperson.SalespersonRow.commissionpct]] */
@@ -41,14 +42,14 @@ case class SpViewRow(
 )
 
 object SpViewRow {
-  implicit lazy val decoder: Decoder[SpViewRow] = Decoder.forProduct10[SpViewRow, Int, BusinessentityId, SalesterritoryId, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(SpViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, SalesterritoryId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SpViewRow] = Encoder.forProduct10[SpViewRow, Int, BusinessentityId, SalesterritoryId, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, SalesterritoryId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SpViewRow] = Decoder.forProduct10[SpViewRow, BusinessentityId, BusinessentityId, Option[SalesterritoryId], Option[BigDecimal], BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(SpViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SpViewRow] = Encoder.forProduct10[SpViewRow, BusinessentityId, BusinessentityId, Option[SalesterritoryId], Option[BigDecimal], BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SpViewRow] = new Read[SpViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
-      (SalesterritoryId.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (SalesterritoryId.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
@@ -57,10 +58,10 @@ object SpViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 2),
-      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 2),
+      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
       bonus = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
       commissionpct = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 5),
       salesytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6),

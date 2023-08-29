@@ -13,7 +13,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait PaViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BusinessentityId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val passwordhash: Field[/* max 128 chars */ String, Row]
   val passwordsalt: Field[/* max 10 chars */ String, Row]

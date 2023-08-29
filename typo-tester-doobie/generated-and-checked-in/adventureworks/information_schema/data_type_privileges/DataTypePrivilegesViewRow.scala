@@ -7,40 +7,38 @@ package adventureworks
 package information_schema
 package data_type_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class DataTypePrivilegesViewRow(
-  objectCatalog: SqlIdentifier,
-  objectSchema: SqlIdentifier,
-  objectName: SqlIdentifier,
-  objectType: CharacterData,
-  /** Points to [[attributes.AttributesViewRow.dtdIdentifier]] */
-  dtdIdentifier: SqlIdentifier
+  objectCatalog: /* nullability unknown */ Option[String],
+  objectSchema: /* nullability unknown */ Option[String],
+  objectName: /* nullability unknown */ Option[String],
+  objectType: /* nullability unknown */ Option[String],
+  dtdIdentifier: /* nullability unknown */ Option[String]
 )
 
 object DataTypePrivilegesViewRow {
-  implicit lazy val decoder: Decoder[DataTypePrivilegesViewRow] = Decoder.forProduct5[DataTypePrivilegesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, SqlIdentifier]("object_catalog", "object_schema", "object_name", "object_type", "dtd_identifier")(DataTypePrivilegesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[DataTypePrivilegesViewRow] = Encoder.forProduct5[DataTypePrivilegesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, SqlIdentifier]("object_catalog", "object_schema", "object_name", "object_type", "dtd_identifier")(x => (x.objectCatalog, x.objectSchema, x.objectName, x.objectType, x.dtdIdentifier))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[DataTypePrivilegesViewRow] = Decoder.forProduct5[DataTypePrivilegesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("object_catalog", "object_schema", "object_name", "object_type", "dtd_identifier")(DataTypePrivilegesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[DataTypePrivilegesViewRow] = Encoder.forProduct5[DataTypePrivilegesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("object_catalog", "object_schema", "object_name", "object_type", "dtd_identifier")(x => (x.objectCatalog, x.objectSchema, x.objectName, x.objectType, x.dtdIdentifier))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[DataTypePrivilegesViewRow] = new Read[DataTypePrivilegesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => DataTypePrivilegesViewRow(
-      objectCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      objectSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      objectName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      objectType = CharacterData.get.unsafeGetNonNullable(rs, i + 3),
-      dtdIdentifier = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4)
+      objectCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      objectSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      objectName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      objectType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      dtdIdentifier = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

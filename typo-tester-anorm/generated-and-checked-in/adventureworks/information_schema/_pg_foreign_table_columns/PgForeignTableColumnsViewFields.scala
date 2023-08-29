@@ -8,12 +8,13 @@ package information_schema
 package `_pg_foreign_table_columns`
 
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgForeignTableColumnsViewFields[Row] {
   val nspname: Field[String, Row]
   val relname: Field[String, Row]
   val attname: Field[String, Row]
-  val attfdwoptions: Field[Array[String], Row]
+  val attfdwoptions: OptField[Array[String], Row]
 }
 object PgForeignTableColumnsViewFields extends PgForeignTableColumnsViewStructure[PgForeignTableColumnsViewRow](None, identity, (_, x) => x)
 

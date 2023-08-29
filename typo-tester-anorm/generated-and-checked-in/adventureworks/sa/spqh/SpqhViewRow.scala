@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpqhViewRow(
-  id: Int,
+  /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.quotadate]] */
@@ -40,7 +41,7 @@ object SpqhViewRow {
   implicit lazy val reads: Reads[SpqhViewRow] = Reads[SpqhViewRow](json => JsResult.fromTry(
       Try(
         SpqhViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           quotadate = json.\("quotadate").as(TypoLocalDateTime.reads),
           salesquota = json.\("salesquota").as(Reads.bigDecReads),
@@ -53,7 +54,7 @@ object SpqhViewRow {
   def rowParser(idx: Int): RowParser[SpqhViewRow] = RowParser[SpqhViewRow] { row =>
     Success(
       SpqhViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         quotadate = row(idx + 2)(TypoLocalDateTime.column),
         salesquota = row(idx + 3)(Column.columnToScalaBigDecimal),
@@ -64,7 +65,7 @@ object SpqhViewRow {
   }
   implicit lazy val writes: OWrites[SpqhViewRow] = OWrites[SpqhViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "quotadate" -> TypoLocalDateTime.writes.writes(o.quotadate),
       "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),

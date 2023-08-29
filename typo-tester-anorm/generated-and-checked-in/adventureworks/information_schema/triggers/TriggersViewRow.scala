@@ -7,10 +7,8 @@ package adventureworks
 package information_schema
 package triggers
 
-import adventureworks.information_schema.CardinalNumber
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.TimeStamp
+import adventureworks.customtypes.TypoOffsetDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,50 +16,51 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TriggersViewRow(
-  triggerCatalog: SqlIdentifier,
-  triggerSchema: SqlIdentifier,
-  triggerName: SqlIdentifier,
-  eventManipulation: CharacterData,
-  eventObjectCatalog: SqlIdentifier,
-  eventObjectSchema: SqlIdentifier,
-  eventObjectTable: SqlIdentifier,
-  actionOrder: CardinalNumber,
-  actionCondition: CharacterData,
-  actionStatement: CharacterData,
-  actionOrientation: CharacterData,
-  actionTiming: CharacterData,
-  actionReferenceOldTable: SqlIdentifier,
-  actionReferenceNewTable: SqlIdentifier,
-  actionReferenceOldRow: SqlIdentifier,
-  actionReferenceNewRow: SqlIdentifier,
-  created: TimeStamp
+  triggerCatalog: /* nullability unknown */ Option[String],
+  triggerSchema: /* nullability unknown */ Option[String],
+  triggerName: /* nullability unknown */ Option[String],
+  eventManipulation: /* nullability unknown */ Option[String],
+  eventObjectCatalog: /* nullability unknown */ Option[String],
+  eventObjectSchema: /* nullability unknown */ Option[String],
+  eventObjectTable: /* nullability unknown */ Option[String],
+  actionOrder: /* nullability unknown */ Option[Int],
+  actionCondition: /* nullability unknown */ Option[String],
+  actionStatement: /* nullability unknown */ Option[String],
+  actionOrientation: /* nullability unknown */ Option[String],
+  actionTiming: /* nullability unknown */ Option[String],
+  actionReferenceOldTable: /* nullability unknown */ Option[String],
+  actionReferenceNewTable: /* nullability unknown */ Option[String],
+  actionReferenceOldRow: /* nullability unknown */ Option[String],
+  actionReferenceNewRow: /* nullability unknown */ Option[String],
+  created: /* nullability unknown */ Option[TypoOffsetDateTime]
 )
 
 object TriggersViewRow {
   implicit lazy val reads: Reads[TriggersViewRow] = Reads[TriggersViewRow](json => JsResult.fromTry(
       Try(
         TriggersViewRow(
-          triggerCatalog = json.\("trigger_catalog").as(SqlIdentifier.reads),
-          triggerSchema = json.\("trigger_schema").as(SqlIdentifier.reads),
-          triggerName = json.\("trigger_name").as(SqlIdentifier.reads),
-          eventManipulation = json.\("event_manipulation").as(CharacterData.reads),
-          eventObjectCatalog = json.\("event_object_catalog").as(SqlIdentifier.reads),
-          eventObjectSchema = json.\("event_object_schema").as(SqlIdentifier.reads),
-          eventObjectTable = json.\("event_object_table").as(SqlIdentifier.reads),
-          actionOrder = json.\("action_order").as(CardinalNumber.reads),
-          actionCondition = json.\("action_condition").as(CharacterData.reads),
-          actionStatement = json.\("action_statement").as(CharacterData.reads),
-          actionOrientation = json.\("action_orientation").as(CharacterData.reads),
-          actionTiming = json.\("action_timing").as(CharacterData.reads),
-          actionReferenceOldTable = json.\("action_reference_old_table").as(SqlIdentifier.reads),
-          actionReferenceNewTable = json.\("action_reference_new_table").as(SqlIdentifier.reads),
-          actionReferenceOldRow = json.\("action_reference_old_row").as(SqlIdentifier.reads),
-          actionReferenceNewRow = json.\("action_reference_new_row").as(SqlIdentifier.reads),
-          created = json.\("created").as(TimeStamp.reads)
+          triggerCatalog = json.\("trigger_catalog").toOption.map(_.as(Reads.StringReads)),
+          triggerSchema = json.\("trigger_schema").toOption.map(_.as(Reads.StringReads)),
+          triggerName = json.\("trigger_name").toOption.map(_.as(Reads.StringReads)),
+          eventManipulation = json.\("event_manipulation").toOption.map(_.as(Reads.StringReads)),
+          eventObjectCatalog = json.\("event_object_catalog").toOption.map(_.as(Reads.StringReads)),
+          eventObjectSchema = json.\("event_object_schema").toOption.map(_.as(Reads.StringReads)),
+          eventObjectTable = json.\("event_object_table").toOption.map(_.as(Reads.StringReads)),
+          actionOrder = json.\("action_order").toOption.map(_.as(Reads.IntReads)),
+          actionCondition = json.\("action_condition").toOption.map(_.as(Reads.StringReads)),
+          actionStatement = json.\("action_statement").toOption.map(_.as(Reads.StringReads)),
+          actionOrientation = json.\("action_orientation").toOption.map(_.as(Reads.StringReads)),
+          actionTiming = json.\("action_timing").toOption.map(_.as(Reads.StringReads)),
+          actionReferenceOldTable = json.\("action_reference_old_table").toOption.map(_.as(Reads.StringReads)),
+          actionReferenceNewTable = json.\("action_reference_new_table").toOption.map(_.as(Reads.StringReads)),
+          actionReferenceOldRow = json.\("action_reference_old_row").toOption.map(_.as(Reads.StringReads)),
+          actionReferenceNewRow = json.\("action_reference_new_row").toOption.map(_.as(Reads.StringReads)),
+          created = json.\("created").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -69,45 +68,45 @@ object TriggersViewRow {
   def rowParser(idx: Int): RowParser[TriggersViewRow] = RowParser[TriggersViewRow] { row =>
     Success(
       TriggersViewRow(
-        triggerCatalog = row(idx + 0)(SqlIdentifier.column),
-        triggerSchema = row(idx + 1)(SqlIdentifier.column),
-        triggerName = row(idx + 2)(SqlIdentifier.column),
-        eventManipulation = row(idx + 3)(CharacterData.column),
-        eventObjectCatalog = row(idx + 4)(SqlIdentifier.column),
-        eventObjectSchema = row(idx + 5)(SqlIdentifier.column),
-        eventObjectTable = row(idx + 6)(SqlIdentifier.column),
-        actionOrder = row(idx + 7)(CardinalNumber.column),
-        actionCondition = row(idx + 8)(CharacterData.column),
-        actionStatement = row(idx + 9)(CharacterData.column),
-        actionOrientation = row(idx + 10)(CharacterData.column),
-        actionTiming = row(idx + 11)(CharacterData.column),
-        actionReferenceOldTable = row(idx + 12)(SqlIdentifier.column),
-        actionReferenceNewTable = row(idx + 13)(SqlIdentifier.column),
-        actionReferenceOldRow = row(idx + 14)(SqlIdentifier.column),
-        actionReferenceNewRow = row(idx + 15)(SqlIdentifier.column),
-        created = row(idx + 16)(TimeStamp.column)
+        triggerCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        triggerSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        triggerName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        eventManipulation = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        eventObjectCatalog = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        eventObjectSchema = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        eventObjectTable = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        actionOrder = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
+        actionCondition = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        actionStatement = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        actionOrientation = row(idx + 10)(Column.columnToOption(Column.columnToString)),
+        actionTiming = row(idx + 11)(Column.columnToOption(Column.columnToString)),
+        actionReferenceOldTable = row(idx + 12)(Column.columnToOption(Column.columnToString)),
+        actionReferenceNewTable = row(idx + 13)(Column.columnToOption(Column.columnToString)),
+        actionReferenceOldRow = row(idx + 14)(Column.columnToOption(Column.columnToString)),
+        actionReferenceNewRow = row(idx + 15)(Column.columnToOption(Column.columnToString)),
+        created = row(idx + 16)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit lazy val writes: OWrites[TriggersViewRow] = OWrites[TriggersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "trigger_catalog" -> SqlIdentifier.writes.writes(o.triggerCatalog),
-      "trigger_schema" -> SqlIdentifier.writes.writes(o.triggerSchema),
-      "trigger_name" -> SqlIdentifier.writes.writes(o.triggerName),
-      "event_manipulation" -> CharacterData.writes.writes(o.eventManipulation),
-      "event_object_catalog" -> SqlIdentifier.writes.writes(o.eventObjectCatalog),
-      "event_object_schema" -> SqlIdentifier.writes.writes(o.eventObjectSchema),
-      "event_object_table" -> SqlIdentifier.writes.writes(o.eventObjectTable),
-      "action_order" -> CardinalNumber.writes.writes(o.actionOrder),
-      "action_condition" -> CharacterData.writes.writes(o.actionCondition),
-      "action_statement" -> CharacterData.writes.writes(o.actionStatement),
-      "action_orientation" -> CharacterData.writes.writes(o.actionOrientation),
-      "action_timing" -> CharacterData.writes.writes(o.actionTiming),
-      "action_reference_old_table" -> SqlIdentifier.writes.writes(o.actionReferenceOldTable),
-      "action_reference_new_table" -> SqlIdentifier.writes.writes(o.actionReferenceNewTable),
-      "action_reference_old_row" -> SqlIdentifier.writes.writes(o.actionReferenceOldRow),
-      "action_reference_new_row" -> SqlIdentifier.writes.writes(o.actionReferenceNewRow),
-      "created" -> TimeStamp.writes.writes(o.created)
+      "trigger_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.triggerCatalog),
+      "trigger_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.triggerSchema),
+      "trigger_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.triggerName),
+      "event_manipulation" -> Writes.OptionWrites(Writes.StringWrites).writes(o.eventManipulation),
+      "event_object_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.eventObjectCatalog),
+      "event_object_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.eventObjectSchema),
+      "event_object_table" -> Writes.OptionWrites(Writes.StringWrites).writes(o.eventObjectTable),
+      "action_order" -> Writes.OptionWrites(Writes.IntWrites).writes(o.actionOrder),
+      "action_condition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionCondition),
+      "action_statement" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionStatement),
+      "action_orientation" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionOrientation),
+      "action_timing" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionTiming),
+      "action_reference_old_table" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionReferenceOldTable),
+      "action_reference_new_table" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionReferenceNewTable),
+      "action_reference_old_row" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionReferenceOldRow),
+      "action_reference_new_row" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionReferenceNewRow),
+      "created" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.created)
     ))
   )
 }

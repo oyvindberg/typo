@@ -12,14 +12,14 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 import java.util.UUID
 
 case class SthViewRow(
-  id: Int,
+  /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.territoryid]] */
+  id: SalesterritoryId,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.territoryid]] */
@@ -27,7 +27,7 @@ case class SthViewRow(
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.startdate]] */
   startdate: TypoLocalDateTime,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.enddate]] */
-  enddate: TypoLocalDateTime,
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.modifieddate]] */
@@ -35,24 +35,24 @@ case class SthViewRow(
 )
 
 object SthViewRow {
-  implicit lazy val decoder: Decoder[SthViewRow] = Decoder.forProduct7[SthViewRow, Int, BusinessentityId, SalesterritoryId, TypoLocalDateTime, TypoLocalDateTime, UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SthViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, SalesterritoryId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SthViewRow] = Encoder.forProduct7[SthViewRow, Int, BusinessentityId, SalesterritoryId, TypoLocalDateTime, TypoLocalDateTime, UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, SalesterritoryId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SthViewRow] = Decoder.forProduct7[SthViewRow, SalesterritoryId, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SthViewRow.apply)(SalesterritoryId.decoder, BusinessentityId.decoder, SalesterritoryId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SthViewRow] = Encoder.forProduct7[SthViewRow, SalesterritoryId, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], UUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))(SalesterritoryId.encoder, BusinessentityId.encoder, SalesterritoryId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SthViewRow] = new Read[SthViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (SalesterritoryId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (SalesterritoryId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.Nullable),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SthViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 2),
       startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
-      enddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
+      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
       rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 5),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
     )

@@ -8,20 +8,20 @@ package pg_catalog
 package pg_cursors
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgCursorsViewStructure[Row](val prefix: Option[String], val extract: Row => PgCursorsViewRow, val merge: (Row, PgCursorsViewRow) => Row)
   extends Relation[PgCursorsViewFields, PgCursorsViewRow, Row]
     with PgCursorsViewFields[Row] { outer =>
 
-  override val name = new Field[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val statement = new Field[String, Row](prefix, "statement", None, None)(x => extract(x).statement, (row, value) => merge(row, extract(row).copy(statement = value)))
-  override val isHoldable = new Field[Boolean, Row](prefix, "is_holdable", None, None)(x => extract(x).isHoldable, (row, value) => merge(row, extract(row).copy(isHoldable = value)))
-  override val isBinary = new Field[Boolean, Row](prefix, "is_binary", None, None)(x => extract(x).isBinary, (row, value) => merge(row, extract(row).copy(isBinary = value)))
-  override val isScrollable = new Field[Boolean, Row](prefix, "is_scrollable", None, None)(x => extract(x).isScrollable, (row, value) => merge(row, extract(row).copy(isScrollable = value)))
-  override val creationTime = new Field[TypoOffsetDateTime, Row](prefix, "creation_time", Some("text"), Some("timestamptz"))(x => extract(x).creationTime, (row, value) => merge(row, extract(row).copy(creationTime = value)))
+  override val name = new OptField[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val statement = new OptField[String, Row](prefix, "statement", None, None)(x => extract(x).statement, (row, value) => merge(row, extract(row).copy(statement = value)))
+  override val isHoldable = new OptField[Boolean, Row](prefix, "is_holdable", None, None)(x => extract(x).isHoldable, (row, value) => merge(row, extract(row).copy(isHoldable = value)))
+  override val isBinary = new OptField[Boolean, Row](prefix, "is_binary", None, None)(x => extract(x).isBinary, (row, value) => merge(row, extract(row).copy(isBinary = value)))
+  override val isScrollable = new OptField[Boolean, Row](prefix, "is_scrollable", None, None)(x => extract(x).isScrollable, (row, value) => merge(row, extract(row).copy(isScrollable = value)))
+  override val creationTime = new OptField[TypoOffsetDateTime, Row](prefix, "creation_time", Some("text"), None)(x => extract(x).creationTime, (row, value) => merge(row, extract(row).copy(creationTime = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](name, statement, isHoldable, isBinary, isScrollable, creationTime)

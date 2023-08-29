@@ -7,18 +7,18 @@ package adventureworks
 package pg_catalog
 package pg_available_extension_versions
 
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgAvailableExtensionVersionsViewFields[Row] {
-  val name: Field[String, Row]
-  val version: Field[String, Row]
-  val installed: Field[Boolean, Row]
-  val superuser: Field[Boolean, Row]
-  val trusted: Field[Boolean, Row]
-  val relocatable: Field[Boolean, Row]
-  val schema: Field[String, Row]
-  val requires: Field[Array[String], Row]
-  val comment: Field[String, Row]
+  val name: OptField[String, Row]
+  val version: OptField[String, Row]
+  val installed: OptField[Boolean, Row]
+  val superuser: OptField[Boolean, Row]
+  val trusted: OptField[Boolean, Row]
+  val relocatable: OptField[Boolean, Row]
+  val schema: OptField[String, Row]
+  val requires: OptField[Array[String], Row]
+  val comment: OptField[String, Row]
 }
 object PgAvailableExtensionVersionsViewFields extends PgAvailableExtensionVersionsViewStructure[PgAvailableExtensionVersionsViewRow](None, identity, (_, x) => x)
 

@@ -7,21 +7,19 @@ package adventureworks
 package information_schema
 package foreign_data_wrappers
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class ForeignDataWrappersViewStructure[Row](val prefix: Option[String], val extract: Row => ForeignDataWrappersViewRow, val merge: (Row, ForeignDataWrappersViewRow) => Row)
   extends Relation[ForeignDataWrappersViewFields, ForeignDataWrappersViewRow, Row]
     with ForeignDataWrappersViewFields[Row] { outer =>
 
-  override val foreignDataWrapperCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_catalog", None, Some("name"))(x => extract(x).foreignDataWrapperCatalog, (row, value) => merge(row, extract(row).copy(foreignDataWrapperCatalog = value)))
-  override val foreignDataWrapperName = new Field[SqlIdentifier, Row](prefix, "foreign_data_wrapper_name", None, Some("name"))(x => extract(x).foreignDataWrapperName, (row, value) => merge(row, extract(row).copy(foreignDataWrapperName = value)))
-  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("name"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
-  override val libraryName = new Field[CharacterData, Row](prefix, "library_name", None, Some("varchar"))(x => extract(x).libraryName, (row, value) => merge(row, extract(row).copy(libraryName = value)))
-  override val foreignDataWrapperLanguage = new Field[CharacterData, Row](prefix, "foreign_data_wrapper_language", None, Some("varchar"))(x => extract(x).foreignDataWrapperLanguage, (row, value) => merge(row, extract(row).copy(foreignDataWrapperLanguage = value)))
+  override val foreignDataWrapperCatalog = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_data_wrapper_catalog", None, None)(x => extract(x).foreignDataWrapperCatalog, (row, value) => merge(row, extract(row).copy(foreignDataWrapperCatalog = value)))
+  override val foreignDataWrapperName = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_data_wrapper_name", None, None)(x => extract(x).foreignDataWrapperName, (row, value) => merge(row, extract(row).copy(foreignDataWrapperName = value)))
+  override val authorizationIdentifier = new OptField[/* nullability unknown */ String, Row](prefix, "authorization_identifier", None, None)(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
+  override val libraryName = new OptField[String, Row](prefix, "library_name", None, None)(x => extract(x).libraryName, (row, value) => merge(row, extract(row).copy(libraryName = value)))
+  override val foreignDataWrapperLanguage = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_data_wrapper_language", None, None)(x => extract(x).foreignDataWrapperLanguage, (row, value) => merge(row, extract(row).copy(foreignDataWrapperLanguage = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](foreignDataWrapperCatalog, foreignDataWrapperName, authorizationIdentifier, libraryName, foreignDataWrapperLanguage)

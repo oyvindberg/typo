@@ -1,6 +1,7 @@
 package typo
 
 import typo.internal.DebugJson
+import typo.internal.analysis.{DecomposedSql, JdbcMetadata, NullabilityFromExplain}
 
 /** Describes what tables look like in postgres
   */
@@ -90,7 +91,6 @@ object db {
 
   sealed trait Relation {
     def name: RelationName
-    def cols: NonEmptyList[Col]
   }
 
   case class Table(
@@ -103,9 +103,9 @@ object db {
 
   case class View(
       name: RelationName,
-      cols: NonEmptyList[Col],
-      sql: Option[String],
-      isMaterialized: Boolean,
-      dependencies: Map[ColName, (RelationName, ColName)]
+      decomposedSql: DecomposedSql,
+      jdbcMetadata: JdbcMetadata,
+      nullableColumnsFromJoins: Option[NullabilityFromExplain.NullableIndices],
+      isMaterialized: Boolean
   ) extends Relation
 }

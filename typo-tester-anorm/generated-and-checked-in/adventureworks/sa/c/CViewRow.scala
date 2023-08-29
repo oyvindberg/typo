@@ -25,15 +25,16 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CViewRow(
-  id: Int,
+  /** Points to [[sales.customer.CustomerRow.customerid]] */
+  id: CustomerId,
   /** Points to [[sales.customer.CustomerRow.customerid]] */
   customerid: CustomerId,
   /** Points to [[sales.customer.CustomerRow.personid]] */
-  personid: BusinessentityId,
+  personid: Option[BusinessentityId],
   /** Points to [[sales.customer.CustomerRow.storeid]] */
-  storeid: BusinessentityId,
+  storeid: Option[BusinessentityId],
   /** Points to [[sales.customer.CustomerRow.territoryid]] */
-  territoryid: SalesterritoryId,
+  territoryid: Option[SalesterritoryId],
   /** Points to [[sales.customer.CustomerRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[sales.customer.CustomerRow.modifieddate]] */
@@ -44,11 +45,11 @@ object CViewRow {
   implicit lazy val reads: Reads[CViewRow] = Reads[CViewRow](json => JsResult.fromTry(
       Try(
         CViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(CustomerId.reads),
           customerid = json.\("customerid").as(CustomerId.reads),
-          personid = json.\("personid").as(BusinessentityId.reads),
-          storeid = json.\("storeid").as(BusinessentityId.reads),
-          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
+          personid = json.\("personid").toOption.map(_.as(BusinessentityId.reads)),
+          storeid = json.\("storeid").toOption.map(_.as(BusinessentityId.reads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -58,11 +59,11 @@ object CViewRow {
   def rowParser(idx: Int): RowParser[CViewRow] = RowParser[CViewRow] { row =>
     Success(
       CViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(CustomerId.column),
         customerid = row(idx + 1)(CustomerId.column),
-        personid = row(idx + 2)(BusinessentityId.column),
-        storeid = row(idx + 3)(BusinessentityId.column),
-        territoryid = row(idx + 4)(SalesterritoryId.column),
+        personid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
+        storeid = row(idx + 3)(Column.columnToOption(BusinessentityId.column)),
+        territoryid = row(idx + 4)(Column.columnToOption(SalesterritoryId.column)),
         rowguid = row(idx + 5)(Column.columnToUUID),
         modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
@@ -70,11 +71,11 @@ object CViewRow {
   }
   implicit lazy val writes: OWrites[CViewRow] = OWrites[CViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> CustomerId.writes.writes(o.id),
       "customerid" -> CustomerId.writes.writes(o.customerid),
-      "personid" -> BusinessentityId.writes.writes(o.personid),
-      "storeid" -> BusinessentityId.writes.writes(o.storeid),
-      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
+      "personid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.personid),
+      "storeid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.storeid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

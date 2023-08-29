@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_user_functions
 
+import adventureworks.pg_catalog.pg_proc.PgProcId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -20,24 +21,27 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatUserFunctionsViewRow(
-  funcid: /* oid */ Long,
+  /** Points to [[pg_proc.PgProcRow.oid]] */
+  funcid: PgProcId,
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_proc.PgProcRow.proname]] */
   funcname: String,
-  calls: Long,
-  totalTime: Double,
-  selfTime: Double
+  calls: /* nullability unknown */ Option[Long],
+  totalTime: /* nullability unknown */ Option[Double],
+  selfTime: /* nullability unknown */ Option[Double]
 )
 
 object PgStatUserFunctionsViewRow {
   implicit lazy val reads: Reads[PgStatUserFunctionsViewRow] = Reads[PgStatUserFunctionsViewRow](json => JsResult.fromTry(
       Try(
         PgStatUserFunctionsViewRow(
-          funcid = json.\("funcid").as(Reads.LongReads),
+          funcid = json.\("funcid").as(PgProcId.reads),
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
           funcname = json.\("funcname").as(Reads.StringReads),
-          calls = json.\("calls").as(Reads.LongReads),
-          totalTime = json.\("total_time").as(Reads.DoubleReads),
-          selfTime = json.\("self_time").as(Reads.DoubleReads)
+          calls = json.\("calls").toOption.map(_.as(Reads.LongReads)),
+          totalTime = json.\("total_time").toOption.map(_.as(Reads.DoubleReads)),
+          selfTime = json.\("self_time").toOption.map(_.as(Reads.DoubleReads))
         )
       )
     ),
@@ -45,23 +49,23 @@ object PgStatUserFunctionsViewRow {
   def rowParser(idx: Int): RowParser[PgStatUserFunctionsViewRow] = RowParser[PgStatUserFunctionsViewRow] { row =>
     Success(
       PgStatUserFunctionsViewRow(
-        funcid = row(idx + 0)(Column.columnToLong),
+        funcid = row(idx + 0)(PgProcId.column),
         schemaname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
         funcname = row(idx + 2)(Column.columnToString),
-        calls = row(idx + 3)(Column.columnToLong),
-        totalTime = row(idx + 4)(Column.columnToDouble),
-        selfTime = row(idx + 5)(Column.columnToDouble)
+        calls = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        totalTime = row(idx + 4)(Column.columnToOption(Column.columnToDouble)),
+        selfTime = row(idx + 5)(Column.columnToOption(Column.columnToDouble))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatUserFunctionsViewRow] = OWrites[PgStatUserFunctionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "funcid" -> Writes.LongWrites.writes(o.funcid),
+      "funcid" -> PgProcId.writes.writes(o.funcid),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "funcname" -> Writes.StringWrites.writes(o.funcname),
-      "calls" -> Writes.LongWrites.writes(o.calls),
-      "total_time" -> Writes.DoubleWrites.writes(o.totalTime),
-      "self_time" -> Writes.DoubleWrites.writes(o.selfTime)
+      "calls" -> Writes.OptionWrites(Writes.LongWrites).writes(o.calls),
+      "total_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.totalTime),
+      "self_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.selfTime)
     ))
   )
 }

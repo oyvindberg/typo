@@ -1,9 +1,8 @@
-package typo
-package internal
-package sqlfiles
+package typo.internal.analysis
 
 import typo.internal.codegen.CodeOps
 import typo.internal.compat.ListOps
+import typo.{db, sc}
 
 case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
   val sqlWithQuestionMarks: String = render(_ => "?")

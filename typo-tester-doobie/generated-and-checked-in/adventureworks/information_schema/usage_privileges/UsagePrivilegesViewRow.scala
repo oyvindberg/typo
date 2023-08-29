@@ -7,49 +7,47 @@ package adventureworks
 package information_schema
 package usage_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class UsagePrivilegesViewRow(
-  grantor: Option[SqlIdentifier],
-  grantee: Option[SqlIdentifier],
-  objectCatalog: Option[SqlIdentifier],
-  objectSchema: Option[SqlIdentifier],
-  objectName: Option[SqlIdentifier],
-  objectType: Option[CharacterData],
-  privilegeType: Option[CharacterData],
-  isGrantable: Option[YesOrNo]
+  grantor: /* nullability unknown */ Option[String],
+  grantee: /* nullability unknown */ Option[String],
+  objectCatalog: /* nullability unknown */ Option[String],
+  objectSchema: /* nullability unknown */ Option[String],
+  objectName: /* nullability unknown */ Option[String],
+  objectType: /* nullability unknown */ Option[String],
+  privilegeType: /* nullability unknown */ Option[String],
+  isGrantable: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object UsagePrivilegesViewRow {
-  implicit lazy val decoder: Decoder[UsagePrivilegesViewRow] = Decoder.forProduct8[UsagePrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "object_catalog", "object_schema", "object_name", "object_type", "privilege_type", "is_grantable")(UsagePrivilegesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder))
-  implicit lazy val encoder: Encoder[UsagePrivilegesViewRow] = Encoder.forProduct8[UsagePrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "object_catalog", "object_schema", "object_name", "object_type", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.objectCatalog, x.objectSchema, x.objectName, x.objectType, x.privilegeType, x.isGrantable))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder))
+  implicit lazy val decoder: Decoder[UsagePrivilegesViewRow] = Decoder.forProduct8[UsagePrivilegesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String]]("grantor", "grantee", "object_catalog", "object_schema", "object_name", "object_type", "privilege_type", "is_grantable")(UsagePrivilegesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[UsagePrivilegesViewRow] = Encoder.forProduct8[UsagePrivilegesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String]]("grantor", "grantee", "object_catalog", "object_schema", "object_name", "object_type", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.objectCatalog, x.objectSchema, x.objectName, x.objectType, x.privilegeType, x.isGrantable))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[UsagePrivilegesViewRow] = new Read[UsagePrivilegesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (SqlIdentifier.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (CharacterData.get, Nullability.Nullable),
-      (YesOrNo.get, Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UsagePrivilegesViewRow(
-      grantor = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
-      grantee = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
-      objectCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
-      objectSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
-      objectName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
-      objectType = CharacterData.get.unsafeGetNullable(rs, i + 5),
-      privilegeType = CharacterData.get.unsafeGetNullable(rs, i + 6),
-      isGrantable = YesOrNo.get.unsafeGetNullable(rs, i + 7)
+      grantor = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      grantee = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      objectCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      objectSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      objectName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      objectType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      privilegeType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      isGrantable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

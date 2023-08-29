@@ -9,19 +9,20 @@ package pg_sequences
 
 import adventureworks.customtypes.TypoRegtype
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgSequencesViewFields[Row] {
   val schemaname: Field[String, Row]
   val sequencename: Field[String, Row]
-  val sequenceowner: Field[String, Row]
-  val dataType: Field[TypoRegtype, Row]
+  val sequenceowner: OptField[String, Row]
+  val dataType: OptField[TypoRegtype, Row]
   val startValue: Field[Long, Row]
   val minValue: Field[Long, Row]
   val maxValue: Field[Long, Row]
   val incrementBy: Field[Long, Row]
   val cycle: Field[Boolean, Row]
   val cacheSize: Field[Long, Row]
-  val lastValue: Field[Long, Row]
+  val lastValue: OptField[Long, Row]
 }
 object PgSequencesViewFields extends PgSequencesViewStructure[PgSequencesViewRow](None, identity, (_, x) => x)
 

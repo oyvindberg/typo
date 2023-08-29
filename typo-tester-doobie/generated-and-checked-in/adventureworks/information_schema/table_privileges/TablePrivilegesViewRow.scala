@@ -7,49 +7,47 @@ package adventureworks
 package information_schema
 package table_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class TablePrivilegesViewRow(
-  grantor: SqlIdentifier,
-  grantee: SqlIdentifier,
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  privilegeType: CharacterData,
-  isGrantable: YesOrNo,
-  withHierarchy: YesOrNo
+  grantor: /* nullability unknown */ Option[String],
+  grantee: /* nullability unknown */ Option[String],
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  privilegeType: /* nullability unknown */ Option[String],
+  isGrantable: /* nullability unknown */ Option[/* max 3 chars */ String],
+  withHierarchy: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object TablePrivilegesViewRow {
-  implicit lazy val decoder: Decoder[TablePrivilegesViewRow] = Decoder.forProduct8[TablePrivilegesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo, YesOrNo]("grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy")(TablePrivilegesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, YesOrNo.decoder, YesOrNo.decoder)
-  implicit lazy val encoder: Encoder[TablePrivilegesViewRow] = Encoder.forProduct8[TablePrivilegesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo, YesOrNo]("grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy")(x => (x.grantor, x.grantee, x.tableCatalog, x.tableSchema, x.tableName, x.privilegeType, x.isGrantable, x.withHierarchy))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, YesOrNo.encoder, YesOrNo.encoder)
+  implicit lazy val decoder: Decoder[TablePrivilegesViewRow] = Decoder.forProduct8[TablePrivilegesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String], /* nullability unknown */ Option[/* max 3 chars */ String]]("grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy")(TablePrivilegesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[TablePrivilegesViewRow] = Encoder.forProduct8[TablePrivilegesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String], /* nullability unknown */ Option[/* max 3 chars */ String]]("grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy")(x => (x.grantor, x.grantee, x.tableCatalog, x.tableSchema, x.tableName, x.privilegeType, x.isGrantable, x.withHierarchy))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[TablePrivilegesViewRow] = new Read[TablePrivilegesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TablePrivilegesViewRow(
-      grantor = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      grantee = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      privilegeType = CharacterData.get.unsafeGetNonNullable(rs, i + 5),
-      isGrantable = YesOrNo.get.unsafeGetNonNullable(rs, i + 6),
-      withHierarchy = YesOrNo.get.unsafeGetNonNullable(rs, i + 7)
+      grantor = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      grantee = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      tableCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      tableSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      tableName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      privilegeType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      isGrantable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      withHierarchy = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

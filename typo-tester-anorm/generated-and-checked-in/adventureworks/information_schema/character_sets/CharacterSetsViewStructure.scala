@@ -7,23 +7,22 @@ package adventureworks
 package information_schema
 package character_sets
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class CharacterSetsViewStructure[Row](val prefix: Option[String], val extract: Row => CharacterSetsViewRow, val merge: (Row, CharacterSetsViewRow) => Row)
   extends Relation[CharacterSetsViewFields, CharacterSetsViewRow, Row]
     with CharacterSetsViewFields[Row] { outer =>
 
-  override val characterSetCatalog = new Field[SqlIdentifier, Row](prefix, "character_set_catalog", None, Some("name"))(x => extract(x).characterSetCatalog, (row, value) => merge(row, extract(row).copy(characterSetCatalog = value)))
-  override val characterSetSchema = new Field[SqlIdentifier, Row](prefix, "character_set_schema", None, Some("name"))(x => extract(x).characterSetSchema, (row, value) => merge(row, extract(row).copy(characterSetSchema = value)))
-  override val characterSetName = new Field[SqlIdentifier, Row](prefix, "character_set_name", None, Some("name"))(x => extract(x).characterSetName, (row, value) => merge(row, extract(row).copy(characterSetName = value)))
-  override val characterRepertoire = new Field[SqlIdentifier, Row](prefix, "character_repertoire", None, Some("name"))(x => extract(x).characterRepertoire, (row, value) => merge(row, extract(row).copy(characterRepertoire = value)))
-  override val formOfUse = new Field[SqlIdentifier, Row](prefix, "form_of_use", None, Some("name"))(x => extract(x).formOfUse, (row, value) => merge(row, extract(row).copy(formOfUse = value)))
-  override val defaultCollateCatalog = new Field[SqlIdentifier, Row](prefix, "default_collate_catalog", None, Some("name"))(x => extract(x).defaultCollateCatalog, (row, value) => merge(row, extract(row).copy(defaultCollateCatalog = value)))
-  override val defaultCollateSchema = new Field[SqlIdentifier, Row](prefix, "default_collate_schema", None, Some("name"))(x => extract(x).defaultCollateSchema, (row, value) => merge(row, extract(row).copy(defaultCollateSchema = value)))
-  override val defaultCollateName = new Field[SqlIdentifier, Row](prefix, "default_collate_name", None, Some("name"))(x => extract(x).defaultCollateName, (row, value) => merge(row, extract(row).copy(defaultCollateName = value)))
+  override val characterSetCatalog = new OptField[String, Row](prefix, "character_set_catalog", None, None)(x => extract(x).characterSetCatalog, (row, value) => merge(row, extract(row).copy(characterSetCatalog = value)))
+  override val characterSetSchema = new OptField[String, Row](prefix, "character_set_schema", None, None)(x => extract(x).characterSetSchema, (row, value) => merge(row, extract(row).copy(characterSetSchema = value)))
+  override val characterSetName = new OptField[String, Row](prefix, "character_set_name", None, None)(x => extract(x).characterSetName, (row, value) => merge(row, extract(row).copy(characterSetName = value)))
+  override val characterRepertoire = new OptField[String, Row](prefix, "character_repertoire", None, None)(x => extract(x).characterRepertoire, (row, value) => merge(row, extract(row).copy(characterRepertoire = value)))
+  override val formOfUse = new OptField[String, Row](prefix, "form_of_use", None, None)(x => extract(x).formOfUse, (row, value) => merge(row, extract(row).copy(formOfUse = value)))
+  override val defaultCollateCatalog = new OptField[String, Row](prefix, "default_collate_catalog", None, None)(x => extract(x).defaultCollateCatalog, (row, value) => merge(row, extract(row).copy(defaultCollateCatalog = value)))
+  override val defaultCollateSchema = new OptField[String, Row](prefix, "default_collate_schema", None, None)(x => extract(x).defaultCollateSchema, (row, value) => merge(row, extract(row).copy(defaultCollateSchema = value)))
+  override val defaultCollateName = new OptField[String, Row](prefix, "default_collate_name", None, None)(x => extract(x).defaultCollateName, (row, value) => merge(row, extract(row).copy(defaultCollateName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](characterSetCatalog, characterSetSchema, characterSetName, characterRepertoire, formOfUse, defaultCollateCatalog, defaultCollateSchema, defaultCollateName)

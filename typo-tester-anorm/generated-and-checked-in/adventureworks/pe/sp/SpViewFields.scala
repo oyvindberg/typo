@@ -17,7 +17,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait SpViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[StateprovinceId, Row]
   val stateprovinceid: Field[StateprovinceId, Row]
   val stateprovincecode: Field[/* bpchar, max 3 chars */ String, Row]
   val countryregioncode: Field[CountryregionId, Row]

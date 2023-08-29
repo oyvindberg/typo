@@ -25,7 +25,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class StViewRow(
-  id: Int,
+  /** Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
+  id: SalesterritoryId,
   /** Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
   /** Points to [[sales.salesterritory.SalesterritoryRow.name]] */
@@ -52,7 +53,7 @@ object StViewRow {
   implicit lazy val reads: Reads[StViewRow] = Reads[StViewRow](json => JsResult.fromTry(
       Try(
         StViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(SalesterritoryId.reads),
           territoryid = json.\("territoryid").as(SalesterritoryId.reads),
           name = json.\("name").as(Name.reads),
           countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
@@ -70,7 +71,7 @@ object StViewRow {
   def rowParser(idx: Int): RowParser[StViewRow] = RowParser[StViewRow] { row =>
     Success(
       StViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(SalesterritoryId.column),
         territoryid = row(idx + 1)(SalesterritoryId.column),
         name = row(idx + 2)(Name.column),
         countryregioncode = row(idx + 3)(CountryregionId.column),
@@ -86,7 +87,7 @@ object StViewRow {
   }
   implicit lazy val writes: OWrites[StViewRow] = OWrites[StViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> SalesterritoryId.writes.writes(o.id),
       "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
       "name" -> Name.writes.writes(o.name),
       "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),

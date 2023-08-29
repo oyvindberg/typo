@@ -21,53 +21,50 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import typo.generated.information_schema.CharacterData
-import typo.generated.information_schema.SqlIdentifier
-import typo.generated.information_schema.YesOrNo
 
 case class TablesViewRow(
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"table_catalog","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"table_schema","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"table_name","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"table_type","ordinal_position":4,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableType: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"self_referencing_column_name","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  selfReferencingColumnName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"reference_generation","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  referenceGeneration: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"user_defined_type_catalog","ordinal_position":7,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  userDefinedTypeCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"user_defined_type_schema","ordinal_position":8,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  userDefinedTypeSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"user_defined_type_name","ordinal_position":9,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  userDefinedTypeName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"is_insertable_into","ordinal_position":10,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  isInsertableInto: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"is_typed","ordinal_position":11,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  isTyped: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"tables","column_name":"commit_action","ordinal_position":12,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  commitAction: Option[CharacterData]
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_catalog"},"columnName":"table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_schema"},"columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_name"},"columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_type"},"columnName":"table_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableType: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"self_referencing_column_name"},"columnName":"self_referencing_column_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  selfReferencingColumnName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"reference_generation"},"columnName":"reference_generation","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  referenceGeneration: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"user_defined_type_catalog"},"columnName":"user_defined_type_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  userDefinedTypeCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"user_defined_type_schema"},"columnName":"user_defined_type_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  userDefinedTypeSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"user_defined_type_name"},"columnName":"user_defined_type_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  userDefinedTypeName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"is_insertable_into"},"columnName":"is_insertable_into","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  isInsertableInto: /* nullability unknown */ Option[/* max 3 chars */ String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"is_typed"},"columnName":"is_typed","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  isTyped: /* nullability unknown */ Option[/* max 3 chars */ String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"commit_action"},"columnName":"commit_action","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  commitAction: /* nullability unknown */ Option[String]
 )
 
 object TablesViewRow {
   implicit lazy val reads: Reads[TablesViewRow] = Reads[TablesViewRow](json => JsResult.fromTry(
       Try(
         TablesViewRow(
-          tableCatalog = json.\("table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          tableSchema = json.\("table_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          tableName = json.\("table_name").toOption.map(_.as(SqlIdentifier.reads)),
-          tableType = json.\("table_type").toOption.map(_.as(CharacterData.reads)),
-          selfReferencingColumnName = json.\("self_referencing_column_name").toOption.map(_.as(SqlIdentifier.reads)),
-          referenceGeneration = json.\("reference_generation").toOption.map(_.as(CharacterData.reads)),
-          userDefinedTypeCatalog = json.\("user_defined_type_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          userDefinedTypeSchema = json.\("user_defined_type_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          userDefinedTypeName = json.\("user_defined_type_name").toOption.map(_.as(SqlIdentifier.reads)),
-          isInsertableInto = json.\("is_insertable_into").toOption.map(_.as(YesOrNo.reads)),
-          isTyped = json.\("is_typed").toOption.map(_.as(YesOrNo.reads)),
-          commitAction = json.\("commit_action").toOption.map(_.as(CharacterData.reads))
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          tableType = json.\("table_type").toOption.map(_.as(Reads.StringReads)),
+          selfReferencingColumnName = json.\("self_referencing_column_name").toOption.map(_.as(Reads.StringReads)),
+          referenceGeneration = json.\("reference_generation").toOption.map(_.as(Reads.StringReads)),
+          userDefinedTypeCatalog = json.\("user_defined_type_catalog").toOption.map(_.as(Reads.StringReads)),
+          userDefinedTypeSchema = json.\("user_defined_type_schema").toOption.map(_.as(Reads.StringReads)),
+          userDefinedTypeName = json.\("user_defined_type_name").toOption.map(_.as(Reads.StringReads)),
+          isInsertableInto = json.\("is_insertable_into").toOption.map(_.as(Reads.StringReads)),
+          isTyped = json.\("is_typed").toOption.map(_.as(Reads.StringReads)),
+          commitAction = json.\("commit_action").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -75,35 +72,35 @@ object TablesViewRow {
   def rowParser(idx: Int): RowParser[TablesViewRow] = RowParser[TablesViewRow] { row =>
     Success(
       TablesViewRow(
-        tableCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        tableSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        tableName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        tableType = row(idx + 3)(Column.columnToOption(CharacterData.column)),
-        selfReferencingColumnName = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        referenceGeneration = row(idx + 5)(Column.columnToOption(CharacterData.column)),
-        userDefinedTypeCatalog = row(idx + 6)(Column.columnToOption(SqlIdentifier.column)),
-        userDefinedTypeSchema = row(idx + 7)(Column.columnToOption(SqlIdentifier.column)),
-        userDefinedTypeName = row(idx + 8)(Column.columnToOption(SqlIdentifier.column)),
-        isInsertableInto = row(idx + 9)(Column.columnToOption(YesOrNo.column)),
-        isTyped = row(idx + 10)(Column.columnToOption(YesOrNo.column)),
-        commitAction = row(idx + 11)(Column.columnToOption(CharacterData.column))
+        tableCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tableType = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        selfReferencingColumnName = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        referenceGeneration = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        userDefinedTypeCatalog = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        userDefinedTypeSchema = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        userDefinedTypeName = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        isInsertableInto = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        isTyped = row(idx + 10)(Column.columnToOption(Column.columnToString)),
+        commitAction = row(idx + 11)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[TablesViewRow] = OWrites[TablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableCatalog),
-      "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),
-      "table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableName),
-      "table_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.tableType),
-      "self_referencing_column_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.selfReferencingColumnName),
-      "reference_generation" -> Writes.OptionWrites(CharacterData.writes).writes(o.referenceGeneration),
-      "user_defined_type_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.userDefinedTypeCatalog),
-      "user_defined_type_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.userDefinedTypeSchema),
-      "user_defined_type_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.userDefinedTypeName),
-      "is_insertable_into" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isInsertableInto),
-      "is_typed" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isTyped),
-      "commit_action" -> Writes.OptionWrites(CharacterData.writes).writes(o.commitAction)
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "table_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableType),
+      "self_referencing_column_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.selfReferencingColumnName),
+      "reference_generation" -> Writes.OptionWrites(Writes.StringWrites).writes(o.referenceGeneration),
+      "user_defined_type_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.userDefinedTypeCatalog),
+      "user_defined_type_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.userDefinedTypeSchema),
+      "user_defined_type_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.userDefinedTypeName),
+      "is_insertable_into" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isInsertableInto),
+      "is_typed" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isTyped),
+      "commit_action" -> Writes.OptionWrites(Writes.StringWrites).writes(o.commitAction)
     ))
   )
 }

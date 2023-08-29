@@ -7,17 +7,16 @@ package adventureworks
 package information_schema
 package `_pg_foreign_tables`
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgForeignTablesViewFields[Row] {
-  val foreignTableCatalog: Field[SqlIdentifier, Row]
-  val foreignTableSchema: Field[SqlIdentifier, Row]
-  val foreignTableName: Field[SqlIdentifier, Row]
-  val ftoptions: Field[Array[String], Row]
-  val foreignServerCatalog: Field[SqlIdentifier, Row]
-  val foreignServerName: Field[SqlIdentifier, Row]
-  val authorizationIdentifier: Field[SqlIdentifier, Row]
+  val foreignTableCatalog: OptField[String, Row]
+  val foreignTableSchema: OptField[String, Row]
+  val foreignTableName: OptField[String, Row]
+  val ftoptions: OptField[Array[String], Row]
+  val foreignServerCatalog: OptField[String, Row]
+  val foreignServerName: OptField[String, Row]
+  val authorizationIdentifier: OptField[String, Row]
 }
 object PgForeignTablesViewFields extends PgForeignTablesViewStructure[PgForeignTablesViewRow](None, identity, (_, x) => x)
 

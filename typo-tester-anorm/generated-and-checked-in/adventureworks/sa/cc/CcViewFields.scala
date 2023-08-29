@@ -12,7 +12,7 @@ import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.SqlExpr.Field
 
 trait CcViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[/* user-picked */ CustomCreditcardId, Row]
   val creditcardid: Field[/* user-picked */ CustomCreditcardId, Row]
   val cardtype: Field[/* max 50 chars */ String, Row]
   val cardnumber: Field[/* max 25 chars */ String, Row]

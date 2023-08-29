@@ -14,7 +14,7 @@ trait PgRulesViewFields[Row] {
   val schemaname: OptField[String, Row]
   val tablename: Field[String, Row]
   val rulename: Field[String, Row]
-  val definition: Field[String, Row]
+  val definition: OptField[String, Row]
 }
 object PgRulesViewFields extends PgRulesViewStructure[PgRulesViewRow](None, identity, (_, x) => x)
 

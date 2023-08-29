@@ -9,25 +9,25 @@ package pg_locks
 
 import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoXid
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgLocksViewFields[Row] {
-  val locktype: Field[String, Row]
-  val database: Field[/* oid */ Long, Row]
-  val relation: Field[/* oid */ Long, Row]
-  val page: Field[Int, Row]
-  val tuple: Field[Int, Row]
-  val virtualxid: Field[String, Row]
-  val transactionid: Field[TypoXid, Row]
-  val classid: Field[/* oid */ Long, Row]
-  val objid: Field[/* oid */ Long, Row]
-  val objsubid: Field[Int, Row]
-  val virtualtransaction: Field[String, Row]
-  val pid: Field[Int, Row]
-  val mode: Field[String, Row]
-  val granted: Field[Boolean, Row]
-  val fastpath: Field[Boolean, Row]
-  val waitstart: Field[TypoOffsetDateTime, Row]
+  val locktype: OptField[String, Row]
+  val database: OptField[/* oid */ Long, Row]
+  val relation: OptField[/* oid */ Long, Row]
+  val page: OptField[Int, Row]
+  val tuple: OptField[Int, Row]
+  val virtualxid: OptField[String, Row]
+  val transactionid: OptField[TypoXid, Row]
+  val classid: OptField[/* oid */ Long, Row]
+  val objid: OptField[/* oid */ Long, Row]
+  val objsubid: OptField[Int, Row]
+  val virtualtransaction: OptField[String, Row]
+  val pid: OptField[Int, Row]
+  val mode: OptField[String, Row]
+  val granted: OptField[Boolean, Row]
+  val fastpath: OptField[Boolean, Row]
+  val waitstart: OptField[TypoOffsetDateTime, Row]
 }
 object PgLocksViewFields extends PgLocksViewStructure[PgLocksViewRow](None, identity, (_, x) => x)
 

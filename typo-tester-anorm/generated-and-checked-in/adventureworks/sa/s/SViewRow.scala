@@ -25,15 +25,16 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SViewRow(
-  id: Int,
+  /** Points to [[sales.store.StoreRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[sales.store.StoreRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[sales.store.StoreRow.name]] */
   name: Name,
   /** Points to [[sales.store.StoreRow.salespersonid]] */
-  salespersonid: BusinessentityId,
+  salespersonid: Option[BusinessentityId],
   /** Points to [[sales.store.StoreRow.demographics]] */
-  demographics: TypoXml,
+  demographics: Option[TypoXml],
   /** Points to [[sales.store.StoreRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[sales.store.StoreRow.modifieddate]] */
@@ -44,11 +45,11 @@ object SViewRow {
   implicit lazy val reads: Reads[SViewRow] = Reads[SViewRow](json => JsResult.fromTry(
       Try(
         SViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           name = json.\("name").as(Name.reads),
-          salespersonid = json.\("salespersonid").as(BusinessentityId.reads),
-          demographics = json.\("demographics").as(TypoXml.reads),
+          salespersonid = json.\("salespersonid").toOption.map(_.as(BusinessentityId.reads)),
+          demographics = json.\("demographics").toOption.map(_.as(TypoXml.reads)),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -58,11 +59,11 @@ object SViewRow {
   def rowParser(idx: Int): RowParser[SViewRow] = RowParser[SViewRow] { row =>
     Success(
       SViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         name = row(idx + 2)(Name.column),
-        salespersonid = row(idx + 3)(BusinessentityId.column),
-        demographics = row(idx + 4)(TypoXml.column),
+        salespersonid = row(idx + 3)(Column.columnToOption(BusinessentityId.column)),
+        demographics = row(idx + 4)(Column.columnToOption(TypoXml.column)),
         rowguid = row(idx + 5)(Column.columnToUUID),
         modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
@@ -70,11 +71,11 @@ object SViewRow {
   }
   implicit lazy val writes: OWrites[SViewRow] = OWrites[SViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "name" -> Name.writes.writes(o.name),
-      "salespersonid" -> BusinessentityId.writes.writes(o.salespersonid),
-      "demographics" -> TypoXml.writes.writes(o.demographics),
+      "salespersonid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.salespersonid),
+      "demographics" -> Writes.OptionWrites(TypoXml.writes).writes(o.demographics),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

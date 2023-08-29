@@ -13,7 +13,7 @@ import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 
 trait UmViewFields[Row] {
-  val id: Field[/* bpchar, max 3 chars */ String, Row]
+  val id: Field[UnitmeasureId, Row]
   val unitmeasurecode: Field[UnitmeasureId, Row]
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

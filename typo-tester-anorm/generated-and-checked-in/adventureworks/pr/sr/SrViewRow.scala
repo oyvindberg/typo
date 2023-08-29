@@ -10,7 +10,6 @@ package sr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.public.Name
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,12 +17,12 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SrViewRow(
-  id: Int,
+  /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
+  id: ScrapreasonId,
   /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
   scrapreasonid: ScrapreasonId,
   /** Points to [[production.scrapreason.ScrapreasonRow.name]] */
@@ -36,7 +35,7 @@ object SrViewRow {
   implicit lazy val reads: Reads[SrViewRow] = Reads[SrViewRow](json => JsResult.fromTry(
       Try(
         SrViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(ScrapreasonId.reads),
           scrapreasonid = json.\("scrapreasonid").as(ScrapreasonId.reads),
           name = json.\("name").as(Name.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
@@ -47,7 +46,7 @@ object SrViewRow {
   def rowParser(idx: Int): RowParser[SrViewRow] = RowParser[SrViewRow] { row =>
     Success(
       SrViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(ScrapreasonId.column),
         scrapreasonid = row(idx + 1)(ScrapreasonId.column),
         name = row(idx + 2)(Name.column),
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
@@ -56,7 +55,7 @@ object SrViewRow {
   }
   implicit lazy val writes: OWrites[SrViewRow] = OWrites[SrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> ScrapreasonId.writes.writes(o.id),
       "scrapreasonid" -> ScrapreasonId.writes.writes(o.scrapreasonid),
       "name" -> Name.writes.writes(o.name),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)

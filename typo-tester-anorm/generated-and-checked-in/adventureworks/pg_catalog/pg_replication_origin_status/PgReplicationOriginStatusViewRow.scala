@@ -20,20 +20,20 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgReplicationOriginStatusViewRow(
-  localId: /* oid */ Long,
-  externalId: String,
-  remoteLsn: /* pg_lsn */ Long,
-  localLsn: /* pg_lsn */ Long
+  localId: /* nullability unknown */ Option[/* oid */ Long],
+  externalId: /* nullability unknown */ Option[String],
+  remoteLsn: /* nullability unknown */ Option[/* pg_lsn */ Long],
+  localLsn: /* nullability unknown */ Option[/* pg_lsn */ Long]
 )
 
 object PgReplicationOriginStatusViewRow {
   implicit lazy val reads: Reads[PgReplicationOriginStatusViewRow] = Reads[PgReplicationOriginStatusViewRow](json => JsResult.fromTry(
       Try(
         PgReplicationOriginStatusViewRow(
-          localId = json.\("local_id").as(Reads.LongReads),
-          externalId = json.\("external_id").as(Reads.StringReads),
-          remoteLsn = json.\("remote_lsn").as(Reads.LongReads),
-          localLsn = json.\("local_lsn").as(Reads.LongReads)
+          localId = json.\("local_id").toOption.map(_.as(Reads.LongReads)),
+          externalId = json.\("external_id").toOption.map(_.as(Reads.StringReads)),
+          remoteLsn = json.\("remote_lsn").toOption.map(_.as(Reads.LongReads)),
+          localLsn = json.\("local_lsn").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -41,19 +41,19 @@ object PgReplicationOriginStatusViewRow {
   def rowParser(idx: Int): RowParser[PgReplicationOriginStatusViewRow] = RowParser[PgReplicationOriginStatusViewRow] { row =>
     Success(
       PgReplicationOriginStatusViewRow(
-        localId = row(idx + 0)(Column.columnToLong),
-        externalId = row(idx + 1)(Column.columnToString),
-        remoteLsn = row(idx + 2)(Column.columnToLong),
-        localLsn = row(idx + 3)(Column.columnToLong)
+        localId = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        externalId = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        remoteLsn = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
+        localLsn = row(idx + 3)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit lazy val writes: OWrites[PgReplicationOriginStatusViewRow] = OWrites[PgReplicationOriginStatusViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "local_id" -> Writes.LongWrites.writes(o.localId),
-      "external_id" -> Writes.StringWrites.writes(o.externalId),
-      "remote_lsn" -> Writes.LongWrites.writes(o.remoteLsn),
-      "local_lsn" -> Writes.LongWrites.writes(o.localLsn)
+      "local_id" -> Writes.OptionWrites(Writes.LongWrites).writes(o.localId),
+      "external_id" -> Writes.OptionWrites(Writes.StringWrites).writes(o.externalId),
+      "remote_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.remoteLsn),
+      "local_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.localLsn)
     ))
   )
 }

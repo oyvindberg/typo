@@ -10,7 +10,6 @@ package d
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,12 +17,12 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class DViewRow(
-  id: Int,
+  /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
+  id: DepartmentId,
   /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
   departmentid: DepartmentId,
   /** Points to [[humanresources.department.DepartmentRow.name]] */
@@ -38,7 +37,7 @@ object DViewRow {
   implicit lazy val reads: Reads[DViewRow] = Reads[DViewRow](json => JsResult.fromTry(
       Try(
         DViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(DepartmentId.reads),
           departmentid = json.\("departmentid").as(DepartmentId.reads),
           name = json.\("name").as(Name.reads),
           groupname = json.\("groupname").as(Name.reads),
@@ -50,7 +49,7 @@ object DViewRow {
   def rowParser(idx: Int): RowParser[DViewRow] = RowParser[DViewRow] { row =>
     Success(
       DViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(DepartmentId.column),
         departmentid = row(idx + 1)(DepartmentId.column),
         name = row(idx + 2)(Name.column),
         groupname = row(idx + 3)(Name.column),
@@ -60,7 +59,7 @@ object DViewRow {
   }
   implicit lazy val writes: OWrites[DViewRow] = OWrites[DViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> DepartmentId.writes.writes(o.id),
       "departmentid" -> DepartmentId.writes.writes(o.departmentid),
       "name" -> Name.writes.writes(o.name),
       "groupname" -> Name.writes.writes(o.groupname),

@@ -8,24 +8,24 @@ package pg_catalog
 package pg_stat_replication_slots
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgStatReplicationSlotsViewStructure[Row](val prefix: Option[String], val extract: Row => PgStatReplicationSlotsViewRow, val merge: (Row, PgStatReplicationSlotsViewRow) => Row)
   extends Relation[PgStatReplicationSlotsViewFields, PgStatReplicationSlotsViewRow, Row]
     with PgStatReplicationSlotsViewFields[Row] { outer =>
 
-  override val slotName = new Field[String, Row](prefix, "slot_name", None, None)(x => extract(x).slotName, (row, value) => merge(row, extract(row).copy(slotName = value)))
-  override val spillTxns = new Field[Long, Row](prefix, "spill_txns", None, Some("int8"))(x => extract(x).spillTxns, (row, value) => merge(row, extract(row).copy(spillTxns = value)))
-  override val spillCount = new Field[Long, Row](prefix, "spill_count", None, Some("int8"))(x => extract(x).spillCount, (row, value) => merge(row, extract(row).copy(spillCount = value)))
-  override val spillBytes = new Field[Long, Row](prefix, "spill_bytes", None, Some("int8"))(x => extract(x).spillBytes, (row, value) => merge(row, extract(row).copy(spillBytes = value)))
-  override val streamTxns = new Field[Long, Row](prefix, "stream_txns", None, Some("int8"))(x => extract(x).streamTxns, (row, value) => merge(row, extract(row).copy(streamTxns = value)))
-  override val streamCount = new Field[Long, Row](prefix, "stream_count", None, Some("int8"))(x => extract(x).streamCount, (row, value) => merge(row, extract(row).copy(streamCount = value)))
-  override val streamBytes = new Field[Long, Row](prefix, "stream_bytes", None, Some("int8"))(x => extract(x).streamBytes, (row, value) => merge(row, extract(row).copy(streamBytes = value)))
-  override val totalTxns = new Field[Long, Row](prefix, "total_txns", None, Some("int8"))(x => extract(x).totalTxns, (row, value) => merge(row, extract(row).copy(totalTxns = value)))
-  override val totalBytes = new Field[Long, Row](prefix, "total_bytes", None, Some("int8"))(x => extract(x).totalBytes, (row, value) => merge(row, extract(row).copy(totalBytes = value)))
-  override val statsReset = new Field[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), Some("timestamptz"))(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val slotName = new OptField[String, Row](prefix, "slot_name", None, None)(x => extract(x).slotName, (row, value) => merge(row, extract(row).copy(slotName = value)))
+  override val spillTxns = new OptField[Long, Row](prefix, "spill_txns", None, None)(x => extract(x).spillTxns, (row, value) => merge(row, extract(row).copy(spillTxns = value)))
+  override val spillCount = new OptField[Long, Row](prefix, "spill_count", None, None)(x => extract(x).spillCount, (row, value) => merge(row, extract(row).copy(spillCount = value)))
+  override val spillBytes = new OptField[Long, Row](prefix, "spill_bytes", None, None)(x => extract(x).spillBytes, (row, value) => merge(row, extract(row).copy(spillBytes = value)))
+  override val streamTxns = new OptField[Long, Row](prefix, "stream_txns", None, None)(x => extract(x).streamTxns, (row, value) => merge(row, extract(row).copy(streamTxns = value)))
+  override val streamCount = new OptField[Long, Row](prefix, "stream_count", None, None)(x => extract(x).streamCount, (row, value) => merge(row, extract(row).copy(streamCount = value)))
+  override val streamBytes = new OptField[Long, Row](prefix, "stream_bytes", None, None)(x => extract(x).streamBytes, (row, value) => merge(row, extract(row).copy(streamBytes = value)))
+  override val totalTxns = new OptField[Long, Row](prefix, "total_txns", None, None)(x => extract(x).totalTxns, (row, value) => merge(row, extract(row).copy(totalTxns = value)))
+  override val totalBytes = new OptField[Long, Row](prefix, "total_bytes", None, None)(x => extract(x).totalBytes, (row, value) => merge(row, extract(row).copy(totalBytes = value)))
+  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](slotName, spillTxns, spillCount, spillBytes, streamTxns, streamCount, streamBytes, totalTxns, totalBytes, statsReset)

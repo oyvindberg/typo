@@ -15,7 +15,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait TrViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[SalestaxrateId, Row]
   val salestaxrateid: Field[SalestaxrateId, Row]
   val stateprovinceid: Field[StateprovinceId, Row]
   val taxtype: Field[Int, Row]

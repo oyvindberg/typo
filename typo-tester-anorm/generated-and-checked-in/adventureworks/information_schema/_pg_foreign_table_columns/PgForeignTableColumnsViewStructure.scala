@@ -9,16 +9,17 @@ package `_pg_foreign_table_columns`
 
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgForeignTableColumnsViewStructure[Row](val prefix: Option[String], val extract: Row => PgForeignTableColumnsViewRow, val merge: (Row, PgForeignTableColumnsViewRow) => Row)
   extends Relation[PgForeignTableColumnsViewFields, PgForeignTableColumnsViewRow, Row]
     with PgForeignTableColumnsViewFields[Row] { outer =>
 
-  override val nspname = new Field[String, Row](prefix, "nspname", None, Some("name"))(x => extract(x).nspname, (row, value) => merge(row, extract(row).copy(nspname = value)))
-  override val relname = new Field[String, Row](prefix, "relname", None, Some("name"))(x => extract(x).relname, (row, value) => merge(row, extract(row).copy(relname = value)))
-  override val attname = new Field[String, Row](prefix, "attname", None, Some("name"))(x => extract(x).attname, (row, value) => merge(row, extract(row).copy(attname = value)))
-  override val attfdwoptions = new Field[Array[String], Row](prefix, "attfdwoptions", None, Some("_text"))(x => extract(x).attfdwoptions, (row, value) => merge(row, extract(row).copy(attfdwoptions = value)))
+  override val nspname = new Field[String, Row](prefix, "nspname", None, None)(x => extract(x).nspname, (row, value) => merge(row, extract(row).copy(nspname = value)))
+  override val relname = new Field[String, Row](prefix, "relname", None, None)(x => extract(x).relname, (row, value) => merge(row, extract(row).copy(relname = value)))
+  override val attname = new Field[String, Row](prefix, "attname", None, None)(x => extract(x).attname, (row, value) => merge(row, extract(row).copy(attname = value)))
+  override val attfdwoptions = new OptField[Array[String], Row](prefix, "attfdwoptions", None, None)(x => extract(x).attfdwoptions, (row, value) => merge(row, extract(row).copy(attfdwoptions = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](nspname, relname, attname, attfdwoptions)

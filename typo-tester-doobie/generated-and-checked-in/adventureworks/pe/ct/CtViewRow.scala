@@ -12,13 +12,13 @@ import adventureworks.person.contacttype.ContacttypeId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CtViewRow(
-  id: Int,
+  /** Points to [[person.contacttype.ContacttypeRow.contacttypeid]] */
+  id: ContacttypeId,
   /** Points to [[person.contacttype.ContacttypeRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
   /** Points to [[person.contacttype.ContacttypeRow.name]] */
@@ -28,17 +28,17 @@ case class CtViewRow(
 )
 
 object CtViewRow {
-  implicit lazy val decoder: Decoder[CtViewRow] = Decoder.forProduct4[CtViewRow, Int, ContacttypeId, Name, TypoLocalDateTime]("id", "contacttypeid", "name", "modifieddate")(CtViewRow.apply)(Decoder.decodeInt, ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[CtViewRow] = Encoder.forProduct4[CtViewRow, Int, ContacttypeId, Name, TypoLocalDateTime]("id", "contacttypeid", "name", "modifieddate")(x => (x.id, x.contacttypeid, x.name, x.modifieddate))(Encoder.encodeInt, ContacttypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[CtViewRow] = Decoder.forProduct4[CtViewRow, ContacttypeId, ContacttypeId, Name, TypoLocalDateTime]("id", "contacttypeid", "name", "modifieddate")(CtViewRow.apply)(ContacttypeId.decoder, ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CtViewRow] = Encoder.forProduct4[CtViewRow, ContacttypeId, ContacttypeId, Name, TypoLocalDateTime]("id", "contacttypeid", "name", "modifieddate")(x => (x.id, x.contacttypeid, x.name, x.modifieddate))(ContacttypeId.encoder, ContacttypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CtViewRow] = new Read[CtViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ContacttypeId.get, Nullability.NoNulls),
       (ContacttypeId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CtViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = ContacttypeId.get.unsafeGetNonNullable(rs, i + 0),
       contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)

@@ -7,6 +7,7 @@
  */
 package typo
 package generated
+package customtypes
 
 import anorm.Column
 import anorm.ParameterMetaData
@@ -18,44 +19,44 @@ import org.postgresql.util.PGobject
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 
-/** regtype (via PGObject) */
-case class TypoRegtype(value: String)
+/** aclitem (via PGObject) */
+case class TypoAclItem(value: String)
 
-object TypoRegtype {
-  implicit lazy val arrayColumn: Column[Array[TypoRegtype]] = Column.nonNull[Array[TypoRegtype]]((v1: Any, _) =>
+object TypoAclItem {
+  implicit lazy val arrayColumn: Column[Array[TypoAclItem]] = Column.nonNull[Array[TypoAclItem]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
            case v: Array[?] =>
-             Right(v.map(v => TypoRegtype(v.asInstanceOf[String])))
-           case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoRegtype, got ${other.getClass.getName}"))
+             Right(v.map(v => TypoAclItem(v.asInstanceOf[String])))
+           case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoAclItem, got ${other.getClass.getName}"))
          }
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayToStatement: ToStatement[Array[TypoRegtype]] = ToStatement[Array[TypoRegtype]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("regtype", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoAclItem]] = ToStatement[Array[TypoAclItem]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("aclitem", v.map(v => {
                                                                                                                            val obj = new PGobject
-                                                                                                                           obj.setType("regtype")
+                                                                                                                           obj.setType("aclitem")
                                                                                                                            obj.setValue(v.value)
                                                                                                                            obj
                                                                                                                          }))))
-  implicit lazy val column: Column[TypoRegtype] = Column.nonNull[TypoRegtype]((v1: Any, _) =>
+  implicit lazy val column: Column[TypoAclItem] = Column.nonNull[TypoAclItem]((v1: Any, _) =>
     v1 match {
-      case v: PGobject => Right(TypoRegtype(v.getValue))
+      case v: PGobject => Right(TypoAclItem(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val ordering: Ordering[TypoRegtype] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoRegtype] = new ParameterMetaData[TypoRegtype] {
-    override def sqlType: String = "regtype"
+  implicit lazy val ordering: Ordering[TypoAclItem] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoAclItem] = new ParameterMetaData[TypoAclItem] {
+    override def sqlType: String = "aclitem"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit lazy val reads: Reads[TypoRegtype] = Reads.StringReads.map(TypoRegtype.apply)
-  implicit lazy val toStatement: ToStatement[TypoRegtype] = ToStatement[TypoRegtype]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoAclItem] = Reads.StringReads.map(TypoAclItem.apply)
+  implicit lazy val toStatement: ToStatement[TypoAclItem] = ToStatement[TypoAclItem]((s, index, v) => s.setObject(index, {
                                                                  val obj = new PGobject
-                                                                 obj.setType("regtype")
+                                                                 obj.setType("aclitem")
                                                                  obj.setValue(v.value)
                                                                  obj
                                                                }))
-  implicit lazy val writes: Writes[TypoRegtype] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoAclItem] = Writes.StringWrites.contramap(_.value)
 }

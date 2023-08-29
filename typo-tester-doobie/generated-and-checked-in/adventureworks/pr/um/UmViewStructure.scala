@@ -18,10 +18,10 @@ class UmViewStructure[Row](val prefix: Option[String], val extract: Row => UmVie
   extends Relation[UmViewFields, UmViewRow, Row]
     with UmViewFields[Row] { outer =>
 
-  override val id = new Field[/* bpchar, max 3 chars */ String, Row](prefix, "id", None, Some("bpchar"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, Some("bpchar"))(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[UnitmeasureId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, None)(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, unitmeasurecode, name, modifieddate)

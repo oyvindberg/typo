@@ -7,18 +7,18 @@ package adventureworks
 package pg_catalog
 package pg_backend_memory_contexts
 
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgBackendMemoryContextsViewFields[Row] {
-  val name: Field[String, Row]
-  val ident: Field[String, Row]
-  val parent: Field[String, Row]
-  val level: Field[Int, Row]
-  val totalBytes: Field[Long, Row]
-  val totalNblocks: Field[Long, Row]
-  val freeBytes: Field[Long, Row]
-  val freeChunks: Field[Long, Row]
-  val usedBytes: Field[Long, Row]
+  val name: OptField[String, Row]
+  val ident: OptField[String, Row]
+  val parent: OptField[String, Row]
+  val level: OptField[Int, Row]
+  val totalBytes: OptField[Long, Row]
+  val totalNblocks: OptField[Long, Row]
+  val freeBytes: OptField[Long, Row]
+  val freeChunks: OptField[Long, Row]
+  val usedBytes: OptField[Long, Row]
 }
 object PgBackendMemoryContextsViewFields extends PgBackendMemoryContextsViewStructure[PgBackendMemoryContextsViewRow](None, identity, (_, x) => x)
 

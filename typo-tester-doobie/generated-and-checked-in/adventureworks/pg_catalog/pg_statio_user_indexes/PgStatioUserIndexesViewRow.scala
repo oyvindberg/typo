@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_statio_user_indexes
 
+import adventureworks.pg_catalog.pg_class.PgClassId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -16,42 +17,42 @@ import java.sql.ResultSet
 
 case class PgStatioUserIndexesViewRow(
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.relid]] */
-  relid: /* oid */ Long,
+  relid: Option[PgClassId],
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.indexrelid]] */
-  indexrelid: /* oid */ Long,
+  indexrelid: Option[PgClassId],
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.schemaname]] */
-  schemaname: String,
+  schemaname: Option[String],
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.relname]] */
-  relname: String,
+  relname: Option[String],
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.indexrelname]] */
-  indexrelname: String,
+  indexrelname: Option[String],
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.idxBlksRead]] */
-  idxBlksRead: Long,
+  idxBlksRead: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_indexes.PgStatioAllIndexesViewRow.idxBlksHit]] */
-  idxBlksHit: Long
+  idxBlksHit: Option[/* nullability unknown */ Long]
 )
 
 object PgStatioUserIndexesViewRow {
-  implicit lazy val decoder: Decoder[PgStatioUserIndexesViewRow] = Decoder.forProduct7[PgStatioUserIndexesViewRow, /* oid */ Long, /* oid */ Long, String, String, String, Long, Long]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_blks_read", "idx_blks_hit")(PgStatioUserIndexesViewRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgStatioUserIndexesViewRow] = Encoder.forProduct7[PgStatioUserIndexesViewRow, /* oid */ Long, /* oid */ Long, String, String, String, Long, Long]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_blks_read", "idx_blks_hit")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxBlksRead, x.idxBlksHit))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgStatioUserIndexesViewRow] = Decoder.forProduct7[PgStatioUserIndexesViewRow, Option[PgClassId], Option[PgClassId], Option[String], Option[String], Option[String], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_blks_read", "idx_blks_hit")(PgStatioUserIndexesViewRow.apply)(Decoder.decodeOption(PgClassId.decoder), Decoder.decodeOption(PgClassId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgStatioUserIndexesViewRow] = Encoder.forProduct7[PgStatioUserIndexesViewRow, Option[PgClassId], Option[PgClassId], Option[String], Option[String], Option[String], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_blks_read", "idx_blks_hit")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxBlksRead, x.idxBlksHit))(Encoder.encodeOption(PgClassId.encoder), Encoder.encodeOption(PgClassId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit lazy val read: Read[PgStatioUserIndexesViewRow] = new Read[PgStatioUserIndexesViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls)
+      (PgClassId.get, Nullability.Nullable),
+      (PgClassId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatioUserIndexesViewRow(
-      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
-      indexrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
-      schemaname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      relname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      indexrelname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      idxBlksRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
-      idxBlksHit = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6)
+      relid = PgClassId.get.unsafeGetNullable(rs, i + 0),
+      indexrelid = PgClassId.get.unsafeGetNullable(rs, i + 1),
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      indexrelname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      idxBlksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
+      idxBlksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

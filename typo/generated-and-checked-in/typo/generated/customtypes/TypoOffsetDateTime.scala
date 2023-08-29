@@ -7,6 +7,7 @@
  */
 package typo
 package generated
+package customtypes
 
 import anorm.Column
 import anorm.ParameterMetaData

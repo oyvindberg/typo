@@ -13,7 +13,7 @@ import adventureworks.sales.currency.CurrencyId
 import typo.dsl.SqlExpr.Field
 
 trait CuViewFields[Row] {
-  val id: Field[/* bpchar, max 3 chars */ String, Row]
+  val id: Field[CurrencyId, Row]
   val currencycode: Field[CurrencyId, Row]
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

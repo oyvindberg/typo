@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package check_constraints
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,24 +15,25 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CheckConstraintsViewRow(
-  constraintCatalog: SqlIdentifier,
-  constraintSchema: SqlIdentifier,
-  constraintName: SqlIdentifier,
-  checkClause: CharacterData
+  constraintCatalog: /* nullability unknown */ Option[String],
+  constraintSchema: /* nullability unknown */ Option[String],
+  constraintName: /* nullability unknown */ Option[String],
+  checkClause: /* nullability unknown */ Option[String]
 )
 
 object CheckConstraintsViewRow {
   implicit lazy val reads: Reads[CheckConstraintsViewRow] = Reads[CheckConstraintsViewRow](json => JsResult.fromTry(
       Try(
         CheckConstraintsViewRow(
-          constraintCatalog = json.\("constraint_catalog").as(SqlIdentifier.reads),
-          constraintSchema = json.\("constraint_schema").as(SqlIdentifier.reads),
-          constraintName = json.\("constraint_name").as(SqlIdentifier.reads),
-          checkClause = json.\("check_clause").as(CharacterData.reads)
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(Reads.StringReads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(Reads.StringReads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(Reads.StringReads)),
+          checkClause = json.\("check_clause").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -41,19 +41,19 @@ object CheckConstraintsViewRow {
   def rowParser(idx: Int): RowParser[CheckConstraintsViewRow] = RowParser[CheckConstraintsViewRow] { row =>
     Success(
       CheckConstraintsViewRow(
-        constraintCatalog = row(idx + 0)(SqlIdentifier.column),
-        constraintSchema = row(idx + 1)(SqlIdentifier.column),
-        constraintName = row(idx + 2)(SqlIdentifier.column),
-        checkClause = row(idx + 3)(CharacterData.column)
+        constraintCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        constraintSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        constraintName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        checkClause = row(idx + 3)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[CheckConstraintsViewRow] = OWrites[CheckConstraintsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "constraint_catalog" -> SqlIdentifier.writes.writes(o.constraintCatalog),
-      "constraint_schema" -> SqlIdentifier.writes.writes(o.constraintSchema),
-      "constraint_name" -> SqlIdentifier.writes.writes(o.constraintName),
-      "check_clause" -> CharacterData.writes.writes(o.checkClause)
+      "constraint_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintName),
+      "check_clause" -> Writes.OptionWrites(Writes.StringWrites).writes(o.checkClause)
     ))
   )
 }

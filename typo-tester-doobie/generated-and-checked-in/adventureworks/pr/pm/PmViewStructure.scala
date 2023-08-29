@@ -14,19 +14,20 @@ import adventureworks.public.Name
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PmViewStructure[Row](val prefix: Option[String], val extract: Row => PmViewRow, val merge: (Row, PmViewRow) => Row)
   extends Relation[PmViewFields, PmViewRow, Row]
     with PmViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, Some("int4"))(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val catalogdescription = new Field[TypoXml, Row](prefix, "catalogdescription", None, Some("xml"))(x => extract(x).catalogdescription, (row, value) => merge(row, extract(row).copy(catalogdescription = value)))
-  override val instructions = new Field[TypoXml, Row](prefix, "instructions", None, Some("xml"))(x => extract(x).instructions, (row, value) => merge(row, extract(row).copy(instructions = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[ProductmodelId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, None)(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val catalogdescription = new OptField[TypoXml, Row](prefix, "catalogdescription", None, None)(x => extract(x).catalogdescription, (row, value) => merge(row, extract(row).copy(catalogdescription = value)))
+  override val instructions = new OptField[TypoXml, Row](prefix, "instructions", None, None)(x => extract(x).instructions, (row, value) => merge(row, extract(row).copy(instructions = value)))
+  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, productmodelid, name, catalogdescription, instructions, rowguid, modifieddate)

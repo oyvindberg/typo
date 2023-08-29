@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_group
 
+import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -20,9 +21,11 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgGroupViewRow(
+  /** Points to [[pg_authid.PgAuthidRow.rolname]] */
   groname: String,
-  grosysid: /* oid */ Long,
-  grolist: Array[/* oid */ Long]
+  /** Points to [[pg_authid.PgAuthidRow.oid]] */
+  grosysid: PgAuthidId,
+  grolist: /* nullability unknown */ Option[Array[/* oid */ Long]]
 )
 
 object PgGroupViewRow {
@@ -30,8 +33,8 @@ object PgGroupViewRow {
       Try(
         PgGroupViewRow(
           groname = json.\("groname").as(Reads.StringReads),
-          grosysid = json.\("grosysid").as(Reads.LongReads),
-          grolist = json.\("grolist").as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))
+          grosysid = json.\("grosysid").as(PgAuthidId.reads),
+          grolist = json.\("grolist").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly)))
         )
       )
     ),
@@ -40,16 +43,16 @@ object PgGroupViewRow {
     Success(
       PgGroupViewRow(
         groname = row(idx + 0)(Column.columnToString),
-        grosysid = row(idx + 1)(Column.columnToLong),
-        grolist = row(idx + 2)(Column.columnToArray[Long](Column.columnToLong, implicitly))
+        grosysid = row(idx + 1)(PgAuthidId.column),
+        grolist = row(idx + 2)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly)))
       )
     )
   }
   implicit lazy val writes: OWrites[PgGroupViewRow] = OWrites[PgGroupViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "groname" -> Writes.StringWrites.writes(o.groname),
-      "grosysid" -> Writes.LongWrites.writes(o.grosysid),
-      "grolist" -> Writes.arrayWrites[Long](implicitly, Writes.LongWrites).writes(o.grolist)
+      "grosysid" -> PgAuthidId.writes.writes(o.grosysid),
+      "grolist" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.grolist)
     ))
   )
 }

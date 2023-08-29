@@ -12,7 +12,7 @@ import adventureworks.production.transactionhistoryarchive.Transactionhistoryarc
 import typo.dsl.SqlExpr.Field
 
 trait ThaViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[TransactionhistoryarchiveId, Row]
   val transactionid: Field[TransactionhistoryarchiveId, Row]
   val productid: Field[Int, Row]
   val referenceorderid: Field[Int, Row]

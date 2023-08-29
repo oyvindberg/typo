@@ -7,42 +7,41 @@ package adventureworks
 package information_schema
 package column_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ColumnOptionsViewRow(
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  columnName: SqlIdentifier,
-  optionName: SqlIdentifier,
-  optionValue: CharacterData
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  columnName: /* nullability unknown */ Option[String],
+  optionName: /* nullability unknown */ Option[String],
+  optionValue: /* nullability unknown */ Option[String]
 )
 
 object ColumnOptionsViewRow {
-  implicit lazy val decoder: Decoder[ColumnOptionsViewRow] = Decoder.forProduct6[ColumnOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(ColumnOptionsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
-  implicit lazy val encoder: Encoder[ColumnOptionsViewRow] = Encoder.forProduct6[ColumnOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.optionName, x.optionValue))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
+  implicit lazy val decoder: Decoder[ColumnOptionsViewRow] = Decoder.forProduct6[ColumnOptionsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(ColumnOptionsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[ColumnOptionsViewRow] = Encoder.forProduct6[ColumnOptionsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.optionName, x.optionValue))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[ColumnOptionsViewRow] = new Read[ColumnOptionsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ColumnOptionsViewRow(
-      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      columnName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      optionName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      optionValue = CharacterData.get.unsafeGetNonNullable(rs, i + 5)
+      tableCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      tableSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      tableName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      columnName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      optionName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      optionValue = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

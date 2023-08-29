@@ -7,17 +7,15 @@ package adventureworks
 package information_schema
 package column_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ColumnOptionsViewFields[Row] {
-  val tableCatalog: Field[SqlIdentifier, Row]
-  val tableSchema: Field[SqlIdentifier, Row]
-  val tableName: Field[SqlIdentifier, Row]
-  val columnName: Field[SqlIdentifier, Row]
-  val optionName: Field[SqlIdentifier, Row]
-  val optionValue: Field[CharacterData, Row]
+  val tableCatalog: OptField[String, Row]
+  val tableSchema: OptField[String, Row]
+  val tableName: OptField[String, Row]
+  val columnName: OptField[String, Row]
+  val optionName: OptField[String, Row]
+  val optionValue: OptField[String, Row]
 }
 object ColumnOptionsViewFields extends ColumnOptionsViewStructure[ColumnOptionsViewRow](None, identity, (_, x) => x)
 

@@ -7,18 +7,18 @@ package adventureworks
 package information_schema
 package `_pg_foreign_data_wrappers`
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
+import adventureworks.pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgForeignDataWrappersViewFields[Row] {
-  val oid: Field[/* oid */ Long, Row]
+  val oid: Field[PgForeignDataWrapperId, Row]
   val fdwowner: Field[/* oid */ Long, Row]
-  val fdwoptions: Field[Array[String], Row]
-  val foreignDataWrapperCatalog: Field[SqlIdentifier, Row]
-  val foreignDataWrapperName: Field[SqlIdentifier, Row]
-  val authorizationIdentifier: Field[SqlIdentifier, Row]
-  val foreignDataWrapperLanguage: Field[CharacterData, Row]
+  val fdwoptions: OptField[Array[String], Row]
+  val foreignDataWrapperCatalog: OptField[String, Row]
+  val foreignDataWrapperName: OptField[String, Row]
+  val authorizationIdentifier: OptField[String, Row]
+  val foreignDataWrapperLanguage: OptField[String, Row]
 }
 object PgForeignDataWrappersViewFields extends PgForeignDataWrappersViewStructure[PgForeignDataWrappersViewRow](None, identity, (_, x) => x)
 

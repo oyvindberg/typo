@@ -17,7 +17,8 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CcViewRow(
-  id: Int,
+  /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
+  id: /* user-picked */ CustomCreditcardId,
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
   creditcardid: /* user-picked */ CustomCreditcardId,
   /** Points to [[sales.creditcard.CreditcardRow.cardtype]] */
@@ -33,11 +34,11 @@ case class CcViewRow(
 )
 
 object CcViewRow {
-  implicit lazy val decoder: Decoder[CcViewRow] = Decoder.forProduct7[CcViewRow, Int, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CcViewRow.apply)(Decoder.decodeInt, CustomCreditcardId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[CcViewRow] = Encoder.forProduct7[CcViewRow, Int, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.id, x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))(Encoder.encodeInt, CustomCreditcardId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[CcViewRow] = Decoder.forProduct7[CcViewRow, /* user-picked */ CustomCreditcardId, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CcViewRow.apply)(CustomCreditcardId.decoder, CustomCreditcardId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CcViewRow] = Encoder.forProduct7[CcViewRow, /* user-picked */ CustomCreditcardId, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.id, x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))(CustomCreditcardId.encoder, CustomCreditcardId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CcViewRow] = new Read[CcViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
       (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
@@ -46,7 +47,7 @@ object CcViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CcViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 0),
       creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 1),
       cardtype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
       cardnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),

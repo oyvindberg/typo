@@ -21,26 +21,26 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatArchiverViewRow(
-  archivedCount: Long,
-  lastArchivedWal: String,
-  lastArchivedTime: TypoOffsetDateTime,
-  failedCount: Long,
-  lastFailedWal: String,
-  lastFailedTime: TypoOffsetDateTime,
-  statsReset: TypoOffsetDateTime
+  archivedCount: /* nullability unknown */ Option[Long],
+  lastArchivedWal: /* nullability unknown */ Option[String],
+  lastArchivedTime: /* nullability unknown */ Option[TypoOffsetDateTime],
+  failedCount: /* nullability unknown */ Option[Long],
+  lastFailedWal: /* nullability unknown */ Option[String],
+  lastFailedTime: /* nullability unknown */ Option[TypoOffsetDateTime],
+  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
 )
 
 object PgStatArchiverViewRow {
   implicit lazy val reads: Reads[PgStatArchiverViewRow] = Reads[PgStatArchiverViewRow](json => JsResult.fromTry(
       Try(
         PgStatArchiverViewRow(
-          archivedCount = json.\("archived_count").as(Reads.LongReads),
-          lastArchivedWal = json.\("last_archived_wal").as(Reads.StringReads),
-          lastArchivedTime = json.\("last_archived_time").as(TypoOffsetDateTime.reads),
-          failedCount = json.\("failed_count").as(Reads.LongReads),
-          lastFailedWal = json.\("last_failed_wal").as(Reads.StringReads),
-          lastFailedTime = json.\("last_failed_time").as(TypoOffsetDateTime.reads),
-          statsReset = json.\("stats_reset").as(TypoOffsetDateTime.reads)
+          archivedCount = json.\("archived_count").toOption.map(_.as(Reads.LongReads)),
+          lastArchivedWal = json.\("last_archived_wal").toOption.map(_.as(Reads.StringReads)),
+          lastArchivedTime = json.\("last_archived_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          failedCount = json.\("failed_count").toOption.map(_.as(Reads.LongReads)),
+          lastFailedWal = json.\("last_failed_wal").toOption.map(_.as(Reads.StringReads)),
+          lastFailedTime = json.\("last_failed_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -48,25 +48,25 @@ object PgStatArchiverViewRow {
   def rowParser(idx: Int): RowParser[PgStatArchiverViewRow] = RowParser[PgStatArchiverViewRow] { row =>
     Success(
       PgStatArchiverViewRow(
-        archivedCount = row(idx + 0)(Column.columnToLong),
-        lastArchivedWal = row(idx + 1)(Column.columnToString),
-        lastArchivedTime = row(idx + 2)(TypoOffsetDateTime.column),
-        failedCount = row(idx + 3)(Column.columnToLong),
-        lastFailedWal = row(idx + 4)(Column.columnToString),
-        lastFailedTime = row(idx + 5)(TypoOffsetDateTime.column),
-        statsReset = row(idx + 6)(TypoOffsetDateTime.column)
+        archivedCount = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        lastArchivedWal = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        lastArchivedTime = row(idx + 2)(Column.columnToOption(TypoOffsetDateTime.column)),
+        failedCount = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        lastFailedWal = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        lastFailedTime = row(idx + 5)(Column.columnToOption(TypoOffsetDateTime.column)),
+        statsReset = row(idx + 6)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatArchiverViewRow] = OWrites[PgStatArchiverViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "archived_count" -> Writes.LongWrites.writes(o.archivedCount),
-      "last_archived_wal" -> Writes.StringWrites.writes(o.lastArchivedWal),
-      "last_archived_time" -> TypoOffsetDateTime.writes.writes(o.lastArchivedTime),
-      "failed_count" -> Writes.LongWrites.writes(o.failedCount),
-      "last_failed_wal" -> Writes.StringWrites.writes(o.lastFailedWal),
-      "last_failed_time" -> TypoOffsetDateTime.writes.writes(o.lastFailedTime),
-      "stats_reset" -> TypoOffsetDateTime.writes.writes(o.statsReset)
+      "archived_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.archivedCount),
+      "last_archived_wal" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastArchivedWal),
+      "last_archived_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastArchivedTime),
+      "failed_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.failedCount),
+      "last_failed_wal" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastFailedWal),
+      "last_failed_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastFailedTime),
+      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
     ))
   )
 }

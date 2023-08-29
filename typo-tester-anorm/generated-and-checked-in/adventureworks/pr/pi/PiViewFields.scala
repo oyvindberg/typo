@@ -14,7 +14,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait PiViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ProductId, Row]
   val productid: Field[ProductId, Row]
   val locationid: Field[LocationId, Row]
   val shelf: Field[/* max 10 chars */ String, Row]

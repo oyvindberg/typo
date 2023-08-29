@@ -21,18 +21,17 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import typo.generated.information_schema.SqlIdentifier
 
 case class CommentsSqlRow(
   /** Points to [[information_schema.columns.ColumnsViewRow.tableSchema]]
       debug: {"baseColumnName":"table_schema","baseRelationName":"information_schema.columns","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_schema"},"columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"columns"} */
-  tableSchema: Option[SqlIdentifier],
+  tableSchema: Option[/* nullability unknown */ String],
   /** Points to [[information_schema.columns.ColumnsViewRow.tableName]]
       debug: {"baseColumnName":"table_name","baseRelationName":"information_schema.columns","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_name"},"columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"columns"} */
-  tableName: Option[SqlIdentifier],
+  tableName: Option[/* nullability unknown */ String],
   /** Points to [[information_schema.columns.ColumnsViewRow.columnName]]
       debug: {"baseColumnName":"column_name","baseRelationName":"information_schema.columns","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"column_name"},"columnName":"column_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"columns"} */
-  columnName: Option[SqlIdentifier],
+  columnName: Option[/* nullability unknown */ String],
   /** Points to [[pg_catalog.pg_description.PgDescriptionRow.description]]
       debug: {"baseColumnName":"description","baseRelationName":"pg_catalog.pg_description","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"description"},"columnName":"description","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_description"} */
   description: String
@@ -42,9 +41,9 @@ object CommentsSqlRow {
   implicit lazy val reads: Reads[CommentsSqlRow] = Reads[CommentsSqlRow](json => JsResult.fromTry(
       Try(
         CommentsSqlRow(
-          tableSchema = json.\("table_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          tableName = json.\("table_name").toOption.map(_.as(SqlIdentifier.reads)),
-          columnName = json.\("column_name").toOption.map(_.as(SqlIdentifier.reads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          columnName = json.\("column_name").toOption.map(_.as(Reads.StringReads)),
           description = json.\("description").as(Reads.StringReads)
         )
       )
@@ -53,18 +52,18 @@ object CommentsSqlRow {
   def rowParser(idx: Int): RowParser[CommentsSqlRow] = RowParser[CommentsSqlRow] { row =>
     Success(
       CommentsSqlRow(
-        tableSchema = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        tableName = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        columnName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        tableSchema = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        columnName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
         description = row(idx + 3)(Column.columnToString)
       )
     )
   }
   implicit lazy val writes: OWrites[CommentsSqlRow] = OWrites[CommentsSqlRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),
-      "table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableName),
-      "column_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.columnName),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "column_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.columnName),
       "description" -> Writes.StringWrites.writes(o.description)
     ))
   )

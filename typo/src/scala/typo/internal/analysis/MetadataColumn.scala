@@ -1,7 +1,8 @@
-package typo.internal.sqlfiles
+package typo
+package internal
+package analysis
 
 import play.api.libs.json.{Json, Writes}
-import typo.db
 
 /** Analyzed from postgres metadata for prepared statements through jdbc
   */

@@ -2,7 +2,8 @@ package typo.internal.sqlfiles
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-import typo.internal.sqlfiles.NullabilityFromExplain.NullableIndices
+import typo.internal.analysis.{DecomposedSql, NullabilityFromExplain}
+import typo.internal.analysis.NullabilityFromExplain.NullableIndices
 
 import java.sql.{Connection, DriverManager}
 

@@ -20,7 +20,8 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class TrViewRow(
-  id: Int,
+  /** Points to [[sales.salestaxrate.SalestaxrateRow.salestaxrateid]] */
+  id: SalestaxrateId,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.salestaxrateid]] */
   salestaxrateid: SalestaxrateId,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.stateprovinceid]] */
@@ -38,11 +39,11 @@ case class TrViewRow(
 )
 
 object TrViewRow {
-  implicit lazy val decoder: Decoder[TrViewRow] = Decoder.forProduct8[TrViewRow, Int, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(TrViewRow.apply)(Decoder.decodeInt, SalestaxrateId.decoder, StateprovinceId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[TrViewRow] = Encoder.forProduct8[TrViewRow, Int, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.id, x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(Encoder.encodeInt, SalestaxrateId.encoder, StateprovinceId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[TrViewRow] = Decoder.forProduct8[TrViewRow, SalestaxrateId, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(TrViewRow.apply)(SalestaxrateId.decoder, SalestaxrateId.decoder, StateprovinceId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[TrViewRow] = Encoder.forProduct8[TrViewRow, SalestaxrateId, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.id, x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(SalestaxrateId.encoder, SalestaxrateId.encoder, StateprovinceId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[TrViewRow] = new Read[TrViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (SalestaxrateId.get, Nullability.NoNulls),
       (SalestaxrateId.get, Nullability.NoNulls),
       (StateprovinceId.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
@@ -52,7 +53,7 @@ object TrViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TrViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = SalestaxrateId.get.unsafeGetNonNullable(rs, i + 0),
       salestaxrateid = SalestaxrateId.get.unsafeGetNonNullable(rs, i + 1),
       stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 2),
       taxtype = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),

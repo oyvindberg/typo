@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_user_functions
 
+import adventureworks.pg_catalog.pg_proc.PgProcId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -16,12 +17,12 @@ class PgStatUserFunctionsViewStructure[Row](val prefix: Option[String], val extr
   extends Relation[PgStatUserFunctionsViewFields, PgStatUserFunctionsViewRow, Row]
     with PgStatUserFunctionsViewFields[Row] { outer =>
 
-  override val funcid = new Field[/* oid */ Long, Row](prefix, "funcid", None, Some("oid"))(x => extract(x).funcid, (row, value) => merge(row, extract(row).copy(funcid = value)))
-  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val funcname = new Field[String, Row](prefix, "funcname", None, Some("name"))(x => extract(x).funcname, (row, value) => merge(row, extract(row).copy(funcname = value)))
-  override val calls = new Field[Long, Row](prefix, "calls", None, Some("int8"))(x => extract(x).calls, (row, value) => merge(row, extract(row).copy(calls = value)))
-  override val totalTime = new Field[Double, Row](prefix, "total_time", None, Some("float8"))(x => extract(x).totalTime, (row, value) => merge(row, extract(row).copy(totalTime = value)))
-  override val selfTime = new Field[Double, Row](prefix, "self_time", None, Some("float8"))(x => extract(x).selfTime, (row, value) => merge(row, extract(row).copy(selfTime = value)))
+  override val funcid = new Field[PgProcId, Row](prefix, "funcid", None, None)(x => extract(x).funcid, (row, value) => merge(row, extract(row).copy(funcid = value)))
+  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, None)(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
+  override val funcname = new Field[String, Row](prefix, "funcname", None, None)(x => extract(x).funcname, (row, value) => merge(row, extract(row).copy(funcname = value)))
+  override val calls = new OptField[Long, Row](prefix, "calls", None, None)(x => extract(x).calls, (row, value) => merge(row, extract(row).copy(calls = value)))
+  override val totalTime = new OptField[Double, Row](prefix, "total_time", None, None)(x => extract(x).totalTime, (row, value) => merge(row, extract(row).copy(totalTime = value)))
+  override val selfTime = new OptField[Double, Row](prefix, "self_time", None, None)(x => extract(x).selfTime, (row, value) => merge(row, extract(row).copy(selfTime = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](funcid, schemaname, funcname, calls, totalTime, selfTime)

@@ -21,24 +21,24 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgCursorsViewRow(
-  name: String,
-  statement: String,
-  isHoldable: Boolean,
-  isBinary: Boolean,
-  isScrollable: Boolean,
-  creationTime: TypoOffsetDateTime
+  name: /* nullability unknown */ Option[String],
+  statement: /* nullability unknown */ Option[String],
+  isHoldable: /* nullability unknown */ Option[Boolean],
+  isBinary: /* nullability unknown */ Option[Boolean],
+  isScrollable: /* nullability unknown */ Option[Boolean],
+  creationTime: /* nullability unknown */ Option[TypoOffsetDateTime]
 )
 
 object PgCursorsViewRow {
   implicit lazy val reads: Reads[PgCursorsViewRow] = Reads[PgCursorsViewRow](json => JsResult.fromTry(
       Try(
         PgCursorsViewRow(
-          name = json.\("name").as(Reads.StringReads),
-          statement = json.\("statement").as(Reads.StringReads),
-          isHoldable = json.\("is_holdable").as(Reads.BooleanReads),
-          isBinary = json.\("is_binary").as(Reads.BooleanReads),
-          isScrollable = json.\("is_scrollable").as(Reads.BooleanReads),
-          creationTime = json.\("creation_time").as(TypoOffsetDateTime.reads)
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          statement = json.\("statement").toOption.map(_.as(Reads.StringReads)),
+          isHoldable = json.\("is_holdable").toOption.map(_.as(Reads.BooleanReads)),
+          isBinary = json.\("is_binary").toOption.map(_.as(Reads.BooleanReads)),
+          isScrollable = json.\("is_scrollable").toOption.map(_.as(Reads.BooleanReads)),
+          creationTime = json.\("creation_time").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -46,23 +46,23 @@ object PgCursorsViewRow {
   def rowParser(idx: Int): RowParser[PgCursorsViewRow] = RowParser[PgCursorsViewRow] { row =>
     Success(
       PgCursorsViewRow(
-        name = row(idx + 0)(Column.columnToString),
-        statement = row(idx + 1)(Column.columnToString),
-        isHoldable = row(idx + 2)(Column.columnToBoolean),
-        isBinary = row(idx + 3)(Column.columnToBoolean),
-        isScrollable = row(idx + 4)(Column.columnToBoolean),
-        creationTime = row(idx + 5)(TypoOffsetDateTime.column)
+        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        statement = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        isHoldable = row(idx + 2)(Column.columnToOption(Column.columnToBoolean)),
+        isBinary = row(idx + 3)(Column.columnToOption(Column.columnToBoolean)),
+        isScrollable = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
+        creationTime = row(idx + 5)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit lazy val writes: OWrites[PgCursorsViewRow] = OWrites[PgCursorsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Writes.StringWrites.writes(o.name),
-      "statement" -> Writes.StringWrites.writes(o.statement),
-      "is_holdable" -> Writes.BooleanWrites.writes(o.isHoldable),
-      "is_binary" -> Writes.BooleanWrites.writes(o.isBinary),
-      "is_scrollable" -> Writes.BooleanWrites.writes(o.isScrollable),
-      "creation_time" -> TypoOffsetDateTime.writes.writes(o.creationTime)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "statement" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statement),
+      "is_holdable" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isHoldable),
+      "is_binary" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isBinary),
+      "is_scrollable" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isScrollable),
+      "creation_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.creationTime)
     ))
   )
 }

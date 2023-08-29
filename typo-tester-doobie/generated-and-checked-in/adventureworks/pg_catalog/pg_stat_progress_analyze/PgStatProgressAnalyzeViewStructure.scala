@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_analyze
 
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -16,18 +15,18 @@ class PgStatProgressAnalyzeViewStructure[Row](val prefix: Option[String], val ex
   extends Relation[PgStatProgressAnalyzeViewFields, PgStatProgressAnalyzeViewRow, Row]
     with PgStatProgressAnalyzeViewFields[Row] { outer =>
 
-  override val pid = new Field[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
-  override val datid = new Field[/* oid */ Long, Row](prefix, "datid", None, Some("oid"))(x => extract(x).datid, (row, value) => merge(row, extract(row).copy(datid = value)))
-  override val datname = new OptField[String, Row](prefix, "datname", None, Some("name"))(x => extract(x).datname, (row, value) => merge(row, extract(row).copy(datname = value)))
-  override val relid = new Field[/* oid */ Long, Row](prefix, "relid", None, Some("oid"))(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
-  override val phase = new Field[String, Row](prefix, "phase", None, None)(x => extract(x).phase, (row, value) => merge(row, extract(row).copy(phase = value)))
-  override val sampleBlksTotal = new Field[Long, Row](prefix, "sample_blks_total", None, Some("int8"))(x => extract(x).sampleBlksTotal, (row, value) => merge(row, extract(row).copy(sampleBlksTotal = value)))
-  override val sampleBlksScanned = new Field[Long, Row](prefix, "sample_blks_scanned", None, Some("int8"))(x => extract(x).sampleBlksScanned, (row, value) => merge(row, extract(row).copy(sampleBlksScanned = value)))
-  override val extStatsTotal = new Field[Long, Row](prefix, "ext_stats_total", None, Some("int8"))(x => extract(x).extStatsTotal, (row, value) => merge(row, extract(row).copy(extStatsTotal = value)))
-  override val extStatsComputed = new Field[Long, Row](prefix, "ext_stats_computed", None, Some("int8"))(x => extract(x).extStatsComputed, (row, value) => merge(row, extract(row).copy(extStatsComputed = value)))
-  override val childTablesTotal = new Field[Long, Row](prefix, "child_tables_total", None, Some("int8"))(x => extract(x).childTablesTotal, (row, value) => merge(row, extract(row).copy(childTablesTotal = value)))
-  override val childTablesDone = new Field[Long, Row](prefix, "child_tables_done", None, Some("int8"))(x => extract(x).childTablesDone, (row, value) => merge(row, extract(row).copy(childTablesDone = value)))
-  override val currentChildTableRelid = new Field[/* oid */ Long, Row](prefix, "current_child_table_relid", None, Some("oid"))(x => extract(x).currentChildTableRelid, (row, value) => merge(row, extract(row).copy(currentChildTableRelid = value)))
+  override val pid = new OptField[Int, Row](prefix, "pid", None, None)(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
+  override val datid = new OptField[/* oid */ Long, Row](prefix, "datid", None, None)(x => extract(x).datid, (row, value) => merge(row, extract(row).copy(datid = value)))
+  override val datname = new OptField[String, Row](prefix, "datname", None, None)(x => extract(x).datname, (row, value) => merge(row, extract(row).copy(datname = value)))
+  override val relid = new OptField[/* oid */ Long, Row](prefix, "relid", None, None)(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
+  override val phase = new OptField[String, Row](prefix, "phase", None, None)(x => extract(x).phase, (row, value) => merge(row, extract(row).copy(phase = value)))
+  override val sampleBlksTotal = new OptField[Long, Row](prefix, "sample_blks_total", None, None)(x => extract(x).sampleBlksTotal, (row, value) => merge(row, extract(row).copy(sampleBlksTotal = value)))
+  override val sampleBlksScanned = new OptField[Long, Row](prefix, "sample_blks_scanned", None, None)(x => extract(x).sampleBlksScanned, (row, value) => merge(row, extract(row).copy(sampleBlksScanned = value)))
+  override val extStatsTotal = new OptField[Long, Row](prefix, "ext_stats_total", None, None)(x => extract(x).extStatsTotal, (row, value) => merge(row, extract(row).copy(extStatsTotal = value)))
+  override val extStatsComputed = new OptField[Long, Row](prefix, "ext_stats_computed", None, None)(x => extract(x).extStatsComputed, (row, value) => merge(row, extract(row).copy(extStatsComputed = value)))
+  override val childTablesTotal = new OptField[Long, Row](prefix, "child_tables_total", None, None)(x => extract(x).childTablesTotal, (row, value) => merge(row, extract(row).copy(childTablesTotal = value)))
+  override val childTablesDone = new OptField[Long, Row](prefix, "child_tables_done", None, None)(x => extract(x).childTablesDone, (row, value) => merge(row, extract(row).copy(childTablesDone = value)))
+  override val currentChildTableRelid = new OptField[/* oid */ Long, Row](prefix, "current_child_table_relid", None, None)(x => extract(x).currentChildTableRelid, (row, value) => merge(row, extract(row).copy(currentChildTableRelid = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](pid, datid, datname, relid, phase, sampleBlksTotal, sampleBlksScanned, extStatsTotal, extStatsComputed, childTablesTotal, childTablesDone, currentChildTableRelid)

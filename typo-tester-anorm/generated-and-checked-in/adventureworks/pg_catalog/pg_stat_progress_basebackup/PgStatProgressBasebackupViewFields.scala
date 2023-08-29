@@ -7,15 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_basebackup
 
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgStatProgressBasebackupViewFields[Row] {
-  val pid: Field[Int, Row]
-  val phase: Field[String, Row]
-  val backupTotal: Field[Long, Row]
-  val backupStreamed: Field[Long, Row]
-  val tablespacesTotal: Field[Long, Row]
-  val tablespacesStreamed: Field[Long, Row]
+  val pid: OptField[Int, Row]
+  val phase: OptField[String, Row]
+  val backupTotal: OptField[Long, Row]
+  val backupStreamed: OptField[Long, Row]
+  val tablespacesTotal: OptField[Long, Row]
+  val tablespacesStreamed: OptField[Long, Row]
 }
 object PgStatProgressBasebackupViewFields extends PgStatProgressBasebackupViewStructure[PgStatProgressBasebackupViewRow](None, identity, (_, x) => x)
 

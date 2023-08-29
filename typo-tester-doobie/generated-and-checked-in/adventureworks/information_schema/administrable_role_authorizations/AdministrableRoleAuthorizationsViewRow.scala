@@ -7,36 +7,35 @@ package adventureworks
 package information_schema
 package administrable_role_authorizations
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class AdministrableRoleAuthorizationsViewRow(
   /** Points to [[applicable_roles.ApplicableRolesViewRow.grantee]] */
-  grantee: SqlIdentifier,
+  grantee: Option[/* nullability unknown */ String],
   /** Points to [[applicable_roles.ApplicableRolesViewRow.roleName]] */
-  roleName: SqlIdentifier,
+  roleName: Option[/* nullability unknown */ String],
   /** Points to [[applicable_roles.ApplicableRolesViewRow.isGrantable]] */
-  isGrantable: YesOrNo
+  isGrantable: Option[/* nullability unknown */ /* max 3 chars */ String]
 )
 
 object AdministrableRoleAuthorizationsViewRow {
-  implicit lazy val decoder: Decoder[AdministrableRoleAuthorizationsViewRow] = Decoder.forProduct3[AdministrableRoleAuthorizationsViewRow, SqlIdentifier, SqlIdentifier, YesOrNo]("grantee", "role_name", "is_grantable")(AdministrableRoleAuthorizationsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, YesOrNo.decoder)
-  implicit lazy val encoder: Encoder[AdministrableRoleAuthorizationsViewRow] = Encoder.forProduct3[AdministrableRoleAuthorizationsViewRow, SqlIdentifier, SqlIdentifier, YesOrNo]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(SqlIdentifier.encoder, SqlIdentifier.encoder, YesOrNo.encoder)
+  implicit lazy val decoder: Decoder[AdministrableRoleAuthorizationsViewRow] = Decoder.forProduct3[AdministrableRoleAuthorizationsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ /* max 3 chars */ String]]("grantee", "role_name", "is_grantable")(AdministrableRoleAuthorizationsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[AdministrableRoleAuthorizationsViewRow] = Encoder.forProduct3[AdministrableRoleAuthorizationsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ /* max 3 chars */ String]]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[AdministrableRoleAuthorizationsViewRow] = new Read[AdministrableRoleAuthorizationsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => AdministrableRoleAuthorizationsViewRow(
-      grantee = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      roleName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      isGrantable = YesOrNo.get.unsafeGetNonNullable(rs, i + 2)
+      grantee = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      roleName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      isGrantable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

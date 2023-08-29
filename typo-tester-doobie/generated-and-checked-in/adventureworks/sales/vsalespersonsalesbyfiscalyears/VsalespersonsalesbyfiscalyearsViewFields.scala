@@ -7,16 +7,16 @@ package adventureworks
 package sales
 package vsalespersonsalesbyfiscalyears
 
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait VsalespersonsalesbyfiscalyearsViewFields[Row] {
-  val SalesPersonID: Field[Int, Row]
-  val FullName: Field[String, Row]
-  val JobTitle: Field[String, Row]
-  val SalesTerritory: Field[String, Row]
-  val `2012`: Field[BigDecimal, Row]
-  val `2013`: Field[BigDecimal, Row]
-  val `2014`: Field[BigDecimal, Row]
+  val SalesPersonID: OptField[Int, Row]
+  val FullName: OptField[String, Row]
+  val JobTitle: OptField[String, Row]
+  val SalesTerritory: OptField[String, Row]
+  val `2012`: OptField[BigDecimal, Row]
+  val `2013`: OptField[BigDecimal, Row]
+  val `2014`: OptField[BigDecimal, Row]
 }
 object VsalespersonsalesbyfiscalyearsViewFields extends VsalespersonsalesbyfiscalyearsViewStructure[VsalespersonsalesbyfiscalyearsViewRow](None, identity, (_, x) => x)
 

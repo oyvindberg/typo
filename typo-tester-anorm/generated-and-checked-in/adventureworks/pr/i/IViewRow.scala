@@ -23,11 +23,12 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class IViewRow(
-  id: Int,
+  /** Points to [[production.illustration.IllustrationRow.illustrationid]] */
+  id: IllustrationId,
   /** Points to [[production.illustration.IllustrationRow.illustrationid]] */
   illustrationid: IllustrationId,
   /** Points to [[production.illustration.IllustrationRow.diagram]] */
-  diagram: TypoXml,
+  diagram: Option[TypoXml],
   /** Points to [[production.illustration.IllustrationRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -36,9 +37,9 @@ object IViewRow {
   implicit lazy val reads: Reads[IViewRow] = Reads[IViewRow](json => JsResult.fromTry(
       Try(
         IViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(IllustrationId.reads),
           illustrationid = json.\("illustrationid").as(IllustrationId.reads),
-          diagram = json.\("diagram").as(TypoXml.reads),
+          diagram = json.\("diagram").toOption.map(_.as(TypoXml.reads)),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -47,18 +48,18 @@ object IViewRow {
   def rowParser(idx: Int): RowParser[IViewRow] = RowParser[IViewRow] { row =>
     Success(
       IViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(IllustrationId.column),
         illustrationid = row(idx + 1)(IllustrationId.column),
-        diagram = row(idx + 2)(TypoXml.column),
+        diagram = row(idx + 2)(Column.columnToOption(TypoXml.column)),
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[IViewRow] = OWrites[IViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> IllustrationId.writes.writes(o.id),
       "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
-      "diagram" -> TypoXml.writes.writes(o.diagram),
+      "diagram" -> Writes.OptionWrites(TypoXml.writes).writes(o.diagram),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

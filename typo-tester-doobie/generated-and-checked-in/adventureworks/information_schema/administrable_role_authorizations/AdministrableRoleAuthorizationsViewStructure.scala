@@ -7,19 +7,17 @@ package adventureworks
 package information_schema
 package administrable_role_authorizations
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class AdministrableRoleAuthorizationsViewStructure[Row](val prefix: Option[String], val extract: Row => AdministrableRoleAuthorizationsViewRow, val merge: (Row, AdministrableRoleAuthorizationsViewRow) => Row)
   extends Relation[AdministrableRoleAuthorizationsViewFields, AdministrableRoleAuthorizationsViewRow, Row]
     with AdministrableRoleAuthorizationsViewFields[Row] { outer =>
 
-  override val grantee = new Field[SqlIdentifier, Row](prefix, "grantee", None, Some("name"))(x => extract(x).grantee, (row, value) => merge(row, extract(row).copy(grantee = value)))
-  override val roleName = new Field[SqlIdentifier, Row](prefix, "role_name", None, Some("name"))(x => extract(x).roleName, (row, value) => merge(row, extract(row).copy(roleName = value)))
-  override val isGrantable = new Field[YesOrNo, Row](prefix, "is_grantable", None, Some("varchar"))(x => extract(x).isGrantable, (row, value) => merge(row, extract(row).copy(isGrantable = value)))
+  override val grantee = new OptField[/* nullability unknown */ String, Row](prefix, "grantee", None, None)(x => extract(x).grantee, (row, value) => merge(row, extract(row).copy(grantee = value)))
+  override val roleName = new OptField[/* nullability unknown */ String, Row](prefix, "role_name", None, None)(x => extract(x).roleName, (row, value) => merge(row, extract(row).copy(roleName = value)))
+  override val isGrantable = new OptField[/* nullability unknown */ /* max 3 chars */ String, Row](prefix, "is_grantable", None, None)(x => extract(x).isGrantable, (row, value) => merge(row, extract(row).copy(isGrantable = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](grantee, roleName, isGrantable)

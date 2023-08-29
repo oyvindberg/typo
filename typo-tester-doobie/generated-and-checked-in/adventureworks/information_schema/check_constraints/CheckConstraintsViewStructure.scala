@@ -7,20 +7,18 @@ package adventureworks
 package information_schema
 package check_constraints
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class CheckConstraintsViewStructure[Row](val prefix: Option[String], val extract: Row => CheckConstraintsViewRow, val merge: (Row, CheckConstraintsViewRow) => Row)
   extends Relation[CheckConstraintsViewFields, CheckConstraintsViewRow, Row]
     with CheckConstraintsViewFields[Row] { outer =>
 
-  override val constraintCatalog = new Field[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("name"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
-  override val constraintSchema = new Field[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("name"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
-  override val constraintName = new Field[SqlIdentifier, Row](prefix, "constraint_name", None, Some("name"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
-  override val checkClause = new Field[CharacterData, Row](prefix, "check_clause", None, Some("varchar"))(x => extract(x).checkClause, (row, value) => merge(row, extract(row).copy(checkClause = value)))
+  override val constraintCatalog = new OptField[String, Row](prefix, "constraint_catalog", None, None)(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
+  override val constraintSchema = new OptField[String, Row](prefix, "constraint_schema", None, None)(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
+  override val constraintName = new OptField[String, Row](prefix, "constraint_name", None, None)(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
+  override val checkClause = new OptField[String, Row](prefix, "check_clause", None, None)(x => extract(x).checkClause, (row, value) => merge(row, extract(row).copy(checkClause = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](constraintCatalog, constraintSchema, constraintName, checkClause)

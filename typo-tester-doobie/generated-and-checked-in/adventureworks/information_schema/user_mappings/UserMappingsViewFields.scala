@@ -7,13 +7,12 @@ package adventureworks
 package information_schema
 package user_mappings
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait UserMappingsViewFields[Row] {
-  val authorizationIdentifier: Field[SqlIdentifier, Row]
-  val foreignServerCatalog: Field[SqlIdentifier, Row]
-  val foreignServerName: Field[SqlIdentifier, Row]
+  val authorizationIdentifier: OptField[/* nullability unknown */ String, Row]
+  val foreignServerCatalog: OptField[/* nullability unknown */ String, Row]
+  val foreignServerName: OptField[/* nullability unknown */ String, Row]
 }
 object UserMappingsViewFields extends UserMappingsViewStructure[UserMappingsViewRow](None, identity, (_, x) => x)
 

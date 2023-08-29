@@ -18,7 +18,8 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class SciViewRow(
-  id: Int,
+  /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartitemid]] */
+  id: ShoppingcartitemId,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartitemid]] */
   shoppingcartitemid: ShoppingcartitemId,
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartid]] */
@@ -34,11 +35,11 @@ case class SciViewRow(
 )
 
 object SciViewRow {
-  implicit lazy val decoder: Decoder[SciViewRow] = Decoder.forProduct7[SciViewRow, Int, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(SciViewRow.apply)(Decoder.decodeInt, ShoppingcartitemId.decoder, Decoder.decodeString, Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SciViewRow] = Encoder.forProduct7[SciViewRow, Int, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.id, x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))(Encoder.encodeInt, ShoppingcartitemId.encoder, Encoder.encodeString, Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SciViewRow] = Decoder.forProduct7[SciViewRow, ShoppingcartitemId, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(SciViewRow.apply)(ShoppingcartitemId.decoder, ShoppingcartitemId.decoder, Decoder.decodeString, Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SciViewRow] = Encoder.forProduct7[SciViewRow, ShoppingcartitemId, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.id, x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))(ShoppingcartitemId.encoder, ShoppingcartitemId.encoder, Encoder.encodeString, Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SciViewRow] = new Read[SciViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ShoppingcartitemId.get, Nullability.NoNulls),
       (ShoppingcartitemId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
@@ -47,7 +48,7 @@ object SciViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SciViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 0),
       shoppingcartitemid = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 1),
       shoppingcartid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
       quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),

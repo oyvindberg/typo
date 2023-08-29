@@ -7,20 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_statio_sys_tables
 
-import typo.dsl.SqlExpr.Field
+import adventureworks.pg_catalog.pg_class.PgClassId
+import typo.dsl.SqlExpr.OptField
 
 trait PgStatioSysTablesViewFields[Row] {
-  val relid: Field[/* oid */ Long, Row]
-  val schemaname: Field[String, Row]
-  val relname: Field[String, Row]
-  val heapBlksRead: Field[Long, Row]
-  val heapBlksHit: Field[Long, Row]
-  val idxBlksRead: Field[Long, Row]
-  val idxBlksHit: Field[Long, Row]
-  val toastBlksRead: Field[Long, Row]
-  val toastBlksHit: Field[Long, Row]
-  val tidxBlksRead: Field[Long, Row]
-  val tidxBlksHit: Field[Long, Row]
+  val relid: OptField[PgClassId, Row]
+  val schemaname: OptField[String, Row]
+  val relname: OptField[String, Row]
+  val heapBlksRead: OptField[/* nullability unknown */ Long, Row]
+  val heapBlksHit: OptField[/* nullability unknown */ Long, Row]
+  val idxBlksRead: OptField[/* nullability unknown */ Long, Row]
+  val idxBlksHit: OptField[/* nullability unknown */ Long, Row]
+  val toastBlksRead: OptField[/* nullability unknown */ Long, Row]
+  val toastBlksHit: OptField[/* nullability unknown */ Long, Row]
+  val tidxBlksRead: OptField[/* nullability unknown */ Long, Row]
+  val tidxBlksHit: OptField[/* nullability unknown */ Long, Row]
 }
 object PgStatioSysTablesViewFields extends PgStatioSysTablesViewStructure[PgStatioSysTablesViewRow](None, identity, (_, x) => x)
 

@@ -22,7 +22,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EphViewRow(
-  id: Int,
+  /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.ratechangedate]] */
@@ -39,7 +40,7 @@ object EphViewRow {
   implicit lazy val reads: Reads[EphViewRow] = Reads[EphViewRow](json => JsResult.fromTry(
       Try(
         EphViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           ratechangedate = json.\("ratechangedate").as(TypoLocalDateTime.reads),
           rate = json.\("rate").as(Reads.bigDecReads),
@@ -52,7 +53,7 @@ object EphViewRow {
   def rowParser(idx: Int): RowParser[EphViewRow] = RowParser[EphViewRow] { row =>
     Success(
       EphViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         ratechangedate = row(idx + 2)(TypoLocalDateTime.column),
         rate = row(idx + 3)(Column.columnToScalaBigDecimal),
@@ -63,7 +64,7 @@ object EphViewRow {
   }
   implicit lazy val writes: OWrites[EphViewRow] = OWrites[EphViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "ratechangedate" -> TypoLocalDateTime.writes.writes(o.ratechangedate),
       "rate" -> Writes.BigDecimalWrites.writes(o.rate),

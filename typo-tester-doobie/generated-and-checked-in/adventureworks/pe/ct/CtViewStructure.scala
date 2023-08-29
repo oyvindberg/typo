@@ -18,10 +18,10 @@ class CtViewStructure[Row](val prefix: Option[String], val extract: Row => CtVie
   extends Relation[CtViewFields, CtViewRow, Row]
     with CtViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val contacttypeid = new Field[ContacttypeId, Row](prefix, "contacttypeid", None, Some("int4"))(x => extract(x).contacttypeid, (row, value) => merge(row, extract(row).copy(contacttypeid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[ContacttypeId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val contacttypeid = new Field[ContacttypeId, Row](prefix, "contacttypeid", None, None)(x => extract(x).contacttypeid, (row, value) => merge(row, extract(row).copy(contacttypeid = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, contacttypeid, name, modifieddate)

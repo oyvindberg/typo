@@ -21,20 +21,20 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTimezoneNamesViewRow(
-  name: String,
-  abbrev: String,
-  utcOffset: TypoInterval,
-  isDst: Boolean
+  name: /* nullability unknown */ Option[String],
+  abbrev: /* nullability unknown */ Option[String],
+  utcOffset: /* nullability unknown */ Option[TypoInterval],
+  isDst: /* nullability unknown */ Option[Boolean]
 )
 
 object PgTimezoneNamesViewRow {
   implicit lazy val reads: Reads[PgTimezoneNamesViewRow] = Reads[PgTimezoneNamesViewRow](json => JsResult.fromTry(
       Try(
         PgTimezoneNamesViewRow(
-          name = json.\("name").as(Reads.StringReads),
-          abbrev = json.\("abbrev").as(Reads.StringReads),
-          utcOffset = json.\("utc_offset").as(TypoInterval.reads),
-          isDst = json.\("is_dst").as(Reads.BooleanReads)
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          abbrev = json.\("abbrev").toOption.map(_.as(Reads.StringReads)),
+          utcOffset = json.\("utc_offset").toOption.map(_.as(TypoInterval.reads)),
+          isDst = json.\("is_dst").toOption.map(_.as(Reads.BooleanReads))
         )
       )
     ),
@@ -42,19 +42,19 @@ object PgTimezoneNamesViewRow {
   def rowParser(idx: Int): RowParser[PgTimezoneNamesViewRow] = RowParser[PgTimezoneNamesViewRow] { row =>
     Success(
       PgTimezoneNamesViewRow(
-        name = row(idx + 0)(Column.columnToString),
-        abbrev = row(idx + 1)(Column.columnToString),
-        utcOffset = row(idx + 2)(TypoInterval.column),
-        isDst = row(idx + 3)(Column.columnToBoolean)
+        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        abbrev = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        utcOffset = row(idx + 2)(Column.columnToOption(TypoInterval.column)),
+        isDst = row(idx + 3)(Column.columnToOption(Column.columnToBoolean))
       )
     )
   }
   implicit lazy val writes: OWrites[PgTimezoneNamesViewRow] = OWrites[PgTimezoneNamesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Writes.StringWrites.writes(o.name),
-      "abbrev" -> Writes.StringWrites.writes(o.abbrev),
-      "utc_offset" -> TypoInterval.writes.writes(o.utcOffset),
-      "is_dst" -> Writes.BooleanWrites.writes(o.isDst)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "abbrev" -> Writes.OptionWrites(Writes.StringWrites).writes(o.abbrev),
+      "utc_offset" -> Writes.OptionWrites(TypoInterval.writes).writes(o.utcOffset),
+      "is_dst" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isDst)
     ))
   )
 }

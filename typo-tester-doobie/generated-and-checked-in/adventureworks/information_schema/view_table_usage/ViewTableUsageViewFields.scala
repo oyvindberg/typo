@@ -7,16 +7,15 @@ package adventureworks
 package information_schema
 package view_table_usage
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ViewTableUsageViewFields[Row] {
-  val viewCatalog: Field[SqlIdentifier, Row]
-  val viewSchema: Field[SqlIdentifier, Row]
-  val viewName: Field[SqlIdentifier, Row]
-  val tableCatalog: Field[SqlIdentifier, Row]
-  val tableSchema: Field[SqlIdentifier, Row]
-  val tableName: Field[SqlIdentifier, Row]
+  val viewCatalog: OptField[String, Row]
+  val viewSchema: OptField[String, Row]
+  val viewName: OptField[String, Row]
+  val tableCatalog: OptField[String, Row]
+  val tableSchema: OptField[String, Row]
+  val tableName: OptField[String, Row]
 }
 object ViewTableUsageViewFields extends ViewTableUsageViewStructure[ViewTableUsageViewRow](None, identity, (_, x) => x)
 

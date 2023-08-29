@@ -8,16 +8,17 @@ package pg_catalog
 package pg_policies
 
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgPoliciesViewFields[Row] {
   val schemaname: Field[String, Row]
   val tablename: Field[String, Row]
   val policyname: Field[String, Row]
-  val permissive: Field[String, Row]
-  val roles: Field[Array[String], Row]
-  val cmd: Field[String, Row]
-  val qual: Field[String, Row]
-  val withCheck: Field[String, Row]
+  val permissive: OptField[String, Row]
+  val roles: OptField[Array[String], Row]
+  val cmd: OptField[String, Row]
+  val qual: OptField[String, Row]
+  val withCheck: OptField[String, Row]
 }
 object PgPoliciesViewFields extends PgPoliciesViewStructure[PgPoliciesViewRow](None, identity, (_, x) => x)
 

@@ -8,7 +8,6 @@ package pg_catalog
 package pg_replication_slots
 
 import adventureworks.customtypes.TypoXid
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -17,21 +16,21 @@ class PgReplicationSlotsViewStructure[Row](val prefix: Option[String], val extra
   extends Relation[PgReplicationSlotsViewFields, PgReplicationSlotsViewRow, Row]
     with PgReplicationSlotsViewFields[Row] { outer =>
 
-  override val slotName = new Field[String, Row](prefix, "slot_name", None, Some("name"))(x => extract(x).slotName, (row, value) => merge(row, extract(row).copy(slotName = value)))
-  override val plugin = new Field[String, Row](prefix, "plugin", None, Some("name"))(x => extract(x).plugin, (row, value) => merge(row, extract(row).copy(plugin = value)))
-  override val slotType = new Field[String, Row](prefix, "slot_type", None, None)(x => extract(x).slotType, (row, value) => merge(row, extract(row).copy(slotType = value)))
-  override val datoid = new Field[/* oid */ Long, Row](prefix, "datoid", None, Some("oid"))(x => extract(x).datoid, (row, value) => merge(row, extract(row).copy(datoid = value)))
-  override val database = new OptField[String, Row](prefix, "database", None, Some("name"))(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
-  override val temporary = new Field[Boolean, Row](prefix, "temporary", None, None)(x => extract(x).temporary, (row, value) => merge(row, extract(row).copy(temporary = value)))
-  override val active = new Field[Boolean, Row](prefix, "active", None, None)(x => extract(x).active, (row, value) => merge(row, extract(row).copy(active = value)))
-  override val activePid = new Field[Int, Row](prefix, "active_pid", None, Some("int4"))(x => extract(x).activePid, (row, value) => merge(row, extract(row).copy(activePid = value)))
-  override val xmin = new Field[TypoXid, Row](prefix, "xmin", None, Some("xid"))(x => extract(x).xmin, (row, value) => merge(row, extract(row).copy(xmin = value)))
-  override val catalogXmin = new Field[TypoXid, Row](prefix, "catalog_xmin", None, Some("xid"))(x => extract(x).catalogXmin, (row, value) => merge(row, extract(row).copy(catalogXmin = value)))
-  override val restartLsn = new Field[/* pg_lsn */ Long, Row](prefix, "restart_lsn", None, Some("pg_lsn"))(x => extract(x).restartLsn, (row, value) => merge(row, extract(row).copy(restartLsn = value)))
-  override val confirmedFlushLsn = new Field[/* pg_lsn */ Long, Row](prefix, "confirmed_flush_lsn", None, Some("pg_lsn"))(x => extract(x).confirmedFlushLsn, (row, value) => merge(row, extract(row).copy(confirmedFlushLsn = value)))
-  override val walStatus = new Field[String, Row](prefix, "wal_status", None, None)(x => extract(x).walStatus, (row, value) => merge(row, extract(row).copy(walStatus = value)))
-  override val safeWalSize = new Field[Long, Row](prefix, "safe_wal_size", None, Some("int8"))(x => extract(x).safeWalSize, (row, value) => merge(row, extract(row).copy(safeWalSize = value)))
-  override val twoPhase = new Field[Boolean, Row](prefix, "two_phase", None, None)(x => extract(x).twoPhase, (row, value) => merge(row, extract(row).copy(twoPhase = value)))
+  override val slotName = new OptField[String, Row](prefix, "slot_name", None, None)(x => extract(x).slotName, (row, value) => merge(row, extract(row).copy(slotName = value)))
+  override val plugin = new OptField[String, Row](prefix, "plugin", None, None)(x => extract(x).plugin, (row, value) => merge(row, extract(row).copy(plugin = value)))
+  override val slotType = new OptField[String, Row](prefix, "slot_type", None, None)(x => extract(x).slotType, (row, value) => merge(row, extract(row).copy(slotType = value)))
+  override val datoid = new OptField[/* oid */ Long, Row](prefix, "datoid", None, None)(x => extract(x).datoid, (row, value) => merge(row, extract(row).copy(datoid = value)))
+  override val database = new OptField[String, Row](prefix, "database", None, None)(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
+  override val temporary = new OptField[Boolean, Row](prefix, "temporary", None, None)(x => extract(x).temporary, (row, value) => merge(row, extract(row).copy(temporary = value)))
+  override val active = new OptField[Boolean, Row](prefix, "active", None, None)(x => extract(x).active, (row, value) => merge(row, extract(row).copy(active = value)))
+  override val activePid = new OptField[Int, Row](prefix, "active_pid", None, None)(x => extract(x).activePid, (row, value) => merge(row, extract(row).copy(activePid = value)))
+  override val xmin = new OptField[TypoXid, Row](prefix, "xmin", None, None)(x => extract(x).xmin, (row, value) => merge(row, extract(row).copy(xmin = value)))
+  override val catalogXmin = new OptField[TypoXid, Row](prefix, "catalog_xmin", None, None)(x => extract(x).catalogXmin, (row, value) => merge(row, extract(row).copy(catalogXmin = value)))
+  override val restartLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "restart_lsn", None, None)(x => extract(x).restartLsn, (row, value) => merge(row, extract(row).copy(restartLsn = value)))
+  override val confirmedFlushLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "confirmed_flush_lsn", None, None)(x => extract(x).confirmedFlushLsn, (row, value) => merge(row, extract(row).copy(confirmedFlushLsn = value)))
+  override val walStatus = new OptField[String, Row](prefix, "wal_status", None, None)(x => extract(x).walStatus, (row, value) => merge(row, extract(row).copy(walStatus = value)))
+  override val safeWalSize = new OptField[Long, Row](prefix, "safe_wal_size", None, None)(x => extract(x).safeWalSize, (row, value) => merge(row, extract(row).copy(safeWalSize = value)))
+  override val twoPhase = new OptField[Boolean, Row](prefix, "two_phase", None, None)(x => extract(x).twoPhase, (row, value) => merge(row, extract(row).copy(twoPhase = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](slotName, plugin, slotType, datoid, database, temporary, active, activePid, xmin, catalogXmin, restartLsn, confirmedFlushLsn, walStatus, safeWalSize, twoPhase)

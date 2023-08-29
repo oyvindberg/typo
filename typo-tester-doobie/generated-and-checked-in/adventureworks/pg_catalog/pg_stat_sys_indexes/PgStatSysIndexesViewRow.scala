@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_sys_indexes
 
+import adventureworks.pg_catalog.pg_class.PgClassId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -16,46 +17,46 @@ import java.sql.ResultSet
 
 case class PgStatSysIndexesViewRow(
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.relid]] */
-  relid: /* oid */ Long,
+  relid: Option[PgClassId],
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.indexrelid]] */
-  indexrelid: /* oid */ Long,
+  indexrelid: Option[PgClassId],
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.schemaname]] */
-  schemaname: String,
+  schemaname: Option[String],
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.relname]] */
-  relname: String,
+  relname: Option[String],
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.indexrelname]] */
-  indexrelname: String,
+  indexrelname: Option[String],
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.idxScan]] */
-  idxScan: Long,
+  idxScan: Option[/* nullability unknown */ Long],
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.idxTupRead]] */
-  idxTupRead: Long,
+  idxTupRead: Option[/* nullability unknown */ Long],
   /** Points to [[pg_stat_all_indexes.PgStatAllIndexesViewRow.idxTupFetch]] */
-  idxTupFetch: Long
+  idxTupFetch: Option[/* nullability unknown */ Long]
 )
 
 object PgStatSysIndexesViewRow {
-  implicit lazy val decoder: Decoder[PgStatSysIndexesViewRow] = Decoder.forProduct8[PgStatSysIndexesViewRow, /* oid */ Long, /* oid */ Long, String, String, String, Long, Long, Long]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(PgStatSysIndexesViewRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgStatSysIndexesViewRow] = Encoder.forProduct8[PgStatSysIndexesViewRow, /* oid */ Long, /* oid */ Long, String, String, String, Long, Long, Long]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxScan, x.idxTupRead, x.idxTupFetch))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgStatSysIndexesViewRow] = Decoder.forProduct8[PgStatSysIndexesViewRow, Option[PgClassId], Option[PgClassId], Option[String], Option[String], Option[String], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(PgStatSysIndexesViewRow.apply)(Decoder.decodeOption(PgClassId.decoder), Decoder.decodeOption(PgClassId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgStatSysIndexesViewRow] = Encoder.forProduct8[PgStatSysIndexesViewRow, Option[PgClassId], Option[PgClassId], Option[String], Option[String], Option[String], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxScan, x.idxTupRead, x.idxTupFetch))(Encoder.encodeOption(PgClassId.encoder), Encoder.encodeOption(PgClassId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit lazy val read: Read[PgStatSysIndexesViewRow] = new Read[PgStatSysIndexesViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls)
+      (PgClassId.get, Nullability.Nullable),
+      (PgClassId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatSysIndexesViewRow(
-      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
-      indexrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
-      schemaname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      relname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      indexrelname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      idxScan = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
-      idxTupRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
-      idxTupFetch = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7)
+      relid = PgClassId.get.unsafeGetNullable(rs, i + 0),
+      indexrelid = PgClassId.get.unsafeGetNullable(rs, i + 1),
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      indexrelname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      idxScan = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
+      idxTupRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
+      idxTupFetch = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

@@ -12,18 +12,19 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PvViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ProductId, Row]
   val productid: Field[ProductId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val averageleadtime: Field[Int, Row]
   val standardprice: Field[BigDecimal, Row]
-  val lastreceiptcost: Field[BigDecimal, Row]
-  val lastreceiptdate: Field[TypoLocalDateTime, Row]
+  val lastreceiptcost: OptField[BigDecimal, Row]
+  val lastreceiptdate: OptField[TypoLocalDateTime, Row]
   val minorderqty: Field[Int, Row]
   val maxorderqty: Field[Int, Row]
-  val onorderqty: Field[Int, Row]
+  val onorderqty: OptField[Int, Row]
   val unitmeasurecode: Field[UnitmeasureId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

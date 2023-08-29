@@ -7,36 +7,35 @@ package adventureworks
 package information_schema
 package check_constraints
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CheckConstraintsViewRow(
-  constraintCatalog: SqlIdentifier,
-  constraintSchema: SqlIdentifier,
-  constraintName: SqlIdentifier,
-  checkClause: CharacterData
+  constraintCatalog: /* nullability unknown */ Option[String],
+  constraintSchema: /* nullability unknown */ Option[String],
+  constraintName: /* nullability unknown */ Option[String],
+  checkClause: /* nullability unknown */ Option[String]
 )
 
 object CheckConstraintsViewRow {
-  implicit lazy val decoder: Decoder[CheckConstraintsViewRow] = Decoder.forProduct4[CheckConstraintsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(CheckConstraintsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
-  implicit lazy val encoder: Encoder[CheckConstraintsViewRow] = Encoder.forProduct4[CheckConstraintsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.checkClause))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
+  implicit lazy val decoder: Decoder[CheckConstraintsViewRow] = Decoder.forProduct4[CheckConstraintsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(CheckConstraintsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[CheckConstraintsViewRow] = Encoder.forProduct4[CheckConstraintsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.checkClause))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[CheckConstraintsViewRow] = new Read[CheckConstraintsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CheckConstraintsViewRow(
-      constraintCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      constraintSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      constraintName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      checkClause = CharacterData.get.unsafeGetNonNullable(rs, i + 3)
+      constraintCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      constraintSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      constraintName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      checkClause = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

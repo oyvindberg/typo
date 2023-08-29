@@ -14,7 +14,7 @@ import adventureworks.public.Phone
 import typo.dsl.SqlExpr.Field
 
 trait PpViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BusinessentityId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val phonenumber: Field[Phone, Row]
   val phonenumbertypeid: Field[PhonenumbertypeId, Row]

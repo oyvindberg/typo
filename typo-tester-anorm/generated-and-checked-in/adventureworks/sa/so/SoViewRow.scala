@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SoViewRow(
-  id: Int,
+  /** Points to [[sales.specialoffer.SpecialofferRow.specialofferid]] */
+  id: SpecialofferId,
   /** Points to [[sales.specialoffer.SpecialofferRow.specialofferid]] */
   specialofferid: SpecialofferId,
   /** Points to [[sales.specialoffer.SpecialofferRow.description]] */
@@ -41,7 +42,7 @@ case class SoViewRow(
   /** Points to [[sales.specialoffer.SpecialofferRow.minqty]] */
   minqty: Int,
   /** Points to [[sales.specialoffer.SpecialofferRow.maxqty]] */
-  maxqty: Int,
+  maxqty: Option[Int],
   /** Points to [[sales.specialoffer.SpecialofferRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[sales.specialoffer.SpecialofferRow.modifieddate]] */
@@ -52,7 +53,7 @@ object SoViewRow {
   implicit lazy val reads: Reads[SoViewRow] = Reads[SoViewRow](json => JsResult.fromTry(
       Try(
         SoViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(SpecialofferId.reads),
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
           description = json.\("description").as(Reads.StringReads),
           discountpct = json.\("discountpct").as(Reads.bigDecReads),
@@ -61,7 +62,7 @@ object SoViewRow {
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
           enddate = json.\("enddate").as(TypoLocalDateTime.reads),
           minqty = json.\("minqty").as(Reads.IntReads),
-          maxqty = json.\("maxqty").as(Reads.IntReads),
+          maxqty = json.\("maxqty").toOption.map(_.as(Reads.IntReads)),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -71,7 +72,7 @@ object SoViewRow {
   def rowParser(idx: Int): RowParser[SoViewRow] = RowParser[SoViewRow] { row =>
     Success(
       SoViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(SpecialofferId.column),
         specialofferid = row(idx + 1)(SpecialofferId.column),
         description = row(idx + 2)(Column.columnToString),
         discountpct = row(idx + 3)(Column.columnToScalaBigDecimal),
@@ -80,7 +81,7 @@ object SoViewRow {
         startdate = row(idx + 6)(TypoLocalDateTime.column),
         enddate = row(idx + 7)(TypoLocalDateTime.column),
         minqty = row(idx + 8)(Column.columnToInt),
-        maxqty = row(idx + 9)(Column.columnToInt),
+        maxqty = row(idx + 9)(Column.columnToOption(Column.columnToInt)),
         rowguid = row(idx + 10)(Column.columnToUUID),
         modifieddate = row(idx + 11)(TypoLocalDateTime.column)
       )
@@ -88,7 +89,7 @@ object SoViewRow {
   }
   implicit lazy val writes: OWrites[SoViewRow] = OWrites[SoViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> SpecialofferId.writes.writes(o.id),
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
       "description" -> Writes.StringWrites.writes(o.description),
       "discountpct" -> Writes.BigDecimalWrites.writes(o.discountpct),
@@ -97,7 +98,7 @@ object SoViewRow {
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
       "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
       "minqty" -> Writes.IntWrites.writes(o.minqty),
-      "maxqty" -> Writes.IntWrites.writes(o.maxqty),
+      "maxqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.maxqty),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

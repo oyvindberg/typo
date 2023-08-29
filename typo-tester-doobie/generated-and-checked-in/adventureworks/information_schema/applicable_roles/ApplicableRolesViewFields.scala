@@ -7,14 +7,12 @@ package adventureworks
 package information_schema
 package applicable_roles
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ApplicableRolesViewFields[Row] {
-  val grantee: Field[SqlIdentifier, Row]
-  val roleName: Field[SqlIdentifier, Row]
-  val isGrantable: Field[YesOrNo, Row]
+  val grantee: OptField[String, Row]
+  val roleName: OptField[String, Row]
+  val isGrantable: OptField[/* max 3 chars */ String, Row]
 }
 object ApplicableRolesViewFields extends ApplicableRolesViewStructure[ApplicableRolesViewRow](None, identity, (_, x) => x)
 

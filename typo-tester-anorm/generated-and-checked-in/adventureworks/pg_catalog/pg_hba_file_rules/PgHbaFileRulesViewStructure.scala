@@ -7,23 +7,23 @@ package adventureworks
 package pg_catalog
 package pg_hba_file_rules
 
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgHbaFileRulesViewStructure[Row](val prefix: Option[String], val extract: Row => PgHbaFileRulesViewRow, val merge: (Row, PgHbaFileRulesViewRow) => Row)
   extends Relation[PgHbaFileRulesViewFields, PgHbaFileRulesViewRow, Row]
     with PgHbaFileRulesViewFields[Row] { outer =>
 
-  override val lineNumber = new Field[Int, Row](prefix, "line_number", None, Some("int4"))(x => extract(x).lineNumber, (row, value) => merge(row, extract(row).copy(lineNumber = value)))
-  override val `type` = new Field[String, Row](prefix, "type", None, None)(x => extract(x).`type`, (row, value) => merge(row, extract(row).copy(`type` = value)))
-  override val database = new Field[Array[String], Row](prefix, "database", None, Some("_text"))(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
-  override val userName = new Field[Array[String], Row](prefix, "user_name", None, Some("_text"))(x => extract(x).userName, (row, value) => merge(row, extract(row).copy(userName = value)))
-  override val address = new Field[String, Row](prefix, "address", None, None)(x => extract(x).address, (row, value) => merge(row, extract(row).copy(address = value)))
-  override val netmask = new Field[String, Row](prefix, "netmask", None, None)(x => extract(x).netmask, (row, value) => merge(row, extract(row).copy(netmask = value)))
-  override val authMethod = new Field[String, Row](prefix, "auth_method", None, None)(x => extract(x).authMethod, (row, value) => merge(row, extract(row).copy(authMethod = value)))
-  override val options = new Field[Array[String], Row](prefix, "options", None, Some("_text"))(x => extract(x).options, (row, value) => merge(row, extract(row).copy(options = value)))
-  override val error = new Field[String, Row](prefix, "error", None, None)(x => extract(x).error, (row, value) => merge(row, extract(row).copy(error = value)))
+  override val lineNumber = new OptField[Int, Row](prefix, "line_number", None, None)(x => extract(x).lineNumber, (row, value) => merge(row, extract(row).copy(lineNumber = value)))
+  override val `type` = new OptField[String, Row](prefix, "type", None, None)(x => extract(x).`type`, (row, value) => merge(row, extract(row).copy(`type` = value)))
+  override val database = new OptField[Array[String], Row](prefix, "database", None, None)(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
+  override val userName = new OptField[Array[String], Row](prefix, "user_name", None, None)(x => extract(x).userName, (row, value) => merge(row, extract(row).copy(userName = value)))
+  override val address = new OptField[String, Row](prefix, "address", None, None)(x => extract(x).address, (row, value) => merge(row, extract(row).copy(address = value)))
+  override val netmask = new OptField[String, Row](prefix, "netmask", None, None)(x => extract(x).netmask, (row, value) => merge(row, extract(row).copy(netmask = value)))
+  override val authMethod = new OptField[String, Row](prefix, "auth_method", None, None)(x => extract(x).authMethod, (row, value) => merge(row, extract(row).copy(authMethod = value)))
+  override val options = new OptField[Array[String], Row](prefix, "options", None, None)(x => extract(x).options, (row, value) => merge(row, extract(row).copy(options = value)))
+  override val error = new OptField[String, Row](prefix, "error", None, None)(x => extract(x).error, (row, value) => merge(row, extract(row).copy(error = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](lineNumber, `type`, database, userName, address, netmask, authMethod, options, error)

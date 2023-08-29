@@ -13,12 +13,13 @@ import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait SodViewFields[Row] {
   val id: Field[Int, Row]
   val salesorderid: Field[SalesorderheaderId, Row]
   val salesorderdetailid: Field[Int, Row]
-  val carriertrackingnumber: Field[/* max 25 chars */ String, Row]
+  val carriertrackingnumber: OptField[/* max 25 chars */ String, Row]
   val orderqty: Field[Int, Row]
   val productid: Field[ProductId, Row]
   val specialofferid: Field[SpecialofferId, Row]

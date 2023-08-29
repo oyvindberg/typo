@@ -20,13 +20,20 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTablesViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   tablename: String,
-  tableowner: String,
+  tableowner: /* nullability unknown */ Option[String],
+  /** Points to [[pg_tablespace.PgTablespaceRow.spcname]] */
   tablespace: Option[String],
+  /** Points to [[pg_class.PgClassRow.relhasindex]] */
   hasindexes: Boolean,
+  /** Points to [[pg_class.PgClassRow.relhasrules]] */
   hasrules: Boolean,
+  /** Points to [[pg_class.PgClassRow.relhastriggers]] */
   hastriggers: Boolean,
+  /** Points to [[pg_class.PgClassRow.relrowsecurity]] */
   rowsecurity: Boolean
 )
 
@@ -36,7 +43,7 @@ object PgTablesViewRow {
         PgTablesViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
           tablename = json.\("tablename").as(Reads.StringReads),
-          tableowner = json.\("tableowner").as(Reads.StringReads),
+          tableowner = json.\("tableowner").toOption.map(_.as(Reads.StringReads)),
           tablespace = json.\("tablespace").toOption.map(_.as(Reads.StringReads)),
           hasindexes = json.\("hasindexes").as(Reads.BooleanReads),
           hasrules = json.\("hasrules").as(Reads.BooleanReads),
@@ -51,7 +58,7 @@ object PgTablesViewRow {
       PgTablesViewRow(
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
         tablename = row(idx + 1)(Column.columnToString),
-        tableowner = row(idx + 2)(Column.columnToString),
+        tableowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
         tablespace = row(idx + 3)(Column.columnToOption(Column.columnToString)),
         hasindexes = row(idx + 4)(Column.columnToBoolean),
         hasrules = row(idx + 5)(Column.columnToBoolean),
@@ -64,7 +71,7 @@ object PgTablesViewRow {
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "tablename" -> Writes.StringWrites.writes(o.tablename),
-      "tableowner" -> Writes.StringWrites.writes(o.tableowner),
+      "tableowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableowner),
       "tablespace" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablespace),
       "hasindexes" -> Writes.BooleanWrites.writes(o.hasindexes),
       "hasrules" -> Writes.BooleanWrites.writes(o.hasrules),

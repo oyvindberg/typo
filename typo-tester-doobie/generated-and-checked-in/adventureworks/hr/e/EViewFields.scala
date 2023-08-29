@@ -13,9 +13,10 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait EViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[BusinessentityId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val nationalidnumber: Field[/* max 15 chars */ String, Row]
   val loginid: Field[/* max 256 chars */ String, Row]
@@ -30,7 +31,7 @@ trait EViewFields[Row] {
   val currentflag: Field[Flag, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
-  val organizationnode: Field[String, Row]
+  val organizationnode: OptField[String, Row]
 }
 object EViewFields extends EViewStructure[EViewRow](None, identity, (_, x) => x)
 

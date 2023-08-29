@@ -1,9 +1,11 @@
-package typo.internal.sqlfiles
+package typo
+package internal
+package analysis
 
 import play.api.libs.json.{Json, Writes}
-import typo.{Nullability, db, sc}
 
 case class ParsedName(name: db.ColName, nullability: Option[Nullability], overriddenType: Option[sc.Type])
+
 object ParsedName {
   implicit val oformat: Writes[ParsedName] = (x: ParsedName) =>
     Json.obj(

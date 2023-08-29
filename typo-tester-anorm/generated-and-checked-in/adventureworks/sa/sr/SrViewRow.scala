@@ -10,7 +10,6 @@ package sr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.salesreason.SalesreasonId
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,12 +17,12 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SrViewRow(
-  id: Int,
+  /** Points to [[sales.salesreason.SalesreasonRow.salesreasonid]] */
+  id: SalesreasonId,
   /** Points to [[sales.salesreason.SalesreasonRow.salesreasonid]] */
   salesreasonid: SalesreasonId,
   /** Points to [[sales.salesreason.SalesreasonRow.name]] */
@@ -38,7 +37,7 @@ object SrViewRow {
   implicit lazy val reads: Reads[SrViewRow] = Reads[SrViewRow](json => JsResult.fromTry(
       Try(
         SrViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(SalesreasonId.reads),
           salesreasonid = json.\("salesreasonid").as(SalesreasonId.reads),
           name = json.\("name").as(Name.reads),
           reasontype = json.\("reasontype").as(Name.reads),
@@ -50,7 +49,7 @@ object SrViewRow {
   def rowParser(idx: Int): RowParser[SrViewRow] = RowParser[SrViewRow] { row =>
     Success(
       SrViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(SalesreasonId.column),
         salesreasonid = row(idx + 1)(SalesreasonId.column),
         name = row(idx + 2)(Name.column),
         reasontype = row(idx + 3)(Name.column),
@@ -60,7 +59,7 @@ object SrViewRow {
   }
   implicit lazy val writes: OWrites[SrViewRow] = OWrites[SrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> SalesreasonId.writes.writes(o.id),
       "salesreasonid" -> SalesreasonId.writes.writes(o.salesreasonid),
       "name" -> Name.writes.writes(o.name),
       "reasontype" -> Name.writes.writes(o.reasontype),

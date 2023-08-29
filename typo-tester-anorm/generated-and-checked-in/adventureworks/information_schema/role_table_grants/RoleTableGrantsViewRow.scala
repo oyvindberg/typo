@@ -7,9 +7,7 @@ package adventureworks
 package information_schema
 package role_table_grants
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -17,40 +15,41 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class RoleTableGrantsViewRow(
   /** Points to [[table_privileges.TablePrivilegesViewRow.grantor]] */
-  grantor: SqlIdentifier,
+  grantor: Option[/* nullability unknown */ String],
   /** Points to [[table_privileges.TablePrivilegesViewRow.grantee]] */
-  grantee: SqlIdentifier,
+  grantee: Option[/* nullability unknown */ String],
   /** Points to [[table_privileges.TablePrivilegesViewRow.tableCatalog]] */
-  tableCatalog: SqlIdentifier,
+  tableCatalog: Option[/* nullability unknown */ String],
   /** Points to [[table_privileges.TablePrivilegesViewRow.tableSchema]] */
-  tableSchema: SqlIdentifier,
+  tableSchema: Option[/* nullability unknown */ String],
   /** Points to [[table_privileges.TablePrivilegesViewRow.tableName]] */
-  tableName: SqlIdentifier,
+  tableName: Option[/* nullability unknown */ String],
   /** Points to [[table_privileges.TablePrivilegesViewRow.privilegeType]] */
-  privilegeType: CharacterData,
+  privilegeType: Option[/* nullability unknown */ String],
   /** Points to [[table_privileges.TablePrivilegesViewRow.isGrantable]] */
-  isGrantable: YesOrNo,
+  isGrantable: Option[/* nullability unknown */ /* max 3 chars */ String],
   /** Points to [[table_privileges.TablePrivilegesViewRow.withHierarchy]] */
-  withHierarchy: YesOrNo
+  withHierarchy: Option[/* nullability unknown */ /* max 3 chars */ String]
 )
 
 object RoleTableGrantsViewRow {
   implicit lazy val reads: Reads[RoleTableGrantsViewRow] = Reads[RoleTableGrantsViewRow](json => JsResult.fromTry(
       Try(
         RoleTableGrantsViewRow(
-          grantor = json.\("grantor").as(SqlIdentifier.reads),
-          grantee = json.\("grantee").as(SqlIdentifier.reads),
-          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
-          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
-          tableName = json.\("table_name").as(SqlIdentifier.reads),
-          privilegeType = json.\("privilege_type").as(CharacterData.reads),
-          isGrantable = json.\("is_grantable").as(YesOrNo.reads),
-          withHierarchy = json.\("with_hierarchy").as(YesOrNo.reads)
+          grantor = json.\("grantor").toOption.map(_.as(Reads.StringReads)),
+          grantee = json.\("grantee").toOption.map(_.as(Reads.StringReads)),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          privilegeType = json.\("privilege_type").toOption.map(_.as(Reads.StringReads)),
+          isGrantable = json.\("is_grantable").toOption.map(_.as(Reads.StringReads)),
+          withHierarchy = json.\("with_hierarchy").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -58,27 +57,27 @@ object RoleTableGrantsViewRow {
   def rowParser(idx: Int): RowParser[RoleTableGrantsViewRow] = RowParser[RoleTableGrantsViewRow] { row =>
     Success(
       RoleTableGrantsViewRow(
-        grantor = row(idx + 0)(SqlIdentifier.column),
-        grantee = row(idx + 1)(SqlIdentifier.column),
-        tableCatalog = row(idx + 2)(SqlIdentifier.column),
-        tableSchema = row(idx + 3)(SqlIdentifier.column),
-        tableName = row(idx + 4)(SqlIdentifier.column),
-        privilegeType = row(idx + 5)(CharacterData.column),
-        isGrantable = row(idx + 6)(YesOrNo.column),
-        withHierarchy = row(idx + 7)(YesOrNo.column)
+        grantor = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        grantee = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableCatalog = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        privilegeType = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        isGrantable = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        withHierarchy = row(idx + 7)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[RoleTableGrantsViewRow] = OWrites[RoleTableGrantsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "grantor" -> SqlIdentifier.writes.writes(o.grantor),
-      "grantee" -> SqlIdentifier.writes.writes(o.grantee),
-      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
-      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
-      "table_name" -> SqlIdentifier.writes.writes(o.tableName),
-      "privilege_type" -> CharacterData.writes.writes(o.privilegeType),
-      "is_grantable" -> YesOrNo.writes.writes(o.isGrantable),
-      "with_hierarchy" -> YesOrNo.writes.writes(o.withHierarchy)
+      "grantor" -> Writes.OptionWrites(Writes.StringWrites).writes(o.grantor),
+      "grantee" -> Writes.OptionWrites(Writes.StringWrites).writes(o.grantee),
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "privilege_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.privilegeType),
+      "is_grantable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isGrantable),
+      "with_hierarchy" -> Writes.OptionWrites(Writes.StringWrites).writes(o.withHierarchy)
     ))
   )
 }

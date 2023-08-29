@@ -13,13 +13,14 @@ import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait CViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[CustomerId, Row]
   val customerid: Field[CustomerId, Row]
-  val personid: Field[BusinessentityId, Row]
-  val storeid: Field[BusinessentityId, Row]
-  val territoryid: Field[SalesterritoryId, Row]
+  val personid: OptField[BusinessentityId, Row]
+  val storeid: OptField[BusinessentityId, Row]
+  val territoryid: OptField[SalesterritoryId, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

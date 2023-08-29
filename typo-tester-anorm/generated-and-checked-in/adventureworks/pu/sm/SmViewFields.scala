@@ -14,7 +14,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait SmViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ShipmethodId, Row]
   val shipmethodid: Field[ShipmethodId, Row]
   val name: Field[Name, Row]
   val shipbase: Field[BigDecimal, Row]

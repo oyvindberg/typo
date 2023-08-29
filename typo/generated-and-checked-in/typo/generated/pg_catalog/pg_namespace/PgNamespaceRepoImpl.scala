@@ -14,7 +14,7 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
-import typo.generated.TypoAclItem
+import typo.generated.customtypes.TypoAclItem
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {

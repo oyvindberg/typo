@@ -12,13 +12,13 @@ import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PdocViewRow(
-  id: Int,
+  /** Points to [[production.productdocument.ProductdocumentRow.productid]] */
+  id: ProductId,
   /** Points to [[production.productdocument.ProductdocumentRow.productid]] */
   productid: ProductId,
   /** Points to [[production.productdocument.ProductdocumentRow.modifieddate]] */
@@ -28,17 +28,17 @@ case class PdocViewRow(
 )
 
 object PdocViewRow {
-  implicit lazy val decoder: Decoder[PdocViewRow] = Decoder.forProduct4[PdocViewRow, Int, ProductId, TypoLocalDateTime, DocumentId]("id", "productid", "modifieddate", "documentnode")(PdocViewRow.apply)(Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, DocumentId.decoder)
-  implicit lazy val encoder: Encoder[PdocViewRow] = Encoder.forProduct4[PdocViewRow, Int, ProductId, TypoLocalDateTime, DocumentId]("id", "productid", "modifieddate", "documentnode")(x => (x.id, x.productid, x.modifieddate, x.documentnode))(Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, DocumentId.encoder)
+  implicit lazy val decoder: Decoder[PdocViewRow] = Decoder.forProduct4[PdocViewRow, ProductId, ProductId, TypoLocalDateTime, DocumentId]("id", "productid", "modifieddate", "documentnode")(PdocViewRow.apply)(ProductId.decoder, ProductId.decoder, TypoLocalDateTime.decoder, DocumentId.decoder)
+  implicit lazy val encoder: Encoder[PdocViewRow] = Encoder.forProduct4[PdocViewRow, ProductId, ProductId, TypoLocalDateTime, DocumentId]("id", "productid", "modifieddate", "documentnode")(x => (x.id, x.productid, x.modifieddate, x.documentnode))(ProductId.encoder, ProductId.encoder, TypoLocalDateTime.encoder, DocumentId.encoder)
   implicit lazy val read: Read[PdocViewRow] = new Read[PdocViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductId.get, Nullability.NoNulls),
       (ProductId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (DocumentId.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PdocViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = ProductId.get.unsafeGetNonNullable(rs, i + 0),
       productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
       documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 3)

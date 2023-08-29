@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_statio_sys_sequences
 
-import typo.dsl.SqlExpr.Field
+import adventureworks.pg_catalog.pg_class.PgClassId
+import typo.dsl.SqlExpr.OptField
 
 trait PgStatioSysSequencesViewFields[Row] {
-  val relid: Field[/* oid */ Long, Row]
-  val schemaname: Field[String, Row]
-  val relname: Field[String, Row]
-  val blksRead: Field[Long, Row]
-  val blksHit: Field[Long, Row]
+  val relid: OptField[PgClassId, Row]
+  val schemaname: OptField[String, Row]
+  val relname: OptField[String, Row]
+  val blksRead: OptField[/* nullability unknown */ Long, Row]
+  val blksHit: OptField[/* nullability unknown */ Long, Row]
 }
 object PgStatioSysSequencesViewFields extends PgStatioSysSequencesViewStructure[PgStatioSysSequencesViewRow](None, identity, (_, x) => x)
 

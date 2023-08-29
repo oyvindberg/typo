@@ -7,30 +7,27 @@ package adventureworks
 package information_schema
 package triggers
 
-import adventureworks.information_schema.CardinalNumber
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.TimeStamp
-import typo.dsl.SqlExpr.Field
+import adventureworks.customtypes.TypoOffsetDateTime
+import typo.dsl.SqlExpr.OptField
 
 trait TriggersViewFields[Row] {
-  val triggerCatalog: Field[SqlIdentifier, Row]
-  val triggerSchema: Field[SqlIdentifier, Row]
-  val triggerName: Field[SqlIdentifier, Row]
-  val eventManipulation: Field[CharacterData, Row]
-  val eventObjectCatalog: Field[SqlIdentifier, Row]
-  val eventObjectSchema: Field[SqlIdentifier, Row]
-  val eventObjectTable: Field[SqlIdentifier, Row]
-  val actionOrder: Field[CardinalNumber, Row]
-  val actionCondition: Field[CharacterData, Row]
-  val actionStatement: Field[CharacterData, Row]
-  val actionOrientation: Field[CharacterData, Row]
-  val actionTiming: Field[CharacterData, Row]
-  val actionReferenceOldTable: Field[SqlIdentifier, Row]
-  val actionReferenceNewTable: Field[SqlIdentifier, Row]
-  val actionReferenceOldRow: Field[SqlIdentifier, Row]
-  val actionReferenceNewRow: Field[SqlIdentifier, Row]
-  val created: Field[TimeStamp, Row]
+  val triggerCatalog: OptField[String, Row]
+  val triggerSchema: OptField[String, Row]
+  val triggerName: OptField[String, Row]
+  val eventManipulation: OptField[String, Row]
+  val eventObjectCatalog: OptField[String, Row]
+  val eventObjectSchema: OptField[String, Row]
+  val eventObjectTable: OptField[String, Row]
+  val actionOrder: OptField[Int, Row]
+  val actionCondition: OptField[String, Row]
+  val actionStatement: OptField[String, Row]
+  val actionOrientation: OptField[String, Row]
+  val actionTiming: OptField[String, Row]
+  val actionReferenceOldTable: OptField[String, Row]
+  val actionReferenceNewTable: OptField[String, Row]
+  val actionReferenceOldRow: OptField[String, Row]
+  val actionReferenceNewRow: OptField[String, Row]
+  val created: OptField[TypoOffsetDateTime, Row]
 }
 object TriggersViewFields extends TriggersViewStructure[TriggersViewRow](None, identity, (_, x) => x)
 

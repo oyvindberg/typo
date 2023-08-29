@@ -7,20 +7,18 @@ package adventureworks
 package information_schema
 package foreign_server_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class ForeignServerOptionsViewStructure[Row](val prefix: Option[String], val extract: Row => ForeignServerOptionsViewRow, val merge: (Row, ForeignServerOptionsViewRow) => Row)
   extends Relation[ForeignServerOptionsViewFields, ForeignServerOptionsViewRow, Row]
     with ForeignServerOptionsViewFields[Row] { outer =>
 
-  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("name"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
-  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("name"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
-  override val optionName = new Field[SqlIdentifier, Row](prefix, "option_name", None, Some("name"))(x => extract(x).optionName, (row, value) => merge(row, extract(row).copy(optionName = value)))
-  override val optionValue = new Field[CharacterData, Row](prefix, "option_value", None, Some("varchar"))(x => extract(x).optionValue, (row, value) => merge(row, extract(row).copy(optionValue = value)))
+  override val foreignServerCatalog = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_server_catalog", None, None)(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
+  override val foreignServerName = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_server_name", None, None)(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
+  override val optionName = new OptField[String, Row](prefix, "option_name", None, None)(x => extract(x).optionName, (row, value) => merge(row, extract(row).copy(optionName = value)))
+  override val optionValue = new OptField[String, Row](prefix, "option_value", None, None)(x => extract(x).optionValue, (row, value) => merge(row, extract(row).copy(optionValue = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](foreignServerCatalog, foreignServerName, optionName, optionValue)

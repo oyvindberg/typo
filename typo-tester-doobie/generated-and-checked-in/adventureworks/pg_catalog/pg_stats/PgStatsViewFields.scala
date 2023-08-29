@@ -19,13 +19,13 @@ trait PgStatsViewFields[Row] {
   val nullFrac: Field[Float, Row]
   val avgWidth: Field[Int, Row]
   val nDistinct: Field[Float, Row]
-  val mostCommonVals: Field[TypoAnyArray, Row]
-  val mostCommonFreqs: Field[Array[Float], Row]
-  val histogramBounds: Field[TypoAnyArray, Row]
-  val correlation: Field[Float, Row]
-  val mostCommonElems: Field[TypoAnyArray, Row]
-  val mostCommonElemFreqs: Field[Array[Float], Row]
-  val elemCountHistogram: Field[Array[Float], Row]
+  val mostCommonVals: OptField[TypoAnyArray, Row]
+  val mostCommonFreqs: OptField[Array[Float], Row]
+  val histogramBounds: OptField[TypoAnyArray, Row]
+  val correlation: OptField[Float, Row]
+  val mostCommonElems: OptField[TypoAnyArray, Row]
+  val mostCommonElemFreqs: OptField[Array[Float], Row]
+  val elemCountHistogram: OptField[Array[Float], Row]
 }
 object PgStatsViewFields extends PgStatsViewStructure[PgStatsViewRow](None, identity, (_, x) => x)
 

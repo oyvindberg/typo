@@ -24,13 +24,14 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpViewRow(
-  id: Int,
+  /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[sales.salesperson.SalespersonRow.territoryid]] */
-  territoryid: SalesterritoryId,
+  territoryid: Option[SalesterritoryId],
   /** Points to [[sales.salesperson.SalespersonRow.salesquota]] */
-  salesquota: BigDecimal,
+  salesquota: Option[BigDecimal],
   /** Points to [[sales.salesperson.SalespersonRow.bonus]] */
   bonus: BigDecimal,
   /** Points to [[sales.salesperson.SalespersonRow.commissionpct]] */
@@ -49,10 +50,10 @@ object SpViewRow {
   implicit lazy val reads: Reads[SpViewRow] = Reads[SpViewRow](json => JsResult.fromTry(
       Try(
         SpViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
-          salesquota = json.\("salesquota").as(Reads.bigDecReads),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          salesquota = json.\("salesquota").toOption.map(_.as(Reads.bigDecReads)),
           bonus = json.\("bonus").as(Reads.bigDecReads),
           commissionpct = json.\("commissionpct").as(Reads.bigDecReads),
           salesytd = json.\("salesytd").as(Reads.bigDecReads),
@@ -66,10 +67,10 @@ object SpViewRow {
   def rowParser(idx: Int): RowParser[SpViewRow] = RowParser[SpViewRow] { row =>
     Success(
       SpViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
-        territoryid = row(idx + 2)(SalesterritoryId.column),
-        salesquota = row(idx + 3)(Column.columnToScalaBigDecimal),
+        territoryid = row(idx + 2)(Column.columnToOption(SalesterritoryId.column)),
+        salesquota = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
         bonus = row(idx + 4)(Column.columnToScalaBigDecimal),
         commissionpct = row(idx + 5)(Column.columnToScalaBigDecimal),
         salesytd = row(idx + 6)(Column.columnToScalaBigDecimal),
@@ -81,10 +82,10 @@ object SpViewRow {
   }
   implicit lazy val writes: OWrites[SpViewRow] = OWrites[SpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
-      "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "salesquota" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesquota),
       "bonus" -> Writes.BigDecimalWrites.writes(o.bonus),
       "commissionpct" -> Writes.BigDecimalWrites.writes(o.commissionpct),
       "salesytd" -> Writes.BigDecimalWrites.writes(o.salesytd),

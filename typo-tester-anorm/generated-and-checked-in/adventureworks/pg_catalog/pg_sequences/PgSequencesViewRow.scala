@@ -21,17 +21,25 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgSequencesViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[pg_class.PgClassRow.relname]] */
   sequencename: String,
-  sequenceowner: String,
-  dataType: TypoRegtype,
+  sequenceowner: /* nullability unknown */ Option[String],
+  dataType: /* nullability unknown */ Option[TypoRegtype],
+  /** Points to [[pg_sequence.PgSequenceRow.seqstart]] */
   startValue: Long,
+  /** Points to [[pg_sequence.PgSequenceRow.seqmin]] */
   minValue: Long,
+  /** Points to [[pg_sequence.PgSequenceRow.seqmax]] */
   maxValue: Long,
+  /** Points to [[pg_sequence.PgSequenceRow.seqincrement]] */
   incrementBy: Long,
+  /** Points to [[pg_sequence.PgSequenceRow.seqcycle]] */
   cycle: Boolean,
+  /** Points to [[pg_sequence.PgSequenceRow.seqcache]] */
   cacheSize: Long,
-  lastValue: Long
+  lastValue: /* nullability unknown */ Option[Long]
 )
 
 object PgSequencesViewRow {
@@ -40,15 +48,15 @@ object PgSequencesViewRow {
         PgSequencesViewRow(
           schemaname = json.\("schemaname").as(Reads.StringReads),
           sequencename = json.\("sequencename").as(Reads.StringReads),
-          sequenceowner = json.\("sequenceowner").as(Reads.StringReads),
-          dataType = json.\("data_type").as(TypoRegtype.reads),
+          sequenceowner = json.\("sequenceowner").toOption.map(_.as(Reads.StringReads)),
+          dataType = json.\("data_type").toOption.map(_.as(TypoRegtype.reads)),
           startValue = json.\("start_value").as(Reads.LongReads),
           minValue = json.\("min_value").as(Reads.LongReads),
           maxValue = json.\("max_value").as(Reads.LongReads),
           incrementBy = json.\("increment_by").as(Reads.LongReads),
           cycle = json.\("cycle").as(Reads.BooleanReads),
           cacheSize = json.\("cache_size").as(Reads.LongReads),
-          lastValue = json.\("last_value").as(Reads.LongReads)
+          lastValue = json.\("last_value").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -58,15 +66,15 @@ object PgSequencesViewRow {
       PgSequencesViewRow(
         schemaname = row(idx + 0)(Column.columnToString),
         sequencename = row(idx + 1)(Column.columnToString),
-        sequenceowner = row(idx + 2)(Column.columnToString),
-        dataType = row(idx + 3)(TypoRegtype.column),
+        sequenceowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        dataType = row(idx + 3)(Column.columnToOption(TypoRegtype.column)),
         startValue = row(idx + 4)(Column.columnToLong),
         minValue = row(idx + 5)(Column.columnToLong),
         maxValue = row(idx + 6)(Column.columnToLong),
         incrementBy = row(idx + 7)(Column.columnToLong),
         cycle = row(idx + 8)(Column.columnToBoolean),
         cacheSize = row(idx + 9)(Column.columnToLong),
-        lastValue = row(idx + 10)(Column.columnToLong)
+        lastValue = row(idx + 10)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
@@ -74,15 +82,15 @@ object PgSequencesViewRow {
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.StringWrites.writes(o.schemaname),
       "sequencename" -> Writes.StringWrites.writes(o.sequencename),
-      "sequenceowner" -> Writes.StringWrites.writes(o.sequenceowner),
-      "data_type" -> TypoRegtype.writes.writes(o.dataType),
+      "sequenceowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.sequenceowner),
+      "data_type" -> Writes.OptionWrites(TypoRegtype.writes).writes(o.dataType),
       "start_value" -> Writes.LongWrites.writes(o.startValue),
       "min_value" -> Writes.LongWrites.writes(o.minValue),
       "max_value" -> Writes.LongWrites.writes(o.maxValue),
       "increment_by" -> Writes.LongWrites.writes(o.incrementBy),
       "cycle" -> Writes.BooleanWrites.writes(o.cycle),
       "cache_size" -> Writes.LongWrites.writes(o.cacheSize),
-      "last_value" -> Writes.LongWrites.writes(o.lastValue)
+      "last_value" -> Writes.OptionWrites(Writes.LongWrites).writes(o.lastValue)
     ))
   )
 }

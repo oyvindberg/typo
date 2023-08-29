@@ -25,7 +25,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TrViewRow(
-  id: Int,
+  /** Points to [[sales.salestaxrate.SalestaxrateRow.salestaxrateid]] */
+  id: SalestaxrateId,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.salestaxrateid]] */
   salestaxrateid: SalestaxrateId,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.stateprovinceid]] */
@@ -46,7 +47,7 @@ object TrViewRow {
   implicit lazy val reads: Reads[TrViewRow] = Reads[TrViewRow](json => JsResult.fromTry(
       Try(
         TrViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(SalestaxrateId.reads),
           salestaxrateid = json.\("salestaxrateid").as(SalestaxrateId.reads),
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
           taxtype = json.\("taxtype").as(Reads.IntReads),
@@ -61,7 +62,7 @@ object TrViewRow {
   def rowParser(idx: Int): RowParser[TrViewRow] = RowParser[TrViewRow] { row =>
     Success(
       TrViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(SalestaxrateId.column),
         salestaxrateid = row(idx + 1)(SalestaxrateId.column),
         stateprovinceid = row(idx + 2)(StateprovinceId.column),
         taxtype = row(idx + 3)(Column.columnToInt),
@@ -74,7 +75,7 @@ object TrViewRow {
   }
   implicit lazy val writes: OWrites[TrViewRow] = OWrites[TrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> SalestaxrateId.writes.writes(o.id),
       "salestaxrateid" -> SalestaxrateId.writes.writes(o.salestaxrateid),
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
       "taxtype" -> Writes.IntWrites.writes(o.taxtype),

@@ -12,14 +12,14 @@ import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 import java.util.UUID
 
 case class AtViewRow(
-  id: Int,
+  /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
+  id: AddresstypeId,
   /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
   addresstypeid: AddresstypeId,
   /** Points to [[person.addresstype.AddresstypeRow.name]] */
@@ -31,18 +31,18 @@ case class AtViewRow(
 )
 
 object AtViewRow {
-  implicit lazy val decoder: Decoder[AtViewRow] = Decoder.forProduct5[AtViewRow, Int, AddresstypeId, Name, UUID, TypoLocalDateTime]("id", "addresstypeid", "name", "rowguid", "modifieddate")(AtViewRow.apply)(Decoder.decodeInt, AddresstypeId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[AtViewRow] = Encoder.forProduct5[AtViewRow, Int, AddresstypeId, Name, UUID, TypoLocalDateTime]("id", "addresstypeid", "name", "rowguid", "modifieddate")(x => (x.id, x.addresstypeid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeInt, AddresstypeId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[AtViewRow] = Decoder.forProduct5[AtViewRow, AddresstypeId, AddresstypeId, Name, UUID, TypoLocalDateTime]("id", "addresstypeid", "name", "rowguid", "modifieddate")(AtViewRow.apply)(AddresstypeId.decoder, AddresstypeId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[AtViewRow] = Encoder.forProduct5[AtViewRow, AddresstypeId, AddresstypeId, Name, UUID, TypoLocalDateTime]("id", "addresstypeid", "name", "rowguid", "modifieddate")(x => (x.id, x.addresstypeid, x.name, x.rowguid, x.modifieddate))(AddresstypeId.encoder, AddresstypeId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[AtViewRow] = new Read[AtViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (AddresstypeId.get, Nullability.NoNulls),
       (AddresstypeId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => AtViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = AddresstypeId.get.unsafeGetNonNullable(rs, i + 0),
       addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
       rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 3),

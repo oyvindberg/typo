@@ -8,9 +8,9 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
   val enumsByName = enums.flatMap(e => List((e.name.name, e), (e.name.value, e))).toMap
   def col(c: ColumnsViewRow): Option[db.Type] = {
     val fromDomain: Option[db.Type.DomainRef] =
-      c.domainName.map(domainName => db.Type.DomainRef(db.RelationName(c.domainSchema.map(_.value), domainName.value)))
+      c.domainName.map(domainName => db.Type.DomainRef(db.RelationName(c.domainSchema, domainName)))
 
-    fromDomain.orElse(dbTypeFrom(c.udtName.get.value, c.characterMaximumLength.map(_.value)))
+    fromDomain.orElse(dbTypeFrom(c.udtName.get, c.characterMaximumLength))
   }
 
   def dbTypeFrom(udtName: String, characterMaximumLength: Option[Int]): Option[db.Type] = {

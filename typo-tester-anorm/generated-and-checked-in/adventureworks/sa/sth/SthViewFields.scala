@@ -12,13 +12,14 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait SthViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[SalesterritoryId, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val territoryid: Field[SalesterritoryId, Row]
   val startdate: Field[TypoLocalDateTime, Row]
-  val enddate: Field[TypoLocalDateTime, Row]
+  val enddate: OptField[TypoLocalDateTime, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

@@ -7,38 +7,37 @@ package adventureworks
 package information_schema
 package foreign_data_wrapper_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ForeignDataWrapperOptionsViewRow(
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperCatalog]] */
-  foreignDataWrapperCatalog: SqlIdentifier,
+  foreignDataWrapperCatalog: Option[/* nullability unknown */ String],
   /** Points to [[`_pg_foreign_data_wrappers`.PgForeignDataWrappersViewRow.foreignDataWrapperName]] */
-  foreignDataWrapperName: SqlIdentifier,
-  optionName: SqlIdentifier,
-  optionValue: CharacterData
+  foreignDataWrapperName: Option[/* nullability unknown */ String],
+  optionName: /* nullability unknown */ Option[String],
+  optionValue: /* nullability unknown */ Option[String]
 )
 
 object ForeignDataWrapperOptionsViewRow {
-  implicit lazy val decoder: Decoder[ForeignDataWrapperOptionsViewRow] = Decoder.forProduct4[ForeignDataWrapperOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(ForeignDataWrapperOptionsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
-  implicit lazy val encoder: Encoder[ForeignDataWrapperOptionsViewRow] = Encoder.forProduct4[ForeignDataWrapperOptionsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.optionName, x.optionValue))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
+  implicit lazy val decoder: Decoder[ForeignDataWrapperOptionsViewRow] = Decoder.forProduct4[ForeignDataWrapperOptionsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(ForeignDataWrapperOptionsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[ForeignDataWrapperOptionsViewRow] = Encoder.forProduct4[ForeignDataWrapperOptionsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.optionName, x.optionValue))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[ForeignDataWrapperOptionsViewRow] = new Read[ForeignDataWrapperOptionsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ForeignDataWrapperOptionsViewRow(
-      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      optionName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      optionValue = CharacterData.get.unsafeGetNonNullable(rs, i + 3)
+      foreignDataWrapperCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      foreignDataWrapperName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      optionName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      optionValue = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

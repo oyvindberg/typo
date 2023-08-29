@@ -7,9 +7,7 @@ package adventureworks
 package information_schema
 package views
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -17,36 +15,37 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ViewsViewRow(
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  viewDefinition: CharacterData,
-  checkOption: CharacterData,
-  isUpdatable: YesOrNo,
-  isInsertableInto: YesOrNo,
-  isTriggerUpdatable: YesOrNo,
-  isTriggerDeletable: YesOrNo,
-  isTriggerInsertableInto: YesOrNo
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  viewDefinition: /* nullability unknown */ Option[String],
+  checkOption: /* nullability unknown */ Option[String],
+  isUpdatable: /* nullability unknown */ Option[/* max 3 chars */ String],
+  isInsertableInto: /* nullability unknown */ Option[/* max 3 chars */ String],
+  isTriggerUpdatable: /* nullability unknown */ Option[/* max 3 chars */ String],
+  isTriggerDeletable: /* nullability unknown */ Option[/* max 3 chars */ String],
+  isTriggerInsertableInto: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object ViewsViewRow {
   implicit lazy val reads: Reads[ViewsViewRow] = Reads[ViewsViewRow](json => JsResult.fromTry(
       Try(
         ViewsViewRow(
-          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
-          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
-          tableName = json.\("table_name").as(SqlIdentifier.reads),
-          viewDefinition = json.\("view_definition").as(CharacterData.reads),
-          checkOption = json.\("check_option").as(CharacterData.reads),
-          isUpdatable = json.\("is_updatable").as(YesOrNo.reads),
-          isInsertableInto = json.\("is_insertable_into").as(YesOrNo.reads),
-          isTriggerUpdatable = json.\("is_trigger_updatable").as(YesOrNo.reads),
-          isTriggerDeletable = json.\("is_trigger_deletable").as(YesOrNo.reads),
-          isTriggerInsertableInto = json.\("is_trigger_insertable_into").as(YesOrNo.reads)
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          viewDefinition = json.\("view_definition").toOption.map(_.as(Reads.StringReads)),
+          checkOption = json.\("check_option").toOption.map(_.as(Reads.StringReads)),
+          isUpdatable = json.\("is_updatable").toOption.map(_.as(Reads.StringReads)),
+          isInsertableInto = json.\("is_insertable_into").toOption.map(_.as(Reads.StringReads)),
+          isTriggerUpdatable = json.\("is_trigger_updatable").toOption.map(_.as(Reads.StringReads)),
+          isTriggerDeletable = json.\("is_trigger_deletable").toOption.map(_.as(Reads.StringReads)),
+          isTriggerInsertableInto = json.\("is_trigger_insertable_into").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -54,31 +53,31 @@ object ViewsViewRow {
   def rowParser(idx: Int): RowParser[ViewsViewRow] = RowParser[ViewsViewRow] { row =>
     Success(
       ViewsViewRow(
-        tableCatalog = row(idx + 0)(SqlIdentifier.column),
-        tableSchema = row(idx + 1)(SqlIdentifier.column),
-        tableName = row(idx + 2)(SqlIdentifier.column),
-        viewDefinition = row(idx + 3)(CharacterData.column),
-        checkOption = row(idx + 4)(CharacterData.column),
-        isUpdatable = row(idx + 5)(YesOrNo.column),
-        isInsertableInto = row(idx + 6)(YesOrNo.column),
-        isTriggerUpdatable = row(idx + 7)(YesOrNo.column),
-        isTriggerDeletable = row(idx + 8)(YesOrNo.column),
-        isTriggerInsertableInto = row(idx + 9)(YesOrNo.column)
+        tableCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        viewDefinition = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        checkOption = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        isUpdatable = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        isInsertableInto = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        isTriggerUpdatable = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        isTriggerDeletable = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        isTriggerInsertableInto = row(idx + 9)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ViewsViewRow] = OWrites[ViewsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
-      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
-      "table_name" -> SqlIdentifier.writes.writes(o.tableName),
-      "view_definition" -> CharacterData.writes.writes(o.viewDefinition),
-      "check_option" -> CharacterData.writes.writes(o.checkOption),
-      "is_updatable" -> YesOrNo.writes.writes(o.isUpdatable),
-      "is_insertable_into" -> YesOrNo.writes.writes(o.isInsertableInto),
-      "is_trigger_updatable" -> YesOrNo.writes.writes(o.isTriggerUpdatable),
-      "is_trigger_deletable" -> YesOrNo.writes.writes(o.isTriggerDeletable),
-      "is_trigger_insertable_into" -> YesOrNo.writes.writes(o.isTriggerInsertableInto)
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "view_definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.viewDefinition),
+      "check_option" -> Writes.OptionWrites(Writes.StringWrites).writes(o.checkOption),
+      "is_updatable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isUpdatable),
+      "is_insertable_into" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isInsertableInto),
+      "is_trigger_updatable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isTriggerUpdatable),
+      "is_trigger_deletable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isTriggerDeletable),
+      "is_trigger_insertable_into" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isTriggerInsertableInto)
     ))
   )
 }

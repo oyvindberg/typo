@@ -7,19 +7,17 @@ package adventureworks
 package information_schema
 package domain_constraints
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait DomainConstraintsViewFields[Row] {
-  val constraintCatalog: Field[SqlIdentifier, Row]
-  val constraintSchema: Field[SqlIdentifier, Row]
-  val constraintName: Field[SqlIdentifier, Row]
-  val domainCatalog: Field[SqlIdentifier, Row]
-  val domainSchema: Field[SqlIdentifier, Row]
-  val domainName: Field[SqlIdentifier, Row]
-  val isDeferrable: Field[YesOrNo, Row]
-  val initiallyDeferred: Field[YesOrNo, Row]
+  val constraintCatalog: OptField[String, Row]
+  val constraintSchema: OptField[String, Row]
+  val constraintName: OptField[String, Row]
+  val domainCatalog: OptField[String, Row]
+  val domainSchema: OptField[String, Row]
+  val domainName: OptField[String, Row]
+  val isDeferrable: OptField[/* max 3 chars */ String, Row]
+  val initiallyDeferred: OptField[/* max 3 chars */ String, Row]
 }
 object DomainConstraintsViewFields extends DomainConstraintsViewStructure[DomainConstraintsViewRow](None, identity, (_, x) => x)
 

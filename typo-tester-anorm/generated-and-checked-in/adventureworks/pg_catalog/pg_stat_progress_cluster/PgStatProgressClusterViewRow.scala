@@ -20,36 +20,37 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatProgressClusterViewRow(
-  pid: Int,
-  datid: /* oid */ Long,
+  pid: /* nullability unknown */ Option[Int],
+  datid: /* nullability unknown */ Option[/* oid */ Long],
+  /** Points to [[pg_database.PgDatabaseRow.datname]] */
   datname: Option[String],
-  relid: /* oid */ Long,
-  command: String,
-  phase: String,
-  clusterIndexRelid: /* oid */ Long,
-  heapTuplesScanned: Long,
-  heapTuplesWritten: Long,
-  heapBlksTotal: Long,
-  heapBlksScanned: Long,
-  indexRebuildCount: Long
+  relid: /* nullability unknown */ Option[/* oid */ Long],
+  command: /* nullability unknown */ Option[String],
+  phase: /* nullability unknown */ Option[String],
+  clusterIndexRelid: /* nullability unknown */ Option[/* oid */ Long],
+  heapTuplesScanned: /* nullability unknown */ Option[Long],
+  heapTuplesWritten: /* nullability unknown */ Option[Long],
+  heapBlksTotal: /* nullability unknown */ Option[Long],
+  heapBlksScanned: /* nullability unknown */ Option[Long],
+  indexRebuildCount: /* nullability unknown */ Option[Long]
 )
 
 object PgStatProgressClusterViewRow {
   implicit lazy val reads: Reads[PgStatProgressClusterViewRow] = Reads[PgStatProgressClusterViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressClusterViewRow(
-          pid = json.\("pid").as(Reads.IntReads),
-          datid = json.\("datid").as(Reads.LongReads),
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          datid = json.\("datid").toOption.map(_.as(Reads.LongReads)),
           datname = json.\("datname").toOption.map(_.as(Reads.StringReads)),
-          relid = json.\("relid").as(Reads.LongReads),
-          command = json.\("command").as(Reads.StringReads),
-          phase = json.\("phase").as(Reads.StringReads),
-          clusterIndexRelid = json.\("cluster_index_relid").as(Reads.LongReads),
-          heapTuplesScanned = json.\("heap_tuples_scanned").as(Reads.LongReads),
-          heapTuplesWritten = json.\("heap_tuples_written").as(Reads.LongReads),
-          heapBlksTotal = json.\("heap_blks_total").as(Reads.LongReads),
-          heapBlksScanned = json.\("heap_blks_scanned").as(Reads.LongReads),
-          indexRebuildCount = json.\("index_rebuild_count").as(Reads.LongReads)
+          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          command = json.\("command").toOption.map(_.as(Reads.StringReads)),
+          phase = json.\("phase").toOption.map(_.as(Reads.StringReads)),
+          clusterIndexRelid = json.\("cluster_index_relid").toOption.map(_.as(Reads.LongReads)),
+          heapTuplesScanned = json.\("heap_tuples_scanned").toOption.map(_.as(Reads.LongReads)),
+          heapTuplesWritten = json.\("heap_tuples_written").toOption.map(_.as(Reads.LongReads)),
+          heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as(Reads.LongReads)),
+          heapBlksScanned = json.\("heap_blks_scanned").toOption.map(_.as(Reads.LongReads)),
+          indexRebuildCount = json.\("index_rebuild_count").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -57,35 +58,35 @@ object PgStatProgressClusterViewRow {
   def rowParser(idx: Int): RowParser[PgStatProgressClusterViewRow] = RowParser[PgStatProgressClusterViewRow] { row =>
     Success(
       PgStatProgressClusterViewRow(
-        pid = row(idx + 0)(Column.columnToInt),
-        datid = row(idx + 1)(Column.columnToLong),
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        datid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
         datname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        relid = row(idx + 3)(Column.columnToLong),
-        command = row(idx + 4)(Column.columnToString),
-        phase = row(idx + 5)(Column.columnToString),
-        clusterIndexRelid = row(idx + 6)(Column.columnToLong),
-        heapTuplesScanned = row(idx + 7)(Column.columnToLong),
-        heapTuplesWritten = row(idx + 8)(Column.columnToLong),
-        heapBlksTotal = row(idx + 9)(Column.columnToLong),
-        heapBlksScanned = row(idx + 10)(Column.columnToLong),
-        indexRebuildCount = row(idx + 11)(Column.columnToLong)
+        relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        command = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        phase = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        clusterIndexRelid = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        heapTuplesScanned = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        heapTuplesWritten = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
+        heapBlksTotal = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        heapBlksScanned = row(idx + 10)(Column.columnToOption(Column.columnToLong)),
+        indexRebuildCount = row(idx + 11)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatProgressClusterViewRow] = OWrites[PgStatProgressClusterViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Writes.IntWrites.writes(o.pid),
-      "datid" -> Writes.LongWrites.writes(o.datid),
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),
       "datname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.datname),
-      "relid" -> Writes.LongWrites.writes(o.relid),
-      "command" -> Writes.StringWrites.writes(o.command),
-      "phase" -> Writes.StringWrites.writes(o.phase),
-      "cluster_index_relid" -> Writes.LongWrites.writes(o.clusterIndexRelid),
-      "heap_tuples_scanned" -> Writes.LongWrites.writes(o.heapTuplesScanned),
-      "heap_tuples_written" -> Writes.LongWrites.writes(o.heapTuplesWritten),
-      "heap_blks_total" -> Writes.LongWrites.writes(o.heapBlksTotal),
-      "heap_blks_scanned" -> Writes.LongWrites.writes(o.heapBlksScanned),
-      "index_rebuild_count" -> Writes.LongWrites.writes(o.indexRebuildCount)
+      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "command" -> Writes.OptionWrites(Writes.StringWrites).writes(o.command),
+      "phase" -> Writes.OptionWrites(Writes.StringWrites).writes(o.phase),
+      "cluster_index_relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.clusterIndexRelid),
+      "heap_tuples_scanned" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapTuplesScanned),
+      "heap_tuples_written" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapTuplesWritten),
+      "heap_blks_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapBlksTotal),
+      "heap_blks_scanned" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapBlksScanned),
+      "index_rebuild_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.indexRebuildCount)
     ))
   )
 }

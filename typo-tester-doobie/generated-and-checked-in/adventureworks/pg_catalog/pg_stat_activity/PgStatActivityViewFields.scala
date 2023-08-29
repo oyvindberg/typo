@@ -10,32 +10,31 @@ package pg_stat_activity
 import adventureworks.customtypes.TypoInet
 import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoXid
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatActivityViewFields[Row] {
-  val datid: Field[/* oid */ Long, Row]
+  val datid: OptField[/* oid */ Long, Row]
   val datname: OptField[String, Row]
-  val pid: Field[Int, Row]
-  val leaderPid: Field[Int, Row]
-  val usesysid: Field[/* oid */ Long, Row]
+  val pid: OptField[Int, Row]
+  val leaderPid: OptField[Int, Row]
+  val usesysid: OptField[/* oid */ Long, Row]
   val usename: OptField[String, Row]
-  val applicationName: Field[String, Row]
-  val clientAddr: Field[TypoInet, Row]
-  val clientHostname: Field[String, Row]
-  val clientPort: Field[Int, Row]
-  val backendStart: Field[TypoOffsetDateTime, Row]
-  val xactStart: Field[TypoOffsetDateTime, Row]
-  val queryStart: Field[TypoOffsetDateTime, Row]
-  val stateChange: Field[TypoOffsetDateTime, Row]
-  val waitEventType: Field[String, Row]
-  val waitEvent: Field[String, Row]
-  val state: Field[String, Row]
-  val backendXid: Field[TypoXid, Row]
-  val backendXmin: Field[TypoXid, Row]
-  val queryId: Field[Long, Row]
-  val query: Field[String, Row]
-  val backendType: Field[String, Row]
+  val applicationName: OptField[String, Row]
+  val clientAddr: OptField[TypoInet, Row]
+  val clientHostname: OptField[String, Row]
+  val clientPort: OptField[Int, Row]
+  val backendStart: OptField[TypoOffsetDateTime, Row]
+  val xactStart: OptField[TypoOffsetDateTime, Row]
+  val queryStart: OptField[TypoOffsetDateTime, Row]
+  val stateChange: OptField[TypoOffsetDateTime, Row]
+  val waitEventType: OptField[String, Row]
+  val waitEvent: OptField[String, Row]
+  val state: OptField[String, Row]
+  val backendXid: OptField[TypoXid, Row]
+  val backendXmin: OptField[TypoXid, Row]
+  val queryId: OptField[Long, Row]
+  val query: OptField[String, Row]
+  val backendType: OptField[String, Row]
 }
 object PgStatActivityViewFields extends PgStatActivityViewStructure[PgStatActivityViewRow](None, identity, (_, x) => x)
 

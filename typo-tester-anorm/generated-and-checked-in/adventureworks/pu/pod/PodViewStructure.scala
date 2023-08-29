@@ -18,16 +18,16 @@ class PodViewStructure[Row](val prefix: Option[String], val extract: Row => PodV
   extends Relation[PodViewFields, PodViewRow, Row]
     with PodViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val purchaseorderid = new Field[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, Some("int4"))(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
-  override val purchaseorderdetailid = new Field[Int, Row](prefix, "purchaseorderdetailid", None, Some("int4"))(x => extract(x).purchaseorderdetailid, (row, value) => merge(row, extract(row).copy(purchaseorderdetailid = value)))
-  override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), Some("timestamp"))(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
-  override val orderqty = new Field[Int, Row](prefix, "orderqty", None, Some("int2"))(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
-  override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val unitprice = new Field[BigDecimal, Row](prefix, "unitprice", None, Some("numeric"))(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
-  override val receivedqty = new Field[BigDecimal, Row](prefix, "receivedqty", None, Some("numeric"))(x => extract(x).receivedqty, (row, value) => merge(row, extract(row).copy(receivedqty = value)))
-  override val rejectedqty = new Field[BigDecimal, Row](prefix, "rejectedqty", None, Some("numeric"))(x => extract(x).rejectedqty, (row, value) => merge(row, extract(row).copy(rejectedqty = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val purchaseorderid = new Field[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, None)(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
+  override val purchaseorderdetailid = new Field[Int, Row](prefix, "purchaseorderdetailid", None, None)(x => extract(x).purchaseorderdetailid, (row, value) => merge(row, extract(row).copy(purchaseorderdetailid = value)))
+  override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), None)(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
+  override val orderqty = new Field[Int, Row](prefix, "orderqty", None, None)(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
+  override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+  override val unitprice = new Field[BigDecimal, Row](prefix, "unitprice", None, None)(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
+  override val receivedqty = new Field[BigDecimal, Row](prefix, "receivedqty", None, None)(x => extract(x).receivedqty, (row, value) => merge(row, extract(row).copy(receivedqty = value)))
+  override val rejectedqty = new Field[BigDecimal, Row](prefix, "rejectedqty", None, None)(x => extract(x).rejectedqty, (row, value) => merge(row, extract(row).copy(rejectedqty = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)

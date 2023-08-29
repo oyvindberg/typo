@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PiViewRow(
-  id: Int,
+  /** Points to [[production.productinventory.ProductinventoryRow.productid]] */
+  id: ProductId,
   /** Points to [[production.productinventory.ProductinventoryRow.productid]] */
   productid: ProductId,
   /** Points to [[production.productinventory.ProductinventoryRow.locationid]] */
@@ -45,7 +46,7 @@ object PiViewRow {
   implicit lazy val reads: Reads[PiViewRow] = Reads[PiViewRow](json => JsResult.fromTry(
       Try(
         PiViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(ProductId.reads),
           productid = json.\("productid").as(ProductId.reads),
           locationid = json.\("locationid").as(LocationId.reads),
           shelf = json.\("shelf").as(Reads.StringReads),
@@ -60,7 +61,7 @@ object PiViewRow {
   def rowParser(idx: Int): RowParser[PiViewRow] = RowParser[PiViewRow] { row =>
     Success(
       PiViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(ProductId.column),
         productid = row(idx + 1)(ProductId.column),
         locationid = row(idx + 2)(LocationId.column),
         shelf = row(idx + 3)(Column.columnToString),
@@ -73,7 +74,7 @@ object PiViewRow {
   }
   implicit lazy val writes: OWrites[PiViewRow] = OWrites[PiViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> ProductId.writes.writes(o.id),
       "productid" -> ProductId.writes.writes(o.productid),
       "locationid" -> LocationId.writes.writes(o.locationid),
       "shelf" -> Writes.StringWrites.writes(o.shelf),

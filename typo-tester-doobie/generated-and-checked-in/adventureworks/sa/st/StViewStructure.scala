@@ -20,17 +20,17 @@ class StViewStructure[Row](val prefix: Option[String], val extract: Row => StVie
   extends Relation[StViewFields, StViewRow, Row]
     with StViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val territoryid = new Field[SalesterritoryId, Row](prefix, "territoryid", None, Some("int4"))(x => extract(x).territoryid, (row, value) => merge(row, extract(row).copy(territoryid = value)))
-  override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val id = new Field[SalesterritoryId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val territoryid = new Field[SalesterritoryId, Row](prefix, "territoryid", None, None)(x => extract(x).territoryid, (row, value) => merge(row, extract(row).copy(territoryid = value)))
+  override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val countryregioncode = new Field[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
   override val group = new Field[/* max 50 chars */ String, Row](prefix, "group", None, None)(x => extract(x).group, (row, value) => merge(row, extract(row).copy(group = value)))
-  override val salesytd = new Field[BigDecimal, Row](prefix, "salesytd", None, Some("numeric"))(x => extract(x).salesytd, (row, value) => merge(row, extract(row).copy(salesytd = value)))
-  override val saleslastyear = new Field[BigDecimal, Row](prefix, "saleslastyear", None, Some("numeric"))(x => extract(x).saleslastyear, (row, value) => merge(row, extract(row).copy(saleslastyear = value)))
-  override val costytd = new Field[BigDecimal, Row](prefix, "costytd", None, Some("numeric"))(x => extract(x).costytd, (row, value) => merge(row, extract(row).copy(costytd = value)))
-  override val costlastyear = new Field[BigDecimal, Row](prefix, "costlastyear", None, Some("numeric"))(x => extract(x).costlastyear, (row, value) => merge(row, extract(row).copy(costlastyear = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val salesytd = new Field[BigDecimal, Row](prefix, "salesytd", None, None)(x => extract(x).salesytd, (row, value) => merge(row, extract(row).copy(salesytd = value)))
+  override val saleslastyear = new Field[BigDecimal, Row](prefix, "saleslastyear", None, None)(x => extract(x).saleslastyear, (row, value) => merge(row, extract(row).copy(saleslastyear = value)))
+  override val costytd = new Field[BigDecimal, Row](prefix, "costytd", None, None)(x => extract(x).costytd, (row, value) => merge(row, extract(row).copy(costytd = value)))
+  override val costlastyear = new Field[BigDecimal, Row](prefix, "costlastyear", None, None)(x => extract(x).costlastyear, (row, value) => merge(row, extract(row).copy(costlastyear = value)))
+  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)

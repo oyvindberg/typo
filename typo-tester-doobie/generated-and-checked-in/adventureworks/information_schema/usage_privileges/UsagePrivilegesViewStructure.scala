@@ -7,9 +7,6 @@ package adventureworks
 package information_schema
 package usage_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -18,14 +15,14 @@ class UsagePrivilegesViewStructure[Row](val prefix: Option[String], val extract:
   extends Relation[UsagePrivilegesViewFields, UsagePrivilegesViewRow, Row]
     with UsagePrivilegesViewFields[Row] { outer =>
 
-  override val grantor = new OptField[SqlIdentifier, Row](prefix, "grantor", None, Some("name"))(x => extract(x).grantor, (row, value) => merge(row, extract(row).copy(grantor = value)))
-  override val grantee = new OptField[SqlIdentifier, Row](prefix, "grantee", None, Some("name"))(x => extract(x).grantee, (row, value) => merge(row, extract(row).copy(grantee = value)))
-  override val objectCatalog = new OptField[SqlIdentifier, Row](prefix, "object_catalog", None, Some("name"))(x => extract(x).objectCatalog, (row, value) => merge(row, extract(row).copy(objectCatalog = value)))
-  override val objectSchema = new OptField[SqlIdentifier, Row](prefix, "object_schema", None, Some("name"))(x => extract(x).objectSchema, (row, value) => merge(row, extract(row).copy(objectSchema = value)))
-  override val objectName = new OptField[SqlIdentifier, Row](prefix, "object_name", None, Some("name"))(x => extract(x).objectName, (row, value) => merge(row, extract(row).copy(objectName = value)))
-  override val objectType = new OptField[CharacterData, Row](prefix, "object_type", None, Some("varchar"))(x => extract(x).objectType, (row, value) => merge(row, extract(row).copy(objectType = value)))
-  override val privilegeType = new OptField[CharacterData, Row](prefix, "privilege_type", None, Some("varchar"))(x => extract(x).privilegeType, (row, value) => merge(row, extract(row).copy(privilegeType = value)))
-  override val isGrantable = new OptField[YesOrNo, Row](prefix, "is_grantable", None, Some("varchar"))(x => extract(x).isGrantable, (row, value) => merge(row, extract(row).copy(isGrantable = value)))
+  override val grantor = new OptField[String, Row](prefix, "grantor", None, None)(x => extract(x).grantor, (row, value) => merge(row, extract(row).copy(grantor = value)))
+  override val grantee = new OptField[String, Row](prefix, "grantee", None, None)(x => extract(x).grantee, (row, value) => merge(row, extract(row).copy(grantee = value)))
+  override val objectCatalog = new OptField[String, Row](prefix, "object_catalog", None, None)(x => extract(x).objectCatalog, (row, value) => merge(row, extract(row).copy(objectCatalog = value)))
+  override val objectSchema = new OptField[String, Row](prefix, "object_schema", None, None)(x => extract(x).objectSchema, (row, value) => merge(row, extract(row).copy(objectSchema = value)))
+  override val objectName = new OptField[String, Row](prefix, "object_name", None, None)(x => extract(x).objectName, (row, value) => merge(row, extract(row).copy(objectName = value)))
+  override val objectType = new OptField[String, Row](prefix, "object_type", None, None)(x => extract(x).objectType, (row, value) => merge(row, extract(row).copy(objectType = value)))
+  override val privilegeType = new OptField[String, Row](prefix, "privilege_type", None, None)(x => extract(x).privilegeType, (row, value) => merge(row, extract(row).copy(privilegeType = value)))
+  override val isGrantable = new OptField[/* max 3 chars */ String, Row](prefix, "is_grantable", None, None)(x => extract(x).isGrantable, (row, value) => merge(row, extract(row).copy(isGrantable = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](grantor, grantee, objectCatalog, objectSchema, objectName, objectType, privilegeType, isGrantable)

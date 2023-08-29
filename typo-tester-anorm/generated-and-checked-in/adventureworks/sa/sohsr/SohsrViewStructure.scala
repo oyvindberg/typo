@@ -18,9 +18,9 @@ class SohsrViewStructure[Row](val prefix: Option[String], val extract: Row => So
   extends Relation[SohsrViewFields, SohsrViewRow, Row]
     with SohsrViewFields[Row] { outer =>
 
-  override val salesorderid = new Field[SalesorderheaderId, Row](prefix, "salesorderid", None, Some("int4"))(x => extract(x).salesorderid, (row, value) => merge(row, extract(row).copy(salesorderid = value)))
-  override val salesreasonid = new Field[SalesreasonId, Row](prefix, "salesreasonid", None, Some("int4"))(x => extract(x).salesreasonid, (row, value) => merge(row, extract(row).copy(salesreasonid = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val salesorderid = new Field[SalesorderheaderId, Row](prefix, "salesorderid", None, None)(x => extract(x).salesorderid, (row, value) => merge(row, extract(row).copy(salesorderid = value)))
+  override val salesreasonid = new Field[SalesreasonId, Row](prefix, "salesreasonid", None, None)(x => extract(x).salesreasonid, (row, value) => merge(row, extract(row).copy(salesreasonid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](salesorderid, salesreasonid, modifieddate)

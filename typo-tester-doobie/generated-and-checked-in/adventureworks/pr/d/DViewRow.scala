@@ -29,7 +29,7 @@ case class DViewRow(
   /** Points to [[production.document.DocumentRow.filename]] */
   filename: /* max 400 chars */ String,
   /** Points to [[production.document.DocumentRow.fileextension]] */
-  fileextension: /* max 8 chars */ String,
+  fileextension: Option[/* max 8 chars */ String],
   /** Points to [[production.document.DocumentRow.revision]] */
   revision: /* bpchar, max 5 chars */ String,
   /** Points to [[production.document.DocumentRow.changenumber]] */
@@ -37,9 +37,9 @@ case class DViewRow(
   /** Points to [[production.document.DocumentRow.status]] */
   status: Int,
   /** Points to [[production.document.DocumentRow.documentsummary]] */
-  documentsummary: String,
+  documentsummary: Option[String],
   /** Points to [[production.document.DocumentRow.document]] */
-  document: Byte,
+  document: Option[Byte],
   /** Points to [[production.document.DocumentRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[production.document.DocumentRow.modifieddate]] */
@@ -49,20 +49,20 @@ case class DViewRow(
 )
 
 object DViewRow {
-  implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct13[DViewRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, /* max 8 chars */ String, /* bpchar, max 5 chars */ String, Int, Int, String, Byte, UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DViewRow.apply)(Decoder.decodeString, BusinessentityId.decoder, Flag.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeByte, Decoder.decodeUUID, TypoLocalDateTime.decoder, DocumentId.decoder)
-  implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct13[DViewRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, /* max 8 chars */ String, /* bpchar, max 5 chars */ String, Int, Int, String, Byte, UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeString, BusinessentityId.encoder, Flag.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeByte, Encoder.encodeUUID, TypoLocalDateTime.encoder, DocumentId.encoder)
+  implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct13[DViewRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, Int, Int, Option[String], Option[Byte], UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DViewRow.apply)(Decoder.decodeString, BusinessentityId.decoder, Flag.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeByte), Decoder.decodeUUID, TypoLocalDateTime.decoder, DocumentId.decoder)
+  implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct13[DViewRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, Int, Int, Option[String], Option[Byte], UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeString, BusinessentityId.encoder, Flag.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeByte), Encoder.encodeUUID, TypoLocalDateTime.encoder, DocumentId.encoder)
   implicit lazy val read: Read[DViewRow] = new Read[DViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.ByteMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ByteMeta.get, Nullability.Nullable),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (DocumentId.get, Nullability.NoNulls)
@@ -72,12 +72,12 @@ object DViewRow {
       owner = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       folderflag = Flag.get.unsafeGetNonNullable(rs, i + 2),
       filename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      fileextension = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      fileextension = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
       revision = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
       changenumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
       status = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
-      documentsummary = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 8),
-      document = Meta.ByteMeta.get.unsafeGetNonNullable(rs, i + 9),
+      documentsummary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      document = Meta.ByteMeta.get.unsafeGetNullable(rs, i + 9),
       rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 10),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11),
       documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 12)

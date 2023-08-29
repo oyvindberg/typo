@@ -18,12 +18,12 @@ class SpqhViewStructure[Row](val prefix: Option[String], val extract: Row => Spq
   extends Relation[SpqhViewFields, SpqhViewRow, Row]
     with SpqhViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val quotadate = new Field[TypoLocalDateTime, Row](prefix, "quotadate", Some("text"), Some("timestamp"))(x => extract(x).quotadate, (row, value) => merge(row, extract(row).copy(quotadate = value)))
-  override val salesquota = new Field[BigDecimal, Row](prefix, "salesquota", None, Some("numeric"))(x => extract(x).salesquota, (row, value) => merge(row, extract(row).copy(salesquota = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+  override val quotadate = new Field[TypoLocalDateTime, Row](prefix, "quotadate", Some("text"), None)(x => extract(x).quotadate, (row, value) => merge(row, extract(row).copy(quotadate = value)))
+  override val salesquota = new Field[BigDecimal, Row](prefix, "salesquota", None, None)(x => extract(x).salesquota, (row, value) => merge(row, extract(row).copy(salesquota = value)))
+  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, businessentityid, quotadate, salesquota, rowguid, modifieddate)

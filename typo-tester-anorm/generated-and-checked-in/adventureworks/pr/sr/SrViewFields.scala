@@ -13,7 +13,7 @@ import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 
 trait SrViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ScrapreasonId, Row]
   val scrapreasonid: Field[ScrapreasonId, Row]
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

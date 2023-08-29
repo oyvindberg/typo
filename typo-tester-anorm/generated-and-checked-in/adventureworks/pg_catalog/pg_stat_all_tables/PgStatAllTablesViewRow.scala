@@ -8,6 +8,7 @@ package pg_catalog
 package pg_stat_all_tables
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.pg_catalog.pg_class.PgClassId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -21,58 +22,61 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatAllTablesViewRow(
-  relid: /* oid */ Long,
+  /** Points to [[pg_class.PgClassRow.oid]] */
+  relid: PgClassId,
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   relname: String,
-  seqScan: Long,
-  seqTupRead: Long,
-  idxScan: Long,
-  idxTupFetch: Long,
-  nTupIns: Long,
-  nTupUpd: Long,
-  nTupDel: Long,
-  nTupHotUpd: Long,
-  nLiveTup: Long,
-  nDeadTup: Long,
-  nModSinceAnalyze: Long,
-  nInsSinceVacuum: Long,
-  lastVacuum: TypoOffsetDateTime,
-  lastAutovacuum: TypoOffsetDateTime,
-  lastAnalyze: TypoOffsetDateTime,
-  lastAutoanalyze: TypoOffsetDateTime,
-  vacuumCount: Long,
-  autovacuumCount: Long,
-  analyzeCount: Long,
-  autoanalyzeCount: Long
+  seqScan: /* nullability unknown */ Option[Long],
+  seqTupRead: /* nullability unknown */ Option[Long],
+  idxScan: /* nullability unknown */ Option[Long],
+  idxTupFetch: /* nullability unknown */ Option[Long],
+  nTupIns: /* nullability unknown */ Option[Long],
+  nTupUpd: /* nullability unknown */ Option[Long],
+  nTupDel: /* nullability unknown */ Option[Long],
+  nTupHotUpd: /* nullability unknown */ Option[Long],
+  nLiveTup: /* nullability unknown */ Option[Long],
+  nDeadTup: /* nullability unknown */ Option[Long],
+  nModSinceAnalyze: /* nullability unknown */ Option[Long],
+  nInsSinceVacuum: /* nullability unknown */ Option[Long],
+  lastVacuum: /* nullability unknown */ Option[TypoOffsetDateTime],
+  lastAutovacuum: /* nullability unknown */ Option[TypoOffsetDateTime],
+  lastAnalyze: /* nullability unknown */ Option[TypoOffsetDateTime],
+  lastAutoanalyze: /* nullability unknown */ Option[TypoOffsetDateTime],
+  vacuumCount: /* nullability unknown */ Option[Long],
+  autovacuumCount: /* nullability unknown */ Option[Long],
+  analyzeCount: /* nullability unknown */ Option[Long],
+  autoanalyzeCount: /* nullability unknown */ Option[Long]
 )
 
 object PgStatAllTablesViewRow {
   implicit lazy val reads: Reads[PgStatAllTablesViewRow] = Reads[PgStatAllTablesViewRow](json => JsResult.fromTry(
       Try(
         PgStatAllTablesViewRow(
-          relid = json.\("relid").as(Reads.LongReads),
+          relid = json.\("relid").as(PgClassId.reads),
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
           relname = json.\("relname").as(Reads.StringReads),
-          seqScan = json.\("seq_scan").as(Reads.LongReads),
-          seqTupRead = json.\("seq_tup_read").as(Reads.LongReads),
-          idxScan = json.\("idx_scan").as(Reads.LongReads),
-          idxTupFetch = json.\("idx_tup_fetch").as(Reads.LongReads),
-          nTupIns = json.\("n_tup_ins").as(Reads.LongReads),
-          nTupUpd = json.\("n_tup_upd").as(Reads.LongReads),
-          nTupDel = json.\("n_tup_del").as(Reads.LongReads),
-          nTupHotUpd = json.\("n_tup_hot_upd").as(Reads.LongReads),
-          nLiveTup = json.\("n_live_tup").as(Reads.LongReads),
-          nDeadTup = json.\("n_dead_tup").as(Reads.LongReads),
-          nModSinceAnalyze = json.\("n_mod_since_analyze").as(Reads.LongReads),
-          nInsSinceVacuum = json.\("n_ins_since_vacuum").as(Reads.LongReads),
-          lastVacuum = json.\("last_vacuum").as(TypoOffsetDateTime.reads),
-          lastAutovacuum = json.\("last_autovacuum").as(TypoOffsetDateTime.reads),
-          lastAnalyze = json.\("last_analyze").as(TypoOffsetDateTime.reads),
-          lastAutoanalyze = json.\("last_autoanalyze").as(TypoOffsetDateTime.reads),
-          vacuumCount = json.\("vacuum_count").as(Reads.LongReads),
-          autovacuumCount = json.\("autovacuum_count").as(Reads.LongReads),
-          analyzeCount = json.\("analyze_count").as(Reads.LongReads),
-          autoanalyzeCount = json.\("autoanalyze_count").as(Reads.LongReads)
+          seqScan = json.\("seq_scan").toOption.map(_.as(Reads.LongReads)),
+          seqTupRead = json.\("seq_tup_read").toOption.map(_.as(Reads.LongReads)),
+          idxScan = json.\("idx_scan").toOption.map(_.as(Reads.LongReads)),
+          idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as(Reads.LongReads)),
+          nTupIns = json.\("n_tup_ins").toOption.map(_.as(Reads.LongReads)),
+          nTupUpd = json.\("n_tup_upd").toOption.map(_.as(Reads.LongReads)),
+          nTupDel = json.\("n_tup_del").toOption.map(_.as(Reads.LongReads)),
+          nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as(Reads.LongReads)),
+          nLiveTup = json.\("n_live_tup").toOption.map(_.as(Reads.LongReads)),
+          nDeadTup = json.\("n_dead_tup").toOption.map(_.as(Reads.LongReads)),
+          nModSinceAnalyze = json.\("n_mod_since_analyze").toOption.map(_.as(Reads.LongReads)),
+          nInsSinceVacuum = json.\("n_ins_since_vacuum").toOption.map(_.as(Reads.LongReads)),
+          lastVacuum = json.\("last_vacuum").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastAutovacuum = json.\("last_autovacuum").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastAnalyze = json.\("last_analyze").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastAutoanalyze = json.\("last_autoanalyze").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          vacuumCount = json.\("vacuum_count").toOption.map(_.as(Reads.LongReads)),
+          autovacuumCount = json.\("autovacuum_count").toOption.map(_.as(Reads.LongReads)),
+          analyzeCount = json.\("analyze_count").toOption.map(_.as(Reads.LongReads)),
+          autoanalyzeCount = json.\("autoanalyze_count").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -80,57 +84,57 @@ object PgStatAllTablesViewRow {
   def rowParser(idx: Int): RowParser[PgStatAllTablesViewRow] = RowParser[PgStatAllTablesViewRow] { row =>
     Success(
       PgStatAllTablesViewRow(
-        relid = row(idx + 0)(Column.columnToLong),
+        relid = row(idx + 0)(PgClassId.column),
         schemaname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
         relname = row(idx + 2)(Column.columnToString),
-        seqScan = row(idx + 3)(Column.columnToLong),
-        seqTupRead = row(idx + 4)(Column.columnToLong),
-        idxScan = row(idx + 5)(Column.columnToLong),
-        idxTupFetch = row(idx + 6)(Column.columnToLong),
-        nTupIns = row(idx + 7)(Column.columnToLong),
-        nTupUpd = row(idx + 8)(Column.columnToLong),
-        nTupDel = row(idx + 9)(Column.columnToLong),
-        nTupHotUpd = row(idx + 10)(Column.columnToLong),
-        nLiveTup = row(idx + 11)(Column.columnToLong),
-        nDeadTup = row(idx + 12)(Column.columnToLong),
-        nModSinceAnalyze = row(idx + 13)(Column.columnToLong),
-        nInsSinceVacuum = row(idx + 14)(Column.columnToLong),
-        lastVacuum = row(idx + 15)(TypoOffsetDateTime.column),
-        lastAutovacuum = row(idx + 16)(TypoOffsetDateTime.column),
-        lastAnalyze = row(idx + 17)(TypoOffsetDateTime.column),
-        lastAutoanalyze = row(idx + 18)(TypoOffsetDateTime.column),
-        vacuumCount = row(idx + 19)(Column.columnToLong),
-        autovacuumCount = row(idx + 20)(Column.columnToLong),
-        analyzeCount = row(idx + 21)(Column.columnToLong),
-        autoanalyzeCount = row(idx + 22)(Column.columnToLong)
+        seqScan = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        seqTupRead = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        idxScan = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        idxTupFetch = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        nTupIns = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        nTupUpd = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
+        nTupDel = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        nTupHotUpd = row(idx + 10)(Column.columnToOption(Column.columnToLong)),
+        nLiveTup = row(idx + 11)(Column.columnToOption(Column.columnToLong)),
+        nDeadTup = row(idx + 12)(Column.columnToOption(Column.columnToLong)),
+        nModSinceAnalyze = row(idx + 13)(Column.columnToOption(Column.columnToLong)),
+        nInsSinceVacuum = row(idx + 14)(Column.columnToOption(Column.columnToLong)),
+        lastVacuum = row(idx + 15)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastAutovacuum = row(idx + 16)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastAnalyze = row(idx + 17)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastAutoanalyze = row(idx + 18)(Column.columnToOption(TypoOffsetDateTime.column)),
+        vacuumCount = row(idx + 19)(Column.columnToOption(Column.columnToLong)),
+        autovacuumCount = row(idx + 20)(Column.columnToOption(Column.columnToLong)),
+        analyzeCount = row(idx + 21)(Column.columnToOption(Column.columnToLong)),
+        autoanalyzeCount = row(idx + 22)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatAllTablesViewRow] = OWrites[PgStatAllTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Writes.LongWrites.writes(o.relid),
+      "relid" -> PgClassId.writes.writes(o.relid),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "relname" -> Writes.StringWrites.writes(o.relname),
-      "seq_scan" -> Writes.LongWrites.writes(o.seqScan),
-      "seq_tup_read" -> Writes.LongWrites.writes(o.seqTupRead),
-      "idx_scan" -> Writes.LongWrites.writes(o.idxScan),
-      "idx_tup_fetch" -> Writes.LongWrites.writes(o.idxTupFetch),
-      "n_tup_ins" -> Writes.LongWrites.writes(o.nTupIns),
-      "n_tup_upd" -> Writes.LongWrites.writes(o.nTupUpd),
-      "n_tup_del" -> Writes.LongWrites.writes(o.nTupDel),
-      "n_tup_hot_upd" -> Writes.LongWrites.writes(o.nTupHotUpd),
-      "n_live_tup" -> Writes.LongWrites.writes(o.nLiveTup),
-      "n_dead_tup" -> Writes.LongWrites.writes(o.nDeadTup),
-      "n_mod_since_analyze" -> Writes.LongWrites.writes(o.nModSinceAnalyze),
-      "n_ins_since_vacuum" -> Writes.LongWrites.writes(o.nInsSinceVacuum),
-      "last_vacuum" -> TypoOffsetDateTime.writes.writes(o.lastVacuum),
-      "last_autovacuum" -> TypoOffsetDateTime.writes.writes(o.lastAutovacuum),
-      "last_analyze" -> TypoOffsetDateTime.writes.writes(o.lastAnalyze),
-      "last_autoanalyze" -> TypoOffsetDateTime.writes.writes(o.lastAutoanalyze),
-      "vacuum_count" -> Writes.LongWrites.writes(o.vacuumCount),
-      "autovacuum_count" -> Writes.LongWrites.writes(o.autovacuumCount),
-      "analyze_count" -> Writes.LongWrites.writes(o.analyzeCount),
-      "autoanalyze_count" -> Writes.LongWrites.writes(o.autoanalyzeCount)
+      "seq_scan" -> Writes.OptionWrites(Writes.LongWrites).writes(o.seqScan),
+      "seq_tup_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.seqTupRead),
+      "idx_scan" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxScan),
+      "idx_tup_fetch" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxTupFetch),
+      "n_tup_ins" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nTupIns),
+      "n_tup_upd" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nTupUpd),
+      "n_tup_del" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nTupDel),
+      "n_tup_hot_upd" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nTupHotUpd),
+      "n_live_tup" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nLiveTup),
+      "n_dead_tup" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nDeadTup),
+      "n_mod_since_analyze" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nModSinceAnalyze),
+      "n_ins_since_vacuum" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nInsSinceVacuum),
+      "last_vacuum" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastVacuum),
+      "last_autovacuum" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastAutovacuum),
+      "last_analyze" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastAnalyze),
+      "last_autoanalyze" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastAutoanalyze),
+      "vacuum_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.vacuumCount),
+      "autovacuum_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.autovacuumCount),
+      "analyze_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.analyzeCount),
+      "autoanalyze_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.autoanalyzeCount)
     ))
   )
 }

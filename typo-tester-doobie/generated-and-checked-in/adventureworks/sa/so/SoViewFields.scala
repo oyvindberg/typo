@@ -11,9 +11,10 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.specialoffer.SpecialofferId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait SoViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[SpecialofferId, Row]
   val specialofferid: Field[SpecialofferId, Row]
   val description: Field[/* max 255 chars */ String, Row]
   val discountpct: Field[BigDecimal, Row]
@@ -22,7 +23,7 @@ trait SoViewFields[Row] {
   val startdate: Field[TypoLocalDateTime, Row]
   val enddate: Field[TypoLocalDateTime, Row]
   val minqty: Field[Int, Row]
-  val maxqty: Field[Int, Row]
+  val maxqty: OptField[Int, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

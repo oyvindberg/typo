@@ -15,7 +15,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait PscViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ProductsubcategoryId, Row]
   val productsubcategoryid: Field[ProductsubcategoryId, Row]
   val productcategoryid: Field[ProductcategoryId, Row]
   val name: Field[Name, Row]

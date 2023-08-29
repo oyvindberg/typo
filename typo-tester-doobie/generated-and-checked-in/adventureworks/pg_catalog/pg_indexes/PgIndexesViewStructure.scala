@@ -16,11 +16,11 @@ class PgIndexesViewStructure[Row](val prefix: Option[String], val extract: Row =
   extends Relation[PgIndexesViewFields, PgIndexesViewRow, Row]
     with PgIndexesViewFields[Row] { outer =>
 
-  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val tablename = new Field[String, Row](prefix, "tablename", None, Some("name"))(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
-  override val indexname = new Field[String, Row](prefix, "indexname", None, Some("name"))(x => extract(x).indexname, (row, value) => merge(row, extract(row).copy(indexname = value)))
-  override val tablespace = new OptField[String, Row](prefix, "tablespace", None, Some("name"))(x => extract(x).tablespace, (row, value) => merge(row, extract(row).copy(tablespace = value)))
-  override val indexdef = new Field[String, Row](prefix, "indexdef", None, None)(x => extract(x).indexdef, (row, value) => merge(row, extract(row).copy(indexdef = value)))
+  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, None)(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
+  override val tablename = new Field[String, Row](prefix, "tablename", None, None)(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
+  override val indexname = new Field[String, Row](prefix, "indexname", None, None)(x => extract(x).indexname, (row, value) => merge(row, extract(row).copy(indexname = value)))
+  override val tablespace = new OptField[String, Row](prefix, "tablespace", None, None)(x => extract(x).tablespace, (row, value) => merge(row, extract(row).copy(tablespace = value)))
+  override val indexdef = new OptField[String, Row](prefix, "indexdef", None, None)(x => extract(x).indexdef, (row, value) => merge(row, extract(row).copy(indexdef = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](schemaname, tablename, indexname, tablespace, indexdef)

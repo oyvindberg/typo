@@ -13,11 +13,11 @@ import typo.dsl.SqlExpr.OptField
 trait PgMatviewsViewFields[Row] {
   val schemaname: OptField[String, Row]
   val matviewname: Field[String, Row]
-  val matviewowner: Field[String, Row]
+  val matviewowner: OptField[String, Row]
   val tablespace: OptField[String, Row]
   val hasindexes: Field[Boolean, Row]
   val ispopulated: Field[Boolean, Row]
-  val definition: Field[String, Row]
+  val definition: OptField[String, Row]
 }
 object PgMatviewsViewFields extends PgMatviewsViewStructure[PgMatviewsViewRow](None, identity, (_, x) => x)
 

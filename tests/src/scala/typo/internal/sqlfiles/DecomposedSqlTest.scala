@@ -2,6 +2,7 @@ package typo.internal.sqlfiles
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
+import typo.internal.analysis.{DecomposedSql, parseName}
 
 class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
 

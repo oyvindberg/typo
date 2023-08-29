@@ -7,17 +7,18 @@ package adventureworks
 package pg_catalog
 package pg_stat_sys_indexes
 
-import typo.dsl.SqlExpr.Field
+import adventureworks.pg_catalog.pg_class.PgClassId
+import typo.dsl.SqlExpr.OptField
 
 trait PgStatSysIndexesViewFields[Row] {
-  val relid: Field[/* oid */ Long, Row]
-  val indexrelid: Field[/* oid */ Long, Row]
-  val schemaname: Field[String, Row]
-  val relname: Field[String, Row]
-  val indexrelname: Field[String, Row]
-  val idxScan: Field[Long, Row]
-  val idxTupRead: Field[Long, Row]
-  val idxTupFetch: Field[Long, Row]
+  val relid: OptField[PgClassId, Row]
+  val indexrelid: OptField[PgClassId, Row]
+  val schemaname: OptField[String, Row]
+  val relname: OptField[String, Row]
+  val indexrelname: OptField[String, Row]
+  val idxScan: OptField[/* nullability unknown */ Long, Row]
+  val idxTupRead: OptField[/* nullability unknown */ Long, Row]
+  val idxTupFetch: OptField[/* nullability unknown */ Long, Row]
 }
 object PgStatSysIndexesViewFields extends PgStatSysIndexesViewStructure[PgStatSysIndexesViewRow](None, identity, (_, x) => x)
 

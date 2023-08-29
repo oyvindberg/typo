@@ -7,41 +7,41 @@ package adventureworks
 package information_schema
 package check_constraint_routine_usage
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CheckConstraintRoutineUsageViewRow(
-  constraintCatalog: SqlIdentifier,
-  constraintSchema: SqlIdentifier,
-  constraintName: SqlIdentifier,
-  specificCatalog: SqlIdentifier,
-  specificSchema: SqlIdentifier,
-  specificName: SqlIdentifier
+  constraintCatalog: /* nullability unknown */ Option[String],
+  constraintSchema: /* nullability unknown */ Option[String],
+  constraintName: /* nullability unknown */ Option[String],
+  specificCatalog: /* nullability unknown */ Option[String],
+  specificSchema: /* nullability unknown */ Option[String],
+  specificName: /* nullability unknown */ Option[String]
 )
 
 object CheckConstraintRoutineUsageViewRow {
-  implicit lazy val decoder: Decoder[CheckConstraintRoutineUsageViewRow] = Decoder.forProduct6[CheckConstraintRoutineUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("constraint_catalog", "constraint_schema", "constraint_name", "specific_catalog", "specific_schema", "specific_name")(CheckConstraintRoutineUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[CheckConstraintRoutineUsageViewRow] = Encoder.forProduct6[CheckConstraintRoutineUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("constraint_catalog", "constraint_schema", "constraint_name", "specific_catalog", "specific_schema", "specific_name")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.specificCatalog, x.specificSchema, x.specificName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[CheckConstraintRoutineUsageViewRow] = Decoder.forProduct6[CheckConstraintRoutineUsageViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("constraint_catalog", "constraint_schema", "constraint_name", "specific_catalog", "specific_schema", "specific_name")(CheckConstraintRoutineUsageViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[CheckConstraintRoutineUsageViewRow] = Encoder.forProduct6[CheckConstraintRoutineUsageViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("constraint_catalog", "constraint_schema", "constraint_name", "specific_catalog", "specific_schema", "specific_name")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.specificCatalog, x.specificSchema, x.specificName))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[CheckConstraintRoutineUsageViewRow] = new Read[CheckConstraintRoutineUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CheckConstraintRoutineUsageViewRow(
-      constraintCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      constraintSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      constraintName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      specificCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      specificSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      specificName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5)
+      constraintCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      constraintSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      constraintName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      specificCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      specificSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      specificName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

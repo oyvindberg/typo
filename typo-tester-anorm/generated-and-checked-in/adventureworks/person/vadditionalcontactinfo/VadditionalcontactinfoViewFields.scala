@@ -14,23 +14,24 @@ import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait VadditionalcontactinfoViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
   val firstname: Field[/* user-picked */ FirstName, Row]
-  val middlename: Field[Name, Row]
+  val middlename: OptField[Name, Row]
   val lastname: Field[Name, Row]
-  val telephonenumber: Field[TypoXml, Row]
-  val telephonespecialinstructions: Field[String, Row]
-  val street: Field[TypoXml, Row]
-  val city: Field[TypoXml, Row]
-  val stateprovince: Field[TypoXml, Row]
-  val postalcode: Field[TypoXml, Row]
-  val countryregion: Field[TypoXml, Row]
-  val homeaddressspecialinstructions: Field[TypoXml, Row]
-  val emailaddress: Field[TypoXml, Row]
-  val emailspecialinstructions: Field[String, Row]
-  val emailtelephonenumber: Field[TypoXml, Row]
+  val telephonenumber: OptField[TypoXml, Row]
+  val telephonespecialinstructions: OptField[String, Row]
+  val street: OptField[TypoXml, Row]
+  val city: OptField[TypoXml, Row]
+  val stateprovince: OptField[TypoXml, Row]
+  val postalcode: OptField[TypoXml, Row]
+  val countryregion: OptField[TypoXml, Row]
+  val homeaddressspecialinstructions: OptField[TypoXml, Row]
+  val emailaddress: OptField[TypoXml, Row]
+  val emailspecialinstructions: OptField[String, Row]
+  val emailtelephonenumber: OptField[TypoXml, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

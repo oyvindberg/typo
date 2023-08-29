@@ -24,17 +24,18 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BomViewRow(
-  id: Int,
+  /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
+  id: BillofmaterialsId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
   billofmaterialsid: BillofmaterialsId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.productassemblyid]] */
-  productassemblyid: ProductId,
+  productassemblyid: Option[ProductId],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.componentid]] */
   componentid: ProductId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.startdate]] */
   startdate: TypoLocalDateTime,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.enddate]] */
-  enddate: TypoLocalDateTime,
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.bomlevel]] */
@@ -49,12 +50,12 @@ object BomViewRow {
   implicit lazy val reads: Reads[BomViewRow] = Reads[BomViewRow](json => JsResult.fromTry(
       Try(
         BomViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BillofmaterialsId.reads),
           billofmaterialsid = json.\("billofmaterialsid").as(BillofmaterialsId.reads),
-          productassemblyid = json.\("productassemblyid").as(ProductId.reads),
+          productassemblyid = json.\("productassemblyid").toOption.map(_.as(ProductId.reads)),
           componentid = json.\("componentid").as(ProductId.reads),
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
-          enddate = json.\("enddate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
           bomlevel = json.\("bomlevel").as(Reads.IntReads),
           perassemblyqty = json.\("perassemblyqty").as(Reads.bigDecReads),
@@ -66,12 +67,12 @@ object BomViewRow {
   def rowParser(idx: Int): RowParser[BomViewRow] = RowParser[BomViewRow] { row =>
     Success(
       BomViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BillofmaterialsId.column),
         billofmaterialsid = row(idx + 1)(BillofmaterialsId.column),
-        productassemblyid = row(idx + 2)(ProductId.column),
+        productassemblyid = row(idx + 2)(Column.columnToOption(ProductId.column)),
         componentid = row(idx + 3)(ProductId.column),
         startdate = row(idx + 4)(TypoLocalDateTime.column),
-        enddate = row(idx + 5)(TypoLocalDateTime.column),
+        enddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
         unitmeasurecode = row(idx + 6)(UnitmeasureId.column),
         bomlevel = row(idx + 7)(Column.columnToInt),
         perassemblyqty = row(idx + 8)(Column.columnToScalaBigDecimal),
@@ -81,12 +82,12 @@ object BomViewRow {
   }
   implicit lazy val writes: OWrites[BomViewRow] = OWrites[BomViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BillofmaterialsId.writes.writes(o.id),
       "billofmaterialsid" -> BillofmaterialsId.writes.writes(o.billofmaterialsid),
-      "productassemblyid" -> ProductId.writes.writes(o.productassemblyid),
+      "productassemblyid" -> Writes.OptionWrites(ProductId.writes).writes(o.productassemblyid),
       "componentid" -> ProductId.writes.writes(o.componentid),
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
-      "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
       "bomlevel" -> Writes.IntWrites.writes(o.bomlevel),
       "perassemblyqty" -> Writes.BigDecimalWrites.writes(o.perassemblyqty),

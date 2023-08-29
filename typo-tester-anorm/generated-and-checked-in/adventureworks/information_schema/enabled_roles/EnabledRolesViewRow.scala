@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package enabled_roles
 
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -15,18 +15,19 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EnabledRolesViewRow(
-  roleName: SqlIdentifier
+  roleName: /* nullability unknown */ Option[String]
 )
 
 object EnabledRolesViewRow {
   implicit lazy val reads: Reads[EnabledRolesViewRow] = Reads[EnabledRolesViewRow](json => JsResult.fromTry(
       Try(
         EnabledRolesViewRow(
-          roleName = json.\("role_name").as(SqlIdentifier.reads)
+          roleName = json.\("role_name").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -34,13 +35,13 @@ object EnabledRolesViewRow {
   def rowParser(idx: Int): RowParser[EnabledRolesViewRow] = RowParser[EnabledRolesViewRow] { row =>
     Success(
       EnabledRolesViewRow(
-        roleName = row(idx + 0)(SqlIdentifier.column)
+        roleName = row(idx + 0)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[EnabledRolesViewRow] = OWrites[EnabledRolesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "role_name" -> SqlIdentifier.writes.writes(o.roleName)
+      "role_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.roleName)
     ))
   )
 }

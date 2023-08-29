@@ -7,15 +7,13 @@ package adventureworks
 package information_schema
 package foreign_data_wrapper_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ForeignDataWrapperOptionsViewFields[Row] {
-  val foreignDataWrapperCatalog: Field[SqlIdentifier, Row]
-  val foreignDataWrapperName: Field[SqlIdentifier, Row]
-  val optionName: Field[SqlIdentifier, Row]
-  val optionValue: Field[CharacterData, Row]
+  val foreignDataWrapperCatalog: OptField[/* nullability unknown */ String, Row]
+  val foreignDataWrapperName: OptField[/* nullability unknown */ String, Row]
+  val optionName: OptField[String, Row]
+  val optionValue: OptField[String, Row]
 }
 object ForeignDataWrapperOptionsViewFields extends ForeignDataWrapperOptionsViewStructure[ForeignDataWrapperOptionsViewRow](None, identity, (_, x) => x)
 

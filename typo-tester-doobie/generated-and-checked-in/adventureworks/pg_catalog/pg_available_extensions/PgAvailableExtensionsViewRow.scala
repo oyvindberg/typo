@@ -15,27 +15,28 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgAvailableExtensionsViewRow(
-  name: String,
-  defaultVersion: String,
+  name: /* nullability unknown */ Option[String],
+  defaultVersion: /* nullability unknown */ Option[String],
+  /** Points to [[pg_extension.PgExtensionRow.extversion]] */
   installedVersion: Option[String],
-  comment: String
+  comment: /* nullability unknown */ Option[String]
 )
 
 object PgAvailableExtensionsViewRow {
-  implicit lazy val decoder: Decoder[PgAvailableExtensionsViewRow] = Decoder.forProduct4[PgAvailableExtensionsViewRow, String, String, Option[String], String]("name", "default_version", "installed_version", "comment")(PgAvailableExtensionsViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString)
-  implicit lazy val encoder: Encoder[PgAvailableExtensionsViewRow] = Encoder.forProduct4[PgAvailableExtensionsViewRow, String, String, Option[String], String]("name", "default_version", "installed_version", "comment")(x => (x.name, x.defaultVersion, x.installedVersion, x.comment))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString)
+  implicit lazy val decoder: Decoder[PgAvailableExtensionsViewRow] = Decoder.forProduct4[PgAvailableExtensionsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], Option[String], /* nullability unknown */ Option[String]]("name", "default_version", "installed_version", "comment")(PgAvailableExtensionsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgAvailableExtensionsViewRow] = Encoder.forProduct4[PgAvailableExtensionsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], Option[String], /* nullability unknown */ Option[String]]("name", "default_version", "installed_version", "comment")(x => (x.name, x.defaultVersion, x.installedVersion, x.comment))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgAvailableExtensionsViewRow] = new Read[PgAvailableExtensionsViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgAvailableExtensionsViewRow(
-      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
-      defaultVersion = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      defaultVersion = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
       installedVersion = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      comment = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3)
+      comment = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

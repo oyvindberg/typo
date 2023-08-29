@@ -20,36 +20,37 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatProgressAnalyzeViewRow(
-  pid: Int,
-  datid: /* oid */ Long,
+  pid: /* nullability unknown */ Option[Int],
+  datid: /* nullability unknown */ Option[/* oid */ Long],
+  /** Points to [[pg_database.PgDatabaseRow.datname]] */
   datname: Option[String],
-  relid: /* oid */ Long,
-  phase: String,
-  sampleBlksTotal: Long,
-  sampleBlksScanned: Long,
-  extStatsTotal: Long,
-  extStatsComputed: Long,
-  childTablesTotal: Long,
-  childTablesDone: Long,
-  currentChildTableRelid: /* oid */ Long
+  relid: /* nullability unknown */ Option[/* oid */ Long],
+  phase: /* nullability unknown */ Option[String],
+  sampleBlksTotal: /* nullability unknown */ Option[Long],
+  sampleBlksScanned: /* nullability unknown */ Option[Long],
+  extStatsTotal: /* nullability unknown */ Option[Long],
+  extStatsComputed: /* nullability unknown */ Option[Long],
+  childTablesTotal: /* nullability unknown */ Option[Long],
+  childTablesDone: /* nullability unknown */ Option[Long],
+  currentChildTableRelid: /* nullability unknown */ Option[/* oid */ Long]
 )
 
 object PgStatProgressAnalyzeViewRow {
   implicit lazy val reads: Reads[PgStatProgressAnalyzeViewRow] = Reads[PgStatProgressAnalyzeViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressAnalyzeViewRow(
-          pid = json.\("pid").as(Reads.IntReads),
-          datid = json.\("datid").as(Reads.LongReads),
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          datid = json.\("datid").toOption.map(_.as(Reads.LongReads)),
           datname = json.\("datname").toOption.map(_.as(Reads.StringReads)),
-          relid = json.\("relid").as(Reads.LongReads),
-          phase = json.\("phase").as(Reads.StringReads),
-          sampleBlksTotal = json.\("sample_blks_total").as(Reads.LongReads),
-          sampleBlksScanned = json.\("sample_blks_scanned").as(Reads.LongReads),
-          extStatsTotal = json.\("ext_stats_total").as(Reads.LongReads),
-          extStatsComputed = json.\("ext_stats_computed").as(Reads.LongReads),
-          childTablesTotal = json.\("child_tables_total").as(Reads.LongReads),
-          childTablesDone = json.\("child_tables_done").as(Reads.LongReads),
-          currentChildTableRelid = json.\("current_child_table_relid").as(Reads.LongReads)
+          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          phase = json.\("phase").toOption.map(_.as(Reads.StringReads)),
+          sampleBlksTotal = json.\("sample_blks_total").toOption.map(_.as(Reads.LongReads)),
+          sampleBlksScanned = json.\("sample_blks_scanned").toOption.map(_.as(Reads.LongReads)),
+          extStatsTotal = json.\("ext_stats_total").toOption.map(_.as(Reads.LongReads)),
+          extStatsComputed = json.\("ext_stats_computed").toOption.map(_.as(Reads.LongReads)),
+          childTablesTotal = json.\("child_tables_total").toOption.map(_.as(Reads.LongReads)),
+          childTablesDone = json.\("child_tables_done").toOption.map(_.as(Reads.LongReads)),
+          currentChildTableRelid = json.\("current_child_table_relid").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -57,35 +58,35 @@ object PgStatProgressAnalyzeViewRow {
   def rowParser(idx: Int): RowParser[PgStatProgressAnalyzeViewRow] = RowParser[PgStatProgressAnalyzeViewRow] { row =>
     Success(
       PgStatProgressAnalyzeViewRow(
-        pid = row(idx + 0)(Column.columnToInt),
-        datid = row(idx + 1)(Column.columnToLong),
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        datid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
         datname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        relid = row(idx + 3)(Column.columnToLong),
-        phase = row(idx + 4)(Column.columnToString),
-        sampleBlksTotal = row(idx + 5)(Column.columnToLong),
-        sampleBlksScanned = row(idx + 6)(Column.columnToLong),
-        extStatsTotal = row(idx + 7)(Column.columnToLong),
-        extStatsComputed = row(idx + 8)(Column.columnToLong),
-        childTablesTotal = row(idx + 9)(Column.columnToLong),
-        childTablesDone = row(idx + 10)(Column.columnToLong),
-        currentChildTableRelid = row(idx + 11)(Column.columnToLong)
+        relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        phase = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        sampleBlksTotal = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        sampleBlksScanned = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        extStatsTotal = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        extStatsComputed = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
+        childTablesTotal = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        childTablesDone = row(idx + 10)(Column.columnToOption(Column.columnToLong)),
+        currentChildTableRelid = row(idx + 11)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatProgressAnalyzeViewRow] = OWrites[PgStatProgressAnalyzeViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Writes.IntWrites.writes(o.pid),
-      "datid" -> Writes.LongWrites.writes(o.datid),
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),
       "datname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.datname),
-      "relid" -> Writes.LongWrites.writes(o.relid),
-      "phase" -> Writes.StringWrites.writes(o.phase),
-      "sample_blks_total" -> Writes.LongWrites.writes(o.sampleBlksTotal),
-      "sample_blks_scanned" -> Writes.LongWrites.writes(o.sampleBlksScanned),
-      "ext_stats_total" -> Writes.LongWrites.writes(o.extStatsTotal),
-      "ext_stats_computed" -> Writes.LongWrites.writes(o.extStatsComputed),
-      "child_tables_total" -> Writes.LongWrites.writes(o.childTablesTotal),
-      "child_tables_done" -> Writes.LongWrites.writes(o.childTablesDone),
-      "current_child_table_relid" -> Writes.LongWrites.writes(o.currentChildTableRelid)
+      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "phase" -> Writes.OptionWrites(Writes.StringWrites).writes(o.phase),
+      "sample_blks_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sampleBlksTotal),
+      "sample_blks_scanned" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sampleBlksScanned),
+      "ext_stats_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.extStatsTotal),
+      "ext_stats_computed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.extStatsComputed),
+      "child_tables_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.childTablesTotal),
+      "child_tables_done" -> Writes.OptionWrites(Writes.LongWrites).writes(o.childTablesDone),
+      "current_child_table_relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.currentChildTableRelid)
     ))
   )
 }

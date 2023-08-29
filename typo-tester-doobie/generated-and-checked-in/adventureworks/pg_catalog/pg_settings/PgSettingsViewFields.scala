@@ -7,26 +7,26 @@ package adventureworks
 package pg_catalog
 package pg_settings
 
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgSettingsViewFields[Row] {
-  val name: Field[String, Row]
-  val setting: Field[String, Row]
-  val unit: Field[String, Row]
-  val category: Field[String, Row]
-  val shortDesc: Field[String, Row]
-  val extraDesc: Field[String, Row]
-  val context: Field[String, Row]
-  val vartype: Field[String, Row]
-  val source: Field[String, Row]
-  val minVal: Field[String, Row]
-  val maxVal: Field[String, Row]
-  val enumvals: Field[Array[String], Row]
-  val bootVal: Field[String, Row]
-  val resetVal: Field[String, Row]
-  val sourcefile: Field[String, Row]
-  val sourceline: Field[Int, Row]
-  val pendingRestart: Field[Boolean, Row]
+  val name: OptField[String, Row]
+  val setting: OptField[String, Row]
+  val unit: OptField[String, Row]
+  val category: OptField[String, Row]
+  val shortDesc: OptField[String, Row]
+  val extraDesc: OptField[String, Row]
+  val context: OptField[String, Row]
+  val vartype: OptField[String, Row]
+  val source: OptField[String, Row]
+  val minVal: OptField[String, Row]
+  val maxVal: OptField[String, Row]
+  val enumvals: OptField[Array[String], Row]
+  val bootVal: OptField[String, Row]
+  val resetVal: OptField[String, Row]
+  val sourcefile: OptField[String, Row]
+  val sourceline: OptField[Int, Row]
+  val pendingRestart: OptField[Boolean, Row]
 }
 object PgSettingsViewFields extends PgSettingsViewStructure[PgSettingsViewRow](None, identity, (_, x) => x)
 

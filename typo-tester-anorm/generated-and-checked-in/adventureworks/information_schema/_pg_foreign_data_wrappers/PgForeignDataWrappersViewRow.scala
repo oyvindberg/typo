@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package `_pg_foreign_data_wrappers`
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
+import adventureworks.pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -22,26 +21,29 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgForeignDataWrappersViewRow(
-  oid: /* oid */ Long,
+  /** Points to [[pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperRow.oid]] */
+  oid: PgForeignDataWrapperId,
+  /** Points to [[pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperRow.fdwowner]] */
   fdwowner: /* oid */ Long,
-  fdwoptions: Array[String],
-  foreignDataWrapperCatalog: SqlIdentifier,
-  foreignDataWrapperName: SqlIdentifier,
-  authorizationIdentifier: SqlIdentifier,
-  foreignDataWrapperLanguage: CharacterData
+  /** Points to [[pg_catalog.pg_foreign_data_wrapper.PgForeignDataWrapperRow.fdwoptions]] */
+  fdwoptions: Option[Array[String]],
+  foreignDataWrapperCatalog: /* nullability unknown */ Option[String],
+  foreignDataWrapperName: /* nullability unknown */ Option[String],
+  authorizationIdentifier: /* nullability unknown */ Option[String],
+  foreignDataWrapperLanguage: /* nullability unknown */ Option[String]
 )
 
 object PgForeignDataWrappersViewRow {
   implicit lazy val reads: Reads[PgForeignDataWrappersViewRow] = Reads[PgForeignDataWrappersViewRow](json => JsResult.fromTry(
       Try(
         PgForeignDataWrappersViewRow(
-          oid = json.\("oid").as(Reads.LongReads),
+          oid = json.\("oid").as(PgForeignDataWrapperId.reads),
           fdwowner = json.\("fdwowner").as(Reads.LongReads),
-          fdwoptions = json.\("fdwoptions").as(Reads.ArrayReads[String](Reads.StringReads, implicitly)),
-          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").as(SqlIdentifier.reads),
-          foreignDataWrapperName = json.\("foreign_data_wrapper_name").as(SqlIdentifier.reads),
-          authorizationIdentifier = json.\("authorization_identifier").as(SqlIdentifier.reads),
-          foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").as(CharacterData.reads)
+          fdwoptions = json.\("fdwoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as(Reads.StringReads)),
+          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as(Reads.StringReads)),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(Reads.StringReads)),
+          foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -49,25 +51,25 @@ object PgForeignDataWrappersViewRow {
   def rowParser(idx: Int): RowParser[PgForeignDataWrappersViewRow] = RowParser[PgForeignDataWrappersViewRow] { row =>
     Success(
       PgForeignDataWrappersViewRow(
-        oid = row(idx + 0)(Column.columnToLong),
+        oid = row(idx + 0)(PgForeignDataWrapperId.column),
         fdwowner = row(idx + 1)(Column.columnToLong),
-        fdwoptions = row(idx + 2)(Column.columnToArray[String](Column.columnToString, implicitly)),
-        foreignDataWrapperCatalog = row(idx + 3)(SqlIdentifier.column),
-        foreignDataWrapperName = row(idx + 4)(SqlIdentifier.column),
-        authorizationIdentifier = row(idx + 5)(SqlIdentifier.column),
-        foreignDataWrapperLanguage = row(idx + 6)(CharacterData.column)
+        fdwoptions = row(idx + 2)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        foreignDataWrapperCatalog = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        foreignDataWrapperName = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        authorizationIdentifier = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        foreignDataWrapperLanguage = row(idx + 6)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[PgForeignDataWrappersViewRow] = OWrites[PgForeignDataWrappersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Writes.LongWrites.writes(o.oid),
+      "oid" -> PgForeignDataWrapperId.writes.writes(o.oid),
       "fdwowner" -> Writes.LongWrites.writes(o.fdwowner),
-      "fdwoptions" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.fdwoptions),
-      "foreign_data_wrapper_catalog" -> SqlIdentifier.writes.writes(o.foreignDataWrapperCatalog),
-      "foreign_data_wrapper_name" -> SqlIdentifier.writes.writes(o.foreignDataWrapperName),
-      "authorization_identifier" -> SqlIdentifier.writes.writes(o.authorizationIdentifier),
-      "foreign_data_wrapper_language" -> CharacterData.writes.writes(o.foreignDataWrapperLanguage)
+      "fdwoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.fdwoptions),
+      "foreign_data_wrapper_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignDataWrapperCatalog),
+      "foreign_data_wrapper_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignDataWrapperName),
+      "authorization_identifier" -> Writes.OptionWrites(Writes.StringWrites).writes(o.authorizationIdentifier),
+      "foreign_data_wrapper_language" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignDataWrapperLanguage)
     ))
   )
 }

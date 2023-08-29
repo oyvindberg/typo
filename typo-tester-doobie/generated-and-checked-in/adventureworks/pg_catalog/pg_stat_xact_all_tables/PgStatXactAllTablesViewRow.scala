@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_xact_all_tables
 
+import adventureworks.pg_catalog.pg_class.PgClassId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -15,48 +16,51 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatXactAllTablesViewRow(
-  relid: /* oid */ Long,
+  /** Points to [[pg_class.PgClassRow.oid]] */
+  relid: PgClassId,
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   relname: String,
-  seqScan: Long,
-  seqTupRead: Long,
-  idxScan: Long,
-  idxTupFetch: Long,
-  nTupIns: Long,
-  nTupUpd: Long,
-  nTupDel: Long,
-  nTupHotUpd: Long
+  seqScan: /* nullability unknown */ Option[Long],
+  seqTupRead: /* nullability unknown */ Option[Long],
+  idxScan: /* nullability unknown */ Option[Long],
+  idxTupFetch: /* nullability unknown */ Option[Long],
+  nTupIns: /* nullability unknown */ Option[Long],
+  nTupUpd: /* nullability unknown */ Option[Long],
+  nTupDel: /* nullability unknown */ Option[Long],
+  nTupHotUpd: /* nullability unknown */ Option[Long]
 )
 
 object PgStatXactAllTablesViewRow {
-  implicit lazy val decoder: Decoder[PgStatXactAllTablesViewRow] = Decoder.forProduct11[PgStatXactAllTablesViewRow, /* oid */ Long, Option[String], String, Long, Long, Long, Long, Long, Long, Long, Long]("relid", "schemaname", "relname", "seq_scan", "seq_tup_read", "idx_scan", "idx_tup_fetch", "n_tup_ins", "n_tup_upd", "n_tup_del", "n_tup_hot_upd")(PgStatXactAllTablesViewRow.apply)(Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgStatXactAllTablesViewRow] = Encoder.forProduct11[PgStatXactAllTablesViewRow, /* oid */ Long, Option[String], String, Long, Long, Long, Long, Long, Long, Long, Long]("relid", "schemaname", "relname", "seq_scan", "seq_tup_read", "idx_scan", "idx_tup_fetch", "n_tup_ins", "n_tup_upd", "n_tup_del", "n_tup_hot_upd")(x => (x.relid, x.schemaname, x.relname, x.seqScan, x.seqTupRead, x.idxScan, x.idxTupFetch, x.nTupIns, x.nTupUpd, x.nTupDel, x.nTupHotUpd))(Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgStatXactAllTablesViewRow] = Decoder.forProduct11[PgStatXactAllTablesViewRow, PgClassId, Option[String], String, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long]]("relid", "schemaname", "relname", "seq_scan", "seq_tup_read", "idx_scan", "idx_tup_fetch", "n_tup_ins", "n_tup_upd", "n_tup_del", "n_tup_hot_upd")(PgStatXactAllTablesViewRow.apply)(PgClassId.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgStatXactAllTablesViewRow] = Encoder.forProduct11[PgStatXactAllTablesViewRow, PgClassId, Option[String], String, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long]]("relid", "schemaname", "relname", "seq_scan", "seq_tup_read", "idx_scan", "idx_tup_fetch", "n_tup_ins", "n_tup_upd", "n_tup_del", "n_tup_hot_upd")(x => (x.relid, x.schemaname, x.relname, x.seqScan, x.seqTupRead, x.idxScan, x.idxTupFetch, x.nTupIns, x.nTupUpd, x.nTupDel, x.nTupHotUpd))(PgClassId.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit lazy val read: Read[PgStatXactAllTablesViewRow] = new Read[PgStatXactAllTablesViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.NoNulls),
+      (PgClassId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls)
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatXactAllTablesViewRow(
-      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      relid = PgClassId.get.unsafeGetNonNullable(rs, i + 0),
       schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
       relname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      seqScan = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      seqTupRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
-      idxScan = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
-      idxTupFetch = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
-      nTupIns = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
-      nTupUpd = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 8),
-      nTupDel = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 9),
-      nTupHotUpd = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 10)
+      seqScan = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      seqTupRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
+      idxScan = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
+      idxTupFetch = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
+      nTupIns = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
+      nTupUpd = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
+      nTupDel = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
+      nTupHotUpd = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }

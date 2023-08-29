@@ -7,16 +7,14 @@ package adventureworks
 package information_schema
 package data_type_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait DataTypePrivilegesViewFields[Row] {
-  val objectCatalog: Field[SqlIdentifier, Row]
-  val objectSchema: Field[SqlIdentifier, Row]
-  val objectName: Field[SqlIdentifier, Row]
-  val objectType: Field[CharacterData, Row]
-  val dtdIdentifier: Field[SqlIdentifier, Row]
+  val objectCatalog: OptField[String, Row]
+  val objectSchema: OptField[String, Row]
+  val objectName: OptField[String, Row]
+  val objectType: OptField[String, Row]
+  val dtdIdentifier: OptField[String, Row]
 }
 object DataTypePrivilegesViewFields extends DataTypePrivilegesViewStructure[DataTypePrivilegesViewRow](None, identity, (_, x) => x)
 

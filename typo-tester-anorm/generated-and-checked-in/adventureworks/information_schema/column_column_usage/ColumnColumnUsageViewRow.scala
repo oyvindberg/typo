@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package column_column_usage
 
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -15,26 +15,27 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ColumnColumnUsageViewRow(
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  columnName: SqlIdentifier,
-  dependentColumn: SqlIdentifier
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  columnName: /* nullability unknown */ Option[String],
+  dependentColumn: /* nullability unknown */ Option[String]
 )
 
 object ColumnColumnUsageViewRow {
   implicit lazy val reads: Reads[ColumnColumnUsageViewRow] = Reads[ColumnColumnUsageViewRow](json => JsResult.fromTry(
       Try(
         ColumnColumnUsageViewRow(
-          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
-          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
-          tableName = json.\("table_name").as(SqlIdentifier.reads),
-          columnName = json.\("column_name").as(SqlIdentifier.reads),
-          dependentColumn = json.\("dependent_column").as(SqlIdentifier.reads)
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          columnName = json.\("column_name").toOption.map(_.as(Reads.StringReads)),
+          dependentColumn = json.\("dependent_column").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -42,21 +43,21 @@ object ColumnColumnUsageViewRow {
   def rowParser(idx: Int): RowParser[ColumnColumnUsageViewRow] = RowParser[ColumnColumnUsageViewRow] { row =>
     Success(
       ColumnColumnUsageViewRow(
-        tableCatalog = row(idx + 0)(SqlIdentifier.column),
-        tableSchema = row(idx + 1)(SqlIdentifier.column),
-        tableName = row(idx + 2)(SqlIdentifier.column),
-        columnName = row(idx + 3)(SqlIdentifier.column),
-        dependentColumn = row(idx + 4)(SqlIdentifier.column)
+        tableCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        columnName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        dependentColumn = row(idx + 4)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ColumnColumnUsageViewRow] = OWrites[ColumnColumnUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
-      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
-      "table_name" -> SqlIdentifier.writes.writes(o.tableName),
-      "column_name" -> SqlIdentifier.writes.writes(o.columnName),
-      "dependent_column" -> SqlIdentifier.writes.writes(o.dependentColumn)
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "column_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.columnName),
+      "dependent_column" -> Writes.OptionWrites(Writes.StringWrites).writes(o.dependentColumn)
     ))
   )
 }

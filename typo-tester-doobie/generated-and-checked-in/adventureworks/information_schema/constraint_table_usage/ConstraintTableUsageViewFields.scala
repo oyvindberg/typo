@@ -7,16 +7,15 @@ package adventureworks
 package information_schema
 package constraint_table_usage
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ConstraintTableUsageViewFields[Row] {
-  val tableCatalog: Field[SqlIdentifier, Row]
-  val tableSchema: Field[SqlIdentifier, Row]
-  val tableName: Field[SqlIdentifier, Row]
-  val constraintCatalog: Field[SqlIdentifier, Row]
-  val constraintSchema: Field[SqlIdentifier, Row]
-  val constraintName: Field[SqlIdentifier, Row]
+  val tableCatalog: OptField[String, Row]
+  val tableSchema: OptField[String, Row]
+  val tableName: OptField[String, Row]
+  val constraintCatalog: OptField[String, Row]
+  val constraintSchema: OptField[String, Row]
+  val constraintName: OptField[String, Row]
 }
 object ConstraintTableUsageViewFields extends ConstraintTableUsageViewStructure[ConstraintTableUsageViewRow](None, identity, (_, x) => x)
 

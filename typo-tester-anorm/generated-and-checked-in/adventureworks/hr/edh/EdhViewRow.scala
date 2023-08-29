@@ -25,7 +25,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EdhViewRow(
-  id: Int,
+  /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.departmentid]] */
@@ -35,7 +36,7 @@ case class EdhViewRow(
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
   startdate: TypoLocalDate,
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.enddate]] */
-  enddate: TypoLocalDate,
+  enddate: Option[TypoLocalDate],
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -44,12 +45,12 @@ object EdhViewRow {
   implicit lazy val reads: Reads[EdhViewRow] = Reads[EdhViewRow](json => JsResult.fromTry(
       Try(
         EdhViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           departmentid = json.\("departmentid").as(DepartmentId.reads),
           shiftid = json.\("shiftid").as(ShiftId.reads),
           startdate = json.\("startdate").as(TypoLocalDate.reads),
-          enddate = json.\("enddate").as(TypoLocalDate.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDate.reads)),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -58,24 +59,24 @@ object EdhViewRow {
   def rowParser(idx: Int): RowParser[EdhViewRow] = RowParser[EdhViewRow] { row =>
     Success(
       EdhViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         departmentid = row(idx + 2)(DepartmentId.column),
         shiftid = row(idx + 3)(ShiftId.column),
         startdate = row(idx + 4)(TypoLocalDate.column),
-        enddate = row(idx + 5)(TypoLocalDate.column),
+        enddate = row(idx + 5)(Column.columnToOption(TypoLocalDate.column)),
         modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[EdhViewRow] = OWrites[EdhViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "departmentid" -> DepartmentId.writes.writes(o.departmentid),
       "shiftid" -> ShiftId.writes.writes(o.shiftid),
       "startdate" -> TypoLocalDate.writes.writes(o.startdate),
-      "enddate" -> TypoLocalDate.writes.writes(o.enddate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.enddate),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

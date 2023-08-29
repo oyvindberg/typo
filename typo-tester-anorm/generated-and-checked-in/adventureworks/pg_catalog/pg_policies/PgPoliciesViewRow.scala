@@ -20,14 +20,17 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPoliciesViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: String,
+  /** Points to [[pg_class.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[pg_policy.PgPolicyRow.polname]] */
   policyname: String,
-  permissive: String,
-  roles: Array[String],
-  cmd: String,
-  qual: String,
-  withCheck: String
+  permissive: /* nullability unknown */ Option[String],
+  roles: /* nullability unknown */ Option[Array[String]],
+  cmd: /* nullability unknown */ Option[String],
+  qual: /* nullability unknown */ Option[String],
+  withCheck: /* nullability unknown */ Option[String]
 )
 
 object PgPoliciesViewRow {
@@ -37,11 +40,11 @@ object PgPoliciesViewRow {
           schemaname = json.\("schemaname").as(Reads.StringReads),
           tablename = json.\("tablename").as(Reads.StringReads),
           policyname = json.\("policyname").as(Reads.StringReads),
-          permissive = json.\("permissive").as(Reads.StringReads),
-          roles = json.\("roles").as(Reads.ArrayReads[String](Reads.StringReads, implicitly)),
-          cmd = json.\("cmd").as(Reads.StringReads),
-          qual = json.\("qual").as(Reads.StringReads),
-          withCheck = json.\("with_check").as(Reads.StringReads)
+          permissive = json.\("permissive").toOption.map(_.as(Reads.StringReads)),
+          roles = json.\("roles").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          cmd = json.\("cmd").toOption.map(_.as(Reads.StringReads)),
+          qual = json.\("qual").toOption.map(_.as(Reads.StringReads)),
+          withCheck = json.\("with_check").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -52,11 +55,11 @@ object PgPoliciesViewRow {
         schemaname = row(idx + 0)(Column.columnToString),
         tablename = row(idx + 1)(Column.columnToString),
         policyname = row(idx + 2)(Column.columnToString),
-        permissive = row(idx + 3)(Column.columnToString),
-        roles = row(idx + 4)(Column.columnToArray[String](Column.columnToString, implicitly)),
-        cmd = row(idx + 5)(Column.columnToString),
-        qual = row(idx + 6)(Column.columnToString),
-        withCheck = row(idx + 7)(Column.columnToString)
+        permissive = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        roles = row(idx + 4)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        cmd = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        qual = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        withCheck = row(idx + 7)(Column.columnToOption(Column.columnToString))
       )
     )
   }
@@ -65,11 +68,11 @@ object PgPoliciesViewRow {
       "schemaname" -> Writes.StringWrites.writes(o.schemaname),
       "tablename" -> Writes.StringWrites.writes(o.tablename),
       "policyname" -> Writes.StringWrites.writes(o.policyname),
-      "permissive" -> Writes.StringWrites.writes(o.permissive),
-      "roles" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.roles),
-      "cmd" -> Writes.StringWrites.writes(o.cmd),
-      "qual" -> Writes.StringWrites.writes(o.qual),
-      "with_check" -> Writes.StringWrites.writes(o.withCheck)
+      "permissive" -> Writes.OptionWrites(Writes.StringWrites).writes(o.permissive),
+      "roles" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.roles),
+      "cmd" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cmd),
+      "qual" -> Writes.OptionWrites(Writes.StringWrites).writes(o.qual),
+      "with_check" -> Writes.OptionWrites(Writes.StringWrites).writes(o.withCheck)
     ))
   )
 }

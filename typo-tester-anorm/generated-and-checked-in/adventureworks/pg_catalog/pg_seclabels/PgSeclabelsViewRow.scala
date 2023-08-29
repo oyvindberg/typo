@@ -20,14 +20,14 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgSeclabelsViewRow(
-  objoid: Option[/* oid */ Long],
-  classoid: Option[/* oid */ Long],
-  objsubid: Option[Int],
-  objtype: Option[String],
-  objnamespace: Option[/* oid */ Long],
-  objname: Option[String],
-  provider: Option[String],
-  label: Option[String]
+  objoid: /* nullability unknown */ Option[/* oid */ Long],
+  classoid: /* nullability unknown */ Option[/* oid */ Long],
+  objsubid: /* nullability unknown */ Option[Int],
+  objtype: /* nullability unknown */ Option[String],
+  objnamespace: /* nullability unknown */ Option[/* oid */ Long],
+  objname: /* nullability unknown */ Option[String],
+  provider: /* nullability unknown */ Option[String],
+  label: /* nullability unknown */ Option[String]
 )
 
 object PgSeclabelsViewRow {

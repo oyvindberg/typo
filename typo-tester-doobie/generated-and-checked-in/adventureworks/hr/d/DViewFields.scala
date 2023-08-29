@@ -13,7 +13,7 @@ import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 
 trait DViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[DepartmentId, Row]
   val departmentid: Field[DepartmentId, Row]
   val name: Field[Name, Row]
   val groupname: Field[Name, Row]

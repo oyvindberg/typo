@@ -19,14 +19,14 @@ class PiViewStructure[Row](val prefix: Option[String], val extract: Row => PiVie
   extends Relation[PiViewFields, PiViewRow, Row]
     with PiViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val locationid = new Field[LocationId, Row](prefix, "locationid", None, Some("int2"))(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
+  override val id = new Field[ProductId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+  override val locationid = new Field[LocationId, Row](prefix, "locationid", None, None)(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
   override val shelf = new Field[/* max 10 chars */ String, Row](prefix, "shelf", None, None)(x => extract(x).shelf, (row, value) => merge(row, extract(row).copy(shelf = value)))
-  override val bin = new Field[Int, Row](prefix, "bin", None, Some("int2"))(x => extract(x).bin, (row, value) => merge(row, extract(row).copy(bin = value)))
-  override val quantity = new Field[Int, Row](prefix, "quantity", None, Some("int2"))(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val bin = new Field[Int, Row](prefix, "bin", None, None)(x => extract(x).bin, (row, value) => merge(row, extract(row).copy(bin = value)))
+  override val quantity = new Field[Int, Row](prefix, "quantity", None, None)(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
+  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate)

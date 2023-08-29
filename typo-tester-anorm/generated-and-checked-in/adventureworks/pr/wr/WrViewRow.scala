@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class WrViewRow(
-  id: Int,
+  /** Points to [[production.workorderrouting.WorkorderroutingRow.workorderid]] */
+  id: WorkorderId,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.workorderid]] */
   workorderid: WorkorderId,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.productid]] */
@@ -37,15 +38,15 @@ case class WrViewRow(
   /** Points to [[production.workorderrouting.WorkorderroutingRow.scheduledenddate]] */
   scheduledenddate: TypoLocalDateTime,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualstartdate]] */
-  actualstartdate: TypoLocalDateTime,
+  actualstartdate: Option[TypoLocalDateTime],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualenddate]] */
-  actualenddate: TypoLocalDateTime,
+  actualenddate: Option[TypoLocalDateTime],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualresourcehrs]] */
-  actualresourcehrs: BigDecimal,
+  actualresourcehrs: Option[BigDecimal],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.plannedcost]] */
   plannedcost: BigDecimal,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualcost]] */
-  actualcost: BigDecimal,
+  actualcost: Option[BigDecimal],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -54,18 +55,18 @@ object WrViewRow {
   implicit lazy val reads: Reads[WrViewRow] = Reads[WrViewRow](json => JsResult.fromTry(
       Try(
         WrViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(WorkorderId.reads),
           workorderid = json.\("workorderid").as(WorkorderId.reads),
           productid = json.\("productid").as(Reads.IntReads),
           operationsequence = json.\("operationsequence").as(Reads.IntReads),
           locationid = json.\("locationid").as(LocationId.reads),
           scheduledstartdate = json.\("scheduledstartdate").as(TypoLocalDateTime.reads),
           scheduledenddate = json.\("scheduledenddate").as(TypoLocalDateTime.reads),
-          actualstartdate = json.\("actualstartdate").as(TypoLocalDateTime.reads),
-          actualenddate = json.\("actualenddate").as(TypoLocalDateTime.reads),
-          actualresourcehrs = json.\("actualresourcehrs").as(Reads.bigDecReads),
+          actualstartdate = json.\("actualstartdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          actualenddate = json.\("actualenddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          actualresourcehrs = json.\("actualresourcehrs").toOption.map(_.as(Reads.bigDecReads)),
           plannedcost = json.\("plannedcost").as(Reads.bigDecReads),
-          actualcost = json.\("actualcost").as(Reads.bigDecReads),
+          actualcost = json.\("actualcost").toOption.map(_.as(Reads.bigDecReads)),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -74,36 +75,36 @@ object WrViewRow {
   def rowParser(idx: Int): RowParser[WrViewRow] = RowParser[WrViewRow] { row =>
     Success(
       WrViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(WorkorderId.column),
         workorderid = row(idx + 1)(WorkorderId.column),
         productid = row(idx + 2)(Column.columnToInt),
         operationsequence = row(idx + 3)(Column.columnToInt),
         locationid = row(idx + 4)(LocationId.column),
         scheduledstartdate = row(idx + 5)(TypoLocalDateTime.column),
         scheduledenddate = row(idx + 6)(TypoLocalDateTime.column),
-        actualstartdate = row(idx + 7)(TypoLocalDateTime.column),
-        actualenddate = row(idx + 8)(TypoLocalDateTime.column),
-        actualresourcehrs = row(idx + 9)(Column.columnToScalaBigDecimal),
+        actualstartdate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column)),
+        actualenddate = row(idx + 8)(Column.columnToOption(TypoLocalDateTime.column)),
+        actualresourcehrs = row(idx + 9)(Column.columnToOption(Column.columnToScalaBigDecimal)),
         plannedcost = row(idx + 10)(Column.columnToScalaBigDecimal),
-        actualcost = row(idx + 11)(Column.columnToScalaBigDecimal),
+        actualcost = row(idx + 11)(Column.columnToOption(Column.columnToScalaBigDecimal)),
         modifieddate = row(idx + 12)(TypoLocalDateTime.column)
       )
     )
   }
   implicit lazy val writes: OWrites[WrViewRow] = OWrites[WrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> WorkorderId.writes.writes(o.id),
       "workorderid" -> WorkorderId.writes.writes(o.workorderid),
       "productid" -> Writes.IntWrites.writes(o.productid),
       "operationsequence" -> Writes.IntWrites.writes(o.operationsequence),
       "locationid" -> LocationId.writes.writes(o.locationid),
       "scheduledstartdate" -> TypoLocalDateTime.writes.writes(o.scheduledstartdate),
       "scheduledenddate" -> TypoLocalDateTime.writes.writes(o.scheduledenddate),
-      "actualstartdate" -> TypoLocalDateTime.writes.writes(o.actualstartdate),
-      "actualenddate" -> TypoLocalDateTime.writes.writes(o.actualenddate),
-      "actualresourcehrs" -> Writes.BigDecimalWrites.writes(o.actualresourcehrs),
+      "actualstartdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.actualstartdate),
+      "actualenddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.actualenddate),
+      "actualresourcehrs" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.actualresourcehrs),
       "plannedcost" -> Writes.BigDecimalWrites.writes(o.plannedcost),
-      "actualcost" -> Writes.BigDecimalWrites.writes(o.actualcost),
+      "actualcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.actualcost),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

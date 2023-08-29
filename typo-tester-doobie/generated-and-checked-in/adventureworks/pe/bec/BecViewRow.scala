@@ -12,14 +12,14 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 import java.util.UUID
 
 case class BecViewRow(
-  id: Int,
+  /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.personid]] */
@@ -33,11 +33,11 @@ case class BecViewRow(
 )
 
 object BecViewRow {
-  implicit lazy val decoder: Decoder[BecViewRow] = Decoder.forProduct6[BecViewRow, Int, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BecViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[BecViewRow] = Encoder.forProduct6[BecViewRow, Int, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[BecViewRow] = Decoder.forProduct6[BecViewRow, BusinessentityId, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BecViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BecViewRow] = Encoder.forProduct6[BecViewRow, BusinessentityId, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BecViewRow] = new Read[BecViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (ContacttypeId.get, Nullability.NoNulls),
@@ -45,7 +45,7 @@ object BecViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BecViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       personid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 2),
       contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 3),

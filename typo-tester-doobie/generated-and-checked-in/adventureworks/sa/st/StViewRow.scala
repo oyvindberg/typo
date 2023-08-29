@@ -20,7 +20,8 @@ import java.sql.ResultSet
 import java.util.UUID
 
 case class StViewRow(
-  id: Int,
+  /** Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
+  id: SalesterritoryId,
   /** Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
   /** Points to [[sales.salesterritory.SalesterritoryRow.name]] */
@@ -44,11 +45,11 @@ case class StViewRow(
 )
 
 object StViewRow {
-  implicit lazy val decoder: Decoder[StViewRow] = Decoder.forProduct11[StViewRow, Int, SalesterritoryId, Name, CountryregionId, /* max 50 chars */ String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(StViewRow.apply)(Decoder.decodeInt, SalesterritoryId.decoder, Name.decoder, CountryregionId.decoder, Decoder.decodeString, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[StViewRow] = Encoder.forProduct11[StViewRow, Int, SalesterritoryId, Name, CountryregionId, /* max 50 chars */ String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(x => (x.id, x.territoryid, x.name, x.countryregioncode, x.group, x.salesytd, x.saleslastyear, x.costytd, x.costlastyear, x.rowguid, x.modifieddate))(Encoder.encodeInt, SalesterritoryId.encoder, Name.encoder, CountryregionId.encoder, Encoder.encodeString, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[StViewRow] = Decoder.forProduct11[StViewRow, SalesterritoryId, SalesterritoryId, Name, CountryregionId, /* max 50 chars */ String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(StViewRow.apply)(SalesterritoryId.decoder, SalesterritoryId.decoder, Name.decoder, CountryregionId.decoder, Decoder.decodeString, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[StViewRow] = Encoder.forProduct11[StViewRow, SalesterritoryId, SalesterritoryId, Name, CountryregionId, /* max 50 chars */ String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(x => (x.id, x.territoryid, x.name, x.countryregioncode, x.group, x.salesytd, x.saleslastyear, x.costytd, x.costlastyear, x.rowguid, x.modifieddate))(SalesterritoryId.encoder, SalesterritoryId.encoder, Name.encoder, CountryregionId.encoder, Encoder.encodeString, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[StViewRow] = new Read[StViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (SalesterritoryId.get, Nullability.NoNulls),
       (SalesterritoryId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (CountryregionId.get, Nullability.NoNulls),
@@ -61,7 +62,7 @@ object StViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => StViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 0),
       territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
       countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 3),

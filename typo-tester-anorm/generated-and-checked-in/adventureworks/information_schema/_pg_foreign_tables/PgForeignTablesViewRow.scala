@@ -7,7 +7,6 @@ package adventureworks
 package information_schema
 package `_pg_foreign_tables`
 
-import adventureworks.information_schema.SqlIdentifier
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -21,26 +20,27 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgForeignTablesViewRow(
-  foreignTableCatalog: SqlIdentifier,
-  foreignTableSchema: SqlIdentifier,
-  foreignTableName: SqlIdentifier,
-  ftoptions: Array[String],
-  foreignServerCatalog: SqlIdentifier,
-  foreignServerName: SqlIdentifier,
-  authorizationIdentifier: SqlIdentifier
+  foreignTableCatalog: /* nullability unknown */ Option[String],
+  foreignTableSchema: /* nullability unknown */ Option[String],
+  foreignTableName: /* nullability unknown */ Option[String],
+  /** Points to [[pg_catalog.pg_foreign_table.PgForeignTableRow.ftoptions]] */
+  ftoptions: Option[Array[String]],
+  foreignServerCatalog: /* nullability unknown */ Option[String],
+  foreignServerName: /* nullability unknown */ Option[String],
+  authorizationIdentifier: /* nullability unknown */ Option[String]
 )
 
 object PgForeignTablesViewRow {
   implicit lazy val reads: Reads[PgForeignTablesViewRow] = Reads[PgForeignTablesViewRow](json => JsResult.fromTry(
       Try(
         PgForeignTablesViewRow(
-          foreignTableCatalog = json.\("foreign_table_catalog").as(SqlIdentifier.reads),
-          foreignTableSchema = json.\("foreign_table_schema").as(SqlIdentifier.reads),
-          foreignTableName = json.\("foreign_table_name").as(SqlIdentifier.reads),
-          ftoptions = json.\("ftoptions").as(Reads.ArrayReads[String](Reads.StringReads, implicitly)),
-          foreignServerCatalog = json.\("foreign_server_catalog").as(SqlIdentifier.reads),
-          foreignServerName = json.\("foreign_server_name").as(SqlIdentifier.reads),
-          authorizationIdentifier = json.\("authorization_identifier").as(SqlIdentifier.reads)
+          foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as(Reads.StringReads)),
+          foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as(Reads.StringReads)),
+          foreignTableName = json.\("foreign_table_name").toOption.map(_.as(Reads.StringReads)),
+          ftoptions = json.\("ftoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(Reads.StringReads)),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(Reads.StringReads)),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -48,25 +48,25 @@ object PgForeignTablesViewRow {
   def rowParser(idx: Int): RowParser[PgForeignTablesViewRow] = RowParser[PgForeignTablesViewRow] { row =>
     Success(
       PgForeignTablesViewRow(
-        foreignTableCatalog = row(idx + 0)(SqlIdentifier.column),
-        foreignTableSchema = row(idx + 1)(SqlIdentifier.column),
-        foreignTableName = row(idx + 2)(SqlIdentifier.column),
-        ftoptions = row(idx + 3)(Column.columnToArray[String](Column.columnToString, implicitly)),
-        foreignServerCatalog = row(idx + 4)(SqlIdentifier.column),
-        foreignServerName = row(idx + 5)(SqlIdentifier.column),
-        authorizationIdentifier = row(idx + 6)(SqlIdentifier.column)
+        foreignTableCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        foreignTableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        foreignTableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        ftoptions = row(idx + 3)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        foreignServerCatalog = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        foreignServerName = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        authorizationIdentifier = row(idx + 6)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[PgForeignTablesViewRow] = OWrites[PgForeignTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_table_catalog" -> SqlIdentifier.writes.writes(o.foreignTableCatalog),
-      "foreign_table_schema" -> SqlIdentifier.writes.writes(o.foreignTableSchema),
-      "foreign_table_name" -> SqlIdentifier.writes.writes(o.foreignTableName),
-      "ftoptions" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.ftoptions),
-      "foreign_server_catalog" -> SqlIdentifier.writes.writes(o.foreignServerCatalog),
-      "foreign_server_name" -> SqlIdentifier.writes.writes(o.foreignServerName),
-      "authorization_identifier" -> SqlIdentifier.writes.writes(o.authorizationIdentifier)
+      "foreign_table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignTableCatalog),
+      "foreign_table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignTableSchema),
+      "foreign_table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignTableName),
+      "ftoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.ftoptions),
+      "foreign_server_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignServerCatalog),
+      "foreign_server_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.foreignServerName),
+      "authorization_identifier" -> Writes.OptionWrites(Writes.StringWrites).writes(o.authorizationIdentifier)
     ))
   )
 }

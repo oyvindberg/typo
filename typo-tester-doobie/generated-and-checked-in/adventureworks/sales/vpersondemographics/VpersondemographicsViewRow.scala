@@ -20,53 +20,53 @@ import java.sql.ResultSet
 case class VpersondemographicsViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  totalpurchaseytd: TypoMoney,
-  datefirstpurchase: TypoLocalDate,
-  birthdate: TypoLocalDate,
-  maritalstatus: /* max 1 chars */ String,
-  yearlyincome: /* max 30 chars */ String,
-  gender: /* max 1 chars */ String,
-  totalchildren: Int,
-  numberchildrenathome: Int,
-  education: /* max 30 chars */ String,
-  occupation: /* max 30 chars */ String,
-  homeownerflag: Boolean,
-  numbercarsowned: Int
+  totalpurchaseytd: /* nullability unknown */ Option[TypoMoney],
+  datefirstpurchase: /* nullability unknown */ Option[TypoLocalDate],
+  birthdate: /* nullability unknown */ Option[TypoLocalDate],
+  maritalstatus: /* nullability unknown */ Option[/* max 1 chars */ String],
+  yearlyincome: /* nullability unknown */ Option[/* max 30 chars */ String],
+  gender: /* nullability unknown */ Option[/* max 1 chars */ String],
+  totalchildren: /* nullability unknown */ Option[Int],
+  numberchildrenathome: /* nullability unknown */ Option[Int],
+  education: /* nullability unknown */ Option[/* max 30 chars */ String],
+  occupation: /* nullability unknown */ Option[/* max 30 chars */ String],
+  homeownerflag: /* nullability unknown */ Option[Boolean],
+  numbercarsowned: /* nullability unknown */ Option[Int]
 )
 
 object VpersondemographicsViewRow {
-  implicit lazy val decoder: Decoder[VpersondemographicsViewRow] = Decoder.forProduct13[VpersondemographicsViewRow, BusinessentityId, TypoMoney, TypoLocalDate, TypoLocalDate, /* max 1 chars */ String, /* max 30 chars */ String, /* max 1 chars */ String, Int, Int, /* max 30 chars */ String, /* max 30 chars */ String, Boolean, Int]("businessentityid", "totalpurchaseytd", "datefirstpurchase", "birthdate", "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned")(VpersondemographicsViewRow.apply)(BusinessentityId.decoder, TypoMoney.decoder, TypoLocalDate.decoder, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeInt)
-  implicit lazy val encoder: Encoder[VpersondemographicsViewRow] = Encoder.forProduct13[VpersondemographicsViewRow, BusinessentityId, TypoMoney, TypoLocalDate, TypoLocalDate, /* max 1 chars */ String, /* max 30 chars */ String, /* max 1 chars */ String, Int, Int, /* max 30 chars */ String, /* max 30 chars */ String, Boolean, Int]("businessentityid", "totalpurchaseytd", "datefirstpurchase", "birthdate", "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned")(x => (x.businessentityid, x.totalpurchaseytd, x.datefirstpurchase, x.birthdate, x.maritalstatus, x.yearlyincome, x.gender, x.totalchildren, x.numberchildrenathome, x.education, x.occupation, x.homeownerflag, x.numbercarsowned))(BusinessentityId.encoder, TypoMoney.encoder, TypoLocalDate.encoder, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeInt)
+  implicit lazy val decoder: Decoder[VpersondemographicsViewRow] = Decoder.forProduct13[VpersondemographicsViewRow, BusinessentityId, /* nullability unknown */ Option[TypoMoney], /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[/* max 1 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 1 chars */ String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Int]]("businessentityid", "totalpurchaseytd", "datefirstpurchase", "birthdate", "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned")(VpersondemographicsViewRow.apply)(BusinessentityId.decoder, Decoder.decodeOption(TypoMoney.decoder), Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeInt))
+  implicit lazy val encoder: Encoder[VpersondemographicsViewRow] = Encoder.forProduct13[VpersondemographicsViewRow, BusinessentityId, /* nullability unknown */ Option[TypoMoney], /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[/* max 1 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 1 chars */ String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Int]]("businessentityid", "totalpurchaseytd", "datefirstpurchase", "birthdate", "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned")(x => (x.businessentityid, x.totalpurchaseytd, x.datefirstpurchase, x.birthdate, x.maritalstatus, x.yearlyincome, x.gender, x.totalchildren, x.numberchildrenathome, x.education, x.occupation, x.homeownerflag, x.numbercarsowned))(BusinessentityId.encoder, Encoder.encodeOption(TypoMoney.encoder), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeInt))
   implicit lazy val read: Read[VpersondemographicsViewRow] = new Read[VpersondemographicsViewRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
-      (TypoMoney.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.BooleanMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls)
+      (TypoMoney.get, Nullability.Nullable),
+      (TypoLocalDate.get, Nullability.Nullable),
+      (TypoLocalDate.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VpersondemographicsViewRow(
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      totalpurchaseytd = TypoMoney.get.unsafeGetNonNullable(rs, i + 1),
-      datefirstpurchase = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 2),
-      birthdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 3),
-      maritalstatus = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      yearlyincome = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      gender = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
-      totalchildren = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
-      numberchildrenathome = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 8),
-      education = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 9),
-      occupation = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 10),
-      homeownerflag = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 11),
-      numbercarsowned = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 12)
+      totalpurchaseytd = TypoMoney.get.unsafeGetNullable(rs, i + 1),
+      datefirstpurchase = TypoLocalDate.get.unsafeGetNullable(rs, i + 2),
+      birthdate = TypoLocalDate.get.unsafeGetNullable(rs, i + 3),
+      maritalstatus = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      yearlyincome = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      gender = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      totalchildren = Meta.IntMeta.get.unsafeGetNullable(rs, i + 7),
+      numberchildrenathome = Meta.IntMeta.get.unsafeGetNullable(rs, i + 8),
+      education = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      occupation = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
+      homeownerflag = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 11),
+      numbercarsowned = Meta.IntMeta.get.unsafeGetNullable(rs, i + 12)
     )
   )
 }

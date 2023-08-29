@@ -7,23 +7,23 @@ package adventureworks
 package pg_catalog
 package pg_available_extension_versions
 
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgAvailableExtensionVersionsViewStructure[Row](val prefix: Option[String], val extract: Row => PgAvailableExtensionVersionsViewRow, val merge: (Row, PgAvailableExtensionVersionsViewRow) => Row)
   extends Relation[PgAvailableExtensionVersionsViewFields, PgAvailableExtensionVersionsViewRow, Row]
     with PgAvailableExtensionVersionsViewFields[Row] { outer =>
 
-  override val name = new Field[String, Row](prefix, "name", None, Some("name"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val version = new Field[String, Row](prefix, "version", None, None)(x => extract(x).version, (row, value) => merge(row, extract(row).copy(version = value)))
-  override val installed = new Field[Boolean, Row](prefix, "installed", None, None)(x => extract(x).installed, (row, value) => merge(row, extract(row).copy(installed = value)))
-  override val superuser = new Field[Boolean, Row](prefix, "superuser", None, None)(x => extract(x).superuser, (row, value) => merge(row, extract(row).copy(superuser = value)))
-  override val trusted = new Field[Boolean, Row](prefix, "trusted", None, None)(x => extract(x).trusted, (row, value) => merge(row, extract(row).copy(trusted = value)))
-  override val relocatable = new Field[Boolean, Row](prefix, "relocatable", None, None)(x => extract(x).relocatable, (row, value) => merge(row, extract(row).copy(relocatable = value)))
-  override val schema = new Field[String, Row](prefix, "schema", None, Some("name"))(x => extract(x).schema, (row, value) => merge(row, extract(row).copy(schema = value)))
-  override val requires = new Field[Array[String], Row](prefix, "requires", None, Some("_name"))(x => extract(x).requires, (row, value) => merge(row, extract(row).copy(requires = value)))
-  override val comment = new Field[String, Row](prefix, "comment", None, None)(x => extract(x).comment, (row, value) => merge(row, extract(row).copy(comment = value)))
+  override val name = new OptField[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+  override val version = new OptField[String, Row](prefix, "version", None, None)(x => extract(x).version, (row, value) => merge(row, extract(row).copy(version = value)))
+  override val installed = new OptField[Boolean, Row](prefix, "installed", None, None)(x => extract(x).installed, (row, value) => merge(row, extract(row).copy(installed = value)))
+  override val superuser = new OptField[Boolean, Row](prefix, "superuser", None, None)(x => extract(x).superuser, (row, value) => merge(row, extract(row).copy(superuser = value)))
+  override val trusted = new OptField[Boolean, Row](prefix, "trusted", None, None)(x => extract(x).trusted, (row, value) => merge(row, extract(row).copy(trusted = value)))
+  override val relocatable = new OptField[Boolean, Row](prefix, "relocatable", None, None)(x => extract(x).relocatable, (row, value) => merge(row, extract(row).copy(relocatable = value)))
+  override val schema = new OptField[String, Row](prefix, "schema", None, None)(x => extract(x).schema, (row, value) => merge(row, extract(row).copy(schema = value)))
+  override val requires = new OptField[Array[String], Row](prefix, "requires", None, None)(x => extract(x).requires, (row, value) => merge(row, extract(row).copy(requires = value)))
+  override val comment = new OptField[String, Row](prefix, "comment", None, None)(x => extract(x).comment, (row, value) => merge(row, extract(row).copy(comment = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](name, version, installed, superuser, trusted, relocatable, schema, requires, comment)

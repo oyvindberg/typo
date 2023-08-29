@@ -7,13 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_stat_gssapi
 
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgStatGssapiViewFields[Row] {
-  val pid: Field[Int, Row]
-  val gssAuthenticated: Field[Boolean, Row]
-  val principal: Field[String, Row]
-  val encrypted: Field[Boolean, Row]
+  val pid: OptField[Int, Row]
+  val gssAuthenticated: OptField[Boolean, Row]
+  val principal: OptField[String, Row]
+  val encrypted: OptField[Boolean, Row]
 }
 object PgStatGssapiViewFields extends PgStatGssapiViewStructure[PgStatGssapiViewRow](None, identity, (_, x) => x)
 

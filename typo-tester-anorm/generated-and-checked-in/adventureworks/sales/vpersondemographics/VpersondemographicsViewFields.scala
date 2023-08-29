@@ -11,21 +11,22 @@ import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait VpersondemographicsViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
-  val totalpurchaseytd: Field[TypoMoney, Row]
-  val datefirstpurchase: Field[TypoLocalDate, Row]
-  val birthdate: Field[TypoLocalDate, Row]
-  val maritalstatus: Field[/* max 1 chars */ String, Row]
-  val yearlyincome: Field[/* max 30 chars */ String, Row]
-  val gender: Field[/* max 1 chars */ String, Row]
-  val totalchildren: Field[Int, Row]
-  val numberchildrenathome: Field[Int, Row]
-  val education: Field[/* max 30 chars */ String, Row]
-  val occupation: Field[/* max 30 chars */ String, Row]
-  val homeownerflag: Field[Boolean, Row]
-  val numbercarsowned: Field[Int, Row]
+  val totalpurchaseytd: OptField[TypoMoney, Row]
+  val datefirstpurchase: OptField[TypoLocalDate, Row]
+  val birthdate: OptField[TypoLocalDate, Row]
+  val maritalstatus: OptField[/* max 1 chars */ String, Row]
+  val yearlyincome: OptField[/* max 30 chars */ String, Row]
+  val gender: OptField[/* max 1 chars */ String, Row]
+  val totalchildren: OptField[Int, Row]
+  val numberchildrenathome: OptField[Int, Row]
+  val education: OptField[/* max 30 chars */ String, Row]
+  val occupation: OptField[/* max 30 chars */ String, Row]
+  val homeownerflag: OptField[Boolean, Row]
+  val numbercarsowned: OptField[Int, Row]
 }
 object VpersondemographicsViewFields extends VpersondemographicsViewStructure[VpersondemographicsViewRow](None, identity, (_, x) => x)
 

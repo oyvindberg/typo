@@ -7,33 +7,32 @@ package adventureworks
 package information_schema
 package applicable_roles
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ApplicableRolesViewRow(
-  grantee: SqlIdentifier,
-  roleName: SqlIdentifier,
-  isGrantable: YesOrNo
+  grantee: /* nullability unknown */ Option[String],
+  roleName: /* nullability unknown */ Option[String],
+  isGrantable: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object ApplicableRolesViewRow {
-  implicit lazy val decoder: Decoder[ApplicableRolesViewRow] = Decoder.forProduct3[ApplicableRolesViewRow, SqlIdentifier, SqlIdentifier, YesOrNo]("grantee", "role_name", "is_grantable")(ApplicableRolesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, YesOrNo.decoder)
-  implicit lazy val encoder: Encoder[ApplicableRolesViewRow] = Encoder.forProduct3[ApplicableRolesViewRow, SqlIdentifier, SqlIdentifier, YesOrNo]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(SqlIdentifier.encoder, SqlIdentifier.encoder, YesOrNo.encoder)
+  implicit lazy val decoder: Decoder[ApplicableRolesViewRow] = Decoder.forProduct3[ApplicableRolesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String]]("grantee", "role_name", "is_grantable")(ApplicableRolesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[ApplicableRolesViewRow] = Encoder.forProduct3[ApplicableRolesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String]]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[ApplicableRolesViewRow] = new Read[ApplicableRolesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ApplicableRolesViewRow(
-      grantee = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      roleName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      isGrantable = YesOrNo.get.unsafeGetNonNullable(rs, i + 2)
+      grantee = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      roleName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      isGrantable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

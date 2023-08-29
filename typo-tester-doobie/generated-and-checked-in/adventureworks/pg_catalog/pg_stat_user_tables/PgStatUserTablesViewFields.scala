@@ -8,32 +8,33 @@ package pg_catalog
 package pg_stat_user_tables
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.Field
+import adventureworks.pg_catalog.pg_class.PgClassId
+import typo.dsl.SqlExpr.OptField
 
 trait PgStatUserTablesViewFields[Row] {
-  val relid: Field[/* oid */ Long, Row]
-  val schemaname: Field[String, Row]
-  val relname: Field[String, Row]
-  val seqScan: Field[Long, Row]
-  val seqTupRead: Field[Long, Row]
-  val idxScan: Field[Long, Row]
-  val idxTupFetch: Field[Long, Row]
-  val nTupIns: Field[Long, Row]
-  val nTupUpd: Field[Long, Row]
-  val nTupDel: Field[Long, Row]
-  val nTupHotUpd: Field[Long, Row]
-  val nLiveTup: Field[Long, Row]
-  val nDeadTup: Field[Long, Row]
-  val nModSinceAnalyze: Field[Long, Row]
-  val nInsSinceVacuum: Field[Long, Row]
-  val lastVacuum: Field[TypoOffsetDateTime, Row]
-  val lastAutovacuum: Field[TypoOffsetDateTime, Row]
-  val lastAnalyze: Field[TypoOffsetDateTime, Row]
-  val lastAutoanalyze: Field[TypoOffsetDateTime, Row]
-  val vacuumCount: Field[Long, Row]
-  val autovacuumCount: Field[Long, Row]
-  val analyzeCount: Field[Long, Row]
-  val autoanalyzeCount: Field[Long, Row]
+  val relid: OptField[PgClassId, Row]
+  val schemaname: OptField[String, Row]
+  val relname: OptField[String, Row]
+  val seqScan: OptField[/* nullability unknown */ Long, Row]
+  val seqTupRead: OptField[/* nullability unknown */ Long, Row]
+  val idxScan: OptField[/* nullability unknown */ Long, Row]
+  val idxTupFetch: OptField[/* nullability unknown */ Long, Row]
+  val nTupIns: OptField[/* nullability unknown */ Long, Row]
+  val nTupUpd: OptField[/* nullability unknown */ Long, Row]
+  val nTupDel: OptField[/* nullability unknown */ Long, Row]
+  val nTupHotUpd: OptField[/* nullability unknown */ Long, Row]
+  val nLiveTup: OptField[/* nullability unknown */ Long, Row]
+  val nDeadTup: OptField[/* nullability unknown */ Long, Row]
+  val nModSinceAnalyze: OptField[/* nullability unknown */ Long, Row]
+  val nInsSinceVacuum: OptField[/* nullability unknown */ Long, Row]
+  val lastVacuum: OptField[/* nullability unknown */ TypoOffsetDateTime, Row]
+  val lastAutovacuum: OptField[/* nullability unknown */ TypoOffsetDateTime, Row]
+  val lastAnalyze: OptField[/* nullability unknown */ TypoOffsetDateTime, Row]
+  val lastAutoanalyze: OptField[/* nullability unknown */ TypoOffsetDateTime, Row]
+  val vacuumCount: OptField[/* nullability unknown */ Long, Row]
+  val autovacuumCount: OptField[/* nullability unknown */ Long, Row]
+  val analyzeCount: OptField[/* nullability unknown */ Long, Row]
+  val autoanalyzeCount: OptField[/* nullability unknown */ Long, Row]
 }
 object PgStatUserTablesViewFields extends PgStatUserTablesViewStructure[PgStatUserTablesViewRow](None, identity, (_, x) => x)
 

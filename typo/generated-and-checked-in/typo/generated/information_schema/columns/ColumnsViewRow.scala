@@ -21,150 +21,146 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import typo.generated.information_schema.CardinalNumber
-import typo.generated.information_schema.CharacterData
-import typo.generated.information_schema.SqlIdentifier
-import typo.generated.information_schema.YesOrNo
 
 case class ColumnsViewRow(
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"table_catalog","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"table_schema","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"table_name","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  tableName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"column_name","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  columnName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"ordinal_position","ordinal_position":5,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  ordinalPosition: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"column_default","ordinal_position":6,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  columnDefault: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"is_nullable","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  isNullable: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"data_type","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  dataType: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"character_maximum_length","ordinal_position":9,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  characterMaximumLength: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"character_octet_length","ordinal_position":10,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"10","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  characterOctetLength: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"numeric_precision","ordinal_position":11,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"11","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  numericPrecision: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"numeric_precision_radix","ordinal_position":12,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"12","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  numericPrecisionRadix: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"numeric_scale","ordinal_position":13,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"13","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  numericScale: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"datetime_precision","ordinal_position":14,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"14","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  datetimePrecision: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"interval_type","ordinal_position":15,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"15","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  intervalType: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"interval_precision","ordinal_position":16,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"16","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  intervalPrecision: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"character_set_catalog","ordinal_position":17,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"17","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  characterSetCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"character_set_schema","ordinal_position":18,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"18","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  characterSetSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"character_set_name","ordinal_position":19,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"19","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  characterSetName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"collation_catalog","ordinal_position":20,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"20","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  collationCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"collation_schema","ordinal_position":21,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"21","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  collationSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"collation_name","ordinal_position":22,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"22","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  collationName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"domain_catalog","ordinal_position":23,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"23","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  domainCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"domain_schema","ordinal_position":24,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"24","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  domainSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"domain_name","ordinal_position":25,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"25","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  domainName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"udt_catalog","ordinal_position":26,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"26","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  udtCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"udt_schema","ordinal_position":27,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"27","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  udtSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"udt_name","ordinal_position":28,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"28","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  udtName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"scope_catalog","ordinal_position":29,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"29","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  scopeCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"scope_schema","ordinal_position":30,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"30","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  scopeSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"scope_name","ordinal_position":31,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"31","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  scopeName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"maximum_cardinality","ordinal_position":32,"is_nullable":"YES","data_type":"integer","numeric_precision":32,"numeric_precision_radix":2,"numeric_scale":0,"domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"cardinal_number","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"int4","dtd_identifier":"32","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  maximumCardinality: Option[CardinalNumber],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"dtd_identifier","ordinal_position":33,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"33","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  dtdIdentifier: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"is_self_referencing","ordinal_position":34,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"34","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  isSelfReferencing: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"is_identity","ordinal_position":35,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"35","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  isIdentity: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"identity_generation","ordinal_position":36,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"36","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  identityGeneration: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"identity_start","ordinal_position":37,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"37","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  identityStart: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"identity_increment","ordinal_position":38,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"38","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  identityIncrement: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"identity_maximum","ordinal_position":39,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"39","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  identityMaximum: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"identity_minimum","ordinal_position":40,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"40","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  identityMinimum: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"identity_cycle","ordinal_position":41,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"41","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  identityCycle: Option[YesOrNo],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"is_generated","ordinal_position":42,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"42","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  isGenerated: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"generation_expression","ordinal_position":43,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"43","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  generationExpression: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"columns","column_name":"is_updatable","ordinal_position":44,"is_nullable":"YES","data_type":"character varying","character_maximum_length":3,"character_octet_length":12,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"yes_or_no","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"44","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  isUpdatable: Option[YesOrNo]
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_catalog"},"columnName":"table_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_schema"},"columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_name"},"columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  tableName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"column_name"},"columnName":"column_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  columnName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"ordinal_position"},"columnName":"ordinal_position","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  ordinalPosition: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"column_default"},"columnName":"column_default","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  columnDefault: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"is_nullable"},"columnName":"is_nullable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  isNullable: /* nullability unknown */ Option[/* max 3 chars */ String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"data_type"},"columnName":"data_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  dataType: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"character_maximum_length"},"columnName":"character_maximum_length","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  characterMaximumLength: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"character_octet_length"},"columnName":"character_octet_length","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  characterOctetLength: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"numeric_precision"},"columnName":"numeric_precision","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  numericPrecision: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"numeric_precision_radix"},"columnName":"numeric_precision_radix","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  numericPrecisionRadix: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"numeric_scale"},"columnName":"numeric_scale","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  numericScale: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"datetime_precision"},"columnName":"datetime_precision","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  datetimePrecision: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"interval_type"},"columnName":"interval_type","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  intervalType: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"interval_precision"},"columnName":"interval_precision","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  intervalPrecision: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"character_set_catalog"},"columnName":"character_set_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  characterSetCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"character_set_schema"},"columnName":"character_set_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  characterSetSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"character_set_name"},"columnName":"character_set_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  characterSetName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"collation_catalog"},"columnName":"collation_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  collationCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"collation_schema"},"columnName":"collation_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  collationSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"collation_name"},"columnName":"collation_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  collationName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"domain_catalog"},"columnName":"domain_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  domainCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"domain_schema"},"columnName":"domain_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  domainSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"domain_name"},"columnName":"domain_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  domainName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"udt_catalog"},"columnName":"udt_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  udtCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"udt_schema"},"columnName":"udt_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  udtSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"udt_name"},"columnName":"udt_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  udtName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"scope_catalog"},"columnName":"scope_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  scopeCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"scope_schema"},"columnName":"scope_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  scopeSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"scope_name"},"columnName":"scope_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  scopeName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.Integer","columnDisplaySize":11,"parsedColumnName":{"name":"maximum_cardinality"},"columnName":"maximum_cardinality","columnType":"Integer","columnTypeName":"int4","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":true,"isWritable":true,"precision":10,"scale":0} */
+  maximumCardinality: /* nullability unknown */ Option[Int],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"dtd_identifier"},"columnName":"dtd_identifier","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  dtdIdentifier: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"is_self_referencing"},"columnName":"is_self_referencing","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  isSelfReferencing: /* nullability unknown */ Option[/* max 3 chars */ String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"is_identity"},"columnName":"is_identity","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  isIdentity: /* nullability unknown */ Option[/* max 3 chars */ String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"identity_generation"},"columnName":"identity_generation","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  identityGeneration: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"identity_start"},"columnName":"identity_start","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  identityStart: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"identity_increment"},"columnName":"identity_increment","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  identityIncrement: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"identity_maximum"},"columnName":"identity_maximum","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  identityMaximum: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"identity_minimum"},"columnName":"identity_minimum","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  identityMinimum: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"identity_cycle"},"columnName":"identity_cycle","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  identityCycle: /* nullability unknown */ Option[/* max 3 chars */ String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"is_generated"},"columnName":"is_generated","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  isGenerated: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"generation_expression"},"columnName":"generation_expression","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  generationExpression: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"is_updatable"},"columnName":"is_updatable","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
+  isUpdatable: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object ColumnsViewRow {
   implicit lazy val reads: Reads[ColumnsViewRow] = Reads[ColumnsViewRow](json => JsResult.fromTry(
       Try(
         ColumnsViewRow(
-          tableCatalog = json.\("table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          tableSchema = json.\("table_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          tableName = json.\("table_name").toOption.map(_.as(SqlIdentifier.reads)),
-          columnName = json.\("column_name").toOption.map(_.as(SqlIdentifier.reads)),
-          ordinalPosition = json.\("ordinal_position").toOption.map(_.as(CardinalNumber.reads)),
-          columnDefault = json.\("column_default").toOption.map(_.as(CharacterData.reads)),
-          isNullable = json.\("is_nullable").toOption.map(_.as(YesOrNo.reads)),
-          dataType = json.\("data_type").toOption.map(_.as(CharacterData.reads)),
-          characterMaximumLength = json.\("character_maximum_length").toOption.map(_.as(CardinalNumber.reads)),
-          characterOctetLength = json.\("character_octet_length").toOption.map(_.as(CardinalNumber.reads)),
-          numericPrecision = json.\("numeric_precision").toOption.map(_.as(CardinalNumber.reads)),
-          numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as(CardinalNumber.reads)),
-          numericScale = json.\("numeric_scale").toOption.map(_.as(CardinalNumber.reads)),
-          datetimePrecision = json.\("datetime_precision").toOption.map(_.as(CardinalNumber.reads)),
-          intervalType = json.\("interval_type").toOption.map(_.as(CharacterData.reads)),
-          intervalPrecision = json.\("interval_precision").toOption.map(_.as(CardinalNumber.reads)),
-          characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          characterSetSchema = json.\("character_set_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          characterSetName = json.\("character_set_name").toOption.map(_.as(SqlIdentifier.reads)),
-          collationCatalog = json.\("collation_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          collationSchema = json.\("collation_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          collationName = json.\("collation_name").toOption.map(_.as(SqlIdentifier.reads)),
-          domainCatalog = json.\("domain_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          domainSchema = json.\("domain_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          domainName = json.\("domain_name").toOption.map(_.as(SqlIdentifier.reads)),
-          udtCatalog = json.\("udt_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          udtSchema = json.\("udt_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          udtName = json.\("udt_name").toOption.map(_.as(SqlIdentifier.reads)),
-          scopeCatalog = json.\("scope_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          scopeSchema = json.\("scope_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          scopeName = json.\("scope_name").toOption.map(_.as(SqlIdentifier.reads)),
-          maximumCardinality = json.\("maximum_cardinality").toOption.map(_.as(CardinalNumber.reads)),
-          dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as(SqlIdentifier.reads)),
-          isSelfReferencing = json.\("is_self_referencing").toOption.map(_.as(YesOrNo.reads)),
-          isIdentity = json.\("is_identity").toOption.map(_.as(YesOrNo.reads)),
-          identityGeneration = json.\("identity_generation").toOption.map(_.as(CharacterData.reads)),
-          identityStart = json.\("identity_start").toOption.map(_.as(CharacterData.reads)),
-          identityIncrement = json.\("identity_increment").toOption.map(_.as(CharacterData.reads)),
-          identityMaximum = json.\("identity_maximum").toOption.map(_.as(CharacterData.reads)),
-          identityMinimum = json.\("identity_minimum").toOption.map(_.as(CharacterData.reads)),
-          identityCycle = json.\("identity_cycle").toOption.map(_.as(YesOrNo.reads)),
-          isGenerated = json.\("is_generated").toOption.map(_.as(CharacterData.reads)),
-          generationExpression = json.\("generation_expression").toOption.map(_.as(CharacterData.reads)),
-          isUpdatable = json.\("is_updatable").toOption.map(_.as(YesOrNo.reads))
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          columnName = json.\("column_name").toOption.map(_.as(Reads.StringReads)),
+          ordinalPosition = json.\("ordinal_position").toOption.map(_.as(Reads.IntReads)),
+          columnDefault = json.\("column_default").toOption.map(_.as(Reads.StringReads)),
+          isNullable = json.\("is_nullable").toOption.map(_.as(Reads.StringReads)),
+          dataType = json.\("data_type").toOption.map(_.as(Reads.StringReads)),
+          characterMaximumLength = json.\("character_maximum_length").toOption.map(_.as(Reads.IntReads)),
+          characterOctetLength = json.\("character_octet_length").toOption.map(_.as(Reads.IntReads)),
+          numericPrecision = json.\("numeric_precision").toOption.map(_.as(Reads.IntReads)),
+          numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as(Reads.IntReads)),
+          numericScale = json.\("numeric_scale").toOption.map(_.as(Reads.IntReads)),
+          datetimePrecision = json.\("datetime_precision").toOption.map(_.as(Reads.IntReads)),
+          intervalType = json.\("interval_type").toOption.map(_.as(Reads.StringReads)),
+          intervalPrecision = json.\("interval_precision").toOption.map(_.as(Reads.IntReads)),
+          characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as(Reads.StringReads)),
+          characterSetSchema = json.\("character_set_schema").toOption.map(_.as(Reads.StringReads)),
+          characterSetName = json.\("character_set_name").toOption.map(_.as(Reads.StringReads)),
+          collationCatalog = json.\("collation_catalog").toOption.map(_.as(Reads.StringReads)),
+          collationSchema = json.\("collation_schema").toOption.map(_.as(Reads.StringReads)),
+          collationName = json.\("collation_name").toOption.map(_.as(Reads.StringReads)),
+          domainCatalog = json.\("domain_catalog").toOption.map(_.as(Reads.StringReads)),
+          domainSchema = json.\("domain_schema").toOption.map(_.as(Reads.StringReads)),
+          domainName = json.\("domain_name").toOption.map(_.as(Reads.StringReads)),
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as(Reads.StringReads)),
+          udtSchema = json.\("udt_schema").toOption.map(_.as(Reads.StringReads)),
+          udtName = json.\("udt_name").toOption.map(_.as(Reads.StringReads)),
+          scopeCatalog = json.\("scope_catalog").toOption.map(_.as(Reads.StringReads)),
+          scopeSchema = json.\("scope_schema").toOption.map(_.as(Reads.StringReads)),
+          scopeName = json.\("scope_name").toOption.map(_.as(Reads.StringReads)),
+          maximumCardinality = json.\("maximum_cardinality").toOption.map(_.as(Reads.IntReads)),
+          dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as(Reads.StringReads)),
+          isSelfReferencing = json.\("is_self_referencing").toOption.map(_.as(Reads.StringReads)),
+          isIdentity = json.\("is_identity").toOption.map(_.as(Reads.StringReads)),
+          identityGeneration = json.\("identity_generation").toOption.map(_.as(Reads.StringReads)),
+          identityStart = json.\("identity_start").toOption.map(_.as(Reads.StringReads)),
+          identityIncrement = json.\("identity_increment").toOption.map(_.as(Reads.StringReads)),
+          identityMaximum = json.\("identity_maximum").toOption.map(_.as(Reads.StringReads)),
+          identityMinimum = json.\("identity_minimum").toOption.map(_.as(Reads.StringReads)),
+          identityCycle = json.\("identity_cycle").toOption.map(_.as(Reads.StringReads)),
+          isGenerated = json.\("is_generated").toOption.map(_.as(Reads.StringReads)),
+          generationExpression = json.\("generation_expression").toOption.map(_.as(Reads.StringReads)),
+          isUpdatable = json.\("is_updatable").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -172,99 +168,99 @@ object ColumnsViewRow {
   def rowParser(idx: Int): RowParser[ColumnsViewRow] = RowParser[ColumnsViewRow] { row =>
     Success(
       ColumnsViewRow(
-        tableCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        tableSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        tableName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        columnName = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        ordinalPosition = row(idx + 4)(Column.columnToOption(CardinalNumber.column)),
-        columnDefault = row(idx + 5)(Column.columnToOption(CharacterData.column)),
-        isNullable = row(idx + 6)(Column.columnToOption(YesOrNo.column)),
-        dataType = row(idx + 7)(Column.columnToOption(CharacterData.column)),
-        characterMaximumLength = row(idx + 8)(Column.columnToOption(CardinalNumber.column)),
-        characterOctetLength = row(idx + 9)(Column.columnToOption(CardinalNumber.column)),
-        numericPrecision = row(idx + 10)(Column.columnToOption(CardinalNumber.column)),
-        numericPrecisionRadix = row(idx + 11)(Column.columnToOption(CardinalNumber.column)),
-        numericScale = row(idx + 12)(Column.columnToOption(CardinalNumber.column)),
-        datetimePrecision = row(idx + 13)(Column.columnToOption(CardinalNumber.column)),
-        intervalType = row(idx + 14)(Column.columnToOption(CharacterData.column)),
-        intervalPrecision = row(idx + 15)(Column.columnToOption(CardinalNumber.column)),
-        characterSetCatalog = row(idx + 16)(Column.columnToOption(SqlIdentifier.column)),
-        characterSetSchema = row(idx + 17)(Column.columnToOption(SqlIdentifier.column)),
-        characterSetName = row(idx + 18)(Column.columnToOption(SqlIdentifier.column)),
-        collationCatalog = row(idx + 19)(Column.columnToOption(SqlIdentifier.column)),
-        collationSchema = row(idx + 20)(Column.columnToOption(SqlIdentifier.column)),
-        collationName = row(idx + 21)(Column.columnToOption(SqlIdentifier.column)),
-        domainCatalog = row(idx + 22)(Column.columnToOption(SqlIdentifier.column)),
-        domainSchema = row(idx + 23)(Column.columnToOption(SqlIdentifier.column)),
-        domainName = row(idx + 24)(Column.columnToOption(SqlIdentifier.column)),
-        udtCatalog = row(idx + 25)(Column.columnToOption(SqlIdentifier.column)),
-        udtSchema = row(idx + 26)(Column.columnToOption(SqlIdentifier.column)),
-        udtName = row(idx + 27)(Column.columnToOption(SqlIdentifier.column)),
-        scopeCatalog = row(idx + 28)(Column.columnToOption(SqlIdentifier.column)),
-        scopeSchema = row(idx + 29)(Column.columnToOption(SqlIdentifier.column)),
-        scopeName = row(idx + 30)(Column.columnToOption(SqlIdentifier.column)),
-        maximumCardinality = row(idx + 31)(Column.columnToOption(CardinalNumber.column)),
-        dtdIdentifier = row(idx + 32)(Column.columnToOption(SqlIdentifier.column)),
-        isSelfReferencing = row(idx + 33)(Column.columnToOption(YesOrNo.column)),
-        isIdentity = row(idx + 34)(Column.columnToOption(YesOrNo.column)),
-        identityGeneration = row(idx + 35)(Column.columnToOption(CharacterData.column)),
-        identityStart = row(idx + 36)(Column.columnToOption(CharacterData.column)),
-        identityIncrement = row(idx + 37)(Column.columnToOption(CharacterData.column)),
-        identityMaximum = row(idx + 38)(Column.columnToOption(CharacterData.column)),
-        identityMinimum = row(idx + 39)(Column.columnToOption(CharacterData.column)),
-        identityCycle = row(idx + 40)(Column.columnToOption(YesOrNo.column)),
-        isGenerated = row(idx + 41)(Column.columnToOption(CharacterData.column)),
-        generationExpression = row(idx + 42)(Column.columnToOption(CharacterData.column)),
-        isUpdatable = row(idx + 43)(Column.columnToOption(YesOrNo.column))
+        tableCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        columnName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        ordinalPosition = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
+        columnDefault = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        isNullable = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        dataType = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        characterMaximumLength = row(idx + 8)(Column.columnToOption(Column.columnToInt)),
+        characterOctetLength = row(idx + 9)(Column.columnToOption(Column.columnToInt)),
+        numericPrecision = row(idx + 10)(Column.columnToOption(Column.columnToInt)),
+        numericPrecisionRadix = row(idx + 11)(Column.columnToOption(Column.columnToInt)),
+        numericScale = row(idx + 12)(Column.columnToOption(Column.columnToInt)),
+        datetimePrecision = row(idx + 13)(Column.columnToOption(Column.columnToInt)),
+        intervalType = row(idx + 14)(Column.columnToOption(Column.columnToString)),
+        intervalPrecision = row(idx + 15)(Column.columnToOption(Column.columnToInt)),
+        characterSetCatalog = row(idx + 16)(Column.columnToOption(Column.columnToString)),
+        characterSetSchema = row(idx + 17)(Column.columnToOption(Column.columnToString)),
+        characterSetName = row(idx + 18)(Column.columnToOption(Column.columnToString)),
+        collationCatalog = row(idx + 19)(Column.columnToOption(Column.columnToString)),
+        collationSchema = row(idx + 20)(Column.columnToOption(Column.columnToString)),
+        collationName = row(idx + 21)(Column.columnToOption(Column.columnToString)),
+        domainCatalog = row(idx + 22)(Column.columnToOption(Column.columnToString)),
+        domainSchema = row(idx + 23)(Column.columnToOption(Column.columnToString)),
+        domainName = row(idx + 24)(Column.columnToOption(Column.columnToString)),
+        udtCatalog = row(idx + 25)(Column.columnToOption(Column.columnToString)),
+        udtSchema = row(idx + 26)(Column.columnToOption(Column.columnToString)),
+        udtName = row(idx + 27)(Column.columnToOption(Column.columnToString)),
+        scopeCatalog = row(idx + 28)(Column.columnToOption(Column.columnToString)),
+        scopeSchema = row(idx + 29)(Column.columnToOption(Column.columnToString)),
+        scopeName = row(idx + 30)(Column.columnToOption(Column.columnToString)),
+        maximumCardinality = row(idx + 31)(Column.columnToOption(Column.columnToInt)),
+        dtdIdentifier = row(idx + 32)(Column.columnToOption(Column.columnToString)),
+        isSelfReferencing = row(idx + 33)(Column.columnToOption(Column.columnToString)),
+        isIdentity = row(idx + 34)(Column.columnToOption(Column.columnToString)),
+        identityGeneration = row(idx + 35)(Column.columnToOption(Column.columnToString)),
+        identityStart = row(idx + 36)(Column.columnToOption(Column.columnToString)),
+        identityIncrement = row(idx + 37)(Column.columnToOption(Column.columnToString)),
+        identityMaximum = row(idx + 38)(Column.columnToOption(Column.columnToString)),
+        identityMinimum = row(idx + 39)(Column.columnToOption(Column.columnToString)),
+        identityCycle = row(idx + 40)(Column.columnToOption(Column.columnToString)),
+        isGenerated = row(idx + 41)(Column.columnToOption(Column.columnToString)),
+        generationExpression = row(idx + 42)(Column.columnToOption(Column.columnToString)),
+        isUpdatable = row(idx + 43)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ColumnsViewRow] = OWrites[ColumnsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableCatalog),
-      "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),
-      "table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableName),
-      "column_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.columnName),
-      "ordinal_position" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.ordinalPosition),
-      "column_default" -> Writes.OptionWrites(CharacterData.writes).writes(o.columnDefault),
-      "is_nullable" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isNullable),
-      "data_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.dataType),
-      "character_maximum_length" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.characterMaximumLength),
-      "character_octet_length" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.characterOctetLength),
-      "numeric_precision" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericPrecision),
-      "numeric_precision_radix" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericPrecisionRadix),
-      "numeric_scale" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericScale),
-      "datetime_precision" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.datetimePrecision),
-      "interval_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.intervalType),
-      "interval_precision" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.intervalPrecision),
-      "character_set_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.characterSetCatalog),
-      "character_set_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.characterSetSchema),
-      "character_set_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.characterSetName),
-      "collation_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.collationCatalog),
-      "collation_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.collationSchema),
-      "collation_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.collationName),
-      "domain_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainCatalog),
-      "domain_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainSchema),
-      "domain_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainName),
-      "udt_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtCatalog),
-      "udt_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtSchema),
-      "udt_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtName),
-      "scope_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.scopeCatalog),
-      "scope_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.scopeSchema),
-      "scope_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.scopeName),
-      "maximum_cardinality" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.maximumCardinality),
-      "dtd_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.dtdIdentifier),
-      "is_self_referencing" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isSelfReferencing),
-      "is_identity" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isIdentity),
-      "identity_generation" -> Writes.OptionWrites(CharacterData.writes).writes(o.identityGeneration),
-      "identity_start" -> Writes.OptionWrites(CharacterData.writes).writes(o.identityStart),
-      "identity_increment" -> Writes.OptionWrites(CharacterData.writes).writes(o.identityIncrement),
-      "identity_maximum" -> Writes.OptionWrites(CharacterData.writes).writes(o.identityMaximum),
-      "identity_minimum" -> Writes.OptionWrites(CharacterData.writes).writes(o.identityMinimum),
-      "identity_cycle" -> Writes.OptionWrites(YesOrNo.writes).writes(o.identityCycle),
-      "is_generated" -> Writes.OptionWrites(CharacterData.writes).writes(o.isGenerated),
-      "generation_expression" -> Writes.OptionWrites(CharacterData.writes).writes(o.generationExpression),
-      "is_updatable" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isUpdatable)
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "column_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.columnName),
+      "ordinal_position" -> Writes.OptionWrites(Writes.IntWrites).writes(o.ordinalPosition),
+      "column_default" -> Writes.OptionWrites(Writes.StringWrites).writes(o.columnDefault),
+      "is_nullable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isNullable),
+      "data_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.dataType),
+      "character_maximum_length" -> Writes.OptionWrites(Writes.IntWrites).writes(o.characterMaximumLength),
+      "character_octet_length" -> Writes.OptionWrites(Writes.IntWrites).writes(o.characterOctetLength),
+      "numeric_precision" -> Writes.OptionWrites(Writes.IntWrites).writes(o.numericPrecision),
+      "numeric_precision_radix" -> Writes.OptionWrites(Writes.IntWrites).writes(o.numericPrecisionRadix),
+      "numeric_scale" -> Writes.OptionWrites(Writes.IntWrites).writes(o.numericScale),
+      "datetime_precision" -> Writes.OptionWrites(Writes.IntWrites).writes(o.datetimePrecision),
+      "interval_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.intervalType),
+      "interval_precision" -> Writes.OptionWrites(Writes.IntWrites).writes(o.intervalPrecision),
+      "character_set_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.characterSetCatalog),
+      "character_set_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.characterSetSchema),
+      "character_set_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.characterSetName),
+      "collation_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.collationCatalog),
+      "collation_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.collationSchema),
+      "collation_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.collationName),
+      "domain_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.domainCatalog),
+      "domain_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.domainSchema),
+      "domain_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.domainName),
+      "udt_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.udtCatalog),
+      "udt_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.udtSchema),
+      "udt_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.udtName),
+      "scope_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.scopeCatalog),
+      "scope_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.scopeSchema),
+      "scope_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.scopeName),
+      "maximum_cardinality" -> Writes.OptionWrites(Writes.IntWrites).writes(o.maximumCardinality),
+      "dtd_identifier" -> Writes.OptionWrites(Writes.StringWrites).writes(o.dtdIdentifier),
+      "is_self_referencing" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isSelfReferencing),
+      "is_identity" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isIdentity),
+      "identity_generation" -> Writes.OptionWrites(Writes.StringWrites).writes(o.identityGeneration),
+      "identity_start" -> Writes.OptionWrites(Writes.StringWrites).writes(o.identityStart),
+      "identity_increment" -> Writes.OptionWrites(Writes.StringWrites).writes(o.identityIncrement),
+      "identity_maximum" -> Writes.OptionWrites(Writes.StringWrites).writes(o.identityMaximum),
+      "identity_minimum" -> Writes.OptionWrites(Writes.StringWrites).writes(o.identityMinimum),
+      "identity_cycle" -> Writes.OptionWrites(Writes.StringWrites).writes(o.identityCycle),
+      "is_generated" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isGenerated),
+      "generation_expression" -> Writes.OptionWrites(Writes.StringWrites).writes(o.generationExpression),
+      "is_updatable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isUpdatable)
     ))
   )
 }

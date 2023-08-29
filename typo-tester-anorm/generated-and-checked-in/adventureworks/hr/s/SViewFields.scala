@@ -14,7 +14,7 @@ import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 
 trait SViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ShiftId, Row]
   val shiftid: Field[ShiftId, Row]
   val name: Field[Name, Row]
   val starttime: Field[TypoLocalTime, Row]

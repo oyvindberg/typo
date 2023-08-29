@@ -16,10 +16,10 @@ class PgRulesViewStructure[Row](val prefix: Option[String], val extract: Row => 
   extends Relation[PgRulesViewFields, PgRulesViewRow, Row]
     with PgRulesViewFields[Row] { outer =>
 
-  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val tablename = new Field[String, Row](prefix, "tablename", None, Some("name"))(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
-  override val rulename = new Field[String, Row](prefix, "rulename", None, Some("name"))(x => extract(x).rulename, (row, value) => merge(row, extract(row).copy(rulename = value)))
-  override val definition = new Field[String, Row](prefix, "definition", None, None)(x => extract(x).definition, (row, value) => merge(row, extract(row).copy(definition = value)))
+  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, None)(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
+  override val tablename = new Field[String, Row](prefix, "tablename", None, None)(x => extract(x).tablename, (row, value) => merge(row, extract(row).copy(tablename = value)))
+  override val rulename = new Field[String, Row](prefix, "rulename", None, None)(x => extract(x).rulename, (row, value) => merge(row, extract(row).copy(rulename = value)))
+  override val definition = new OptField[String, Row](prefix, "definition", None, None)(x => extract(x).definition, (row, value) => merge(row, extract(row).copy(definition = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](schemaname, tablename, rulename, definition)

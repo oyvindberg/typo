@@ -7,22 +7,21 @@ package adventureworks
 package information_schema
 package column_domain_usage
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class ColumnDomainUsageViewStructure[Row](val prefix: Option[String], val extract: Row => ColumnDomainUsageViewRow, val merge: (Row, ColumnDomainUsageViewRow) => Row)
   extends Relation[ColumnDomainUsageViewFields, ColumnDomainUsageViewRow, Row]
     with ColumnDomainUsageViewFields[Row] { outer =>
 
-  override val domainCatalog = new Field[SqlIdentifier, Row](prefix, "domain_catalog", None, Some("name"))(x => extract(x).domainCatalog, (row, value) => merge(row, extract(row).copy(domainCatalog = value)))
-  override val domainSchema = new Field[SqlIdentifier, Row](prefix, "domain_schema", None, Some("name"))(x => extract(x).domainSchema, (row, value) => merge(row, extract(row).copy(domainSchema = value)))
-  override val domainName = new Field[SqlIdentifier, Row](prefix, "domain_name", None, Some("name"))(x => extract(x).domainName, (row, value) => merge(row, extract(row).copy(domainName = value)))
-  override val tableCatalog = new Field[SqlIdentifier, Row](prefix, "table_catalog", None, Some("name"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
-  override val tableSchema = new Field[SqlIdentifier, Row](prefix, "table_schema", None, Some("name"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
-  override val tableName = new Field[SqlIdentifier, Row](prefix, "table_name", None, Some("name"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
-  override val columnName = new Field[SqlIdentifier, Row](prefix, "column_name", None, Some("name"))(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
+  override val domainCatalog = new OptField[String, Row](prefix, "domain_catalog", None, None)(x => extract(x).domainCatalog, (row, value) => merge(row, extract(row).copy(domainCatalog = value)))
+  override val domainSchema = new OptField[String, Row](prefix, "domain_schema", None, None)(x => extract(x).domainSchema, (row, value) => merge(row, extract(row).copy(domainSchema = value)))
+  override val domainName = new OptField[String, Row](prefix, "domain_name", None, None)(x => extract(x).domainName, (row, value) => merge(row, extract(row).copy(domainName = value)))
+  override val tableCatalog = new OptField[String, Row](prefix, "table_catalog", None, None)(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
+  override val tableSchema = new OptField[String, Row](prefix, "table_schema", None, None)(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
+  override val tableName = new OptField[String, Row](prefix, "table_name", None, None)(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
+  override val columnName = new OptField[String, Row](prefix, "column_name", None, None)(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](domainCatalog, domainSchema, domainName, tableCatalog, tableSchema, tableName, columnName)

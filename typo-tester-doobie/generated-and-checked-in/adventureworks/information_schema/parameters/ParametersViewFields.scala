@@ -7,45 +7,41 @@ package adventureworks
 package information_schema
 package parameters
 
-import adventureworks.information_schema.CardinalNumber
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ParametersViewFields[Row] {
-  val specificCatalog: Field[SqlIdentifier, Row]
-  val specificSchema: Field[SqlIdentifier, Row]
-  val specificName: Field[SqlIdentifier, Row]
-  val ordinalPosition: Field[CardinalNumber, Row]
-  val parameterMode: Field[CharacterData, Row]
-  val isResult: Field[YesOrNo, Row]
-  val asLocator: Field[YesOrNo, Row]
-  val parameterName: Field[SqlIdentifier, Row]
-  val dataType: Field[CharacterData, Row]
-  val characterMaximumLength: Field[CardinalNumber, Row]
-  val characterOctetLength: Field[CardinalNumber, Row]
-  val characterSetCatalog: Field[SqlIdentifier, Row]
-  val characterSetSchema: Field[SqlIdentifier, Row]
-  val characterSetName: Field[SqlIdentifier, Row]
-  val collationCatalog: Field[SqlIdentifier, Row]
-  val collationSchema: Field[SqlIdentifier, Row]
-  val collationName: Field[SqlIdentifier, Row]
-  val numericPrecision: Field[CardinalNumber, Row]
-  val numericPrecisionRadix: Field[CardinalNumber, Row]
-  val numericScale: Field[CardinalNumber, Row]
-  val datetimePrecision: Field[CardinalNumber, Row]
-  val intervalType: Field[CharacterData, Row]
-  val intervalPrecision: Field[CardinalNumber, Row]
-  val udtCatalog: Field[SqlIdentifier, Row]
-  val udtSchema: Field[SqlIdentifier, Row]
-  val udtName: Field[SqlIdentifier, Row]
-  val scopeCatalog: Field[SqlIdentifier, Row]
-  val scopeSchema: Field[SqlIdentifier, Row]
-  val scopeName: Field[SqlIdentifier, Row]
-  val maximumCardinality: Field[CardinalNumber, Row]
-  val dtdIdentifier: Field[SqlIdentifier, Row]
-  val parameterDefault: Field[CharacterData, Row]
+  val specificCatalog: OptField[String, Row]
+  val specificSchema: OptField[String, Row]
+  val specificName: OptField[String, Row]
+  val ordinalPosition: OptField[Int, Row]
+  val parameterMode: OptField[String, Row]
+  val isResult: OptField[/* max 3 chars */ String, Row]
+  val asLocator: OptField[/* max 3 chars */ String, Row]
+  val parameterName: OptField[String, Row]
+  val dataType: OptField[String, Row]
+  val characterMaximumLength: OptField[Int, Row]
+  val characterOctetLength: OptField[Int, Row]
+  val characterSetCatalog: OptField[String, Row]
+  val characterSetSchema: OptField[String, Row]
+  val characterSetName: OptField[String, Row]
+  val collationCatalog: OptField[String, Row]
+  val collationSchema: OptField[String, Row]
+  val collationName: OptField[String, Row]
+  val numericPrecision: OptField[Int, Row]
+  val numericPrecisionRadix: OptField[Int, Row]
+  val numericScale: OptField[Int, Row]
+  val datetimePrecision: OptField[Int, Row]
+  val intervalType: OptField[String, Row]
+  val intervalPrecision: OptField[Int, Row]
+  val udtCatalog: OptField[String, Row]
+  val udtSchema: OptField[String, Row]
+  val udtName: OptField[String, Row]
+  val scopeCatalog: OptField[String, Row]
+  val scopeSchema: OptField[String, Row]
+  val scopeName: OptField[String, Row]
+  val maximumCardinality: OptField[Int, Row]
+  val dtdIdentifier: OptField[String, Row]
+  val parameterDefault: OptField[String, Row]
 }
 object ParametersViewFields extends ParametersViewStructure[ParametersViewRow](None, identity, (_, x) => x)
 

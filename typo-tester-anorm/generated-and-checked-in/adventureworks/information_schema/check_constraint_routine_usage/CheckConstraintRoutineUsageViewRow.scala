@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package check_constraint_routine_usage
 
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -15,28 +15,29 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CheckConstraintRoutineUsageViewRow(
-  constraintCatalog: SqlIdentifier,
-  constraintSchema: SqlIdentifier,
-  constraintName: SqlIdentifier,
-  specificCatalog: SqlIdentifier,
-  specificSchema: SqlIdentifier,
-  specificName: SqlIdentifier
+  constraintCatalog: /* nullability unknown */ Option[String],
+  constraintSchema: /* nullability unknown */ Option[String],
+  constraintName: /* nullability unknown */ Option[String],
+  specificCatalog: /* nullability unknown */ Option[String],
+  specificSchema: /* nullability unknown */ Option[String],
+  specificName: /* nullability unknown */ Option[String]
 )
 
 object CheckConstraintRoutineUsageViewRow {
   implicit lazy val reads: Reads[CheckConstraintRoutineUsageViewRow] = Reads[CheckConstraintRoutineUsageViewRow](json => JsResult.fromTry(
       Try(
         CheckConstraintRoutineUsageViewRow(
-          constraintCatalog = json.\("constraint_catalog").as(SqlIdentifier.reads),
-          constraintSchema = json.\("constraint_schema").as(SqlIdentifier.reads),
-          constraintName = json.\("constraint_name").as(SqlIdentifier.reads),
-          specificCatalog = json.\("specific_catalog").as(SqlIdentifier.reads),
-          specificSchema = json.\("specific_schema").as(SqlIdentifier.reads),
-          specificName = json.\("specific_name").as(SqlIdentifier.reads)
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(Reads.StringReads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(Reads.StringReads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(Reads.StringReads)),
+          specificCatalog = json.\("specific_catalog").toOption.map(_.as(Reads.StringReads)),
+          specificSchema = json.\("specific_schema").toOption.map(_.as(Reads.StringReads)),
+          specificName = json.\("specific_name").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -44,23 +45,23 @@ object CheckConstraintRoutineUsageViewRow {
   def rowParser(idx: Int): RowParser[CheckConstraintRoutineUsageViewRow] = RowParser[CheckConstraintRoutineUsageViewRow] { row =>
     Success(
       CheckConstraintRoutineUsageViewRow(
-        constraintCatalog = row(idx + 0)(SqlIdentifier.column),
-        constraintSchema = row(idx + 1)(SqlIdentifier.column),
-        constraintName = row(idx + 2)(SqlIdentifier.column),
-        specificCatalog = row(idx + 3)(SqlIdentifier.column),
-        specificSchema = row(idx + 4)(SqlIdentifier.column),
-        specificName = row(idx + 5)(SqlIdentifier.column)
+        constraintCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        constraintSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        constraintName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        specificCatalog = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        specificSchema = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        specificName = row(idx + 5)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[CheckConstraintRoutineUsageViewRow] = OWrites[CheckConstraintRoutineUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "constraint_catalog" -> SqlIdentifier.writes.writes(o.constraintCatalog),
-      "constraint_schema" -> SqlIdentifier.writes.writes(o.constraintSchema),
-      "constraint_name" -> SqlIdentifier.writes.writes(o.constraintName),
-      "specific_catalog" -> SqlIdentifier.writes.writes(o.specificCatalog),
-      "specific_schema" -> SqlIdentifier.writes.writes(o.specificSchema),
-      "specific_name" -> SqlIdentifier.writes.writes(o.specificName)
+      "constraint_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintName),
+      "specific_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.specificCatalog),
+      "specific_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.specificSchema),
+      "specific_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.specificName)
     ))
   )
 }

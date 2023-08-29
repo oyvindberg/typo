@@ -7,42 +7,38 @@ package adventureworks
 package information_schema
 package user_defined_types
 
-import adventureworks.information_schema.CardinalNumber
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait UserDefinedTypesViewFields[Row] {
-  val userDefinedTypeCatalog: Field[SqlIdentifier, Row]
-  val userDefinedTypeSchema: Field[SqlIdentifier, Row]
-  val userDefinedTypeName: Field[SqlIdentifier, Row]
-  val userDefinedTypeCategory: Field[CharacterData, Row]
-  val isInstantiable: Field[YesOrNo, Row]
-  val isFinal: Field[YesOrNo, Row]
-  val orderingForm: Field[CharacterData, Row]
-  val orderingCategory: Field[CharacterData, Row]
-  val orderingRoutineCatalog: Field[SqlIdentifier, Row]
-  val orderingRoutineSchema: Field[SqlIdentifier, Row]
-  val orderingRoutineName: Field[SqlIdentifier, Row]
-  val referenceType: Field[CharacterData, Row]
-  val dataType: Field[CharacterData, Row]
-  val characterMaximumLength: Field[CardinalNumber, Row]
-  val characterOctetLength: Field[CardinalNumber, Row]
-  val characterSetCatalog: Field[SqlIdentifier, Row]
-  val characterSetSchema: Field[SqlIdentifier, Row]
-  val characterSetName: Field[SqlIdentifier, Row]
-  val collationCatalog: Field[SqlIdentifier, Row]
-  val collationSchema: Field[SqlIdentifier, Row]
-  val collationName: Field[SqlIdentifier, Row]
-  val numericPrecision: Field[CardinalNumber, Row]
-  val numericPrecisionRadix: Field[CardinalNumber, Row]
-  val numericScale: Field[CardinalNumber, Row]
-  val datetimePrecision: Field[CardinalNumber, Row]
-  val intervalType: Field[CharacterData, Row]
-  val intervalPrecision: Field[CardinalNumber, Row]
-  val sourceDtdIdentifier: Field[SqlIdentifier, Row]
-  val refDtdIdentifier: Field[SqlIdentifier, Row]
+  val userDefinedTypeCatalog: OptField[String, Row]
+  val userDefinedTypeSchema: OptField[String, Row]
+  val userDefinedTypeName: OptField[String, Row]
+  val userDefinedTypeCategory: OptField[String, Row]
+  val isInstantiable: OptField[/* max 3 chars */ String, Row]
+  val isFinal: OptField[/* max 3 chars */ String, Row]
+  val orderingForm: OptField[String, Row]
+  val orderingCategory: OptField[String, Row]
+  val orderingRoutineCatalog: OptField[String, Row]
+  val orderingRoutineSchema: OptField[String, Row]
+  val orderingRoutineName: OptField[String, Row]
+  val referenceType: OptField[String, Row]
+  val dataType: OptField[String, Row]
+  val characterMaximumLength: OptField[Int, Row]
+  val characterOctetLength: OptField[Int, Row]
+  val characterSetCatalog: OptField[String, Row]
+  val characterSetSchema: OptField[String, Row]
+  val characterSetName: OptField[String, Row]
+  val collationCatalog: OptField[String, Row]
+  val collationSchema: OptField[String, Row]
+  val collationName: OptField[String, Row]
+  val numericPrecision: OptField[Int, Row]
+  val numericPrecisionRadix: OptField[Int, Row]
+  val numericScale: OptField[Int, Row]
+  val datetimePrecision: OptField[Int, Row]
+  val intervalType: OptField[String, Row]
+  val intervalPrecision: OptField[Int, Row]
+  val sourceDtdIdentifier: OptField[String, Row]
+  val refDtdIdentifier: OptField[String, Row]
 }
 object UserDefinedTypesViewFields extends UserDefinedTypesViewStructure[UserDefinedTypesViewRow](None, identity, (_, x) => x)
 

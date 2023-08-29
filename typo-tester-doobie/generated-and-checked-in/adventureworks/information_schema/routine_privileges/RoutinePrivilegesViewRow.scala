@@ -7,55 +7,53 @@ package adventureworks
 package information_schema
 package routine_privileges
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class RoutinePrivilegesViewRow(
-  grantor: SqlIdentifier,
-  grantee: SqlIdentifier,
-  specificCatalog: SqlIdentifier,
-  specificSchema: SqlIdentifier,
-  specificName: SqlIdentifier,
-  routineCatalog: SqlIdentifier,
-  routineSchema: SqlIdentifier,
-  routineName: SqlIdentifier,
-  privilegeType: CharacterData,
-  isGrantable: YesOrNo
+  grantor: /* nullability unknown */ Option[String],
+  grantee: /* nullability unknown */ Option[String],
+  specificCatalog: /* nullability unknown */ Option[String],
+  specificSchema: /* nullability unknown */ Option[String],
+  specificName: /* nullability unknown */ Option[String],
+  routineCatalog: /* nullability unknown */ Option[String],
+  routineSchema: /* nullability unknown */ Option[String],
+  routineName: /* nullability unknown */ Option[String],
+  privilegeType: /* nullability unknown */ Option[String],
+  isGrantable: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object RoutinePrivilegesViewRow {
-  implicit lazy val decoder: Decoder[RoutinePrivilegesViewRow] = Decoder.forProduct10[RoutinePrivilegesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo]("grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable")(RoutinePrivilegesViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, YesOrNo.decoder)
-  implicit lazy val encoder: Encoder[RoutinePrivilegesViewRow] = Encoder.forProduct10[RoutinePrivilegesViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo]("grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.specificCatalog, x.specificSchema, x.specificName, x.routineCatalog, x.routineSchema, x.routineName, x.privilegeType, x.isGrantable))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, YesOrNo.encoder)
+  implicit lazy val decoder: Decoder[RoutinePrivilegesViewRow] = Decoder.forProduct10[RoutinePrivilegesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String]]("grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable")(RoutinePrivilegesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[RoutinePrivilegesViewRow] = Encoder.forProduct10[RoutinePrivilegesViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 3 chars */ String]]("grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.specificCatalog, x.specificSchema, x.specificName, x.routineCatalog, x.routineSchema, x.routineName, x.privilegeType, x.isGrantable))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[RoutinePrivilegesViewRow] = new Read[RoutinePrivilegesViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => RoutinePrivilegesViewRow(
-      grantor = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      grantee = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      specificCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      specificSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      specificName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      routineCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      routineSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6),
-      routineName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 7),
-      privilegeType = CharacterData.get.unsafeGetNonNullable(rs, i + 8),
-      isGrantable = YesOrNo.get.unsafeGetNonNullable(rs, i + 9)
+      grantor = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      grantee = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      specificCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      specificSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      specificName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      routineCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      routineSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      routineName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+      privilegeType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      isGrantable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

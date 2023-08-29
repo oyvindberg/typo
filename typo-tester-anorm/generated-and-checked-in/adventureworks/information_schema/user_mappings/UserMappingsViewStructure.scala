@@ -7,18 +7,17 @@ package adventureworks
 package information_schema
 package user_mappings
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class UserMappingsViewStructure[Row](val prefix: Option[String], val extract: Row => UserMappingsViewRow, val merge: (Row, UserMappingsViewRow) => Row)
   extends Relation[UserMappingsViewFields, UserMappingsViewRow, Row]
     with UserMappingsViewFields[Row] { outer =>
 
-  override val authorizationIdentifier = new Field[SqlIdentifier, Row](prefix, "authorization_identifier", None, Some("name"))(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
-  override val foreignServerCatalog = new Field[SqlIdentifier, Row](prefix, "foreign_server_catalog", None, Some("name"))(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
-  override val foreignServerName = new Field[SqlIdentifier, Row](prefix, "foreign_server_name", None, Some("name"))(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
+  override val authorizationIdentifier = new OptField[/* nullability unknown */ String, Row](prefix, "authorization_identifier", None, None)(x => extract(x).authorizationIdentifier, (row, value) => merge(row, extract(row).copy(authorizationIdentifier = value)))
+  override val foreignServerCatalog = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_server_catalog", None, None)(x => extract(x).foreignServerCatalog, (row, value) => merge(row, extract(row).copy(foreignServerCatalog = value)))
+  override val foreignServerName = new OptField[/* nullability unknown */ String, Row](prefix, "foreign_server_name", None, None)(x => extract(x).foreignServerName, (row, value) => merge(row, extract(row).copy(foreignServerName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](authorizationIdentifier, foreignServerCatalog, foreignServerName)

@@ -18,6 +18,7 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PodViewRow(
+  /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderdetailid]] */
   id: Int,
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderid]] */
   purchaseorderid: PurchaseorderheaderId,

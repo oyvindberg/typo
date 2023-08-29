@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package key_column_usage
 
-import adventureworks.information_schema.CardinalNumber
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,34 +15,35 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class KeyColumnUsageViewRow(
-  constraintCatalog: SqlIdentifier,
-  constraintSchema: SqlIdentifier,
-  constraintName: SqlIdentifier,
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  columnName: SqlIdentifier,
-  ordinalPosition: CardinalNumber,
-  positionInUniqueConstraint: CardinalNumber
+  constraintCatalog: /* nullability unknown */ Option[String],
+  constraintSchema: /* nullability unknown */ Option[String],
+  constraintName: /* nullability unknown */ Option[String],
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  columnName: /* nullability unknown */ Option[String],
+  ordinalPosition: /* nullability unknown */ Option[Int],
+  positionInUniqueConstraint: /* nullability unknown */ Option[Int]
 )
 
 object KeyColumnUsageViewRow {
   implicit lazy val reads: Reads[KeyColumnUsageViewRow] = Reads[KeyColumnUsageViewRow](json => JsResult.fromTry(
       Try(
         KeyColumnUsageViewRow(
-          constraintCatalog = json.\("constraint_catalog").as(SqlIdentifier.reads),
-          constraintSchema = json.\("constraint_schema").as(SqlIdentifier.reads),
-          constraintName = json.\("constraint_name").as(SqlIdentifier.reads),
-          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
-          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
-          tableName = json.\("table_name").as(SqlIdentifier.reads),
-          columnName = json.\("column_name").as(SqlIdentifier.reads),
-          ordinalPosition = json.\("ordinal_position").as(CardinalNumber.reads),
-          positionInUniqueConstraint = json.\("position_in_unique_constraint").as(CardinalNumber.reads)
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(Reads.StringReads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(Reads.StringReads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(Reads.StringReads)),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          columnName = json.\("column_name").toOption.map(_.as(Reads.StringReads)),
+          ordinalPosition = json.\("ordinal_position").toOption.map(_.as(Reads.IntReads)),
+          positionInUniqueConstraint = json.\("position_in_unique_constraint").toOption.map(_.as(Reads.IntReads))
         )
       )
     ),
@@ -51,29 +51,29 @@ object KeyColumnUsageViewRow {
   def rowParser(idx: Int): RowParser[KeyColumnUsageViewRow] = RowParser[KeyColumnUsageViewRow] { row =>
     Success(
       KeyColumnUsageViewRow(
-        constraintCatalog = row(idx + 0)(SqlIdentifier.column),
-        constraintSchema = row(idx + 1)(SqlIdentifier.column),
-        constraintName = row(idx + 2)(SqlIdentifier.column),
-        tableCatalog = row(idx + 3)(SqlIdentifier.column),
-        tableSchema = row(idx + 4)(SqlIdentifier.column),
-        tableName = row(idx + 5)(SqlIdentifier.column),
-        columnName = row(idx + 6)(SqlIdentifier.column),
-        ordinalPosition = row(idx + 7)(CardinalNumber.column),
-        positionInUniqueConstraint = row(idx + 8)(CardinalNumber.column)
+        constraintCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        constraintSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        constraintName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tableCatalog = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        columnName = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        ordinalPosition = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
+        positionInUniqueConstraint = row(idx + 8)(Column.columnToOption(Column.columnToInt))
       )
     )
   }
   implicit lazy val writes: OWrites[KeyColumnUsageViewRow] = OWrites[KeyColumnUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "constraint_catalog" -> SqlIdentifier.writes.writes(o.constraintCatalog),
-      "constraint_schema" -> SqlIdentifier.writes.writes(o.constraintSchema),
-      "constraint_name" -> SqlIdentifier.writes.writes(o.constraintName),
-      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
-      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
-      "table_name" -> SqlIdentifier.writes.writes(o.tableName),
-      "column_name" -> SqlIdentifier.writes.writes(o.columnName),
-      "ordinal_position" -> CardinalNumber.writes.writes(o.ordinalPosition),
-      "position_in_unique_constraint" -> CardinalNumber.writes.writes(o.positionInUniqueConstraint)
+      "constraint_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintName),
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "column_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.columnName),
+      "ordinal_position" -> Writes.OptionWrites(Writes.IntWrites).writes(o.ordinalPosition),
+      "position_in_unique_constraint" -> Writes.OptionWrites(Writes.IntWrites).writes(o.positionInUniqueConstraint)
     ))
   )
 }

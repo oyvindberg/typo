@@ -15,36 +15,36 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgFileSettingsViewRow(
-  sourcefile: String,
-  sourceline: Int,
-  seqno: Int,
-  name: String,
-  setting: String,
-  applied: Boolean,
-  error: String
+  sourcefile: /* nullability unknown */ Option[String],
+  sourceline: /* nullability unknown */ Option[Int],
+  seqno: /* nullability unknown */ Option[Int],
+  name: /* nullability unknown */ Option[String],
+  setting: /* nullability unknown */ Option[String],
+  applied: /* nullability unknown */ Option[Boolean],
+  error: /* nullability unknown */ Option[String]
 )
 
 object PgFileSettingsViewRow {
-  implicit lazy val decoder: Decoder[PgFileSettingsViewRow] = Decoder.forProduct7[PgFileSettingsViewRow, String, Int, Int, String, String, Boolean, String]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(PgFileSettingsViewRow.apply)(Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeString)
-  implicit lazy val encoder: Encoder[PgFileSettingsViewRow] = Encoder.forProduct7[PgFileSettingsViewRow, String, Int, Int, String, String, Boolean, String]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(x => (x.sourcefile, x.sourceline, x.seqno, x.name, x.setting, x.applied, x.error))(Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeString)
+  implicit lazy val decoder: Decoder[PgFileSettingsViewRow] = Decoder.forProduct7[PgFileSettingsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[String]]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(PgFileSettingsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgFileSettingsViewRow] = Encoder.forProduct7[PgFileSettingsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[String]]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(x => (x.sourcefile, x.sourceline, x.seqno, x.name, x.setting, x.applied, x.error))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgFileSettingsViewRow] = new Read[PgFileSettingsViewRow](
     gets = List(
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.BooleanMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgFileSettingsViewRow(
-      sourcefile = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
-      sourceline = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
-      seqno = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      setting = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      applied = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 5),
-      error = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6)
+      sourcefile = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      sourceline = Meta.IntMeta.get.unsafeGetNullable(rs, i + 1),
+      seqno = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
+      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      setting = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      applied = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 5),
+      error = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

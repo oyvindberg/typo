@@ -7,15 +7,13 @@ package adventureworks
 package information_schema
 package foreign_server_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ForeignServerOptionsViewFields[Row] {
-  val foreignServerCatalog: Field[SqlIdentifier, Row]
-  val foreignServerName: Field[SqlIdentifier, Row]
-  val optionName: Field[SqlIdentifier, Row]
-  val optionValue: Field[CharacterData, Row]
+  val foreignServerCatalog: OptField[/* nullability unknown */ String, Row]
+  val foreignServerName: OptField[/* nullability unknown */ String, Row]
+  val optionName: OptField[String, Row]
+  val optionValue: OptField[String, Row]
 }
 object ForeignServerOptionsViewFields extends ForeignServerOptionsViewStructure[ForeignServerOptionsViewRow](None, identity, (_, x) => x)
 

@@ -15,39 +15,39 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgStatSslViewRow(
-  pid: Int,
-  ssl: Boolean,
-  version: String,
-  cipher: String,
-  bits: Int,
-  clientDn: String,
-  clientSerial: BigDecimal,
-  issuerDn: String
+  pid: /* nullability unknown */ Option[Int],
+  ssl: /* nullability unknown */ Option[Boolean],
+  version: /* nullability unknown */ Option[String],
+  cipher: /* nullability unknown */ Option[String],
+  bits: /* nullability unknown */ Option[Int],
+  clientDn: /* nullability unknown */ Option[String],
+  clientSerial: /* nullability unknown */ Option[BigDecimal],
+  issuerDn: /* nullability unknown */ Option[String]
 )
 
 object PgStatSslViewRow {
-  implicit lazy val decoder: Decoder[PgStatSslViewRow] = Decoder.forProduct8[PgStatSslViewRow, Int, Boolean, String, String, Int, String, BigDecimal, String]("pid", "ssl", "version", "cipher", "bits", "client_dn", "client_serial", "issuer_dn")(PgStatSslViewRow.apply)(Decoder.decodeInt, Decoder.decodeBoolean, Decoder.decodeString, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeBigDecimal, Decoder.decodeString)
-  implicit lazy val encoder: Encoder[PgStatSslViewRow] = Encoder.forProduct8[PgStatSslViewRow, Int, Boolean, String, String, Int, String, BigDecimal, String]("pid", "ssl", "version", "cipher", "bits", "client_dn", "client_serial", "issuer_dn")(x => (x.pid, x.ssl, x.version, x.cipher, x.bits, x.clientDn, x.clientSerial, x.issuerDn))(Encoder.encodeInt, Encoder.encodeBoolean, Encoder.encodeString, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeBigDecimal, Encoder.encodeString)
+  implicit lazy val decoder: Decoder[PgStatSslViewRow] = Decoder.forProduct8[PgStatSslViewRow, /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[String]]("pid", "ssl", "version", "cipher", "bits", "client_dn", "client_serial", "issuer_dn")(PgStatSslViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgStatSslViewRow] = Encoder.forProduct8[PgStatSslViewRow, /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[String]]("pid", "ssl", "version", "cipher", "bits", "client_dn", "client_serial", "issuer_dn")(x => (x.pid, x.ssl, x.version, x.cipher, x.bits, x.clientDn, x.clientSerial, x.issuerDn))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgStatSslViewRow] = new Read[PgStatSslViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.BooleanMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatSslViewRow(
-      pid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      ssl = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 1),
-      version = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      cipher = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      bits = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
-      clientDn = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      clientSerial = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6),
-      issuerDn = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 7)
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      ssl = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 1),
+      version = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      cipher = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      bits = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      clientDn = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      clientSerial = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 6),
+      issuerDn = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

@@ -11,12 +11,13 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait EViewFields[Row] {
   val id: Field[Int, Row]
   val businessentityid: Field[BusinessentityId, Row]
   val emailaddressid: Field[Int, Row]
-  val emailaddress: Field[/* max 50 chars */ String, Row]
+  val emailaddress: OptField[/* max 50 chars */ String, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

@@ -7,8 +7,7 @@ package adventureworks
 package information_schema
 package column_options
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -16,28 +15,29 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ColumnOptionsViewRow(
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  columnName: SqlIdentifier,
-  optionName: SqlIdentifier,
-  optionValue: CharacterData
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  columnName: /* nullability unknown */ Option[String],
+  optionName: /* nullability unknown */ Option[String],
+  optionValue: /* nullability unknown */ Option[String]
 )
 
 object ColumnOptionsViewRow {
   implicit lazy val reads: Reads[ColumnOptionsViewRow] = Reads[ColumnOptionsViewRow](json => JsResult.fromTry(
       Try(
         ColumnOptionsViewRow(
-          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
-          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
-          tableName = json.\("table_name").as(SqlIdentifier.reads),
-          columnName = json.\("column_name").as(SqlIdentifier.reads),
-          optionName = json.\("option_name").as(SqlIdentifier.reads),
-          optionValue = json.\("option_value").as(CharacterData.reads)
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          columnName = json.\("column_name").toOption.map(_.as(Reads.StringReads)),
+          optionName = json.\("option_name").toOption.map(_.as(Reads.StringReads)),
+          optionValue = json.\("option_value").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -45,23 +45,23 @@ object ColumnOptionsViewRow {
   def rowParser(idx: Int): RowParser[ColumnOptionsViewRow] = RowParser[ColumnOptionsViewRow] { row =>
     Success(
       ColumnOptionsViewRow(
-        tableCatalog = row(idx + 0)(SqlIdentifier.column),
-        tableSchema = row(idx + 1)(SqlIdentifier.column),
-        tableName = row(idx + 2)(SqlIdentifier.column),
-        columnName = row(idx + 3)(SqlIdentifier.column),
-        optionName = row(idx + 4)(SqlIdentifier.column),
-        optionValue = row(idx + 5)(CharacterData.column)
+        tableCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        columnName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        optionName = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        optionValue = row(idx + 5)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ColumnOptionsViewRow] = OWrites[ColumnOptionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
-      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
-      "table_name" -> SqlIdentifier.writes.writes(o.tableName),
-      "column_name" -> SqlIdentifier.writes.writes(o.columnName),
-      "option_name" -> SqlIdentifier.writes.writes(o.optionName),
-      "option_value" -> CharacterData.writes.writes(o.optionValue)
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "column_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.columnName),
+      "option_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.optionName),
+      "option_value" -> Writes.OptionWrites(Writes.StringWrites).writes(o.optionValue)
     ))
   )
 }

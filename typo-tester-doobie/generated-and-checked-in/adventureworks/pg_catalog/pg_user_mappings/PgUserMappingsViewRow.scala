@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_user_mappings
 
+import adventureworks.pg_catalog.pg_foreign_server.PgForeignServerId
+import adventureworks.pg_catalog.pg_user_mapping.PgUserMappingId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -15,33 +17,37 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PgUserMappingsViewRow(
-  umid: /* oid */ Long,
-  srvid: /* oid */ Long,
+  /** Points to [[pg_user_mapping.PgUserMappingRow.oid]] */
+  umid: PgUserMappingId,
+  /** Points to [[pg_foreign_server.PgForeignServerRow.oid]] */
+  srvid: PgForeignServerId,
+  /** Points to [[pg_foreign_server.PgForeignServerRow.srvname]] */
   srvname: String,
+  /** Points to [[pg_user_mapping.PgUserMappingRow.umuser]] */
   umuser: /* oid */ Long,
-  usename: String,
-  umoptions: Array[String]
+  usename: /* nullability unknown */ Option[String],
+  umoptions: /* nullability unknown */ Option[Array[String]]
 )
 
 object PgUserMappingsViewRow {
-  implicit lazy val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct6[PgUserMappingsViewRow, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, String, Array[String]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(PgUserMappingsViewRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeArray[String](Decoder.decodeString, implicitly))
-  implicit lazy val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct6[PgUserMappingsViewRow, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, String, Array[String]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(x => (x.umid, x.srvid, x.srvname, x.umuser, x.usename, x.umoptions))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly))
+  implicit lazy val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct6[PgUserMappingsViewRow, PgUserMappingId, PgForeignServerId, String, /* oid */ Long, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(PgUserMappingsViewRow.apply)(PgUserMappingId.decoder, PgForeignServerId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct6[PgUserMappingsViewRow, PgUserMappingId, PgForeignServerId, String, /* oid */ Long, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(x => (x.umid, x.srvid, x.srvname, x.umuser, x.usename, x.umoptions))(PgUserMappingId.encoder, PgForeignServerId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit lazy val read: Read[PgUserMappingsViewRow] = new Read[PgUserMappingsViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
+      (PgUserMappingId.get, Nullability.NoNulls),
+      (PgForeignServerId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (adventureworks.StringArrayMeta.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgUserMappingsViewRow(
-      umid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
-      srvid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      umid = PgUserMappingId.get.unsafeGetNonNullable(rs, i + 0),
+      srvid = PgForeignServerId.get.unsafeGetNonNullable(rs, i + 1),
       srvname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
       umuser = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      usename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      umoptions = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 5)
+      usename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      umoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

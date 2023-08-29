@@ -13,13 +13,13 @@ import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.util.Read
-import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class SViewRow(
-  id: Int,
+  /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
+  id: ShiftId,
   /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
   shiftid: ShiftId,
   /** Points to [[humanresources.shift.ShiftRow.name]] */
@@ -33,11 +33,11 @@ case class SViewRow(
 )
 
 object SViewRow {
-  implicit lazy val decoder: Decoder[SViewRow] = Decoder.forProduct6[SViewRow, Int, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(SViewRow.apply)(Decoder.decodeInt, ShiftId.decoder, Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SViewRow] = Encoder.forProduct6[SViewRow, Int, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.id, x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(Encoder.encodeInt, ShiftId.encoder, Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SViewRow] = Decoder.forProduct6[SViewRow, ShiftId, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(SViewRow.apply)(ShiftId.decoder, ShiftId.decoder, Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SViewRow] = Encoder.forProduct6[SViewRow, ShiftId, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.id, x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(ShiftId.encoder, ShiftId.encoder, Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SViewRow] = new Read[SViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ShiftId.get, Nullability.NoNulls),
       (ShiftId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (TypoLocalTime.get, Nullability.NoNulls),
@@ -45,7 +45,7 @@ object SViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = ShiftId.get.unsafeGetNonNullable(rs, i + 0),
       shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
       starttime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 3),

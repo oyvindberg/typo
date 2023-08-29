@@ -7,35 +7,35 @@ package adventureworks
 package information_schema
 package user_mappings
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class UserMappingsViewRow(
   /** Points to [[`_pg_user_mappings`.PgUserMappingsViewRow.authorizationIdentifier]] */
-  authorizationIdentifier: SqlIdentifier,
+  authorizationIdentifier: Option[/* nullability unknown */ String],
   /** Points to [[`_pg_user_mappings`.PgUserMappingsViewRow.foreignServerCatalog]] */
-  foreignServerCatalog: SqlIdentifier,
+  foreignServerCatalog: Option[/* nullability unknown */ String],
   /** Points to [[`_pg_user_mappings`.PgUserMappingsViewRow.foreignServerName]] */
-  foreignServerName: SqlIdentifier
+  foreignServerName: Option[/* nullability unknown */ String]
 )
 
 object UserMappingsViewRow {
-  implicit lazy val decoder: Decoder[UserMappingsViewRow] = Decoder.forProduct3[UserMappingsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(UserMappingsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[UserMappingsViewRow] = Encoder.forProduct3[UserMappingsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[UserMappingsViewRow] = Decoder.forProduct3[UserMappingsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(UserMappingsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[UserMappingsViewRow] = Encoder.forProduct3[UserMappingsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[UserMappingsViewRow] = new Read[UserMappingsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UserMappingsViewRow(
-      authorizationIdentifier = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      foreignServerCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      foreignServerName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2)
+      authorizationIdentifier = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      foreignServerCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      foreignServerName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

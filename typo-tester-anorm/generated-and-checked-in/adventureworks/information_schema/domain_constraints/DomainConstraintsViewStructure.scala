@@ -7,24 +7,22 @@ package adventureworks
 package information_schema
 package domain_constraints
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class DomainConstraintsViewStructure[Row](val prefix: Option[String], val extract: Row => DomainConstraintsViewRow, val merge: (Row, DomainConstraintsViewRow) => Row)
   extends Relation[DomainConstraintsViewFields, DomainConstraintsViewRow, Row]
     with DomainConstraintsViewFields[Row] { outer =>
 
-  override val constraintCatalog = new Field[SqlIdentifier, Row](prefix, "constraint_catalog", None, Some("name"))(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
-  override val constraintSchema = new Field[SqlIdentifier, Row](prefix, "constraint_schema", None, Some("name"))(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
-  override val constraintName = new Field[SqlIdentifier, Row](prefix, "constraint_name", None, Some("name"))(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
-  override val domainCatalog = new Field[SqlIdentifier, Row](prefix, "domain_catalog", None, Some("name"))(x => extract(x).domainCatalog, (row, value) => merge(row, extract(row).copy(domainCatalog = value)))
-  override val domainSchema = new Field[SqlIdentifier, Row](prefix, "domain_schema", None, Some("name"))(x => extract(x).domainSchema, (row, value) => merge(row, extract(row).copy(domainSchema = value)))
-  override val domainName = new Field[SqlIdentifier, Row](prefix, "domain_name", None, Some("name"))(x => extract(x).domainName, (row, value) => merge(row, extract(row).copy(domainName = value)))
-  override val isDeferrable = new Field[YesOrNo, Row](prefix, "is_deferrable", None, Some("varchar"))(x => extract(x).isDeferrable, (row, value) => merge(row, extract(row).copy(isDeferrable = value)))
-  override val initiallyDeferred = new Field[YesOrNo, Row](prefix, "initially_deferred", None, Some("varchar"))(x => extract(x).initiallyDeferred, (row, value) => merge(row, extract(row).copy(initiallyDeferred = value)))
+  override val constraintCatalog = new OptField[String, Row](prefix, "constraint_catalog", None, None)(x => extract(x).constraintCatalog, (row, value) => merge(row, extract(row).copy(constraintCatalog = value)))
+  override val constraintSchema = new OptField[String, Row](prefix, "constraint_schema", None, None)(x => extract(x).constraintSchema, (row, value) => merge(row, extract(row).copy(constraintSchema = value)))
+  override val constraintName = new OptField[String, Row](prefix, "constraint_name", None, None)(x => extract(x).constraintName, (row, value) => merge(row, extract(row).copy(constraintName = value)))
+  override val domainCatalog = new OptField[String, Row](prefix, "domain_catalog", None, None)(x => extract(x).domainCatalog, (row, value) => merge(row, extract(row).copy(domainCatalog = value)))
+  override val domainSchema = new OptField[String, Row](prefix, "domain_schema", None, None)(x => extract(x).domainSchema, (row, value) => merge(row, extract(row).copy(domainSchema = value)))
+  override val domainName = new OptField[String, Row](prefix, "domain_name", None, None)(x => extract(x).domainName, (row, value) => merge(row, extract(row).copy(domainName = value)))
+  override val isDeferrable = new OptField[/* max 3 chars */ String, Row](prefix, "is_deferrable", None, None)(x => extract(x).isDeferrable, (row, value) => merge(row, extract(row).copy(isDeferrable = value)))
+  override val initiallyDeferred = new OptField[/* max 3 chars */ String, Row](prefix, "initially_deferred", None, None)(x => extract(x).initiallyDeferred, (row, value) => merge(row, extract(row).copy(initiallyDeferred = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](constraintCatalog, constraintSchema, constraintName, domainCatalog, domainSchema, domainName, isDeferrable, initiallyDeferred)

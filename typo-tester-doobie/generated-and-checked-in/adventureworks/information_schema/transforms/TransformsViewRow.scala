@@ -7,48 +7,47 @@ package adventureworks
 package information_schema
 package transforms
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class TransformsViewRow(
-  udtCatalog: SqlIdentifier,
-  udtSchema: SqlIdentifier,
-  udtName: SqlIdentifier,
-  specificCatalog: SqlIdentifier,
-  specificSchema: SqlIdentifier,
-  specificName: SqlIdentifier,
-  groupName: SqlIdentifier,
-  transformType: CharacterData
+  udtCatalog: /* nullability unknown */ Option[String],
+  udtSchema: /* nullability unknown */ Option[String],
+  udtName: /* nullability unknown */ Option[String],
+  specificCatalog: /* nullability unknown */ Option[String],
+  specificSchema: /* nullability unknown */ Option[String],
+  specificName: /* nullability unknown */ Option[String],
+  groupName: /* nullability unknown */ Option[String],
+  transformType: /* nullability unknown */ Option[String]
 )
 
 object TransformsViewRow {
-  implicit lazy val decoder: Decoder[TransformsViewRow] = Decoder.forProduct8[TransformsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("udt_catalog", "udt_schema", "udt_name", "specific_catalog", "specific_schema", "specific_name", "group_name", "transform_type")(TransformsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
-  implicit lazy val encoder: Encoder[TransformsViewRow] = Encoder.forProduct8[TransformsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("udt_catalog", "udt_schema", "udt_name", "specific_catalog", "specific_schema", "specific_name", "group_name", "transform_type")(x => (x.udtCatalog, x.udtSchema, x.udtName, x.specificCatalog, x.specificSchema, x.specificName, x.groupName, x.transformType))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
+  implicit lazy val decoder: Decoder[TransformsViewRow] = Decoder.forProduct8[TransformsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("udt_catalog", "udt_schema", "udt_name", "specific_catalog", "specific_schema", "specific_name", "group_name", "transform_type")(TransformsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[TransformsViewRow] = Encoder.forProduct8[TransformsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("udt_catalog", "udt_schema", "udt_name", "specific_catalog", "specific_schema", "specific_name", "group_name", "transform_type")(x => (x.udtCatalog, x.udtSchema, x.udtName, x.specificCatalog, x.specificSchema, x.specificName, x.groupName, x.transformType))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[TransformsViewRow] = new Read[TransformsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TransformsViewRow(
-      udtCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      udtSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      udtName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      specificCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      specificSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      specificName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      groupName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6),
-      transformType = CharacterData.get.unsafeGetNonNullable(rs, i + 7)
+      udtCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      udtSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      udtName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      specificCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      specificSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      specificName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      groupName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      transformType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

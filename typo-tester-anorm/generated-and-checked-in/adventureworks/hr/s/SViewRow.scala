@@ -11,7 +11,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -19,12 +18,12 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SViewRow(
-  id: Int,
+  /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
+  id: ShiftId,
   /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
   shiftid: ShiftId,
   /** Points to [[humanresources.shift.ShiftRow.name]] */
@@ -41,7 +40,7 @@ object SViewRow {
   implicit lazy val reads: Reads[SViewRow] = Reads[SViewRow](json => JsResult.fromTry(
       Try(
         SViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(ShiftId.reads),
           shiftid = json.\("shiftid").as(ShiftId.reads),
           name = json.\("name").as(Name.reads),
           starttime = json.\("starttime").as(TypoLocalTime.reads),
@@ -54,7 +53,7 @@ object SViewRow {
   def rowParser(idx: Int): RowParser[SViewRow] = RowParser[SViewRow] { row =>
     Success(
       SViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(ShiftId.column),
         shiftid = row(idx + 1)(ShiftId.column),
         name = row(idx + 2)(Name.column),
         starttime = row(idx + 3)(TypoLocalTime.column),
@@ -65,7 +64,7 @@ object SViewRow {
   }
   implicit lazy val writes: OWrites[SViewRow] = OWrites[SViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> ShiftId.writes.writes(o.id),
       "shiftid" -> ShiftId.writes.writes(o.shiftid),
       "name" -> Name.writes.writes(o.name),
       "starttime" -> TypoLocalTime.writes.writes(o.starttime),

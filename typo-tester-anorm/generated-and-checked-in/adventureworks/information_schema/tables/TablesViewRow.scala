@@ -7,9 +7,7 @@ package adventureworks
 package information_schema
 package tables
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -17,40 +15,41 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TablesViewRow(
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  tableType: CharacterData,
-  selfReferencingColumnName: SqlIdentifier,
-  referenceGeneration: CharacterData,
-  userDefinedTypeCatalog: SqlIdentifier,
-  userDefinedTypeSchema: SqlIdentifier,
-  userDefinedTypeName: SqlIdentifier,
-  isInsertableInto: YesOrNo,
-  isTyped: YesOrNo,
-  commitAction: CharacterData
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  tableType: /* nullability unknown */ Option[String],
+  selfReferencingColumnName: /* nullability unknown */ Option[String],
+  referenceGeneration: /* nullability unknown */ Option[String],
+  userDefinedTypeCatalog: /* nullability unknown */ Option[String],
+  userDefinedTypeSchema: /* nullability unknown */ Option[String],
+  userDefinedTypeName: /* nullability unknown */ Option[String],
+  isInsertableInto: /* nullability unknown */ Option[/* max 3 chars */ String],
+  isTyped: /* nullability unknown */ Option[/* max 3 chars */ String],
+  commitAction: /* nullability unknown */ Option[String]
 )
 
 object TablesViewRow {
   implicit lazy val reads: Reads[TablesViewRow] = Reads[TablesViewRow](json => JsResult.fromTry(
       Try(
         TablesViewRow(
-          tableCatalog = json.\("table_catalog").as(SqlIdentifier.reads),
-          tableSchema = json.\("table_schema").as(SqlIdentifier.reads),
-          tableName = json.\("table_name").as(SqlIdentifier.reads),
-          tableType = json.\("table_type").as(CharacterData.reads),
-          selfReferencingColumnName = json.\("self_referencing_column_name").as(SqlIdentifier.reads),
-          referenceGeneration = json.\("reference_generation").as(CharacterData.reads),
-          userDefinedTypeCatalog = json.\("user_defined_type_catalog").as(SqlIdentifier.reads),
-          userDefinedTypeSchema = json.\("user_defined_type_schema").as(SqlIdentifier.reads),
-          userDefinedTypeName = json.\("user_defined_type_name").as(SqlIdentifier.reads),
-          isInsertableInto = json.\("is_insertable_into").as(YesOrNo.reads),
-          isTyped = json.\("is_typed").as(YesOrNo.reads),
-          commitAction = json.\("commit_action").as(CharacterData.reads)
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(Reads.StringReads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          tableType = json.\("table_type").toOption.map(_.as(Reads.StringReads)),
+          selfReferencingColumnName = json.\("self_referencing_column_name").toOption.map(_.as(Reads.StringReads)),
+          referenceGeneration = json.\("reference_generation").toOption.map(_.as(Reads.StringReads)),
+          userDefinedTypeCatalog = json.\("user_defined_type_catalog").toOption.map(_.as(Reads.StringReads)),
+          userDefinedTypeSchema = json.\("user_defined_type_schema").toOption.map(_.as(Reads.StringReads)),
+          userDefinedTypeName = json.\("user_defined_type_name").toOption.map(_.as(Reads.StringReads)),
+          isInsertableInto = json.\("is_insertable_into").toOption.map(_.as(Reads.StringReads)),
+          isTyped = json.\("is_typed").toOption.map(_.as(Reads.StringReads)),
+          commitAction = json.\("commit_action").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -58,35 +57,35 @@ object TablesViewRow {
   def rowParser(idx: Int): RowParser[TablesViewRow] = RowParser[TablesViewRow] { row =>
     Success(
       TablesViewRow(
-        tableCatalog = row(idx + 0)(SqlIdentifier.column),
-        tableSchema = row(idx + 1)(SqlIdentifier.column),
-        tableName = row(idx + 2)(SqlIdentifier.column),
-        tableType = row(idx + 3)(CharacterData.column),
-        selfReferencingColumnName = row(idx + 4)(SqlIdentifier.column),
-        referenceGeneration = row(idx + 5)(CharacterData.column),
-        userDefinedTypeCatalog = row(idx + 6)(SqlIdentifier.column),
-        userDefinedTypeSchema = row(idx + 7)(SqlIdentifier.column),
-        userDefinedTypeName = row(idx + 8)(SqlIdentifier.column),
-        isInsertableInto = row(idx + 9)(YesOrNo.column),
-        isTyped = row(idx + 10)(YesOrNo.column),
-        commitAction = row(idx + 11)(CharacterData.column)
+        tableCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tableType = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        selfReferencingColumnName = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        referenceGeneration = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        userDefinedTypeCatalog = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        userDefinedTypeSchema = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        userDefinedTypeName = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        isInsertableInto = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        isTyped = row(idx + 10)(Column.columnToOption(Column.columnToString)),
+        commitAction = row(idx + 11)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[TablesViewRow] = OWrites[TablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "table_catalog" -> SqlIdentifier.writes.writes(o.tableCatalog),
-      "table_schema" -> SqlIdentifier.writes.writes(o.tableSchema),
-      "table_name" -> SqlIdentifier.writes.writes(o.tableName),
-      "table_type" -> CharacterData.writes.writes(o.tableType),
-      "self_referencing_column_name" -> SqlIdentifier.writes.writes(o.selfReferencingColumnName),
-      "reference_generation" -> CharacterData.writes.writes(o.referenceGeneration),
-      "user_defined_type_catalog" -> SqlIdentifier.writes.writes(o.userDefinedTypeCatalog),
-      "user_defined_type_schema" -> SqlIdentifier.writes.writes(o.userDefinedTypeSchema),
-      "user_defined_type_name" -> SqlIdentifier.writes.writes(o.userDefinedTypeName),
-      "is_insertable_into" -> YesOrNo.writes.writes(o.isInsertableInto),
-      "is_typed" -> YesOrNo.writes.writes(o.isTyped),
-      "commit_action" -> CharacterData.writes.writes(o.commitAction)
+      "table_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "table_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableType),
+      "self_referencing_column_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.selfReferencingColumnName),
+      "reference_generation" -> Writes.OptionWrites(Writes.StringWrites).writes(o.referenceGeneration),
+      "user_defined_type_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.userDefinedTypeCatalog),
+      "user_defined_type_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.userDefinedTypeSchema),
+      "user_defined_type_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.userDefinedTypeName),
+      "is_insertable_into" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isInsertableInto),
+      "is_typed" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isTyped),
+      "commit_action" -> Writes.OptionWrites(Writes.StringWrites).writes(o.commitAction)
     ))
   )
 }

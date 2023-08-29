@@ -25,13 +25,14 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SodViewRow(
+  /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]] */
   id: Int,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderid]] */
   salesorderid: SalesorderheaderId,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]] */
   salesorderdetailid: Int,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.carriertrackingnumber]] */
-  carriertrackingnumber: /* max 25 chars */ String,
+  carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.orderqty]] */
   orderqty: Int,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.productid]] */
@@ -55,7 +56,7 @@ object SodViewRow {
           id = json.\("id").as(Reads.IntReads),
           salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
           salesorderdetailid = json.\("salesorderdetailid").as(Reads.IntReads),
-          carriertrackingnumber = json.\("carriertrackingnumber").as(Reads.StringReads),
+          carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as(Reads.StringReads)),
           orderqty = json.\("orderqty").as(Reads.IntReads),
           productid = json.\("productid").as(ProductId.reads),
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
@@ -73,7 +74,7 @@ object SodViewRow {
         id = row(idx + 0)(Column.columnToInt),
         salesorderid = row(idx + 1)(SalesorderheaderId.column),
         salesorderdetailid = row(idx + 2)(Column.columnToInt),
-        carriertrackingnumber = row(idx + 3)(Column.columnToString),
+        carriertrackingnumber = row(idx + 3)(Column.columnToOption(Column.columnToString)),
         orderqty = row(idx + 4)(Column.columnToInt),
         productid = row(idx + 5)(ProductId.column),
         specialofferid = row(idx + 6)(SpecialofferId.column),
@@ -89,7 +90,7 @@ object SodViewRow {
       "id" -> Writes.IntWrites.writes(o.id),
       "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
       "salesorderdetailid" -> Writes.IntWrites.writes(o.salesorderdetailid),
-      "carriertrackingnumber" -> Writes.StringWrites.writes(o.carriertrackingnumber),
+      "carriertrackingnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.carriertrackingnumber),
       "orderqty" -> Writes.IntWrites.writes(o.orderqty),
       "productid" -> ProductId.writes.writes(o.productid),
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),

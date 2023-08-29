@@ -7,15 +7,13 @@ package adventureworks
 package information_schema
 package check_constraints
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait CheckConstraintsViewFields[Row] {
-  val constraintCatalog: Field[SqlIdentifier, Row]
-  val constraintSchema: Field[SqlIdentifier, Row]
-  val constraintName: Field[SqlIdentifier, Row]
-  val checkClause: Field[CharacterData, Row]
+  val constraintCatalog: OptField[String, Row]
+  val constraintSchema: OptField[String, Row]
+  val constraintName: OptField[String, Row]
+  val checkClause: OptField[String, Row]
 }
 object CheckConstraintsViewFields extends CheckConstraintsViewStructure[CheckConstraintsViewRow](None, identity, (_, x) => x)
 

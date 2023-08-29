@@ -13,13 +13,14 @@ import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PmViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ProductmodelId, Row]
   val productmodelid: Field[ProductmodelId, Row]
   val name: Field[Name, Row]
-  val catalogdescription: Field[TypoXml, Row]
-  val instructions: Field[TypoXml, Row]
+  val catalogdescription: OptField[TypoXml, Row]
+  val instructions: OptField[TypoXml, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

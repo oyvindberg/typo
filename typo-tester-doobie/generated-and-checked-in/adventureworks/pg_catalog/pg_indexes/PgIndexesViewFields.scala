@@ -15,7 +15,7 @@ trait PgIndexesViewFields[Row] {
   val tablename: Field[String, Row]
   val indexname: Field[String, Row]
   val tablespace: OptField[String, Row]
-  val indexdef: Field[String, Row]
+  val indexdef: OptField[String, Row]
 }
 object PgIndexesViewFields extends PgIndexesViewStructure[PgIndexesViewRow](None, identity, (_, x) => x)
 

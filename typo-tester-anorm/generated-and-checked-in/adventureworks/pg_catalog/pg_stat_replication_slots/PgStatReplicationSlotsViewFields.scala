@@ -8,19 +8,19 @@ package pg_catalog
 package pg_stat_replication_slots
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait PgStatReplicationSlotsViewFields[Row] {
-  val slotName: Field[String, Row]
-  val spillTxns: Field[Long, Row]
-  val spillCount: Field[Long, Row]
-  val spillBytes: Field[Long, Row]
-  val streamTxns: Field[Long, Row]
-  val streamCount: Field[Long, Row]
-  val streamBytes: Field[Long, Row]
-  val totalTxns: Field[Long, Row]
-  val totalBytes: Field[Long, Row]
-  val statsReset: Field[TypoOffsetDateTime, Row]
+  val slotName: OptField[String, Row]
+  val spillTxns: OptField[Long, Row]
+  val spillCount: OptField[Long, Row]
+  val spillBytes: OptField[Long, Row]
+  val streamTxns: OptField[Long, Row]
+  val streamCount: OptField[Long, Row]
+  val streamBytes: OptField[Long, Row]
+  val totalTxns: OptField[Long, Row]
+  val totalBytes: OptField[Long, Row]
+  val statsReset: OptField[TypoOffsetDateTime, Row]
 }
 object PgStatReplicationSlotsViewFields extends PgStatReplicationSlotsViewStructure[PgStatReplicationSlotsViewRow](None, identity, (_, x) => x)
 

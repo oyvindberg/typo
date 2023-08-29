@@ -7,15 +7,13 @@ package adventureworks
 package information_schema
 package collations
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait CollationsViewFields[Row] {
-  val collationCatalog: Field[SqlIdentifier, Row]
-  val collationSchema: Field[SqlIdentifier, Row]
-  val collationName: Field[SqlIdentifier, Row]
-  val padAttribute: Field[CharacterData, Row]
+  val collationCatalog: OptField[String, Row]
+  val collationSchema: OptField[String, Row]
+  val collationName: OptField[String, Row]
+  val padAttribute: OptField[String, Row]
 }
 object CollationsViewFields extends CollationsViewStructure[CollationsViewRow](None, identity, (_, x) => x)
 

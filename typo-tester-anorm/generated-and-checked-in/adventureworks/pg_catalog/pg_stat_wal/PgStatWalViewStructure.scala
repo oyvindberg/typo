@@ -8,23 +8,23 @@ package pg_catalog
 package pg_stat_wal
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgStatWalViewStructure[Row](val prefix: Option[String], val extract: Row => PgStatWalViewRow, val merge: (Row, PgStatWalViewRow) => Row)
   extends Relation[PgStatWalViewFields, PgStatWalViewRow, Row]
     with PgStatWalViewFields[Row] { outer =>
 
-  override val walRecords = new Field[Long, Row](prefix, "wal_records", None, Some("int8"))(x => extract(x).walRecords, (row, value) => merge(row, extract(row).copy(walRecords = value)))
-  override val walFpi = new Field[Long, Row](prefix, "wal_fpi", None, Some("int8"))(x => extract(x).walFpi, (row, value) => merge(row, extract(row).copy(walFpi = value)))
-  override val walBytes = new Field[BigDecimal, Row](prefix, "wal_bytes", None, Some("numeric"))(x => extract(x).walBytes, (row, value) => merge(row, extract(row).copy(walBytes = value)))
-  override val walBuffersFull = new Field[Long, Row](prefix, "wal_buffers_full", None, Some("int8"))(x => extract(x).walBuffersFull, (row, value) => merge(row, extract(row).copy(walBuffersFull = value)))
-  override val walWrite = new Field[Long, Row](prefix, "wal_write", None, Some("int8"))(x => extract(x).walWrite, (row, value) => merge(row, extract(row).copy(walWrite = value)))
-  override val walSync = new Field[Long, Row](prefix, "wal_sync", None, Some("int8"))(x => extract(x).walSync, (row, value) => merge(row, extract(row).copy(walSync = value)))
-  override val walWriteTime = new Field[Double, Row](prefix, "wal_write_time", None, Some("float8"))(x => extract(x).walWriteTime, (row, value) => merge(row, extract(row).copy(walWriteTime = value)))
-  override val walSyncTime = new Field[Double, Row](prefix, "wal_sync_time", None, Some("float8"))(x => extract(x).walSyncTime, (row, value) => merge(row, extract(row).copy(walSyncTime = value)))
-  override val statsReset = new Field[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), Some("timestamptz"))(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val walRecords = new OptField[Long, Row](prefix, "wal_records", None, None)(x => extract(x).walRecords, (row, value) => merge(row, extract(row).copy(walRecords = value)))
+  override val walFpi = new OptField[Long, Row](prefix, "wal_fpi", None, None)(x => extract(x).walFpi, (row, value) => merge(row, extract(row).copy(walFpi = value)))
+  override val walBytes = new OptField[BigDecimal, Row](prefix, "wal_bytes", None, None)(x => extract(x).walBytes, (row, value) => merge(row, extract(row).copy(walBytes = value)))
+  override val walBuffersFull = new OptField[Long, Row](prefix, "wal_buffers_full", None, None)(x => extract(x).walBuffersFull, (row, value) => merge(row, extract(row).copy(walBuffersFull = value)))
+  override val walWrite = new OptField[Long, Row](prefix, "wal_write", None, None)(x => extract(x).walWrite, (row, value) => merge(row, extract(row).copy(walWrite = value)))
+  override val walSync = new OptField[Long, Row](prefix, "wal_sync", None, None)(x => extract(x).walSync, (row, value) => merge(row, extract(row).copy(walSync = value)))
+  override val walWriteTime = new OptField[Double, Row](prefix, "wal_write_time", None, None)(x => extract(x).walWriteTime, (row, value) => merge(row, extract(row).copy(walWriteTime = value)))
+  override val walSyncTime = new OptField[Double, Row](prefix, "wal_sync_time", None, None)(x => extract(x).walSyncTime, (row, value) => merge(row, extract(row).copy(walSyncTime = value)))
+  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](walRecords, walFpi, walBytes, walBuffersFull, walWrite, walSync, walWriteTime, walSyncTime, statsReset)

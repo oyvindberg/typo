@@ -19,10 +19,10 @@ class PppViewStructure[Row](val prefix: Option[String], val extract: Row => PppV
   extends Relation[PppViewFields, PppViewRow, Row]
     with PppViewFields[Row] { outer =>
 
-  override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val productphotoid = new Field[ProductphotoId, Row](prefix, "productphotoid", None, Some("int4"))(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
-  override val primary = new Field[Flag, Row](prefix, "primary", None, Some("bool"))(x => extract(x).primary, (row, value) => merge(row, extract(row).copy(primary = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+  override val productphotoid = new Field[ProductphotoId, Row](prefix, "productphotoid", None, None)(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
+  override val primary = new Field[Flag, Row](prefix, "primary", None, None)(x => extract(x).primary, (row, value) => merge(row, extract(row).copy(primary = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](productid, productphotoid, primary, modifieddate)

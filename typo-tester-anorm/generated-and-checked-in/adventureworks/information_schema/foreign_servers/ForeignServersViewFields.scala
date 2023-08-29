@@ -7,18 +7,16 @@ package adventureworks
 package information_schema
 package foreign_servers
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait ForeignServersViewFields[Row] {
-  val foreignServerCatalog: Field[SqlIdentifier, Row]
-  val foreignServerName: Field[SqlIdentifier, Row]
-  val foreignDataWrapperCatalog: Field[SqlIdentifier, Row]
-  val foreignDataWrapperName: Field[SqlIdentifier, Row]
-  val foreignServerType: Field[CharacterData, Row]
-  val foreignServerVersion: Field[CharacterData, Row]
-  val authorizationIdentifier: Field[SqlIdentifier, Row]
+  val foreignServerCatalog: OptField[/* nullability unknown */ String, Row]
+  val foreignServerName: OptField[/* nullability unknown */ String, Row]
+  val foreignDataWrapperCatalog: OptField[/* nullability unknown */ String, Row]
+  val foreignDataWrapperName: OptField[/* nullability unknown */ String, Row]
+  val foreignServerType: OptField[/* nullability unknown */ String, Row]
+  val foreignServerVersion: OptField[/* nullability unknown */ String, Row]
+  val authorizationIdentifier: OptField[/* nullability unknown */ String, Row]
 }
 object ForeignServersViewFields extends ForeignServersViewStructure[ForeignServersViewRow](None, identity, (_, x) => x)
 

@@ -25,7 +25,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BeaViewRow(
-  id: Int,
+  /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.addressid]] */
@@ -42,7 +43,7 @@ object BeaViewRow {
   implicit lazy val reads: Reads[BeaViewRow] = Reads[BeaViewRow](json => JsResult.fromTry(
       Try(
         BeaViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           addressid = json.\("addressid").as(AddressId.reads),
           addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
@@ -55,7 +56,7 @@ object BeaViewRow {
   def rowParser(idx: Int): RowParser[BeaViewRow] = RowParser[BeaViewRow] { row =>
     Success(
       BeaViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         addressid = row(idx + 2)(AddressId.column),
         addresstypeid = row(idx + 3)(AddresstypeId.column),
@@ -66,7 +67,7 @@ object BeaViewRow {
   }
   implicit lazy val writes: OWrites[BeaViewRow] = OWrites[BeaViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "addressid" -> AddressId.writes.writes(o.addressid),
       "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),

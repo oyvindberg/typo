@@ -13,7 +13,7 @@ import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 
 trait LViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[LocationId, Row]
   val locationid: Field[LocationId, Row]
   val name: Field[Name, Row]
   val costrate: Field[BigDecimal, Row]

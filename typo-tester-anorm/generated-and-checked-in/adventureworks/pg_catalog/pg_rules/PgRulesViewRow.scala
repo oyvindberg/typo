@@ -20,10 +20,13 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgRulesViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   tablename: String,
+  /** Points to [[pg_rewrite.PgRewriteRow.rulename]] */
   rulename: String,
-  definition: String
+  definition: /* nullability unknown */ Option[String]
 )
 
 object PgRulesViewRow {
@@ -33,7 +36,7 @@ object PgRulesViewRow {
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
           tablename = json.\("tablename").as(Reads.StringReads),
           rulename = json.\("rulename").as(Reads.StringReads),
-          definition = json.\("definition").as(Reads.StringReads)
+          definition = json.\("definition").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -44,7 +47,7 @@ object PgRulesViewRow {
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
         tablename = row(idx + 1)(Column.columnToString),
         rulename = row(idx + 2)(Column.columnToString),
-        definition = row(idx + 3)(Column.columnToString)
+        definition = row(idx + 3)(Column.columnToOption(Column.columnToString))
       )
     )
   }
@@ -53,7 +56,7 @@ object PgRulesViewRow {
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "tablename" -> Writes.StringWrites.writes(o.tablename),
       "rulename" -> Writes.StringWrites.writes(o.rulename),
-      "definition" -> Writes.StringWrites.writes(o.definition)
+      "definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.definition)
     ))
   )
 }

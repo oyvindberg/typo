@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BecViewRow(
-  id: Int,
+  /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.personid]] */
@@ -41,7 +42,7 @@ object BecViewRow {
   implicit lazy val reads: Reads[BecViewRow] = Reads[BecViewRow](json => JsResult.fromTry(
       Try(
         BecViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           personid = json.\("personid").as(BusinessentityId.reads),
           contacttypeid = json.\("contacttypeid").as(ContacttypeId.reads),
@@ -54,7 +55,7 @@ object BecViewRow {
   def rowParser(idx: Int): RowParser[BecViewRow] = RowParser[BecViewRow] { row =>
     Success(
       BecViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         personid = row(idx + 2)(BusinessentityId.column),
         contacttypeid = row(idx + 3)(ContacttypeId.column),
@@ -65,7 +66,7 @@ object BecViewRow {
   }
   implicit lazy val writes: OWrites[BecViewRow] = OWrites[BecViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "personid" -> BusinessentityId.writes.writes(o.personid),
       "contacttypeid" -> ContacttypeId.writes.writes(o.contacttypeid),

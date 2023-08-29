@@ -12,14 +12,15 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait VemployeedepartmentViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
-  val title: Field[/* max 8 chars */ String, Row]
+  val title: OptField[/* max 8 chars */ String, Row]
   val firstname: Field[/* user-picked */ FirstName, Row]
-  val middlename: Field[Name, Row]
+  val middlename: OptField[Name, Row]
   val lastname: Field[Name, Row]
-  val suffix: Field[/* max 10 chars */ String, Row]
+  val suffix: OptField[/* max 10 chars */ String, Row]
   val jobtitle: Field[/* max 50 chars */ String, Row]
   val department: Field[Name, Row]
   val groupname: Field[Name, Row]

@@ -20,20 +20,20 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgShmemAllocationsViewRow(
-  name: String,
-  off: Long,
-  size: Long,
-  allocatedSize: Long
+  name: /* nullability unknown */ Option[String],
+  off: /* nullability unknown */ Option[Long],
+  size: /* nullability unknown */ Option[Long],
+  allocatedSize: /* nullability unknown */ Option[Long]
 )
 
 object PgShmemAllocationsViewRow {
   implicit lazy val reads: Reads[PgShmemAllocationsViewRow] = Reads[PgShmemAllocationsViewRow](json => JsResult.fromTry(
       Try(
         PgShmemAllocationsViewRow(
-          name = json.\("name").as(Reads.StringReads),
-          off = json.\("off").as(Reads.LongReads),
-          size = json.\("size").as(Reads.LongReads),
-          allocatedSize = json.\("allocated_size").as(Reads.LongReads)
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          off = json.\("off").toOption.map(_.as(Reads.LongReads)),
+          size = json.\("size").toOption.map(_.as(Reads.LongReads)),
+          allocatedSize = json.\("allocated_size").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -41,19 +41,19 @@ object PgShmemAllocationsViewRow {
   def rowParser(idx: Int): RowParser[PgShmemAllocationsViewRow] = RowParser[PgShmemAllocationsViewRow] { row =>
     Success(
       PgShmemAllocationsViewRow(
-        name = row(idx + 0)(Column.columnToString),
-        off = row(idx + 1)(Column.columnToLong),
-        size = row(idx + 2)(Column.columnToLong),
-        allocatedSize = row(idx + 3)(Column.columnToLong)
+        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        off = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        size = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
+        allocatedSize = row(idx + 3)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit lazy val writes: OWrites[PgShmemAllocationsViewRow] = OWrites[PgShmemAllocationsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Writes.StringWrites.writes(o.name),
-      "off" -> Writes.LongWrites.writes(o.off),
-      "size" -> Writes.LongWrites.writes(o.size),
-      "allocated_size" -> Writes.LongWrites.writes(o.allocatedSize)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "off" -> Writes.OptionWrites(Writes.LongWrites).writes(o.off),
+      "size" -> Writes.OptionWrites(Writes.LongWrites).writes(o.size),
+      "allocated_size" -> Writes.OptionWrites(Writes.LongWrites).writes(o.allocatedSize)
     ))
   )
 }

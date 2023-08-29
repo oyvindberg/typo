@@ -8,18 +8,19 @@ package pg_catalog
 package pg_shadow
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait PgShadowViewFields[Row] {
   val usename: Field[String, Row]
-  val usesysid: Field[/* oid */ Long, Row]
+  val usesysid: Field[PgAuthidId, Row]
   val usecreatedb: Field[Boolean, Row]
   val usesuper: Field[Boolean, Row]
   val userepl: Field[Boolean, Row]
   val usebypassrls: Field[Boolean, Row]
-  val passwd: Field[String, Row]
-  val valuntil: Field[TypoOffsetDateTime, Row]
+  val passwd: OptField[String, Row]
+  val valuntil: OptField[TypoOffsetDateTime, Row]
   val useconfig: OptField[Array[String], Row]
 }
 object PgShadowViewFields extends PgShadowViewStructure[PgShadowViewRow](None, identity, (_, x) => x)

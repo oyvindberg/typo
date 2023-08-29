@@ -34,7 +34,7 @@ case class DViewRow(
   /** Points to [[production.document.DocumentRow.filename]] */
   filename: /* max 400 chars */ String,
   /** Points to [[production.document.DocumentRow.fileextension]] */
-  fileextension: /* max 8 chars */ String,
+  fileextension: Option[/* max 8 chars */ String],
   /** Points to [[production.document.DocumentRow.revision]] */
   revision: /* bpchar, max 5 chars */ String,
   /** Points to [[production.document.DocumentRow.changenumber]] */
@@ -42,9 +42,9 @@ case class DViewRow(
   /** Points to [[production.document.DocumentRow.status]] */
   status: Int,
   /** Points to [[production.document.DocumentRow.documentsummary]] */
-  documentsummary: String,
+  documentsummary: Option[String],
   /** Points to [[production.document.DocumentRow.document]] */
-  document: Byte,
+  document: Option[Byte],
   /** Points to [[production.document.DocumentRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[production.document.DocumentRow.modifieddate]] */
@@ -61,12 +61,12 @@ object DViewRow {
           owner = json.\("owner").as(BusinessentityId.reads),
           folderflag = json.\("folderflag").as(Flag.reads),
           filename = json.\("filename").as(Reads.StringReads),
-          fileextension = json.\("fileextension").as(Reads.StringReads),
+          fileextension = json.\("fileextension").toOption.map(_.as(Reads.StringReads)),
           revision = json.\("revision").as(Reads.StringReads),
           changenumber = json.\("changenumber").as(Reads.IntReads),
           status = json.\("status").as(Reads.IntReads),
-          documentsummary = json.\("documentsummary").as(Reads.StringReads),
-          document = json.\("document").as(Reads.ByteReads),
+          documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
+          document = json.\("document").toOption.map(_.as(Reads.ByteReads)),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
           documentnode = json.\("documentnode").as(DocumentId.reads)
@@ -81,12 +81,12 @@ object DViewRow {
         owner = row(idx + 1)(BusinessentityId.column),
         folderflag = row(idx + 2)(Flag.column),
         filename = row(idx + 3)(Column.columnToString),
-        fileextension = row(idx + 4)(Column.columnToString),
+        fileextension = row(idx + 4)(Column.columnToOption(Column.columnToString)),
         revision = row(idx + 5)(Column.columnToString),
         changenumber = row(idx + 6)(Column.columnToInt),
         status = row(idx + 7)(Column.columnToInt),
-        documentsummary = row(idx + 8)(Column.columnToString),
-        document = row(idx + 9)(Column.columnToByte),
+        documentsummary = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        document = row(idx + 9)(Column.columnToOption(Column.columnToByte)),
         rowguid = row(idx + 10)(Column.columnToUUID),
         modifieddate = row(idx + 11)(TypoLocalDateTime.column),
         documentnode = row(idx + 12)(DocumentId.column)
@@ -99,12 +99,12 @@ object DViewRow {
       "owner" -> BusinessentityId.writes.writes(o.owner),
       "folderflag" -> Flag.writes.writes(o.folderflag),
       "filename" -> Writes.StringWrites.writes(o.filename),
-      "fileextension" -> Writes.StringWrites.writes(o.fileextension),
+      "fileextension" -> Writes.OptionWrites(Writes.StringWrites).writes(o.fileextension),
       "revision" -> Writes.StringWrites.writes(o.revision),
       "changenumber" -> Writes.IntWrites.writes(o.changenumber),
       "status" -> Writes.IntWrites.writes(o.status),
-      "documentsummary" -> Writes.StringWrites.writes(o.documentsummary),
-      "document" -> Writes.ByteWrites.writes(o.document),
+      "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
+      "document" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.document),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
       "documentnode" -> DocumentId.writes.writes(o.documentnode)

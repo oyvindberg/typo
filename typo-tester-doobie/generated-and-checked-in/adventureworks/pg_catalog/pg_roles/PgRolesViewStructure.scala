@@ -8,6 +8,7 @@ package pg_catalog
 package pg_roles
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -17,19 +18,19 @@ class PgRolesViewStructure[Row](val prefix: Option[String], val extract: Row => 
   extends Relation[PgRolesViewFields, PgRolesViewRow, Row]
     with PgRolesViewFields[Row] { outer =>
 
-  override val rolname = new Field[String, Row](prefix, "rolname", None, Some("name"))(x => extract(x).rolname, (row, value) => merge(row, extract(row).copy(rolname = value)))
+  override val rolname = new Field[String, Row](prefix, "rolname", None, None)(x => extract(x).rolname, (row, value) => merge(row, extract(row).copy(rolname = value)))
   override val rolsuper = new Field[Boolean, Row](prefix, "rolsuper", None, None)(x => extract(x).rolsuper, (row, value) => merge(row, extract(row).copy(rolsuper = value)))
   override val rolinherit = new Field[Boolean, Row](prefix, "rolinherit", None, None)(x => extract(x).rolinherit, (row, value) => merge(row, extract(row).copy(rolinherit = value)))
   override val rolcreaterole = new Field[Boolean, Row](prefix, "rolcreaterole", None, None)(x => extract(x).rolcreaterole, (row, value) => merge(row, extract(row).copy(rolcreaterole = value)))
   override val rolcreatedb = new Field[Boolean, Row](prefix, "rolcreatedb", None, None)(x => extract(x).rolcreatedb, (row, value) => merge(row, extract(row).copy(rolcreatedb = value)))
   override val rolcanlogin = new Field[Boolean, Row](prefix, "rolcanlogin", None, None)(x => extract(x).rolcanlogin, (row, value) => merge(row, extract(row).copy(rolcanlogin = value)))
   override val rolreplication = new Field[Boolean, Row](prefix, "rolreplication", None, None)(x => extract(x).rolreplication, (row, value) => merge(row, extract(row).copy(rolreplication = value)))
-  override val rolconnlimit = new Field[Int, Row](prefix, "rolconnlimit", None, Some("int4"))(x => extract(x).rolconnlimit, (row, value) => merge(row, extract(row).copy(rolconnlimit = value)))
-  override val rolpassword = new Field[String, Row](prefix, "rolpassword", None, None)(x => extract(x).rolpassword, (row, value) => merge(row, extract(row).copy(rolpassword = value)))
-  override val rolvaliduntil = new Field[TypoOffsetDateTime, Row](prefix, "rolvaliduntil", Some("text"), Some("timestamptz"))(x => extract(x).rolvaliduntil, (row, value) => merge(row, extract(row).copy(rolvaliduntil = value)))
+  override val rolconnlimit = new Field[Int, Row](prefix, "rolconnlimit", None, None)(x => extract(x).rolconnlimit, (row, value) => merge(row, extract(row).copy(rolconnlimit = value)))
+  override val rolpassword = new OptField[String, Row](prefix, "rolpassword", None, None)(x => extract(x).rolpassword, (row, value) => merge(row, extract(row).copy(rolpassword = value)))
+  override val rolvaliduntil = new OptField[TypoOffsetDateTime, Row](prefix, "rolvaliduntil", Some("text"), None)(x => extract(x).rolvaliduntil, (row, value) => merge(row, extract(row).copy(rolvaliduntil = value)))
   override val rolbypassrls = new Field[Boolean, Row](prefix, "rolbypassrls", None, None)(x => extract(x).rolbypassrls, (row, value) => merge(row, extract(row).copy(rolbypassrls = value)))
-  override val rolconfig = new OptField[Array[String], Row](prefix, "rolconfig", None, Some("_text"))(x => extract(x).rolconfig, (row, value) => merge(row, extract(row).copy(rolconfig = value)))
-  override val oid = new Field[/* oid */ Long, Row](prefix, "oid", None, Some("oid"))(x => extract(x).oid, (row, value) => merge(row, extract(row).copy(oid = value)))
+  override val rolconfig = new OptField[Array[String], Row](prefix, "rolconfig", None, None)(x => extract(x).rolconfig, (row, value) => merge(row, extract(row).copy(rolconfig = value)))
+  override val oid = new Field[PgAuthidId, Row](prefix, "oid", None, None)(x => extract(x).oid, (row, value) => merge(row, extract(row).copy(oid = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil, rolbypassrls, rolconfig, oid)

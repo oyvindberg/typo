@@ -7,36 +7,35 @@ package adventureworks
 package information_schema
 package collations
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CollationsViewRow(
-  collationCatalog: SqlIdentifier,
-  collationSchema: SqlIdentifier,
-  collationName: SqlIdentifier,
-  padAttribute: CharacterData
+  collationCatalog: /* nullability unknown */ Option[String],
+  collationSchema: /* nullability unknown */ Option[String],
+  collationName: /* nullability unknown */ Option[String],
+  padAttribute: /* nullability unknown */ Option[String]
 )
 
 object CollationsViewRow {
-  implicit lazy val decoder: Decoder[CollationsViewRow] = Decoder.forProduct4[CollationsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(CollationsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder)
-  implicit lazy val encoder: Encoder[CollationsViewRow] = Encoder.forProduct4[CollationsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.padAttribute))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder)
+  implicit lazy val decoder: Decoder[CollationsViewRow] = Decoder.forProduct4[CollationsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(CollationsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[CollationsViewRow] = Encoder.forProduct4[CollationsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.padAttribute))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[CollationsViewRow] = new Read[CollationsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CollationsViewRow(
-      collationCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      collationSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      collationName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      padAttribute = CharacterData.get.unsafeGetNonNullable(rs, i + 3)
+      collationCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      collationSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      collationName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      padAttribute = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

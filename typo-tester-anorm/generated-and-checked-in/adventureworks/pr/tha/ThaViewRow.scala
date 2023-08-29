@@ -22,7 +22,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ThaViewRow(
-  id: Int,
+  /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]] */
+  id: TransactionhistoryarchiveId,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]] */
   transactionid: TransactionhistoryarchiveId,
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.productid]] */
@@ -47,7 +48,7 @@ object ThaViewRow {
   implicit lazy val reads: Reads[ThaViewRow] = Reads[ThaViewRow](json => JsResult.fromTry(
       Try(
         ThaViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(TransactionhistoryarchiveId.reads),
           transactionid = json.\("transactionid").as(TransactionhistoryarchiveId.reads),
           productid = json.\("productid").as(Reads.IntReads),
           referenceorderid = json.\("referenceorderid").as(Reads.IntReads),
@@ -64,7 +65,7 @@ object ThaViewRow {
   def rowParser(idx: Int): RowParser[ThaViewRow] = RowParser[ThaViewRow] { row =>
     Success(
       ThaViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(TransactionhistoryarchiveId.column),
         transactionid = row(idx + 1)(TransactionhistoryarchiveId.column),
         productid = row(idx + 2)(Column.columnToInt),
         referenceorderid = row(idx + 3)(Column.columnToInt),
@@ -79,7 +80,7 @@ object ThaViewRow {
   }
   implicit lazy val writes: OWrites[ThaViewRow] = OWrites[ThaViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> TransactionhistoryarchiveId.writes.writes(o.id),
       "transactionid" -> TransactionhistoryarchiveId.writes.writes(o.transactionid),
       "productid" -> Writes.IntWrites.writes(o.productid),
       "referenceorderid" -> Writes.IntWrites.writes(o.referenceorderid),

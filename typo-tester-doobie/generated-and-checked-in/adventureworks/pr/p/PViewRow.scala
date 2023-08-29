@@ -27,7 +27,8 @@ import java.util.UUID
 import scala.util.Try
 
 case class PViewRow(
-  id: Int,
+  /** Points to [[production.product.ProductRow.productid]] */
+  id: ProductId,
   /** Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
   /** Points to [[production.product.ProductRow.name]] */
@@ -39,7 +40,7 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.finishedgoodsflag]] */
   finishedgoodsflag: Flag,
   /** Points to [[production.product.ProductRow.color]] */
-  color: /* max 15 chars */ String,
+  color: Option[/* max 15 chars */ String],
   /** Points to [[production.product.ProductRow.safetystocklevel]] */
   safetystocklevel: Int,
   /** Points to [[production.product.ProductRow.reorderpoint]] */
@@ -49,31 +50,31 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.listprice]] */
   listprice: BigDecimal,
   /** Points to [[production.product.ProductRow.size]] */
-  size: /* max 5 chars */ String,
+  size: Option[/* max 5 chars */ String],
   /** Points to [[production.product.ProductRow.sizeunitmeasurecode]] */
-  sizeunitmeasurecode: UnitmeasureId,
+  sizeunitmeasurecode: Option[UnitmeasureId],
   /** Points to [[production.product.ProductRow.weightunitmeasurecode]] */
-  weightunitmeasurecode: UnitmeasureId,
+  weightunitmeasurecode: Option[UnitmeasureId],
   /** Points to [[production.product.ProductRow.weight]] */
-  weight: BigDecimal,
+  weight: Option[BigDecimal],
   /** Points to [[production.product.ProductRow.daystomanufacture]] */
   daystomanufacture: Int,
   /** Points to [[production.product.ProductRow.productline]] */
-  productline: /* bpchar, max 2 chars */ String,
+  productline: Option[/* bpchar, max 2 chars */ String],
   /** Points to [[production.product.ProductRow.class]] */
-  `class`: /* bpchar, max 2 chars */ String,
+  `class`: Option[/* bpchar, max 2 chars */ String],
   /** Points to [[production.product.ProductRow.style]] */
-  style: /* bpchar, max 2 chars */ String,
+  style: Option[/* bpchar, max 2 chars */ String],
   /** Points to [[production.product.ProductRow.productsubcategoryid]] */
-  productsubcategoryid: ProductsubcategoryId,
+  productsubcategoryid: Option[ProductsubcategoryId],
   /** Points to [[production.product.ProductRow.productmodelid]] */
-  productmodelid: ProductmodelId,
+  productmodelid: Option[ProductmodelId],
   /** Points to [[production.product.ProductRow.sellstartdate]] */
   sellstartdate: TypoLocalDateTime,
   /** Points to [[production.product.ProductRow.sellenddate]] */
-  sellenddate: TypoLocalDateTime,
+  sellenddate: Option[TypoLocalDateTime],
   /** Points to [[production.product.ProductRow.discontinueddate]] */
-  discontinueddate: TypoLocalDateTime,
+  discontinueddate: Option[TypoLocalDateTime],
   /** Points to [[production.product.ProductRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[production.product.ProductRow.modifieddate]] */
@@ -88,30 +89,30 @@ object PViewRow {
         case Right(r)  => r
       }
       PViewRow(
-        id = orThrow(c.get("id")(Decoder.decodeInt)),
+        id = orThrow(c.get("id")(ProductId.decoder)),
         productid = orThrow(c.get("productid")(ProductId.decoder)),
         name = orThrow(c.get("name")(Name.decoder)),
         productnumber = orThrow(c.get("productnumber")(Decoder.decodeString)),
         makeflag = orThrow(c.get("makeflag")(Flag.decoder)),
         finishedgoodsflag = orThrow(c.get("finishedgoodsflag")(Flag.decoder)),
-        color = orThrow(c.get("color")(Decoder.decodeString)),
+        color = orThrow(c.get("color")(Decoder.decodeOption(Decoder.decodeString))),
         safetystocklevel = orThrow(c.get("safetystocklevel")(Decoder.decodeInt)),
         reorderpoint = orThrow(c.get("reorderpoint")(Decoder.decodeInt)),
         standardcost = orThrow(c.get("standardcost")(Decoder.decodeBigDecimal)),
         listprice = orThrow(c.get("listprice")(Decoder.decodeBigDecimal)),
-        size = orThrow(c.get("size")(Decoder.decodeString)),
-        sizeunitmeasurecode = orThrow(c.get("sizeunitmeasurecode")(UnitmeasureId.decoder)),
-        weightunitmeasurecode = orThrow(c.get("weightunitmeasurecode")(UnitmeasureId.decoder)),
-        weight = orThrow(c.get("weight")(Decoder.decodeBigDecimal)),
+        size = orThrow(c.get("size")(Decoder.decodeOption(Decoder.decodeString))),
+        sizeunitmeasurecode = orThrow(c.get("sizeunitmeasurecode")(Decoder.decodeOption(UnitmeasureId.decoder))),
+        weightunitmeasurecode = orThrow(c.get("weightunitmeasurecode")(Decoder.decodeOption(UnitmeasureId.decoder))),
+        weight = orThrow(c.get("weight")(Decoder.decodeOption(Decoder.decodeBigDecimal))),
         daystomanufacture = orThrow(c.get("daystomanufacture")(Decoder.decodeInt)),
-        productline = orThrow(c.get("productline")(Decoder.decodeString)),
-        `class` = orThrow(c.get("class")(Decoder.decodeString)),
-        style = orThrow(c.get("style")(Decoder.decodeString)),
-        productsubcategoryid = orThrow(c.get("productsubcategoryid")(ProductsubcategoryId.decoder)),
-        productmodelid = orThrow(c.get("productmodelid")(ProductmodelId.decoder)),
+        productline = orThrow(c.get("productline")(Decoder.decodeOption(Decoder.decodeString))),
+        `class` = orThrow(c.get("class")(Decoder.decodeOption(Decoder.decodeString))),
+        style = orThrow(c.get("style")(Decoder.decodeOption(Decoder.decodeString))),
+        productsubcategoryid = orThrow(c.get("productsubcategoryid")(Decoder.decodeOption(ProductsubcategoryId.decoder))),
+        productmodelid = orThrow(c.get("productmodelid")(Decoder.decodeOption(ProductmodelId.decoder))),
         sellstartdate = orThrow(c.get("sellstartdate")(TypoLocalDateTime.decoder)),
-        sellenddate = orThrow(c.get("sellenddate")(TypoLocalDateTime.decoder)),
-        discontinueddate = orThrow(c.get("discontinueddate")(TypoLocalDateTime.decoder)),
+        sellenddate = orThrow(c.get("sellenddate")(Decoder.decodeOption(TypoLocalDateTime.decoder))),
+        discontinueddate = orThrow(c.get("discontinueddate")(Decoder.decodeOption(TypoLocalDateTime.decoder))),
         rowguid = orThrow(c.get("rowguid")(Decoder.decodeUUID)),
         modifieddate = orThrow(c.get("modifieddate")(TypoLocalDateTime.decoder))
       )
@@ -119,88 +120,88 @@ object PViewRow {
   )
   implicit lazy val encoder: Encoder[PViewRow] = Encoder[PViewRow](row =>
     Json.obj(
-      "id" -> Encoder.encodeInt.apply(row.id),
+      "id" -> ProductId.encoder.apply(row.id),
       "productid" -> ProductId.encoder.apply(row.productid),
       "name" -> Name.encoder.apply(row.name),
       "productnumber" -> Encoder.encodeString.apply(row.productnumber),
       "makeflag" -> Flag.encoder.apply(row.makeflag),
       "finishedgoodsflag" -> Flag.encoder.apply(row.finishedgoodsflag),
-      "color" -> Encoder.encodeString.apply(row.color),
+      "color" -> Encoder.encodeOption(Encoder.encodeString).apply(row.color),
       "safetystocklevel" -> Encoder.encodeInt.apply(row.safetystocklevel),
       "reorderpoint" -> Encoder.encodeInt.apply(row.reorderpoint),
       "standardcost" -> Encoder.encodeBigDecimal.apply(row.standardcost),
       "listprice" -> Encoder.encodeBigDecimal.apply(row.listprice),
-      "size" -> Encoder.encodeString.apply(row.size),
-      "sizeunitmeasurecode" -> UnitmeasureId.encoder.apply(row.sizeunitmeasurecode),
-      "weightunitmeasurecode" -> UnitmeasureId.encoder.apply(row.weightunitmeasurecode),
-      "weight" -> Encoder.encodeBigDecimal.apply(row.weight),
+      "size" -> Encoder.encodeOption(Encoder.encodeString).apply(row.size),
+      "sizeunitmeasurecode" -> Encoder.encodeOption(UnitmeasureId.encoder).apply(row.sizeunitmeasurecode),
+      "weightunitmeasurecode" -> Encoder.encodeOption(UnitmeasureId.encoder).apply(row.weightunitmeasurecode),
+      "weight" -> Encoder.encodeOption(Encoder.encodeBigDecimal).apply(row.weight),
       "daystomanufacture" -> Encoder.encodeInt.apply(row.daystomanufacture),
-      "productline" -> Encoder.encodeString.apply(row.productline),
-      "class" -> Encoder.encodeString.apply(row.`class`),
-      "style" -> Encoder.encodeString.apply(row.style),
-      "productsubcategoryid" -> ProductsubcategoryId.encoder.apply(row.productsubcategoryid),
-      "productmodelid" -> ProductmodelId.encoder.apply(row.productmodelid),
+      "productline" -> Encoder.encodeOption(Encoder.encodeString).apply(row.productline),
+      "class" -> Encoder.encodeOption(Encoder.encodeString).apply(row.`class`),
+      "style" -> Encoder.encodeOption(Encoder.encodeString).apply(row.style),
+      "productsubcategoryid" -> Encoder.encodeOption(ProductsubcategoryId.encoder).apply(row.productsubcategoryid),
+      "productmodelid" -> Encoder.encodeOption(ProductmodelId.encoder).apply(row.productmodelid),
       "sellstartdate" -> TypoLocalDateTime.encoder.apply(row.sellstartdate),
-      "sellenddate" -> TypoLocalDateTime.encoder.apply(row.sellenddate),
-      "discontinueddate" -> TypoLocalDateTime.encoder.apply(row.discontinueddate),
+      "sellenddate" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.sellenddate),
+      "discontinueddate" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.discontinueddate),
       "rowguid" -> Encoder.encodeUUID.apply(row.rowguid),
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
   implicit lazy val read: Read[PViewRow] = new Read[PViewRow](
     gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductId.get, Nullability.NoNulls),
       (ProductId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (UnitmeasureId.get, Nullability.NoNulls),
-      (UnitmeasureId.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (UnitmeasureId.get, Nullability.Nullable),
+      (UnitmeasureId.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
       (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (ProductsubcategoryId.get, Nullability.NoNulls),
-      (ProductmodelId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (ProductsubcategoryId.get, Nullability.Nullable),
+      (ProductmodelId.get, Nullability.Nullable),
       (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+      id = ProductId.get.unsafeGetNonNullable(rs, i + 0),
       productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
       productnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
       makeflag = Flag.get.unsafeGetNonNullable(rs, i + 4),
       finishedgoodsflag = Flag.get.unsafeGetNonNullable(rs, i + 5),
-      color = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
+      color = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
       safetystocklevel = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
       reorderpoint = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 8),
       standardcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 9),
       listprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 10),
-      size = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 11),
-      sizeunitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 12),
-      weightunitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 13),
-      weight = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 14),
+      size = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11),
+      sizeunitmeasurecode = UnitmeasureId.get.unsafeGetNullable(rs, i + 12),
+      weightunitmeasurecode = UnitmeasureId.get.unsafeGetNullable(rs, i + 13),
+      weight = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 14),
       daystomanufacture = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 15),
-      productline = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 16),
-      `class` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 17),
-      style = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 18),
-      productsubcategoryid = ProductsubcategoryId.get.unsafeGetNonNullable(rs, i + 19),
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 20),
+      productline = Meta.StringMeta.get.unsafeGetNullable(rs, i + 16),
+      `class` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 17),
+      style = Meta.StringMeta.get.unsafeGetNullable(rs, i + 18),
+      productsubcategoryid = ProductsubcategoryId.get.unsafeGetNullable(rs, i + 19),
+      productmodelid = ProductmodelId.get.unsafeGetNullable(rs, i + 20),
       sellstartdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 21),
-      sellenddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 22),
-      discontinueddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 23),
+      sellenddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 22),
+      discontinueddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 23),
       rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 24),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 25)
     )

@@ -13,7 +13,7 @@ import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait PdViewFields[Row] {
-  val id: Field[Int, Row]
+  val id: Field[ProductdescriptionId, Row]
   val productdescriptionid: Field[ProductdescriptionId, Row]
   val description: Field[/* max 400 chars */ String, Row]
   val rowguid: Field[UUID, Row]

@@ -20,10 +20,12 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgViewsViewRow(
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   viewname: String,
-  viewowner: String,
-  definition: String
+  viewowner: /* nullability unknown */ Option[String],
+  definition: /* nullability unknown */ Option[String]
 )
 
 object PgViewsViewRow {
@@ -32,8 +34,8 @@ object PgViewsViewRow {
         PgViewsViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
           viewname = json.\("viewname").as(Reads.StringReads),
-          viewowner = json.\("viewowner").as(Reads.StringReads),
-          definition = json.\("definition").as(Reads.StringReads)
+          viewowner = json.\("viewowner").toOption.map(_.as(Reads.StringReads)),
+          definition = json.\("definition").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -43,8 +45,8 @@ object PgViewsViewRow {
       PgViewsViewRow(
         schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
         viewname = row(idx + 1)(Column.columnToString),
-        viewowner = row(idx + 2)(Column.columnToString),
-        definition = row(idx + 3)(Column.columnToString)
+        viewowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        definition = row(idx + 3)(Column.columnToOption(Column.columnToString))
       )
     )
   }
@@ -52,8 +54,8 @@ object PgViewsViewRow {
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "viewname" -> Writes.StringWrites.writes(o.viewname),
-      "viewowner" -> Writes.StringWrites.writes(o.viewowner),
-      "definition" -> Writes.StringWrites.writes(o.definition)
+      "viewowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.viewowner),
+      "definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.definition)
     ))
   )
 }

@@ -7,22 +7,21 @@ package adventureworks
 package information_schema
 package column_udt_usage
 
-import adventureworks.information_schema.SqlIdentifier
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class ColumnUdtUsageViewStructure[Row](val prefix: Option[String], val extract: Row => ColumnUdtUsageViewRow, val merge: (Row, ColumnUdtUsageViewRow) => Row)
   extends Relation[ColumnUdtUsageViewFields, ColumnUdtUsageViewRow, Row]
     with ColumnUdtUsageViewFields[Row] { outer =>
 
-  override val udtCatalog = new Field[SqlIdentifier, Row](prefix, "udt_catalog", None, Some("name"))(x => extract(x).udtCatalog, (row, value) => merge(row, extract(row).copy(udtCatalog = value)))
-  override val udtSchema = new Field[SqlIdentifier, Row](prefix, "udt_schema", None, Some("name"))(x => extract(x).udtSchema, (row, value) => merge(row, extract(row).copy(udtSchema = value)))
-  override val udtName = new Field[SqlIdentifier, Row](prefix, "udt_name", None, Some("name"))(x => extract(x).udtName, (row, value) => merge(row, extract(row).copy(udtName = value)))
-  override val tableCatalog = new Field[SqlIdentifier, Row](prefix, "table_catalog", None, Some("name"))(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
-  override val tableSchema = new Field[SqlIdentifier, Row](prefix, "table_schema", None, Some("name"))(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
-  override val tableName = new Field[SqlIdentifier, Row](prefix, "table_name", None, Some("name"))(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
-  override val columnName = new Field[SqlIdentifier, Row](prefix, "column_name", None, Some("name"))(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
+  override val udtCatalog = new OptField[String, Row](prefix, "udt_catalog", None, None)(x => extract(x).udtCatalog, (row, value) => merge(row, extract(row).copy(udtCatalog = value)))
+  override val udtSchema = new OptField[String, Row](prefix, "udt_schema", None, None)(x => extract(x).udtSchema, (row, value) => merge(row, extract(row).copy(udtSchema = value)))
+  override val udtName = new OptField[String, Row](prefix, "udt_name", None, None)(x => extract(x).udtName, (row, value) => merge(row, extract(row).copy(udtName = value)))
+  override val tableCatalog = new OptField[String, Row](prefix, "table_catalog", None, None)(x => extract(x).tableCatalog, (row, value) => merge(row, extract(row).copy(tableCatalog = value)))
+  override val tableSchema = new OptField[String, Row](prefix, "table_schema", None, None)(x => extract(x).tableSchema, (row, value) => merge(row, extract(row).copy(tableSchema = value)))
+  override val tableName = new OptField[String, Row](prefix, "table_name", None, None)(x => extract(x).tableName, (row, value) => merge(row, extract(row).copy(tableName = value)))
+  override val columnName = new OptField[String, Row](prefix, "column_name", None, None)(x => extract(x).columnName, (row, value) => merge(row, extract(row).copy(columnName = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](udtCatalog, udtSchema, udtName, tableCatalog, tableSchema, tableName, columnName)

@@ -9,30 +9,30 @@ package pg_locks
 
 import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoXid
-import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgLocksViewStructure[Row](val prefix: Option[String], val extract: Row => PgLocksViewRow, val merge: (Row, PgLocksViewRow) => Row)
   extends Relation[PgLocksViewFields, PgLocksViewRow, Row]
     with PgLocksViewFields[Row] { outer =>
 
-  override val locktype = new Field[String, Row](prefix, "locktype", None, None)(x => extract(x).locktype, (row, value) => merge(row, extract(row).copy(locktype = value)))
-  override val database = new Field[/* oid */ Long, Row](prefix, "database", None, Some("oid"))(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
-  override val relation = new Field[/* oid */ Long, Row](prefix, "relation", None, Some("oid"))(x => extract(x).relation, (row, value) => merge(row, extract(row).copy(relation = value)))
-  override val page = new Field[Int, Row](prefix, "page", None, Some("int4"))(x => extract(x).page, (row, value) => merge(row, extract(row).copy(page = value)))
-  override val tuple = new Field[Int, Row](prefix, "tuple", None, Some("int2"))(x => extract(x).tuple, (row, value) => merge(row, extract(row).copy(tuple = value)))
-  override val virtualxid = new Field[String, Row](prefix, "virtualxid", None, None)(x => extract(x).virtualxid, (row, value) => merge(row, extract(row).copy(virtualxid = value)))
-  override val transactionid = new Field[TypoXid, Row](prefix, "transactionid", None, Some("xid"))(x => extract(x).transactionid, (row, value) => merge(row, extract(row).copy(transactionid = value)))
-  override val classid = new Field[/* oid */ Long, Row](prefix, "classid", None, Some("oid"))(x => extract(x).classid, (row, value) => merge(row, extract(row).copy(classid = value)))
-  override val objid = new Field[/* oid */ Long, Row](prefix, "objid", None, Some("oid"))(x => extract(x).objid, (row, value) => merge(row, extract(row).copy(objid = value)))
-  override val objsubid = new Field[Int, Row](prefix, "objsubid", None, Some("int2"))(x => extract(x).objsubid, (row, value) => merge(row, extract(row).copy(objsubid = value)))
-  override val virtualtransaction = new Field[String, Row](prefix, "virtualtransaction", None, None)(x => extract(x).virtualtransaction, (row, value) => merge(row, extract(row).copy(virtualtransaction = value)))
-  override val pid = new Field[Int, Row](prefix, "pid", None, Some("int4"))(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
-  override val mode = new Field[String, Row](prefix, "mode", None, None)(x => extract(x).mode, (row, value) => merge(row, extract(row).copy(mode = value)))
-  override val granted = new Field[Boolean, Row](prefix, "granted", None, None)(x => extract(x).granted, (row, value) => merge(row, extract(row).copy(granted = value)))
-  override val fastpath = new Field[Boolean, Row](prefix, "fastpath", None, None)(x => extract(x).fastpath, (row, value) => merge(row, extract(row).copy(fastpath = value)))
-  override val waitstart = new Field[TypoOffsetDateTime, Row](prefix, "waitstart", Some("text"), Some("timestamptz"))(x => extract(x).waitstart, (row, value) => merge(row, extract(row).copy(waitstart = value)))
+  override val locktype = new OptField[String, Row](prefix, "locktype", None, None)(x => extract(x).locktype, (row, value) => merge(row, extract(row).copy(locktype = value)))
+  override val database = new OptField[/* oid */ Long, Row](prefix, "database", None, None)(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
+  override val relation = new OptField[/* oid */ Long, Row](prefix, "relation", None, None)(x => extract(x).relation, (row, value) => merge(row, extract(row).copy(relation = value)))
+  override val page = new OptField[Int, Row](prefix, "page", None, None)(x => extract(x).page, (row, value) => merge(row, extract(row).copy(page = value)))
+  override val tuple = new OptField[Int, Row](prefix, "tuple", None, None)(x => extract(x).tuple, (row, value) => merge(row, extract(row).copy(tuple = value)))
+  override val virtualxid = new OptField[String, Row](prefix, "virtualxid", None, None)(x => extract(x).virtualxid, (row, value) => merge(row, extract(row).copy(virtualxid = value)))
+  override val transactionid = new OptField[TypoXid, Row](prefix, "transactionid", None, None)(x => extract(x).transactionid, (row, value) => merge(row, extract(row).copy(transactionid = value)))
+  override val classid = new OptField[/* oid */ Long, Row](prefix, "classid", None, None)(x => extract(x).classid, (row, value) => merge(row, extract(row).copy(classid = value)))
+  override val objid = new OptField[/* oid */ Long, Row](prefix, "objid", None, None)(x => extract(x).objid, (row, value) => merge(row, extract(row).copy(objid = value)))
+  override val objsubid = new OptField[Int, Row](prefix, "objsubid", None, None)(x => extract(x).objsubid, (row, value) => merge(row, extract(row).copy(objsubid = value)))
+  override val virtualtransaction = new OptField[String, Row](prefix, "virtualtransaction", None, None)(x => extract(x).virtualtransaction, (row, value) => merge(row, extract(row).copy(virtualtransaction = value)))
+  override val pid = new OptField[Int, Row](prefix, "pid", None, None)(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
+  override val mode = new OptField[String, Row](prefix, "mode", None, None)(x => extract(x).mode, (row, value) => merge(row, extract(row).copy(mode = value)))
+  override val granted = new OptField[Boolean, Row](prefix, "granted", None, None)(x => extract(x).granted, (row, value) => merge(row, extract(row).copy(granted = value)))
+  override val fastpath = new OptField[Boolean, Row](prefix, "fastpath", None, None)(x => extract(x).fastpath, (row, value) => merge(row, extract(row).copy(fastpath = value)))
+  override val waitstart = new OptField[TypoOffsetDateTime, Row](prefix, "waitstart", Some("text"), None)(x => extract(x).waitstart, (row, value) => merge(row, extract(row).copy(waitstart = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](locktype, database, relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, mode, granted, fastpath, waitstart)

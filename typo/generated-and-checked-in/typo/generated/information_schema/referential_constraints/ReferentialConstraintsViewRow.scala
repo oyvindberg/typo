@@ -21,43 +21,41 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import typo.generated.information_schema.CharacterData
-import typo.generated.information_schema.SqlIdentifier
 
 case class ReferentialConstraintsViewRow(
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"constraint_catalog","ordinal_position":1,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  constraintCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"constraint_schema","ordinal_position":2,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  constraintSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"constraint_name","ordinal_position":3,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  constraintName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"unique_constraint_catalog","ordinal_position":4,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"4","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  uniqueConstraintCatalog: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"unique_constraint_schema","ordinal_position":5,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"5","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  uniqueConstraintSchema: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"unique_constraint_name","ordinal_position":6,"is_nullable":"YES","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"sql_identifier","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"6","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  uniqueConstraintName: Option[SqlIdentifier],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"match_option","ordinal_position":7,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"7","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  matchOption: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"update_rule","ordinal_position":8,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"8","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  updateRule: Option[CharacterData],
-  /** debug: {"table_catalog":"postgres","table_schema":"information_schema","table_name":"referential_constraints","column_name":"delete_rule","ordinal_position":9,"is_nullable":"YES","data_type":"character varying","character_octet_length":1073741824,"collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","domain_catalog":"postgres","domain_schema":"information_schema","domain_name":"character_data","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"varchar","dtd_identifier":"9","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */
-  deleteRule: Option[CharacterData]
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_catalog"},"columnName":"constraint_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  constraintCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_schema"},"columnName":"constraint_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  constraintSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_name"},"columnName":"constraint_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  constraintName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"unique_constraint_catalog"},"columnName":"unique_constraint_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  uniqueConstraintCatalog: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"unique_constraint_schema"},"columnName":"unique_constraint_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  uniqueConstraintSchema: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"unique_constraint_name"},"columnName":"unique_constraint_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  uniqueConstraintName: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"match_option"},"columnName":"match_option","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  matchOption: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"update_rule"},"columnName":"update_rule","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  updateRule: /* nullability unknown */ Option[String],
+  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"delete_rule"},"columnName":"delete_rule","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  deleteRule: /* nullability unknown */ Option[String]
 )
 
 object ReferentialConstraintsViewRow {
   implicit lazy val reads: Reads[ReferentialConstraintsViewRow] = Reads[ReferentialConstraintsViewRow](json => JsResult.fromTry(
       Try(
         ReferentialConstraintsViewRow(
-          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          constraintSchema = json.\("constraint_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          constraintName = json.\("constraint_name").toOption.map(_.as(SqlIdentifier.reads)),
-          uniqueConstraintCatalog = json.\("unique_constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
-          uniqueConstraintSchema = json.\("unique_constraint_schema").toOption.map(_.as(SqlIdentifier.reads)),
-          uniqueConstraintName = json.\("unique_constraint_name").toOption.map(_.as(SqlIdentifier.reads)),
-          matchOption = json.\("match_option").toOption.map(_.as(CharacterData.reads)),
-          updateRule = json.\("update_rule").toOption.map(_.as(CharacterData.reads)),
-          deleteRule = json.\("delete_rule").toOption.map(_.as(CharacterData.reads))
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(Reads.StringReads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(Reads.StringReads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(Reads.StringReads)),
+          uniqueConstraintCatalog = json.\("unique_constraint_catalog").toOption.map(_.as(Reads.StringReads)),
+          uniqueConstraintSchema = json.\("unique_constraint_schema").toOption.map(_.as(Reads.StringReads)),
+          uniqueConstraintName = json.\("unique_constraint_name").toOption.map(_.as(Reads.StringReads)),
+          matchOption = json.\("match_option").toOption.map(_.as(Reads.StringReads)),
+          updateRule = json.\("update_rule").toOption.map(_.as(Reads.StringReads)),
+          deleteRule = json.\("delete_rule").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -65,29 +63,29 @@ object ReferentialConstraintsViewRow {
   def rowParser(idx: Int): RowParser[ReferentialConstraintsViewRow] = RowParser[ReferentialConstraintsViewRow] { row =>
     Success(
       ReferentialConstraintsViewRow(
-        constraintCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
-        constraintSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
-        constraintName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
-        uniqueConstraintCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
-        uniqueConstraintSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
-        uniqueConstraintName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
-        matchOption = row(idx + 6)(Column.columnToOption(CharacterData.column)),
-        updateRule = row(idx + 7)(Column.columnToOption(CharacterData.column)),
-        deleteRule = row(idx + 8)(Column.columnToOption(CharacterData.column))
+        constraintCatalog = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        constraintSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        constraintName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        uniqueConstraintCatalog = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        uniqueConstraintSchema = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        uniqueConstraintName = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        matchOption = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        updateRule = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        deleteRule = row(idx + 8)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[ReferentialConstraintsViewRow] = OWrites[ReferentialConstraintsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
-      "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),
-      "constraint_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintName),
-      "unique_constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.uniqueConstraintCatalog),
-      "unique_constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.uniqueConstraintSchema),
-      "unique_constraint_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.uniqueConstraintName),
-      "match_option" -> Writes.OptionWrites(CharacterData.writes).writes(o.matchOption),
-      "update_rule" -> Writes.OptionWrites(CharacterData.writes).writes(o.updateRule),
-      "delete_rule" -> Writes.OptionWrites(CharacterData.writes).writes(o.deleteRule)
+      "constraint_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintName),
+      "unique_constraint_catalog" -> Writes.OptionWrites(Writes.StringWrites).writes(o.uniqueConstraintCatalog),
+      "unique_constraint_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.uniqueConstraintSchema),
+      "unique_constraint_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.uniqueConstraintName),
+      "match_option" -> Writes.OptionWrites(Writes.StringWrites).writes(o.matchOption),
+      "update_rule" -> Writes.OptionWrites(Writes.StringWrites).writes(o.updateRule),
+      "delete_rule" -> Writes.OptionWrites(Writes.StringWrites).writes(o.deleteRule)
     ))
   )
 }

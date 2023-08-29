@@ -10,7 +10,6 @@ package pnt
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -18,12 +17,12 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PntViewRow(
-  id: Int,
+  /** Points to [[person.phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
+  id: PhonenumbertypeId,
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
   phonenumbertypeid: PhonenumbertypeId,
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.name]] */
@@ -36,7 +35,7 @@ object PntViewRow {
   implicit lazy val reads: Reads[PntViewRow] = Reads[PntViewRow](json => JsResult.fromTry(
       Try(
         PntViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(PhonenumbertypeId.reads),
           phonenumbertypeid = json.\("phonenumbertypeid").as(PhonenumbertypeId.reads),
           name = json.\("name").as(Name.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
@@ -47,7 +46,7 @@ object PntViewRow {
   def rowParser(idx: Int): RowParser[PntViewRow] = RowParser[PntViewRow] { row =>
     Success(
       PntViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(PhonenumbertypeId.column),
         phonenumbertypeid = row(idx + 1)(PhonenumbertypeId.column),
         name = row(idx + 2)(Name.column),
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
@@ -56,7 +55,7 @@ object PntViewRow {
   }
   implicit lazy val writes: OWrites[PntViewRow] = OWrites[PntViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> PhonenumbertypeId.writes.writes(o.id),
       "phonenumbertypeid" -> PhonenumbertypeId.writes.writes(o.phonenumbertypeid),
       "name" -> Name.writes.writes(o.name),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)

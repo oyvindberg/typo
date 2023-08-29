@@ -8,37 +8,38 @@ package pg_catalog
 package pg_stat_sys_tables
 
 import adventureworks.customtypes.TypoOffsetDateTime
-import typo.dsl.SqlExpr.Field
+import adventureworks.pg_catalog.pg_class.PgClassId
 import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 class PgStatSysTablesViewStructure[Row](val prefix: Option[String], val extract: Row => PgStatSysTablesViewRow, val merge: (Row, PgStatSysTablesViewRow) => Row)
   extends Relation[PgStatSysTablesViewFields, PgStatSysTablesViewRow, Row]
     with PgStatSysTablesViewFields[Row] { outer =>
 
-  override val relid = new Field[/* oid */ Long, Row](prefix, "relid", None, Some("oid"))(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
-  override val schemaname = new Field[String, Row](prefix, "schemaname", None, Some("name"))(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
-  override val relname = new Field[String, Row](prefix, "relname", None, Some("name"))(x => extract(x).relname, (row, value) => merge(row, extract(row).copy(relname = value)))
-  override val seqScan = new Field[Long, Row](prefix, "seq_scan", None, Some("int8"))(x => extract(x).seqScan, (row, value) => merge(row, extract(row).copy(seqScan = value)))
-  override val seqTupRead = new Field[Long, Row](prefix, "seq_tup_read", None, Some("int8"))(x => extract(x).seqTupRead, (row, value) => merge(row, extract(row).copy(seqTupRead = value)))
-  override val idxScan = new Field[Long, Row](prefix, "idx_scan", None, Some("int8"))(x => extract(x).idxScan, (row, value) => merge(row, extract(row).copy(idxScan = value)))
-  override val idxTupFetch = new Field[Long, Row](prefix, "idx_tup_fetch", None, Some("int8"))(x => extract(x).idxTupFetch, (row, value) => merge(row, extract(row).copy(idxTupFetch = value)))
-  override val nTupIns = new Field[Long, Row](prefix, "n_tup_ins", None, Some("int8"))(x => extract(x).nTupIns, (row, value) => merge(row, extract(row).copy(nTupIns = value)))
-  override val nTupUpd = new Field[Long, Row](prefix, "n_tup_upd", None, Some("int8"))(x => extract(x).nTupUpd, (row, value) => merge(row, extract(row).copy(nTupUpd = value)))
-  override val nTupDel = new Field[Long, Row](prefix, "n_tup_del", None, Some("int8"))(x => extract(x).nTupDel, (row, value) => merge(row, extract(row).copy(nTupDel = value)))
-  override val nTupHotUpd = new Field[Long, Row](prefix, "n_tup_hot_upd", None, Some("int8"))(x => extract(x).nTupHotUpd, (row, value) => merge(row, extract(row).copy(nTupHotUpd = value)))
-  override val nLiveTup = new Field[Long, Row](prefix, "n_live_tup", None, Some("int8"))(x => extract(x).nLiveTup, (row, value) => merge(row, extract(row).copy(nLiveTup = value)))
-  override val nDeadTup = new Field[Long, Row](prefix, "n_dead_tup", None, Some("int8"))(x => extract(x).nDeadTup, (row, value) => merge(row, extract(row).copy(nDeadTup = value)))
-  override val nModSinceAnalyze = new Field[Long, Row](prefix, "n_mod_since_analyze", None, Some("int8"))(x => extract(x).nModSinceAnalyze, (row, value) => merge(row, extract(row).copy(nModSinceAnalyze = value)))
-  override val nInsSinceVacuum = new Field[Long, Row](prefix, "n_ins_since_vacuum", None, Some("int8"))(x => extract(x).nInsSinceVacuum, (row, value) => merge(row, extract(row).copy(nInsSinceVacuum = value)))
-  override val lastVacuum = new Field[TypoOffsetDateTime, Row](prefix, "last_vacuum", Some("text"), Some("timestamptz"))(x => extract(x).lastVacuum, (row, value) => merge(row, extract(row).copy(lastVacuum = value)))
-  override val lastAutovacuum = new Field[TypoOffsetDateTime, Row](prefix, "last_autovacuum", Some("text"), Some("timestamptz"))(x => extract(x).lastAutovacuum, (row, value) => merge(row, extract(row).copy(lastAutovacuum = value)))
-  override val lastAnalyze = new Field[TypoOffsetDateTime, Row](prefix, "last_analyze", Some("text"), Some("timestamptz"))(x => extract(x).lastAnalyze, (row, value) => merge(row, extract(row).copy(lastAnalyze = value)))
-  override val lastAutoanalyze = new Field[TypoOffsetDateTime, Row](prefix, "last_autoanalyze", Some("text"), Some("timestamptz"))(x => extract(x).lastAutoanalyze, (row, value) => merge(row, extract(row).copy(lastAutoanalyze = value)))
-  override val vacuumCount = new Field[Long, Row](prefix, "vacuum_count", None, Some("int8"))(x => extract(x).vacuumCount, (row, value) => merge(row, extract(row).copy(vacuumCount = value)))
-  override val autovacuumCount = new Field[Long, Row](prefix, "autovacuum_count", None, Some("int8"))(x => extract(x).autovacuumCount, (row, value) => merge(row, extract(row).copy(autovacuumCount = value)))
-  override val analyzeCount = new Field[Long, Row](prefix, "analyze_count", None, Some("int8"))(x => extract(x).analyzeCount, (row, value) => merge(row, extract(row).copy(analyzeCount = value)))
-  override val autoanalyzeCount = new Field[Long, Row](prefix, "autoanalyze_count", None, Some("int8"))(x => extract(x).autoanalyzeCount, (row, value) => merge(row, extract(row).copy(autoanalyzeCount = value)))
+  override val relid = new OptField[PgClassId, Row](prefix, "relid", None, None)(x => extract(x).relid, (row, value) => merge(row, extract(row).copy(relid = value)))
+  override val schemaname = new OptField[String, Row](prefix, "schemaname", None, None)(x => extract(x).schemaname, (row, value) => merge(row, extract(row).copy(schemaname = value)))
+  override val relname = new OptField[String, Row](prefix, "relname", None, None)(x => extract(x).relname, (row, value) => merge(row, extract(row).copy(relname = value)))
+  override val seqScan = new OptField[/* nullability unknown */ Long, Row](prefix, "seq_scan", None, None)(x => extract(x).seqScan, (row, value) => merge(row, extract(row).copy(seqScan = value)))
+  override val seqTupRead = new OptField[/* nullability unknown */ Long, Row](prefix, "seq_tup_read", None, None)(x => extract(x).seqTupRead, (row, value) => merge(row, extract(row).copy(seqTupRead = value)))
+  override val idxScan = new OptField[/* nullability unknown */ Long, Row](prefix, "idx_scan", None, None)(x => extract(x).idxScan, (row, value) => merge(row, extract(row).copy(idxScan = value)))
+  override val idxTupFetch = new OptField[/* nullability unknown */ Long, Row](prefix, "idx_tup_fetch", None, None)(x => extract(x).idxTupFetch, (row, value) => merge(row, extract(row).copy(idxTupFetch = value)))
+  override val nTupIns = new OptField[/* nullability unknown */ Long, Row](prefix, "n_tup_ins", None, None)(x => extract(x).nTupIns, (row, value) => merge(row, extract(row).copy(nTupIns = value)))
+  override val nTupUpd = new OptField[/* nullability unknown */ Long, Row](prefix, "n_tup_upd", None, None)(x => extract(x).nTupUpd, (row, value) => merge(row, extract(row).copy(nTupUpd = value)))
+  override val nTupDel = new OptField[/* nullability unknown */ Long, Row](prefix, "n_tup_del", None, None)(x => extract(x).nTupDel, (row, value) => merge(row, extract(row).copy(nTupDel = value)))
+  override val nTupHotUpd = new OptField[/* nullability unknown */ Long, Row](prefix, "n_tup_hot_upd", None, None)(x => extract(x).nTupHotUpd, (row, value) => merge(row, extract(row).copy(nTupHotUpd = value)))
+  override val nLiveTup = new OptField[/* nullability unknown */ Long, Row](prefix, "n_live_tup", None, None)(x => extract(x).nLiveTup, (row, value) => merge(row, extract(row).copy(nLiveTup = value)))
+  override val nDeadTup = new OptField[/* nullability unknown */ Long, Row](prefix, "n_dead_tup", None, None)(x => extract(x).nDeadTup, (row, value) => merge(row, extract(row).copy(nDeadTup = value)))
+  override val nModSinceAnalyze = new OptField[/* nullability unknown */ Long, Row](prefix, "n_mod_since_analyze", None, None)(x => extract(x).nModSinceAnalyze, (row, value) => merge(row, extract(row).copy(nModSinceAnalyze = value)))
+  override val nInsSinceVacuum = new OptField[/* nullability unknown */ Long, Row](prefix, "n_ins_since_vacuum", None, None)(x => extract(x).nInsSinceVacuum, (row, value) => merge(row, extract(row).copy(nInsSinceVacuum = value)))
+  override val lastVacuum = new OptField[/* nullability unknown */ TypoOffsetDateTime, Row](prefix, "last_vacuum", Some("text"), None)(x => extract(x).lastVacuum, (row, value) => merge(row, extract(row).copy(lastVacuum = value)))
+  override val lastAutovacuum = new OptField[/* nullability unknown */ TypoOffsetDateTime, Row](prefix, "last_autovacuum", Some("text"), None)(x => extract(x).lastAutovacuum, (row, value) => merge(row, extract(row).copy(lastAutovacuum = value)))
+  override val lastAnalyze = new OptField[/* nullability unknown */ TypoOffsetDateTime, Row](prefix, "last_analyze", Some("text"), None)(x => extract(x).lastAnalyze, (row, value) => merge(row, extract(row).copy(lastAnalyze = value)))
+  override val lastAutoanalyze = new OptField[/* nullability unknown */ TypoOffsetDateTime, Row](prefix, "last_autoanalyze", Some("text"), None)(x => extract(x).lastAutoanalyze, (row, value) => merge(row, extract(row).copy(lastAutoanalyze = value)))
+  override val vacuumCount = new OptField[/* nullability unknown */ Long, Row](prefix, "vacuum_count", None, None)(x => extract(x).vacuumCount, (row, value) => merge(row, extract(row).copy(vacuumCount = value)))
+  override val autovacuumCount = new OptField[/* nullability unknown */ Long, Row](prefix, "autovacuum_count", None, None)(x => extract(x).autovacuumCount, (row, value) => merge(row, extract(row).copy(autovacuumCount = value)))
+  override val analyzeCount = new OptField[/* nullability unknown */ Long, Row](prefix, "analyze_count", None, None)(x => extract(x).analyzeCount, (row, value) => merge(row, extract(row).copy(analyzeCount = value)))
+  override val autoanalyzeCount = new OptField[/* nullability unknown */ Long, Row](prefix, "autoanalyze_count", None, None)(x => extract(x).autoanalyzeCount, (row, value) => merge(row, extract(row).copy(autoanalyzeCount = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](relid, schemaname, relname, seqScan, seqTupRead, idxScan, idxTupFetch, nTupIns, nTupUpd, nTupDel, nTupHotUpd, nLiveTup, nDeadTup, nModSinceAnalyze, nInsSinceVacuum, lastVacuum, lastAutovacuum, lastAnalyze, lastAutoanalyze, vacuumCount, autovacuumCount, analyzeCount, autoanalyzeCount)

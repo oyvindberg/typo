@@ -7,22 +7,19 @@ package adventureworks
 package information_schema
 package role_routine_grants
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
-import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.OptField
 
 trait RoleRoutineGrantsViewFields[Row] {
-  val grantor: Field[SqlIdentifier, Row]
-  val grantee: Field[SqlIdentifier, Row]
-  val specificCatalog: Field[SqlIdentifier, Row]
-  val specificSchema: Field[SqlIdentifier, Row]
-  val specificName: Field[SqlIdentifier, Row]
-  val routineCatalog: Field[SqlIdentifier, Row]
-  val routineSchema: Field[SqlIdentifier, Row]
-  val routineName: Field[SqlIdentifier, Row]
-  val privilegeType: Field[CharacterData, Row]
-  val isGrantable: Field[YesOrNo, Row]
+  val grantor: OptField[/* nullability unknown */ String, Row]
+  val grantee: OptField[/* nullability unknown */ String, Row]
+  val specificCatalog: OptField[/* nullability unknown */ String, Row]
+  val specificSchema: OptField[/* nullability unknown */ String, Row]
+  val specificName: OptField[/* nullability unknown */ String, Row]
+  val routineCatalog: OptField[/* nullability unknown */ String, Row]
+  val routineSchema: OptField[/* nullability unknown */ String, Row]
+  val routineName: OptField[/* nullability unknown */ String, Row]
+  val privilegeType: OptField[/* nullability unknown */ String, Row]
+  val isGrantable: OptField[/* nullability unknown */ /* max 3 chars */ String, Row]
 }
 object RoleRoutineGrantsViewFields extends RoleRoutineGrantsViewStructure[RoleRoutineGrantsViewRow](None, identity, (_, x) => x)
 

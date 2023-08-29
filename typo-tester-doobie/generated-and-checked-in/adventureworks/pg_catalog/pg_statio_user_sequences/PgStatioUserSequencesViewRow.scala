@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_statio_user_sequences
 
+import adventureworks.pg_catalog.pg_class.PgClassId
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -16,34 +17,34 @@ import java.sql.ResultSet
 
 case class PgStatioUserSequencesViewRow(
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.relid]] */
-  relid: /* oid */ Long,
+  relid: Option[PgClassId],
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.schemaname]] */
-  schemaname: String,
+  schemaname: Option[String],
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.relname]] */
-  relname: String,
+  relname: Option[String],
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.blksRead]] */
-  blksRead: Long,
+  blksRead: Option[/* nullability unknown */ Long],
   /** Points to [[pg_statio_all_sequences.PgStatioAllSequencesViewRow.blksHit]] */
-  blksHit: Long
+  blksHit: Option[/* nullability unknown */ Long]
 )
 
 object PgStatioUserSequencesViewRow {
-  implicit lazy val decoder: Decoder[PgStatioUserSequencesViewRow] = Decoder.forProduct5[PgStatioUserSequencesViewRow, /* oid */ Long, String, String, Long, Long]("relid", "schemaname", "relname", "blks_read", "blks_hit")(PgStatioUserSequencesViewRow.apply)(Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgStatioUserSequencesViewRow] = Encoder.forProduct5[PgStatioUserSequencesViewRow, /* oid */ Long, String, String, Long, Long]("relid", "schemaname", "relname", "blks_read", "blks_hit")(x => (x.relid, x.schemaname, x.relname, x.blksRead, x.blksHit))(Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgStatioUserSequencesViewRow] = Decoder.forProduct5[PgStatioUserSequencesViewRow, Option[PgClassId], Option[String], Option[String], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(PgStatioUserSequencesViewRow.apply)(Decoder.decodeOption(PgClassId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgStatioUserSequencesViewRow] = Encoder.forProduct5[PgStatioUserSequencesViewRow, Option[PgClassId], Option[String], Option[String], Option[/* nullability unknown */ Long], Option[/* nullability unknown */ Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(x => (x.relid, x.schemaname, x.relname, x.blksRead, x.blksHit))(Encoder.encodeOption(PgClassId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit lazy val read: Read[PgStatioUserSequencesViewRow] = new Read[PgStatioUserSequencesViewRow](
     gets = List(
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.LongMeta.get, Nullability.NoNulls)
+      (PgClassId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatioUserSequencesViewRow(
-      relid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
-      schemaname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      relname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      blksRead = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      blksHit = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4)
+      relid = PgClassId.get.unsafeGetNullable(rs, i + 0),
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      blksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      blksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

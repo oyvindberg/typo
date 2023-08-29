@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_statio_all_indexes
 
+import adventureworks.pg_catalog.pg_class.PgClassId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -20,26 +21,31 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatioAllIndexesViewRow(
-  relid: /* oid */ Long,
-  indexrelid: /* oid */ Long,
+  /** Points to [[pg_class.PgClassRow.oid]] */
+  relid: PgClassId,
+  /** Points to [[pg_class.PgClassRow.oid]] */
+  indexrelid: PgClassId,
+  /** Points to [[pg_namespace.PgNamespaceRow.nspname]] */
   schemaname: Option[String],
+  /** Points to [[pg_class.PgClassRow.relname]] */
   relname: String,
+  /** Points to [[pg_class.PgClassRow.relname]] */
   indexrelname: String,
-  idxBlksRead: Long,
-  idxBlksHit: Long
+  idxBlksRead: /* nullability unknown */ Option[Long],
+  idxBlksHit: /* nullability unknown */ Option[Long]
 )
 
 object PgStatioAllIndexesViewRow {
   implicit lazy val reads: Reads[PgStatioAllIndexesViewRow] = Reads[PgStatioAllIndexesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioAllIndexesViewRow(
-          relid = json.\("relid").as(Reads.LongReads),
-          indexrelid = json.\("indexrelid").as(Reads.LongReads),
+          relid = json.\("relid").as(PgClassId.reads),
+          indexrelid = json.\("indexrelid").as(PgClassId.reads),
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
           relname = json.\("relname").as(Reads.StringReads),
           indexrelname = json.\("indexrelname").as(Reads.StringReads),
-          idxBlksRead = json.\("idx_blks_read").as(Reads.LongReads),
-          idxBlksHit = json.\("idx_blks_hit").as(Reads.LongReads)
+          idxBlksRead = json.\("idx_blks_read").toOption.map(_.as(Reads.LongReads)),
+          idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -47,25 +53,25 @@ object PgStatioAllIndexesViewRow {
   def rowParser(idx: Int): RowParser[PgStatioAllIndexesViewRow] = RowParser[PgStatioAllIndexesViewRow] { row =>
     Success(
       PgStatioAllIndexesViewRow(
-        relid = row(idx + 0)(Column.columnToLong),
-        indexrelid = row(idx + 1)(Column.columnToLong),
+        relid = row(idx + 0)(PgClassId.column),
+        indexrelid = row(idx + 1)(PgClassId.column),
         schemaname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
         relname = row(idx + 3)(Column.columnToString),
         indexrelname = row(idx + 4)(Column.columnToString),
-        idxBlksRead = row(idx + 5)(Column.columnToLong),
-        idxBlksHit = row(idx + 6)(Column.columnToLong)
+        idxBlksRead = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        idxBlksHit = row(idx + 6)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatioAllIndexesViewRow] = OWrites[PgStatioAllIndexesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Writes.LongWrites.writes(o.relid),
-      "indexrelid" -> Writes.LongWrites.writes(o.indexrelid),
+      "relid" -> PgClassId.writes.writes(o.relid),
+      "indexrelid" -> PgClassId.writes.writes(o.indexrelid),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "relname" -> Writes.StringWrites.writes(o.relname),
       "indexrelname" -> Writes.StringWrites.writes(o.indexrelname),
-      "idx_blks_read" -> Writes.LongWrites.writes(o.idxBlksRead),
-      "idx_blks_hit" -> Writes.LongWrites.writes(o.idxBlksHit)
+      "idx_blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxBlksRead),
+      "idx_blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxBlksHit)
     ))
   )
 }

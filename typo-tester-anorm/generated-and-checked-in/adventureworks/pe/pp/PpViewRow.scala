@@ -11,7 +11,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
@@ -19,12 +18,12 @@ import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PpViewRow(
-  id: Int,
+  /** Points to [[person.personphone.PersonphoneRow.businessentityid]] */
+  id: BusinessentityId,
   /** Points to [[person.personphone.PersonphoneRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
@@ -39,7 +38,7 @@ object PpViewRow {
   implicit lazy val reads: Reads[PpViewRow] = Reads[PpViewRow](json => JsResult.fromTry(
       Try(
         PpViewRow(
-          id = json.\("id").as(Reads.IntReads),
+          id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           phonenumber = json.\("phonenumber").as(Phone.reads),
           phonenumbertypeid = json.\("phonenumbertypeid").as(PhonenumbertypeId.reads),
@@ -51,7 +50,7 @@ object PpViewRow {
   def rowParser(idx: Int): RowParser[PpViewRow] = RowParser[PpViewRow] { row =>
     Success(
       PpViewRow(
-        id = row(idx + 0)(Column.columnToInt),
+        id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
         phonenumber = row(idx + 2)(Phone.column),
         phonenumbertypeid = row(idx + 3)(PhonenumbertypeId.column),
@@ -61,7 +60,7 @@ object PpViewRow {
   }
   implicit lazy val writes: OWrites[PpViewRow] = OWrites[PpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
+      "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "phonenumber" -> Phone.writes.writes(o.phonenumber),
       "phonenumbertypeid" -> PhonenumbertypeId.writes.writes(o.phonenumbertypeid),

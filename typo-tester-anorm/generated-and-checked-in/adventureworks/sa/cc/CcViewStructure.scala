@@ -17,13 +17,13 @@ class CcViewStructure[Row](val prefix: Option[String], val extract: Row => CcVie
   extends Relation[CcViewFields, CcViewRow, Row]
     with CcViewFields[Row] { outer =>
 
-  override val id = new Field[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val creditcardid = new Field[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, Some("int4"))(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
+  override val id = new Field[/* user-picked */ CustomCreditcardId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val creditcardid = new Field[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, None)(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
   override val cardtype = new Field[/* max 50 chars */ String, Row](prefix, "cardtype", None, None)(x => extract(x).cardtype, (row, value) => merge(row, extract(row).copy(cardtype = value)))
   override val cardnumber = new Field[/* max 25 chars */ String, Row](prefix, "cardnumber", None, None)(x => extract(x).cardnumber, (row, value) => merge(row, extract(row).copy(cardnumber = value)))
-  override val expmonth = new Field[Int, Row](prefix, "expmonth", None, Some("int2"))(x => extract(x).expmonth, (row, value) => merge(row, extract(row).copy(expmonth = value)))
-  override val expyear = new Field[Int, Row](prefix, "expyear", None, Some("int2"))(x => extract(x).expyear, (row, value) => merge(row, extract(row).copy(expyear = value)))
-  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+  override val expmonth = new Field[Int, Row](prefix, "expmonth", None, None)(x => extract(x).expmonth, (row, value) => merge(row, extract(row).copy(expmonth = value)))
+  override val expyear = new Field[Int, Row](prefix, "expyear", None, None)(x => extract(x).expyear, (row, value) => merge(row, extract(row).copy(expyear = value)))
+  override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)

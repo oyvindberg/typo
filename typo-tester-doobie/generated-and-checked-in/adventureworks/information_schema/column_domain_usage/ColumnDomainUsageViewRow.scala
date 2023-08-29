@@ -7,44 +7,44 @@ package adventureworks
 package information_schema
 package column_domain_usage
 
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ColumnDomainUsageViewRow(
-  domainCatalog: SqlIdentifier,
-  domainSchema: SqlIdentifier,
-  domainName: SqlIdentifier,
-  tableCatalog: SqlIdentifier,
-  tableSchema: SqlIdentifier,
-  tableName: SqlIdentifier,
-  columnName: SqlIdentifier
+  domainCatalog: /* nullability unknown */ Option[String],
+  domainSchema: /* nullability unknown */ Option[String],
+  domainName: /* nullability unknown */ Option[String],
+  tableCatalog: /* nullability unknown */ Option[String],
+  tableSchema: /* nullability unknown */ Option[String],
+  tableName: /* nullability unknown */ Option[String],
+  columnName: /* nullability unknown */ Option[String]
 )
 
 object ColumnDomainUsageViewRow {
-  implicit lazy val decoder: Decoder[ColumnDomainUsageViewRow] = Decoder.forProduct7[ColumnDomainUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("domain_catalog", "domain_schema", "domain_name", "table_catalog", "table_schema", "table_name", "column_name")(ColumnDomainUsageViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder)
-  implicit lazy val encoder: Encoder[ColumnDomainUsageViewRow] = Encoder.forProduct7[ColumnDomainUsageViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier]("domain_catalog", "domain_schema", "domain_name", "table_catalog", "table_schema", "table_name", "column_name")(x => (x.domainCatalog, x.domainSchema, x.domainName, x.tableCatalog, x.tableSchema, x.tableName, x.columnName))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder)
+  implicit lazy val decoder: Decoder[ColumnDomainUsageViewRow] = Decoder.forProduct7[ColumnDomainUsageViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("domain_catalog", "domain_schema", "domain_name", "table_catalog", "table_schema", "table_name", "column_name")(ColumnDomainUsageViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[ColumnDomainUsageViewRow] = Encoder.forProduct7[ColumnDomainUsageViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("domain_catalog", "domain_schema", "domain_name", "table_catalog", "table_schema", "table_name", "column_name")(x => (x.domainCatalog, x.domainSchema, x.domainName, x.tableCatalog, x.tableSchema, x.tableName, x.columnName))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[ColumnDomainUsageViewRow] = new Read[ColumnDomainUsageViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ColumnDomainUsageViewRow(
-      domainCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      domainSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      domainName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      tableCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      tableSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      tableName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 5),
-      columnName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 6)
+      domainCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      domainSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      domainName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      tableCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      tableSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      tableName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      columnName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

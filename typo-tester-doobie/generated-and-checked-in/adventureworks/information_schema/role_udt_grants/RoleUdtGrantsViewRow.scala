@@ -7,53 +7,51 @@ package adventureworks
 package information_schema
 package role_udt_grants
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
 case class RoleUdtGrantsViewRow(
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.grantor]] */
-  grantor: SqlIdentifier,
+  grantor: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.grantee]] */
-  grantee: SqlIdentifier,
+  grantee: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.udtCatalog]] */
-  udtCatalog: SqlIdentifier,
+  udtCatalog: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.udtSchema]] */
-  udtSchema: SqlIdentifier,
+  udtSchema: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.udtName]] */
-  udtName: SqlIdentifier,
+  udtName: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.privilegeType]] */
-  privilegeType: CharacterData,
+  privilegeType: Option[/* nullability unknown */ String],
   /** Points to [[udt_privileges.UdtPrivilegesViewRow.isGrantable]] */
-  isGrantable: YesOrNo
+  isGrantable: Option[/* nullability unknown */ /* max 3 chars */ String]
 )
 
 object RoleUdtGrantsViewRow {
-  implicit lazy val decoder: Decoder[RoleUdtGrantsViewRow] = Decoder.forProduct7[RoleUdtGrantsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(RoleUdtGrantsViewRow.apply)(SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, SqlIdentifier.decoder, CharacterData.decoder, YesOrNo.decoder)
-  implicit lazy val encoder: Encoder[RoleUdtGrantsViewRow] = Encoder.forProduct7[RoleUdtGrantsViewRow, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, SqlIdentifier, CharacterData, YesOrNo]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.udtCatalog, x.udtSchema, x.udtName, x.privilegeType, x.isGrantable))(SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, SqlIdentifier.encoder, CharacterData.encoder, YesOrNo.encoder)
+  implicit lazy val decoder: Decoder[RoleUdtGrantsViewRow] = Decoder.forProduct7[RoleUdtGrantsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ /* max 3 chars */ String]]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(RoleUdtGrantsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[RoleUdtGrantsViewRow] = Encoder.forProduct7[RoleUdtGrantsViewRow, Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ String], Option[/* nullability unknown */ /* max 3 chars */ String]]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.udtCatalog, x.udtSchema, x.udtName, x.privilegeType, x.isGrantable))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[RoleUdtGrantsViewRow] = new Read[RoleUdtGrantsViewRow](
     gets = List(
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (SqlIdentifier.get, Nullability.NoNulls),
-      (CharacterData.get, Nullability.NoNulls),
-      (YesOrNo.get, Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => RoleUdtGrantsViewRow(
-      grantor = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 0),
-      grantee = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 1),
-      udtCatalog = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 2),
-      udtSchema = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 3),
-      udtName = SqlIdentifier.get.unsafeGetNonNullable(rs, i + 4),
-      privilegeType = CharacterData.get.unsafeGetNonNullable(rs, i + 5),
-      isGrantable = YesOrNo.get.unsafeGetNonNullable(rs, i + 6)
+      grantor = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      grantee = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      udtCatalog = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      udtSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      udtName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      privilegeType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      isGrantable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }
