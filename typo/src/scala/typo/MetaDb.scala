@@ -28,11 +28,11 @@ object MetaDb {
       keyColumnUsage: List[KeyColumnUsageViewRow],
       referentialConstraints: List[ReferentialConstraintsViewRow],
       pgEnums: List[EnumsSqlRow],
-      tablesViewRows: List[TablesViewRow],
-      columnsViewRows: List[ColumnsViewRow],
-      viewRows: List[ViewFindAllSqlRow],
+      tables: List[TablesViewRow],
+      columns: List[ColumnsViewRow],
+      views: List[ViewFindAllSqlRow],
       domains: List[DomainsSqlRow],
-      comments: List[CommentsSqlRow]
+      columnComments: List[CommentsSqlRow]
   )
 
   object Input {
@@ -50,19 +50,17 @@ object MetaDb {
         keyColumnUsage = timed("keyColumnUsage")(KeyColumnUsageViewRepoImpl.selectAll),
         referentialConstraints = timed("referentialConstraints")(ReferentialConstraintsViewRepoImpl.selectAll),
         pgEnums = timed("pgEnums")(EnumsSqlRepoImpl()),
-        tablesViewRows = timed("tablesViewRows")(TablesViewRepoImpl.selectAll),
-        columnsViewRows = timed("columnsViewRows")(ColumnsViewRepoImpl.selectAll),
-        viewRows = timed("viewRows")(ViewFindAllSqlRepoImpl()),
+        tables = timed("tables")(TablesViewRepoImpl.selectAll),
+        columns = timed("columns")(ColumnsViewRepoImpl.selectAll),
+        views = timed("views")(ViewFindAllSqlRepoImpl()),
         domains = timed("domains")(DomainsSqlRepoImpl()),
-        comments = timed("comments")(CommentsSqlRepoImpl())
+        columnComments = timed("columnComments")(CommentsSqlRepoImpl())
       )
     }
   }
 
   def fromDb(implicit c: Connection): MetaDb = {
     val input = Input.fromDb
-    val groupedViewRows: Map[db.RelationName, ViewFindAllSqlRow] =
-      input.viewRows.map { view => (db.RelationName(view.tableSchema, view.tableName.get), view) }.toMap
 
     val foreignKeys = ForeignKeys(input.tableConstraints, input.keyColumnUsage, input.referentialConstraints)
     val primaryKeys = PrimaryKeys(input.tableConstraints, input.keyColumnUsage)
@@ -92,73 +90,71 @@ object MetaDb {
     val typeMapperDb = TypeMapperDb(enums, domains)
 
     val comments: Map[(db.RelationName, db.ColName), String] =
-      input.comments.collect { case CommentsSqlRow(maybeSchema, Some(table), Some(column), description) =>
+      input.columnComments.collect { case CommentsSqlRow(maybeSchema, Some(table), Some(column), description) =>
         (db.RelationName(maybeSchema, table), db.ColName(column)) -> description
       }.toMap
 
-    val columnsByTable: Map[(Option[String], Option[String], Option[String]), List[ColumnsViewRow]] = input.columnsViewRows
-      .groupBy(c => (c.tableCatalog, c.tableSchema, c.tableName))
+    val columnsByTable: Map[db.RelationName, List[ColumnsViewRow]] =
+      input.columns.groupBy(c => db.RelationName(c.tableSchema, c.tableName.get))
 
-    val relations: List[db.Relation] = {
-      input.tablesViewRows.flatMap { relation =>
-        val relationName = db.RelationName(
-          schema = relation.tableSchema,
-          name = relation.tableName.get
-        )
+    val views: Map[db.RelationName, db.View] =
+      input.views.flatMap { viewRow =>
+        val relationName = db.RelationName(viewRow.tableSchema, viewRow.tableName.get)
+        viewRow.viewDefinition.map { sqlContent =>
+          val decomposedSql = DecomposedSql.parse(sqlContent)
+          val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked
+          val nullabilityInfo = NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
+          (relationName, db.View(relationName, decomposedSql, jdbcMetadata, nullabilityInfo, isMaterialized = viewRow.relkind == "m"))
+        }
+      }.toMap
 
-        val columns = columnsByTable((relation.tableCatalog, relation.tableSchema, relation.tableName))
-          .sortBy(_.ordinalPosition)
+    val tables: List[db.Relation] =
+      input.tables.flatMap { relation =>
+        val relationName = db.RelationName(schema = relation.tableSchema, name = relation.tableName.get)
 
-        groupedViewRows.get(relationName) match {
-          case Some(view) =>
-            view.viewDefinition.map { sqlContent =>
-              val decomposedSql = DecomposedSql.parse(sqlContent)
-              val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked
-              val nullabilityInfo = NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
-              db.View(relationName, decomposedSql, jdbcMetadata, nullabilityInfo, isMaterialized = view.relkind == "m")
+        if (views.contains(relationName)) None
+        else {
+          val columns = columnsByTable(relationName).sortBy(_.ordinalPosition)
+
+          val mappedCols: List[db.Col] =
+            columns.map { c =>
+              val jsonDescription = DebugJson(c)
+
+              val colName = db.ColName(c.columnName.get)
+              val nullability =
+                c.isNullable match {
+                  case Some("YES") => Nullability.Nullable
+                  case Some("NO")  => Nullability.NoNulls
+                  case None        => Nullability.NullableUnknown
+                  case other       => throw new Exception(s"Unknown nullability: $other")
+                }
+              val tpe = typeMapperDb.col(c).getOrElse {
+                System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${colName.value}. Falling back to text")
+                db.Type.Text
+              }
+              db.Col(
+                name = colName,
+                columnDefault = c.columnDefault,
+                nullability = nullability,
+                tpe = tpe,
+                udtName = c.udtName,
+                comment = comments.get((relationName, colName)),
+                jsonDescription = jsonDescription
+              )
             }
 
-          case None =>
-            val mappedCols: List[db.Col] =
-              columns.map { c =>
-                val jsonDescription = DebugJson(c)
-
-                val colName = db.ColName(c.columnName.get)
-                val nullability =
-                  c.isNullable match {
-                    case Some("YES") => Nullability.Nullable
-                    case Some("NO")  => Nullability.NoNulls
-                    case None        => Nullability.NullableUnknown
-                    case other       => throw new Exception(s"Unknown nullability: $other")
-                  }
-                db.Col(
-                  name = colName,
-                  columnDefault = c.columnDefault,
-                  nullability = nullability,
-                  tpe = typeMapperDb.col(c).getOrElse {
-                    System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${colName.value}. Falling back to text")
-                    db.Type.Text
-                  },
-                  udtName = c.udtName,
-                  comment = comments.get((relationName, colName)),
-                  jsonDescription = jsonDescription
-                )
-              }
-
-            for {
-              mappedCols <- NonEmptyList.fromList(mappedCols)
-            } yield db.Table(
-              name = relationName,
-              cols = mappedCols,
-              primaryKey = primaryKeys.get(relationName),
-              uniqueKeys = uniqueKeys.getOrElse(relationName, List.empty),
-              foreignKeys = foreignKeys.getOrElse(relationName, List.empty)
-            )
+          for {
+            mappedCols <- NonEmptyList.fromList(mappedCols)
+          } yield db.Table(
+            name = relationName,
+            cols = mappedCols,
+            primaryKey = primaryKeys.get(relationName),
+            uniqueKeys = uniqueKeys.getOrElse(relationName, List.empty),
+            foreignKeys = foreignKeys.getOrElse(relationName, List.empty)
+          )
         }
       }
-    }
 
-    MetaDb(relations, enums, domains, typeMapperDb)
-
+    MetaDb(tables ++ views.values, enums, domains, typeMapperDb)
   }
 }
