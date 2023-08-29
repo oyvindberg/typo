@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.transactionhistory where transactionid = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from production.transactionhistory where "transactionid" = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     DeleteBuilder("production.transactionhistory", TransactionhistoryFields)
   }
   override def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
-    SQL"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
+    SQL"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (${ParameterValue(unsaved.transactionid, null, TransactionhistoryId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.referenceorderid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.referenceorderlineid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.transactiondate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.transactiontype, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
+          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """
       .executeInsert(TransactionhistoryRow.rowParser(1).single)
     
@@ -65,13 +65,13 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.transactionhistory default values
-            returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
+            returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
          """
         .executeInsert(TransactionhistoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.transactionhistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
+                  returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(TransactionhistoryRow.rowParser(1).single)
@@ -82,42 +82,42 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     SelectBuilderSql("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
+    SQL"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
           from production.transactionhistory
        """.as(TransactionhistoryRow.rowParser(1).*)
   }
   override def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
+    SQL"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
           from production.transactionhistory
-          where transactionid = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}
+          where "transactionid" = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}
        """.as(TransactionhistoryRow.rowParser(1).singleOpt)
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow] = {
-    SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
+    SQL"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
           from production.transactionhistory
-          where transactionid = ANY(${transactionids})
+          where "transactionid" = ANY(${transactionids})
        """.as(TransactionhistoryRow.rowParser(1).*)
     
   }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
     val transactionid = row.transactionid
     SQL"""update production.transactionhistory
-          set productid = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
-              referenceorderid = ${ParameterValue(row.referenceorderid, null, ToStatement.intToStatement)}::int4,
-              referenceorderlineid = ${ParameterValue(row.referenceorderlineid, null, ToStatement.intToStatement)}::int4,
-              transactiondate = ${ParameterValue(row.transactiondate, null, TypoLocalDateTime.toStatement)}::timestamp,
-              transactiontype = ${ParameterValue(row.transactiontype, null, ToStatement.stringToStatement)}::bpchar,
-              quantity = ${ParameterValue(row.quantity, null, ToStatement.intToStatement)}::int4,
-              actualcost = ${ParameterValue(row.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where transactionid = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}
+          set "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
+              "referenceorderid" = ${ParameterValue(row.referenceorderid, null, ToStatement.intToStatement)}::int4,
+              "referenceorderlineid" = ${ParameterValue(row.referenceorderlineid, null, ToStatement.intToStatement)}::int4,
+              "transactiondate" = ${ParameterValue(row.transactiondate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              "transactiontype" = ${ParameterValue(row.transactiontype, null, ToStatement.stringToStatement)}::bpchar,
+              "quantity" = ${ParameterValue(row.quantity, null, ToStatement.intToStatement)}::int4,
+              "actualcost" = ${ParameterValue(row.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "transactionid" = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     UpdateBuilder("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.rowParser)
   }
   override def upsert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
-    SQL"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
+    SQL"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (
             ${ParameterValue(unsaved.transactionid, null, TransactionhistoryId.toStatement)}::int4,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
@@ -129,17 +129,17 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
             ${ParameterValue(unsaved.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (transactionid)
+          on conflict ("transactionid")
           do update set
-            productid = EXCLUDED.productid,
-            referenceorderid = EXCLUDED.referenceorderid,
-            referenceorderlineid = EXCLUDED.referenceorderlineid,
-            transactiondate = EXCLUDED.transactiondate,
-            transactiontype = EXCLUDED.transactiontype,
-            quantity = EXCLUDED.quantity,
-            actualcost = EXCLUDED.actualcost,
-            modifieddate = EXCLUDED.modifieddate
-          returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
+            "productid" = EXCLUDED."productid",
+            "referenceorderid" = EXCLUDED."referenceorderid",
+            "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+            "transactiondate" = EXCLUDED."transactiondate",
+            "transactiontype" = EXCLUDED."transactiontype",
+            "quantity" = EXCLUDED."quantity",
+            "actualcost" = EXCLUDED."actualcost",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """
       .executeInsert(TransactionhistoryRow.rowParser(1).single)
     

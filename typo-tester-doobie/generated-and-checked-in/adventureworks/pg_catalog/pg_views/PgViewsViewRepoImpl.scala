@@ -18,6 +18,6 @@ object PgViewsViewRepoImpl extends PgViewsViewRepo {
     SelectBuilderSql("pg_catalog.pg_views", PgViewsViewFields, PgViewsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgViewsViewRow] = {
-    sql"select schemaname, viewname, viewowner, definition from pg_catalog.pg_views".query(PgViewsViewRow.read).stream
+    sql"""select "schemaname", "viewname", "viewowner", "definition" from pg_catalog.pg_views""".query(PgViewsViewRow.read).stream
   }
 }

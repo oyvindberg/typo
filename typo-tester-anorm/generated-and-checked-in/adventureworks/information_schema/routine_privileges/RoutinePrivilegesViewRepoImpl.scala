@@ -17,7 +17,7 @@ object RoutinePrivilegesViewRepoImpl extends RoutinePrivilegesViewRepo {
     SelectBuilderSql("information_schema.routine_privileges", RoutinePrivilegesViewFields, RoutinePrivilegesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[RoutinePrivilegesViewRow] = {
-    SQL"""select grantor, grantee, specific_catalog, specific_schema, "specific_name", "routine_catalog", "routine_schema", "routine_name", privilege_type, is_grantable
+    SQL"""select "grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable"
           from information_schema.routine_privileges
        """.as(RoutinePrivilegesViewRow.rowParser(1).*)
   }

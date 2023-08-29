@@ -18,6 +18,6 @@ object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo
     SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VadditionalcontactinfoViewRow] = {
-    sql"select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate::text from person.vadditionalcontactinfo".query(VadditionalcontactinfoViewRow.read).stream
+    sql"""select "businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate"::text from person.vadditionalcontactinfo""".query(VadditionalcontactinfoViewRow.read).stream
   }
 }

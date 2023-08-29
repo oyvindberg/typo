@@ -18,6 +18,6 @@ object PppViewRepoImpl extends PppViewRepo {
     SelectBuilderSql("pr.ppp", PppViewFields, PppViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PppViewRow] = {
-    sql"""select productid, productphotoid, "primary", modifieddate::text from pr.ppp""".query(PppViewRow.read).stream
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from pr.ppp""".query(PppViewRow.read).stream
   }
 }

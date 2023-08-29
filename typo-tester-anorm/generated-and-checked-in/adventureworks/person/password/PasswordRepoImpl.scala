@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person."password" where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from person.password where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
     DeleteBuilder("person.password", PasswordFields)
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
-    SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
+    SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.passwordhash, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.passwordsalt, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
+          returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """
       .executeInsert(PasswordRow.rowParser(1).single)
     
@@ -54,14 +54,14 @@ object PasswordRepoImpl extends PasswordRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into person."password" default values
-            returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
+      SQL"""insert into person.password default values
+            returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
          """
         .executeInsert(PasswordRow.rowParser(1).single)
     } else {
-      val q = s"""insert into person."password"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into person.password(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
+                  returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(PasswordRow.rowParser(1).single)
@@ -72,38 +72,38 @@ object PasswordRepoImpl extends PasswordRepo {
     SelectBuilderSql("person.password", PasswordFields, PasswordRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
-          from person."password"
+    SQL"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
+          from person.password
        """.as(PasswordRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
-          from person."password"
-          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
+    SQL"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
+          from person.password
+          where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(PasswordRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
-          from person."password"
-          where businessentityid = ANY(${businessentityids})
+    SQL"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
+          from person.password
+          where "businessentityid" = ANY(${businessentityids})
        """.as(PasswordRow.rowParser(1).*)
     
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
-    SQL"""update person."password"
-          set passwordhash = ${ParameterValue(row.passwordhash, null, ToStatement.stringToStatement)},
-              passwordsalt = ${ParameterValue(row.passwordsalt, null, ToStatement.stringToStatement)},
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
+    SQL"""update person.password
+          set "passwordhash" = ${ParameterValue(row.passwordhash, null, ToStatement.stringToStatement)},
+              "passwordsalt" = ${ParameterValue(row.passwordsalt, null, ToStatement.stringToStatement)},
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
     UpdateBuilder("person.password", PasswordFields, PasswordRow.rowParser)
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
-    SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
+    SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.passwordhash, null, ToStatement.stringToStatement)},
@@ -111,13 +111,13 @@ object PasswordRepoImpl extends PasswordRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (businessentityid)
+          on conflict ("businessentityid")
           do update set
-            passwordhash = EXCLUDED.passwordhash,
-            passwordsalt = EXCLUDED.passwordsalt,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
+            "passwordhash" = EXCLUDED."passwordhash",
+            "passwordsalt" = EXCLUDED."passwordsalt",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """
       .executeInsert(PasswordRow.rowParser(1).single)
     

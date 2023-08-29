@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgShdescriptionRepoImpl extends PgShdescriptionRepo {
   override def delete(compositeId: PgShdescriptionId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_shdescription where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_shdescription where "objoid" = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND "classoid" = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgShdescriptionFields, PgShdescriptionRow] = {
     DeleteBuilder("pg_catalog.pg_shdescription", PgShdescriptionFields)
   }
   override def insert(unsaved: PgShdescriptionRow)(implicit c: Connection): PgShdescriptionRow = {
-    SQL"""insert into pg_catalog.pg_shdescription(objoid, classoid, description)
+    SQL"""insert into pg_catalog.pg_shdescription("objoid", "classoid", "description")
           values (${ParameterValue(unsaved.objoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.classoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)})
-          returning objoid, classoid, description
+          returning "objoid", "classoid", "description"
        """
       .executeInsert(PgShdescriptionRow.rowParser(1).single)
     
@@ -35,37 +35,37 @@ object PgShdescriptionRepoImpl extends PgShdescriptionRepo {
     SelectBuilderSql("pg_catalog.pg_shdescription", PgShdescriptionFields, PgShdescriptionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgShdescriptionRow] = {
-    SQL"""select objoid, classoid, description
+    SQL"""select "objoid", "classoid", "description"
           from pg_catalog.pg_shdescription
        """.as(PgShdescriptionRow.rowParser(1).*)
   }
   override def selectById(compositeId: PgShdescriptionId)(implicit c: Connection): Option[PgShdescriptionRow] = {
-    SQL"""select objoid, classoid, description
+    SQL"""select "objoid", "classoid", "description"
           from pg_catalog.pg_shdescription
-          where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)}
+          where "objoid" = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND "classoid" = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)}
        """.as(PgShdescriptionRow.rowParser(1).singleOpt)
   }
   override def update(row: PgShdescriptionRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_shdescription
-          set description = ${ParameterValue(row.description, null, ToStatement.stringToStatement)}
-          where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)}
+          set "description" = ${ParameterValue(row.description, null, ToStatement.stringToStatement)}
+          where "objoid" = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND "classoid" = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgShdescriptionFields, PgShdescriptionRow] = {
     UpdateBuilder("pg_catalog.pg_shdescription", PgShdescriptionFields, PgShdescriptionRow.rowParser)
   }
   override def upsert(unsaved: PgShdescriptionRow)(implicit c: Connection): PgShdescriptionRow = {
-    SQL"""insert into pg_catalog.pg_shdescription(objoid, classoid, description)
+    SQL"""insert into pg_catalog.pg_shdescription("objoid", "classoid", "description")
           values (
             ${ParameterValue(unsaved.objoid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.classoid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)}
           )
-          on conflict (objoid, classoid)
+          on conflict ("objoid", "classoid")
           do update set
-            description = EXCLUDED.description
-          returning objoid, classoid, description
+            "description" = EXCLUDED."description"
+          returning "objoid", "classoid", "description"
        """
       .executeInsert(PgShdescriptionRow.rowParser(1).single)
     

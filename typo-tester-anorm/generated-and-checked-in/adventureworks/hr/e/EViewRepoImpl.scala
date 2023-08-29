@@ -17,7 +17,7 @@ object EViewRepoImpl extends EViewRepo {
     SelectBuilderSql("hr.e", EViewFields, EViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EViewRow] = {
-    SQL"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
+    SQL"""select "id", "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
           from hr.e
        """.as(EViewRow.rowParser(1).*)
   }

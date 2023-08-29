@@ -18,6 +18,6 @@ object WrViewRepoImpl extends WrViewRepo {
     SelectBuilderSql("pr.wr", WrViewFields, WrViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, WrViewRow] = {
-    sql"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text from pr.wr""".query(WrViewRow.read).stream
+    sql"""select "id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from pr.wr""".query(WrViewRow.read).stream
   }
 }

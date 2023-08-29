@@ -17,7 +17,7 @@ object ViewColumnUsageViewRepoImpl extends ViewColumnUsageViewRepo {
     SelectBuilderSql("information_schema.view_column_usage", ViewColumnUsageViewFields, ViewColumnUsageViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ViewColumnUsageViewRow] = {
-    SQL"""select view_catalog, view_schema, view_name, table_catalog, table_schema, "table_name", "column_name"
+    SQL"""select "view_catalog", "view_schema", "view_name", "table_catalog", "table_schema", "table_name", "column_name"
           from information_schema.view_column_usage
        """.as(ViewColumnUsageViewRow.rowParser(1).*)
   }

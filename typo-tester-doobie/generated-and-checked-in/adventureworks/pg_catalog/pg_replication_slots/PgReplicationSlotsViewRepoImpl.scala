@@ -18,6 +18,6 @@ object PgReplicationSlotsViewRepoImpl extends PgReplicationSlotsViewRepo {
     SelectBuilderSql("pg_catalog.pg_replication_slots", PgReplicationSlotsViewFields, PgReplicationSlotsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgReplicationSlotsViewRow] = {
-    sql"""select slot_name, plugin, slot_type, datoid, "database", "temporary", active, active_pid, xmin, catalog_xmin, restart_lsn, confirmed_flush_lsn, wal_status, safe_wal_size, two_phase from pg_catalog.pg_replication_slots""".query(PgReplicationSlotsViewRow.read).stream
+    sql"""select "slot_name", "plugin", "slot_type", "datoid", "database", "temporary", "active", "active_pid", "xmin", "catalog_xmin", "restart_lsn", "confirmed_flush_lsn", "wal_status", "safe_wal_size", "two_phase" from pg_catalog.pg_replication_slots""".query(PgReplicationSlotsViewRow.read).stream
   }
 }

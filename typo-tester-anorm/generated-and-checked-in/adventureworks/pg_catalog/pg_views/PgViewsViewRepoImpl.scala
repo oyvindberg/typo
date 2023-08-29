@@ -17,7 +17,7 @@ object PgViewsViewRepoImpl extends PgViewsViewRepo {
     SelectBuilderSql("pg_catalog.pg_views", PgViewsViewFields, PgViewsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgViewsViewRow] = {
-    SQL"""select schemaname, viewname, viewowner, definition
+    SQL"""select "schemaname", "viewname", "viewowner", "definition"
           from pg_catalog.pg_views
        """.as(PgViewsViewRow.rowParser(1).*)
   }

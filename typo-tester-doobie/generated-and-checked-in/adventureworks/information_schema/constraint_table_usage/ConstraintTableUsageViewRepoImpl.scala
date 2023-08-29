@@ -18,6 +18,6 @@ object ConstraintTableUsageViewRepoImpl extends ConstraintTableUsageViewRepo {
     SelectBuilderSql("information_schema.constraint_table_usage", ConstraintTableUsageViewFields, ConstraintTableUsageViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ConstraintTableUsageViewRow] = {
-    sql"""select table_catalog, table_schema, "table_name", "constraint_catalog", "constraint_schema", "constraint_name" from information_schema.constraint_table_usage""".query(ConstraintTableUsageViewRow.read).stream
+    sql"""select "table_catalog", "table_schema", "table_name", "constraint_catalog", "constraint_schema", "constraint_name" from information_schema.constraint_table_usage""".query(ConstraintTableUsageViewRow.read).stream
   }
 }

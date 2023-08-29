@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def delete(compositeId: PgAuthMembersId)(implicit c: Connection): Boolean = {
-    SQL"""delete from pg_catalog.pg_auth_members where roleid = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}""".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_auth_members where "roleid" = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
     DeleteBuilder("pg_catalog.pg_auth_members", PgAuthMembersFields)
   }
   override def insert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow = {
-    SQL"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
+    SQL"""insert into pg_catalog.pg_auth_members("roleid", "member", "grantor", "admin_option")
           values (${ParameterValue(unsaved.roleid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.member, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.grantor, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.adminOption, null, ToStatement.booleanToStatement)})
-          returning roleid, "member", grantor, admin_option
+          returning "roleid", "member", "grantor", "admin_option"
        """
       .executeInsert(PgAuthMembersRow.rowParser(1).single)
     
@@ -35,47 +35,47 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
     SelectBuilderSql("pg_catalog.pg_auth_members", PgAuthMembersFields, PgAuthMembersRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAuthMembersRow] = {
-    SQL"""select roleid, "member", grantor, admin_option
+    SQL"""select "roleid", "member", "grantor", "admin_option"
           from pg_catalog.pg_auth_members
        """.as(PgAuthMembersRow.rowParser(1).*)
   }
   override def selectById(compositeId: PgAuthMembersId)(implicit c: Connection): Option[PgAuthMembersRow] = {
-    SQL"""select roleid, "member", grantor, admin_option
+    SQL"""select "roleid", "member", "grantor", "admin_option"
           from pg_catalog.pg_auth_members
-          where roleid = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}
+          where "roleid" = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}
        """.as(PgAuthMembersRow.rowParser(1).singleOpt)
   }
   override def selectByUnique(member: /* oid */ Long, roleid: /* oid */ Long)(implicit c: Connection): Option[PgAuthMembersRow] = {
-    SQL"""select "member", roleid
+    SQL"""select "member", "roleid"
           from pg_catalog.pg_auth_members
-          where "member" = ${ParameterValue(member, null, ToStatement.longToStatement)} AND roleid = ${ParameterValue(roleid, null, ToStatement.longToStatement)}
+          where "member" = ${ParameterValue(member, null, ToStatement.longToStatement)} AND "roleid" = ${ParameterValue(roleid, null, ToStatement.longToStatement)}
        """.as(PgAuthMembersRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgAuthMembersRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_auth_members
-          set grantor = ${ParameterValue(row.grantor, null, ToStatement.longToStatement)}::oid,
-              admin_option = ${ParameterValue(row.adminOption, null, ToStatement.booleanToStatement)}
-          where roleid = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}
+          set "grantor" = ${ParameterValue(row.grantor, null, ToStatement.longToStatement)}::oid,
+              "admin_option" = ${ParameterValue(row.adminOption, null, ToStatement.booleanToStatement)}
+          where "roleid" = ${ParameterValue(compositeId.roleid, null, ToStatement.longToStatement)} AND "member" = ${ParameterValue(compositeId.member, null, ToStatement.longToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
     UpdateBuilder("pg_catalog.pg_auth_members", PgAuthMembersFields, PgAuthMembersRow.rowParser)
   }
   override def upsert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow = {
-    SQL"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
+    SQL"""insert into pg_catalog.pg_auth_members("roleid", "member", "grantor", "admin_option")
           values (
             ${ParameterValue(unsaved.roleid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.member, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.grantor, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.adminOption, null, ToStatement.booleanToStatement)}
           )
-          on conflict (roleid, "member")
+          on conflict ("roleid", "member")
           do update set
-            grantor = EXCLUDED.grantor,
-            admin_option = EXCLUDED.admin_option
-          returning roleid, "member", grantor, admin_option
+            "grantor" = EXCLUDED."grantor",
+            "admin_option" = EXCLUDED."admin_option"
+          returning "roleid", "member", "grantor", "admin_option"
        """
       .executeInsert(PgAuthMembersRow.rowParser(1).single)
     

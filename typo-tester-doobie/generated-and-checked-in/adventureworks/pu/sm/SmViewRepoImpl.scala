@@ -18,6 +18,6 @@ object SmViewRepoImpl extends SmViewRepo {
     SelectBuilderSql("pu.sm", SmViewFields, SmViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SmViewRow] = {
-    sql"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from pu.sm""".query(SmViewRow.read).stream
+    sql"""select "id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from pu.sm""".query(SmViewRow.read).stream
   }
 }

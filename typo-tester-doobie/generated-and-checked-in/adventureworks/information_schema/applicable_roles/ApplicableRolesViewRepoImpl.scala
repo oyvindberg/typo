@@ -18,6 +18,6 @@ object ApplicableRolesViewRepoImpl extends ApplicableRolesViewRepo {
     SelectBuilderSql("information_schema.applicable_roles", ApplicableRolesViewFields, ApplicableRolesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ApplicableRolesViewRow] = {
-    sql"select grantee, role_name, is_grantable from information_schema.applicable_roles".query(ApplicableRolesViewRow.read).stream
+    sql"""select "grantee", "role_name", "is_grantable" from information_schema.applicable_roles""".query(ApplicableRolesViewRow.read).stream
   }
 }

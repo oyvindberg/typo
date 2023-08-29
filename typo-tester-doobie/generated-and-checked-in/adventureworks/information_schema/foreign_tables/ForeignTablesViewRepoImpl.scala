@@ -18,6 +18,6 @@ object ForeignTablesViewRepoImpl extends ForeignTablesViewRepo {
     SelectBuilderSql("information_schema.foreign_tables", ForeignTablesViewFields, ForeignTablesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ForeignTablesViewRow] = {
-    sql"select foreign_table_catalog, foreign_table_schema, foreign_table_name, foreign_server_catalog, foreign_server_name from information_schema.foreign_tables".query(ForeignTablesViewRow.read).stream
+    sql"""select "foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name" from information_schema.foreign_tables""".query(ForeignTablesViewRow.read).stream
   }
 }

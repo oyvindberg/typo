@@ -18,6 +18,6 @@ object PgStatProgressCopyViewRepoImpl extends PgStatProgressCopyViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_progress_copy", PgStatProgressCopyViewFields, PgStatProgressCopyViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatProgressCopyViewRow] = {
-    sql"""select pid, datid, datname, relid, command, "type", bytes_processed, bytes_total, tuples_processed, tuples_excluded from pg_catalog.pg_stat_progress_copy""".query(PgStatProgressCopyViewRow.read).stream
+    sql"""select "pid", "datid", "datname", "relid", "command", "type", "bytes_processed", "bytes_total", "tuples_processed", "tuples_excluded" from pg_catalog.pg_stat_progress_copy""".query(PgStatProgressCopyViewRow.read).stream
   }
 }

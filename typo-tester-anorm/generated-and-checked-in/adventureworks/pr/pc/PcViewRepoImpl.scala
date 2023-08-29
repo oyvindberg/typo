@@ -17,7 +17,7 @@ object PcViewRepoImpl extends PcViewRepo {
     SelectBuilderSql("pr.pc", PcViewFields, PcViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PcViewRow] = {
-    SQL"""select "id", productcategoryid, "name", rowguid, modifieddate::text
+    SQL"""select "id", "productcategoryid", "name", "rowguid", "modifieddate"::text
           from pr.pc
        """.as(PcViewRow.rowParser(1).*)
   }

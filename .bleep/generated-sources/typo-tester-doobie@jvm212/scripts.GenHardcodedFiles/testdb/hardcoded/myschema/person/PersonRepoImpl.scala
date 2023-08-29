@@ -36,48 +36,48 @@ object PersonRepoImpl extends PersonRepo {
     DeleteBuilder("myschema.person", PersonFields)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
-    sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number)
-          values (${fromWrite(unsaved.id)(Write.fromPut(PersonId.put))}::int8, ${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.maritalStatusId)(Write.fromPut(MaritalStatusId.put))}, ${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sector)(Write.fromPut(Sector.put))}::myschema.sector, ${fromWrite(unsaved.favoriteNumber)(Write.fromPut(Number.put))}::myschema."number")
-          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
+    sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+          values (${fromWrite(unsaved.id)(Write.fromPut(PersonId.put))}::int8, ${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.maritalStatusId)(Write.fromPut(MaritalStatusId.put))}, ${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sector)(Write.fromPut(Sector.put))}::myschema.sector, ${fromWrite(unsaved.favoriteNumber)(Write.fromPut(Number.put))}::myschema.number)
+          returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """.query(PersonRow.read).unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const(s"favourite_football_club_id"), fr"${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}")),
+      Some((Fragment.const(s""""favourite_football_club_id""""), fr"${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}")),
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s"nick_name"), fr"${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s"blog_url"), fr"${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s"email"), fr"${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s"phone"), fr"${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s"likes_pizza"), fr"${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}")),
-      Some((Fragment.const(s"work_email"), fr"${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s""""nick_name""""), fr"${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s""""blog_url""""), fr"${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s""""email""""), fr"${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s""""phone""""), fr"${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s""""likes_pizza""""), fr"${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}")),
+      Some((Fragment.const(s""""work_email""""), fr"${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.id match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s""""id""""), fr"${fromWrite(value: PersonId)(Write.fromPut(PersonId.put))}::int8"))
       },
       unsaved.maritalStatusId match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"marital_status_id"), fr"${fromWrite(value: MaritalStatusId)(Write.fromPut(MaritalStatusId.put))}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""marital_status_id""""), fr"${fromWrite(value: MaritalStatusId)(Write.fromPut(MaritalStatusId.put))}"))
       },
       unsaved.sector match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"sector"), fr"${fromWrite(value: Sector)(Write.fromPut(Sector.put))}::myschema.sector"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""sector""""), fr"${fromWrite(value: Sector)(Write.fromPut(Sector.put))}::myschema.sector"))
       },
       unsaved.favoriteNumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"favorite_number"), fr"""${fromWrite(value: Number)(Write.fromPut(Number.put))}::myschema."number""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""favorite_number""""), fr"${fromWrite(value: Number)(Write.fromPut(Number.put))}::myschema.number"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into myschema.person default values
-            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
+            returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into myschema.person(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
+            returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
          """
     }
     q.query(PersonRow.read).unique
@@ -87,47 +87,47 @@ object PersonRepoImpl extends PersonRepo {
     SelectBuilderSql("myschema.person", PersonFields, PersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person""".query(PersonRow.read).stream
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person""".query(PersonRow.read).stream
   }
   override def selectById(id: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".query(PersonRow.read).option
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".query(PersonRow.read).option
   }
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person where "id" = ANY(${ids})""".query(PersonRow.read).stream
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ANY(${ids})""".query(PersonRow.read).stream
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
     val where = fragments.whereAndOpt(
       fieldValues.map {
         case PersonFieldValue.id(value) => fr""""id" = ${fromWrite(value)(Write.fromPut(PersonId.put))}"""
-        case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}"
+        case PersonFieldValue.favouriteFootballClubId(value) => fr""""favourite_football_club_id" = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}"""
         case PersonFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
-        case PersonFieldValue.nickName(value) => fr"nick_name = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
-        case PersonFieldValue.blogUrl(value) => fr"blog_url = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
-        case PersonFieldValue.email(value) => fr"email = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"
-        case PersonFieldValue.phone(value) => fr"phone = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"
-        case PersonFieldValue.likesPizza(value) => fr"likes_pizza = ${fromWrite(value)(Write.fromPut(Meta.BooleanMeta.put))}"
-        case PersonFieldValue.maritalStatusId(value) => fr"marital_status_id = ${fromWrite(value)(Write.fromPut(MaritalStatusId.put))}"
-        case PersonFieldValue.workEmail(value) => fr"work_email = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
-        case PersonFieldValue.sector(value) => fr"sector = ${fromWrite(value)(Write.fromPut(Sector.put))}"
-        case PersonFieldValue.favoriteNumber(value) => fr"favorite_number = ${fromWrite(value)(Write.fromPut(Number.put))}"
+        case PersonFieldValue.nickName(value) => fr""""nick_name" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
+        case PersonFieldValue.blogUrl(value) => fr""""blog_url" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
+        case PersonFieldValue.email(value) => fr""""email" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
+        case PersonFieldValue.phone(value) => fr""""phone" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
+        case PersonFieldValue.likesPizza(value) => fr""""likes_pizza" = ${fromWrite(value)(Write.fromPut(Meta.BooleanMeta.put))}"""
+        case PersonFieldValue.maritalStatusId(value) => fr""""marital_status_id" = ${fromWrite(value)(Write.fromPut(MaritalStatusId.put))}"""
+        case PersonFieldValue.workEmail(value) => fr""""work_email" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
+        case PersonFieldValue.sector(value) => fr""""sector" = ${fromWrite(value)(Write.fromPut(Sector.put))}"""
+        case PersonFieldValue.favoriteNumber(value) => fr""""favorite_number" = ${fromWrite(value)(Write.fromPut(Number.put))}"""
       }
     )
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person $where""".query(PersonRow.read).stream
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person $where""".query(PersonRow.read).stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val id = row.id
     sql"""update myschema.person
-          set favourite_football_club_id = ${fromWrite(row.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))},
+          set "favourite_football_club_id" = ${fromWrite(row.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))},
               "name" = ${fromWrite(row.name)(Write.fromPut(Meta.StringMeta.put))},
-              nick_name = ${fromWrite(row.nickName)(Write.fromPutOption(Meta.StringMeta.put))},
-              blog_url = ${fromWrite(row.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))},
-              email = ${fromWrite(row.email)(Write.fromPut(Meta.StringMeta.put))},
-              phone = ${fromWrite(row.phone)(Write.fromPut(Meta.StringMeta.put))},
-              likes_pizza = ${fromWrite(row.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))},
-              marital_status_id = ${fromWrite(row.maritalStatusId)(Write.fromPut(MaritalStatusId.put))},
-              work_email = ${fromWrite(row.workEmail)(Write.fromPutOption(Meta.StringMeta.put))},
-              sector = ${fromWrite(row.sector)(Write.fromPut(Sector.put))}::myschema.sector,
-              favorite_number = ${fromWrite(row.favoriteNumber)(Write.fromPut(Number.put))}::myschema."number"
+              "nick_name" = ${fromWrite(row.nickName)(Write.fromPutOption(Meta.StringMeta.put))},
+              "blog_url" = ${fromWrite(row.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))},
+              "email" = ${fromWrite(row.email)(Write.fromPut(Meta.StringMeta.put))},
+              "phone" = ${fromWrite(row.phone)(Write.fromPut(Meta.StringMeta.put))},
+              "likes_pizza" = ${fromWrite(row.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))},
+              "marital_status_id" = ${fromWrite(row.maritalStatusId)(Write.fromPut(MaritalStatusId.put))},
+              "work_email" = ${fromWrite(row.workEmail)(Write.fromPutOption(Meta.StringMeta.put))},
+              "sector" = ${fromWrite(row.sector)(Write.fromPut(Sector.put))}::myschema.sector,
+              "favorite_number" = ${fromWrite(row.favoriteNumber)(Write.fromPut(Number.put))}::myschema.number
           where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}"""
       .update
       .run
@@ -142,17 +142,17 @@ object PersonRepoImpl extends PersonRepo {
       case Some(nonEmpty) =>
         val updates = fragments.set(
           nonEmpty.map {
-            case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}"
+            case PersonFieldValue.favouriteFootballClubId(value) => fr""""favourite_football_club_id" = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}"""
             case PersonFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
-            case PersonFieldValue.nickName(value) => fr"nick_name = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
-            case PersonFieldValue.blogUrl(value) => fr"blog_url = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
-            case PersonFieldValue.email(value) => fr"email = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"
-            case PersonFieldValue.phone(value) => fr"phone = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"
-            case PersonFieldValue.likesPizza(value) => fr"likes_pizza = ${fromWrite(value)(Write.fromPut(Meta.BooleanMeta.put))}"
-            case PersonFieldValue.maritalStatusId(value) => fr"marital_status_id = ${fromWrite(value)(Write.fromPut(MaritalStatusId.put))}"
-            case PersonFieldValue.workEmail(value) => fr"work_email = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
-            case PersonFieldValue.sector(value) => fr"sector = ${fromWrite(value)(Write.fromPut(Sector.put))}::myschema.sector"
-            case PersonFieldValue.favoriteNumber(value) => fr"""favorite_number = ${fromWrite(value)(Write.fromPut(Number.put))}::myschema."number""""
+            case PersonFieldValue.nickName(value) => fr""""nick_name" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
+            case PersonFieldValue.blogUrl(value) => fr""""blog_url" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
+            case PersonFieldValue.email(value) => fr""""email" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
+            case PersonFieldValue.phone(value) => fr""""phone" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
+            case PersonFieldValue.likesPizza(value) => fr""""likes_pizza" = ${fromWrite(value)(Write.fromPut(Meta.BooleanMeta.put))}"""
+            case PersonFieldValue.maritalStatusId(value) => fr""""marital_status_id" = ${fromWrite(value)(Write.fromPut(MaritalStatusId.put))}"""
+            case PersonFieldValue.workEmail(value) => fr""""work_email" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
+            case PersonFieldValue.sector(value) => fr""""sector" = ${fromWrite(value)(Write.fromPut(Sector.put))}::myschema.sector"""
+            case PersonFieldValue.favoriteNumber(value) => fr""""favorite_number" = ${fromWrite(value)(Write.fromPut(Number.put))}::myschema.number"""
           }
         )
         sql"""update myschema.person
@@ -161,7 +161,7 @@ object PersonRepoImpl extends PersonRepo {
     }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
-    sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number)
+    sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
           values (
             ${fromWrite(unsaved.id)(Write.fromPut(PersonId.put))}::int8,
             ${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))},
@@ -174,22 +174,22 @@ object PersonRepoImpl extends PersonRepo {
             ${fromWrite(unsaved.maritalStatusId)(Write.fromPut(MaritalStatusId.put))},
             ${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))},
             ${fromWrite(unsaved.sector)(Write.fromPut(Sector.put))}::myschema.sector,
-            ${fromWrite(unsaved.favoriteNumber)(Write.fromPut(Number.put))}::myschema."number"
+            ${fromWrite(unsaved.favoriteNumber)(Write.fromPut(Number.put))}::myschema.number
           )
           on conflict ("id")
           do update set
-            favourite_football_club_id = EXCLUDED.favourite_football_club_id,
+            "favourite_football_club_id" = EXCLUDED."favourite_football_club_id",
             "name" = EXCLUDED."name",
-            nick_name = EXCLUDED.nick_name,
-            blog_url = EXCLUDED.blog_url,
-            email = EXCLUDED.email,
-            phone = EXCLUDED.phone,
-            likes_pizza = EXCLUDED.likes_pizza,
-            marital_status_id = EXCLUDED.marital_status_id,
-            work_email = EXCLUDED.work_email,
-            sector = EXCLUDED.sector,
-            favorite_number = EXCLUDED.favorite_number
-          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
+            "nick_name" = EXCLUDED."nick_name",
+            "blog_url" = EXCLUDED."blog_url",
+            "email" = EXCLUDED."email",
+            "phone" = EXCLUDED."phone",
+            "likes_pizza" = EXCLUDED."likes_pizza",
+            "marital_status_id" = EXCLUDED."marital_status_id",
+            "work_email" = EXCLUDED."work_email",
+            "sector" = EXCLUDED."sector",
+            "favorite_number" = EXCLUDED."favorite_number"
+          returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """.query(PersonRow.read).unique
   }
 }

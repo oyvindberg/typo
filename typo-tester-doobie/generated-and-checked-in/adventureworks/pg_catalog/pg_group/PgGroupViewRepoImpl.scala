@@ -18,6 +18,6 @@ object PgGroupViewRepoImpl extends PgGroupViewRepo {
     SelectBuilderSql("pg_catalog.pg_group", PgGroupViewFields, PgGroupViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgGroupViewRow] = {
-    sql"select groname, grosysid, grolist from pg_catalog.pg_group".query(PgGroupViewRow.read).stream
+    sql"""select "groname", "grosysid", "grolist" from pg_catalog.pg_group""".query(PgGroupViewRow.read).stream
   }
 }

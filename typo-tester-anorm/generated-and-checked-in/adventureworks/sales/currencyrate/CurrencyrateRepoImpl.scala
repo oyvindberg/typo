@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.currencyrate where currencyrateid = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.currencyrate where "currencyrateid" = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
     DeleteBuilder("sales.currencyrate", CurrencyrateFields)
   }
   override def insert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
-    SQL"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
+    SQL"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
           values (${ParameterValue(unsaved.currencyrateid, null, CurrencyrateId.toStatement)}::int4, ${ParameterValue(unsaved.currencyratedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.fromcurrencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.tocurrencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.averagerate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.endofdayrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
+          returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
     
@@ -57,13 +57,13 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.currencyrate default values
-            returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
+            returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
          """
         .executeInsert(CurrencyrateRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.currencyrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
+                  returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(CurrencyrateRow.rowParser(1).single)
@@ -74,40 +74,40 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     SelectBuilderSql("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
+    SQL"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
           from sales.currencyrate
        """.as(CurrencyrateRow.rowParser(1).*)
   }
   override def selectById(currencyrateid: CurrencyrateId)(implicit c: Connection): Option[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
+    SQL"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
           from sales.currencyrate
-          where currencyrateid = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}
+          where "currencyrateid" = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}
        """.as(CurrencyrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
+    SQL"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
           from sales.currencyrate
-          where currencyrateid = ANY(${currencyrateids})
+          where "currencyrateid" = ANY(${currencyrateids})
        """.as(CurrencyrateRow.rowParser(1).*)
     
   }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
     val currencyrateid = row.currencyrateid
     SQL"""update sales.currencyrate
-          set currencyratedate = ${ParameterValue(row.currencyratedate, null, TypoLocalDateTime.toStatement)}::timestamp,
-              fromcurrencycode = ${ParameterValue(row.fromcurrencycode, null, CurrencyId.toStatement)}::bpchar,
-              tocurrencycode = ${ParameterValue(row.tocurrencycode, null, CurrencyId.toStatement)}::bpchar,
-              averagerate = ${ParameterValue(row.averagerate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              endofdayrate = ${ParameterValue(row.endofdayrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where currencyrateid = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}
+          set "currencyratedate" = ${ParameterValue(row.currencyratedate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              "fromcurrencycode" = ${ParameterValue(row.fromcurrencycode, null, CurrencyId.toStatement)}::bpchar,
+              "tocurrencycode" = ${ParameterValue(row.tocurrencycode, null, CurrencyId.toStatement)}::bpchar,
+              "averagerate" = ${ParameterValue(row.averagerate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "endofdayrate" = ${ParameterValue(row.endofdayrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "currencyrateid" = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
     UpdateBuilder("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.rowParser)
   }
   override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
-    SQL"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
+    SQL"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
           values (
             ${ParameterValue(unsaved.currencyrateid, null, CurrencyrateId.toStatement)}::int4,
             ${ParameterValue(unsaved.currencyratedate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -117,15 +117,15 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
             ${ParameterValue(unsaved.endofdayrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (currencyrateid)
+          on conflict ("currencyrateid")
           do update set
-            currencyratedate = EXCLUDED.currencyratedate,
-            fromcurrencycode = EXCLUDED.fromcurrencycode,
-            tocurrencycode = EXCLUDED.tocurrencycode,
-            averagerate = EXCLUDED.averagerate,
-            endofdayrate = EXCLUDED.endofdayrate,
-            modifieddate = EXCLUDED.modifieddate
-          returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
+            "currencyratedate" = EXCLUDED."currencyratedate",
+            "fromcurrencycode" = EXCLUDED."fromcurrencycode",
+            "tocurrencycode" = EXCLUDED."tocurrencycode",
+            "averagerate" = EXCLUDED."averagerate",
+            "endofdayrate" = EXCLUDED."endofdayrate",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
     

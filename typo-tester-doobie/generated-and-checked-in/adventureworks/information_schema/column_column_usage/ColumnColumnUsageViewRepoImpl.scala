@@ -18,6 +18,6 @@ object ColumnColumnUsageViewRepoImpl extends ColumnColumnUsageViewRepo {
     SelectBuilderSql("information_schema.column_column_usage", ColumnColumnUsageViewFields, ColumnColumnUsageViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ColumnColumnUsageViewRow] = {
-    sql"""select table_catalog, table_schema, "table_name", "column_name", dependent_column from information_schema.column_column_usage""".query(ColumnColumnUsageViewRow.read).stream
+    sql"""select "table_catalog", "table_schema", "table_name", "column_name", "dependent_column" from information_schema.column_column_usage""".query(ColumnColumnUsageViewRow.read).stream
   }
 }

@@ -26,15 +26,15 @@ import typo.dsl.UpdateBuilder
 
 object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.specialofferproduct where specialofferid = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.specialofferproduct where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields)
   }
   override def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
-    SQL"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
+    SQL"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning specialofferid, productid, rowguid, modifieddate::text
+          returning "specialofferid", "productid", "rowguid", "modifieddate"::text
        """
       .executeInsert(SpecialofferproductRow.rowParser(1).single)
     
@@ -55,13 +55,13 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.specialofferproduct default values
-            returning specialofferid, productid, rowguid, modifieddate::text
+            returning "specialofferid", "productid", "rowguid", "modifieddate"::text
          """
         .executeInsert(SpecialofferproductRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.specialofferproduct(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning specialofferid, productid, rowguid, modifieddate::text
+                  returning "specialofferid", "productid", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(SpecialofferproductRow.rowParser(1).single)
@@ -72,40 +72,40 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
-    SQL"""select specialofferid, productid, rowguid, modifieddate::text
+    SQL"""select "specialofferid", "productid", "rowguid", "modifieddate"::text
           from sales.specialofferproduct
        """.as(SpecialofferproductRow.rowParser(1).*)
   }
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
-    SQL"""select specialofferid, productid, rowguid, modifieddate::text
+    SQL"""select "specialofferid", "productid", "rowguid", "modifieddate"::text
           from sales.specialofferproduct
-          where specialofferid = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}
+          where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}
        """.as(SpecialofferproductRow.rowParser(1).singleOpt)
   }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.specialofferproduct
-          set rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where specialofferid = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}
+          set "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.rowParser)
   }
   override def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
-    SQL"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
+    SQL"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (specialofferid, productid)
+          on conflict ("specialofferid", "productid")
           do update set
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning specialofferid, productid, rowguid, modifieddate::text
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "specialofferid", "productid", "rowguid", "modifieddate"::text
        """
       .executeInsert(SpecialofferproductRow.rowParser(1).single)
     

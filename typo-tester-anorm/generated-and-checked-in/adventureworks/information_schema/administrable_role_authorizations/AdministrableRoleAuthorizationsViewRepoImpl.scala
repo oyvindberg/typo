@@ -17,7 +17,7 @@ object AdministrableRoleAuthorizationsViewRepoImpl extends AdministrableRoleAuth
     SelectBuilderSql("information_schema.administrable_role_authorizations", AdministrableRoleAuthorizationsViewFields, AdministrableRoleAuthorizationsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[AdministrableRoleAuthorizationsViewRow] = {
-    SQL"""select grantee, role_name, is_grantable
+    SQL"""select "grantee", "role_name", "is_grantable"
           from information_schema.administrable_role_authorizations
        """.as(AdministrableRoleAuthorizationsViewRow.rowParser(1).*)
   }

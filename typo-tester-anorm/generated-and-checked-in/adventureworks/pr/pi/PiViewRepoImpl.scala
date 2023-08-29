@@ -17,7 +17,7 @@ object PiViewRepoImpl extends PiViewRepo {
     SelectBuilderSql("pr.pi", PiViewFields, PiViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PiViewRow] = {
-    SQL"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
+    SQL"""select "id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
           from pr.pi
        """.as(PiViewRow.rowParser(1).*)
   }

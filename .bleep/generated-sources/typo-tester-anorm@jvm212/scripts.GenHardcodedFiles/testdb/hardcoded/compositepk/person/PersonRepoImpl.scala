@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from compositepk.person where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND two = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}""".executeUpdate() > 0
+    SQL"""delete from compositepk.person where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("compositepk.person", PersonFields)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    SQL"""insert into compositepk.person("one", two, "name")
+    SQL"""insert into compositepk.person("one", "two", "name")
           values (${ParameterValue(unsaved.one, null, ToStatement.longToStatement)}::int8, ${ParameterValue(unsaved.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.name, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
-          returning "one", two, "name"
+          returning "one", "two", "name"
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
@@ -53,13 +53,13 @@ object PersonRepoImpl extends PersonRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into compositepk.person default values
-            returning "one", two, "name"
+            returning "one", "two", "name"
          """
         .executeInsert(PersonRow.rowParser(1).single)
     } else {
       val q = s"""insert into compositepk.person(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning "one", two, "name"
+                  returning "one", "two", "name"
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(PersonRow.rowParser(1).single)
@@ -70,14 +70,14 @@ object PersonRepoImpl extends PersonRepo {
     SelectBuilderSql("compositepk.person", PersonFields, PersonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select "one", two, "name"
+    SQL"""select "one", "two", "name"
           from compositepk.person
        """.as(PersonRow.rowParser(1).*)
   }
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select "one", two, "name"
+    SQL"""select "one", "two", "name"
           from compositepk.person
-          where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND two = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+          where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
        """.as(PersonRow.rowParser(1).singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow] = {
@@ -90,7 +90,7 @@ object PersonRepoImpl extends PersonRepo {
           case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue(value, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)))
         }
         val quote = '"'.toString
-        val q = s"""select "one", two, "name"
+        val q = s"""select "one", "two", "name"
                     from compositepk.person
                     where ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
@@ -103,7 +103,7 @@ object PersonRepoImpl extends PersonRepo {
     val compositeId = row.compositeId
     SQL"""update compositepk.person
           set "name" = ${ParameterValue(row.name, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
-          where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND two = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+          where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
@@ -119,7 +119,7 @@ object PersonRepoImpl extends PersonRepo {
         val quote = '"'.toString
         val q = s"""update compositepk.person
                     set ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where "one" = {one} AND two = {two}
+                    where "one" = {one} AND "two" = {two}
                  """
         SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap ++ List(("one", ParameterValue(compositeId.one, null, ToStatement.longToStatement)), ("two", ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)))), RowParser.successful)
           .executeUpdate() > 0
@@ -127,16 +127,16 @@ object PersonRepoImpl extends PersonRepo {
     
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    SQL"""insert into compositepk.person("one", two, "name")
+    SQL"""insert into compositepk.person("one", "two", "name")
           values (
             ${ParameterValue(unsaved.one, null, ToStatement.longToStatement)}::int8,
             ${ParameterValue(unsaved.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
             ${ParameterValue(unsaved.name, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           )
-          on conflict ("one", two)
+          on conflict ("one", "two")
           do update set
             "name" = EXCLUDED."name"
-          returning "one", two, "name"
+          returning "one", "two", "name"
        """
       .executeInsert(PersonRow.rowParser(1).single)
     

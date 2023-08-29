@@ -24,15 +24,15 @@ import typo.dsl.UpdateBuilder
 
 object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.currency where currencycode = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.currency where "currencycode" = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
     DeleteBuilder("sales.currency", CurrencyFields)
   }
   override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
-    SQL"""insert into sales.currency(currencycode, "name", modifieddate)
+    SQL"""insert into sales.currency("currencycode", "name", "modifieddate")
           values (${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning currencycode, "name", modifieddate::text
+          returning "currencycode", "name", "modifieddate"::text
        """
       .executeInsert(CurrencyRow.rowParser(1).single)
     
@@ -49,13 +49,13 @@ object CurrencyRepoImpl extends CurrencyRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.currency default values
-            returning currencycode, "name", modifieddate::text
+            returning "currencycode", "name", "modifieddate"::text
          """
         .executeInsert(CurrencyRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.currency(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning currencycode, "name", modifieddate::text
+                  returning "currencycode", "name", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(CurrencyRow.rowParser(1).single)
@@ -66,20 +66,20 @@ object CurrencyRepoImpl extends CurrencyRepo {
     SelectBuilderSql("sales.currency", CurrencyFields, CurrencyRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
-    SQL"""select currencycode, "name", modifieddate::text
+    SQL"""select "currencycode", "name", "modifieddate"::text
           from sales.currency
        """.as(CurrencyRow.rowParser(1).*)
   }
   override def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow] = {
-    SQL"""select currencycode, "name", modifieddate::text
+    SQL"""select "currencycode", "name", "modifieddate"::text
           from sales.currency
-          where currencycode = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
+          where "currencycode" = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
        """.as(CurrencyRow.rowParser(1).singleOpt)
   }
   override def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
-    SQL"""select currencycode, "name", modifieddate::text
+    SQL"""select "currencycode", "name", "modifieddate"::text
           from sales.currency
-          where currencycode = ANY(${currencycodes})
+          where "currencycode" = ANY(${currencycodes})
        """.as(CurrencyRow.rowParser(1).*)
     
   }
@@ -87,25 +87,25 @@ object CurrencyRepoImpl extends CurrencyRepo {
     val currencycode = row.currencycode
     SQL"""update sales.currency
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where currencycode = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "currencycode" = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
     UpdateBuilder("sales.currency", CurrencyFields, CurrencyRow.rowParser)
   }
   override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
-    SQL"""insert into sales.currency(currencycode, "name", modifieddate)
+    SQL"""insert into sales.currency("currencycode", "name", "modifieddate")
           values (
             ${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (currencycode)
+          on conflict ("currencycode")
           do update set
             "name" = EXCLUDED."name",
-            modifieddate = EXCLUDED.modifieddate
-          returning currencycode, "name", modifieddate::text
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "currencycode", "name", "modifieddate"::text
        """
       .executeInsert(CurrencyRow.rowParser(1).single)
     

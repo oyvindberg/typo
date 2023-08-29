@@ -17,7 +17,7 @@ object PgPublicationTablesViewRepoImpl extends PgPublicationTablesViewRepo {
     SelectBuilderSql("pg_catalog.pg_publication_tables", PgPublicationTablesViewFields, PgPublicationTablesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPublicationTablesViewRow] = {
-    SQL"""select pubname, schemaname, tablename
+    SQL"""select "pubname", "schemaname", "tablename"
           from pg_catalog.pg_publication_tables
        """.as(PgPublicationTablesViewRow.rowParser(1).*)
   }

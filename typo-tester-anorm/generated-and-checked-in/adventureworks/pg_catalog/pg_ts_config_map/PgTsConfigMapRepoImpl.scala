@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
   override def delete(compositeId: PgTsConfigMapId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_ts_config_map where mapcfg = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND maptokentype = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND mapseqno = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_ts_config_map where "mapcfg" = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND "maptokentype" = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND "mapseqno" = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
     DeleteBuilder("pg_catalog.pg_ts_config_map", PgTsConfigMapFields)
   }
   override def insert(unsaved: PgTsConfigMapRow)(implicit c: Connection): PgTsConfigMapRow = {
-    SQL"""insert into pg_catalog.pg_ts_config_map(mapcfg, maptokentype, mapseqno, mapdict)
+    SQL"""insert into pg_catalog.pg_ts_config_map("mapcfg", "maptokentype", "mapseqno", "mapdict")
           values (${ParameterValue(unsaved.mapcfg, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.maptokentype, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.mapseqno, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.mapdict, null, ToStatement.longToStatement)}::oid)
-          returning mapcfg, maptokentype, mapseqno, mapdict
+          returning "mapcfg", "maptokentype", "mapseqno", "mapdict"
        """
       .executeInsert(PgTsConfigMapRow.rowParser(1).single)
     
@@ -35,38 +35,38 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
     SelectBuilderSql("pg_catalog.pg_ts_config_map", PgTsConfigMapFields, PgTsConfigMapRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTsConfigMapRow] = {
-    SQL"""select mapcfg, maptokentype, mapseqno, mapdict
+    SQL"""select "mapcfg", "maptokentype", "mapseqno", "mapdict"
           from pg_catalog.pg_ts_config_map
        """.as(PgTsConfigMapRow.rowParser(1).*)
   }
   override def selectById(compositeId: PgTsConfigMapId)(implicit c: Connection): Option[PgTsConfigMapRow] = {
-    SQL"""select mapcfg, maptokentype, mapseqno, mapdict
+    SQL"""select "mapcfg", "maptokentype", "mapseqno", "mapdict"
           from pg_catalog.pg_ts_config_map
-          where mapcfg = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND maptokentype = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND mapseqno = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}
+          where "mapcfg" = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND "maptokentype" = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND "mapseqno" = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}
        """.as(PgTsConfigMapRow.rowParser(1).singleOpt)
   }
   override def update(row: PgTsConfigMapRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_ts_config_map
-          set mapdict = ${ParameterValue(row.mapdict, null, ToStatement.longToStatement)}::oid
-          where mapcfg = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND maptokentype = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND mapseqno = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}
+          set "mapdict" = ${ParameterValue(row.mapdict, null, ToStatement.longToStatement)}::oid
+          where "mapcfg" = ${ParameterValue(compositeId.mapcfg, null, ToStatement.longToStatement)} AND "maptokentype" = ${ParameterValue(compositeId.maptokentype, null, ToStatement.intToStatement)} AND "mapseqno" = ${ParameterValue(compositeId.mapseqno, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
     UpdateBuilder("pg_catalog.pg_ts_config_map", PgTsConfigMapFields, PgTsConfigMapRow.rowParser)
   }
   override def upsert(unsaved: PgTsConfigMapRow)(implicit c: Connection): PgTsConfigMapRow = {
-    SQL"""insert into pg_catalog.pg_ts_config_map(mapcfg, maptokentype, mapseqno, mapdict)
+    SQL"""insert into pg_catalog.pg_ts_config_map("mapcfg", "maptokentype", "mapseqno", "mapdict")
           values (
             ${ParameterValue(unsaved.mapcfg, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.maptokentype, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.mapseqno, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.mapdict, null, ToStatement.longToStatement)}::oid
           )
-          on conflict (mapcfg, maptokentype, mapseqno)
+          on conflict ("mapcfg", "maptokentype", "mapseqno")
           do update set
-            mapdict = EXCLUDED.mapdict
-          returning mapcfg, maptokentype, mapseqno, mapdict
+            "mapdict" = EXCLUDED."mapdict"
+          returning "mapcfg", "maptokentype", "mapseqno", "mapdict"
        """
       .executeInsert(PgTsConfigMapRow.rowParser(1).single)
     

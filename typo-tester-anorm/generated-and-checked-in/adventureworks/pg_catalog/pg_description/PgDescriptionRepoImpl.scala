@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def delete(compositeId: PgDescriptionId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_description where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_description where "objoid" = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND "classoid" = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND "objsubid" = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgDescriptionFields, PgDescriptionRow] = {
     DeleteBuilder("pg_catalog.pg_description", PgDescriptionFields)
   }
   override def insert(unsaved: PgDescriptionRow)(implicit c: Connection): PgDescriptionRow = {
-    SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
+    SQL"""insert into pg_catalog.pg_description("objoid", "classoid", "objsubid", "description")
           values (${ParameterValue(unsaved.objoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.classoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.objsubid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)})
-          returning objoid, classoid, objsubid, description
+          returning "objoid", "classoid", "objsubid", "description"
        """
       .executeInsert(PgDescriptionRow.rowParser(1).single)
     
@@ -35,38 +35,38 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
     SelectBuilderSql("pg_catalog.pg_description", PgDescriptionFields, PgDescriptionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgDescriptionRow] = {
-    SQL"""select objoid, classoid, objsubid, description
+    SQL"""select "objoid", "classoid", "objsubid", "description"
           from pg_catalog.pg_description
        """.as(PgDescriptionRow.rowParser(1).*)
   }
   override def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow] = {
-    SQL"""select objoid, classoid, objsubid, description
+    SQL"""select "objoid", "classoid", "objsubid", "description"
           from pg_catalog.pg_description
-          where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}
+          where "objoid" = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND "classoid" = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND "objsubid" = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}
        """.as(PgDescriptionRow.rowParser(1).singleOpt)
   }
   override def update(row: PgDescriptionRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_description
-          set description = ${ParameterValue(row.description, null, ToStatement.stringToStatement)}
-          where objoid = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND classoid = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND objsubid = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}
+          set "description" = ${ParameterValue(row.description, null, ToStatement.stringToStatement)}
+          where "objoid" = ${ParameterValue(compositeId.objoid, null, ToStatement.longToStatement)} AND "classoid" = ${ParameterValue(compositeId.classoid, null, ToStatement.longToStatement)} AND "objsubid" = ${ParameterValue(compositeId.objsubid, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgDescriptionFields, PgDescriptionRow] = {
     UpdateBuilder("pg_catalog.pg_description", PgDescriptionFields, PgDescriptionRow.rowParser)
   }
   override def upsert(unsaved: PgDescriptionRow)(implicit c: Connection): PgDescriptionRow = {
-    SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
+    SQL"""insert into pg_catalog.pg_description("objoid", "classoid", "objsubid", "description")
           values (
             ${ParameterValue(unsaved.objoid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.classoid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.objsubid, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)}
           )
-          on conflict (objoid, classoid, objsubid)
+          on conflict ("objoid", "classoid", "objsubid")
           do update set
-            description = EXCLUDED.description
-          returning objoid, classoid, objsubid, description
+            "description" = EXCLUDED."description"
+          returning "objoid", "classoid", "objsubid", "description"
        """
       .executeInsert(PgDescriptionRow.rowParser(1).single)
     

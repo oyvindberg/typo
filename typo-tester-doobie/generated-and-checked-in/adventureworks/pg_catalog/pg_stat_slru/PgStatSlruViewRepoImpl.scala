@@ -18,6 +18,6 @@ object PgStatSlruViewRepoImpl extends PgStatSlruViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_slru", PgStatSlruViewFields, PgStatSlruViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatSlruViewRow] = {
-    sql"""select "name", blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset::text from pg_catalog.pg_stat_slru""".query(PgStatSlruViewRow.read).stream
+    sql"""select "name", "blks_zeroed", "blks_hit", "blks_read", "blks_written", "blks_exists", "flushes", "truncates", "stats_reset"::text from pg_catalog.pg_stat_slru""".query(PgStatSlruViewRow.read).stream
   }
 }

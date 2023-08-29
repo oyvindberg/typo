@@ -19,15 +19,15 @@ import typo.dsl.UpdateBuilder
 
 object PgExtensionRepoImpl extends PgExtensionRepo {
   override def delete(oid: PgExtensionId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_extension where oid = ${ParameterValue(oid, null, PgExtensionId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_extension where "oid" = ${ParameterValue(oid, null, PgExtensionId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgExtensionFields, PgExtensionRow] = {
     DeleteBuilder("pg_catalog.pg_extension", PgExtensionFields)
   }
   override def insert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow = {
-    SQL"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)
+    SQL"""insert into pg_catalog.pg_extension("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")
           values (${ParameterValue(unsaved.oid, null, PgExtensionId.toStatement)}::oid, ${ParameterValue(unsaved.extname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.extowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.extnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.extrelocatable, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.extversion, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.extconfig, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid, ${ParameterValue(unsaved.extcondition, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text)
-          returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
+          returning "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition"
        """
       .executeInsert(PgExtensionRow.rowParser(1).single)
     
@@ -36,48 +36,48 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
     SelectBuilderSql("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgExtensionRow] = {
-    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
+    SQL"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition"
           from pg_catalog.pg_extension
        """.as(PgExtensionRow.rowParser(1).*)
   }
   override def selectById(oid: PgExtensionId)(implicit c: Connection): Option[PgExtensionRow] = {
-    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
+    SQL"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition"
           from pg_catalog.pg_extension
-          where oid = ${ParameterValue(oid, null, PgExtensionId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgExtensionId.toStatement)}
        """.as(PgExtensionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgExtensionId])(implicit c: Connection): List[PgExtensionRow] = {
-    SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
+    SQL"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition"
           from pg_catalog.pg_extension
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgExtensionRow.rowParser(1).*)
     
   }
   override def selectByUnique(extname: String)(implicit c: Connection): Option[PgExtensionRow] = {
-    SQL"""select extname
+    SQL"""select "extname"
           from pg_catalog.pg_extension
-          where extname = ${ParameterValue(extname, null, ToStatement.stringToStatement)}
+          where "extname" = ${ParameterValue(extname, null, ToStatement.stringToStatement)}
        """.as(PgExtensionRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgExtensionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_extension
-          set extname = ${ParameterValue(row.extname, null, ToStatement.stringToStatement)}::name,
-              extowner = ${ParameterValue(row.extowner, null, ToStatement.longToStatement)}::oid,
-              extnamespace = ${ParameterValue(row.extnamespace, null, ToStatement.longToStatement)}::oid,
-              extrelocatable = ${ParameterValue(row.extrelocatable, null, ToStatement.booleanToStatement)},
-              extversion = ${ParameterValue(row.extversion, null, ToStatement.stringToStatement)},
-              extconfig = ${ParameterValue(row.extconfig, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
-              extcondition = ${ParameterValue(row.extcondition, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
-          where oid = ${ParameterValue(oid, null, PgExtensionId.toStatement)}
+          set "extname" = ${ParameterValue(row.extname, null, ToStatement.stringToStatement)}::name,
+              "extowner" = ${ParameterValue(row.extowner, null, ToStatement.longToStatement)}::oid,
+              "extnamespace" = ${ParameterValue(row.extnamespace, null, ToStatement.longToStatement)}::oid,
+              "extrelocatable" = ${ParameterValue(row.extrelocatable, null, ToStatement.booleanToStatement)},
+              "extversion" = ${ParameterValue(row.extversion, null, ToStatement.stringToStatement)},
+              "extconfig" = ${ParameterValue(row.extconfig, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
+              "extcondition" = ${ParameterValue(row.extcondition, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
+          where "oid" = ${ParameterValue(oid, null, PgExtensionId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgExtensionFields, PgExtensionRow] = {
     UpdateBuilder("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.rowParser)
   }
   override def upsert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow = {
-    SQL"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)
+    SQL"""insert into pg_catalog.pg_extension("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")
           values (
             ${ParameterValue(unsaved.oid, null, PgExtensionId.toStatement)}::oid,
             ${ParameterValue(unsaved.extname, null, ToStatement.stringToStatement)}::name,
@@ -88,16 +88,16 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
             ${ParameterValue(unsaved.extconfig, null, ToStatement.optionToStatement(adventureworks.LongArrayToStatement, adventureworks.arrayParameterMetaData(ParameterMetaData.LongParameterMetaData)))}::_oid,
             ${ParameterValue(unsaved.extcondition, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            extname = EXCLUDED.extname,
-            extowner = EXCLUDED.extowner,
-            extnamespace = EXCLUDED.extnamespace,
-            extrelocatable = EXCLUDED.extrelocatable,
-            extversion = EXCLUDED.extversion,
-            extconfig = EXCLUDED.extconfig,
-            extcondition = EXCLUDED.extcondition
-          returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
+            "extname" = EXCLUDED."extname",
+            "extowner" = EXCLUDED."extowner",
+            "extnamespace" = EXCLUDED."extnamespace",
+            "extrelocatable" = EXCLUDED."extrelocatable",
+            "extversion" = EXCLUDED."extversion",
+            "extconfig" = EXCLUDED."extconfig",
+            "extcondition" = EXCLUDED."extcondition"
+          returning "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition"
        """
       .executeInsert(PgExtensionRow.rowParser(1).single)
     

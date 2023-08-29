@@ -17,7 +17,7 @@ object PgTimezoneNamesViewRepoImpl extends PgTimezoneNamesViewRepo {
     SelectBuilderSql("pg_catalog.pg_timezone_names", PgTimezoneNamesViewFields, PgTimezoneNamesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTimezoneNamesViewRow] = {
-    SQL"""select "name", abbrev, utc_offset, is_dst
+    SQL"""select "name", "abbrev", "utc_offset", "is_dst"
           from pg_catalog.pg_timezone_names
        """.as(PgTimezoneNamesViewRow.rowParser(1).*)
   }

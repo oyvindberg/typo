@@ -17,8 +17,8 @@ object PViewRepoImpl extends PViewRepo {
     SelectBuilderSql("pr.p", PViewFields, PViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PViewRow] = {
-    SQL"""select "id", productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text
-          from pr."p"
+    SQL"""select "id", "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
+          from pr.p
        """.as(PViewRow.rowParser(1).*)
   }
 }

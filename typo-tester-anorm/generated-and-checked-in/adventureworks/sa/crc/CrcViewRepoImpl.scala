@@ -17,7 +17,7 @@ object CrcViewRepoImpl extends CrcViewRepo {
     SelectBuilderSql("sa.crc", CrcViewFields, CrcViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CrcViewRow] = {
-    SQL"""select countryregioncode, currencycode, modifieddate::text
+    SQL"""select "countryregioncode", "currencycode", "modifieddate"::text
           from sa.crc
        """.as(CrcViewRow.rowParser(1).*)
   }

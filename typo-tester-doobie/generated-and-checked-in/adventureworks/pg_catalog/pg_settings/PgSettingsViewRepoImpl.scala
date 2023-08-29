@@ -18,6 +18,6 @@ object PgSettingsViewRepoImpl extends PgSettingsViewRepo {
     SelectBuilderSql("pg_catalog.pg_settings", PgSettingsViewFields, PgSettingsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgSettingsViewRow] = {
-    sql"""select "name", setting, unit, category, short_desc, extra_desc, context, vartype, "source", min_val, max_val, enumvals, boot_val, reset_val, sourcefile, sourceline, pending_restart from pg_catalog.pg_settings""".query(PgSettingsViewRow.read).stream
+    sql"""select "name", "setting", "unit", "category", "short_desc", "extra_desc", "context", "vartype", "source", "min_val", "max_val", "enumvals", "boot_val", "reset_val", "sourcefile", "sourceline", "pending_restart" from pg_catalog.pg_settings""".query(PgSettingsViewRow.read).stream
   }
 }

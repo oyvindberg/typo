@@ -17,7 +17,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
     SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
-    SQL"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate::text
+    SQL"""select "productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate"::text
           from production.vproductmodelinstructions
        """.as(VproductmodelinstructionsViewRow.rowParser(1).*)
   }

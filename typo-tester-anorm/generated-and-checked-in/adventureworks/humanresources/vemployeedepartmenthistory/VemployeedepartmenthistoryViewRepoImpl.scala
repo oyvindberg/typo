@@ -17,7 +17,7 @@ object VemployeedepartmenthistoryViewRepoImpl extends Vemployeedepartmenthistory
     SelectBuilderSql("humanresources.vemployeedepartmenthistory", VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VemployeedepartmenthistoryViewRow] = {
-    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate::text, enddate::text
+    SQL"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate"::text, "enddate"::text
           from humanresources.vemployeedepartmenthistory
        """.as(VemployeedepartmenthistoryViewRow.rowParser(1).*)
   }

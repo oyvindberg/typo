@@ -28,15 +28,15 @@ import typo.dsl.UpdateBuilder
 
 object StateprovinceRepoImpl extends StateprovinceRepo {
   override def delete(stateprovinceid: StateprovinceId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.stateprovince where stateprovinceid = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from person.stateprovince where "stateprovinceid" = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
     DeleteBuilder("person.stateprovince", StateprovinceFields)
   }
   override def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
-    SQL"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
+    SQL"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.isonlystateprovinceflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
+          returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
     
@@ -67,13 +67,13 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.stateprovince default values
-            returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
+            returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
          """
         .executeInsert(StateprovinceRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.stateprovince(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
+                  returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(StateprovinceRow.rowParser(1).single)
@@ -84,41 +84,41 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
+    SQL"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
           from person.stateprovince
        """.as(StateprovinceRow.rowParser(1).*)
   }
   override def selectById(stateprovinceid: StateprovinceId)(implicit c: Connection): Option[StateprovinceRow] = {
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
+    SQL"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
           from person.stateprovince
-          where stateprovinceid = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}
+          where "stateprovinceid" = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}
        """.as(StateprovinceRow.rowParser(1).singleOpt)
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
-    SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
+    SQL"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
           from person.stateprovince
-          where stateprovinceid = ANY(${stateprovinceids})
+          where "stateprovinceid" = ANY(${stateprovinceids})
        """.as(StateprovinceRow.rowParser(1).*)
     
   }
   override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
     val stateprovinceid = row.stateprovinceid
     SQL"""update person.stateprovince
-          set stateprovincecode = ${ParameterValue(row.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar,
-              countryregioncode = ${ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)},
-              isonlystateprovinceflag = ${ParameterValue(row.isonlystateprovinceflag, null, Flag.toStatement)}::bool,
+          set "stateprovincecode" = ${ParameterValue(row.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar,
+              "countryregioncode" = ${ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)},
+              "isonlystateprovinceflag" = ${ParameterValue(row.isonlystateprovinceflag, null, Flag.toStatement)}::bool,
               "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              territoryid = ${ParameterValue(row.territoryid, null, SalesterritoryId.toStatement)}::int4,
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where stateprovinceid = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}
+              "territoryid" = ${ParameterValue(row.territoryid, null, SalesterritoryId.toStatement)}::int4,
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "stateprovinceid" = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilder("person.stateprovince", StateprovinceFields, StateprovinceRow.rowParser)
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
-    SQL"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
+    SQL"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
             ${ParameterValue(unsaved.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar,
@@ -129,16 +129,16 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (stateprovinceid)
+          on conflict ("stateprovinceid")
           do update set
-            stateprovincecode = EXCLUDED.stateprovincecode,
-            countryregioncode = EXCLUDED.countryregioncode,
-            isonlystateprovinceflag = EXCLUDED.isonlystateprovinceflag,
+            "stateprovincecode" = EXCLUDED."stateprovincecode",
+            "countryregioncode" = EXCLUDED."countryregioncode",
+            "isonlystateprovinceflag" = EXCLUDED."isonlystateprovinceflag",
             "name" = EXCLUDED."name",
-            territoryid = EXCLUDED.territoryid,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
+            "territoryid" = EXCLUDED."territoryid",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
     

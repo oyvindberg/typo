@@ -17,7 +17,7 @@ object SopViewRepoImpl extends SopViewRepo {
     SelectBuilderSql("sa.sop", SopViewFields, SopViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SopViewRow] = {
-    SQL"""select "id", specialofferid, productid, rowguid, modifieddate::text
+    SQL"""select "id", "specialofferid", "productid", "rowguid", "modifieddate"::text
           from sa.sop
        """.as(SopViewRow.rowParser(1).*)
   }

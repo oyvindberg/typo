@@ -17,7 +17,7 @@ object PgSeclabelsViewRepoImpl extends PgSeclabelsViewRepo {
     SelectBuilderSql("pg_catalog.pg_seclabels", PgSeclabelsViewFields, PgSeclabelsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgSeclabelsViewRow] = {
-    SQL"""select objoid, classoid, objsubid, objtype, objnamespace, objname, provider, "label"
+    SQL"""select "objoid", "classoid", "objsubid", "objtype", "objnamespace", "objname", "provider", "label"
           from pg_catalog.pg_seclabels
        """.as(PgSeclabelsViewRow.rowParser(1).*)
   }

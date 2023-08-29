@@ -17,7 +17,7 @@ object ColumnOptionsViewRepoImpl extends ColumnOptionsViewRepo {
     SelectBuilderSql("information_schema.column_options", ColumnOptionsViewFields, ColumnOptionsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ColumnOptionsViewRow] = {
-    SQL"""select table_catalog, table_schema, "table_name", "column_name", option_name, option_value
+    SQL"""select "table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value"
           from information_schema.column_options
        """.as(ColumnOptionsViewRow.rowParser(1).*)
   }

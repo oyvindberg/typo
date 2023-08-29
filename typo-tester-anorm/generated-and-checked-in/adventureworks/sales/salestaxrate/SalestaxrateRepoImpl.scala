@@ -26,15 +26,15 @@ import typo.dsl.UpdateBuilder
 
 object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salestaxrate where salestaxrateid = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.salestaxrate where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
     DeleteBuilder("sales.salestaxrate", SalestaxrateFields)
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
-    SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
+    SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
+          returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
     
@@ -64,13 +64,13 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.salestaxrate default values
-            returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
+            returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
          """
         .executeInsert(SalestaxrateRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salestaxrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
+                  returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(SalestaxrateRow.rowParser(1).single)
@@ -81,40 +81,40 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     SelectBuilderSql("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
+    SQL"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
           from sales.salestaxrate
        """.as(SalestaxrateRow.rowParser(1).*)
   }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
+    SQL"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
           from sales.salestaxrate
-          where salestaxrateid = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
+          where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
        """.as(SalestaxrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
+    SQL"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
           from sales.salestaxrate
-          where salestaxrateid = ANY(${salestaxrateids})
+          where "salestaxrateid" = ANY(${salestaxrateids})
        """.as(SalestaxrateRow.rowParser(1).*)
     
   }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
     val salestaxrateid = row.salestaxrateid
     SQL"""update sales.salestaxrate
-          set stateprovinceid = ${ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
-              taxtype = ${ParameterValue(row.taxtype, null, ToStatement.intToStatement)}::int2,
-              taxrate = ${ParameterValue(row.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+          set "stateprovinceid" = ${ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
+              "taxtype" = ${ParameterValue(row.taxtype, null, ToStatement.intToStatement)}::int2,
+              "taxrate" = ${ParameterValue(row.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where salestaxrateid = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilder("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.rowParser)
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
-    SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
+    SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4,
             ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
@@ -124,15 +124,15 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (salestaxrateid)
+          on conflict ("salestaxrateid")
           do update set
-            stateprovinceid = EXCLUDED.stateprovinceid,
-            taxtype = EXCLUDED.taxtype,
-            taxrate = EXCLUDED.taxrate,
+            "stateprovinceid" = EXCLUDED."stateprovinceid",
+            "taxtype" = EXCLUDED."taxtype",
+            "taxrate" = EXCLUDED."taxrate",
             "name" = EXCLUDED."name",
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
     

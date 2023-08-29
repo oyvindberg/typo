@@ -18,6 +18,6 @@ object VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
     SelectBuilderSql("sales.vstorewithaddresses", VstorewithaddressesViewFields, VstorewithaddressesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VstorewithaddressesViewRow] = {
-    sql"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from sales.vstorewithaddresses""".query(VstorewithaddressesViewRow.read).stream
+    sql"""select "businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname" from sales.vstorewithaddresses""".query(VstorewithaddressesViewRow.read).stream
   }
 }

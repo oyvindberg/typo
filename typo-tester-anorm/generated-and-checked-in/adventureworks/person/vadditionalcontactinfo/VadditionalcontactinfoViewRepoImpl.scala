@@ -17,7 +17,7 @@ object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo
     SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoViewRow] = {
-    SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate"::text
           from person.vadditionalcontactinfo
        """.as(VadditionalcontactinfoViewRow.rowParser(1).*)
   }

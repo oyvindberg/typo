@@ -17,7 +17,7 @@ object DomainUdtUsageViewRepoImpl extends DomainUdtUsageViewRepo {
     SelectBuilderSql("information_schema.domain_udt_usage", DomainUdtUsageViewFields, DomainUdtUsageViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DomainUdtUsageViewRow] = {
-    SQL"""select udt_catalog, udt_schema, udt_name, domain_catalog, domain_schema, domain_name
+    SQL"""select "udt_catalog", "udt_schema", "udt_name", "domain_catalog", "domain_schema", "domain_name"
           from information_schema.domain_udt_usage
        """.as(DomainUdtUsageViewRow.rowParser(1).*)
   }

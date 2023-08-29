@@ -18,6 +18,6 @@ object PgStatUserIndexesViewRepoImpl extends PgStatUserIndexesViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_user_indexes", PgStatUserIndexesViewFields, PgStatUserIndexesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatUserIndexesViewRow] = {
-    sql"select relid, indexrelid, schemaname, relname, indexrelname, idx_scan, idx_tup_read, idx_tup_fetch from pg_catalog.pg_stat_user_indexes".query(PgStatUserIndexesViewRow.read).stream
+    sql"""select "relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch" from pg_catalog.pg_stat_user_indexes""".query(PgStatUserIndexesViewRow.read).stream
   }
 }

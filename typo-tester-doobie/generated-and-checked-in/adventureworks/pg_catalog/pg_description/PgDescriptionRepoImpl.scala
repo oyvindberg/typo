@@ -20,31 +20,31 @@ import typo.dsl.UpdateBuilder
 
 object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def delete(compositeId: PgDescriptionId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_description where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_description where "objoid" = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND "classoid" = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND "objsubid" = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgDescriptionFields, PgDescriptionRow] = {
     DeleteBuilder("pg_catalog.pg_description", PgDescriptionFields)
   }
   override def insert(unsaved: PgDescriptionRow): ConnectionIO[PgDescriptionRow] = {
-    sql"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
+    sql"""insert into pg_catalog.pg_description("objoid", "classoid", "objsubid", "description")
           values (${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))})
-          returning objoid, classoid, objsubid, description
+          returning "objoid", "classoid", "objsubid", "description"
        """.query(PgDescriptionRow.read).unique
   }
   override def select: SelectBuilder[PgDescriptionFields, PgDescriptionRow] = {
     SelectBuilderSql("pg_catalog.pg_description", PgDescriptionFields, PgDescriptionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgDescriptionRow] = {
-    sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description".query(PgDescriptionRow.read).stream
+    sql"""select "objoid", "classoid", "objsubid", "description" from pg_catalog.pg_description""".query(PgDescriptionRow.read).stream
   }
   override def selectById(compositeId: PgDescriptionId): ConnectionIO[Option[PgDescriptionRow]] = {
-    sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}".query(PgDescriptionRow.read).option
+    sql"""select "objoid", "classoid", "objsubid", "description" from pg_catalog.pg_description where "objoid" = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND "classoid" = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND "objsubid" = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}""".query(PgDescriptionRow.read).option
   }
   override def update(row: PgDescriptionRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_description
-          set description = ${fromWrite(row.description)(Write.fromPut(Meta.StringMeta.put))}
-          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}"""
+          set "description" = ${fromWrite(row.description)(Write.fromPut(Meta.StringMeta.put))}
+          where "objoid" = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND "classoid" = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND "objsubid" = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -53,17 +53,17 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
     UpdateBuilder("pg_catalog.pg_description", PgDescriptionFields, PgDescriptionRow.read)
   }
   override def upsert(unsaved: PgDescriptionRow): ConnectionIO[PgDescriptionRow] = {
-    sql"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
+    sql"""insert into pg_catalog.pg_description("objoid", "classoid", "objsubid", "description")
           values (
             ${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4,
             ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}
           )
-          on conflict (objoid, classoid, objsubid)
+          on conflict ("objoid", "classoid", "objsubid")
           do update set
-            description = EXCLUDED.description
-          returning objoid, classoid, objsubid, description
+            "description" = EXCLUDED."description"
+          returning "objoid", "classoid", "objsubid", "description"
        """.query(PgDescriptionRow.read).unique
   }
 }

@@ -17,7 +17,7 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
     SelectBuilderSql("sales.vstorewithdemographics", VstorewithdemographicsViewFields, VstorewithdemographicsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VstorewithdemographicsViewRow] = {
-    SQL"""select businessentityid, "name", AnnualSales::numeric, AnnualRevenue::numeric, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees
+    SQL"""select "businessentityid", "name", "AnnualSales"::numeric, "AnnualRevenue"::numeric, "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees"
           from sales.vstorewithdemographics
        """.as(VstorewithdemographicsViewRow.rowParser(1).*)
   }

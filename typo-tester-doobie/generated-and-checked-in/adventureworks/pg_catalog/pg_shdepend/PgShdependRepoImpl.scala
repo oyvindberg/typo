@@ -23,16 +23,16 @@ object PgShdependRepoImpl extends PgShdependRepo {
     DeleteBuilder("pg_catalog.pg_shdepend", PgShdependFields)
   }
   override def insert(unsaved: PgShdependRow): ConnectionIO[PgShdependRow] = {
-    sql"""insert into pg_catalog.pg_shdepend(dbid, classid, objid, objsubid, refclassid, refobjid, deptype)
+    sql"""insert into pg_catalog.pg_shdepend("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")
           values (${fromWrite(unsaved.dbid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.refclassid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.refobjid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.deptype)(Write.fromPut(Meta.StringMeta.put))}::char)
-          returning dbid, classid, objid, objsubid, refclassid, refobjid, deptype
+          returning "dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype"
        """.query(PgShdependRow.read).unique
   }
   override def select: SelectBuilder[PgShdependFields, PgShdependRow] = {
     SelectBuilderSql("pg_catalog.pg_shdepend", PgShdependFields, PgShdependRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgShdependRow] = {
-    sql"select dbid, classid, objid, objsubid, refclassid, refobjid, deptype from pg_catalog.pg_shdepend".query(PgShdependRow.read).stream
+    sql"""select "dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype" from pg_catalog.pg_shdepend""".query(PgShdependRow.read).stream
   }
   override def update: UpdateBuilder[PgShdependFields, PgShdependRow] = {
     UpdateBuilder("pg_catalog.pg_shdepend", PgShdependFields, PgShdependRow.read)

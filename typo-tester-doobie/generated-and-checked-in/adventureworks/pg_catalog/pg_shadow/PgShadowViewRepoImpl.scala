@@ -18,6 +18,6 @@ object PgShadowViewRepoImpl extends PgShadowViewRepo {
     SelectBuilderSql("pg_catalog.pg_shadow", PgShadowViewFields, PgShadowViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgShadowViewRow] = {
-    sql"select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig from pg_catalog.pg_shadow".query(PgShadowViewRow.read).stream
+    sql"""select "usename", "usesysid", "usecreatedb", "usesuper", "userepl", "usebypassrls", "passwd", "valuntil"::text, "useconfig" from pg_catalog.pg_shadow""".query(PgShadowViewRow.read).stream
   }
 }

@@ -17,7 +17,7 @@ object ApplicableRolesViewRepoImpl extends ApplicableRolesViewRepo {
     SelectBuilderSql("information_schema.applicable_roles", ApplicableRolesViewFields, ApplicableRolesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ApplicableRolesViewRow] = {
-    SQL"""select grantee, role_name, is_grantable
+    SQL"""select "grantee", "role_name", "is_grantable"
           from information_schema.applicable_roles
        """.as(ApplicableRolesViewRow.rowParser(1).*)
   }

@@ -17,7 +17,7 @@ object ThaViewRepoImpl extends ThaViewRepo {
     SelectBuilderSql("pr.tha", ThaViewFields, ThaViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ThaViewRow] = {
-    SQL"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
+    SQL"""select "id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
           from pr.tha
        """.as(ThaViewRow.rowParser(1).*)
   }

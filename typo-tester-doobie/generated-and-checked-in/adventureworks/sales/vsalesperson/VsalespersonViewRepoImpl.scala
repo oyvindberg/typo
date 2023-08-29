@@ -18,6 +18,6 @@ object VsalespersonViewRepoImpl extends VsalespersonViewRepo {
     SelectBuilderSql("sales.vsalesperson", VsalespersonViewFields, VsalespersonViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VsalespersonViewRow] = {
-    sql"select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, territoryname, territorygroup, salesquota, salesytd, saleslastyear from sales.vsalesperson".query(VsalespersonViewRow.read).stream
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear" from sales.vsalesperson""".query(VsalespersonViewRow.read).stream
   }
 }

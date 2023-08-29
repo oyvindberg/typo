@@ -19,15 +19,15 @@ import typo.dsl.UpdateBuilder
 
 object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def delete(stxoid: PgStatisticExtDataId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_statistic_ext_data where stxoid = ${ParameterValue(stxoid, null, PgStatisticExtDataId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_statistic_ext_data where "stxoid" = ${ParameterValue(stxoid, null, PgStatisticExtDataId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
     DeleteBuilder("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields)
   }
   override def insert(unsaved: PgStatisticExtDataRow)(implicit c: Connection): PgStatisticExtDataRow = {
-    SQL"""insert into pg_catalog.pg_statistic_ext_data(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)
+    SQL"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
           values (${ParameterValue(unsaved.stxoid, null, PgStatisticExtDataId.toStatement)}::oid, ${ParameterValue(unsaved.stxdndistinct, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.stxddependencies, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.stxdmcv, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.stxdexpr, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
-          returning stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
+          returning "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
        """
       .executeInsert(PgStatisticExtDataRow.rowParser(1).single)
     
@@ -36,38 +36,38 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
     SelectBuilderSql("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields, PgStatisticExtDataRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatisticExtDataRow] = {
-    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
+    SQL"""select "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
           from pg_catalog.pg_statistic_ext_data
        """.as(PgStatisticExtDataRow.rowParser(1).*)
   }
   override def selectById(stxoid: PgStatisticExtDataId)(implicit c: Connection): Option[PgStatisticExtDataRow] = {
-    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
+    SQL"""select "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
           from pg_catalog.pg_statistic_ext_data
-          where stxoid = ${ParameterValue(stxoid, null, PgStatisticExtDataId.toStatement)}
+          where "stxoid" = ${ParameterValue(stxoid, null, PgStatisticExtDataId.toStatement)}
        """.as(PgStatisticExtDataRow.rowParser(1).singleOpt)
   }
   override def selectByIds(stxoids: Array[PgStatisticExtDataId])(implicit c: Connection): List[PgStatisticExtDataRow] = {
-    SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
+    SQL"""select "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
           from pg_catalog.pg_statistic_ext_data
-          where stxoid = ANY(${stxoids})
+          where "stxoid" = ANY(${stxoids})
        """.as(PgStatisticExtDataRow.rowParser(1).*)
     
   }
   override def update(row: PgStatisticExtDataRow)(implicit c: Connection): Boolean = {
     val stxoid = row.stxoid
     SQL"""update pg_catalog.pg_statistic_ext_data
-          set stxdndistinct = ${ParameterValue(row.stxdndistinct, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              stxddependencies = ${ParameterValue(row.stxddependencies, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              stxdmcv = ${ParameterValue(row.stxdmcv, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              stxdexpr = ${ParameterValue(row.stxdexpr, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
-          where stxoid = ${ParameterValue(stxoid, null, PgStatisticExtDataId.toStatement)}
+          set "stxdndistinct" = ${ParameterValue(row.stxdndistinct, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "stxddependencies" = ${ParameterValue(row.stxddependencies, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "stxdmcv" = ${ParameterValue(row.stxdmcv, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "stxdexpr" = ${ParameterValue(row.stxdexpr, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+          where "stxoid" = ${ParameterValue(stxoid, null, PgStatisticExtDataId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
     UpdateBuilder("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields, PgStatisticExtDataRow.rowParser)
   }
   override def upsert(unsaved: PgStatisticExtDataRow)(implicit c: Connection): PgStatisticExtDataRow = {
-    SQL"""insert into pg_catalog.pg_statistic_ext_data(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)
+    SQL"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
           values (
             ${ParameterValue(unsaved.stxoid, null, PgStatisticExtDataId.toStatement)}::oid,
             ${ParameterValue(unsaved.stxdndistinct, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
@@ -75,13 +75,13 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
             ${ParameterValue(unsaved.stxdmcv, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
             ${ParameterValue(unsaved.stxdexpr, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           )
-          on conflict (stxoid)
+          on conflict ("stxoid")
           do update set
-            stxdndistinct = EXCLUDED.stxdndistinct,
-            stxddependencies = EXCLUDED.stxddependencies,
-            stxdmcv = EXCLUDED.stxdmcv,
-            stxdexpr = EXCLUDED.stxdexpr
-          returning stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
+            "stxdndistinct" = EXCLUDED."stxdndistinct",
+            "stxddependencies" = EXCLUDED."stxddependencies",
+            "stxdmcv" = EXCLUDED."stxdmcv",
+            "stxdexpr" = EXCLUDED."stxdexpr"
+          returning "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
        """
       .executeInsert(PgStatisticExtDataRow.rowParser(1).single)
     

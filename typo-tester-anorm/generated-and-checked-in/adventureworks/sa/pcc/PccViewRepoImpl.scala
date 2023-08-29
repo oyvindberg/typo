@@ -17,7 +17,7 @@ object PccViewRepoImpl extends PccViewRepo {
     SelectBuilderSql("sa.pcc", PccViewFields, PccViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PccViewRow] = {
-    SQL"""select "id", businessentityid, creditcardid, modifieddate::text
+    SQL"""select "id", "businessentityid", "creditcardid", "modifieddate"::text
           from sa.pcc
        """.as(PccViewRow.rowParser(1).*)
   }

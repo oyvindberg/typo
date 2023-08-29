@@ -26,15 +26,15 @@ import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId): ConnectionIO[Boolean] = {
-    sql"""delete from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
+    sql"""delete from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("compositepk.person", PersonFields)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
-    sql"""insert into compositepk.person("one", two, "name")
+    sql"""insert into compositepk.person("one", "two", "name")
           values (${fromWrite(unsaved.one)(Write.fromPut(Meta.LongMeta.put))}::int8, ${fromWrite(unsaved.two)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))})
-          returning "one", two, "name"
+          returning "one", "two", "name"
        """.query(PersonRow.read).unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
@@ -46,19 +46,19 @@ object PersonRepoImpl extends PersonRepo {
       },
       unsaved.two match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"two"), fr"${fromWrite(value: Option[String])(Write.fromPutOption(Meta.StringMeta.put))}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""two""""), fr"${fromWrite(value: Option[String])(Write.fromPutOption(Meta.StringMeta.put))}"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into compositepk.person default values
-            returning "one", two, "name"
+            returning "one", "two", "name"
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into compositepk.person(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning "one", two, "name"
+            returning "one", "two", "name"
          """
     }
     q.query(PersonRow.read).unique
@@ -68,26 +68,26 @@ object PersonRepoImpl extends PersonRepo {
     SelectBuilderSql("compositepk.person", PersonFields, PersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"""select "one", two, "name" from compositepk.person""".query(PersonRow.read).stream
+    sql"""select "one", "two", "name" from compositepk.person""".query(PersonRow.read).stream
   }
   override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "one", two, "name" from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".query(PersonRow.read).option
+    sql"""select "one", "two", "name" from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".query(PersonRow.read).option
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
     val where = fragments.whereAndOpt(
       fieldValues.map {
         case PersonFieldValue.one(value) => fr""""one" = ${fromWrite(value)(Write.fromPut(Meta.LongMeta.put))}"""
-        case PersonFieldValue.two(value) => fr"two = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
+        case PersonFieldValue.two(value) => fr""""two" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
         case PersonFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
       }
     )
-    sql"""select "one", two, "name" from compositepk.person $where""".query(PersonRow.read).stream
+    sql"""select "one", "two", "name" from compositepk.person $where""".query(PersonRow.read).stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update compositepk.person
           set "name" = ${fromWrite(row.name)(Write.fromPutOption(Meta.StringMeta.put))}
-          where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}"""
+          where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -106,20 +106,20 @@ object PersonRepoImpl extends PersonRepo {
         )
         sql"""update compositepk.person
               $updates
-              where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
+              where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
     }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
-    sql"""insert into compositepk.person("one", two, "name")
+    sql"""insert into compositepk.person("one", "two", "name")
           values (
             ${fromWrite(unsaved.one)(Write.fromPut(Meta.LongMeta.put))}::int8,
             ${fromWrite(unsaved.two)(Write.fromPutOption(Meta.StringMeta.put))},
             ${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))}
           )
-          on conflict ("one", two)
+          on conflict ("one", "two")
           do update set
             "name" = EXCLUDED."name"
-          returning "one", two, "name"
+          returning "one", "two", "name"
        """.query(PersonRow.read).unique
   }
 }

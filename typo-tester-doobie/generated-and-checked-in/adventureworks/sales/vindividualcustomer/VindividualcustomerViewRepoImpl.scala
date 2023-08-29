@@ -18,6 +18,6 @@ object VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
     SelectBuilderSql("sales.vindividualcustomer", VindividualcustomerViewFields, VindividualcustomerViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VindividualcustomerViewRow] = {
-    sql"select businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics from sales.vindividualcustomer".query(VindividualcustomerViewRow.read).stream
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics" from sales.vindividualcustomer""".query(VindividualcustomerViewRow.read).stream
   }
 }

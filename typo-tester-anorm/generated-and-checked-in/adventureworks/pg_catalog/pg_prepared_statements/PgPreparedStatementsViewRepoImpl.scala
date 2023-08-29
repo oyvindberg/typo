@@ -17,7 +17,7 @@ object PgPreparedStatementsViewRepoImpl extends PgPreparedStatementsViewRepo {
     SelectBuilderSql("pg_catalog.pg_prepared_statements", PgPreparedStatementsViewFields, PgPreparedStatementsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPreparedStatementsViewRow] = {
-    SQL"""select "name", "statement", prepare_time::text, parameter_types, from_sql, generic_plans, custom_plans
+    SQL"""select "name", "statement", "prepare_time"::text, "parameter_types", "from_sql", "generic_plans", "custom_plans"
           from pg_catalog.pg_prepared_statements
        """.as(PgPreparedStatementsViewRow.rowParser(1).*)
   }

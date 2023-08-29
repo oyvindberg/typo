@@ -17,7 +17,7 @@ object PchViewRepoImpl extends PchViewRepo {
     SelectBuilderSql("pr.pch", PchViewFields, PchViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PchViewRow] = {
-    SQL"""select "id", productid, startdate::text, enddate::text, standardcost, modifieddate::text
+    SQL"""select "id", "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
           from pr.pch
        """.as(PchViewRow.rowParser(1).*)
   }

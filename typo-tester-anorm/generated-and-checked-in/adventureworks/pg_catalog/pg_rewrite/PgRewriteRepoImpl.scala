@@ -19,15 +19,15 @@ import typo.dsl.UpdateBuilder
 
 object PgRewriteRepoImpl extends PgRewriteRepo {
   override def delete(oid: PgRewriteId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_rewrite where oid = ${ParameterValue(oid, null, PgRewriteId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_rewrite where "oid" = ${ParameterValue(oid, null, PgRewriteId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgRewriteFields, PgRewriteRow] = {
     DeleteBuilder("pg_catalog.pg_rewrite", PgRewriteFields)
   }
   override def insert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow = {
-    SQL"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)
+    SQL"""insert into pg_catalog.pg_rewrite("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")
           values (${ParameterValue(unsaved.oid, null, PgRewriteId.toStatement)}::oid, ${ParameterValue(unsaved.rulename, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.evClass, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.evType, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.evEnabled, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.isInstead, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.evQual, null, TypoPgNodeTree.toStatement)}::pg_node_tree, ${ParameterValue(unsaved.evAction, null, TypoPgNodeTree.toStatement)}::pg_node_tree)
-          returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
+          returning "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action"
        """
       .executeInsert(PgRewriteRow.rowParser(1).single)
     
@@ -36,48 +36,48 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
     SelectBuilderSql("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgRewriteRow] = {
-    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
+    SQL"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action"
           from pg_catalog.pg_rewrite
        """.as(PgRewriteRow.rowParser(1).*)
   }
   override def selectById(oid: PgRewriteId)(implicit c: Connection): Option[PgRewriteRow] = {
-    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
+    SQL"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action"
           from pg_catalog.pg_rewrite
-          where oid = ${ParameterValue(oid, null, PgRewriteId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgRewriteId.toStatement)}
        """.as(PgRewriteRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgRewriteId])(implicit c: Connection): List[PgRewriteRow] = {
-    SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
+    SQL"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action"
           from pg_catalog.pg_rewrite
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgRewriteRow.rowParser(1).*)
     
   }
   override def selectByUnique(evClass: /* oid */ Long, rulename: String)(implicit c: Connection): Option[PgRewriteRow] = {
-    SQL"""select ev_class, rulename
+    SQL"""select "ev_class", "rulename"
           from pg_catalog.pg_rewrite
-          where ev_class = ${ParameterValue(evClass, null, ToStatement.longToStatement)} AND rulename = ${ParameterValue(rulename, null, ToStatement.stringToStatement)}
+          where "ev_class" = ${ParameterValue(evClass, null, ToStatement.longToStatement)} AND "rulename" = ${ParameterValue(rulename, null, ToStatement.stringToStatement)}
        """.as(PgRewriteRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgRewriteRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_rewrite
-          set rulename = ${ParameterValue(row.rulename, null, ToStatement.stringToStatement)}::name,
-              ev_class = ${ParameterValue(row.evClass, null, ToStatement.longToStatement)}::oid,
-              ev_type = ${ParameterValue(row.evType, null, ToStatement.stringToStatement)}::char,
-              ev_enabled = ${ParameterValue(row.evEnabled, null, ToStatement.stringToStatement)}::char,
-              is_instead = ${ParameterValue(row.isInstead, null, ToStatement.booleanToStatement)},
-              ev_qual = ${ParameterValue(row.evQual, null, TypoPgNodeTree.toStatement)}::pg_node_tree,
-              ev_action = ${ParameterValue(row.evAction, null, TypoPgNodeTree.toStatement)}::pg_node_tree
-          where oid = ${ParameterValue(oid, null, PgRewriteId.toStatement)}
+          set "rulename" = ${ParameterValue(row.rulename, null, ToStatement.stringToStatement)}::name,
+              "ev_class" = ${ParameterValue(row.evClass, null, ToStatement.longToStatement)}::oid,
+              "ev_type" = ${ParameterValue(row.evType, null, ToStatement.stringToStatement)}::char,
+              "ev_enabled" = ${ParameterValue(row.evEnabled, null, ToStatement.stringToStatement)}::char,
+              "is_instead" = ${ParameterValue(row.isInstead, null, ToStatement.booleanToStatement)},
+              "ev_qual" = ${ParameterValue(row.evQual, null, TypoPgNodeTree.toStatement)}::pg_node_tree,
+              "ev_action" = ${ParameterValue(row.evAction, null, TypoPgNodeTree.toStatement)}::pg_node_tree
+          where "oid" = ${ParameterValue(oid, null, PgRewriteId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgRewriteFields, PgRewriteRow] = {
     UpdateBuilder("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.rowParser)
   }
   override def upsert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow = {
-    SQL"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)
+    SQL"""insert into pg_catalog.pg_rewrite("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")
           values (
             ${ParameterValue(unsaved.oid, null, PgRewriteId.toStatement)}::oid,
             ${ParameterValue(unsaved.rulename, null, ToStatement.stringToStatement)}::name,
@@ -88,16 +88,16 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
             ${ParameterValue(unsaved.evQual, null, TypoPgNodeTree.toStatement)}::pg_node_tree,
             ${ParameterValue(unsaved.evAction, null, TypoPgNodeTree.toStatement)}::pg_node_tree
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            rulename = EXCLUDED.rulename,
-            ev_class = EXCLUDED.ev_class,
-            ev_type = EXCLUDED.ev_type,
-            ev_enabled = EXCLUDED.ev_enabled,
-            is_instead = EXCLUDED.is_instead,
-            ev_qual = EXCLUDED.ev_qual,
-            ev_action = EXCLUDED.ev_action
-          returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
+            "rulename" = EXCLUDED."rulename",
+            "ev_class" = EXCLUDED."ev_class",
+            "ev_type" = EXCLUDED."ev_type",
+            "ev_enabled" = EXCLUDED."ev_enabled",
+            "is_instead" = EXCLUDED."is_instead",
+            "ev_qual" = EXCLUDED."ev_qual",
+            "ev_action" = EXCLUDED."ev_action"
+          returning "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action"
        """
       .executeInsert(PgRewriteRow.rowParser(1).single)
     

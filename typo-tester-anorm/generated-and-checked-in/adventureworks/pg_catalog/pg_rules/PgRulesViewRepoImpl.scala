@@ -17,7 +17,7 @@ object PgRulesViewRepoImpl extends PgRulesViewRepo {
     SelectBuilderSql("pg_catalog.pg_rules", PgRulesViewFields, PgRulesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgRulesViewRow] = {
-    SQL"""select schemaname, tablename, rulename, definition
+    SQL"""select "schemaname", "tablename", "rulename", "definition"
           from pg_catalog.pg_rules
        """.as(PgRulesViewRow.rowParser(1).*)
   }

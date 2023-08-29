@@ -21,15 +21,15 @@ import typo.dsl.UpdateBuilder
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_attribute where attrelid = ${ParameterValue(compositeId.attrelid, null, ToStatement.longToStatement)} AND attnum = ${ParameterValue(compositeId.attnum, null, ToStatement.intToStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_attribute where "attrelid" = ${ParameterValue(compositeId.attrelid, null, ToStatement.longToStatement)} AND "attnum" = ${ParameterValue(compositeId.attnum, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAttributeFields, PgAttributeRow] = {
     DeleteBuilder("pg_catalog.pg_attribute", PgAttributeFields)
   }
   override def insert(unsaved: PgAttributeRow)(implicit c: Connection): PgAttributeRow = {
-    SQL"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
+    SQL"""insert into pg_catalog.pg_attribute("attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval")
           values (${ParameterValue(unsaved.attrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.attname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.atttypid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.attstattarget, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.attlen, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.attnum, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.attndims, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.attcacheoff, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.atttypmod, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.attbyval, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.attalign, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.attstorage, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.attcompression, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.attnotnull, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.atthasdef, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.atthasmissing, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.attidentity, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.attgenerated, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.attisdropped, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.attislocal, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.attinhcount, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.attcollation, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.attacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem, ${ParameterValue(unsaved.attoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text, ${ParameterValue(unsaved.attfdwoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text, ${ParameterValue(unsaved.attmissingval, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray)
-          returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
+          returning "attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval"
        """
       .executeInsert(PgAttributeRow.rowParser(1).single)
     
@@ -38,58 +38,58 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
     SelectBuilderSql("pg_catalog.pg_attribute", PgAttributeFields, PgAttributeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
-    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
+    SQL"""select "attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval"
           from pg_catalog.pg_attribute
        """.as(PgAttributeRow.rowParser(1).*)
   }
   override def selectById(compositeId: PgAttributeId)(implicit c: Connection): Option[PgAttributeRow] = {
-    SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
+    SQL"""select "attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval"
           from pg_catalog.pg_attribute
-          where attrelid = ${ParameterValue(compositeId.attrelid, null, ToStatement.longToStatement)} AND attnum = ${ParameterValue(compositeId.attnum, null, ToStatement.intToStatement)}
+          where "attrelid" = ${ParameterValue(compositeId.attrelid, null, ToStatement.longToStatement)} AND "attnum" = ${ParameterValue(compositeId.attnum, null, ToStatement.intToStatement)}
        """.as(PgAttributeRow.rowParser(1).singleOpt)
   }
   override def selectByUnique(attrelid: /* oid */ Long, attname: String)(implicit c: Connection): Option[PgAttributeRow] = {
-    SQL"""select attrelid, attname
+    SQL"""select "attrelid", "attname"
           from pg_catalog.pg_attribute
-          where attrelid = ${ParameterValue(attrelid, null, ToStatement.longToStatement)} AND attname = ${ParameterValue(attname, null, ToStatement.stringToStatement)}
+          where "attrelid" = ${ParameterValue(attrelid, null, ToStatement.longToStatement)} AND "attname" = ${ParameterValue(attname, null, ToStatement.stringToStatement)}
        """.as(PgAttributeRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgAttributeRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_attribute
-          set attname = ${ParameterValue(row.attname, null, ToStatement.stringToStatement)}::name,
-              atttypid = ${ParameterValue(row.atttypid, null, ToStatement.longToStatement)}::oid,
-              attstattarget = ${ParameterValue(row.attstattarget, null, ToStatement.intToStatement)}::int4,
-              attlen = ${ParameterValue(row.attlen, null, ToStatement.intToStatement)}::int2,
-              attndims = ${ParameterValue(row.attndims, null, ToStatement.intToStatement)}::int4,
-              attcacheoff = ${ParameterValue(row.attcacheoff, null, ToStatement.intToStatement)}::int4,
-              atttypmod = ${ParameterValue(row.atttypmod, null, ToStatement.intToStatement)}::int4,
-              attbyval = ${ParameterValue(row.attbyval, null, ToStatement.booleanToStatement)},
-              attalign = ${ParameterValue(row.attalign, null, ToStatement.stringToStatement)}::char,
-              attstorage = ${ParameterValue(row.attstorage, null, ToStatement.stringToStatement)}::char,
-              attcompression = ${ParameterValue(row.attcompression, null, ToStatement.stringToStatement)}::char,
-              attnotnull = ${ParameterValue(row.attnotnull, null, ToStatement.booleanToStatement)},
-              atthasdef = ${ParameterValue(row.atthasdef, null, ToStatement.booleanToStatement)},
-              atthasmissing = ${ParameterValue(row.atthasmissing, null, ToStatement.booleanToStatement)},
-              attidentity = ${ParameterValue(row.attidentity, null, ToStatement.stringToStatement)}::char,
-              attgenerated = ${ParameterValue(row.attgenerated, null, ToStatement.stringToStatement)}::char,
-              attisdropped = ${ParameterValue(row.attisdropped, null, ToStatement.booleanToStatement)},
-              attislocal = ${ParameterValue(row.attislocal, null, ToStatement.booleanToStatement)},
-              attinhcount = ${ParameterValue(row.attinhcount, null, ToStatement.intToStatement)}::int4,
-              attcollation = ${ParameterValue(row.attcollation, null, ToStatement.longToStatement)}::oid,
-              attacl = ${ParameterValue(row.attacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem,
-              attoptions = ${ParameterValue(row.attoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text,
-              attfdwoptions = ${ParameterValue(row.attfdwoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text,
-              attmissingval = ${ParameterValue(row.attmissingval, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray
-          where attrelid = ${ParameterValue(compositeId.attrelid, null, ToStatement.longToStatement)} AND attnum = ${ParameterValue(compositeId.attnum, null, ToStatement.intToStatement)}
+          set "attname" = ${ParameterValue(row.attname, null, ToStatement.stringToStatement)}::name,
+              "atttypid" = ${ParameterValue(row.atttypid, null, ToStatement.longToStatement)}::oid,
+              "attstattarget" = ${ParameterValue(row.attstattarget, null, ToStatement.intToStatement)}::int4,
+              "attlen" = ${ParameterValue(row.attlen, null, ToStatement.intToStatement)}::int2,
+              "attndims" = ${ParameterValue(row.attndims, null, ToStatement.intToStatement)}::int4,
+              "attcacheoff" = ${ParameterValue(row.attcacheoff, null, ToStatement.intToStatement)}::int4,
+              "atttypmod" = ${ParameterValue(row.atttypmod, null, ToStatement.intToStatement)}::int4,
+              "attbyval" = ${ParameterValue(row.attbyval, null, ToStatement.booleanToStatement)},
+              "attalign" = ${ParameterValue(row.attalign, null, ToStatement.stringToStatement)}::char,
+              "attstorage" = ${ParameterValue(row.attstorage, null, ToStatement.stringToStatement)}::char,
+              "attcompression" = ${ParameterValue(row.attcompression, null, ToStatement.stringToStatement)}::char,
+              "attnotnull" = ${ParameterValue(row.attnotnull, null, ToStatement.booleanToStatement)},
+              "atthasdef" = ${ParameterValue(row.atthasdef, null, ToStatement.booleanToStatement)},
+              "atthasmissing" = ${ParameterValue(row.atthasmissing, null, ToStatement.booleanToStatement)},
+              "attidentity" = ${ParameterValue(row.attidentity, null, ToStatement.stringToStatement)}::char,
+              "attgenerated" = ${ParameterValue(row.attgenerated, null, ToStatement.stringToStatement)}::char,
+              "attisdropped" = ${ParameterValue(row.attisdropped, null, ToStatement.booleanToStatement)},
+              "attislocal" = ${ParameterValue(row.attislocal, null, ToStatement.booleanToStatement)},
+              "attinhcount" = ${ParameterValue(row.attinhcount, null, ToStatement.intToStatement)}::int4,
+              "attcollation" = ${ParameterValue(row.attcollation, null, ToStatement.longToStatement)}::oid,
+              "attacl" = ${ParameterValue(row.attacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, adventureworks.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem,
+              "attoptions" = ${ParameterValue(row.attoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text,
+              "attfdwoptions" = ${ParameterValue(row.attfdwoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text,
+              "attmissingval" = ${ParameterValue(row.attmissingval, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray
+          where "attrelid" = ${ParameterValue(compositeId.attrelid, null, ToStatement.longToStatement)} AND "attnum" = ${ParameterValue(compositeId.attnum, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAttributeFields, PgAttributeRow] = {
     UpdateBuilder("pg_catalog.pg_attribute", PgAttributeFields, PgAttributeRow.rowParser)
   }
   override def upsert(unsaved: PgAttributeRow)(implicit c: Connection): PgAttributeRow = {
-    SQL"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
+    SQL"""insert into pg_catalog.pg_attribute("attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval")
           values (
             ${ParameterValue(unsaved.attrelid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.attname, null, ToStatement.stringToStatement)}::name,
@@ -118,33 +118,33 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
             ${ParameterValue(unsaved.attfdwoptions, null, ToStatement.optionToStatement(ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData), adventureworks.arrayParameterMetaData(ParameterMetaData.StringParameterMetaData)))}::_text,
             ${ParameterValue(unsaved.attmissingval, null, ToStatement.optionToStatement(TypoAnyArray.toStatement, TypoAnyArray.parameterMetadata))}::anyarray
           )
-          on conflict (attrelid, attnum)
+          on conflict ("attrelid", "attnum")
           do update set
-            attname = EXCLUDED.attname,
-            atttypid = EXCLUDED.atttypid,
-            attstattarget = EXCLUDED.attstattarget,
-            attlen = EXCLUDED.attlen,
-            attndims = EXCLUDED.attndims,
-            attcacheoff = EXCLUDED.attcacheoff,
-            atttypmod = EXCLUDED.atttypmod,
-            attbyval = EXCLUDED.attbyval,
-            attalign = EXCLUDED.attalign,
-            attstorage = EXCLUDED.attstorage,
-            attcompression = EXCLUDED.attcompression,
-            attnotnull = EXCLUDED.attnotnull,
-            atthasdef = EXCLUDED.atthasdef,
-            atthasmissing = EXCLUDED.atthasmissing,
-            attidentity = EXCLUDED.attidentity,
-            attgenerated = EXCLUDED.attgenerated,
-            attisdropped = EXCLUDED.attisdropped,
-            attislocal = EXCLUDED.attislocal,
-            attinhcount = EXCLUDED.attinhcount,
-            attcollation = EXCLUDED.attcollation,
-            attacl = EXCLUDED.attacl,
-            attoptions = EXCLUDED.attoptions,
-            attfdwoptions = EXCLUDED.attfdwoptions,
-            attmissingval = EXCLUDED.attmissingval
-          returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
+            "attname" = EXCLUDED."attname",
+            "atttypid" = EXCLUDED."atttypid",
+            "attstattarget" = EXCLUDED."attstattarget",
+            "attlen" = EXCLUDED."attlen",
+            "attndims" = EXCLUDED."attndims",
+            "attcacheoff" = EXCLUDED."attcacheoff",
+            "atttypmod" = EXCLUDED."atttypmod",
+            "attbyval" = EXCLUDED."attbyval",
+            "attalign" = EXCLUDED."attalign",
+            "attstorage" = EXCLUDED."attstorage",
+            "attcompression" = EXCLUDED."attcompression",
+            "attnotnull" = EXCLUDED."attnotnull",
+            "atthasdef" = EXCLUDED."atthasdef",
+            "atthasmissing" = EXCLUDED."atthasmissing",
+            "attidentity" = EXCLUDED."attidentity",
+            "attgenerated" = EXCLUDED."attgenerated",
+            "attisdropped" = EXCLUDED."attisdropped",
+            "attislocal" = EXCLUDED."attislocal",
+            "attinhcount" = EXCLUDED."attinhcount",
+            "attcollation" = EXCLUDED."attcollation",
+            "attacl" = EXCLUDED."attacl",
+            "attoptions" = EXCLUDED."attoptions",
+            "attfdwoptions" = EXCLUDED."attfdwoptions",
+            "attmissingval" = EXCLUDED."attmissingval"
+          returning "attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval"
        """
       .executeInsert(PgAttributeRow.rowParser(1).single)
     

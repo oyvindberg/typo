@@ -18,6 +18,6 @@ object ColumnOptionsViewRepoImpl extends ColumnOptionsViewRepo {
     SelectBuilderSql("information_schema.column_options", ColumnOptionsViewFields, ColumnOptionsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ColumnOptionsViewRow] = {
-    sql"""select table_catalog, table_schema, "table_name", "column_name", option_name, option_value from information_schema.column_options""".query(ColumnOptionsViewRow.read).stream
+    sql"""select "table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value" from information_schema.column_options""".query(ColumnOptionsViewRow.read).stream
   }
 }

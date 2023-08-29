@@ -17,7 +17,7 @@ object UmViewRepoImpl extends UmViewRepo {
     SelectBuilderSql("pr.um", UmViewFields, UmViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[UmViewRow] = {
-    SQL"""select "id", unitmeasurecode, "name", modifieddate::text
+    SQL"""select "id", "unitmeasurecode", "name", "modifieddate"::text
           from pr.um
        """.as(UmViewRow.rowParser(1).*)
   }

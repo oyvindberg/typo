@@ -18,6 +18,6 @@ object PgAvailableExtensionVersionsViewRepoImpl extends PgAvailableExtensionVers
     SelectBuilderSql("pg_catalog.pg_available_extension_versions", PgAvailableExtensionVersionsViewFields, PgAvailableExtensionVersionsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgAvailableExtensionVersionsViewRow] = {
-    sql"""select "name", "version", installed, superuser, "trusted", relocatable, "schema", requires, "comment" from pg_catalog.pg_available_extension_versions""".query(PgAvailableExtensionVersionsViewRow.read).stream
+    sql"""select "name", "version", "installed", "superuser", "trusted", "relocatable", "schema", "requires", "comment" from pg_catalog.pg_available_extension_versions""".query(PgAvailableExtensionVersionsViewRow.read).stream
   }
 }

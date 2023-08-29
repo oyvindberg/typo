@@ -28,15 +28,15 @@ import typo.dsl.UpdateBuilder
 
 object DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production."document" where documentnode = ${ParameterValue(documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from production.document where "documentnode" = ${ParameterValue(documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
     DeleteBuilder("production.document", DocumentFields)
   }
   override def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
-    SQL"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
+    SQL"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (${ParameterValue(unsaved.title, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.owner, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.folderflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.filename, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.fileextension, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.revision, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.changenumber, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.documentsummary, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.document, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.documentnode, null, DocumentId.toStatement)})
-          returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
+          returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """
       .executeInsert(DocumentRow.rowParser(1).single)
     
@@ -74,14 +74,14 @@ object DocumentRepoImpl extends DocumentRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production."document" default values
-            returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
+      SQL"""insert into production.document default values
+            returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
          """
         .executeInsert(DocumentRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production."document"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into production.document(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
+                  returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(DocumentRow.rowParser(1).single)
@@ -92,53 +92,53 @@ object DocumentRepoImpl extends DocumentRepo {
     SelectBuilderSql("production.document", DocumentFields, DocumentRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
-    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
-          from production."document"
+    SQL"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
+          from production.document
        """.as(DocumentRow.rowParser(1).*)
   }
   override def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow] = {
-    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
-          from production."document"
-          where documentnode = ${ParameterValue(documentnode, null, DocumentId.toStatement)}
+    SQL"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
+          from production.document
+          where "documentnode" = ${ParameterValue(documentnode, null, DocumentId.toStatement)}
        """.as(DocumentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow] = {
-    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
-          from production."document"
-          where documentnode = ANY(${documentnodes})
+    SQL"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
+          from production.document
+          where "documentnode" = ANY(${documentnodes})
        """.as(DocumentRow.rowParser(1).*)
     
   }
   override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
-    SQL"""select rowguid
-          from production."document"
-          where rowguid = ${ParameterValue(rowguid, null, ToStatement.uuidToStatement)}
+    SQL"""select "rowguid"
+          from production.document
+          where "rowguid" = ${ParameterValue(rowguid, null, ToStatement.uuidToStatement)}
        """.as(DocumentRow.rowParser(1).singleOpt)
     
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {
     val documentnode = row.documentnode
-    SQL"""update production."document"
-          set title = ${ParameterValue(row.title, null, ToStatement.stringToStatement)},
+    SQL"""update production.document
+          set "title" = ${ParameterValue(row.title, null, ToStatement.stringToStatement)},
               "owner" = ${ParameterValue(row.owner, null, BusinessentityId.toStatement)}::int4,
-              folderflag = ${ParameterValue(row.folderflag, null, Flag.toStatement)}::bool,
-              filename = ${ParameterValue(row.filename, null, ToStatement.stringToStatement)},
-              fileextension = ${ParameterValue(row.fileextension, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              revision = ${ParameterValue(row.revision, null, ToStatement.stringToStatement)}::bpchar,
-              changenumber = ${ParameterValue(row.changenumber, null, ToStatement.intToStatement)}::int4,
-              status = ${ParameterValue(row.status, null, ToStatement.intToStatement)}::int2,
-              documentsummary = ${ParameterValue(row.documentsummary, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "folderflag" = ${ParameterValue(row.folderflag, null, Flag.toStatement)}::bool,
+              "filename" = ${ParameterValue(row.filename, null, ToStatement.stringToStatement)},
+              "fileextension" = ${ParameterValue(row.fileextension, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "revision" = ${ParameterValue(row.revision, null, ToStatement.stringToStatement)}::bpchar,
+              "changenumber" = ${ParameterValue(row.changenumber, null, ToStatement.intToStatement)}::int4,
+              "status" = ${ParameterValue(row.status, null, ToStatement.intToStatement)}::int2,
+              "documentsummary" = ${ParameterValue(row.documentsummary, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "document" = ${ParameterValue(row.document, null, ToStatement.optionToStatement(ToStatement.byteArrayToStatement, ParameterMetaData.ByteArrayParameterMetaData))}::bytea,
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where documentnode = ${ParameterValue(documentnode, null, DocumentId.toStatement)}
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "documentnode" = ${ParameterValue(documentnode, null, DocumentId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
     UpdateBuilder("production.document", DocumentFields, DocumentRow.rowParser)
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
-    SQL"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
+    SQL"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (
             ${ParameterValue(unsaved.title, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.owner, null, BusinessentityId.toStatement)}::int4,
@@ -154,21 +154,21 @@ object DocumentRepoImpl extends DocumentRepo {
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.documentnode, null, DocumentId.toStatement)}
           )
-          on conflict (documentnode)
+          on conflict ("documentnode")
           do update set
-            title = EXCLUDED.title,
+            "title" = EXCLUDED."title",
             "owner" = EXCLUDED."owner",
-            folderflag = EXCLUDED.folderflag,
-            filename = EXCLUDED.filename,
-            fileextension = EXCLUDED.fileextension,
-            revision = EXCLUDED.revision,
-            changenumber = EXCLUDED.changenumber,
-            status = EXCLUDED.status,
-            documentsummary = EXCLUDED.documentsummary,
+            "folderflag" = EXCLUDED."folderflag",
+            "filename" = EXCLUDED."filename",
+            "fileextension" = EXCLUDED."fileextension",
+            "revision" = EXCLUDED."revision",
+            "changenumber" = EXCLUDED."changenumber",
+            "status" = EXCLUDED."status",
+            "documentsummary" = EXCLUDED."documentsummary",
             "document" = EXCLUDED."document",
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """
       .executeInsert(DocumentRow.rowParser(1).single)
     

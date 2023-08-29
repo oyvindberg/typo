@@ -21,15 +21,15 @@ import typo.dsl.UpdateBuilder
 
 object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_statistic_ext where oid = ${ParameterValue(oid, null, PgStatisticExtId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_statistic_ext where "oid" = ${ParameterValue(oid, null, PgStatisticExtId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
     DeleteBuilder("pg_catalog.pg_statistic_ext", PgStatisticExtFields)
   }
   override def insert(unsaved: PgStatisticExtRow)(implicit c: Connection): PgStatisticExtRow = {
-    SQL"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
+    SQL"""insert into pg_catalog.pg_statistic_ext("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")
           values (${ParameterValue(unsaved.oid, null, PgStatisticExtId.toStatement)}::oid, ${ParameterValue(unsaved.stxrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stxname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.stxnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stxowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.stxstattarget, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.stxkeys, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.stxkind, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}::_char, ${ParameterValue(unsaved.stxexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
-          returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
+          returning "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs"
        """
       .executeInsert(PgStatisticExtRow.rowParser(1).single)
     
@@ -38,49 +38,49 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
     SelectBuilderSql("pg_catalog.pg_statistic_ext", PgStatisticExtFields, PgStatisticExtRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatisticExtRow] = {
-    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
+    SQL"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs"
           from pg_catalog.pg_statistic_ext
        """.as(PgStatisticExtRow.rowParser(1).*)
   }
   override def selectById(oid: PgStatisticExtId)(implicit c: Connection): Option[PgStatisticExtRow] = {
-    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
+    SQL"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs"
           from pg_catalog.pg_statistic_ext
-          where oid = ${ParameterValue(oid, null, PgStatisticExtId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgStatisticExtId.toStatement)}
        """.as(PgStatisticExtRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgStatisticExtId])(implicit c: Connection): List[PgStatisticExtRow] = {
-    SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
+    SQL"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs"
           from pg_catalog.pg_statistic_ext
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgStatisticExtRow.rowParser(1).*)
     
   }
   override def selectByUnique(stxname: String, stxnamespace: /* oid */ Long)(implicit c: Connection): Option[PgStatisticExtRow] = {
-    SQL"""select stxname, stxnamespace
+    SQL"""select "stxname", "stxnamespace"
           from pg_catalog.pg_statistic_ext
-          where stxname = ${ParameterValue(stxname, null, ToStatement.stringToStatement)} AND stxnamespace = ${ParameterValue(stxnamespace, null, ToStatement.longToStatement)}
+          where "stxname" = ${ParameterValue(stxname, null, ToStatement.stringToStatement)} AND "stxnamespace" = ${ParameterValue(stxnamespace, null, ToStatement.longToStatement)}
        """.as(PgStatisticExtRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgStatisticExtRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_statistic_ext
-          set stxrelid = ${ParameterValue(row.stxrelid, null, ToStatement.longToStatement)}::oid,
-              stxname = ${ParameterValue(row.stxname, null, ToStatement.stringToStatement)}::name,
-              stxnamespace = ${ParameterValue(row.stxnamespace, null, ToStatement.longToStatement)}::oid,
-              stxowner = ${ParameterValue(row.stxowner, null, ToStatement.longToStatement)}::oid,
-              stxstattarget = ${ParameterValue(row.stxstattarget, null, ToStatement.intToStatement)}::int4,
-              stxkeys = ${ParameterValue(row.stxkeys, null, TypoInt2Vector.toStatement)}::int2vector,
-              stxkind = ${ParameterValue(row.stxkind, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}::_char,
-              stxexprs = ${ParameterValue(row.stxexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
-          where oid = ${ParameterValue(oid, null, PgStatisticExtId.toStatement)}
+          set "stxrelid" = ${ParameterValue(row.stxrelid, null, ToStatement.longToStatement)}::oid,
+              "stxname" = ${ParameterValue(row.stxname, null, ToStatement.stringToStatement)}::name,
+              "stxnamespace" = ${ParameterValue(row.stxnamespace, null, ToStatement.longToStatement)}::oid,
+              "stxowner" = ${ParameterValue(row.stxowner, null, ToStatement.longToStatement)}::oid,
+              "stxstattarget" = ${ParameterValue(row.stxstattarget, null, ToStatement.intToStatement)}::int4,
+              "stxkeys" = ${ParameterValue(row.stxkeys, null, TypoInt2Vector.toStatement)}::int2vector,
+              "stxkind" = ${ParameterValue(row.stxkind, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}::_char,
+              "stxexprs" = ${ParameterValue(row.stxexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
+          where "oid" = ${ParameterValue(oid, null, PgStatisticExtId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
     UpdateBuilder("pg_catalog.pg_statistic_ext", PgStatisticExtFields, PgStatisticExtRow.rowParser)
   }
   override def upsert(unsaved: PgStatisticExtRow)(implicit c: Connection): PgStatisticExtRow = {
-    SQL"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
+    SQL"""insert into pg_catalog.pg_statistic_ext("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")
           values (
             ${ParameterValue(unsaved.oid, null, PgStatisticExtId.toStatement)}::oid,
             ${ParameterValue(unsaved.stxrelid, null, ToStatement.longToStatement)}::oid,
@@ -92,17 +92,17 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
             ${ParameterValue(unsaved.stxkind, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}::_char,
             ${ParameterValue(unsaved.stxexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            stxrelid = EXCLUDED.stxrelid,
-            stxname = EXCLUDED.stxname,
-            stxnamespace = EXCLUDED.stxnamespace,
-            stxowner = EXCLUDED.stxowner,
-            stxstattarget = EXCLUDED.stxstattarget,
-            stxkeys = EXCLUDED.stxkeys,
-            stxkind = EXCLUDED.stxkind,
-            stxexprs = EXCLUDED.stxexprs
-          returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
+            "stxrelid" = EXCLUDED."stxrelid",
+            "stxname" = EXCLUDED."stxname",
+            "stxnamespace" = EXCLUDED."stxnamespace",
+            "stxowner" = EXCLUDED."stxowner",
+            "stxstattarget" = EXCLUDED."stxstattarget",
+            "stxkeys" = EXCLUDED."stxkeys",
+            "stxkind" = EXCLUDED."stxkind",
+            "stxexprs" = EXCLUDED."stxexprs"
+          returning "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs"
        """
       .executeInsert(PgStatisticExtRow.rowParser(1).single)
     

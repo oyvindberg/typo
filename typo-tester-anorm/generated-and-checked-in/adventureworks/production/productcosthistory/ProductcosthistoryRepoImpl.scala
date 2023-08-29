@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productcosthistory where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}".executeUpdate() > 0
+    SQL"""delete from production.productcosthistory where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     DeleteBuilder("production.productcosthistory", ProductcosthistoryFields)
   }
   override def insert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
-    SQL"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
+    SQL"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
+          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """
       .executeInsert(ProductcosthistoryRow.rowParser(1).single)
     
@@ -52,13 +52,13 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productcosthistory default values
-            returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
+            returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
          """
         .executeInsert(ProductcosthistoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productcosthistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
+                  returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(ProductcosthistoryRow.rowParser(1).single)
@@ -69,30 +69,30 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
-    SQL"""select productid, startdate::text, enddate::text, standardcost, modifieddate::text
+    SQL"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
           from production.productcosthistory
        """.as(ProductcosthistoryRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow] = {
-    SQL"""select productid, startdate::text, enddate::text, standardcost, modifieddate::text
+    SQL"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
           from production.productcosthistory
-          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
+          where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
        """.as(ProductcosthistoryRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productcosthistory
-          set enddate = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
-              standardcost = ${ParameterValue(row.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND startdate = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
+          set "enddate" = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
+              "standardcost" = ${ParameterValue(row.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     UpdateBuilder("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.rowParser)
   }
   override def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
-    SQL"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
+    SQL"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -100,12 +100,12 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             ${ParameterValue(unsaved.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (productid, startdate)
+          on conflict ("productid", "startdate")
           do update set
-            enddate = EXCLUDED.enddate,
-            standardcost = EXCLUDED.standardcost,
-            modifieddate = EXCLUDED.modifieddate
-          returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
+            "enddate" = EXCLUDED."enddate",
+            "standardcost" = EXCLUDED."standardcost",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """
       .executeInsert(ProductcosthistoryRow.rowParser(1).single)
     

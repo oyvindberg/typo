@@ -21,15 +21,15 @@ import typo.dsl.UpdateBuilder
 
 object PgIndexRepoImpl extends PgIndexRepo {
   override def delete(indexrelid: PgIndexId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_index where indexrelid = ${ParameterValue(indexrelid, null, PgIndexId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_index where "indexrelid" = ${ParameterValue(indexrelid, null, PgIndexId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgIndexFields, PgIndexRow] = {
     DeleteBuilder("pg_catalog.pg_index", PgIndexFields)
   }
   override def insert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
-    SQL"""insert into pg_catalog.pg_index(indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred)
+    SQL"""insert into pg_catalog.pg_index("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")
           values (${ParameterValue(unsaved.indexrelid, null, PgIndexId.toStatement)}::oid, ${ParameterValue(unsaved.indrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.indnatts, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.indnkeyatts, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.indisunique, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisprimary, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisexclusion, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indimmediate, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisclustered, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisvalid, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indcheckxmin, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisready, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indislive, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisreplident, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indkey, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.indcollation, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.indclass, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.indoption, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.indexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree, ${ParameterValue(unsaved.indpred, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
-          returning indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
+          returning "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred"
        """
       .executeInsert(PgIndexRow.rowParser(1).single)
     
@@ -38,53 +38,53 @@ object PgIndexRepoImpl extends PgIndexRepo {
     SelectBuilderSql("pg_catalog.pg_index", PgIndexFields, PgIndexRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgIndexRow] = {
-    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
+    SQL"""select "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred"
           from pg_catalog.pg_index
        """.as(PgIndexRow.rowParser(1).*)
   }
   override def selectById(indexrelid: PgIndexId)(implicit c: Connection): Option[PgIndexRow] = {
-    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
+    SQL"""select "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred"
           from pg_catalog.pg_index
-          where indexrelid = ${ParameterValue(indexrelid, null, PgIndexId.toStatement)}
+          where "indexrelid" = ${ParameterValue(indexrelid, null, PgIndexId.toStatement)}
        """.as(PgIndexRow.rowParser(1).singleOpt)
   }
   override def selectByIds(indexrelids: Array[PgIndexId])(implicit c: Connection): List[PgIndexRow] = {
-    SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
+    SQL"""select "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred"
           from pg_catalog.pg_index
-          where indexrelid = ANY(${indexrelids})
+          where "indexrelid" = ANY(${indexrelids})
        """.as(PgIndexRow.rowParser(1).*)
     
   }
   override def update(row: PgIndexRow)(implicit c: Connection): Boolean = {
     val indexrelid = row.indexrelid
     SQL"""update pg_catalog.pg_index
-          set indrelid = ${ParameterValue(row.indrelid, null, ToStatement.longToStatement)}::oid,
-              indnatts = ${ParameterValue(row.indnatts, null, ToStatement.intToStatement)}::int2,
-              indnkeyatts = ${ParameterValue(row.indnkeyatts, null, ToStatement.intToStatement)}::int2,
-              indisunique = ${ParameterValue(row.indisunique, null, ToStatement.booleanToStatement)},
-              indisprimary = ${ParameterValue(row.indisprimary, null, ToStatement.booleanToStatement)},
-              indisexclusion = ${ParameterValue(row.indisexclusion, null, ToStatement.booleanToStatement)},
-              indimmediate = ${ParameterValue(row.indimmediate, null, ToStatement.booleanToStatement)},
-              indisclustered = ${ParameterValue(row.indisclustered, null, ToStatement.booleanToStatement)},
-              indisvalid = ${ParameterValue(row.indisvalid, null, ToStatement.booleanToStatement)},
-              indcheckxmin = ${ParameterValue(row.indcheckxmin, null, ToStatement.booleanToStatement)},
-              indisready = ${ParameterValue(row.indisready, null, ToStatement.booleanToStatement)},
-              indislive = ${ParameterValue(row.indislive, null, ToStatement.booleanToStatement)},
-              indisreplident = ${ParameterValue(row.indisreplident, null, ToStatement.booleanToStatement)},
-              indkey = ${ParameterValue(row.indkey, null, TypoInt2Vector.toStatement)}::int2vector,
-              indcollation = ${ParameterValue(row.indcollation, null, TypoOidVector.toStatement)}::oidvector,
-              indclass = ${ParameterValue(row.indclass, null, TypoOidVector.toStatement)}::oidvector,
-              indoption = ${ParameterValue(row.indoption, null, TypoInt2Vector.toStatement)}::int2vector,
-              indexprs = ${ParameterValue(row.indexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
-              indpred = ${ParameterValue(row.indpred, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
-          where indexrelid = ${ParameterValue(indexrelid, null, PgIndexId.toStatement)}
+          set "indrelid" = ${ParameterValue(row.indrelid, null, ToStatement.longToStatement)}::oid,
+              "indnatts" = ${ParameterValue(row.indnatts, null, ToStatement.intToStatement)}::int2,
+              "indnkeyatts" = ${ParameterValue(row.indnkeyatts, null, ToStatement.intToStatement)}::int2,
+              "indisunique" = ${ParameterValue(row.indisunique, null, ToStatement.booleanToStatement)},
+              "indisprimary" = ${ParameterValue(row.indisprimary, null, ToStatement.booleanToStatement)},
+              "indisexclusion" = ${ParameterValue(row.indisexclusion, null, ToStatement.booleanToStatement)},
+              "indimmediate" = ${ParameterValue(row.indimmediate, null, ToStatement.booleanToStatement)},
+              "indisclustered" = ${ParameterValue(row.indisclustered, null, ToStatement.booleanToStatement)},
+              "indisvalid" = ${ParameterValue(row.indisvalid, null, ToStatement.booleanToStatement)},
+              "indcheckxmin" = ${ParameterValue(row.indcheckxmin, null, ToStatement.booleanToStatement)},
+              "indisready" = ${ParameterValue(row.indisready, null, ToStatement.booleanToStatement)},
+              "indislive" = ${ParameterValue(row.indislive, null, ToStatement.booleanToStatement)},
+              "indisreplident" = ${ParameterValue(row.indisreplident, null, ToStatement.booleanToStatement)},
+              "indkey" = ${ParameterValue(row.indkey, null, TypoInt2Vector.toStatement)}::int2vector,
+              "indcollation" = ${ParameterValue(row.indcollation, null, TypoOidVector.toStatement)}::oidvector,
+              "indclass" = ${ParameterValue(row.indclass, null, TypoOidVector.toStatement)}::oidvector,
+              "indoption" = ${ParameterValue(row.indoption, null, TypoInt2Vector.toStatement)}::int2vector,
+              "indexprs" = ${ParameterValue(row.indexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
+              "indpred" = ${ParameterValue(row.indpred, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
+          where "indexrelid" = ${ParameterValue(indexrelid, null, PgIndexId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgIndexFields, PgIndexRow] = {
     UpdateBuilder("pg_catalog.pg_index", PgIndexFields, PgIndexRow.rowParser)
   }
   override def upsert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
-    SQL"""insert into pg_catalog.pg_index(indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred)
+    SQL"""insert into pg_catalog.pg_index("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")
           values (
             ${ParameterValue(unsaved.indexrelid, null, PgIndexId.toStatement)}::oid,
             ${ParameterValue(unsaved.indrelid, null, ToStatement.longToStatement)}::oid,
@@ -107,28 +107,28 @@ object PgIndexRepoImpl extends PgIndexRepo {
             ${ParameterValue(unsaved.indexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
             ${ParameterValue(unsaved.indpred, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
           )
-          on conflict (indexrelid)
+          on conflict ("indexrelid")
           do update set
-            indrelid = EXCLUDED.indrelid,
-            indnatts = EXCLUDED.indnatts,
-            indnkeyatts = EXCLUDED.indnkeyatts,
-            indisunique = EXCLUDED.indisunique,
-            indisprimary = EXCLUDED.indisprimary,
-            indisexclusion = EXCLUDED.indisexclusion,
-            indimmediate = EXCLUDED.indimmediate,
-            indisclustered = EXCLUDED.indisclustered,
-            indisvalid = EXCLUDED.indisvalid,
-            indcheckxmin = EXCLUDED.indcheckxmin,
-            indisready = EXCLUDED.indisready,
-            indislive = EXCLUDED.indislive,
-            indisreplident = EXCLUDED.indisreplident,
-            indkey = EXCLUDED.indkey,
-            indcollation = EXCLUDED.indcollation,
-            indclass = EXCLUDED.indclass,
-            indoption = EXCLUDED.indoption,
-            indexprs = EXCLUDED.indexprs,
-            indpred = EXCLUDED.indpred
-          returning indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
+            "indrelid" = EXCLUDED."indrelid",
+            "indnatts" = EXCLUDED."indnatts",
+            "indnkeyatts" = EXCLUDED."indnkeyatts",
+            "indisunique" = EXCLUDED."indisunique",
+            "indisprimary" = EXCLUDED."indisprimary",
+            "indisexclusion" = EXCLUDED."indisexclusion",
+            "indimmediate" = EXCLUDED."indimmediate",
+            "indisclustered" = EXCLUDED."indisclustered",
+            "indisvalid" = EXCLUDED."indisvalid",
+            "indcheckxmin" = EXCLUDED."indcheckxmin",
+            "indisready" = EXCLUDED."indisready",
+            "indislive" = EXCLUDED."indislive",
+            "indisreplident" = EXCLUDED."indisreplident",
+            "indkey" = EXCLUDED."indkey",
+            "indcollation" = EXCLUDED."indcollation",
+            "indclass" = EXCLUDED."indclass",
+            "indoption" = EXCLUDED."indoption",
+            "indexprs" = EXCLUDED."indexprs",
+            "indpred" = EXCLUDED."indpred"
+          returning "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred"
        """
       .executeInsert(PgIndexRow.rowParser(1).single)
     

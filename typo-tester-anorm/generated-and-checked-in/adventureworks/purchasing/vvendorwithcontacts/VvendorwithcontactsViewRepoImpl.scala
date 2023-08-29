@@ -17,7 +17,7 @@ object VvendorwithcontactsViewRepoImpl extends VvendorwithcontactsViewRepo {
     SelectBuilderSql("purchasing.vvendorwithcontacts", VvendorwithcontactsViewFields, VvendorwithcontactsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VvendorwithcontactsViewRow] = {
-    SQL"""select businessentityid, "name", contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion
+    SQL"""select "businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion"
           from purchasing.vvendorwithcontacts
        """.as(VvendorwithcontactsViewRow.rowParser(1).*)
   }

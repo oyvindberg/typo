@@ -24,15 +24,15 @@ import typo.dsl.UpdateBuilder
 
 object BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.businessentity where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from person.businessentity where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
     DeleteBuilder("person.businessentity", BusinessentityFields)
   }
   override def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
-    SQL"""insert into person.businessentity(businessentityid, rowguid, modifieddate)
+    SQL"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning businessentityid, rowguid, modifieddate::text
+          returning "businessentityid", "rowguid", "modifieddate"::text
        """
       .executeInsert(BusinessentityRow.rowParser(1).single)
     
@@ -55,13 +55,13 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.businessentity default values
-            returning businessentityid, rowguid, modifieddate::text
+            returning "businessentityid", "rowguid", "modifieddate"::text
          """
         .executeInsert(BusinessentityRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.businessentity(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, rowguid, modifieddate::text
+                  returning "businessentityid", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(BusinessentityRow.rowParser(1).single)
@@ -72,46 +72,46 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     SelectBuilderSql("person.businessentity", BusinessentityFields, BusinessentityRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
-    SQL"""select businessentityid, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "rowguid", "modifieddate"::text
           from person.businessentity
        """.as(BusinessentityRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[BusinessentityRow] = {
-    SQL"""select businessentityid, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "rowguid", "modifieddate"::text
           from person.businessentity
-          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
+          where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(BusinessentityRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[BusinessentityRow] = {
-    SQL"""select businessentityid, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "rowguid", "modifieddate"::text
           from person.businessentity
-          where businessentityid = ANY(${businessentityids})
+          where "businessentityid" = ANY(${businessentityids})
        """.as(BusinessentityRow.rowParser(1).*)
     
   }
   override def update(row: BusinessentityRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update person.businessentity
-          set rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
+          set "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
     UpdateBuilder("person.businessentity", BusinessentityFields, BusinessentityRow.rowParser)
   }
   override def upsert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
-    SQL"""insert into person.businessentity(businessentityid, rowguid, modifieddate)
+    SQL"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (businessentityid)
+          on conflict ("businessentityid")
           do update set
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, rowguid, modifieddate::text
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "rowguid", "modifieddate"::text
        """
       .executeInsert(BusinessentityRow.rowParser(1).single)
     

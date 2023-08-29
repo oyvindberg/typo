@@ -18,6 +18,6 @@ object UdtPrivilegesViewRepoImpl extends UdtPrivilegesViewRepo {
     SelectBuilderSql("information_schema.udt_privileges", UdtPrivilegesViewFields, UdtPrivilegesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, UdtPrivilegesViewRow] = {
-    sql"select grantor, grantee, udt_catalog, udt_schema, udt_name, privilege_type, is_grantable from information_schema.udt_privileges".query(UdtPrivilegesViewRow.read).stream
+    sql"""select "grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable" from information_schema.udt_privileges""".query(UdtPrivilegesViewRow.read).stream
   }
 }

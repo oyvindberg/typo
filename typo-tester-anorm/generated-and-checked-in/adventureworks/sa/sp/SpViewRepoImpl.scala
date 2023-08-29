@@ -17,7 +17,7 @@ object SpViewRepoImpl extends SpViewRepo {
     SelectBuilderSql("sa.sp", SpViewFields, SpViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SpViewRow] = {
-    SQL"""select "id", businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
+    SQL"""select "id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
           from sa.sp
        """.as(SpViewRow.rowParser(1).*)
   }

@@ -17,7 +17,7 @@ object CtViewRepoImpl extends CtViewRepo {
     SelectBuilderSql("pe.ct", CtViewFields, CtViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CtViewRow] = {
-    SQL"""select "id", contacttypeid, "name", modifieddate::text
+    SQL"""select "id", "contacttypeid", "name", "modifieddate"::text
           from pe.ct
        """.as(CtViewRow.rowParser(1).*)
   }

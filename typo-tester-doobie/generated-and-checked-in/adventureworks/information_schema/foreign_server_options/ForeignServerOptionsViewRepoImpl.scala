@@ -18,6 +18,6 @@ object ForeignServerOptionsViewRepoImpl extends ForeignServerOptionsViewRepo {
     SelectBuilderSql("information_schema.foreign_server_options", ForeignServerOptionsViewFields, ForeignServerOptionsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ForeignServerOptionsViewRow] = {
-    sql"select foreign_server_catalog, foreign_server_name, option_name, option_value from information_schema.foreign_server_options".query(ForeignServerOptionsViewRow.read).stream
+    sql"""select "foreign_server_catalog", "foreign_server_name", "option_name", "option_value" from information_schema.foreign_server_options""".query(ForeignServerOptionsViewRow.read).stream
   }
 }

@@ -18,6 +18,6 @@ object TablePrivilegesViewRepoImpl extends TablePrivilegesViewRepo {
     SelectBuilderSql("information_schema.table_privileges", TablePrivilegesViewFields, TablePrivilegesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, TablePrivilegesViewRow] = {
-    sql"""select grantor, grantee, table_catalog, table_schema, "table_name", privilege_type, is_grantable, with_hierarchy from information_schema.table_privileges""".query(TablePrivilegesViewRow.read).stream
+    sql"""select "grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy" from information_schema.table_privileges""".query(TablePrivilegesViewRow.read).stream
   }
 }

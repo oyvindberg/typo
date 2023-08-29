@@ -17,7 +17,7 @@ object ForeignServersViewRepoImpl extends ForeignServersViewRepo {
     SelectBuilderSql("information_schema.foreign_servers", ForeignServersViewFields, ForeignServersViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ForeignServersViewRow] = {
-    SQL"""select foreign_server_catalog, foreign_server_name, foreign_data_wrapper_catalog, foreign_data_wrapper_name, foreign_server_type, foreign_server_version, authorization_identifier
+    SQL"""select "foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier"
           from information_schema.foreign_servers
        """.as(ForeignServersViewRow.rowParser(1).*)
   }

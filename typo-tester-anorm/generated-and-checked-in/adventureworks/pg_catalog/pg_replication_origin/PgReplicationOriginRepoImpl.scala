@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def delete(roident: PgReplicationOriginId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_replication_origin where roident = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_replication_origin where "roident" = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
     DeleteBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields)
   }
   override def insert(unsaved: PgReplicationOriginRow)(implicit c: Connection): PgReplicationOriginRow = {
-    SQL"""insert into pg_catalog.pg_replication_origin(roident, roname)
+    SQL"""insert into pg_catalog.pg_replication_origin("roident", "roname")
           values (${ParameterValue(unsaved.roident, null, PgReplicationOriginId.toStatement)}::oid, ${ParameterValue(unsaved.roname, null, ToStatement.stringToStatement)})
-          returning roident, roname
+          returning "roident", "roname"
        """
       .executeInsert(PgReplicationOriginRow.rowParser(1).single)
     
@@ -35,50 +35,50 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     SelectBuilderSql("pg_catalog.pg_replication_origin", PgReplicationOriginFields, PgReplicationOriginRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgReplicationOriginRow] = {
-    SQL"""select roident, roname
+    SQL"""select "roident", "roname"
           from pg_catalog.pg_replication_origin
        """.as(PgReplicationOriginRow.rowParser(1).*)
   }
   override def selectById(roident: PgReplicationOriginId)(implicit c: Connection): Option[PgReplicationOriginRow] = {
-    SQL"""select roident, roname
+    SQL"""select "roident", "roname"
           from pg_catalog.pg_replication_origin
-          where roident = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}
+          where "roident" = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}
        """.as(PgReplicationOriginRow.rowParser(1).singleOpt)
   }
   override def selectByIds(roidents: Array[PgReplicationOriginId])(implicit c: Connection): List[PgReplicationOriginRow] = {
-    SQL"""select roident, roname
+    SQL"""select "roident", "roname"
           from pg_catalog.pg_replication_origin
-          where roident = ANY(${roidents})
+          where "roident" = ANY(${roidents})
        """.as(PgReplicationOriginRow.rowParser(1).*)
     
   }
   override def selectByUnique(roname: String)(implicit c: Connection): Option[PgReplicationOriginRow] = {
-    SQL"""select roname
+    SQL"""select "roname"
           from pg_catalog.pg_replication_origin
-          where roname = ${ParameterValue(roname, null, ToStatement.stringToStatement)}
+          where "roname" = ${ParameterValue(roname, null, ToStatement.stringToStatement)}
        """.as(PgReplicationOriginRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgReplicationOriginRow)(implicit c: Connection): Boolean = {
     val roident = row.roident
     SQL"""update pg_catalog.pg_replication_origin
-          set roname = ${ParameterValue(row.roname, null, ToStatement.stringToStatement)}
-          where roident = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}
+          set "roname" = ${ParameterValue(row.roname, null, ToStatement.stringToStatement)}
+          where "roident" = ${ParameterValue(roident, null, PgReplicationOriginId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
     UpdateBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields, PgReplicationOriginRow.rowParser)
   }
   override def upsert(unsaved: PgReplicationOriginRow)(implicit c: Connection): PgReplicationOriginRow = {
-    SQL"""insert into pg_catalog.pg_replication_origin(roident, roname)
+    SQL"""insert into pg_catalog.pg_replication_origin("roident", "roname")
           values (
             ${ParameterValue(unsaved.roident, null, PgReplicationOriginId.toStatement)}::oid,
             ${ParameterValue(unsaved.roname, null, ToStatement.stringToStatement)}
           )
-          on conflict (roident)
+          on conflict ("roident")
           do update set
-            roname = EXCLUDED.roname
-          returning roident, roname
+            "roname" = EXCLUDED."roname"
+          returning "roident", "roname"
        """
       .executeInsert(PgReplicationOriginRow.rowParser(1).single)
     

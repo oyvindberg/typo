@@ -18,6 +18,6 @@ object PgStatsViewRepoImpl extends PgStatsViewRepo {
     SelectBuilderSql("pg_catalog.pg_stats", PgStatsViewFields, PgStatsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatsViewRow] = {
-    sql"select schemaname, tablename, attname, inherited, null_frac, avg_width, n_distinct, most_common_vals, most_common_freqs, histogram_bounds, correlation, most_common_elems, most_common_elem_freqs, elem_count_histogram from pg_catalog.pg_stats".query(PgStatsViewRow.read).stream
+    sql"""select "schemaname", "tablename", "attname", "inherited", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram" from pg_catalog.pg_stats""".query(PgStatsViewRow.read).stream
   }
 }

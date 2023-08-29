@@ -23,15 +23,15 @@ import typo.dsl.UpdateBuilder
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean] = {
-    sql"delete from production.scrapreason where scrapreasonid = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}".update.run.map(_ > 0)
+    sql"""delete from production.scrapreason where "scrapreasonid" = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
     DeleteBuilder("production.scrapreason", ScrapreasonFields)
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
-    sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
+    sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
           values (${fromWrite(unsaved.scrapreasonid)(Write.fromPut(ScrapreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
-          returning scrapreasonid, "name", modifieddate::text
+          returning "scrapreasonid", "name", "modifieddate"::text
        """.query(ScrapreasonRow.read).unique
   }
   override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
@@ -39,23 +39,23 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.scrapreasonid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"scrapreasonid"), fr"${fromWrite(value: ScrapreasonId)(Write.fromPut(ScrapreasonId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""scrapreasonid""""), fr"${fromWrite(value: ScrapreasonId)(Write.fromPut(ScrapreasonId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.scrapreason default values
-            returning scrapreasonid, "name", modifieddate::text
+            returning "scrapreasonid", "name", "modifieddate"::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.scrapreason(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning scrapreasonid, "name", modifieddate::text
+            returning "scrapreasonid", "name", "modifieddate"::text
          """
     }
     q.query(ScrapreasonRow.read).unique
@@ -65,20 +65,20 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
-    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason""".query(ScrapreasonRow.read).stream
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason""".query(ScrapreasonRow.read).stream
   }
   override def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]] = {
-    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}""".query(ScrapreasonRow.read).option
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}""".query(ScrapreasonRow.read).option
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow] = {
-    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ANY(${scrapreasonids})""".query(ScrapreasonRow.read).stream
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ANY(${scrapreasonids})""".query(ScrapreasonRow.read).stream
   }
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     val scrapreasonid = row.scrapreasonid
     sql"""update production.scrapreason
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where scrapreasonid = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}"""
+              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where "scrapreasonid" = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -87,17 +87,17 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     UpdateBuilder("production.scrapreason", ScrapreasonFields, ScrapreasonRow.read)
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
-    sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
+    sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
           values (
             ${fromWrite(unsaved.scrapreasonid)(Write.fromPut(ScrapreasonId.put))}::int4,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
-          on conflict (scrapreasonid)
+          on conflict ("scrapreasonid")
           do update set
             "name" = EXCLUDED."name",
-            modifieddate = EXCLUDED.modifieddate
-          returning scrapreasonid, "name", modifieddate::text
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "scrapreasonid", "name", "modifieddate"::text
        """.query(ScrapreasonRow.read).unique
   }
 }

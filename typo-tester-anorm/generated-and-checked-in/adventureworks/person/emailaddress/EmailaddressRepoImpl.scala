@@ -26,15 +26,15 @@ import typo.dsl.UpdateBuilder
 
 object EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.emailaddress where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND emailaddressid = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}".executeUpdate() > 0
+    SQL"""delete from person.emailaddress where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "emailaddressid" = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
     DeleteBuilder("person.emailaddress", EmailaddressFields)
   }
   override def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
-    SQL"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
+    SQL"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.emailaddressid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.emailaddress, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
+          returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
        """
       .executeInsert(EmailaddressRow.rowParser(1).single)
     
@@ -59,13 +59,13 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.emailaddress default values
-            returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
+            returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
          """
         .executeInsert(EmailaddressRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.emailaddress(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
+                  returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(EmailaddressRow.rowParser(1).single)
@@ -76,30 +76,30 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     SelectBuilderSql("person.emailaddress", EmailaddressFields, EmailaddressRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
-    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
           from person.emailaddress
        """.as(EmailaddressRow.rowParser(1).*)
   }
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
-    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
           from person.emailaddress
-          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND emailaddressid = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}
+          where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "emailaddressid" = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}
        """.as(EmailaddressRow.rowParser(1).singleOpt)
   }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.emailaddress
-          set emailaddress = ${ParameterValue(row.emailaddress, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND emailaddressid = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}
+          set "emailaddress" = ${ParameterValue(row.emailaddress, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "emailaddressid" = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
     UpdateBuilder("person.emailaddress", EmailaddressFields, EmailaddressRow.rowParser)
   }
   override def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
-    SQL"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
+    SQL"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.emailaddressid, null, ToStatement.intToStatement)}::int4,
@@ -107,12 +107,12 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (businessentityid, emailaddressid)
+          on conflict ("businessentityid", "emailaddressid")
           do update set
-            emailaddress = EXCLUDED.emailaddress,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
+            "emailaddress" = EXCLUDED."emailaddress",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
        """
       .executeInsert(EmailaddressRow.rowParser(1).single)
     

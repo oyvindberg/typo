@@ -22,57 +22,57 @@ import typo.dsl.UpdateBuilder
 
 object PgTriggerRepoImpl extends PgTriggerRepo {
   override def delete(oid: PgTriggerId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_trigger where oid = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_trigger where "oid" = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTriggerFields, PgTriggerRow] = {
     DeleteBuilder("pg_catalog.pg_trigger", PgTriggerFields)
   }
   override def insert(unsaved: PgTriggerRow): ConnectionIO[PgTriggerRow] = {
-    sql"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)
+    sql"""insert into pg_catalog.pg_trigger("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTriggerId.put))}::oid, ${fromWrite(unsaved.tgrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgparentid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tgfoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgtype)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.tgenabled)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.tgisinternal)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tgconstrrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgconstrindid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgconstraint)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgdeferrable)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tginitdeferred)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tgnargs)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.tgattr)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.tgargs)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name)
-          returning oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
+          returning "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable"
        """.query(PgTriggerRow.read).unique
   }
   override def select: SelectBuilder[PgTriggerFields, PgTriggerRow] = {
     SelectBuilderSql("pg_catalog.pg_trigger", PgTriggerFields, PgTriggerRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTriggerRow] = {
-    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger".query(PgTriggerRow.read).stream
+    sql"""select "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable" from pg_catalog.pg_trigger""".query(PgTriggerRow.read).stream
   }
   override def selectById(oid: PgTriggerId): ConnectionIO[Option[PgTriggerRow]] = {
-    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}".query(PgTriggerRow.read).option
+    sql"""select "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable" from pg_catalog.pg_trigger where "oid" = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}""".query(PgTriggerRow.read).option
   }
   override def selectByIds(oids: Array[PgTriggerId]): Stream[ConnectionIO, PgTriggerRow] = {
-    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ANY(${oids})".query(PgTriggerRow.read).stream
+    sql"""select "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable" from pg_catalog.pg_trigger where "oid" = ANY(${oids})""".query(PgTriggerRow.read).stream
   }
   override def selectByUnique(tgrelid: /* oid */ Long, tgname: String): ConnectionIO[Option[PgTriggerRow]] = {
-    sql"""select tgrelid, tgname
+    sql"""select "tgrelid", "tgname"
           from pg_catalog.pg_trigger
-          where tgrelid = ${fromWrite(tgrelid)(Write.fromPut(Meta.LongMeta.put))} AND tgname = ${fromWrite(tgname)(Write.fromPut(Meta.StringMeta.put))}
+          where "tgrelid" = ${fromWrite(tgrelid)(Write.fromPut(Meta.LongMeta.put))} AND "tgname" = ${fromWrite(tgname)(Write.fromPut(Meta.StringMeta.put))}
        """.query(PgTriggerRow.read).option
   }
   override def update(row: PgTriggerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_trigger
-          set tgrelid = ${fromWrite(row.tgrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              tgparentid = ${fromWrite(row.tgparentid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              tgname = ${fromWrite(row.tgname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              tgfoid = ${fromWrite(row.tgfoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              tgtype = ${fromWrite(row.tgtype)(Write.fromPut(Meta.IntMeta.put))}::int2,
-              tgenabled = ${fromWrite(row.tgenabled)(Write.fromPut(Meta.StringMeta.put))}::char,
-              tgisinternal = ${fromWrite(row.tgisinternal)(Write.fromPut(Meta.BooleanMeta.put))},
-              tgconstrrelid = ${fromWrite(row.tgconstrrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              tgconstrindid = ${fromWrite(row.tgconstrindid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              tgconstraint = ${fromWrite(row.tgconstraint)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              tgdeferrable = ${fromWrite(row.tgdeferrable)(Write.fromPut(Meta.BooleanMeta.put))},
-              tginitdeferred = ${fromWrite(row.tginitdeferred)(Write.fromPut(Meta.BooleanMeta.put))},
-              tgnargs = ${fromWrite(row.tgnargs)(Write.fromPut(Meta.IntMeta.put))}::int2,
-              tgattr = ${fromWrite(row.tgattr)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
-              tgargs = ${fromWrite(row.tgargs)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea,
-              tgqual = ${fromWrite(row.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
-              tgoldtable = ${fromWrite(row.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name,
-              tgnewtable = ${fromWrite(row.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}"""
+          set "tgrelid" = ${fromWrite(row.tgrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "tgparentid" = ${fromWrite(row.tgparentid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "tgname" = ${fromWrite(row.tgname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "tgfoid" = ${fromWrite(row.tgfoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "tgtype" = ${fromWrite(row.tgtype)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "tgenabled" = ${fromWrite(row.tgenabled)(Write.fromPut(Meta.StringMeta.put))}::char,
+              "tgisinternal" = ${fromWrite(row.tgisinternal)(Write.fromPut(Meta.BooleanMeta.put))},
+              "tgconstrrelid" = ${fromWrite(row.tgconstrrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "tgconstrindid" = ${fromWrite(row.tgconstrindid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "tgconstraint" = ${fromWrite(row.tgconstraint)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "tgdeferrable" = ${fromWrite(row.tgdeferrable)(Write.fromPut(Meta.BooleanMeta.put))},
+              "tginitdeferred" = ${fromWrite(row.tginitdeferred)(Write.fromPut(Meta.BooleanMeta.put))},
+              "tgnargs" = ${fromWrite(row.tgnargs)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "tgattr" = ${fromWrite(row.tgattr)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
+              "tgargs" = ${fromWrite(row.tgargs)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea,
+              "tgqual" = ${fromWrite(row.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
+              "tgoldtable" = ${fromWrite(row.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name,
+              "tgnewtable" = ${fromWrite(row.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -81,7 +81,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
     UpdateBuilder("pg_catalog.pg_trigger", PgTriggerFields, PgTriggerRow.read)
   }
   override def upsert(unsaved: PgTriggerRow): ConnectionIO[PgTriggerRow] = {
-    sql"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)
+    sql"""insert into pg_catalog.pg_trigger("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgTriggerId.put))}::oid,
             ${fromWrite(unsaved.tgrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
@@ -103,27 +103,27 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
             ${fromWrite(unsaved.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name,
             ${fromWrite(unsaved.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            tgrelid = EXCLUDED.tgrelid,
-            tgparentid = EXCLUDED.tgparentid,
-            tgname = EXCLUDED.tgname,
-            tgfoid = EXCLUDED.tgfoid,
-            tgtype = EXCLUDED.tgtype,
-            tgenabled = EXCLUDED.tgenabled,
-            tgisinternal = EXCLUDED.tgisinternal,
-            tgconstrrelid = EXCLUDED.tgconstrrelid,
-            tgconstrindid = EXCLUDED.tgconstrindid,
-            tgconstraint = EXCLUDED.tgconstraint,
-            tgdeferrable = EXCLUDED.tgdeferrable,
-            tginitdeferred = EXCLUDED.tginitdeferred,
-            tgnargs = EXCLUDED.tgnargs,
-            tgattr = EXCLUDED.tgattr,
-            tgargs = EXCLUDED.tgargs,
-            tgqual = EXCLUDED.tgqual,
-            tgoldtable = EXCLUDED.tgoldtable,
-            tgnewtable = EXCLUDED.tgnewtable
-          returning oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
+            "tgrelid" = EXCLUDED."tgrelid",
+            "tgparentid" = EXCLUDED."tgparentid",
+            "tgname" = EXCLUDED."tgname",
+            "tgfoid" = EXCLUDED."tgfoid",
+            "tgtype" = EXCLUDED."tgtype",
+            "tgenabled" = EXCLUDED."tgenabled",
+            "tgisinternal" = EXCLUDED."tgisinternal",
+            "tgconstrrelid" = EXCLUDED."tgconstrrelid",
+            "tgconstrindid" = EXCLUDED."tgconstrindid",
+            "tgconstraint" = EXCLUDED."tgconstraint",
+            "tgdeferrable" = EXCLUDED."tgdeferrable",
+            "tginitdeferred" = EXCLUDED."tginitdeferred",
+            "tgnargs" = EXCLUDED."tgnargs",
+            "tgattr" = EXCLUDED."tgattr",
+            "tgargs" = EXCLUDED."tgargs",
+            "tgqual" = EXCLUDED."tgqual",
+            "tgoldtable" = EXCLUDED."tgoldtable",
+            "tgnewtable" = EXCLUDED."tgnewtable"
+          returning "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable"
        """.query(PgTriggerRow.read).unique
   }
 }

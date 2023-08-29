@@ -17,7 +17,7 @@ object SodViewRepoImpl extends SodViewRepo {
     SelectBuilderSql("sa.sod", SodViewFields, SodViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SodViewRow] = {
-    SQL"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text
+    SQL"""select "id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
           from sa.sod
        """.as(SodViewRow.rowParser(1).*)
   }

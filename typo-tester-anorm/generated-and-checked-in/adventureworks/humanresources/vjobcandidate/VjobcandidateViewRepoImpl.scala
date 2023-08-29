@@ -17,7 +17,7 @@ object VjobcandidateViewRepoImpl extends VjobcandidateViewRepo {
     SelectBuilderSql("humanresources.vjobcandidate", VjobcandidateViewFields, VjobcandidateViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VjobcandidateViewRow] = {
-    SQL"""select jobcandidateid, businessentityid, "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", Skills, "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", EMail, WebSite, modifieddate::text
+    SQL"""select "jobcandidateid", "businessentityid", "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", "Skills", "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", "EMail", "WebSite", "modifieddate"::text
           from humanresources.vjobcandidate
        """.as(VjobcandidateViewRow.rowParser(1).*)
   }

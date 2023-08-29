@@ -17,7 +17,7 @@ object PmiViewRepoImpl extends PmiViewRepo {
     SelectBuilderSql("pr.pmi", PmiViewFields, PmiViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PmiViewRow] = {
-    SQL"""select productmodelid, illustrationid, modifieddate::text
+    SQL"""select "productmodelid", "illustrationid", "modifieddate"::text
           from pr.pmi
        """.as(PmiViewRow.rowParser(1).*)
   }

@@ -17,7 +17,7 @@ object SpqhViewRepoImpl extends SpqhViewRepo {
     SelectBuilderSql("sa.spqh", SpqhViewFields, SpqhViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SpqhViewRow] = {
-    SQL"""select "id", businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
+    SQL"""select "id", "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
           from sa.spqh
        """.as(SpqhViewRow.rowParser(1).*)
   }

@@ -17,7 +17,7 @@ object PgStatReplicationViewRepoImpl extends PgStatReplicationViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_replication", PgStatReplicationViewFields, PgStatReplicationViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatReplicationViewRow] = {
-    SQL"""select pid, usesysid, usename, application_name, client_addr, client_hostname, client_port, backend_start::text, backend_xmin, "state", sent_lsn, write_lsn, flush_lsn, replay_lsn, write_lag, flush_lag, replay_lag, sync_priority, sync_state, reply_time::text
+    SQL"""select "pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start"::text, "backend_xmin", "state", "sent_lsn", "write_lsn", "flush_lsn", "replay_lsn", "write_lag", "flush_lag", "replay_lag", "sync_priority", "sync_state", "reply_time"::text
           from pg_catalog.pg_stat_replication
        """.as(PgStatReplicationViewRow.rowParser(1).*)
   }

@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productdocument where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND documentnode = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from production.productdocument where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
     DeleteBuilder("production.productdocument", ProductdocumentFields)
   }
   override def insert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
-    SQL"""insert into production.productdocument(productid, modifieddate, documentnode)
+    SQL"""insert into production.productdocument("productid", "modifieddate", "documentnode")
           values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.documentnode, null, DocumentId.toStatement)})
-          returning productid, modifieddate::text, documentnode
+          returning "productid", "modifieddate"::text, "documentnode"
        """
       .executeInsert(ProductdocumentRow.rowParser(1).single)
     
@@ -53,13 +53,13 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productdocument default values
-            returning productid, modifieddate::text, documentnode
+            returning "productid", "modifieddate"::text, "documentnode"
          """
         .executeInsert(ProductdocumentRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productdocument(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productid, modifieddate::text, documentnode
+                  returning "productid", "modifieddate"::text, "documentnode"
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(ProductdocumentRow.rowParser(1).single)
@@ -70,37 +70,37 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     SelectBuilderSql("production.productdocument", ProductdocumentFields, ProductdocumentRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
-    SQL"""select productid, modifieddate::text, documentnode
+    SQL"""select "productid", "modifieddate"::text, "documentnode"
           from production.productdocument
        """.as(ProductdocumentRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow] = {
-    SQL"""select productid, modifieddate::text, documentnode
+    SQL"""select "productid", "modifieddate"::text, "documentnode"
           from production.productdocument
-          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND documentnode = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
+          where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
        """.as(ProductdocumentRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productdocument
-          set modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where productid = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND documentnode = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
+          set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
     UpdateBuilder("production.productdocument", ProductdocumentFields, ProductdocumentRow.rowParser)
   }
   override def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
-    SQL"""insert into production.productdocument(productid, modifieddate, documentnode)
+    SQL"""insert into production.productdocument("productid", "modifieddate", "documentnode")
           values (
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.documentnode, null, DocumentId.toStatement)}
           )
-          on conflict (productid, documentnode)
+          on conflict ("productid", "documentnode")
           do update set
-            modifieddate = EXCLUDED.modifieddate
-          returning productid, modifieddate::text, documentnode
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "modifieddate"::text, "documentnode"
        """
       .executeInsert(ProductdocumentRow.rowParser(1).single)
     

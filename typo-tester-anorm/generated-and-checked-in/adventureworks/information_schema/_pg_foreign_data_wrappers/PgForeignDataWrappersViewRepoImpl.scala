@@ -17,7 +17,7 @@ object PgForeignDataWrappersViewRepoImpl extends PgForeignDataWrappersViewRepo {
     SelectBuilderSql("information_schema._pg_foreign_data_wrappers", PgForeignDataWrappersViewFields, PgForeignDataWrappersViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgForeignDataWrappersViewRow] = {
-    SQL"""select oid, fdwowner, fdwoptions, foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, foreign_data_wrapper_language
+    SQL"""select "oid", "fdwowner", "fdwoptions", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "foreign_data_wrapper_language"
           from information_schema._pg_foreign_data_wrappers
        """.as(PgForeignDataWrappersViewRow.rowParser(1).*)
   }

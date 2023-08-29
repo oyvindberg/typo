@@ -21,15 +21,15 @@ import typo.dsl.UpdateBuilder
 
 object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   override def delete(partrelid: PgPartitionedTableId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_partitioned_table where partrelid = ${ParameterValue(partrelid, null, PgPartitionedTableId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_partitioned_table where "partrelid" = ${ParameterValue(partrelid, null, PgPartitionedTableId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
     DeleteBuilder("pg_catalog.pg_partitioned_table", PgPartitionedTableFields)
   }
   override def insert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
-    SQL"""insert into pg_catalog.pg_partitioned_table(partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs)
+    SQL"""insert into pg_catalog.pg_partitioned_table("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")
           values (${ParameterValue(unsaved.partrelid, null, PgPartitionedTableId.toStatement)}::oid, ${ParameterValue(unsaved.partstrat, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.partnatts, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.partdefid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.partattrs, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.partclass, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.partcollation, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.partexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
-          returning partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
+          returning "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs"
        """
       .executeInsert(PgPartitionedTableRow.rowParser(1).single)
     
@@ -38,41 +38,41 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     SelectBuilderSql("pg_catalog.pg_partitioned_table", PgPartitionedTableFields, PgPartitionedTableRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPartitionedTableRow] = {
-    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
+    SQL"""select "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs"
           from pg_catalog.pg_partitioned_table
        """.as(PgPartitionedTableRow.rowParser(1).*)
   }
   override def selectById(partrelid: PgPartitionedTableId)(implicit c: Connection): Option[PgPartitionedTableRow] = {
-    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
+    SQL"""select "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs"
           from pg_catalog.pg_partitioned_table
-          where partrelid = ${ParameterValue(partrelid, null, PgPartitionedTableId.toStatement)}
+          where "partrelid" = ${ParameterValue(partrelid, null, PgPartitionedTableId.toStatement)}
        """.as(PgPartitionedTableRow.rowParser(1).singleOpt)
   }
   override def selectByIds(partrelids: Array[PgPartitionedTableId])(implicit c: Connection): List[PgPartitionedTableRow] = {
-    SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
+    SQL"""select "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs"
           from pg_catalog.pg_partitioned_table
-          where partrelid = ANY(${partrelids})
+          where "partrelid" = ANY(${partrelids})
        """.as(PgPartitionedTableRow.rowParser(1).*)
     
   }
   override def update(row: PgPartitionedTableRow)(implicit c: Connection): Boolean = {
     val partrelid = row.partrelid
     SQL"""update pg_catalog.pg_partitioned_table
-          set partstrat = ${ParameterValue(row.partstrat, null, ToStatement.stringToStatement)}::char,
-              partnatts = ${ParameterValue(row.partnatts, null, ToStatement.intToStatement)}::int2,
-              partdefid = ${ParameterValue(row.partdefid, null, ToStatement.longToStatement)}::oid,
-              partattrs = ${ParameterValue(row.partattrs, null, TypoInt2Vector.toStatement)}::int2vector,
-              partclass = ${ParameterValue(row.partclass, null, TypoOidVector.toStatement)}::oidvector,
-              partcollation = ${ParameterValue(row.partcollation, null, TypoOidVector.toStatement)}::oidvector,
-              partexprs = ${ParameterValue(row.partexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
-          where partrelid = ${ParameterValue(partrelid, null, PgPartitionedTableId.toStatement)}
+          set "partstrat" = ${ParameterValue(row.partstrat, null, ToStatement.stringToStatement)}::char,
+              "partnatts" = ${ParameterValue(row.partnatts, null, ToStatement.intToStatement)}::int2,
+              "partdefid" = ${ParameterValue(row.partdefid, null, ToStatement.longToStatement)}::oid,
+              "partattrs" = ${ParameterValue(row.partattrs, null, TypoInt2Vector.toStatement)}::int2vector,
+              "partclass" = ${ParameterValue(row.partclass, null, TypoOidVector.toStatement)}::oidvector,
+              "partcollation" = ${ParameterValue(row.partcollation, null, TypoOidVector.toStatement)}::oidvector,
+              "partexprs" = ${ParameterValue(row.partexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
+          where "partrelid" = ${ParameterValue(partrelid, null, PgPartitionedTableId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
     UpdateBuilder("pg_catalog.pg_partitioned_table", PgPartitionedTableFields, PgPartitionedTableRow.rowParser)
   }
   override def upsert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
-    SQL"""insert into pg_catalog.pg_partitioned_table(partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs)
+    SQL"""insert into pg_catalog.pg_partitioned_table("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")
           values (
             ${ParameterValue(unsaved.partrelid, null, PgPartitionedTableId.toStatement)}::oid,
             ${ParameterValue(unsaved.partstrat, null, ToStatement.stringToStatement)}::char,
@@ -83,16 +83,16 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
             ${ParameterValue(unsaved.partcollation, null, TypoOidVector.toStatement)}::oidvector,
             ${ParameterValue(unsaved.partexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree
           )
-          on conflict (partrelid)
+          on conflict ("partrelid")
           do update set
-            partstrat = EXCLUDED.partstrat,
-            partnatts = EXCLUDED.partnatts,
-            partdefid = EXCLUDED.partdefid,
-            partattrs = EXCLUDED.partattrs,
-            partclass = EXCLUDED.partclass,
-            partcollation = EXCLUDED.partcollation,
-            partexprs = EXCLUDED.partexprs
-          returning partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
+            "partstrat" = EXCLUDED."partstrat",
+            "partnatts" = EXCLUDED."partnatts",
+            "partdefid" = EXCLUDED."partdefid",
+            "partattrs" = EXCLUDED."partattrs",
+            "partclass" = EXCLUDED."partclass",
+            "partcollation" = EXCLUDED."partcollation",
+            "partexprs" = EXCLUDED."partexprs"
+          returning "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs"
        """
       .executeInsert(PgPartitionedTableRow.rowParser(1).single)
     

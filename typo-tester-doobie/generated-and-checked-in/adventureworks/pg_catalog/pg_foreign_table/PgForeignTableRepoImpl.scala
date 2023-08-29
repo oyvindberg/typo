@@ -20,35 +20,35 @@ import typo.dsl.UpdateBuilder
 
 object PgForeignTableRepoImpl extends PgForeignTableRepo {
   override def delete(ftrelid: PgForeignTableId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_foreign_table where ftrelid = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_foreign_table where "ftrelid" = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgForeignTableFields, PgForeignTableRow] = {
     DeleteBuilder("pg_catalog.pg_foreign_table", PgForeignTableFields)
   }
   override def insert(unsaved: PgForeignTableRow): ConnectionIO[PgForeignTableRow] = {
-    sql"""insert into pg_catalog.pg_foreign_table(ftrelid, ftserver, ftoptions)
+    sql"""insert into pg_catalog.pg_foreign_table("ftrelid", "ftserver", "ftoptions")
           values (${fromWrite(unsaved.ftrelid)(Write.fromPut(PgForeignTableId.put))}::oid, ${fromWrite(unsaved.ftserver)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.ftoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
-          returning ftrelid, ftserver, ftoptions
+          returning "ftrelid", "ftserver", "ftoptions"
        """.query(PgForeignTableRow.read).unique
   }
   override def select: SelectBuilder[PgForeignTableFields, PgForeignTableRow] = {
     SelectBuilderSql("pg_catalog.pg_foreign_table", PgForeignTableFields, PgForeignTableRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgForeignTableRow] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table".query(PgForeignTableRow.read).stream
+    sql"""select "ftrelid", "ftserver", "ftoptions" from pg_catalog.pg_foreign_table""".query(PgForeignTableRow.read).stream
   }
   override def selectById(ftrelid: PgForeignTableId): ConnectionIO[Option[PgForeignTableRow]] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}".query(PgForeignTableRow.read).option
+    sql"""select "ftrelid", "ftserver", "ftoptions" from pg_catalog.pg_foreign_table where "ftrelid" = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}""".query(PgForeignTableRow.read).option
   }
   override def selectByIds(ftrelids: Array[PgForeignTableId]): Stream[ConnectionIO, PgForeignTableRow] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ANY(${ftrelids})".query(PgForeignTableRow.read).stream
+    sql"""select "ftrelid", "ftserver", "ftoptions" from pg_catalog.pg_foreign_table where "ftrelid" = ANY(${ftrelids})""".query(PgForeignTableRow.read).stream
   }
   override def update(row: PgForeignTableRow): ConnectionIO[Boolean] = {
     val ftrelid = row.ftrelid
     sql"""update pg_catalog.pg_foreign_table
-          set ftserver = ${fromWrite(row.ftserver)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              ftoptions = ${fromWrite(row.ftoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where ftrelid = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}"""
+          set "ftserver" = ${fromWrite(row.ftserver)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "ftoptions" = ${fromWrite(row.ftoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
+          where "ftrelid" = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -57,17 +57,17 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
     UpdateBuilder("pg_catalog.pg_foreign_table", PgForeignTableFields, PgForeignTableRow.read)
   }
   override def upsert(unsaved: PgForeignTableRow): ConnectionIO[PgForeignTableRow] = {
-    sql"""insert into pg_catalog.pg_foreign_table(ftrelid, ftserver, ftoptions)
+    sql"""insert into pg_catalog.pg_foreign_table("ftrelid", "ftserver", "ftoptions")
           values (
             ${fromWrite(unsaved.ftrelid)(Write.fromPut(PgForeignTableId.put))}::oid,
             ${fromWrite(unsaved.ftserver)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.ftoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
           )
-          on conflict (ftrelid)
+          on conflict ("ftrelid")
           do update set
-            ftserver = EXCLUDED.ftserver,
-            ftoptions = EXCLUDED.ftoptions
-          returning ftrelid, ftserver, ftoptions
+            "ftserver" = EXCLUDED."ftserver",
+            "ftoptions" = EXCLUDED."ftoptions"
+          returning "ftrelid", "ftserver", "ftoptions"
        """.query(PgForeignTableRow.read).unique
   }
 }

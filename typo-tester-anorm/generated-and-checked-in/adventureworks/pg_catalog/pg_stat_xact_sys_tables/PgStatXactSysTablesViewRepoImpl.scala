@@ -17,7 +17,7 @@ object PgStatXactSysTablesViewRepoImpl extends PgStatXactSysTablesViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_xact_sys_tables", PgStatXactSysTablesViewFields, PgStatXactSysTablesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatXactSysTablesViewRow] = {
-    SQL"""select relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd
+    SQL"""select "relid", "schemaname", "relname", "seq_scan", "seq_tup_read", "idx_scan", "idx_tup_fetch", "n_tup_ins", "n_tup_upd", "n_tup_del", "n_tup_hot_upd"
           from pg_catalog.pg_stat_xact_sys_tables
        """.as(PgStatXactSysTablesViewRow.rowParser(1).*)
   }

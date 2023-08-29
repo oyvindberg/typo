@@ -21,35 +21,35 @@ import typo.dsl.UpdateBuilder
 
 object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def delete(oid: PgLargeobjectMetadataId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_largeobject_metadata where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_largeobject_metadata where "oid" = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
     DeleteBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields)
   }
   override def insert(unsaved: PgLargeobjectMetadataRow): ConnectionIO[PgLargeobjectMetadataRow] = {
-    sql"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
+    sql"""insert into pg_catalog.pg_largeobject_metadata("oid", "lomowner", "lomacl")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgLargeobjectMetadataId.put))}::oid, ${fromWrite(unsaved.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
-          returning oid, lomowner, lomacl
+          returning "oid", "lomowner", "lomacl"
        """.query(PgLargeobjectMetadataRow.read).unique
   }
   override def select: SelectBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
     SelectBuilderSql("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields, PgLargeobjectMetadataRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgLargeobjectMetadataRow] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata".query(PgLargeobjectMetadataRow.read).stream
+    sql"""select "oid", "lomowner", "lomacl" from pg_catalog.pg_largeobject_metadata""".query(PgLargeobjectMetadataRow.read).stream
   }
   override def selectById(oid: PgLargeobjectMetadataId): ConnectionIO[Option[PgLargeobjectMetadataRow]] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}".query(PgLargeobjectMetadataRow.read).option
+    sql"""select "oid", "lomowner", "lomacl" from pg_catalog.pg_largeobject_metadata where "oid" = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}""".query(PgLargeobjectMetadataRow.read).option
   }
   override def selectByIds(oids: Array[PgLargeobjectMetadataId]): Stream[ConnectionIO, PgLargeobjectMetadataRow] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY(${oids})".query(PgLargeobjectMetadataRow.read).stream
+    sql"""select "oid", "lomowner", "lomacl" from pg_catalog.pg_largeobject_metadata where "oid" = ANY(${oids})""".query(PgLargeobjectMetadataRow.read).stream
   }
   override def update(row: PgLargeobjectMetadataRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_largeobject_metadata
-          set lomowner = ${fromWrite(row.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              lomacl = ${fromWrite(row.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}"""
+          set "lomowner" = ${fromWrite(row.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "lomacl" = ${fromWrite(row.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -58,17 +58,17 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     UpdateBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields, PgLargeobjectMetadataRow.read)
   }
   override def upsert(unsaved: PgLargeobjectMetadataRow): ConnectionIO[PgLargeobjectMetadataRow] = {
-    sql"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
+    sql"""insert into pg_catalog.pg_largeobject_metadata("oid", "lomowner", "lomacl")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgLargeobjectMetadataId.put))}::oid,
             ${fromWrite(unsaved.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            lomowner = EXCLUDED.lomowner,
-            lomacl = EXCLUDED.lomacl
-          returning oid, lomowner, lomacl
+            "lomowner" = EXCLUDED."lomowner",
+            "lomacl" = EXCLUDED."lomacl"
+          returning "oid", "lomowner", "lomacl"
        """.query(PgLargeobjectMetadataRow.read).unique
   }
 }

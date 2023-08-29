@@ -18,6 +18,6 @@ object PohViewRepoImpl extends PohViewRepo {
     SelectBuilderSql("pu.poh", PohViewFields, PohViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PohViewRow] = {
-    sql"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from pu.poh""".query(PohViewRow.read).stream
+    sql"""select "id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from pu.poh""".query(PohViewRow.read).stream
   }
 }

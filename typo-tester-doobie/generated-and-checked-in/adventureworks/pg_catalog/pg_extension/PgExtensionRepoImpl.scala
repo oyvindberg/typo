@@ -20,46 +20,46 @@ import typo.dsl.UpdateBuilder
 
 object PgExtensionRepoImpl extends PgExtensionRepo {
   override def delete(oid: PgExtensionId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_extension where oid = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_extension where "oid" = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgExtensionFields, PgExtensionRow] = {
     DeleteBuilder("pg_catalog.pg_extension", PgExtensionFields)
   }
   override def insert(unsaved: PgExtensionRow): ConnectionIO[PgExtensionRow] = {
-    sql"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)
+    sql"""insert into pg_catalog.pg_extension("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgExtensionId.put))}::oid, ${fromWrite(unsaved.extname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.extowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.extnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.extrelocatable)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.extversion)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.extconfig)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid, ${fromWrite(unsaved.extcondition)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
-          returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
+          returning "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition"
        """.query(PgExtensionRow.read).unique
   }
   override def select: SelectBuilder[PgExtensionFields, PgExtensionRow] = {
     SelectBuilderSql("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgExtensionRow] = {
-    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension".query(PgExtensionRow.read).stream
+    sql"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition" from pg_catalog.pg_extension""".query(PgExtensionRow.read).stream
   }
   override def selectById(oid: PgExtensionId): ConnectionIO[Option[PgExtensionRow]] = {
-    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}".query(PgExtensionRow.read).option
+    sql"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition" from pg_catalog.pg_extension where "oid" = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}""".query(PgExtensionRow.read).option
   }
   override def selectByIds(oids: Array[PgExtensionId]): Stream[ConnectionIO, PgExtensionRow] = {
-    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ANY(${oids})".query(PgExtensionRow.read).stream
+    sql"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition" from pg_catalog.pg_extension where "oid" = ANY(${oids})""".query(PgExtensionRow.read).stream
   }
   override def selectByUnique(extname: String): ConnectionIO[Option[PgExtensionRow]] = {
-    sql"""select extname
+    sql"""select "extname"
           from pg_catalog.pg_extension
-          where extname = ${fromWrite(extname)(Write.fromPut(Meta.StringMeta.put))}
+          where "extname" = ${fromWrite(extname)(Write.fromPut(Meta.StringMeta.put))}
        """.query(PgExtensionRow.read).option
   }
   override def update(row: PgExtensionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_extension
-          set extname = ${fromWrite(row.extname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              extowner = ${fromWrite(row.extowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              extnamespace = ${fromWrite(row.extnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              extrelocatable = ${fromWrite(row.extrelocatable)(Write.fromPut(Meta.BooleanMeta.put))},
-              extversion = ${fromWrite(row.extversion)(Write.fromPut(Meta.StringMeta.put))},
-              extconfig = ${fromWrite(row.extconfig)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
-              extcondition = ${fromWrite(row.extcondition)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}"""
+          set "extname" = ${fromWrite(row.extname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "extowner" = ${fromWrite(row.extowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "extnamespace" = ${fromWrite(row.extnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "extrelocatable" = ${fromWrite(row.extrelocatable)(Write.fromPut(Meta.BooleanMeta.put))},
+              "extversion" = ${fromWrite(row.extversion)(Write.fromPut(Meta.StringMeta.put))},
+              "extconfig" = ${fromWrite(row.extconfig)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
+              "extcondition" = ${fromWrite(row.extcondition)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -68,7 +68,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
     UpdateBuilder("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.read)
   }
   override def upsert(unsaved: PgExtensionRow): ConnectionIO[PgExtensionRow] = {
-    sql"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)
+    sql"""insert into pg_catalog.pg_extension("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgExtensionId.put))}::oid,
             ${fromWrite(unsaved.extname)(Write.fromPut(Meta.StringMeta.put))}::name,
@@ -79,16 +79,16 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
             ${fromWrite(unsaved.extconfig)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
             ${fromWrite(unsaved.extcondition)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            extname = EXCLUDED.extname,
-            extowner = EXCLUDED.extowner,
-            extnamespace = EXCLUDED.extnamespace,
-            extrelocatable = EXCLUDED.extrelocatable,
-            extversion = EXCLUDED.extversion,
-            extconfig = EXCLUDED.extconfig,
-            extcondition = EXCLUDED.extcondition
-          returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
+            "extname" = EXCLUDED."extname",
+            "extowner" = EXCLUDED."extowner",
+            "extnamespace" = EXCLUDED."extnamespace",
+            "extrelocatable" = EXCLUDED."extrelocatable",
+            "extversion" = EXCLUDED."extversion",
+            "extconfig" = EXCLUDED."extconfig",
+            "extcondition" = EXCLUDED."extcondition"
+          returning "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition"
        """.query(PgExtensionRow.read).unique
   }
 }

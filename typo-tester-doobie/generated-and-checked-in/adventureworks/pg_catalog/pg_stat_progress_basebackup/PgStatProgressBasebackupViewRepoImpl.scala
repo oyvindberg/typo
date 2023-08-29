@@ -18,6 +18,6 @@ object PgStatProgressBasebackupViewRepoImpl extends PgStatProgressBasebackupView
     SelectBuilderSql("pg_catalog.pg_stat_progress_basebackup", PgStatProgressBasebackupViewFields, PgStatProgressBasebackupViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatProgressBasebackupViewRow] = {
-    sql"select pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed from pg_catalog.pg_stat_progress_basebackup".query(PgStatProgressBasebackupViewRow.read).stream
+    sql"""select "pid", "phase", "backup_total", "backup_streamed", "tablespaces_total", "tablespaces_streamed" from pg_catalog.pg_stat_progress_basebackup""".query(PgStatProgressBasebackupViewRow.read).stream
   }
 }

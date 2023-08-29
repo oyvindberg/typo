@@ -18,6 +18,6 @@ object CheckConstraintsViewRepoImpl extends CheckConstraintsViewRepo {
     SelectBuilderSql("information_schema.check_constraints", CheckConstraintsViewFields, CheckConstraintsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CheckConstraintsViewRow] = {
-    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", check_clause from information_schema.check_constraints""".query(CheckConstraintsViewRow.read).stream
+    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", "check_clause" from information_schema.check_constraints""".query(CheckConstraintsViewRow.read).stream
   }
 }

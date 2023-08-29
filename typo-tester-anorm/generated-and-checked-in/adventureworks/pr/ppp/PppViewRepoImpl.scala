@@ -17,7 +17,7 @@ object PppViewRepoImpl extends PppViewRepo {
     SelectBuilderSql("pr.ppp", PppViewFields, PppViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PppViewRow] = {
-    SQL"""select productid, productphotoid, "primary", modifieddate::text
+    SQL"""select "productid", "productphotoid", "primary", "modifieddate"::text
           from pr.ppp
        """.as(PppViewRow.rowParser(1).*)
   }

@@ -17,7 +17,7 @@ object WViewRepoImpl extends WViewRepo {
     SelectBuilderSql("pr.w", WViewFields, WViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[WViewRow] = {
-    SQL"""select "id", workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
+    SQL"""select "id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
           from pr.w
        """.as(WViewRow.rowParser(1).*)
   }

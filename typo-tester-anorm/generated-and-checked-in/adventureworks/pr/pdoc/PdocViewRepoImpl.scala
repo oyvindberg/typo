@@ -17,7 +17,7 @@ object PdocViewRepoImpl extends PdocViewRepo {
     SelectBuilderSql("pr.pdoc", PdocViewFields, PdocViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PdocViewRow] = {
-    SQL"""select "id", productid, modifieddate::text, documentnode
+    SQL"""select "id", "productid", "modifieddate"::text, "documentnode"
           from pr.pdoc
        """.as(PdocViewRow.rowParser(1).*)
   }

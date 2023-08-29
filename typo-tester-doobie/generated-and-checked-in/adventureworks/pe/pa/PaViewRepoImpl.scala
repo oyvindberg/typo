@@ -18,6 +18,6 @@ object PaViewRepoImpl extends PaViewRepo {
     SelectBuilderSql("pe.pa", PaViewFields, PaViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PaViewRow] = {
-    sql"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from pe.pa""".query(PaViewRow.read).stream
+    sql"""select "id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from pe.pa""".query(PaViewRow.read).stream
   }
 }

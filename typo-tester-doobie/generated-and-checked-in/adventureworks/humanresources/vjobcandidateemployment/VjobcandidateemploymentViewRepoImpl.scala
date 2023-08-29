@@ -18,6 +18,6 @@ object VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRe
     SelectBuilderSql("humanresources.vjobcandidateemployment", VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VjobcandidateemploymentViewRow] = {
-    sql"""select jobcandidateid, "Emp.StartDate"::text, "Emp.EndDate"::text, "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City" from humanresources.vjobcandidateemployment""".query(VjobcandidateemploymentViewRow.read).stream
+    sql"""select "jobcandidateid", "Emp.StartDate"::text, "Emp.EndDate"::text, "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City" from humanresources.vjobcandidateemployment""".query(VjobcandidateemploymentViewRow.read).stream
   }
 }

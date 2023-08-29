@@ -17,8 +17,8 @@ object AtViewRepoImpl extends AtViewRepo {
     SelectBuilderSql("pe.at", AtViewFields, AtViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[AtViewRow] = {
-    SQL"""select "id", addresstypeid, "name", rowguid, modifieddate::text
-          from pe."at"
+    SQL"""select "id", "addresstypeid", "name", "rowguid", "modifieddate"::text
+          from pe.at
        """.as(AtViewRow.rowParser(1).*)
   }
 }

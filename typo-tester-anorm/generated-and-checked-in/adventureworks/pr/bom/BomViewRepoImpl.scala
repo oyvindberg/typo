@@ -17,8 +17,8 @@ object BomViewRepoImpl extends BomViewRepo {
     SelectBuilderSql("pr.bom", BomViewFields, BomViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[BomViewRow] = {
-    SQL"""select "id", billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
-          from pr."bom"
+    SQL"""select "id", "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
+          from pr.bom
        """.as(BomViewRow.rowParser(1).*)
   }
 }

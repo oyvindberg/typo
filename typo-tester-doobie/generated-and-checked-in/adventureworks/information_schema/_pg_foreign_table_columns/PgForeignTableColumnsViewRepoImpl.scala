@@ -18,6 +18,6 @@ object PgForeignTableColumnsViewRepoImpl extends PgForeignTableColumnsViewRepo {
     SelectBuilderSql("information_schema._pg_foreign_table_columns", PgForeignTableColumnsViewFields, PgForeignTableColumnsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgForeignTableColumnsViewRow] = {
-    sql"select nspname, relname, attname, attfdwoptions from information_schema._pg_foreign_table_columns".query(PgForeignTableColumnsViewRow.read).stream
+    sql"""select "nspname", "relname", "attname", "attfdwoptions" from information_schema._pg_foreign_table_columns""".query(PgForeignTableColumnsViewRow.read).stream
   }
 }

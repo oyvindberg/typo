@@ -18,6 +18,6 @@ object PgStatioUserSequencesViewRepoImpl extends PgStatioUserSequencesViewRepo {
     SelectBuilderSql("pg_catalog.pg_statio_user_sequences", PgStatioUserSequencesViewFields, PgStatioUserSequencesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatioUserSequencesViewRow] = {
-    sql"select relid, schemaname, relname, blks_read, blks_hit from pg_catalog.pg_statio_user_sequences".query(PgStatioUserSequencesViewRow.read).stream
+    sql"""select "relid", "schemaname", "relname", "blks_read", "blks_hit" from pg_catalog.pg_statio_user_sequences""".query(PgStatioUserSequencesViewRow.read).stream
   }
 }

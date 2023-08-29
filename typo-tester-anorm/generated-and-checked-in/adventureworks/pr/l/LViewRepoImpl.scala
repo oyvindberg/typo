@@ -17,7 +17,7 @@ object LViewRepoImpl extends LViewRepo {
     SelectBuilderSql("pr.l", LViewFields, LViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[LViewRow] = {
-    SQL"""select "id", locationid, "name", costrate, availability, modifieddate::text
+    SQL"""select "id", "locationid", "name", "costrate", "availability", "modifieddate"::text
           from pr.l
        """.as(LViewRow.rowParser(1).*)
   }

@@ -17,7 +17,7 @@ object CollationsViewRepoImpl extends CollationsViewRepo {
     SelectBuilderSql("information_schema.collations", CollationsViewFields, CollationsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CollationsViewRow] = {
-    SQL"""select "collation_catalog", "collation_schema", "collation_name", pad_attribute
+    SQL"""select "collation_catalog", "collation_schema", "collation_name", "pad_attribute"
           from information_schema.collations
        """.as(CollationsViewRow.rowParser(1).*)
   }

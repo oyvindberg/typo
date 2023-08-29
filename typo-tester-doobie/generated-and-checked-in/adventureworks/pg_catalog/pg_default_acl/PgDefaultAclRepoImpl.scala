@@ -21,43 +21,43 @@ import typo.dsl.UpdateBuilder
 
 object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_default_acl where oid = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_default_acl where "oid" = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
     DeleteBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields)
   }
   override def insert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow] = {
-    sql"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)
+    sql"""insert into pg_catalog.pg_default_acl("oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgDefaultAclId.put))}::oid, ${fromWrite(unsaved.defaclrole)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.defaclnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.defaclobjtype)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.defaclacl)(Write.fromPut(TypoAclItem.arrayPut))}::_aclitem)
-          returning oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
+          returning "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl"
        """.query(PgDefaultAclRow.read).unique
   }
   override def select: SelectBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
     SelectBuilderSql("pg_catalog.pg_default_acl", PgDefaultAclFields, PgDefaultAclRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgDefaultAclRow] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl".query(PgDefaultAclRow.read).stream
+    sql"""select "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl" from pg_catalog.pg_default_acl""".query(PgDefaultAclRow.read).stream
   }
   override def selectById(oid: PgDefaultAclId): ConnectionIO[Option[PgDefaultAclRow]] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}".query(PgDefaultAclRow.read).option
+    sql"""select "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl" from pg_catalog.pg_default_acl where "oid" = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}""".query(PgDefaultAclRow.read).option
   }
   override def selectByIds(oids: Array[PgDefaultAclId]): Stream[ConnectionIO, PgDefaultAclRow] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ANY(${oids})".query(PgDefaultAclRow.read).stream
+    sql"""select "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl" from pg_catalog.pg_default_acl where "oid" = ANY(${oids})""".query(PgDefaultAclRow.read).stream
   }
   override def selectByUnique(defaclrole: /* oid */ Long, defaclnamespace: /* oid */ Long, defaclobjtype: String): ConnectionIO[Option[PgDefaultAclRow]] = {
-    sql"""select defaclrole, defaclnamespace, defaclobjtype
+    sql"""select "defaclrole", "defaclnamespace", "defaclobjtype"
           from pg_catalog.pg_default_acl
-          where defaclrole = ${fromWrite(defaclrole)(Write.fromPut(Meta.LongMeta.put))} AND defaclnamespace = ${fromWrite(defaclnamespace)(Write.fromPut(Meta.LongMeta.put))} AND defaclobjtype = ${fromWrite(defaclobjtype)(Write.fromPut(Meta.StringMeta.put))}
+          where "defaclrole" = ${fromWrite(defaclrole)(Write.fromPut(Meta.LongMeta.put))} AND "defaclnamespace" = ${fromWrite(defaclnamespace)(Write.fromPut(Meta.LongMeta.put))} AND "defaclobjtype" = ${fromWrite(defaclobjtype)(Write.fromPut(Meta.StringMeta.put))}
        """.query(PgDefaultAclRow.read).option
   }
   override def update(row: PgDefaultAclRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_default_acl
-          set defaclrole = ${fromWrite(row.defaclrole)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              defaclnamespace = ${fromWrite(row.defaclnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              defaclobjtype = ${fromWrite(row.defaclobjtype)(Write.fromPut(Meta.StringMeta.put))}::char,
-              defaclacl = ${fromWrite(row.defaclacl)(Write.fromPut(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}"""
+          set "defaclrole" = ${fromWrite(row.defaclrole)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "defaclnamespace" = ${fromWrite(row.defaclnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "defaclobjtype" = ${fromWrite(row.defaclobjtype)(Write.fromPut(Meta.StringMeta.put))}::char,
+              "defaclacl" = ${fromWrite(row.defaclacl)(Write.fromPut(TypoAclItem.arrayPut))}::_aclitem
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -66,7 +66,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
     UpdateBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields, PgDefaultAclRow.read)
   }
   override def upsert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow] = {
-    sql"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)
+    sql"""insert into pg_catalog.pg_default_acl("oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgDefaultAclId.put))}::oid,
             ${fromWrite(unsaved.defaclrole)(Write.fromPut(Meta.LongMeta.put))}::oid,
@@ -74,13 +74,13 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
             ${fromWrite(unsaved.defaclobjtype)(Write.fromPut(Meta.StringMeta.put))}::char,
             ${fromWrite(unsaved.defaclacl)(Write.fromPut(TypoAclItem.arrayPut))}::_aclitem
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            defaclrole = EXCLUDED.defaclrole,
-            defaclnamespace = EXCLUDED.defaclnamespace,
-            defaclobjtype = EXCLUDED.defaclobjtype,
-            defaclacl = EXCLUDED.defaclacl
-          returning oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
+            "defaclrole" = EXCLUDED."defaclrole",
+            "defaclnamespace" = EXCLUDED."defaclnamespace",
+            "defaclobjtype" = EXCLUDED."defaclobjtype",
+            "defaclacl" = EXCLUDED."defaclacl"
+          returning "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl"
        """.query(PgDefaultAclRow.read).unique
   }
 }

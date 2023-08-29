@@ -18,6 +18,6 @@ object BeaViewRepoImpl extends BeaViewRepo {
     SelectBuilderSql("pe.bea", BeaViewFields, BeaViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BeaViewRow] = {
-    sql"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate::text from pe.bea""".query(BeaViewRow.read).stream
+    sql"""select "id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from pe.bea""".query(BeaViewRow.read).stream
   }
 }

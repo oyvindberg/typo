@@ -18,6 +18,6 @@ object PgStatSslViewRepoImpl extends PgStatSslViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_ssl", PgStatSslViewFields, PgStatSslViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatSslViewRow] = {
-    sql"""select pid, ssl, "version", cipher, bits, client_dn, client_serial, issuer_dn from pg_catalog.pg_stat_ssl""".query(PgStatSslViewRow.read).stream
+    sql"""select "pid", "ssl", "version", "cipher", "bits", "client_dn", "client_serial", "issuer_dn" from pg_catalog.pg_stat_ssl""".query(PgStatSslViewRow.read).stream
   }
 }

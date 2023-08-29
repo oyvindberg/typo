@@ -17,7 +17,7 @@ object TriggersViewRepoImpl extends TriggersViewRepo {
     SelectBuilderSql("information_schema.triggers", TriggersViewFields, TriggersViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[TriggersViewRow] = {
-    SQL"""select "trigger_catalog", "trigger_schema", "trigger_name", event_manipulation, event_object_catalog, event_object_schema, event_object_table, action_order, action_condition, action_statement, action_orientation, action_timing, action_reference_old_table, action_reference_new_table, action_reference_old_row, action_reference_new_row, created::text
+    SQL"""select "trigger_catalog", "trigger_schema", "trigger_name", "event_manipulation", "event_object_catalog", "event_object_schema", "event_object_table", "action_order", "action_condition", "action_statement", "action_orientation", "action_timing", "action_reference_old_table", "action_reference_new_table", "action_reference_old_row", "action_reference_new_row", "created"::text
           from information_schema.triggers
        """.as(TriggersViewRow.rowParser(1).*)
   }

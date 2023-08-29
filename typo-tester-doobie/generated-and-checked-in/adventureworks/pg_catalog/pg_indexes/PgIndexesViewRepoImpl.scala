@@ -18,6 +18,6 @@ object PgIndexesViewRepoImpl extends PgIndexesViewRepo {
     SelectBuilderSql("pg_catalog.pg_indexes", PgIndexesViewFields, PgIndexesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgIndexesViewRow] = {
-    sql"""select schemaname, tablename, indexname, "tablespace", indexdef from pg_catalog.pg_indexes""".query(PgIndexesViewRow.read).stream
+    sql"""select "schemaname", "tablename", "indexname", "tablespace", "indexdef" from pg_catalog.pg_indexes""".query(PgIndexesViewRow.read).stream
   }
 }

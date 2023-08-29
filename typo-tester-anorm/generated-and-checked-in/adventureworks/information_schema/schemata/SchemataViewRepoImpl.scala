@@ -17,7 +17,7 @@ object SchemataViewRepoImpl extends SchemataViewRepo {
     SelectBuilderSql("information_schema.schemata", SchemataViewFields, SchemataViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SchemataViewRow] = {
-    SQL"""select "catalog_name", "schema_name", schema_owner, default_character_set_catalog, default_character_set_schema, default_character_set_name, sql_path
+    SQL"""select "catalog_name", "schema_name", "schema_owner", "default_character_set_catalog", "default_character_set_schema", "default_character_set_name", "sql_path"
           from information_schema.schemata
        """.as(SchemataViewRow.rowParser(1).*)
   }

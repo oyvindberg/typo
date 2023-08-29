@@ -17,7 +17,7 @@ object PgStatDatabaseConflictsViewRepoImpl extends PgStatDatabaseConflictsViewRe
     SelectBuilderSql("pg_catalog.pg_stat_database_conflicts", PgStatDatabaseConflictsViewFields, PgStatDatabaseConflictsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatDatabaseConflictsViewRow] = {
-    SQL"""select datid, datname, confl_tablespace, confl_lock, confl_snapshot, confl_bufferpin, confl_deadlock
+    SQL"""select "datid", "datname", "confl_tablespace", "confl_lock", "confl_snapshot", "confl_bufferpin", "confl_deadlock"
           from pg_catalog.pg_stat_database_conflicts
        """.as(PgStatDatabaseConflictsViewRow.rowParser(1).*)
   }

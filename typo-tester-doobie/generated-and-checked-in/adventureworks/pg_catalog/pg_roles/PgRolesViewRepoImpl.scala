@@ -18,6 +18,6 @@ object PgRolesViewRepoImpl extends PgRolesViewRepo {
     SelectBuilderSql("pg_catalog.pg_roles", PgRolesViewFields, PgRolesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgRolesViewRow] = {
-    sql"select rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil::text, rolbypassrls, rolconfig, oid from pg_catalog.pg_roles".query(PgRolesViewRow.read).stream
+    sql"""select "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolconnlimit", "rolpassword", "rolvaliduntil"::text, "rolbypassrls", "rolconfig", "oid" from pg_catalog.pg_roles""".query(PgRolesViewRow.read).stream
   }
 }

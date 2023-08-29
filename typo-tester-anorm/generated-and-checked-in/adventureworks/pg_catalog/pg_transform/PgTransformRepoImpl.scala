@@ -19,15 +19,15 @@ import typo.dsl.UpdateBuilder
 
 object PgTransformRepoImpl extends PgTransformRepo {
   override def delete(oid: PgTransformId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_transform where oid = ${ParameterValue(oid, null, PgTransformId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_transform where "oid" = ${ParameterValue(oid, null, PgTransformId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTransformFields, PgTransformRow] = {
     DeleteBuilder("pg_catalog.pg_transform", PgTransformFields)
   }
   override def insert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow = {
-    SQL"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)
+    SQL"""insert into pg_catalog.pg_transform("oid", "trftype", "trflang", "trffromsql", "trftosql")
           values (${ParameterValue(unsaved.oid, null, PgTransformId.toStatement)}::oid, ${ParameterValue(unsaved.trftype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.trflang, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.trffromsql, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.trftosql, null, TypoRegproc.toStatement)}::regproc)
-          returning oid, trftype, trflang, trffromsql, trftosql
+          returning "oid", "trftype", "trflang", "trffromsql", "trftosql"
        """
       .executeInsert(PgTransformRow.rowParser(1).single)
     
@@ -36,45 +36,45 @@ object PgTransformRepoImpl extends PgTransformRepo {
     SelectBuilderSql("pg_catalog.pg_transform", PgTransformFields, PgTransformRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTransformRow] = {
-    SQL"""select oid, trftype, trflang, trffromsql, trftosql
+    SQL"""select "oid", "trftype", "trflang", "trffromsql", "trftosql"
           from pg_catalog.pg_transform
        """.as(PgTransformRow.rowParser(1).*)
   }
   override def selectById(oid: PgTransformId)(implicit c: Connection): Option[PgTransformRow] = {
-    SQL"""select oid, trftype, trflang, trffromsql, trftosql
+    SQL"""select "oid", "trftype", "trflang", "trffromsql", "trftosql"
           from pg_catalog.pg_transform
-          where oid = ${ParameterValue(oid, null, PgTransformId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgTransformId.toStatement)}
        """.as(PgTransformRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTransformId])(implicit c: Connection): List[PgTransformRow] = {
-    SQL"""select oid, trftype, trflang, trffromsql, trftosql
+    SQL"""select "oid", "trftype", "trflang", "trffromsql", "trftosql"
           from pg_catalog.pg_transform
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgTransformRow.rowParser(1).*)
     
   }
   override def selectByUnique(trftype: /* oid */ Long, trflang: /* oid */ Long)(implicit c: Connection): Option[PgTransformRow] = {
-    SQL"""select trftype, trflang
+    SQL"""select "trftype", "trflang"
           from pg_catalog.pg_transform
-          where trftype = ${ParameterValue(trftype, null, ToStatement.longToStatement)} AND trflang = ${ParameterValue(trflang, null, ToStatement.longToStatement)}
+          where "trftype" = ${ParameterValue(trftype, null, ToStatement.longToStatement)} AND "trflang" = ${ParameterValue(trflang, null, ToStatement.longToStatement)}
        """.as(PgTransformRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgTransformRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_transform
-          set trftype = ${ParameterValue(row.trftype, null, ToStatement.longToStatement)}::oid,
-              trflang = ${ParameterValue(row.trflang, null, ToStatement.longToStatement)}::oid,
-              trffromsql = ${ParameterValue(row.trffromsql, null, TypoRegproc.toStatement)}::regproc,
-              trftosql = ${ParameterValue(row.trftosql, null, TypoRegproc.toStatement)}::regproc
-          where oid = ${ParameterValue(oid, null, PgTransformId.toStatement)}
+          set "trftype" = ${ParameterValue(row.trftype, null, ToStatement.longToStatement)}::oid,
+              "trflang" = ${ParameterValue(row.trflang, null, ToStatement.longToStatement)}::oid,
+              "trffromsql" = ${ParameterValue(row.trffromsql, null, TypoRegproc.toStatement)}::regproc,
+              "trftosql" = ${ParameterValue(row.trftosql, null, TypoRegproc.toStatement)}::regproc
+          where "oid" = ${ParameterValue(oid, null, PgTransformId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTransformFields, PgTransformRow] = {
     UpdateBuilder("pg_catalog.pg_transform", PgTransformFields, PgTransformRow.rowParser)
   }
   override def upsert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow = {
-    SQL"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)
+    SQL"""insert into pg_catalog.pg_transform("oid", "trftype", "trflang", "trffromsql", "trftosql")
           values (
             ${ParameterValue(unsaved.oid, null, PgTransformId.toStatement)}::oid,
             ${ParameterValue(unsaved.trftype, null, ToStatement.longToStatement)}::oid,
@@ -82,13 +82,13 @@ object PgTransformRepoImpl extends PgTransformRepo {
             ${ParameterValue(unsaved.trffromsql, null, TypoRegproc.toStatement)}::regproc,
             ${ParameterValue(unsaved.trftosql, null, TypoRegproc.toStatement)}::regproc
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            trftype = EXCLUDED.trftype,
-            trflang = EXCLUDED.trflang,
-            trffromsql = EXCLUDED.trffromsql,
-            trftosql = EXCLUDED.trftosql
-          returning oid, trftype, trflang, trffromsql, trftosql
+            "trftype" = EXCLUDED."trftype",
+            "trflang" = EXCLUDED."trflang",
+            "trffromsql" = EXCLUDED."trffromsql",
+            "trftosql" = EXCLUDED."trftosql"
+          returning "oid", "trftype", "trflang", "trffromsql", "trftosql"
        """
       .executeInsert(PgTransformRow.rowParser(1).single)
     

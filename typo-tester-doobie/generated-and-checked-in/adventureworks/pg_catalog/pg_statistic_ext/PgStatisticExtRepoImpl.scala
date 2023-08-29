@@ -22,47 +22,47 @@ import typo.dsl.UpdateBuilder
 
 object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_statistic_ext where oid = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_statistic_ext where "oid" = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
     DeleteBuilder("pg_catalog.pg_statistic_ext", PgStatisticExtFields)
   }
   override def insert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow] = {
-    sql"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
+    sql"""insert into pg_catalog.pg_statistic_ext("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgStatisticExtId.put))}::oid, ${fromWrite(unsaved.stxrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.stxname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.stxnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.stxowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.stxstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.stxkeys)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.stxkind)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_char, ${fromWrite(unsaved.stxexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree)
-          returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
+          returning "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs"
        """.query(PgStatisticExtRow.read).unique
   }
   override def select: SelectBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
     SelectBuilderSql("pg_catalog.pg_statistic_ext", PgStatisticExtFields, PgStatisticExtRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatisticExtRow] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext".query(PgStatisticExtRow.read).stream
+    sql"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs" from pg_catalog.pg_statistic_ext""".query(PgStatisticExtRow.read).stream
   }
   override def selectById(oid: PgStatisticExtId): ConnectionIO[Option[PgStatisticExtRow]] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}".query(PgStatisticExtRow.read).option
+    sql"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs" from pg_catalog.pg_statistic_ext where "oid" = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}""".query(PgStatisticExtRow.read).option
   }
   override def selectByIds(oids: Array[PgStatisticExtId]): Stream[ConnectionIO, PgStatisticExtRow] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ANY(${oids})".query(PgStatisticExtRow.read).stream
+    sql"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs" from pg_catalog.pg_statistic_ext where "oid" = ANY(${oids})""".query(PgStatisticExtRow.read).stream
   }
   override def selectByUnique(stxname: String, stxnamespace: /* oid */ Long): ConnectionIO[Option[PgStatisticExtRow]] = {
-    sql"""select stxname, stxnamespace
+    sql"""select "stxname", "stxnamespace"
           from pg_catalog.pg_statistic_ext
-          where stxname = ${fromWrite(stxname)(Write.fromPut(Meta.StringMeta.put))} AND stxnamespace = ${fromWrite(stxnamespace)(Write.fromPut(Meta.LongMeta.put))}
+          where "stxname" = ${fromWrite(stxname)(Write.fromPut(Meta.StringMeta.put))} AND "stxnamespace" = ${fromWrite(stxnamespace)(Write.fromPut(Meta.LongMeta.put))}
        """.query(PgStatisticExtRow.read).option
   }
   override def update(row: PgStatisticExtRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_statistic_ext
-          set stxrelid = ${fromWrite(row.stxrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              stxname = ${fromWrite(row.stxname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              stxnamespace = ${fromWrite(row.stxnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              stxowner = ${fromWrite(row.stxowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              stxstattarget = ${fromWrite(row.stxstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              stxkeys = ${fromWrite(row.stxkeys)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
-              stxkind = ${fromWrite(row.stxkind)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_char,
-              stxexprs = ${fromWrite(row.stxexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
-          where oid = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}"""
+          set "stxrelid" = ${fromWrite(row.stxrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "stxname" = ${fromWrite(row.stxname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "stxnamespace" = ${fromWrite(row.stxnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "stxowner" = ${fromWrite(row.stxowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "stxstattarget" = ${fromWrite(row.stxstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              "stxkeys" = ${fromWrite(row.stxkeys)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
+              "stxkind" = ${fromWrite(row.stxkind)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_char,
+              "stxexprs" = ${fromWrite(row.stxexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -71,7 +71,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
     UpdateBuilder("pg_catalog.pg_statistic_ext", PgStatisticExtFields, PgStatisticExtRow.read)
   }
   override def upsert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow] = {
-    sql"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
+    sql"""insert into pg_catalog.pg_statistic_ext("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgStatisticExtId.put))}::oid,
             ${fromWrite(unsaved.stxrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
@@ -83,17 +83,17 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
             ${fromWrite(unsaved.stxkind)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_char,
             ${fromWrite(unsaved.stxexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            stxrelid = EXCLUDED.stxrelid,
-            stxname = EXCLUDED.stxname,
-            stxnamespace = EXCLUDED.stxnamespace,
-            stxowner = EXCLUDED.stxowner,
-            stxstattarget = EXCLUDED.stxstattarget,
-            stxkeys = EXCLUDED.stxkeys,
-            stxkind = EXCLUDED.stxkind,
-            stxexprs = EXCLUDED.stxexprs
-          returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
+            "stxrelid" = EXCLUDED."stxrelid",
+            "stxname" = EXCLUDED."stxname",
+            "stxnamespace" = EXCLUDED."stxnamespace",
+            "stxowner" = EXCLUDED."stxowner",
+            "stxstattarget" = EXCLUDED."stxstattarget",
+            "stxkeys" = EXCLUDED."stxkeys",
+            "stxkind" = EXCLUDED."stxkind",
+            "stxexprs" = EXCLUDED."stxexprs"
+          returning "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs"
        """.query(PgStatisticExtRow.read).unique
   }
 }

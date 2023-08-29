@@ -18,6 +18,6 @@ object PgForeignTablesViewRepoImpl extends PgForeignTablesViewRepo {
     SelectBuilderSql("information_schema._pg_foreign_tables", PgForeignTablesViewFields, PgForeignTablesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgForeignTablesViewRow] = {
-    sql"select foreign_table_catalog, foreign_table_schema, foreign_table_name, ftoptions, foreign_server_catalog, foreign_server_name, authorization_identifier from information_schema._pg_foreign_tables".query(PgForeignTablesViewRow.read).stream
+    sql"""select "foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "ftoptions", "foreign_server_catalog", "foreign_server_name", "authorization_identifier" from information_schema._pg_foreign_tables""".query(PgForeignTablesViewRow.read).stream
   }
 }

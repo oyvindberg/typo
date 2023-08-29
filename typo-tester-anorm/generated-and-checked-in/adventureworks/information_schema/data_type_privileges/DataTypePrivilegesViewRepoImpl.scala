@@ -17,7 +17,7 @@ object DataTypePrivilegesViewRepoImpl extends DataTypePrivilegesViewRepo {
     SelectBuilderSql("information_schema.data_type_privileges", DataTypePrivilegesViewFields, DataTypePrivilegesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DataTypePrivilegesViewRow] = {
-    SQL"""select object_catalog, object_schema, object_name, object_type, dtd_identifier
+    SQL"""select "object_catalog", "object_schema", "object_name", "object_type", "dtd_identifier"
           from information_schema.data_type_privileges
        """.as(DataTypePrivilegesViewRow.rowParser(1).*)
   }

@@ -18,6 +18,6 @@ object RoleRoutineGrantsViewRepoImpl extends RoleRoutineGrantsViewRepo {
     SelectBuilderSql("information_schema.role_routine_grants", RoleRoutineGrantsViewFields, RoleRoutineGrantsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, RoleRoutineGrantsViewRow] = {
-    sql"""select grantor, grantee, specific_catalog, specific_schema, "specific_name", "routine_catalog", "routine_schema", "routine_name", privilege_type, is_grantable from information_schema.role_routine_grants""".query(RoleRoutineGrantsViewRow.read).stream
+    sql"""select "grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable" from information_schema.role_routine_grants""".query(RoleRoutineGrantsViewRow.read).stream
   }
 }

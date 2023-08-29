@@ -17,7 +17,7 @@ object PgFileSettingsViewRepoImpl extends PgFileSettingsViewRepo {
     SelectBuilderSql("pg_catalog.pg_file_settings", PgFileSettingsViewFields, PgFileSettingsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgFileSettingsViewRow] = {
-    SQL"""select sourcefile, sourceline, seqno, "name", setting, applied, "error"
+    SQL"""select "sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error"
           from pg_catalog.pg_file_settings
        """.as(PgFileSettingsViewRow.rowParser(1).*)
   }

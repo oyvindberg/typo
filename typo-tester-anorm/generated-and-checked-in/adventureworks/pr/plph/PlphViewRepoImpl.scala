@@ -17,7 +17,7 @@ object PlphViewRepoImpl extends PlphViewRepo {
     SelectBuilderSql("pr.plph", PlphViewFields, PlphViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PlphViewRow] = {
-    SQL"""select "id", productid, startdate::text, enddate::text, listprice, modifieddate::text
+    SQL"""select "id", "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
           from pr.plph
        """.as(PlphViewRow.rowParser(1).*)
   }

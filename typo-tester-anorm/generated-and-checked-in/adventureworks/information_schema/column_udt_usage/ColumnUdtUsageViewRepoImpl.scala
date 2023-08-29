@@ -17,7 +17,7 @@ object ColumnUdtUsageViewRepoImpl extends ColumnUdtUsageViewRepo {
     SelectBuilderSql("information_schema.column_udt_usage", ColumnUdtUsageViewFields, ColumnUdtUsageViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ColumnUdtUsageViewRow] = {
-    SQL"""select udt_catalog, udt_schema, udt_name, table_catalog, table_schema, "table_name", "column_name"
+    SQL"""select "udt_catalog", "udt_schema", "udt_name", "table_catalog", "table_schema", "table_name", "column_name"
           from information_schema.column_udt_usage
        """.as(ColumnUdtUsageViewRow.rowParser(1).*)
   }

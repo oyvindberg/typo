@@ -17,8 +17,8 @@ object TransformsViewRepoImpl extends TransformsViewRepo {
     SelectBuilderSql("information_schema.transforms", TransformsViewFields, TransformsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[TransformsViewRow] = {
-    SQL"""select udt_catalog, udt_schema, udt_name, specific_catalog, specific_schema, "specific_name", group_name, transform_type
-          from information_schema."transforms"
+    SQL"""select "udt_catalog", "udt_schema", "udt_name", "specific_catalog", "specific_schema", "specific_name", "group_name", "transform_type"
+          from information_schema.transforms
        """.as(TransformsViewRow.rowParser(1).*)
   }
 }

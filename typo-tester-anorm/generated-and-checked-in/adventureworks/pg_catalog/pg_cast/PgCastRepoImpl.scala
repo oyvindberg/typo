@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgCastRepoImpl extends PgCastRepo {
   override def delete(oid: PgCastId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_cast where oid = ${ParameterValue(oid, null, PgCastId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_cast where "oid" = ${ParameterValue(oid, null, PgCastId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgCastFields, PgCastRow] = {
     DeleteBuilder("pg_catalog.pg_cast", PgCastFields)
   }
   override def insert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow = {
-    SQL"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)
+    SQL"""insert into pg_catalog.pg_cast("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")
           values (${ParameterValue(unsaved.oid, null, PgCastId.toStatement)}::oid, ${ParameterValue(unsaved.castsource, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.casttarget, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.castfunc, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.castcontext, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.castmethod, null, ToStatement.stringToStatement)}::char)
-          returning oid, castsource, casttarget, castfunc, castcontext, castmethod
+          returning "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod"
        """
       .executeInsert(PgCastRow.rowParser(1).single)
     
@@ -35,46 +35,46 @@ object PgCastRepoImpl extends PgCastRepo {
     SelectBuilderSql("pg_catalog.pg_cast", PgCastFields, PgCastRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgCastRow] = {
-    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod
+    SQL"""select "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod"
           from pg_catalog.pg_cast
        """.as(PgCastRow.rowParser(1).*)
   }
   override def selectById(oid: PgCastId)(implicit c: Connection): Option[PgCastRow] = {
-    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod
+    SQL"""select "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod"
           from pg_catalog.pg_cast
-          where oid = ${ParameterValue(oid, null, PgCastId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgCastId.toStatement)}
        """.as(PgCastRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgCastId])(implicit c: Connection): List[PgCastRow] = {
-    SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod
+    SQL"""select "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod"
           from pg_catalog.pg_cast
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgCastRow.rowParser(1).*)
     
   }
   override def selectByUnique(castsource: /* oid */ Long, casttarget: /* oid */ Long)(implicit c: Connection): Option[PgCastRow] = {
-    SQL"""select castsource, casttarget
+    SQL"""select "castsource", "casttarget"
           from pg_catalog.pg_cast
-          where castsource = ${ParameterValue(castsource, null, ToStatement.longToStatement)} AND casttarget = ${ParameterValue(casttarget, null, ToStatement.longToStatement)}
+          where "castsource" = ${ParameterValue(castsource, null, ToStatement.longToStatement)} AND "casttarget" = ${ParameterValue(casttarget, null, ToStatement.longToStatement)}
        """.as(PgCastRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgCastRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_cast
-          set castsource = ${ParameterValue(row.castsource, null, ToStatement.longToStatement)}::oid,
-              casttarget = ${ParameterValue(row.casttarget, null, ToStatement.longToStatement)}::oid,
-              castfunc = ${ParameterValue(row.castfunc, null, ToStatement.longToStatement)}::oid,
-              castcontext = ${ParameterValue(row.castcontext, null, ToStatement.stringToStatement)}::char,
-              castmethod = ${ParameterValue(row.castmethod, null, ToStatement.stringToStatement)}::char
-          where oid = ${ParameterValue(oid, null, PgCastId.toStatement)}
+          set "castsource" = ${ParameterValue(row.castsource, null, ToStatement.longToStatement)}::oid,
+              "casttarget" = ${ParameterValue(row.casttarget, null, ToStatement.longToStatement)}::oid,
+              "castfunc" = ${ParameterValue(row.castfunc, null, ToStatement.longToStatement)}::oid,
+              "castcontext" = ${ParameterValue(row.castcontext, null, ToStatement.stringToStatement)}::char,
+              "castmethod" = ${ParameterValue(row.castmethod, null, ToStatement.stringToStatement)}::char
+          where "oid" = ${ParameterValue(oid, null, PgCastId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgCastFields, PgCastRow] = {
     UpdateBuilder("pg_catalog.pg_cast", PgCastFields, PgCastRow.rowParser)
   }
   override def upsert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow = {
-    SQL"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)
+    SQL"""insert into pg_catalog.pg_cast("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")
           values (
             ${ParameterValue(unsaved.oid, null, PgCastId.toStatement)}::oid,
             ${ParameterValue(unsaved.castsource, null, ToStatement.longToStatement)}::oid,
@@ -83,14 +83,14 @@ object PgCastRepoImpl extends PgCastRepo {
             ${ParameterValue(unsaved.castcontext, null, ToStatement.stringToStatement)}::char,
             ${ParameterValue(unsaved.castmethod, null, ToStatement.stringToStatement)}::char
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            castsource = EXCLUDED.castsource,
-            casttarget = EXCLUDED.casttarget,
-            castfunc = EXCLUDED.castfunc,
-            castcontext = EXCLUDED.castcontext,
-            castmethod = EXCLUDED.castmethod
-          returning oid, castsource, casttarget, castfunc, castcontext, castmethod
+            "castsource" = EXCLUDED."castsource",
+            "casttarget" = EXCLUDED."casttarget",
+            "castfunc" = EXCLUDED."castfunc",
+            "castcontext" = EXCLUDED."castcontext",
+            "castmethod" = EXCLUDED."castmethod"
+          returning "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod"
        """
       .executeInsert(PgCastRow.rowParser(1).single)
     

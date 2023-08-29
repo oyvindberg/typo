@@ -26,42 +26,42 @@ import typo.dsl.UpdateBuilder
 
 object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"delete from sales.store where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".update.run.map(_ > 0)
+    sql"""delete from sales.store where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[StoreFields, StoreRow] = {
     DeleteBuilder("sales.store", StoreFields)
   }
   override def insert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
-    sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
+    sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
-          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
+          returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
        """.query(StoreRow.read).unique
   }
   override def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const(s"salespersonid"), fr"${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s"demographics"), fr"${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const(s""""salespersonid""""), fr"${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s""""demographics""""), fr"${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.store default values
-            returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
+            returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.store(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
+            returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
          """
     }
     q.query(StoreRow.read).unique
@@ -71,23 +71,23 @@ object StoreRepoImpl extends StoreRepo {
     SelectBuilderSql("sales.store", StoreFields, StoreRow.read)
   }
   override def selectAll: Stream[ConnectionIO, StoreRow] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store""".query(StoreRow.read).stream
+    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store""".query(StoreRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[StoreRow]] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(StoreRow.read).option
+    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(StoreRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ANY(${businessentityids})""".query(StoreRow.read).stream
+    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ANY(${businessentityids})""".query(StoreRow.read).stream
   }
   override def update(row: StoreRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update sales.store
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              salespersonid = ${fromWrite(row.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4,
-              demographics = ${fromWrite(row.demographics)(Write.fromPutOption(TypoXml.put))}::xml,
-              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
-              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
+              "salespersonid" = ${fromWrite(row.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+              "demographics" = ${fromWrite(row.demographics)(Write.fromPutOption(TypoXml.put))}::xml,
+              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -96,7 +96,7 @@ object StoreRepoImpl extends StoreRepo {
     UpdateBuilder("sales.store", StoreFields, StoreRow.read)
   }
   override def upsert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
-    sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
+    sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
@@ -105,14 +105,14 @@ object StoreRepoImpl extends StoreRepo {
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
-          on conflict (businessentityid)
+          on conflict ("businessentityid")
           do update set
             "name" = EXCLUDED."name",
-            salespersonid = EXCLUDED.salespersonid,
-            demographics = EXCLUDED.demographics,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
+            "salespersonid" = EXCLUDED."salespersonid",
+            "demographics" = EXCLUDED."demographics",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
        """.query(StoreRow.read).unique
   }
 }

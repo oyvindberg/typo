@@ -18,6 +18,6 @@ object PgBackendMemoryContextsViewRepoImpl extends PgBackendMemoryContextsViewRe
     SelectBuilderSql("pg_catalog.pg_backend_memory_contexts", PgBackendMemoryContextsViewFields, PgBackendMemoryContextsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgBackendMemoryContextsViewRow] = {
-    sql"""select "name", ident, parent, "level", total_bytes, total_nblocks, free_bytes, free_chunks, used_bytes from pg_catalog.pg_backend_memory_contexts""".query(PgBackendMemoryContextsViewRow.read).stream
+    sql"""select "name", "ident", "parent", "level", "total_bytes", "total_nblocks", "free_bytes", "free_chunks", "used_bytes" from pg_catalog.pg_backend_memory_contexts""".query(PgBackendMemoryContextsViewRow.read).stream
   }
 }

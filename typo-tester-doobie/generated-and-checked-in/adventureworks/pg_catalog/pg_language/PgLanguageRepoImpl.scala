@@ -21,47 +21,47 @@ import typo.dsl.UpdateBuilder
 
 object PgLanguageRepoImpl extends PgLanguageRepo {
   override def delete(oid: PgLanguageId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_language where oid = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_language where "oid" = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgLanguageFields, PgLanguageRow] = {
     DeleteBuilder("pg_catalog.pg_language", PgLanguageFields)
   }
   override def insert(unsaved: PgLanguageRow): ConnectionIO[PgLanguageRow] = {
-    sql"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)
+    sql"""insert into pg_catalog.pg_language("oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgLanguageId.put))}::oid, ${fromWrite(unsaved.lanname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.lanowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lanispl)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.lanpltrusted)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.lanplcallfoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.laninline)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lanvalidator)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lanacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
-          returning oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
+          returning "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl"
        """.query(PgLanguageRow.read).unique
   }
   override def select: SelectBuilder[PgLanguageFields, PgLanguageRow] = {
     SelectBuilderSql("pg_catalog.pg_language", PgLanguageFields, PgLanguageRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgLanguageRow] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language".query(PgLanguageRow.read).stream
+    sql"""select "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl" from pg_catalog.pg_language""".query(PgLanguageRow.read).stream
   }
   override def selectById(oid: PgLanguageId): ConnectionIO[Option[PgLanguageRow]] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}".query(PgLanguageRow.read).option
+    sql"""select "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl" from pg_catalog.pg_language where "oid" = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}""".query(PgLanguageRow.read).option
   }
   override def selectByIds(oids: Array[PgLanguageId]): Stream[ConnectionIO, PgLanguageRow] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ANY(${oids})".query(PgLanguageRow.read).stream
+    sql"""select "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl" from pg_catalog.pg_language where "oid" = ANY(${oids})""".query(PgLanguageRow.read).stream
   }
   override def selectByUnique(lanname: String): ConnectionIO[Option[PgLanguageRow]] = {
-    sql"""select lanname
+    sql"""select "lanname"
           from pg_catalog.pg_language
-          where lanname = ${fromWrite(lanname)(Write.fromPut(Meta.StringMeta.put))}
+          where "lanname" = ${fromWrite(lanname)(Write.fromPut(Meta.StringMeta.put))}
        """.query(PgLanguageRow.read).option
   }
   override def update(row: PgLanguageRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_language
-          set lanname = ${fromWrite(row.lanname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              lanowner = ${fromWrite(row.lanowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              lanispl = ${fromWrite(row.lanispl)(Write.fromPut(Meta.BooleanMeta.put))},
-              lanpltrusted = ${fromWrite(row.lanpltrusted)(Write.fromPut(Meta.BooleanMeta.put))},
-              lanplcallfoid = ${fromWrite(row.lanplcallfoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              laninline = ${fromWrite(row.laninline)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              lanvalidator = ${fromWrite(row.lanvalidator)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              lanacl = ${fromWrite(row.lanacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}"""
+          set "lanname" = ${fromWrite(row.lanname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "lanowner" = ${fromWrite(row.lanowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "lanispl" = ${fromWrite(row.lanispl)(Write.fromPut(Meta.BooleanMeta.put))},
+              "lanpltrusted" = ${fromWrite(row.lanpltrusted)(Write.fromPut(Meta.BooleanMeta.put))},
+              "lanplcallfoid" = ${fromWrite(row.lanplcallfoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "laninline" = ${fromWrite(row.laninline)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "lanvalidator" = ${fromWrite(row.lanvalidator)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "lanacl" = ${fromWrite(row.lanacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -70,7 +70,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
     UpdateBuilder("pg_catalog.pg_language", PgLanguageFields, PgLanguageRow.read)
   }
   override def upsert(unsaved: PgLanguageRow): ConnectionIO[PgLanguageRow] = {
-    sql"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)
+    sql"""insert into pg_catalog.pg_language("oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgLanguageId.put))}::oid,
             ${fromWrite(unsaved.lanname)(Write.fromPut(Meta.StringMeta.put))}::name,
@@ -82,17 +82,17 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
             ${fromWrite(unsaved.lanvalidator)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.lanacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            lanname = EXCLUDED.lanname,
-            lanowner = EXCLUDED.lanowner,
-            lanispl = EXCLUDED.lanispl,
-            lanpltrusted = EXCLUDED.lanpltrusted,
-            lanplcallfoid = EXCLUDED.lanplcallfoid,
-            laninline = EXCLUDED.laninline,
-            lanvalidator = EXCLUDED.lanvalidator,
-            lanacl = EXCLUDED.lanacl
-          returning oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
+            "lanname" = EXCLUDED."lanname",
+            "lanowner" = EXCLUDED."lanowner",
+            "lanispl" = EXCLUDED."lanispl",
+            "lanpltrusted" = EXCLUDED."lanpltrusted",
+            "lanplcallfoid" = EXCLUDED."lanplcallfoid",
+            "laninline" = EXCLUDED."laninline",
+            "lanvalidator" = EXCLUDED."lanvalidator",
+            "lanacl" = EXCLUDED."lanacl"
+          returning "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl"
        """.query(PgLanguageRow.read).unique
   }
 }

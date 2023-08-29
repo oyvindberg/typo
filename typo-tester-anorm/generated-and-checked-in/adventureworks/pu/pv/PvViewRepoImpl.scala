@@ -17,7 +17,7 @@ object PvViewRepoImpl extends PvViewRepo {
     SelectBuilderSql("pu.pv", PvViewFields, PvViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PvViewRow] = {
-    SQL"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
+    SQL"""select "id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
           from pu.pv
        """.as(PvViewRow.rowParser(1).*)
   }

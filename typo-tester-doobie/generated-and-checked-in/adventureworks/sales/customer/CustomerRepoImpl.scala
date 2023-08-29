@@ -25,45 +25,45 @@ import typo.dsl.UpdateBuilder
 
 object CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId): ConnectionIO[Boolean] = {
-    sql"delete from sales.customer where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}".update.run.map(_ > 0)
+    sql"""delete from sales.customer where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
     DeleteBuilder("sales.customer", CustomerFields)
   }
   override def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
-    sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
+    sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4, ${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
-          returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
+          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
        """.query(CustomerRow.read).unique
   }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
     val fs = List(
-      Some((Fragment.const(s"personid"), fr"${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s"storeid"), fr"${fromWrite(unsaved.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s"territoryid"), fr"${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4")),
+      Some((Fragment.const(s""""personid""""), fr"${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s""""storeid""""), fr"${fromWrite(unsaved.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s""""territoryid""""), fr"${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4")),
       unsaved.customerid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"customerid"), fr"${fromWrite(value: CustomerId)(Write.fromPut(CustomerId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""customerid""""), fr"${fromWrite(value: CustomerId)(Write.fromPut(CustomerId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.customer default values
-            returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
+            returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.customer(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
+            returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
          """
     }
     q.query(CustomerRow.read).unique
@@ -73,23 +73,23 @@ object CustomerRepoImpl extends CustomerRepo {
     SelectBuilderSql("sales.customer", CustomerFields, CustomerRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer".query(CustomerRow.read).stream
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer""".query(CustomerRow.read).stream
   }
   override def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}".query(CustomerRow.read).option
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}""".query(CustomerRow.read).option
   }
   override def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ANY(${customerids})".query(CustomerRow.read).stream
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${customerids})""".query(CustomerRow.read).stream
   }
   override def update(row: CustomerRow): ConnectionIO[Boolean] = {
     val customerid = row.customerid
     sql"""update sales.customer
-          set personid = ${fromWrite(row.personid)(Write.fromPutOption(BusinessentityId.put))}::int4,
-              storeid = ${fromWrite(row.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4,
-              territoryid = ${fromWrite(row.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4,
-              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
-              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}"""
+          set "personid" = ${fromWrite(row.personid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+              "storeid" = ${fromWrite(row.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+              "territoryid" = ${fromWrite(row.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4,
+              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -98,7 +98,7 @@ object CustomerRepoImpl extends CustomerRepo {
     UpdateBuilder("sales.customer", CustomerFields, CustomerRow.read)
   }
   override def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
-    sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
+    sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4,
             ${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4,
@@ -107,14 +107,14 @@ object CustomerRepoImpl extends CustomerRepo {
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
-          on conflict (customerid)
+          on conflict ("customerid")
           do update set
-            personid = EXCLUDED.personid,
-            storeid = EXCLUDED.storeid,
-            territoryid = EXCLUDED.territoryid,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
+            "personid" = EXCLUDED."personid",
+            "storeid" = EXCLUDED."storeid",
+            "territoryid" = EXCLUDED."territoryid",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
        """.query(CustomerRow.read).unique
   }
 }

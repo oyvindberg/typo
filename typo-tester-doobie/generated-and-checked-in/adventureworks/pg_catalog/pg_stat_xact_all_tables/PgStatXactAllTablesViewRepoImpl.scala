@@ -18,6 +18,6 @@ object PgStatXactAllTablesViewRepoImpl extends PgStatXactAllTablesViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_xact_all_tables", PgStatXactAllTablesViewFields, PgStatXactAllTablesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatXactAllTablesViewRow] = {
-    sql"select relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd from pg_catalog.pg_stat_xact_all_tables".query(PgStatXactAllTablesViewRow.read).stream
+    sql"""select "relid", "schemaname", "relname", "seq_scan", "seq_tup_read", "idx_scan", "idx_tup_fetch", "n_tup_ins", "n_tup_upd", "n_tup_del", "n_tup_hot_upd" from pg_catalog.pg_stat_xact_all_tables""".query(PgStatXactAllTablesViewRow.read).stream
   }
 }

@@ -21,52 +21,52 @@ import typo.dsl.UpdateBuilder
 
 object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_conversion where oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_conversion where "oid" = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgConversionFields, PgConversionRow] = {
     DeleteBuilder("pg_catalog.pg_conversion", PgConversionFields)
   }
   override def insert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
-    sql"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
+    sql"""insert into pg_catalog.pg_conversion("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgConversionId.put))}::oid, ${fromWrite(unsaved.conname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.connamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.conowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.conforencoding)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.contoencoding)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.conproc)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.condefault)(Write.fromPut(Meta.BooleanMeta.put))})
-          returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
+          returning "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault"
        """.query(PgConversionRow.read).unique
   }
   override def select: SelectBuilder[PgConversionFields, PgConversionRow] = {
     SelectBuilderSql("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgConversionRow] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion".query(PgConversionRow.read).stream
+    sql"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault" from pg_catalog.pg_conversion""".query(PgConversionRow.read).stream
   }
   override def selectById(oid: PgConversionId): ConnectionIO[Option[PgConversionRow]] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}".query(PgConversionRow.read).option
+    sql"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault" from pg_catalog.pg_conversion where "oid" = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}""".query(PgConversionRow.read).option
   }
   override def selectByIds(oids: Array[PgConversionId]): Stream[ConnectionIO, PgConversionRow] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ANY(${oids})".query(PgConversionRow.read).stream
+    sql"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault" from pg_catalog.pg_conversion where "oid" = ANY(${oids})""".query(PgConversionRow.read).stream
   }
   override def selectByUnique(conname: String, connamespace: /* oid */ Long): ConnectionIO[Option[PgConversionRow]] = {
-    sql"""select conname, connamespace
+    sql"""select "conname", "connamespace"
           from pg_catalog.pg_conversion
-          where conname = ${fromWrite(conname)(Write.fromPut(Meta.StringMeta.put))} AND connamespace = ${fromWrite(connamespace)(Write.fromPut(Meta.LongMeta.put))}
+          where "conname" = ${fromWrite(conname)(Write.fromPut(Meta.StringMeta.put))} AND "connamespace" = ${fromWrite(connamespace)(Write.fromPut(Meta.LongMeta.put))}
        """.query(PgConversionRow.read).option
   }
   override def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId): ConnectionIO[Option[PgConversionRow]] = {
-    sql"""select connamespace, conforencoding, contoencoding, oid
+    sql"""select "connamespace", "conforencoding", "contoencoding", "oid"
           from pg_catalog.pg_conversion
-          where connamespace = ${fromWrite(connamespace)(Write.fromPut(Meta.LongMeta.put))} AND conforencoding = ${fromWrite(conforencoding)(Write.fromPut(Meta.IntMeta.put))} AND contoencoding = ${fromWrite(contoencoding)(Write.fromPut(Meta.IntMeta.put))} AND oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}
+          where "connamespace" = ${fromWrite(connamespace)(Write.fromPut(Meta.LongMeta.put))} AND "conforencoding" = ${fromWrite(conforencoding)(Write.fromPut(Meta.IntMeta.put))} AND "contoencoding" = ${fromWrite(contoencoding)(Write.fromPut(Meta.IntMeta.put))} AND "oid" = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}
        """.query(PgConversionRow.read).option
   }
   override def update(row: PgConversionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_conversion
-          set conname = ${fromWrite(row.conname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              connamespace = ${fromWrite(row.connamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              conowner = ${fromWrite(row.conowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              conforencoding = ${fromWrite(row.conforencoding)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              contoencoding = ${fromWrite(row.contoencoding)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              conproc = ${fromWrite(row.conproc)(Write.fromPut(TypoRegproc.put))}::regproc,
-              condefault = ${fromWrite(row.condefault)(Write.fromPut(Meta.BooleanMeta.put))}
-          where oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}"""
+          set "conname" = ${fromWrite(row.conname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "connamespace" = ${fromWrite(row.connamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "conowner" = ${fromWrite(row.conowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "conforencoding" = ${fromWrite(row.conforencoding)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              "contoencoding" = ${fromWrite(row.contoencoding)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              "conproc" = ${fromWrite(row.conproc)(Write.fromPut(TypoRegproc.put))}::regproc,
+              "condefault" = ${fromWrite(row.condefault)(Write.fromPut(Meta.BooleanMeta.put))}
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -75,7 +75,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
     UpdateBuilder("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.read)
   }
   override def upsert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
-    sql"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
+    sql"""insert into pg_catalog.pg_conversion("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgConversionId.put))}::oid,
             ${fromWrite(unsaved.conname)(Write.fromPut(Meta.StringMeta.put))}::name,
@@ -86,16 +86,16 @@ object PgConversionRepoImpl extends PgConversionRepo {
             ${fromWrite(unsaved.conproc)(Write.fromPut(TypoRegproc.put))}::regproc,
             ${fromWrite(unsaved.condefault)(Write.fromPut(Meta.BooleanMeta.put))}
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            conname = EXCLUDED.conname,
-            connamespace = EXCLUDED.connamespace,
-            conowner = EXCLUDED.conowner,
-            conforencoding = EXCLUDED.conforencoding,
-            contoencoding = EXCLUDED.contoencoding,
-            conproc = EXCLUDED.conproc,
-            condefault = EXCLUDED.condefault
-          returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
+            "conname" = EXCLUDED."conname",
+            "connamespace" = EXCLUDED."connamespace",
+            "conowner" = EXCLUDED."conowner",
+            "conforencoding" = EXCLUDED."conforencoding",
+            "contoencoding" = EXCLUDED."contoencoding",
+            "conproc" = EXCLUDED."conproc",
+            "condefault" = EXCLUDED."condefault"
+          returning "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault"
        """.query(PgConversionRow.read).unique
   }
 }

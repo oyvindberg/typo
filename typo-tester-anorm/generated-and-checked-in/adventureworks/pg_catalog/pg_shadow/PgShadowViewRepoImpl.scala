@@ -17,7 +17,7 @@ object PgShadowViewRepoImpl extends PgShadowViewRepo {
     SelectBuilderSql("pg_catalog.pg_shadow", PgShadowViewFields, PgShadowViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgShadowViewRow] = {
-    SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig
+    SQL"""select "usename", "usesysid", "usecreatedb", "usesuper", "userepl", "usebypassrls", "passwd", "valuntil"::text, "useconfig"
           from pg_catalog.pg_shadow
        """.as(PgShadowViewRow.rowParser(1).*)
   }

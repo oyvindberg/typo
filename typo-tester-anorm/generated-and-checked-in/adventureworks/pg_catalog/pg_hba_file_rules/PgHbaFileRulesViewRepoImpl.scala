@@ -17,7 +17,7 @@ object PgHbaFileRulesViewRepoImpl extends PgHbaFileRulesViewRepo {
     SelectBuilderSql("pg_catalog.pg_hba_file_rules", PgHbaFileRulesViewFields, PgHbaFileRulesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgHbaFileRulesViewRow] = {
-    SQL"""select line_number, "type", "database", user_name, address, netmask, auth_method, "options", "error"
+    SQL"""select "line_number", "type", "database", "user_name", "address", "netmask", "auth_method", "options", "error"
           from pg_catalog.pg_hba_file_rules
        """.as(PgHbaFileRulesViewRow.rowParser(1).*)
   }

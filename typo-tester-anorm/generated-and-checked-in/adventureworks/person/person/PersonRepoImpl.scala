@@ -30,15 +30,15 @@ import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.person where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from person.person where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("person.person", PersonFields)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    SQL"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
+    SQL"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.persontype, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.namestyle, null, NameStyle.toStatement)}::bool, ${ParameterValue(unsaved.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.firstname, null, /* user-picked */ FirstName.toStatement)}::varchar, ${ParameterValue(unsaved.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))}::varchar, ${ParameterValue(unsaved.lastname, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.emailpromotion, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.additionalcontactinfo, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
+          returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
@@ -74,13 +74,13 @@ object PersonRepoImpl extends PersonRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.person default values
-            returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
+            returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
          """
         .executeInsert(PersonRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.person(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
+                  returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(PersonRow.rowParser(1).single)
@@ -91,46 +91,46 @@ object PersonRepoImpl extends PersonRepo {
     SelectBuilderSql("person.person", PersonFields, PersonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
           from person.person
        """.as(PersonRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
           from person.person
-          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
+          where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(PersonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PersonRow] = {
-    SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
           from person.person
-          where businessentityid = ANY(${businessentityids})
+          where "businessentityid" = ANY(${businessentityids})
        """.as(PersonRow.rowParser(1).*)
     
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update person.person
-          set persontype = ${ParameterValue(row.persontype, null, ToStatement.stringToStatement)}::bpchar,
-              namestyle = ${ParameterValue(row.namestyle, null, NameStyle.toStatement)}::bool,
-              title = ${ParameterValue(row.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              firstname = ${ParameterValue(row.firstname, null, /* user-picked */ FirstName.toStatement)}::varchar,
-              middlename = ${ParameterValue(row.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))}::varchar,
-              lastname = ${ParameterValue(row.lastname, null, Name.toStatement)}::varchar,
-              suffix = ${ParameterValue(row.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              emailpromotion = ${ParameterValue(row.emailpromotion, null, ToStatement.intToStatement)}::int4,
-              additionalcontactinfo = ${ParameterValue(row.additionalcontactinfo, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
-              demographics = ${ParameterValue(row.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
+          set "persontype" = ${ParameterValue(row.persontype, null, ToStatement.stringToStatement)}::bpchar,
+              "namestyle" = ${ParameterValue(row.namestyle, null, NameStyle.toStatement)}::bool,
+              "title" = ${ParameterValue(row.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "firstname" = ${ParameterValue(row.firstname, null, /* user-picked */ FirstName.toStatement)}::varchar,
+              "middlename" = ${ParameterValue(row.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))}::varchar,
+              "lastname" = ${ParameterValue(row.lastname, null, Name.toStatement)}::varchar,
+              "suffix" = ${ParameterValue(row.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "emailpromotion" = ${ParameterValue(row.emailpromotion, null, ToStatement.intToStatement)}::int4,
+              "additionalcontactinfo" = ${ParameterValue(row.additionalcontactinfo, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+              "demographics" = ${ParameterValue(row.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("person.person", PersonFields, PersonRow.rowParser)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    SQL"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
+    SQL"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.persontype, null, ToStatement.stringToStatement)}::bpchar,
@@ -146,21 +146,21 @@ object PersonRepoImpl extends PersonRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (businessentityid)
+          on conflict ("businessentityid")
           do update set
-            persontype = EXCLUDED.persontype,
-            namestyle = EXCLUDED.namestyle,
-            title = EXCLUDED.title,
-            firstname = EXCLUDED.firstname,
-            middlename = EXCLUDED.middlename,
-            lastname = EXCLUDED.lastname,
-            suffix = EXCLUDED.suffix,
-            emailpromotion = EXCLUDED.emailpromotion,
-            additionalcontactinfo = EXCLUDED.additionalcontactinfo,
-            demographics = EXCLUDED.demographics,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
+            "persontype" = EXCLUDED."persontype",
+            "namestyle" = EXCLUDED."namestyle",
+            "title" = EXCLUDED."title",
+            "firstname" = EXCLUDED."firstname",
+            "middlename" = EXCLUDED."middlename",
+            "lastname" = EXCLUDED."lastname",
+            "suffix" = EXCLUDED."suffix",
+            "emailpromotion" = EXCLUDED."emailpromotion",
+            "additionalcontactinfo" = EXCLUDED."additionalcontactinfo",
+            "demographics" = EXCLUDED."demographics",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
        """
       .executeInsert(PersonRow.rowParser(1).single)
     

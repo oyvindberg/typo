@@ -17,7 +17,7 @@ object PgUserViewRepoImpl extends PgUserViewRepo {
     SelectBuilderSql("pg_catalog.pg_user", PgUserViewFields, PgUserViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgUserViewRow] = {
-    SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig
+    SQL"""select "usename", "usesysid", "usecreatedb", "usesuper", "userepl", "usebypassrls", "passwd", "valuntil"::text, "useconfig"
           from pg_catalog.pg_user
        """.as(PgUserViewRow.rowParser(1).*)
   }

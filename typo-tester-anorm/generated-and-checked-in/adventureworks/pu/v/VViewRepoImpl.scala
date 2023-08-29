@@ -17,7 +17,7 @@ object VViewRepoImpl extends VViewRepo {
     SelectBuilderSql("pu.v", VViewFields, VViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VViewRow] = {
-    SQL"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
+    SQL"""select "id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
           from pu.v
        """.as(VViewRow.rowParser(1).*)
   }

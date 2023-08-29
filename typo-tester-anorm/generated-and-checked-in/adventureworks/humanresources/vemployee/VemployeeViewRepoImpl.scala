@@ -17,7 +17,7 @@ object VemployeeViewRepoImpl extends VemployeeViewRepo {
     SelectBuilderSql("humanresources.vemployee", VemployeeViewFields, VemployeeViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VemployeeViewRow] = {
-    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, additionalcontactinfo
+    SQL"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo"
           from humanresources.vemployee
        """.as(VemployeeViewRow.rowParser(1).*)
   }

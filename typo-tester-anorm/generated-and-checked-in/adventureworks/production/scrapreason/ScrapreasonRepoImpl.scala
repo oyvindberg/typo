@@ -24,15 +24,15 @@ import typo.dsl.UpdateBuilder
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.scrapreason where scrapreasonid = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from production.scrapreason where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
     DeleteBuilder("production.scrapreason", ScrapreasonFields)
   }
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
-    SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
+    SQL"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
           values (${ParameterValue(unsaved.scrapreasonid, null, ScrapreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning scrapreasonid, "name", modifieddate::text
+          returning "scrapreasonid", "name", "modifieddate"::text
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
     
@@ -52,13 +52,13 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.scrapreason default values
-            returning scrapreasonid, "name", modifieddate::text
+            returning "scrapreasonid", "name", "modifieddate"::text
          """
         .executeInsert(ScrapreasonRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.scrapreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning scrapreasonid, "name", modifieddate::text
+                  returning "scrapreasonid", "name", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(ScrapreasonRow.rowParser(1).single)
@@ -69,20 +69,20 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, "name", modifieddate::text
+    SQL"""select "scrapreasonid", "name", "modifieddate"::text
           from production.scrapreason
        """.as(ScrapreasonRow.rowParser(1).*)
   }
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, "name", modifieddate::text
+    SQL"""select "scrapreasonid", "name", "modifieddate"::text
           from production.scrapreason
-          where scrapreasonid = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
+          where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
        """.as(ScrapreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, "name", modifieddate::text
+    SQL"""select "scrapreasonid", "name", "modifieddate"::text
           from production.scrapreason
-          where scrapreasonid = ANY(${scrapreasonids})
+          where "scrapreasonid" = ANY(${scrapreasonids})
        """.as(ScrapreasonRow.rowParser(1).*)
     
   }
@@ -90,25 +90,25 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     val scrapreasonid = row.scrapreasonid
     SQL"""update production.scrapreason
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where scrapreasonid = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
     UpdateBuilder("production.scrapreason", ScrapreasonFields, ScrapreasonRow.rowParser)
   }
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
-    SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
+    SQL"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
           values (
             ${ParameterValue(unsaved.scrapreasonid, null, ScrapreasonId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (scrapreasonid)
+          on conflict ("scrapreasonid")
           do update set
             "name" = EXCLUDED."name",
-            modifieddate = EXCLUDED.modifieddate
-          returning scrapreasonid, "name", modifieddate::text
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "scrapreasonid", "name", "modifieddate"::text
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
     

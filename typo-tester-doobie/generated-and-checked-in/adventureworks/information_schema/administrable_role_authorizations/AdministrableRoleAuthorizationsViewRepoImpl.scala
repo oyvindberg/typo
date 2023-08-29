@@ -18,6 +18,6 @@ object AdministrableRoleAuthorizationsViewRepoImpl extends AdministrableRoleAuth
     SelectBuilderSql("information_schema.administrable_role_authorizations", AdministrableRoleAuthorizationsViewFields, AdministrableRoleAuthorizationsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AdministrableRoleAuthorizationsViewRow] = {
-    sql"select grantee, role_name, is_grantable from information_schema.administrable_role_authorizations".query(AdministrableRoleAuthorizationsViewRow.read).stream
+    sql"""select "grantee", "role_name", "is_grantable" from information_schema.administrable_role_authorizations""".query(AdministrableRoleAuthorizationsViewRow.read).stream
   }
 }

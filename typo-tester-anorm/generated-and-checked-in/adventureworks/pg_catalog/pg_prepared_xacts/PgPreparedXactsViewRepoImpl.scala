@@ -17,7 +17,7 @@ object PgPreparedXactsViewRepoImpl extends PgPreparedXactsViewRepo {
     SelectBuilderSql("pg_catalog.pg_prepared_xacts", PgPreparedXactsViewFields, PgPreparedXactsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPreparedXactsViewRow] = {
-    SQL"""select "transaction", gid, "prepared"::text, "owner", "database"
+    SQL"""select "transaction", "gid", "prepared"::text, "owner", "database"
           from pg_catalog.pg_prepared_xacts
        """.as(PgPreparedXactsViewRow.rowParser(1).*)
   }

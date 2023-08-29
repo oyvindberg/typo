@@ -24,15 +24,15 @@ import typo.dsl.UpdateBuilder
 
 object AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
-    sql"delete from person.addresstype where addresstypeid = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}".update.run.map(_ > 0)
+    sql"""delete from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
     DeleteBuilder("person.addresstype", AddresstypeFields)
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
-    sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
+    sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
-          returning addresstypeid, "name", rowguid, modifieddate::text
+          returning "addresstypeid", "name", "rowguid", "modifieddate"::text
        """.query(AddresstypeRow.read).unique
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
@@ -40,27 +40,27 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       unsaved.addresstypeid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"addresstypeid"), fr"${fromWrite(value: AddresstypeId)(Write.fromPut(AddresstypeId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""addresstypeid""""), fr"${fromWrite(value: AddresstypeId)(Write.fromPut(AddresstypeId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.addresstype default values
-            returning addresstypeid, "name", rowguid, modifieddate::text
+            returning "addresstypeid", "name", "rowguid", "modifieddate"::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.addresstype(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning addresstypeid, "name", rowguid, modifieddate::text
+            returning "addresstypeid", "name", "rowguid", "modifieddate"::text
          """
     }
     q.query(AddresstypeRow.read).unique
@@ -70,21 +70,21 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype""".query(AddresstypeRow.read).stream
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype""".query(AddresstypeRow.read).stream
   }
   override def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(AddresstypeRow.read).option
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(AddresstypeRow.read).option
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ANY(${addresstypeids})""".query(AddresstypeRow.read).stream
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".query(AddresstypeRow.read).stream
   }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid
     sql"""update person.addresstype
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
-              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where addresstypeid = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}"""
+              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -93,19 +93,19 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     UpdateBuilder("person.addresstype", AddresstypeFields, AddresstypeRow.read)
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
-    sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
+    sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
-          on conflict (addresstypeid)
+          on conflict ("addresstypeid")
           do update set
             "name" = EXCLUDED."name",
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning addresstypeid, "name", rowguid, modifieddate::text
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "addresstypeid", "name", "rowguid", "modifieddate"::text
        """.query(AddresstypeRow.read).unique
   }
 }

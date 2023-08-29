@@ -17,7 +17,7 @@ object StViewRepoImpl extends StViewRepo {
     SelectBuilderSql("sa.st", StViewFields, StViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[StViewRow] = {
-    SQL"""select "id", territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
+    SQL"""select "id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
           from sa.st
        """.as(StViewRow.rowParser(1).*)
   }

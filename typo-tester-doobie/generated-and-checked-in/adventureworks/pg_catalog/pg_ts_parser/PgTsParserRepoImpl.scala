@@ -21,46 +21,46 @@ import typo.dsl.UpdateBuilder
 
 object PgTsParserRepoImpl extends PgTsParserRepo {
   override def delete(oid: PgTsParserId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_parser where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_ts_parser where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTsParserFields, PgTsParserRow] = {
     DeleteBuilder("pg_catalog.pg_ts_parser", PgTsParserFields)
   }
   override def insert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
-    sql"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
+    sql"""insert into pg_catalog.pg_ts_parser("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsParserId.put))}::oid, ${fromWrite(unsaved.prsname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.prsnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prsstart)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prstoken)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prsend)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc)
-          returning oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
+          returning "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype"
        """.query(PgTsParserRow.read).unique
   }
   override def select: SelectBuilder[PgTsParserFields, PgTsParserRow] = {
     SelectBuilderSql("pg_catalog.pg_ts_parser", PgTsParserFields, PgTsParserRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTsParserRow] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser".query(PgTsParserRow.read).stream
+    sql"""select "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype" from pg_catalog.pg_ts_parser""".query(PgTsParserRow.read).stream
   }
   override def selectById(oid: PgTsParserId): ConnectionIO[Option[PgTsParserRow]] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}".query(PgTsParserRow.read).option
+    sql"""select "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype" from pg_catalog.pg_ts_parser where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}""".query(PgTsParserRow.read).option
   }
   override def selectByIds(oids: Array[PgTsParserId]): Stream[ConnectionIO, PgTsParserRow] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY(${oids})".query(PgTsParserRow.read).stream
+    sql"""select "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype" from pg_catalog.pg_ts_parser where "oid" = ANY(${oids})""".query(PgTsParserRow.read).stream
   }
   override def selectByUnique(prsname: String, prsnamespace: /* oid */ Long): ConnectionIO[Option[PgTsParserRow]] = {
-    sql"""select prsname, prsnamespace
+    sql"""select "prsname", "prsnamespace"
           from pg_catalog.pg_ts_parser
-          where prsname = ${fromWrite(prsname)(Write.fromPut(Meta.StringMeta.put))} AND prsnamespace = ${fromWrite(prsnamespace)(Write.fromPut(Meta.LongMeta.put))}
+          where "prsname" = ${fromWrite(prsname)(Write.fromPut(Meta.StringMeta.put))} AND "prsnamespace" = ${fromWrite(prsnamespace)(Write.fromPut(Meta.LongMeta.put))}
        """.query(PgTsParserRow.read).option
   }
   override def update(row: PgTsParserRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_parser
-          set prsname = ${fromWrite(row.prsname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              prsnamespace = ${fromWrite(row.prsnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              prsstart = ${fromWrite(row.prsstart)(Write.fromPut(TypoRegproc.put))}::regproc,
-              prstoken = ${fromWrite(row.prstoken)(Write.fromPut(TypoRegproc.put))}::regproc,
-              prsend = ${fromWrite(row.prsend)(Write.fromPut(TypoRegproc.put))}::regproc,
-              prsheadline = ${fromWrite(row.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc,
-              prslextype = ${fromWrite(row.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}"""
+          set "prsname" = ${fromWrite(row.prsname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "prsnamespace" = ${fromWrite(row.prsnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "prsstart" = ${fromWrite(row.prsstart)(Write.fromPut(TypoRegproc.put))}::regproc,
+              "prstoken" = ${fromWrite(row.prstoken)(Write.fromPut(TypoRegproc.put))}::regproc,
+              "prsend" = ${fromWrite(row.prsend)(Write.fromPut(TypoRegproc.put))}::regproc,
+              "prsheadline" = ${fromWrite(row.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc,
+              "prslextype" = ${fromWrite(row.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -69,7 +69,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     UpdateBuilder("pg_catalog.pg_ts_parser", PgTsParserFields, PgTsParserRow.read)
   }
   override def upsert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
-    sql"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
+    sql"""insert into pg_catalog.pg_ts_parser("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgTsParserId.put))}::oid,
             ${fromWrite(unsaved.prsname)(Write.fromPut(Meta.StringMeta.put))}::name,
@@ -80,16 +80,16 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
             ${fromWrite(unsaved.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc,
             ${fromWrite(unsaved.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            prsname = EXCLUDED.prsname,
-            prsnamespace = EXCLUDED.prsnamespace,
-            prsstart = EXCLUDED.prsstart,
-            prstoken = EXCLUDED.prstoken,
-            prsend = EXCLUDED.prsend,
-            prsheadline = EXCLUDED.prsheadline,
-            prslextype = EXCLUDED.prslextype
-          returning oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
+            "prsname" = EXCLUDED."prsname",
+            "prsnamespace" = EXCLUDED."prsnamespace",
+            "prsstart" = EXCLUDED."prsstart",
+            "prstoken" = EXCLUDED."prstoken",
+            "prsend" = EXCLUDED."prsend",
+            "prsheadline" = EXCLUDED."prsheadline",
+            "prslextype" = EXCLUDED."prslextype"
+          returning "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype"
        """.query(PgTsParserRow.read).unique
   }
 }

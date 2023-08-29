@@ -17,7 +17,7 @@ object PgMatviewsViewRepoImpl extends PgMatviewsViewRepo {
     SelectBuilderSql("pg_catalog.pg_matviews", PgMatviewsViewFields, PgMatviewsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgMatviewsViewRow] = {
-    SQL"""select schemaname, matviewname, matviewowner, "tablespace", hasindexes, ispopulated, definition
+    SQL"""select "schemaname", "matviewname", "matviewowner", "tablespace", "hasindexes", "ispopulated", "definition"
           from pg_catalog.pg_matviews
        """.as(PgMatviewsViewRow.rowParser(1).*)
   }

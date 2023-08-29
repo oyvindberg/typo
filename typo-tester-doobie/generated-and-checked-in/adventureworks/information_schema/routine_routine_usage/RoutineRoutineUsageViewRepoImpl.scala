@@ -18,6 +18,6 @@ object RoutineRoutineUsageViewRepoImpl extends RoutineRoutineUsageViewRepo {
     SelectBuilderSql("information_schema.routine_routine_usage", RoutineRoutineUsageViewFields, RoutineRoutineUsageViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, RoutineRoutineUsageViewRow] = {
-    sql"""select specific_catalog, specific_schema, "specific_name", "routine_catalog", "routine_schema", "routine_name" from information_schema.routine_routine_usage""".query(RoutineRoutineUsageViewRow.read).stream
+    sql"""select "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name" from information_schema.routine_routine_usage""".query(RoutineRoutineUsageViewRow.read).stream
   }
 }

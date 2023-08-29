@@ -17,7 +17,7 @@ object PgConfigViewRepoImpl extends PgConfigViewRepo {
     SelectBuilderSql("pg_catalog.pg_config", PgConfigViewFields, PgConfigViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgConfigViewRow] = {
-    SQL"""select "name", setting
+    SQL"""select "name", "setting"
           from pg_catalog.pg_config
        """.as(PgConfigViewRow.rowParser(1).*)
   }

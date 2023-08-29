@@ -17,7 +17,7 @@ object ForeignTableOptionsViewRepoImpl extends ForeignTableOptionsViewRepo {
     SelectBuilderSql("information_schema.foreign_table_options", ForeignTableOptionsViewFields, ForeignTableOptionsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ForeignTableOptionsViewRow] = {
-    SQL"""select foreign_table_catalog, foreign_table_schema, foreign_table_name, option_name, option_value
+    SQL"""select "foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "option_name", "option_value"
           from information_schema.foreign_table_options
        """.as(ForeignTableOptionsViewRow.rowParser(1).*)
   }

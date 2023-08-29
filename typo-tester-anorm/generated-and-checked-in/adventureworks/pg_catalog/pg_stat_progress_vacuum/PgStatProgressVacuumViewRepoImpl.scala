@@ -17,7 +17,7 @@ object PgStatProgressVacuumViewRepoImpl extends PgStatProgressVacuumViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_progress_vacuum", PgStatProgressVacuumViewFields, PgStatProgressVacuumViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatProgressVacuumViewRow] = {
-    SQL"""select pid, datid, datname, relid, phase, heap_blks_total, heap_blks_scanned, heap_blks_vacuumed, index_vacuum_count, max_dead_tuples, num_dead_tuples
+    SQL"""select "pid", "datid", "datname", "relid", "phase", "heap_blks_total", "heap_blks_scanned", "heap_blks_vacuumed", "index_vacuum_count", "max_dead_tuples", "num_dead_tuples"
           from pg_catalog.pg_stat_progress_vacuum
        """.as(PgStatProgressVacuumViewRow.rowParser(1).*)
   }

@@ -21,9 +21,9 @@ object PgShdependRepoImpl extends PgShdependRepo {
     DeleteBuilder("pg_catalog.pg_shdepend", PgShdependFields)
   }
   override def insert(unsaved: PgShdependRow)(implicit c: Connection): PgShdependRow = {
-    SQL"""insert into pg_catalog.pg_shdepend(dbid, classid, objid, objsubid, refclassid, refobjid, deptype)
+    SQL"""insert into pg_catalog.pg_shdepend("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")
           values (${ParameterValue(unsaved.dbid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.classid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.objid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.objsubid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.refclassid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.refobjid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.deptype, null, ToStatement.stringToStatement)}::char)
-          returning dbid, classid, objid, objsubid, refclassid, refobjid, deptype
+          returning "dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype"
        """
       .executeInsert(PgShdependRow.rowParser(1).single)
     
@@ -32,7 +32,7 @@ object PgShdependRepoImpl extends PgShdependRepo {
     SelectBuilderSql("pg_catalog.pg_shdepend", PgShdependFields, PgShdependRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgShdependRow] = {
-    SQL"""select dbid, classid, objid, objsubid, refclassid, refobjid, deptype
+    SQL"""select "dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype"
           from pg_catalog.pg_shdepend
        """.as(PgShdependRow.rowParser(1).*)
   }

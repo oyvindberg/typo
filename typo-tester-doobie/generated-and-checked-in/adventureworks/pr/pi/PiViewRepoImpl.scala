@@ -18,6 +18,6 @@ object PiViewRepoImpl extends PiViewRepo {
     SelectBuilderSql("pr.pi", PiViewFields, PiViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PiViewRow] = {
-    sql"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text from pr.pi""".query(PiViewRow.read).stream
+    sql"""select "id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from pr.pi""".query(PiViewRow.read).stream
   }
 }

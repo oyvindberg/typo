@@ -17,7 +17,7 @@ object SohsrViewRepoImpl extends SohsrViewRepo {
     SelectBuilderSql("sa.sohsr", SohsrViewFields, SohsrViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SohsrViewRow] = {
-    SQL"""select salesorderid, salesreasonid, modifieddate::text
+    SQL"""select "salesorderid", "salesreasonid", "modifieddate"::text
           from sa.sohsr
        """.as(SohsrViewRow.rowParser(1).*)
   }

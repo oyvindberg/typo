@@ -20,15 +20,15 @@ import typo.dsl.UpdateBuilder
 
 object PgAggregateRepoImpl extends PgAggregateRepo {
   override def delete(aggfnoid: PgAggregateId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_aggregate where aggfnoid = ${ParameterValue(aggfnoid, null, PgAggregateId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_aggregate where "aggfnoid" = ${ParameterValue(aggfnoid, null, PgAggregateId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAggregateFields, PgAggregateRow] = {
     DeleteBuilder("pg_catalog.pg_aggregate", PgAggregateFields)
   }
   override def insert(unsaved: PgAggregateRow)(implicit c: Connection): PgAggregateRow = {
-    SQL"""insert into pg_catalog.pg_aggregate(aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval)
+    SQL"""insert into pg_catalog.pg_aggregate("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")
           values (${ParameterValue(unsaved.aggfnoid, null, PgAggregateId.toStatement)}::regproc, ${ParameterValue(unsaved.aggkind, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggnumdirectargs, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.aggtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggfinalfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggcombinefn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggserialfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggdeserialfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggmtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggminvtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggmfinalfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggfinalextra, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.aggmfinalextra, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.aggfinalmodify, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggmfinalmodify, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggsortop, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggtranstype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggtransspace, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.aggmtranstype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggmtransspace, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.agginitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.aggminitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
-          returning aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
+          returning "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval"
        """
       .executeInsert(PgAggregateRow.rowParser(1).single)
     
@@ -37,55 +37,55 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
     SelectBuilderSql("pg_catalog.pg_aggregate", PgAggregateFields, PgAggregateRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAggregateRow] = {
-    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
+    SQL"""select "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval"
           from pg_catalog.pg_aggregate
        """.as(PgAggregateRow.rowParser(1).*)
   }
   override def selectById(aggfnoid: PgAggregateId)(implicit c: Connection): Option[PgAggregateRow] = {
-    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
+    SQL"""select "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval"
           from pg_catalog.pg_aggregate
-          where aggfnoid = ${ParameterValue(aggfnoid, null, PgAggregateId.toStatement)}
+          where "aggfnoid" = ${ParameterValue(aggfnoid, null, PgAggregateId.toStatement)}
        """.as(PgAggregateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(aggfnoids: Array[PgAggregateId])(implicit c: Connection): List[PgAggregateRow] = {
-    SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
+    SQL"""select "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval"
           from pg_catalog.pg_aggregate
-          where aggfnoid = ANY(${aggfnoids})
+          where "aggfnoid" = ANY(${aggfnoids})
        """.as(PgAggregateRow.rowParser(1).*)
     
   }
   override def update(row: PgAggregateRow)(implicit c: Connection): Boolean = {
     val aggfnoid = row.aggfnoid
     SQL"""update pg_catalog.pg_aggregate
-          set aggkind = ${ParameterValue(row.aggkind, null, ToStatement.stringToStatement)}::char,
-              aggnumdirectargs = ${ParameterValue(row.aggnumdirectargs, null, ToStatement.intToStatement)}::int2,
-              aggtransfn = ${ParameterValue(row.aggtransfn, null, TypoRegproc.toStatement)}::regproc,
-              aggfinalfn = ${ParameterValue(row.aggfinalfn, null, TypoRegproc.toStatement)}::regproc,
-              aggcombinefn = ${ParameterValue(row.aggcombinefn, null, TypoRegproc.toStatement)}::regproc,
-              aggserialfn = ${ParameterValue(row.aggserialfn, null, TypoRegproc.toStatement)}::regproc,
-              aggdeserialfn = ${ParameterValue(row.aggdeserialfn, null, TypoRegproc.toStatement)}::regproc,
-              aggmtransfn = ${ParameterValue(row.aggmtransfn, null, TypoRegproc.toStatement)}::regproc,
-              aggminvtransfn = ${ParameterValue(row.aggminvtransfn, null, TypoRegproc.toStatement)}::regproc,
-              aggmfinalfn = ${ParameterValue(row.aggmfinalfn, null, TypoRegproc.toStatement)}::regproc,
-              aggfinalextra = ${ParameterValue(row.aggfinalextra, null, ToStatement.booleanToStatement)},
-              aggmfinalextra = ${ParameterValue(row.aggmfinalextra, null, ToStatement.booleanToStatement)},
-              aggfinalmodify = ${ParameterValue(row.aggfinalmodify, null, ToStatement.stringToStatement)}::char,
-              aggmfinalmodify = ${ParameterValue(row.aggmfinalmodify, null, ToStatement.stringToStatement)}::char,
-              aggsortop = ${ParameterValue(row.aggsortop, null, ToStatement.longToStatement)}::oid,
-              aggtranstype = ${ParameterValue(row.aggtranstype, null, ToStatement.longToStatement)}::oid,
-              aggtransspace = ${ParameterValue(row.aggtransspace, null, ToStatement.intToStatement)}::int4,
-              aggmtranstype = ${ParameterValue(row.aggmtranstype, null, ToStatement.longToStatement)}::oid,
-              aggmtransspace = ${ParameterValue(row.aggmtransspace, null, ToStatement.intToStatement)}::int4,
-              agginitval = ${ParameterValue(row.agginitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              aggminitval = ${ParameterValue(row.aggminitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
-          where aggfnoid = ${ParameterValue(aggfnoid, null, PgAggregateId.toStatement)}
+          set "aggkind" = ${ParameterValue(row.aggkind, null, ToStatement.stringToStatement)}::char,
+              "aggnumdirectargs" = ${ParameterValue(row.aggnumdirectargs, null, ToStatement.intToStatement)}::int2,
+              "aggtransfn" = ${ParameterValue(row.aggtransfn, null, TypoRegproc.toStatement)}::regproc,
+              "aggfinalfn" = ${ParameterValue(row.aggfinalfn, null, TypoRegproc.toStatement)}::regproc,
+              "aggcombinefn" = ${ParameterValue(row.aggcombinefn, null, TypoRegproc.toStatement)}::regproc,
+              "aggserialfn" = ${ParameterValue(row.aggserialfn, null, TypoRegproc.toStatement)}::regproc,
+              "aggdeserialfn" = ${ParameterValue(row.aggdeserialfn, null, TypoRegproc.toStatement)}::regproc,
+              "aggmtransfn" = ${ParameterValue(row.aggmtransfn, null, TypoRegproc.toStatement)}::regproc,
+              "aggminvtransfn" = ${ParameterValue(row.aggminvtransfn, null, TypoRegproc.toStatement)}::regproc,
+              "aggmfinalfn" = ${ParameterValue(row.aggmfinalfn, null, TypoRegproc.toStatement)}::regproc,
+              "aggfinalextra" = ${ParameterValue(row.aggfinalextra, null, ToStatement.booleanToStatement)},
+              "aggmfinalextra" = ${ParameterValue(row.aggmfinalextra, null, ToStatement.booleanToStatement)},
+              "aggfinalmodify" = ${ParameterValue(row.aggfinalmodify, null, ToStatement.stringToStatement)}::char,
+              "aggmfinalmodify" = ${ParameterValue(row.aggmfinalmodify, null, ToStatement.stringToStatement)}::char,
+              "aggsortop" = ${ParameterValue(row.aggsortop, null, ToStatement.longToStatement)}::oid,
+              "aggtranstype" = ${ParameterValue(row.aggtranstype, null, ToStatement.longToStatement)}::oid,
+              "aggtransspace" = ${ParameterValue(row.aggtransspace, null, ToStatement.intToStatement)}::int4,
+              "aggmtranstype" = ${ParameterValue(row.aggmtranstype, null, ToStatement.longToStatement)}::oid,
+              "aggmtransspace" = ${ParameterValue(row.aggmtransspace, null, ToStatement.intToStatement)}::int4,
+              "agginitval" = ${ParameterValue(row.agginitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
+              "aggminitval" = ${ParameterValue(row.aggminitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+          where "aggfnoid" = ${ParameterValue(aggfnoid, null, PgAggregateId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAggregateFields, PgAggregateRow] = {
     UpdateBuilder("pg_catalog.pg_aggregate", PgAggregateFields, PgAggregateRow.rowParser)
   }
   override def upsert(unsaved: PgAggregateRow)(implicit c: Connection): PgAggregateRow = {
-    SQL"""insert into pg_catalog.pg_aggregate(aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval)
+    SQL"""insert into pg_catalog.pg_aggregate("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")
           values (
             ${ParameterValue(unsaved.aggfnoid, null, PgAggregateId.toStatement)}::regproc,
             ${ParameterValue(unsaved.aggkind, null, ToStatement.stringToStatement)}::char,
@@ -110,30 +110,30 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
             ${ParameterValue(unsaved.agginitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
             ${ParameterValue(unsaved.aggminitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           )
-          on conflict (aggfnoid)
+          on conflict ("aggfnoid")
           do update set
-            aggkind = EXCLUDED.aggkind,
-            aggnumdirectargs = EXCLUDED.aggnumdirectargs,
-            aggtransfn = EXCLUDED.aggtransfn,
-            aggfinalfn = EXCLUDED.aggfinalfn,
-            aggcombinefn = EXCLUDED.aggcombinefn,
-            aggserialfn = EXCLUDED.aggserialfn,
-            aggdeserialfn = EXCLUDED.aggdeserialfn,
-            aggmtransfn = EXCLUDED.aggmtransfn,
-            aggminvtransfn = EXCLUDED.aggminvtransfn,
-            aggmfinalfn = EXCLUDED.aggmfinalfn,
-            aggfinalextra = EXCLUDED.aggfinalextra,
-            aggmfinalextra = EXCLUDED.aggmfinalextra,
-            aggfinalmodify = EXCLUDED.aggfinalmodify,
-            aggmfinalmodify = EXCLUDED.aggmfinalmodify,
-            aggsortop = EXCLUDED.aggsortop,
-            aggtranstype = EXCLUDED.aggtranstype,
-            aggtransspace = EXCLUDED.aggtransspace,
-            aggmtranstype = EXCLUDED.aggmtranstype,
-            aggmtransspace = EXCLUDED.aggmtransspace,
-            agginitval = EXCLUDED.agginitval,
-            aggminitval = EXCLUDED.aggminitval
-          returning aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
+            "aggkind" = EXCLUDED."aggkind",
+            "aggnumdirectargs" = EXCLUDED."aggnumdirectargs",
+            "aggtransfn" = EXCLUDED."aggtransfn",
+            "aggfinalfn" = EXCLUDED."aggfinalfn",
+            "aggcombinefn" = EXCLUDED."aggcombinefn",
+            "aggserialfn" = EXCLUDED."aggserialfn",
+            "aggdeserialfn" = EXCLUDED."aggdeserialfn",
+            "aggmtransfn" = EXCLUDED."aggmtransfn",
+            "aggminvtransfn" = EXCLUDED."aggminvtransfn",
+            "aggmfinalfn" = EXCLUDED."aggmfinalfn",
+            "aggfinalextra" = EXCLUDED."aggfinalextra",
+            "aggmfinalextra" = EXCLUDED."aggmfinalextra",
+            "aggfinalmodify" = EXCLUDED."aggfinalmodify",
+            "aggmfinalmodify" = EXCLUDED."aggmfinalmodify",
+            "aggsortop" = EXCLUDED."aggsortop",
+            "aggtranstype" = EXCLUDED."aggtranstype",
+            "aggtransspace" = EXCLUDED."aggtransspace",
+            "aggmtranstype" = EXCLUDED."aggmtranstype",
+            "aggmtransspace" = EXCLUDED."aggmtransspace",
+            "agginitval" = EXCLUDED."agginitval",
+            "aggminitval" = EXCLUDED."aggminitval"
+          returning "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval"
        """
       .executeInsert(PgAggregateRow.rowParser(1).single)
     

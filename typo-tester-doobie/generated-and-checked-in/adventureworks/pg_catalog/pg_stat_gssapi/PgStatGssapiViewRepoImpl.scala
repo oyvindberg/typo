@@ -18,6 +18,6 @@ object PgStatGssapiViewRepoImpl extends PgStatGssapiViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_gssapi", PgStatGssapiViewFields, PgStatGssapiViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatGssapiViewRow] = {
-    sql"""select pid, gss_authenticated, principal, "encrypted" from pg_catalog.pg_stat_gssapi""".query(PgStatGssapiViewRow.read).stream
+    sql"""select "pid", "gss_authenticated", "principal", "encrypted" from pg_catalog.pg_stat_gssapi""".query(PgStatGssapiViewRow.read).stream
   }
 }

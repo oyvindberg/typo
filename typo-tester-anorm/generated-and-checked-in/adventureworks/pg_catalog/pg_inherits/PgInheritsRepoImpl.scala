@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgInheritsRepoImpl extends PgInheritsRepo {
   override def delete(compositeId: PgInheritsId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_inherits where inhrelid = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND inhseqno = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_inherits where "inhrelid" = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND "inhseqno" = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgInheritsFields, PgInheritsRow] = {
     DeleteBuilder("pg_catalog.pg_inherits", PgInheritsFields)
   }
   override def insert(unsaved: PgInheritsRow)(implicit c: Connection): PgInheritsRow = {
-    SQL"""insert into pg_catalog.pg_inherits(inhrelid, inhparent, inhseqno, inhdetachpending)
+    SQL"""insert into pg_catalog.pg_inherits("inhrelid", "inhparent", "inhseqno", "inhdetachpending")
           values (${ParameterValue(unsaved.inhrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.inhparent, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.inhseqno, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.inhdetachpending, null, ToStatement.booleanToStatement)})
-          returning inhrelid, inhparent, inhseqno, inhdetachpending
+          returning "inhrelid", "inhparent", "inhseqno", "inhdetachpending"
        """
       .executeInsert(PgInheritsRow.rowParser(1).single)
     
@@ -35,40 +35,40 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
     SelectBuilderSql("pg_catalog.pg_inherits", PgInheritsFields, PgInheritsRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgInheritsRow] = {
-    SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending
+    SQL"""select "inhrelid", "inhparent", "inhseqno", "inhdetachpending"
           from pg_catalog.pg_inherits
        """.as(PgInheritsRow.rowParser(1).*)
   }
   override def selectById(compositeId: PgInheritsId)(implicit c: Connection): Option[PgInheritsRow] = {
-    SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending
+    SQL"""select "inhrelid", "inhparent", "inhseqno", "inhdetachpending"
           from pg_catalog.pg_inherits
-          where inhrelid = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND inhseqno = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}
+          where "inhrelid" = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND "inhseqno" = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}
        """.as(PgInheritsRow.rowParser(1).singleOpt)
   }
   override def update(row: PgInheritsRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_inherits
-          set inhparent = ${ParameterValue(row.inhparent, null, ToStatement.longToStatement)}::oid,
-              inhdetachpending = ${ParameterValue(row.inhdetachpending, null, ToStatement.booleanToStatement)}
-          where inhrelid = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND inhseqno = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}
+          set "inhparent" = ${ParameterValue(row.inhparent, null, ToStatement.longToStatement)}::oid,
+              "inhdetachpending" = ${ParameterValue(row.inhdetachpending, null, ToStatement.booleanToStatement)}
+          where "inhrelid" = ${ParameterValue(compositeId.inhrelid, null, ToStatement.longToStatement)} AND "inhseqno" = ${ParameterValue(compositeId.inhseqno, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgInheritsFields, PgInheritsRow] = {
     UpdateBuilder("pg_catalog.pg_inherits", PgInheritsFields, PgInheritsRow.rowParser)
   }
   override def upsert(unsaved: PgInheritsRow)(implicit c: Connection): PgInheritsRow = {
-    SQL"""insert into pg_catalog.pg_inherits(inhrelid, inhparent, inhseqno, inhdetachpending)
+    SQL"""insert into pg_catalog.pg_inherits("inhrelid", "inhparent", "inhseqno", "inhdetachpending")
           values (
             ${ParameterValue(unsaved.inhrelid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.inhparent, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.inhseqno, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.inhdetachpending, null, ToStatement.booleanToStatement)}
           )
-          on conflict (inhrelid, inhseqno)
+          on conflict ("inhrelid", "inhseqno")
           do update set
-            inhparent = EXCLUDED.inhparent,
-            inhdetachpending = EXCLUDED.inhdetachpending
-          returning inhrelid, inhparent, inhseqno, inhdetachpending
+            "inhparent" = EXCLUDED."inhparent",
+            "inhdetachpending" = EXCLUDED."inhdetachpending"
+          returning "inhrelid", "inhparent", "inhseqno", "inhdetachpending"
        """
       .executeInsert(PgInheritsRow.rowParser(1).single)
     

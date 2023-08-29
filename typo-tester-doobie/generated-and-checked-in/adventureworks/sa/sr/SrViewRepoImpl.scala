@@ -18,6 +18,6 @@ object SrViewRepoImpl extends SrViewRepo {
     SelectBuilderSql("sa.sr", SrViewFields, SrViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SrViewRow] = {
-    sql"""select "id", salesreasonid, "name", reasontype, modifieddate::text from sa.sr""".query(SrViewRow.read).stream
+    sql"""select "id", "salesreasonid", "name", "reasontype", "modifieddate"::text from sa.sr""".query(SrViewRow.read).stream
   }
 }

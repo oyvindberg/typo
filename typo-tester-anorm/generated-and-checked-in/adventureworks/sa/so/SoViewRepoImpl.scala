@@ -17,7 +17,7 @@ object SoViewRepoImpl extends SoViewRepo {
     SelectBuilderSql("sa.so", SoViewFields, SoViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SoViewRow] = {
-    SQL"""select "id", specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
+    SQL"""select "id", "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
           from sa.so
        """.as(SoViewRow.rowParser(1).*)
   }

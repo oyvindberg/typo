@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def delete(oid: PgOpfamilyId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_opfamily where oid = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_opfamily where "oid" = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
     DeleteBuilder("pg_catalog.pg_opfamily", PgOpfamilyFields)
   }
   override def insert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow = {
-    SQL"""insert into pg_catalog.pg_opfamily(oid, opfmethod, opfname, opfnamespace, opfowner)
+    SQL"""insert into pg_catalog.pg_opfamily("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")
           values (${ParameterValue(unsaved.oid, null, PgOpfamilyId.toStatement)}::oid, ${ParameterValue(unsaved.opfmethod, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opfname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.opfnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.opfowner, null, ToStatement.longToStatement)}::oid)
-          returning oid, opfmethod, opfname, opfnamespace, opfowner
+          returning "oid", "opfmethod", "opfname", "opfnamespace", "opfowner"
        """
       .executeInsert(PgOpfamilyRow.rowParser(1).single)
     
@@ -35,45 +35,45 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
     SelectBuilderSql("pg_catalog.pg_opfamily", PgOpfamilyFields, PgOpfamilyRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgOpfamilyRow] = {
-    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner
+    SQL"""select "oid", "opfmethod", "opfname", "opfnamespace", "opfowner"
           from pg_catalog.pg_opfamily
        """.as(PgOpfamilyRow.rowParser(1).*)
   }
   override def selectById(oid: PgOpfamilyId)(implicit c: Connection): Option[PgOpfamilyRow] = {
-    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner
+    SQL"""select "oid", "opfmethod", "opfname", "opfnamespace", "opfowner"
           from pg_catalog.pg_opfamily
-          where oid = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}
        """.as(PgOpfamilyRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgOpfamilyId])(implicit c: Connection): List[PgOpfamilyRow] = {
-    SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner
+    SQL"""select "oid", "opfmethod", "opfname", "opfnamespace", "opfowner"
           from pg_catalog.pg_opfamily
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgOpfamilyRow.rowParser(1).*)
     
   }
   override def selectByUnique(opfmethod: /* oid */ Long, opfname: String, opfnamespace: /* oid */ Long)(implicit c: Connection): Option[PgOpfamilyRow] = {
-    SQL"""select opfmethod, opfname, opfnamespace
+    SQL"""select "opfmethod", "opfname", "opfnamespace"
           from pg_catalog.pg_opfamily
-          where opfmethod = ${ParameterValue(opfmethod, null, ToStatement.longToStatement)} AND opfname = ${ParameterValue(opfname, null, ToStatement.stringToStatement)} AND opfnamespace = ${ParameterValue(opfnamespace, null, ToStatement.longToStatement)}
+          where "opfmethod" = ${ParameterValue(opfmethod, null, ToStatement.longToStatement)} AND "opfname" = ${ParameterValue(opfname, null, ToStatement.stringToStatement)} AND "opfnamespace" = ${ParameterValue(opfnamespace, null, ToStatement.longToStatement)}
        """.as(PgOpfamilyRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgOpfamilyRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_opfamily
-          set opfmethod = ${ParameterValue(row.opfmethod, null, ToStatement.longToStatement)}::oid,
-              opfname = ${ParameterValue(row.opfname, null, ToStatement.stringToStatement)}::name,
-              opfnamespace = ${ParameterValue(row.opfnamespace, null, ToStatement.longToStatement)}::oid,
-              opfowner = ${ParameterValue(row.opfowner, null, ToStatement.longToStatement)}::oid
-          where oid = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}
+          set "opfmethod" = ${ParameterValue(row.opfmethod, null, ToStatement.longToStatement)}::oid,
+              "opfname" = ${ParameterValue(row.opfname, null, ToStatement.stringToStatement)}::name,
+              "opfnamespace" = ${ParameterValue(row.opfnamespace, null, ToStatement.longToStatement)}::oid,
+              "opfowner" = ${ParameterValue(row.opfowner, null, ToStatement.longToStatement)}::oid
+          where "oid" = ${ParameterValue(oid, null, PgOpfamilyId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
     UpdateBuilder("pg_catalog.pg_opfamily", PgOpfamilyFields, PgOpfamilyRow.rowParser)
   }
   override def upsert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow = {
-    SQL"""insert into pg_catalog.pg_opfamily(oid, opfmethod, opfname, opfnamespace, opfowner)
+    SQL"""insert into pg_catalog.pg_opfamily("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")
           values (
             ${ParameterValue(unsaved.oid, null, PgOpfamilyId.toStatement)}::oid,
             ${ParameterValue(unsaved.opfmethod, null, ToStatement.longToStatement)}::oid,
@@ -81,13 +81,13 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
             ${ParameterValue(unsaved.opfnamespace, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.opfowner, null, ToStatement.longToStatement)}::oid
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            opfmethod = EXCLUDED.opfmethod,
-            opfname = EXCLUDED.opfname,
-            opfnamespace = EXCLUDED.opfnamespace,
-            opfowner = EXCLUDED.opfowner
-          returning oid, opfmethod, opfname, opfnamespace, opfowner
+            "opfmethod" = EXCLUDED."opfmethod",
+            "opfname" = EXCLUDED."opfname",
+            "opfnamespace" = EXCLUDED."opfnamespace",
+            "opfowner" = EXCLUDED."opfowner"
+          returning "oid", "opfmethod", "opfname", "opfnamespace", "opfowner"
        """
       .executeInsert(PgOpfamilyRow.rowParser(1).single)
     

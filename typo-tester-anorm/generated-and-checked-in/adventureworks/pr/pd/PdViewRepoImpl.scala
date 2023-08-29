@@ -17,7 +17,7 @@ object PdViewRepoImpl extends PdViewRepo {
     SelectBuilderSql("pr.pd", PdViewFields, PdViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PdViewRow] = {
-    SQL"""select "id", productdescriptionid, description, rowguid, modifieddate::text
+    SQL"""select "id", "productdescriptionid", "description", "rowguid", "modifieddate"::text
           from pr.pd
        """.as(PdViewRow.rowParser(1).*)
   }

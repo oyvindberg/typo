@@ -17,7 +17,7 @@ object PgStatXactUserFunctionsViewRepoImpl extends PgStatXactUserFunctionsViewRe
     SelectBuilderSql("pg_catalog.pg_stat_xact_user_functions", PgStatXactUserFunctionsViewFields, PgStatXactUserFunctionsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatXactUserFunctionsViewRow] = {
-    SQL"""select funcid, schemaname, funcname, calls, total_time, self_time
+    SQL"""select "funcid", "schemaname", "funcname", "calls", "total_time", "self_time"
           from pg_catalog.pg_stat_xact_user_functions
        """.as(PgStatXactUserFunctionsViewRow.rowParser(1).*)
   }

@@ -17,7 +17,7 @@ object PgStatGssapiViewRepoImpl extends PgStatGssapiViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_gssapi", PgStatGssapiViewFields, PgStatGssapiViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatGssapiViewRow] = {
-    SQL"""select pid, gss_authenticated, principal, "encrypted"
+    SQL"""select "pid", "gss_authenticated", "principal", "encrypted"
           from pg_catalog.pg_stat_gssapi
        """.as(PgStatGssapiViewRow.rowParser(1).*)
   }

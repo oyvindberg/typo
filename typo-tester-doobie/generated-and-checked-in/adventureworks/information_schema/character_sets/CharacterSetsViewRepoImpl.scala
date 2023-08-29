@@ -18,6 +18,6 @@ object CharacterSetsViewRepoImpl extends CharacterSetsViewRepo {
     SelectBuilderSql("information_schema.character_sets", CharacterSetsViewFields, CharacterSetsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CharacterSetsViewRow] = {
-    sql"""select "character_set_catalog", "character_set_schema", "character_set_name", character_repertoire, form_of_use, default_collate_catalog, default_collate_schema, default_collate_name from information_schema.character_sets""".query(CharacterSetsViewRow.read).stream
+    sql"""select "character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name" from information_schema.character_sets""".query(CharacterSetsViewRow.read).stream
   }
 }

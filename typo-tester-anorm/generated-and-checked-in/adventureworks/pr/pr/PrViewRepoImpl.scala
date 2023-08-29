@@ -17,7 +17,7 @@ object PrViewRepoImpl extends PrViewRepo {
     SelectBuilderSql("pr.pr", PrViewFields, PrViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PrViewRow] = {
-    SQL"""select "id", productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
+    SQL"""select "id", "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
           from pr.pr
        """.as(PrViewRow.rowParser(1).*)
   }

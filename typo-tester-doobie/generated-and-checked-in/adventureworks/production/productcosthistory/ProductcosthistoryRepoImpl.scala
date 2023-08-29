@@ -24,38 +24,38 @@ import typo.dsl.UpdateBuilder
 
 object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
-    sql"delete from production.productcosthistory where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}".update.run.map(_ > 0)
+    sql"""delete from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     DeleteBuilder("production.productcosthistory", ProductcosthistoryFields)
   }
   override def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
-    sql"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
+    sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
-          returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
+          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.query(ProductcosthistoryRow.read).unique
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved): ConnectionIO[ProductcosthistoryRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const(s"startdate"), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s"enddate"), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s"standardcost"), fr"${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
+      Some((Fragment.const(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const(s""""standardcost""""), fr"${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productcosthistory default values
-            returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
+            returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productcosthistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
+            returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
          """
     }
     q.query(ProductcosthistoryRow.read).unique
@@ -65,18 +65,18 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductcosthistoryRow] = {
-    sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory".query(ProductcosthistoryRow.read).stream
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory""".query(ProductcosthistoryRow.read).stream
   }
   override def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]] = {
-    sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}".query(ProductcosthistoryRow.read).option
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".query(ProductcosthistoryRow.read).option
   }
   override def update(row: ProductcosthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productcosthistory
-          set enddate = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-              standardcost = ${fromWrite(row.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}"""
+          set "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
+              "standardcost" = ${fromWrite(row.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -85,7 +85,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     UpdateBuilder("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.read)
   }
   override def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
-    sql"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
+    sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
@@ -93,12 +93,12 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
-          on conflict (productid, startdate)
+          on conflict ("productid", "startdate")
           do update set
-            enddate = EXCLUDED.enddate,
-            standardcost = EXCLUDED.standardcost,
-            modifieddate = EXCLUDED.modifieddate
-          returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
+            "enddate" = EXCLUDED."enddate",
+            "standardcost" = EXCLUDED."standardcost",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.query(ProductcosthistoryRow.read).unique
   }
 }

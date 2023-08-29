@@ -17,7 +17,7 @@ object PmpdcViewRepoImpl extends PmpdcViewRepo {
     SelectBuilderSql("pr.pmpdc", PmpdcViewFields, PmpdcViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PmpdcViewRow] = {
-    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate::text
+    SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
           from pr.pmpdc
        """.as(PmpdcViewRow.rowParser(1).*)
   }

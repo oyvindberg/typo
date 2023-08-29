@@ -17,7 +17,7 @@ object PgStatioSysSequencesViewRepoImpl extends PgStatioSysSequencesViewRepo {
     SelectBuilderSql("pg_catalog.pg_statio_sys_sequences", PgStatioSysSequencesViewFields, PgStatioSysSequencesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatioSysSequencesViewRow] = {
-    SQL"""select relid, schemaname, relname, blks_read, blks_hit
+    SQL"""select "relid", "schemaname", "relname", "blks_read", "blks_hit"
           from pg_catalog.pg_statio_sys_sequences
        """.as(PgStatioSysSequencesViewRow.rowParser(1).*)
   }

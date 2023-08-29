@@ -17,7 +17,7 @@ object SciViewRepoImpl extends SciViewRepo {
     SelectBuilderSql("sa.sci", SciViewFields, SciViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SciViewRow] = {
-    SQL"""select "id", shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
+    SQL"""select "id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
           from sa.sci
        """.as(SciViewRow.rowParser(1).*)
   }

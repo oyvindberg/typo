@@ -23,9 +23,9 @@ object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
     DeleteBuilder("information_schema.sql_implementation_info", SqlImplementationInfoFields)
   }
   override def insert(unsaved: SqlImplementationInfoRow)(implicit c: Connection): SqlImplementationInfoRow = {
-    SQL"""insert into information_schema.sql_implementation_info(implementation_info_id, implementation_info_name, integer_value, character_value, "comments")
+    SQL"""insert into information_schema.sql_implementation_info("implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments")
           values (${ParameterValue(unsaved.implementationInfoId, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.implementationInfoName, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.integerValue, null, ToStatement.optionToStatement(CardinalNumber.toStatement, CardinalNumber.parameterMetadata))}::int4, ${ParameterValue(unsaved.characterValue, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar)
-          returning implementation_info_id, implementation_info_name, integer_value, character_value, "comments"
+          returning "implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments"
        """
       .executeInsert(SqlImplementationInfoRow.rowParser(1).single)
     
@@ -34,7 +34,7 @@ object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
     SelectBuilderSql("information_schema.sql_implementation_info", SqlImplementationInfoFields, SqlImplementationInfoRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SqlImplementationInfoRow] = {
-    SQL"""select implementation_info_id, implementation_info_name, integer_value, character_value, "comments"
+    SQL"""select "implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments"
           from information_schema.sql_implementation_info
        """.as(SqlImplementationInfoRow.rowParser(1).*)
   }

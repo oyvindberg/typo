@@ -17,7 +17,7 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
     SelectBuilderSql("sales.vpersondemographics", VpersondemographicsViewFields, VpersondemographicsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VpersondemographicsViewRow] = {
-    SQL"""select businessentityid, totalpurchaseytd::numeric, datefirstpurchase::text, birthdate::text, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
+    SQL"""select "businessentityid", "totalpurchaseytd"::numeric, "datefirstpurchase"::text, "birthdate"::text, "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned"
           from sales.vpersondemographics
        """.as(VpersondemographicsViewRow.rowParser(1).*)
   }

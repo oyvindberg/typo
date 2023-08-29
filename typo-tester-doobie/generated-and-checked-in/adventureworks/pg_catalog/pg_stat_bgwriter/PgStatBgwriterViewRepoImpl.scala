@@ -18,6 +18,6 @@ object PgStatBgwriterViewRepoImpl extends PgStatBgwriterViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_bgwriter", PgStatBgwriterViewFields, PgStatBgwriterViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatBgwriterViewRow] = {
-    sql"select checkpoints_timed, checkpoints_req, checkpoint_write_time, checkpoint_sync_time, buffers_checkpoint, buffers_clean, maxwritten_clean, buffers_backend, buffers_backend_fsync, buffers_alloc, stats_reset::text from pg_catalog.pg_stat_bgwriter".query(PgStatBgwriterViewRow.read).stream
+    sql"""select "checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset"::text from pg_catalog.pg_stat_bgwriter""".query(PgStatBgwriterViewRow.read).stream
   }
 }

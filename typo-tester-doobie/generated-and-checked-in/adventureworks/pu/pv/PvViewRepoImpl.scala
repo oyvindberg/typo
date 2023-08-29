@@ -18,6 +18,6 @@ object PvViewRepoImpl extends PvViewRepo {
     SelectBuilderSql("pu.pv", PvViewFields, PvViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PvViewRow] = {
-    sql"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from pu.pv""".query(PvViewRow.read).stream
+    sql"""select "id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from pu.pv""".query(PvViewRow.read).stream
   }
 }

@@ -18,6 +18,6 @@ object PgFileSettingsViewRepoImpl extends PgFileSettingsViewRepo {
     SelectBuilderSql("pg_catalog.pg_file_settings", PgFileSettingsViewFields, PgFileSettingsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgFileSettingsViewRow] = {
-    sql"""select sourcefile, sourceline, seqno, "name", setting, applied, "error" from pg_catalog.pg_file_settings""".query(PgFileSettingsViewRow.read).stream
+    sql"""select "sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error" from pg_catalog.pg_file_settings""".query(PgFileSettingsViewRow.read).stream
   }
 }

@@ -21,43 +21,43 @@ import typo.dsl.UpdateBuilder
 
 object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_tablespace where oid = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_tablespace where "oid" = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTablespaceFields, PgTablespaceRow] = {
     DeleteBuilder("pg_catalog.pg_tablespace", PgTablespaceFields)
   }
   override def insert(unsaved: PgTablespaceRow): ConnectionIO[PgTablespaceRow] = {
-    sql"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)
+    sql"""insert into pg_catalog.pg_tablespace("oid", "spcname", "spcowner", "spcacl", "spcoptions")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTablespaceId.put))}::oid, ${fromWrite(unsaved.spcname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.spcowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.spcacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem, ${fromWrite(unsaved.spcoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
-          returning oid, spcname, spcowner, spcacl, spcoptions
+          returning "oid", "spcname", "spcowner", "spcacl", "spcoptions"
        """.query(PgTablespaceRow.read).unique
   }
   override def select: SelectBuilder[PgTablespaceFields, PgTablespaceRow] = {
     SelectBuilderSql("pg_catalog.pg_tablespace", PgTablespaceFields, PgTablespaceRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTablespaceRow] = {
-    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace".query(PgTablespaceRow.read).stream
+    sql"""select "oid", "spcname", "spcowner", "spcacl", "spcoptions" from pg_catalog.pg_tablespace""".query(PgTablespaceRow.read).stream
   }
   override def selectById(oid: PgTablespaceId): ConnectionIO[Option[PgTablespaceRow]] = {
-    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}".query(PgTablespaceRow.read).option
+    sql"""select "oid", "spcname", "spcowner", "spcacl", "spcoptions" from pg_catalog.pg_tablespace where "oid" = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}""".query(PgTablespaceRow.read).option
   }
   override def selectByIds(oids: Array[PgTablespaceId]): Stream[ConnectionIO, PgTablespaceRow] = {
-    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ANY(${oids})".query(PgTablespaceRow.read).stream
+    sql"""select "oid", "spcname", "spcowner", "spcacl", "spcoptions" from pg_catalog.pg_tablespace where "oid" = ANY(${oids})""".query(PgTablespaceRow.read).stream
   }
   override def selectByUnique(spcname: String): ConnectionIO[Option[PgTablespaceRow]] = {
-    sql"""select spcname
+    sql"""select "spcname"
           from pg_catalog.pg_tablespace
-          where spcname = ${fromWrite(spcname)(Write.fromPut(Meta.StringMeta.put))}
+          where "spcname" = ${fromWrite(spcname)(Write.fromPut(Meta.StringMeta.put))}
        """.query(PgTablespaceRow.read).option
   }
   override def update(row: PgTablespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_tablespace
-          set spcname = ${fromWrite(row.spcname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              spcowner = ${fromWrite(row.spcowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              spcacl = ${fromWrite(row.spcacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
-              spcoptions = ${fromWrite(row.spcoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}"""
+          set "spcname" = ${fromWrite(row.spcname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "spcowner" = ${fromWrite(row.spcowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "spcacl" = ${fromWrite(row.spcacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
+              "spcoptions" = ${fromWrite(row.spcoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -66,7 +66,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
     UpdateBuilder("pg_catalog.pg_tablespace", PgTablespaceFields, PgTablespaceRow.read)
   }
   override def upsert(unsaved: PgTablespaceRow): ConnectionIO[PgTablespaceRow] = {
-    sql"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)
+    sql"""insert into pg_catalog.pg_tablespace("oid", "spcname", "spcowner", "spcacl", "spcoptions")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgTablespaceId.put))}::oid,
             ${fromWrite(unsaved.spcname)(Write.fromPut(Meta.StringMeta.put))}::name,
@@ -74,13 +74,13 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
             ${fromWrite(unsaved.spcacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
             ${fromWrite(unsaved.spcoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            spcname = EXCLUDED.spcname,
-            spcowner = EXCLUDED.spcowner,
-            spcacl = EXCLUDED.spcacl,
-            spcoptions = EXCLUDED.spcoptions
-          returning oid, spcname, spcowner, spcacl, spcoptions
+            "spcname" = EXCLUDED."spcname",
+            "spcowner" = EXCLUDED."spcowner",
+            "spcacl" = EXCLUDED."spcacl",
+            "spcoptions" = EXCLUDED."spcoptions"
+          returning "oid", "spcname", "spcowner", "spcacl", "spcoptions"
        """.query(PgTablespaceRow.read).unique
   }
 }

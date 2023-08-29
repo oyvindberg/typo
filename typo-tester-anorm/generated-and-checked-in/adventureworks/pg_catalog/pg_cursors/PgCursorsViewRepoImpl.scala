@@ -17,7 +17,7 @@ object PgCursorsViewRepoImpl extends PgCursorsViewRepo {
     SelectBuilderSql("pg_catalog.pg_cursors", PgCursorsViewFields, PgCursorsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgCursorsViewRow] = {
-    SQL"""select "name", "statement", is_holdable, is_binary, is_scrollable, creation_time::text
+    SQL"""select "name", "statement", "is_holdable", "is_binary", "is_scrollable", "creation_time"::text
           from pg_catalog.pg_cursors
        """.as(PgCursorsViewRow.rowParser(1).*)
   }

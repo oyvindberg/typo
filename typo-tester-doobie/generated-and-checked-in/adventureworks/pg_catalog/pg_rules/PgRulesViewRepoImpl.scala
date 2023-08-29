@@ -18,6 +18,6 @@ object PgRulesViewRepoImpl extends PgRulesViewRepo {
     SelectBuilderSql("pg_catalog.pg_rules", PgRulesViewFields, PgRulesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgRulesViewRow] = {
-    sql"select schemaname, tablename, rulename, definition from pg_catalog.pg_rules".query(PgRulesViewRow.read).stream
+    sql"""select "schemaname", "tablename", "rulename", "definition" from pg_catalog.pg_rules""".query(PgRulesViewRow.read).stream
   }
 }

@@ -24,36 +24,36 @@ import typo.dsl.UpdateBuilder
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
-    sql"delete from sales.personcreditcard where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND creditcardid = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}".update.run.map(_ > 0)
+    sql"""delete from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     DeleteBuilder("sales.personcreditcard", PersoncreditcardFields)
   }
   override def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
-    sql"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
+    sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
-          returning businessentityid, creditcardid, modifieddate::text
+          returning "businessentityid", "creditcardid", "modifieddate"::text
        """.query(PersoncreditcardRow.read).unique
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s"creditcardid"), fr"${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4")),
+      Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s""""creditcardid""""), fr"${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.personcreditcard default values
-            returning businessentityid, creditcardid, modifieddate::text
+            returning "businessentityid", "creditcardid", "modifieddate"::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.personcreditcard(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, creditcardid, modifieddate::text
+            returning "businessentityid", "creditcardid", "modifieddate"::text
          """
     }
     q.query(PersoncreditcardRow.read).unique
@@ -63,16 +63,16 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
-    sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard".query(PersoncreditcardRow.read).stream
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard""".query(PersoncreditcardRow.read).stream
   }
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
-    sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND creditcardid = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}".query(PersoncreditcardRow.read).option
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(PersoncreditcardRow.read).option
   }
   override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.personcreditcard
-          set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND creditcardid = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}"""
+          set "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -81,16 +81,16 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     UpdateBuilder("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.read)
   }
   override def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
-    sql"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
+    sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
-          on conflict (businessentityid, creditcardid)
+          on conflict ("businessentityid", "creditcardid")
           do update set
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, creditcardid, modifieddate::text
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "creditcardid", "modifieddate"::text
        """.query(PersoncreditcardRow.read).unique
   }
 }

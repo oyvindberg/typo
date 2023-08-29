@@ -23,7 +23,7 @@ object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
               where modifieddate < ${fromWrite(cutoff)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp
               returning firstname, modifieddate
             )
-            select row.firstname, row.modifieddate::text
+            select row."firstname", row."modifieddate"::text
             from row"""
     sql.query(UpdatePersonReturningSqlRow.read).stream
   }

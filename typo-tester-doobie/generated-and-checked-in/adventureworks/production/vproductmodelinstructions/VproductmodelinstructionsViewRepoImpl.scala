@@ -18,6 +18,6 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
     SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VproductmodelinstructionsViewRow] = {
-    sql"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate::text from production.vproductmodelinstructions""".query(VproductmodelinstructionsViewRow.read).stream
+    sql"""select "productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate"::text from production.vproductmodelinstructions""".query(VproductmodelinstructionsViewRow.read).stream
   }
 }

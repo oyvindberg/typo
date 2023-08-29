@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.personcreditcard where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.personcreditcard where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "creditcardid" = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     DeleteBuilder("sales.personcreditcard", PersoncreditcardFields)
   }
   override def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
-    SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
+    SQL"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning businessentityid, creditcardid, modifieddate::text
+          returning "businessentityid", "creditcardid", "modifieddate"::text
        """
       .executeInsert(PersoncreditcardRow.rowParser(1).single)
     
@@ -50,13 +50,13 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.personcreditcard default values
-            returning businessentityid, creditcardid, modifieddate::text
+            returning "businessentityid", "creditcardid", "modifieddate"::text
          """
         .executeInsert(PersoncreditcardRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.personcreditcard(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, creditcardid, modifieddate::text
+                  returning "businessentityid", "creditcardid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(PersoncreditcardRow.rowParser(1).single)
@@ -67,37 +67,37 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
-    SQL"""select businessentityid, creditcardid, modifieddate::text
+    SQL"""select "businessentityid", "creditcardid", "modifieddate"::text
           from sales.personcreditcard
        """.as(PersoncreditcardRow.rowParser(1).*)
   }
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
-    SQL"""select businessentityid, creditcardid, modifieddate::text
+    SQL"""select "businessentityid", "creditcardid", "modifieddate"::text
           from sales.personcreditcard
-          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
+          where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "creditcardid" = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.as(PersoncreditcardRow.rowParser(1).singleOpt)
   }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.personcreditcard
-          set modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND creditcardid = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
+          set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "creditcardid" = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     UpdateBuilder("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.rowParser)
   }
   override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
-    SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
+    SQL"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (businessentityid, creditcardid)
+          on conflict ("businessentityid", "creditcardid")
           do update set
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, creditcardid, modifieddate::text
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "creditcardid", "modifieddate"::text
        """
       .executeInsert(PersoncreditcardRow.rowParser(1).single)
     

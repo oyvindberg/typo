@@ -17,7 +17,7 @@ object TriggeredUpdateColumnsViewRepoImpl extends TriggeredUpdateColumnsViewRepo
     SelectBuilderSql("information_schema.triggered_update_columns", TriggeredUpdateColumnsViewFields, TriggeredUpdateColumnsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[TriggeredUpdateColumnsViewRow] = {
-    SQL"""select "trigger_catalog", "trigger_schema", "trigger_name", event_object_catalog, event_object_schema, event_object_table, event_object_column
+    SQL"""select "trigger_catalog", "trigger_schema", "trigger_name", "event_object_catalog", "event_object_schema", "event_object_table", "event_object_column"
           from information_schema.triggered_update_columns
        """.as(TriggeredUpdateColumnsViewRow.rowParser(1).*)
   }

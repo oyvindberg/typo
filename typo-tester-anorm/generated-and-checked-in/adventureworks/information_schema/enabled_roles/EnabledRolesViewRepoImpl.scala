@@ -17,7 +17,7 @@ object EnabledRolesViewRepoImpl extends EnabledRolesViewRepo {
     SelectBuilderSql("information_schema.enabled_roles", EnabledRolesViewFields, EnabledRolesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EnabledRolesViewRow] = {
-    SQL"""select role_name
+    SQL"""select "role_name"
           from information_schema.enabled_roles
        """.as(EnabledRolesViewRow.rowParser(1).*)
   }

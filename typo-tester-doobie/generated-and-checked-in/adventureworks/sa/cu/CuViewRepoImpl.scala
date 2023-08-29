@@ -18,6 +18,6 @@ object CuViewRepoImpl extends CuViewRepo {
     SelectBuilderSql("sa.cu", CuViewFields, CuViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CuViewRow] = {
-    sql"""select "id", currencycode, "name", modifieddate::text from sa.cu""".query(CuViewRow.read).stream
+    sql"""select "id", "currencycode", "name", "modifieddate"::text from sa.cu""".query(CuViewRow.read).stream
   }
 }

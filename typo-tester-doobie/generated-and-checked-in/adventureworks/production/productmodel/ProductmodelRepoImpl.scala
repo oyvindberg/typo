@@ -25,45 +25,45 @@ import typo.dsl.UpdateBuilder
 
 object ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete(productmodelid: ProductmodelId): ConnectionIO[Boolean] = {
-    sql"delete from production.productmodel where productmodelid = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}".update.run.map(_ > 0)
+    sql"""delete from production.productmodel where "productmodelid" = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
     DeleteBuilder("production.productmodel", ProductmodelFields)
   }
   override def insert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
-    sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
+    sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.catalogdescription)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.instructions)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
-          returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
+          returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
        """.query(ProductmodelRow.read).unique
   }
   override def insert(unsaved: ProductmodelRowUnsaved): ConnectionIO[ProductmodelRow] = {
     val fs = List(
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const(s"catalogdescription"), fr"${fromWrite(unsaved.catalogdescription)(Write.fromPutOption(TypoXml.put))}::xml")),
-      Some((Fragment.const(s"instructions"), fr"${fromWrite(unsaved.instructions)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const(s""""catalogdescription""""), fr"${fromWrite(unsaved.catalogdescription)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const(s""""instructions""""), fr"${fromWrite(unsaved.instructions)(Write.fromPutOption(TypoXml.put))}::xml")),
       unsaved.productmodelid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productmodelid"), fr"${fromWrite(value: ProductmodelId)(Write.fromPut(ProductmodelId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""productmodelid""""), fr"${fromWrite(value: ProductmodelId)(Write.fromPut(ProductmodelId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productmodel default values
-            returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
+            returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productmodel(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
+            returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
          """
     }
     q.query(ProductmodelRow.read).unique
@@ -73,23 +73,23 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelRow] = {
-    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel""".query(ProductmodelRow.read).stream
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel""".query(ProductmodelRow.read).stream
   }
   override def selectById(productmodelid: ProductmodelId): ConnectionIO[Option[ProductmodelRow]] = {
-    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}""".query(ProductmodelRow.read).option
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}""".query(ProductmodelRow.read).option
   }
   override def selectByIds(productmodelids: Array[ProductmodelId]): Stream[ConnectionIO, ProductmodelRow] = {
-    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ANY(${productmodelids})""".query(ProductmodelRow.read).stream
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ANY(${productmodelids})""".query(ProductmodelRow.read).stream
   }
   override def update(row: ProductmodelRow): ConnectionIO[Boolean] = {
     val productmodelid = row.productmodelid
     sql"""update production.productmodel
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              catalogdescription = ${fromWrite(row.catalogdescription)(Write.fromPutOption(TypoXml.put))}::xml,
-              instructions = ${fromWrite(row.instructions)(Write.fromPutOption(TypoXml.put))}::xml,
-              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
-              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productmodelid = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}"""
+              "catalogdescription" = ${fromWrite(row.catalogdescription)(Write.fromPutOption(TypoXml.put))}::xml,
+              "instructions" = ${fromWrite(row.instructions)(Write.fromPutOption(TypoXml.put))}::xml,
+              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where "productmodelid" = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -98,7 +98,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     UpdateBuilder("production.productmodel", ProductmodelFields, ProductmodelRow.read)
   }
   override def upsert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
-    sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
+    sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
@@ -107,14 +107,14 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
-          on conflict (productmodelid)
+          on conflict ("productmodelid")
           do update set
             "name" = EXCLUDED."name",
-            catalogdescription = EXCLUDED.catalogdescription,
-            instructions = EXCLUDED.instructions,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
+            "catalogdescription" = EXCLUDED."catalogdescription",
+            "instructions" = EXCLUDED."instructions",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
        """.query(ProductmodelRow.read).unique
   }
 }

@@ -18,6 +18,6 @@ object PgUserViewRepoImpl extends PgUserViewRepo {
     SelectBuilderSql("pg_catalog.pg_user", PgUserViewFields, PgUserViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgUserViewRow] = {
-    sql"select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig from pg_catalog.pg_user".query(PgUserViewRow.read).stream
+    sql"""select "usename", "usesysid", "usecreatedb", "usesuper", "userepl", "usebypassrls", "passwd", "valuntil"::text, "useconfig" from pg_catalog.pg_user""".query(PgUserViewRow.read).stream
   }
 }

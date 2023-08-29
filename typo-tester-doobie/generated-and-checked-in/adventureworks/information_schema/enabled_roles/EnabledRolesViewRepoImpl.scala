@@ -18,6 +18,6 @@ object EnabledRolesViewRepoImpl extends EnabledRolesViewRepo {
     SelectBuilderSql("information_schema.enabled_roles", EnabledRolesViewFields, EnabledRolesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EnabledRolesViewRow] = {
-    sql"select role_name from information_schema.enabled_roles".query(EnabledRolesViewRow.read).stream
+    sql"""select "role_name" from information_schema.enabled_roles""".query(EnabledRolesViewRow.read).stream
   }
 }

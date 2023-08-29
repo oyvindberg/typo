@@ -20,31 +20,31 @@ import typo.dsl.UpdateBuilder
 
 object PgShseclabelRepoImpl extends PgShseclabelRepo {
   override def delete(compositeId: PgShseclabelId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_shseclabel where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_shseclabel where "objoid" = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND "classoid" = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND "provider" = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgShseclabelFields, PgShseclabelRow] = {
     DeleteBuilder("pg_catalog.pg_shseclabel", PgShseclabelFields)
   }
   override def insert(unsaved: PgShseclabelRow): ConnectionIO[PgShseclabelRow] = {
-    sql"""insert into pg_catalog.pg_shseclabel(objoid, classoid, provider, "label")
+    sql"""insert into pg_catalog.pg_shseclabel("objoid", "classoid", "provider", "label")
           values (${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.provider)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.label)(Write.fromPut(Meta.StringMeta.put))})
-          returning objoid, classoid, provider, "label"
+          returning "objoid", "classoid", "provider", "label"
        """.query(PgShseclabelRow.read).unique
   }
   override def select: SelectBuilder[PgShseclabelFields, PgShseclabelRow] = {
     SelectBuilderSql("pg_catalog.pg_shseclabel", PgShseclabelFields, PgShseclabelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgShseclabelRow] = {
-    sql"""select objoid, classoid, provider, "label" from pg_catalog.pg_shseclabel""".query(PgShseclabelRow.read).stream
+    sql"""select "objoid", "classoid", "provider", "label" from pg_catalog.pg_shseclabel""".query(PgShseclabelRow.read).stream
   }
   override def selectById(compositeId: PgShseclabelId): ConnectionIO[Option[PgShseclabelRow]] = {
-    sql"""select objoid, classoid, provider, "label" from pg_catalog.pg_shseclabel where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}""".query(PgShseclabelRow.read).option
+    sql"""select "objoid", "classoid", "provider", "label" from pg_catalog.pg_shseclabel where "objoid" = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND "classoid" = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND "provider" = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}""".query(PgShseclabelRow.read).option
   }
   override def update(row: PgShseclabelRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_shseclabel
           set "label" = ${fromWrite(row.label)(Write.fromPut(Meta.StringMeta.put))}
-          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}"""
+          where "objoid" = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND "classoid" = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND "provider" = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -53,17 +53,17 @@ object PgShseclabelRepoImpl extends PgShseclabelRepo {
     UpdateBuilder("pg_catalog.pg_shseclabel", PgShseclabelFields, PgShseclabelRow.read)
   }
   override def upsert(unsaved: PgShseclabelRow): ConnectionIO[PgShseclabelRow] = {
-    sql"""insert into pg_catalog.pg_shseclabel(objoid, classoid, provider, "label")
+    sql"""insert into pg_catalog.pg_shseclabel("objoid", "classoid", "provider", "label")
           values (
             ${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.provider)(Write.fromPut(Meta.StringMeta.put))},
             ${fromWrite(unsaved.label)(Write.fromPut(Meta.StringMeta.put))}
           )
-          on conflict (objoid, classoid, provider)
+          on conflict ("objoid", "classoid", "provider")
           do update set
             "label" = EXCLUDED."label"
-          returning objoid, classoid, provider, "label"
+          returning "objoid", "classoid", "provider", "label"
        """.query(PgShseclabelRow.read).unique
   }
 }

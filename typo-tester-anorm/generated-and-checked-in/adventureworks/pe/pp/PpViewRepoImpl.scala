@@ -17,7 +17,7 @@ object PpViewRepoImpl extends PpViewRepo {
     SelectBuilderSql("pe.pp", PpViewFields, PpViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PpViewRow] = {
-    SQL"""select "id", businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
+    SQL"""select "id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
           from pe.pp
        """.as(PpViewRow.rowParser(1).*)
   }

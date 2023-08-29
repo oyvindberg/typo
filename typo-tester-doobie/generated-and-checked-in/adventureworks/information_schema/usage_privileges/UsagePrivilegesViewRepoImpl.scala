@@ -18,6 +18,6 @@ object UsagePrivilegesViewRepoImpl extends UsagePrivilegesViewRepo {
     SelectBuilderSql("information_schema.usage_privileges", UsagePrivilegesViewFields, UsagePrivilegesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, UsagePrivilegesViewRow] = {
-    sql"select grantor, grantee, object_catalog, object_schema, object_name, object_type, privilege_type, is_grantable from information_schema.usage_privileges".query(UsagePrivilegesViewRow.read).stream
+    sql"""select "grantor", "grantee", "object_catalog", "object_schema", "object_name", "object_type", "privilege_type", "is_grantable" from information_schema.usage_privileges""".query(UsagePrivilegesViewRow.read).stream
   }
 }

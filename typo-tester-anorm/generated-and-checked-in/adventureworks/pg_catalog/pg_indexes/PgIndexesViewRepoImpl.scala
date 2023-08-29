@@ -17,7 +17,7 @@ object PgIndexesViewRepoImpl extends PgIndexesViewRepo {
     SelectBuilderSql("pg_catalog.pg_indexes", PgIndexesViewFields, PgIndexesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgIndexesViewRow] = {
-    SQL"""select schemaname, tablename, indexname, "tablespace", indexdef
+    SQL"""select "schemaname", "tablename", "indexname", "tablespace", "indexdef"
           from pg_catalog.pg_indexes
        """.as(PgIndexesViewRow.rowParser(1).*)
   }

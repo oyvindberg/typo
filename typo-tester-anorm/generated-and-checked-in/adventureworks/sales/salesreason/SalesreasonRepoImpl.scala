@@ -24,15 +24,15 @@ import typo.dsl.UpdateBuilder
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salesreason where salesreasonid = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.salesreason where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
     DeleteBuilder("sales.salesreason", SalesreasonFields)
   }
   override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
-    SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
+    SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
           values (${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning salesreasonid, "name", reasontype, modifieddate::text
+          returning "salesreasonid", "name", "reasontype", "modifieddate"::text
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
     
@@ -53,13 +53,13 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.salesreason default values
-            returning salesreasonid, "name", reasontype, modifieddate::text
+            returning "salesreasonid", "name", "reasontype", "modifieddate"::text
          """
         .executeInsert(SalesreasonRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning salesreasonid, "name", reasontype, modifieddate::text
+                  returning "salesreasonid", "name", "reasontype", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(SalesreasonRow.rowParser(1).single)
@@ -70,20 +70,20 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     SelectBuilderSql("sales.salesreason", SalesreasonFields, SalesreasonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"""select salesreasonid, "name", reasontype, modifieddate::text
+    SQL"""select "salesreasonid", "name", "reasontype", "modifieddate"::text
           from sales.salesreason
        """.as(SalesreasonRow.rowParser(1).*)
   }
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
-    SQL"""select salesreasonid, "name", reasontype, modifieddate::text
+    SQL"""select "salesreasonid", "name", "reasontype", "modifieddate"::text
           from sales.salesreason
-          where salesreasonid = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
+          where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
        """.as(SalesreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"""select salesreasonid, "name", reasontype, modifieddate::text
+    SQL"""select "salesreasonid", "name", "reasontype", "modifieddate"::text
           from sales.salesreason
-          where salesreasonid = ANY(${salesreasonids})
+          where "salesreasonid" = ANY(${salesreasonids})
        """.as(SalesreasonRow.rowParser(1).*)
     
   }
@@ -91,28 +91,28 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     val salesreasonid = row.salesreasonid
     SQL"""update sales.salesreason
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              reasontype = ${ParameterValue(row.reasontype, null, Name.toStatement)}::varchar,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where salesreasonid = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
+              "reasontype" = ${ParameterValue(row.reasontype, null, Name.toStatement)}::varchar,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
     UpdateBuilder("sales.salesreason", SalesreasonFields, SalesreasonRow.rowParser)
   }
   override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
-    SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
+    SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
           values (
             ${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (salesreasonid)
+          on conflict ("salesreasonid")
           do update set
             "name" = EXCLUDED."name",
-            reasontype = EXCLUDED.reasontype,
-            modifieddate = EXCLUDED.modifieddate
-          returning salesreasonid, "name", reasontype, modifieddate::text
+            "reasontype" = EXCLUDED."reasontype",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "salesreasonid", "name", "reasontype", "modifieddate"::text
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
     

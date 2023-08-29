@@ -17,7 +17,7 @@ object WrViewRepoImpl extends WrViewRepo {
     SelectBuilderSql("pr.wr", WrViewFields, WrViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[WrViewRow] = {
-    SQL"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text
+    SQL"""select "id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
           from pr.wr
        """.as(WrViewRow.rowParser(1).*)
   }

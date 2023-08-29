@@ -17,7 +17,7 @@ object VsalespersonsalesbyfiscalyearsViewRepoImpl extends Vsalespersonsalesbyfis
     SelectBuilderSql("sales.vsalespersonsalesbyfiscalyears", VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsViewRow] = {
-    SQL"""select SalesPersonID, FullName, JobTitle, SalesTerritory, 2012, 2013, 2014
+    SQL"""select "SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014"
           from sales.vsalespersonsalesbyfiscalyears
        """.as(VsalespersonsalesbyfiscalyearsViewRow.rowParser(1).*)
   }

@@ -20,47 +20,47 @@ import typo.dsl.UpdateBuilder
 
 object PgOpclassRepoImpl extends PgOpclassRepo {
   override def delete(oid: PgOpclassId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_opclass where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_opclass where "oid" = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgOpclassFields, PgOpclassRow] = {
     DeleteBuilder("pg_catalog.pg_opclass", PgOpclassFields)
   }
   override def insert(unsaved: PgOpclassRow): ConnectionIO[PgOpclassRow] = {
-    sql"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
+    sql"""insert into pg_catalog.pg_opclass("oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgOpclassId.put))}::oid, ${fromWrite(unsaved.opcmethod)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.opcnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcfamily)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcintype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid)
-          returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
+          returning "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype"
        """.query(PgOpclassRow.read).unique
   }
   override def select: SelectBuilder[PgOpclassFields, PgOpclassRow] = {
     SelectBuilderSql("pg_catalog.pg_opclass", PgOpclassFields, PgOpclassRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgOpclassRow] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass".query(PgOpclassRow.read).stream
+    sql"""select "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype" from pg_catalog.pg_opclass""".query(PgOpclassRow.read).stream
   }
   override def selectById(oid: PgOpclassId): ConnectionIO[Option[PgOpclassRow]] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}".query(PgOpclassRow.read).option
+    sql"""select "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype" from pg_catalog.pg_opclass where "oid" = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}""".query(PgOpclassRow.read).option
   }
   override def selectByIds(oids: Array[PgOpclassId]): Stream[ConnectionIO, PgOpclassRow] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${oids})".query(PgOpclassRow.read).stream
+    sql"""select "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype" from pg_catalog.pg_opclass where "oid" = ANY(${oids})""".query(PgOpclassRow.read).stream
   }
   override def selectByUnique(opcmethod: /* oid */ Long, opcname: String, opcnamespace: /* oid */ Long): ConnectionIO[Option[PgOpclassRow]] = {
-    sql"""select opcmethod, opcname, opcnamespace
+    sql"""select "opcmethod", "opcname", "opcnamespace"
           from pg_catalog.pg_opclass
-          where opcmethod = ${fromWrite(opcmethod)(Write.fromPut(Meta.LongMeta.put))} AND opcname = ${fromWrite(opcname)(Write.fromPut(Meta.StringMeta.put))} AND opcnamespace = ${fromWrite(opcnamespace)(Write.fromPut(Meta.LongMeta.put))}
+          where "opcmethod" = ${fromWrite(opcmethod)(Write.fromPut(Meta.LongMeta.put))} AND "opcname" = ${fromWrite(opcname)(Write.fromPut(Meta.StringMeta.put))} AND "opcnamespace" = ${fromWrite(opcnamespace)(Write.fromPut(Meta.LongMeta.put))}
        """.query(PgOpclassRow.read).option
   }
   override def update(row: PgOpclassRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_opclass
-          set opcmethod = ${fromWrite(row.opcmethod)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              opcname = ${fromWrite(row.opcname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              opcnamespace = ${fromWrite(row.opcnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              opcowner = ${fromWrite(row.opcowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              opcfamily = ${fromWrite(row.opcfamily)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              opcintype = ${fromWrite(row.opcintype)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              opcdefault = ${fromWrite(row.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))},
-              opckeytype = ${fromWrite(row.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid
-          where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}"""
+          set "opcmethod" = ${fromWrite(row.opcmethod)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "opcname" = ${fromWrite(row.opcname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "opcnamespace" = ${fromWrite(row.opcnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "opcowner" = ${fromWrite(row.opcowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "opcfamily" = ${fromWrite(row.opcfamily)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "opcintype" = ${fromWrite(row.opcintype)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "opcdefault" = ${fromWrite(row.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))},
+              "opckeytype" = ${fromWrite(row.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -69,7 +69,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
     UpdateBuilder("pg_catalog.pg_opclass", PgOpclassFields, PgOpclassRow.read)
   }
   override def upsert(unsaved: PgOpclassRow): ConnectionIO[PgOpclassRow] = {
-    sql"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
+    sql"""insert into pg_catalog.pg_opclass("oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgOpclassId.put))}::oid,
             ${fromWrite(unsaved.opcmethod)(Write.fromPut(Meta.LongMeta.put))}::oid,
@@ -81,17 +81,17 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
             ${fromWrite(unsaved.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))},
             ${fromWrite(unsaved.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            opcmethod = EXCLUDED.opcmethod,
-            opcname = EXCLUDED.opcname,
-            opcnamespace = EXCLUDED.opcnamespace,
-            opcowner = EXCLUDED.opcowner,
-            opcfamily = EXCLUDED.opcfamily,
-            opcintype = EXCLUDED.opcintype,
-            opcdefault = EXCLUDED.opcdefault,
-            opckeytype = EXCLUDED.opckeytype
-          returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
+            "opcmethod" = EXCLUDED."opcmethod",
+            "opcname" = EXCLUDED."opcname",
+            "opcnamespace" = EXCLUDED."opcnamespace",
+            "opcowner" = EXCLUDED."opcowner",
+            "opcfamily" = EXCLUDED."opcfamily",
+            "opcintype" = EXCLUDED."opcintype",
+            "opcdefault" = EXCLUDED."opcdefault",
+            "opckeytype" = EXCLUDED."opckeytype"
+          returning "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype"
        """.query(PgOpclassRow.read).unique
   }
 }

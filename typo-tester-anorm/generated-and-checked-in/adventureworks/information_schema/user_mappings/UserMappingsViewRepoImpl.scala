@@ -17,7 +17,7 @@ object UserMappingsViewRepoImpl extends UserMappingsViewRepo {
     SelectBuilderSql("information_schema.user_mappings", UserMappingsViewFields, UserMappingsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[UserMappingsViewRow] = {
-    SQL"""select authorization_identifier, foreign_server_catalog, foreign_server_name
+    SQL"""select "authorization_identifier", "foreign_server_catalog", "foreign_server_name"
           from information_schema.user_mappings
        """.as(UserMappingsViewRow.rowParser(1).*)
   }

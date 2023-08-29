@@ -17,7 +17,7 @@ object SthViewRepoImpl extends SthViewRepo {
     SelectBuilderSql("sa.sth", SthViewFields, SthViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SthViewRow] = {
-    SQL"""select "id", businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
+    SQL"""select "id", "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
           from sa.sth
        """.as(SthViewRow.rowParser(1).*)
   }

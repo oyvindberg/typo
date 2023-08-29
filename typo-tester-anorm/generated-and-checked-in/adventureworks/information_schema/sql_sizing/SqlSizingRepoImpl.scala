@@ -23,9 +23,9 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
     DeleteBuilder("information_schema.sql_sizing", SqlSizingFields)
   }
   override def insert(unsaved: SqlSizingRow)(implicit c: Connection): SqlSizingRow = {
-    SQL"""insert into information_schema.sql_sizing(sizing_id, sizing_name, supported_value, "comments")
+    SQL"""insert into information_schema.sql_sizing("sizing_id", "sizing_name", "supported_value", "comments")
           values (${ParameterValue(unsaved.sizingId, null, ToStatement.optionToStatement(CardinalNumber.toStatement, CardinalNumber.parameterMetadata))}::int4, ${ParameterValue(unsaved.sizingName, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.supportedValue, null, ToStatement.optionToStatement(CardinalNumber.toStatement, CardinalNumber.parameterMetadata))}::int4, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar)
-          returning sizing_id, sizing_name, supported_value, "comments"
+          returning "sizing_id", "sizing_name", "supported_value", "comments"
        """
       .executeInsert(SqlSizingRow.rowParser(1).single)
     
@@ -34,7 +34,7 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
     SelectBuilderSql("information_schema.sql_sizing", SqlSizingFields, SqlSizingRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SqlSizingRow] = {
-    SQL"""select sizing_id, sizing_name, supported_value, "comments"
+    SQL"""select "sizing_id", "sizing_name", "supported_value", "comments"
           from information_schema.sql_sizing
        """.as(SqlSizingRow.rowParser(1).*)
   }

@@ -18,6 +18,6 @@ object PntViewRepoImpl extends PntViewRepo {
     SelectBuilderSql("pe.pnt", PntViewFields, PntViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PntViewRow] = {
-    sql"""select "id", phonenumbertypeid, "name", modifieddate::text from pe.pnt""".query(PntViewRow.read).stream
+    sql"""select "id", "phonenumbertypeid", "name", "modifieddate"::text from pe.pnt""".query(PntViewRow.read).stream
   }
 }

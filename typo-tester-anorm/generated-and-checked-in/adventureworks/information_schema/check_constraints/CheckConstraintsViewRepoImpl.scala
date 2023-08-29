@@ -17,7 +17,7 @@ object CheckConstraintsViewRepoImpl extends CheckConstraintsViewRepo {
     SelectBuilderSql("information_schema.check_constraints", CheckConstraintsViewFields, CheckConstraintsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CheckConstraintsViewRow] = {
-    SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", check_clause
+    SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", "check_clause"
           from information_schema.check_constraints
        """.as(CheckConstraintsViewRow.rowParser(1).*)
   }

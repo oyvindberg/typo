@@ -26,15 +26,15 @@ import typo.dsl.UpdateBuilder
 
 object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salesterritory where territoryid = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.salesterritory where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
     DeleteBuilder("sales.salesterritory", SalesterritoryFields)
   }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
-    SQL"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
+    SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.group, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.salesytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.costytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.costlastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
+          returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalesterritoryRow.rowParser(1).single)
     
@@ -76,13 +76,13 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.salesterritory default values
-            returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
+            returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
          """
         .executeInsert(SalesterritoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesterritory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
+                  returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(SalesterritoryRow.rowParser(1).single)
@@ -93,20 +93,20 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     SelectBuilderSql("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
-    SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
+    SQL"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
           from sales.salesterritory
        """.as(SalesterritoryRow.rowParser(1).*)
   }
   override def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow] = {
-    SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
+    SQL"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
           from sales.salesterritory
-          where territoryid = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}
+          where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}
        """.as(SalesterritoryRow.rowParser(1).singleOpt)
   }
   override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
-    SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
+    SQL"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
           from sales.salesterritory
-          where territoryid = ANY(${territoryids})
+          where "territoryid" = ANY(${territoryids})
        """.as(SalesterritoryRow.rowParser(1).*)
     
   }
@@ -114,22 +114,22 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     val territoryid = row.territoryid
     SQL"""update sales.salesterritory
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              countryregioncode = ${ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)},
+              "countryregioncode" = ${ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)},
               "group" = ${ParameterValue(row.group, null, ToStatement.stringToStatement)},
-              salesytd = ${ParameterValue(row.salesytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              saleslastyear = ${ParameterValue(row.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              costytd = ${ParameterValue(row.costytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              costlastyear = ${ParameterValue(row.costlastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where territoryid = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}
+              "salesytd" = ${ParameterValue(row.salesytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "saleslastyear" = ${ParameterValue(row.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "costytd" = ${ParameterValue(row.costytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "costlastyear" = ${ParameterValue(row.costlastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
     UpdateBuilder("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.rowParser)
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
-    SQL"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
+    SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -142,18 +142,18 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (territoryid)
+          on conflict ("territoryid")
           do update set
             "name" = EXCLUDED."name",
-            countryregioncode = EXCLUDED.countryregioncode,
+            "countryregioncode" = EXCLUDED."countryregioncode",
             "group" = EXCLUDED."group",
-            salesytd = EXCLUDED.salesytd,
-            saleslastyear = EXCLUDED.saleslastyear,
-            costytd = EXCLUDED.costytd,
-            costlastyear = EXCLUDED.costlastyear,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
+            "salesytd" = EXCLUDED."salesytd",
+            "saleslastyear" = EXCLUDED."saleslastyear",
+            "costytd" = EXCLUDED."costytd",
+            "costlastyear" = EXCLUDED."costlastyear",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalesterritoryRow.rowParser(1).single)
     

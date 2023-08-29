@@ -17,7 +17,7 @@ object IViewRepoImpl extends IViewRepo {
     SelectBuilderSql("pr.i", IViewFields, IViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[IViewRow] = {
-    SQL"""select "id", illustrationid, diagram, modifieddate::text
+    SQL"""select "id", "illustrationid", "diagram", "modifieddate"::text
           from pr.i
        """.as(IViewRow.rowParser(1).*)
   }

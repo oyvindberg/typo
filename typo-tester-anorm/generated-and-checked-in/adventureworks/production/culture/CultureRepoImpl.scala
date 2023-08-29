@@ -24,15 +24,15 @@ import typo.dsl.UpdateBuilder
 
 object CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.culture where cultureid = ${ParameterValue(cultureid, null, CultureId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from production.culture where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
     DeleteBuilder("production.culture", CultureFields)
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
-    SQL"""insert into production.culture(cultureid, "name", modifieddate)
+    SQL"""insert into production.culture("cultureid", "name", "modifieddate")
           values (${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning cultureid, "name", modifieddate::text
+          returning "cultureid", "name", "modifieddate"::text
        """
       .executeInsert(CultureRow.rowParser(1).single)
     
@@ -49,13 +49,13 @@ object CultureRepoImpl extends CultureRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.culture default values
-            returning cultureid, "name", modifieddate::text
+            returning "cultureid", "name", "modifieddate"::text
          """
         .executeInsert(CultureRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.culture(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning cultureid, "name", modifieddate::text
+                  returning "cultureid", "name", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(CultureRow.rowParser(1).single)
@@ -66,20 +66,20 @@ object CultureRepoImpl extends CultureRepo {
     SelectBuilderSql("production.culture", CultureFields, CultureRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, "name", modifieddate::text
+    SQL"""select "cultureid", "name", "modifieddate"::text
           from production.culture
        """.as(CultureRow.rowParser(1).*)
   }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
-    SQL"""select cultureid, "name", modifieddate::text
+    SQL"""select "cultureid", "name", "modifieddate"::text
           from production.culture
-          where cultureid = ${ParameterValue(cultureid, null, CultureId.toStatement)}
+          where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}
        """.as(CultureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, "name", modifieddate::text
+    SQL"""select "cultureid", "name", "modifieddate"::text
           from production.culture
-          where cultureid = ANY(${cultureids})
+          where "cultureid" = ANY(${cultureids})
        """.as(CultureRow.rowParser(1).*)
     
   }
@@ -87,25 +87,25 @@ object CultureRepoImpl extends CultureRepo {
     val cultureid = row.cultureid
     SQL"""update production.culture
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where cultureid = ${ParameterValue(cultureid, null, CultureId.toStatement)}
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilder("production.culture", CultureFields, CultureRow.rowParser)
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
-    SQL"""insert into production.culture(cultureid, "name", modifieddate)
+    SQL"""insert into production.culture("cultureid", "name", "modifieddate")
           values (
             ${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (cultureid)
+          on conflict ("cultureid")
           do update set
             "name" = EXCLUDED."name",
-            modifieddate = EXCLUDED.modifieddate
-          returning cultureid, "name", modifieddate::text
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "cultureid", "name", "modifieddate"::text
        """
       .executeInsert(CultureRow.rowParser(1).single)
     

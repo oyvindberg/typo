@@ -17,8 +17,8 @@ object SequencesViewRepoImpl extends SequencesViewRepo {
     SelectBuilderSql("information_schema.sequences", SequencesViewFields, SequencesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SequencesViewRow] = {
-    SQL"""select sequence_catalog, sequence_schema, sequence_name, data_type, numeric_precision, numeric_precision_radix, numeric_scale, start_value, minimum_value, maximum_value, "increment", cycle_option
-          from information_schema."sequences"
+    SQL"""select "sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option"
+          from information_schema.sequences
        """.as(SequencesViewRow.rowParser(1).*)
   }
 }

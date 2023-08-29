@@ -17,7 +17,7 @@ object PntViewRepoImpl extends PntViewRepo {
     SelectBuilderSql("pe.pnt", PntViewFields, PntViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PntViewRow] = {
-    SQL"""select "id", phonenumbertypeid, "name", modifieddate::text
+    SQL"""select "id", "phonenumbertypeid", "name", "modifieddate"::text
           from pe.pnt
        """.as(PntViewRow.rowParser(1).*)
   }

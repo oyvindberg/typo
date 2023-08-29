@@ -17,7 +17,7 @@ object PgForeignTablesViewRepoImpl extends PgForeignTablesViewRepo {
     SelectBuilderSql("information_schema._pg_foreign_tables", PgForeignTablesViewFields, PgForeignTablesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgForeignTablesViewRow] = {
-    SQL"""select foreign_table_catalog, foreign_table_schema, foreign_table_name, ftoptions, foreign_server_catalog, foreign_server_name, authorization_identifier
+    SQL"""select "foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "ftoptions", "foreign_server_catalog", "foreign_server_name", "authorization_identifier"
           from information_schema._pg_foreign_tables
        """.as(PgForeignTablesViewRow.rowParser(1).*)
   }

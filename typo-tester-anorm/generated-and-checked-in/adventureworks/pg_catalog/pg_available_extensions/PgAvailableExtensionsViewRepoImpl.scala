@@ -17,7 +17,7 @@ object PgAvailableExtensionsViewRepoImpl extends PgAvailableExtensionsViewRepo {
     SelectBuilderSql("pg_catalog.pg_available_extensions", PgAvailableExtensionsViewFields, PgAvailableExtensionsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAvailableExtensionsViewRow] = {
-    SQL"""select "name", default_version, installed_version, "comment"
+    SQL"""select "name", "default_version", "installed_version", "comment"
           from pg_catalog.pg_available_extensions
        """.as(PgAvailableExtensionsViewRow.rowParser(1).*)
   }

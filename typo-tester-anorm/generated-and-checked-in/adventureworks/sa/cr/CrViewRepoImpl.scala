@@ -17,7 +17,7 @@ object CrViewRepoImpl extends CrViewRepo {
     SelectBuilderSql("sa.cr", CrViewFields, CrViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CrViewRow] = {
-    SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
+    SQL"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
           from sa.cr
        """.as(CrViewRow.rowParser(1).*)
   }

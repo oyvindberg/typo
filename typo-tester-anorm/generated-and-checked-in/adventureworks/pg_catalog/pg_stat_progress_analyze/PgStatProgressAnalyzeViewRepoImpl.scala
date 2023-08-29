@@ -17,7 +17,7 @@ object PgStatProgressAnalyzeViewRepoImpl extends PgStatProgressAnalyzeViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_progress_analyze", PgStatProgressAnalyzeViewFields, PgStatProgressAnalyzeViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatProgressAnalyzeViewRow] = {
-    SQL"""select pid, datid, datname, relid, phase, sample_blks_total, sample_blks_scanned, ext_stats_total, ext_stats_computed, child_tables_total, child_tables_done, current_child_table_relid
+    SQL"""select "pid", "datid", "datname", "relid", "phase", "sample_blks_total", "sample_blks_scanned", "ext_stats_total", "ext_stats_computed", "child_tables_total", "child_tables_done", "current_child_table_relid"
           from pg_catalog.pg_stat_progress_analyze
        """.as(PgStatProgressAnalyzeViewRow.rowParser(1).*)
   }

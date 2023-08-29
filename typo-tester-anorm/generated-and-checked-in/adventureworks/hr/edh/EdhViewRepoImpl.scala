@@ -17,7 +17,7 @@ object EdhViewRepoImpl extends EdhViewRepo {
     SelectBuilderSql("hr.edh", EdhViewFields, EdhViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EdhViewRow] = {
-    SQL"""select "id", businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text
+    SQL"""select "id", "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
           from hr.edh
        """.as(EdhViewRow.rowParser(1).*)
   }

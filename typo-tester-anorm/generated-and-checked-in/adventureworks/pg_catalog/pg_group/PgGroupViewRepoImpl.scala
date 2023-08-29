@@ -17,7 +17,7 @@ object PgGroupViewRepoImpl extends PgGroupViewRepo {
     SelectBuilderSql("pg_catalog.pg_group", PgGroupViewFields, PgGroupViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgGroupViewRow] = {
-    SQL"""select groname, grosysid, grolist
+    SQL"""select "groname", "grosysid", "grolist"
           from pg_catalog.pg_group
        """.as(PgGroupViewRow.rowParser(1).*)
   }

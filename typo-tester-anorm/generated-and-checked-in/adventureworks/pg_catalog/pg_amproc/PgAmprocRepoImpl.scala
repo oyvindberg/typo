@@ -19,15 +19,15 @@ import typo.dsl.UpdateBuilder
 
 object PgAmprocRepoImpl extends PgAmprocRepo {
   override def delete(oid: PgAmprocId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_amproc where oid = ${ParameterValue(oid, null, PgAmprocId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_amproc where "oid" = ${ParameterValue(oid, null, PgAmprocId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAmprocFields, PgAmprocRow] = {
     DeleteBuilder("pg_catalog.pg_amproc", PgAmprocFields)
   }
   override def insert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow = {
-    SQL"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
+    SQL"""insert into pg_catalog.pg_amproc("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")
           values (${ParameterValue(unsaved.oid, null, PgAmprocId.toStatement)}::oid, ${ParameterValue(unsaved.amprocfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amproclefttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amprocrighttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amprocnum, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.amproc, null, TypoRegproc.toStatement)}::regproc)
-          returning oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
+          returning "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc"
        """
       .executeInsert(PgAmprocRow.rowParser(1).single)
     
@@ -36,46 +36,46 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
     SelectBuilderSql("pg_catalog.pg_amproc", PgAmprocFields, PgAmprocRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAmprocRow] = {
-    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
+    SQL"""select "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc"
           from pg_catalog.pg_amproc
        """.as(PgAmprocRow.rowParser(1).*)
   }
   override def selectById(oid: PgAmprocId)(implicit c: Connection): Option[PgAmprocRow] = {
-    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
+    SQL"""select "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc"
           from pg_catalog.pg_amproc
-          where oid = ${ParameterValue(oid, null, PgAmprocId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgAmprocId.toStatement)}
        """.as(PgAmprocRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgAmprocId])(implicit c: Connection): List[PgAmprocRow] = {
-    SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
+    SQL"""select "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc"
           from pg_catalog.pg_amproc
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgAmprocRow.rowParser(1).*)
     
   }
   override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int)(implicit c: Connection): Option[PgAmprocRow] = {
-    SQL"""select amprocfamily, amproclefttype, amprocrighttype, amprocnum
+    SQL"""select "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum"
           from pg_catalog.pg_amproc
-          where amprocfamily = ${ParameterValue(amprocfamily, null, ToStatement.longToStatement)} AND amproclefttype = ${ParameterValue(amproclefttype, null, ToStatement.longToStatement)} AND amprocrighttype = ${ParameterValue(amprocrighttype, null, ToStatement.longToStatement)} AND amprocnum = ${ParameterValue(amprocnum, null, ToStatement.intToStatement)}
+          where "amprocfamily" = ${ParameterValue(amprocfamily, null, ToStatement.longToStatement)} AND "amproclefttype" = ${ParameterValue(amproclefttype, null, ToStatement.longToStatement)} AND "amprocrighttype" = ${ParameterValue(amprocrighttype, null, ToStatement.longToStatement)} AND "amprocnum" = ${ParameterValue(amprocnum, null, ToStatement.intToStatement)}
        """.as(PgAmprocRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgAmprocRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_amproc
-          set amprocfamily = ${ParameterValue(row.amprocfamily, null, ToStatement.longToStatement)}::oid,
-              amproclefttype = ${ParameterValue(row.amproclefttype, null, ToStatement.longToStatement)}::oid,
-              amprocrighttype = ${ParameterValue(row.amprocrighttype, null, ToStatement.longToStatement)}::oid,
-              amprocnum = ${ParameterValue(row.amprocnum, null, ToStatement.intToStatement)}::int2,
-              amproc = ${ParameterValue(row.amproc, null, TypoRegproc.toStatement)}::regproc
-          where oid = ${ParameterValue(oid, null, PgAmprocId.toStatement)}
+          set "amprocfamily" = ${ParameterValue(row.amprocfamily, null, ToStatement.longToStatement)}::oid,
+              "amproclefttype" = ${ParameterValue(row.amproclefttype, null, ToStatement.longToStatement)}::oid,
+              "amprocrighttype" = ${ParameterValue(row.amprocrighttype, null, ToStatement.longToStatement)}::oid,
+              "amprocnum" = ${ParameterValue(row.amprocnum, null, ToStatement.intToStatement)}::int2,
+              "amproc" = ${ParameterValue(row.amproc, null, TypoRegproc.toStatement)}::regproc
+          where "oid" = ${ParameterValue(oid, null, PgAmprocId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAmprocFields, PgAmprocRow] = {
     UpdateBuilder("pg_catalog.pg_amproc", PgAmprocFields, PgAmprocRow.rowParser)
   }
   override def upsert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow = {
-    SQL"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
+    SQL"""insert into pg_catalog.pg_amproc("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")
           values (
             ${ParameterValue(unsaved.oid, null, PgAmprocId.toStatement)}::oid,
             ${ParameterValue(unsaved.amprocfamily, null, ToStatement.longToStatement)}::oid,
@@ -84,14 +84,14 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
             ${ParameterValue(unsaved.amprocnum, null, ToStatement.intToStatement)}::int2,
             ${ParameterValue(unsaved.amproc, null, TypoRegproc.toStatement)}::regproc
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            amprocfamily = EXCLUDED.amprocfamily,
-            amproclefttype = EXCLUDED.amproclefttype,
-            amprocrighttype = EXCLUDED.amprocrighttype,
-            amprocnum = EXCLUDED.amprocnum,
-            amproc = EXCLUDED.amproc
-          returning oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
+            "amprocfamily" = EXCLUDED."amprocfamily",
+            "amproclefttype" = EXCLUDED."amproclefttype",
+            "amprocrighttype" = EXCLUDED."amprocrighttype",
+            "amprocnum" = EXCLUDED."amprocnum",
+            "amproc" = EXCLUDED."amproc"
+          returning "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc"
        """
       .executeInsert(PgAmprocRow.rowParser(1).single)
     

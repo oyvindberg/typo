@@ -17,7 +17,7 @@ object PgUserMappingsViewRepoImpl extends PgUserMappingsViewRepo {
     SelectBuilderSql("pg_catalog.pg_user_mappings", PgUserMappingsViewFields, PgUserMappingsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgUserMappingsViewRow] = {
-    SQL"""select umid, srvid, srvname, umuser, usename, umoptions
+    SQL"""select "umid", "srvid", "srvname", "umuser", "usename", "umoptions"
           from pg_catalog.pg_user_mappings
        """.as(PgUserMappingsViewRow.rowParser(1).*)
   }

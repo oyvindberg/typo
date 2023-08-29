@@ -18,6 +18,6 @@ object DomainConstraintsViewRepoImpl extends DomainConstraintsViewRepo {
     SelectBuilderSql("information_schema.domain_constraints", DomainConstraintsViewFields, DomainConstraintsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, DomainConstraintsViewRow] = {
-    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", domain_catalog, domain_schema, domain_name, is_deferrable, initially_deferred from information_schema.domain_constraints""".query(DomainConstraintsViewRow.read).stream
+    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", "domain_catalog", "domain_schema", "domain_name", "is_deferrable", "initially_deferred" from information_schema.domain_constraints""".query(DomainConstraintsViewRow.read).stream
   }
 }

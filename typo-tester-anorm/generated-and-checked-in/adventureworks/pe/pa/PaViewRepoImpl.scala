@@ -17,7 +17,7 @@ object PaViewRepoImpl extends PaViewRepo {
     SelectBuilderSql("pe.pa", PaViewFields, PaViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PaViewRow] = {
-    SQL"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
+    SQL"""select "id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
           from pe.pa
        """.as(PaViewRow.rowParser(1).*)
   }

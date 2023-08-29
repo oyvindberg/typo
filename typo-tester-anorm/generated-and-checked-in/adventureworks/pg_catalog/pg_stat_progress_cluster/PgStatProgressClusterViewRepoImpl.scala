@@ -17,7 +17,7 @@ object PgStatProgressClusterViewRepoImpl extends PgStatProgressClusterViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_progress_cluster", PgStatProgressClusterViewFields, PgStatProgressClusterViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatProgressClusterViewRow] = {
-    SQL"""select pid, datid, datname, relid, command, phase, cluster_index_relid, heap_tuples_scanned, heap_tuples_written, heap_blks_total, heap_blks_scanned, index_rebuild_count
+    SQL"""select "pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count"
           from pg_catalog.pg_stat_progress_cluster
        """.as(PgStatProgressClusterViewRow.rowParser(1).*)
   }

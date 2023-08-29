@@ -17,7 +17,7 @@ object DomainConstraintsViewRepoImpl extends DomainConstraintsViewRepo {
     SelectBuilderSql("information_schema.domain_constraints", DomainConstraintsViewFields, DomainConstraintsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DomainConstraintsViewRow] = {
-    SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", domain_catalog, domain_schema, domain_name, is_deferrable, initially_deferred
+    SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", "domain_catalog", "domain_schema", "domain_name", "is_deferrable", "initially_deferred"
           from information_schema.domain_constraints
        """.as(DomainConstraintsViewRow.rowParser(1).*)
   }

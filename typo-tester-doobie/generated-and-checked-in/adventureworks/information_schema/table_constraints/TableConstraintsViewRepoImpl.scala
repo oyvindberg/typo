@@ -18,6 +18,6 @@ object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
     SelectBuilderSql("information_schema.table_constraints", TableConstraintsViewFields, TableConstraintsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, TableConstraintsViewRow] = {
-    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced" from information_schema.table_constraints""".query(TableConstraintsViewRow.read).stream
+    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced" from information_schema.table_constraints""".query(TableConstraintsViewRow.read).stream
   }
 }

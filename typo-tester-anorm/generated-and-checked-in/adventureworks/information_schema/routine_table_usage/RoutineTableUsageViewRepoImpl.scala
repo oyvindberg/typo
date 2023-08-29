@@ -17,7 +17,7 @@ object RoutineTableUsageViewRepoImpl extends RoutineTableUsageViewRepo {
     SelectBuilderSql("information_schema.routine_table_usage", RoutineTableUsageViewFields, RoutineTableUsageViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[RoutineTableUsageViewRow] = {
-    SQL"""select specific_catalog, specific_schema, "specific_name", "routine_catalog", "routine_schema", "routine_name", table_catalog, table_schema, "table_name"
+    SQL"""select "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "table_catalog", "table_schema", "table_name"
           from information_schema.routine_table_usage
        """.as(RoutineTableUsageViewRow.rowParser(1).*)
   }

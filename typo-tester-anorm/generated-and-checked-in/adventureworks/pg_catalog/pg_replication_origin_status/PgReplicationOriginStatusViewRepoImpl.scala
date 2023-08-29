@@ -17,7 +17,7 @@ object PgReplicationOriginStatusViewRepoImpl extends PgReplicationOriginStatusVi
     SelectBuilderSql("pg_catalog.pg_replication_origin_status", PgReplicationOriginStatusViewFields, PgReplicationOriginStatusViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgReplicationOriginStatusViewRow] = {
-    SQL"""select local_id, external_id, remote_lsn, local_lsn
+    SQL"""select "local_id", "external_id", "remote_lsn", "local_lsn"
           from pg_catalog.pg_replication_origin_status
        """.as(PgReplicationOriginStatusViewRow.rowParser(1).*)
   }

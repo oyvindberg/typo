@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_ts_config where oid = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_ts_config where "oid" = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTsConfigFields, PgTsConfigRow] = {
     DeleteBuilder("pg_catalog.pg_ts_config", PgTsConfigFields)
   }
   override def insert(unsaved: PgTsConfigRow)(implicit c: Connection): PgTsConfigRow = {
-    SQL"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
+    SQL"""insert into pg_catalog.pg_ts_config("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")
           values (${ParameterValue(unsaved.oid, null, PgTsConfigId.toStatement)}::oid, ${ParameterValue(unsaved.cfgname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.cfgnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.cfgowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.cfgparser, null, ToStatement.longToStatement)}::oid)
-          returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
+          returning "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser"
        """
       .executeInsert(PgTsConfigRow.rowParser(1).single)
     
@@ -35,45 +35,45 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     SelectBuilderSql("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTsConfigRow] = {
-    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser
+    SQL"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser"
           from pg_catalog.pg_ts_config
        """.as(PgTsConfigRow.rowParser(1).*)
   }
   override def selectById(oid: PgTsConfigId)(implicit c: Connection): Option[PgTsConfigRow] = {
-    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser
+    SQL"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser"
           from pg_catalog.pg_ts_config
-          where oid = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}
        """.as(PgTsConfigRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTsConfigId])(implicit c: Connection): List[PgTsConfigRow] = {
-    SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser
+    SQL"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser"
           from pg_catalog.pg_ts_config
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgTsConfigRow.rowParser(1).*)
     
   }
   override def selectByUnique(cfgname: String, cfgnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsConfigRow] = {
-    SQL"""select cfgname, cfgnamespace
+    SQL"""select "cfgname", "cfgnamespace"
           from pg_catalog.pg_ts_config
-          where cfgname = ${ParameterValue(cfgname, null, ToStatement.stringToStatement)} AND cfgnamespace = ${ParameterValue(cfgnamespace, null, ToStatement.longToStatement)}
+          where "cfgname" = ${ParameterValue(cfgname, null, ToStatement.stringToStatement)} AND "cfgnamespace" = ${ParameterValue(cfgnamespace, null, ToStatement.longToStatement)}
        """.as(PgTsConfigRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgTsConfigRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_config
-          set cfgname = ${ParameterValue(row.cfgname, null, ToStatement.stringToStatement)}::name,
-              cfgnamespace = ${ParameterValue(row.cfgnamespace, null, ToStatement.longToStatement)}::oid,
-              cfgowner = ${ParameterValue(row.cfgowner, null, ToStatement.longToStatement)}::oid,
-              cfgparser = ${ParameterValue(row.cfgparser, null, ToStatement.longToStatement)}::oid
-          where oid = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}
+          set "cfgname" = ${ParameterValue(row.cfgname, null, ToStatement.stringToStatement)}::name,
+              "cfgnamespace" = ${ParameterValue(row.cfgnamespace, null, ToStatement.longToStatement)}::oid,
+              "cfgowner" = ${ParameterValue(row.cfgowner, null, ToStatement.longToStatement)}::oid,
+              "cfgparser" = ${ParameterValue(row.cfgparser, null, ToStatement.longToStatement)}::oid
+          where "oid" = ${ParameterValue(oid, null, PgTsConfigId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTsConfigFields, PgTsConfigRow] = {
     UpdateBuilder("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.rowParser)
   }
   override def upsert(unsaved: PgTsConfigRow)(implicit c: Connection): PgTsConfigRow = {
-    SQL"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
+    SQL"""insert into pg_catalog.pg_ts_config("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")
           values (
             ${ParameterValue(unsaved.oid, null, PgTsConfigId.toStatement)}::oid,
             ${ParameterValue(unsaved.cfgname, null, ToStatement.stringToStatement)}::name,
@@ -81,13 +81,13 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
             ${ParameterValue(unsaved.cfgowner, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.cfgparser, null, ToStatement.longToStatement)}::oid
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            cfgname = EXCLUDED.cfgname,
-            cfgnamespace = EXCLUDED.cfgnamespace,
-            cfgowner = EXCLUDED.cfgowner,
-            cfgparser = EXCLUDED.cfgparser
-          returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
+            "cfgname" = EXCLUDED."cfgname",
+            "cfgnamespace" = EXCLUDED."cfgnamespace",
+            "cfgowner" = EXCLUDED."cfgowner",
+            "cfgparser" = EXCLUDED."cfgparser"
+          returning "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser"
        """
       .executeInsert(PgTsConfigRow.rowParser(1).single)
     

@@ -18,6 +18,6 @@ object PgCursorsViewRepoImpl extends PgCursorsViewRepo {
     SelectBuilderSql("pg_catalog.pg_cursors", PgCursorsViewFields, PgCursorsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgCursorsViewRow] = {
-    sql"""select "name", "statement", is_holdable, is_binary, is_scrollable, creation_time::text from pg_catalog.pg_cursors""".query(PgCursorsViewRow.read).stream
+    sql"""select "name", "statement", "is_holdable", "is_binary", "is_scrollable", "creation_time"::text from pg_catalog.pg_cursors""".query(PgCursorsViewRow.read).stream
   }
 }

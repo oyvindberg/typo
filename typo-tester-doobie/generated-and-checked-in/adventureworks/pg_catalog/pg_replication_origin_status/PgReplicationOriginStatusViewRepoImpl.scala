@@ -18,6 +18,6 @@ object PgReplicationOriginStatusViewRepoImpl extends PgReplicationOriginStatusVi
     SelectBuilderSql("pg_catalog.pg_replication_origin_status", PgReplicationOriginStatusViewFields, PgReplicationOriginStatusViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgReplicationOriginStatusViewRow] = {
-    sql"select local_id, external_id, remote_lsn, local_lsn from pg_catalog.pg_replication_origin_status".query(PgReplicationOriginStatusViewRow.read).stream
+    sql"""select "local_id", "external_id", "remote_lsn", "local_lsn" from pg_catalog.pg_replication_origin_status""".query(PgReplicationOriginStatusViewRow.read).stream
   }
 }

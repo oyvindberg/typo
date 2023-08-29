@@ -17,7 +17,7 @@ object EphViewRepoImpl extends EphViewRepo {
     SelectBuilderSql("hr.eph", EphViewFields, EphViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EphViewRow] = {
-    SQL"""select "id", businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
+    SQL"""select "id", "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
           from hr.eph
        """.as(EphViewRow.rowParser(1).*)
   }

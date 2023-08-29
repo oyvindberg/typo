@@ -17,7 +17,7 @@ object PgStatSslViewRepoImpl extends PgStatSslViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_ssl", PgStatSslViewFields, PgStatSslViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatSslViewRow] = {
-    SQL"""select pid, ssl, "version", cipher, bits, client_dn, client_serial, issuer_dn
+    SQL"""select "pid", "ssl", "version", "cipher", "bits", "client_dn", "client_serial", "issuer_dn"
           from pg_catalog.pg_stat_ssl
        """.as(PgStatSslViewRow.rowParser(1).*)
   }

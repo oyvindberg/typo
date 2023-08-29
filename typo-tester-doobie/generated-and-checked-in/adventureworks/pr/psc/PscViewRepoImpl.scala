@@ -18,6 +18,6 @@ object PscViewRepoImpl extends PscViewRepo {
     SelectBuilderSql("pr.psc", PscViewFields, PscViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PscViewRow] = {
-    sql"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from pr.psc""".query(PscViewRow.read).stream
+    sql"""select "id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.psc""".query(PscViewRow.read).stream
   }
 }

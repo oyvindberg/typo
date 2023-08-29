@@ -17,7 +17,7 @@ object PgPoliciesViewRepoImpl extends PgPoliciesViewRepo {
     SelectBuilderSql("pg_catalog.pg_policies", PgPoliciesViewFields, PgPoliciesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPoliciesViewRow] = {
-    SQL"""select schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check
+    SQL"""select "schemaname", "tablename", "policyname", "permissive", "roles", "cmd", "qual", "with_check"
           from pg_catalog.pg_policies
        """.as(PgPoliciesViewRow.rowParser(1).*)
   }

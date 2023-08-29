@@ -18,6 +18,6 @@ object PgConfigViewRepoImpl extends PgConfigViewRepo {
     SelectBuilderSql("pg_catalog.pg_config", PgConfigViewFields, PgConfigViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgConfigViewRow] = {
-    sql"""select "name", setting from pg_catalog.pg_config""".query(PgConfigViewRow.read).stream
+    sql"""select "name", "setting" from pg_catalog.pg_config""".query(PgConfigViewRow.read).stream
   }
 }

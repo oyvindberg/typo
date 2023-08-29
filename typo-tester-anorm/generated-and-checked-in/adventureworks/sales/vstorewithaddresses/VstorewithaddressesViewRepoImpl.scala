@@ -17,7 +17,7 @@ object VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
     SelectBuilderSql("sales.vstorewithaddresses", VstorewithaddressesViewFields, VstorewithaddressesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VstorewithaddressesViewRow] = {
-    SQL"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
+    SQL"""select "businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname"
           from sales.vstorewithaddresses
        """.as(VstorewithaddressesViewRow.rowParser(1).*)
   }

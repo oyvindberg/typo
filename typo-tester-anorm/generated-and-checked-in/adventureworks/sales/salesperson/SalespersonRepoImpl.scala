@@ -27,15 +27,15 @@ import typo.dsl.UpdateBuilder
 
 object SalespersonRepoImpl extends SalespersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.salesperson where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.salesperson where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
     DeleteBuilder("sales.salesperson", SalespersonFields)
   }
   override def insert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
-    SQL"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
+    SQL"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.salesquota, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.bonus, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.commissionpct, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.salesytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
+          returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalespersonRow.rowParser(1).single)
     
@@ -73,13 +73,13 @@ object SalespersonRepoImpl extends SalespersonRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.salesperson default values
-            returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
+            returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
          """
         .executeInsert(SalespersonRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesperson(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
+                  returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(SalespersonRow.rowParser(1).single)
@@ -90,42 +90,42 @@ object SalespersonRepoImpl extends SalespersonRepo {
     SelectBuilderSql("sales.salesperson", SalespersonFields, SalespersonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
           from sales.salesperson
        """.as(SalespersonRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[SalespersonRow] = {
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
           from sales.salesperson
-          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
+          where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(SalespersonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[SalespersonRow] = {
-    SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
           from sales.salesperson
-          where businessentityid = ANY(${businessentityids})
+          where "businessentityid" = ANY(${businessentityids})
        """.as(SalespersonRow.rowParser(1).*)
     
   }
   override def update(row: SalespersonRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update sales.salesperson
-          set territoryid = ${ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
-              salesquota = ${ParameterValue(row.salesquota, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
-              bonus = ${ParameterValue(row.bonus, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              commissionpct = ${ParameterValue(row.commissionpct, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              salesytd = ${ParameterValue(row.salesytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              saleslastyear = ${ParameterValue(row.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where businessentityid = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
+          set "territoryid" = ${ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
+              "salesquota" = ${ParameterValue(row.salesquota, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
+              "bonus" = ${ParameterValue(row.bonus, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "commissionpct" = ${ParameterValue(row.commissionpct, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "salesytd" = ${ParameterValue(row.salesytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "saleslastyear" = ${ParameterValue(row.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
     UpdateBuilder("sales.salesperson", SalespersonFields, SalespersonRow.rowParser)
   }
   override def upsert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
-    SQL"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
+    SQL"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
@@ -137,17 +137,17 @@ object SalespersonRepoImpl extends SalespersonRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (businessentityid)
+          on conflict ("businessentityid")
           do update set
-            territoryid = EXCLUDED.territoryid,
-            salesquota = EXCLUDED.salesquota,
-            bonus = EXCLUDED.bonus,
-            commissionpct = EXCLUDED.commissionpct,
-            salesytd = EXCLUDED.salesytd,
-            saleslastyear = EXCLUDED.saleslastyear,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
+            "territoryid" = EXCLUDED."territoryid",
+            "salesquota" = EXCLUDED."salesquota",
+            "bonus" = EXCLUDED."bonus",
+            "commissionpct" = EXCLUDED."commissionpct",
+            "salesytd" = EXCLUDED."salesytd",
+            "saleslastyear" = EXCLUDED."saleslastyear",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalespersonRow.rowParser(1).single)
     

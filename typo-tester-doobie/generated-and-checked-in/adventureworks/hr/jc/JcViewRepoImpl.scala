@@ -18,6 +18,6 @@ object JcViewRepoImpl extends JcViewRepo {
     SelectBuilderSql("hr.jc", JcViewFields, JcViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, JcViewRow] = {
-    sql"""select "id", jobcandidateid, businessentityid, resume, modifieddate::text from hr.jc""".query(JcViewRow.read).stream
+    sql"""select "id", "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from hr.jc""".query(JcViewRow.read).stream
   }
 }

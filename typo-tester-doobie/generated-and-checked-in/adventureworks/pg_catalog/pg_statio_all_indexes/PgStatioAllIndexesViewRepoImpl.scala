@@ -18,6 +18,6 @@ object PgStatioAllIndexesViewRepoImpl extends PgStatioAllIndexesViewRepo {
     SelectBuilderSql("pg_catalog.pg_statio_all_indexes", PgStatioAllIndexesViewFields, PgStatioAllIndexesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatioAllIndexesViewRow] = {
-    sql"select relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit from pg_catalog.pg_statio_all_indexes".query(PgStatioAllIndexesViewRow.read).stream
+    sql"""select "relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_blks_read", "idx_blks_hit" from pg_catalog.pg_statio_all_indexes""".query(PgStatioAllIndexesViewRow.read).stream
   }
 }

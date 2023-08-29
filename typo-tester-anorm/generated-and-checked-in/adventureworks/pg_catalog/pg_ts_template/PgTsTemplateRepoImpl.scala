@@ -19,15 +19,15 @@ import typo.dsl.UpdateBuilder
 
 object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def delete(oid: PgTsTemplateId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_ts_template where oid = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_ts_template where "oid" = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
     DeleteBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields)
   }
   override def insert(unsaved: PgTsTemplateRow)(implicit c: Connection): PgTsTemplateRow = {
-    SQL"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
+    SQL"""insert into pg_catalog.pg_ts_template("oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize")
           values (${ParameterValue(unsaved.oid, null, PgTsTemplateId.toStatement)}::oid, ${ParameterValue(unsaved.tmplname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.tmplnamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tmplinit, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.tmpllexize, null, TypoRegproc.toStatement)}::regproc)
-          returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
+          returning "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize"
        """
       .executeInsert(PgTsTemplateRow.rowParser(1).single)
     
@@ -36,45 +36,45 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     SelectBuilderSql("pg_catalog.pg_ts_template", PgTsTemplateFields, PgTsTemplateRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTsTemplateRow] = {
-    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize
+    SQL"""select "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize"
           from pg_catalog.pg_ts_template
        """.as(PgTsTemplateRow.rowParser(1).*)
   }
   override def selectById(oid: PgTsTemplateId)(implicit c: Connection): Option[PgTsTemplateRow] = {
-    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize
+    SQL"""select "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize"
           from pg_catalog.pg_ts_template
-          where oid = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}
        """.as(PgTsTemplateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgTsTemplateId])(implicit c: Connection): List[PgTsTemplateRow] = {
-    SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize
+    SQL"""select "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize"
           from pg_catalog.pg_ts_template
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgTsTemplateRow.rowParser(1).*)
     
   }
   override def selectByUnique(tmplname: String, tmplnamespace: /* oid */ Long)(implicit c: Connection): Option[PgTsTemplateRow] = {
-    SQL"""select tmplname, tmplnamespace
+    SQL"""select "tmplname", "tmplnamespace"
           from pg_catalog.pg_ts_template
-          where tmplname = ${ParameterValue(tmplname, null, ToStatement.stringToStatement)} AND tmplnamespace = ${ParameterValue(tmplnamespace, null, ToStatement.longToStatement)}
+          where "tmplname" = ${ParameterValue(tmplname, null, ToStatement.stringToStatement)} AND "tmplnamespace" = ${ParameterValue(tmplnamespace, null, ToStatement.longToStatement)}
        """.as(PgTsTemplateRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgTsTemplateRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_ts_template
-          set tmplname = ${ParameterValue(row.tmplname, null, ToStatement.stringToStatement)}::name,
-              tmplnamespace = ${ParameterValue(row.tmplnamespace, null, ToStatement.longToStatement)}::oid,
-              tmplinit = ${ParameterValue(row.tmplinit, null, TypoRegproc.toStatement)}::regproc,
-              tmpllexize = ${ParameterValue(row.tmpllexize, null, TypoRegproc.toStatement)}::regproc
-          where oid = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}
+          set "tmplname" = ${ParameterValue(row.tmplname, null, ToStatement.stringToStatement)}::name,
+              "tmplnamespace" = ${ParameterValue(row.tmplnamespace, null, ToStatement.longToStatement)}::oid,
+              "tmplinit" = ${ParameterValue(row.tmplinit, null, TypoRegproc.toStatement)}::regproc,
+              "tmpllexize" = ${ParameterValue(row.tmpllexize, null, TypoRegproc.toStatement)}::regproc
+          where "oid" = ${ParameterValue(oid, null, PgTsTemplateId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
     UpdateBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields, PgTsTemplateRow.rowParser)
   }
   override def upsert(unsaved: PgTsTemplateRow)(implicit c: Connection): PgTsTemplateRow = {
-    SQL"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
+    SQL"""insert into pg_catalog.pg_ts_template("oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize")
           values (
             ${ParameterValue(unsaved.oid, null, PgTsTemplateId.toStatement)}::oid,
             ${ParameterValue(unsaved.tmplname, null, ToStatement.stringToStatement)}::name,
@@ -82,13 +82,13 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
             ${ParameterValue(unsaved.tmplinit, null, TypoRegproc.toStatement)}::regproc,
             ${ParameterValue(unsaved.tmpllexize, null, TypoRegproc.toStatement)}::regproc
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            tmplname = EXCLUDED.tmplname,
-            tmplnamespace = EXCLUDED.tmplnamespace,
-            tmplinit = EXCLUDED.tmplinit,
-            tmpllexize = EXCLUDED.tmpllexize
-          returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
+            "tmplname" = EXCLUDED."tmplname",
+            "tmplnamespace" = EXCLUDED."tmplnamespace",
+            "tmplinit" = EXCLUDED."tmplinit",
+            "tmpllexize" = EXCLUDED."tmpllexize"
+          returning "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize"
        """
       .executeInsert(PgTsTemplateRow.rowParser(1).single)
     

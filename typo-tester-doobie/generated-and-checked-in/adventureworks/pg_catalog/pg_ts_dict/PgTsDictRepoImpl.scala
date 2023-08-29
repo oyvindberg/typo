@@ -20,44 +20,44 @@ import typo.dsl.UpdateBuilder
 
 object PgTsDictRepoImpl extends PgTsDictRepo {
   override def delete(oid: PgTsDictId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_dict where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_ts_dict where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTsDictFields, PgTsDictRow] = {
     DeleteBuilder("pg_catalog.pg_ts_dict", PgTsDictFields)
   }
   override def insert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
-    sql"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
+    sql"""insert into pg_catalog.pg_ts_dict("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsDictId.put))}::oid, ${fromWrite(unsaved.dictname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.dictnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dictowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))})
-          returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
+          returning "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption"
        """.query(PgTsDictRow.read).unique
   }
   override def select: SelectBuilder[PgTsDictFields, PgTsDictRow] = {
     SelectBuilderSql("pg_catalog.pg_ts_dict", PgTsDictFields, PgTsDictRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTsDictRow] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict".query(PgTsDictRow.read).stream
+    sql"""select "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption" from pg_catalog.pg_ts_dict""".query(PgTsDictRow.read).stream
   }
   override def selectById(oid: PgTsDictId): ConnectionIO[Option[PgTsDictRow]] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}".query(PgTsDictRow.read).option
+    sql"""select "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption" from pg_catalog.pg_ts_dict where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}""".query(PgTsDictRow.read).option
   }
   override def selectByIds(oids: Array[PgTsDictId]): Stream[ConnectionIO, PgTsDictRow] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ANY(${oids})".query(PgTsDictRow.read).stream
+    sql"""select "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption" from pg_catalog.pg_ts_dict where "oid" = ANY(${oids})""".query(PgTsDictRow.read).stream
   }
   override def selectByUnique(dictname: String, dictnamespace: /* oid */ Long): ConnectionIO[Option[PgTsDictRow]] = {
-    sql"""select dictname, dictnamespace
+    sql"""select "dictname", "dictnamespace"
           from pg_catalog.pg_ts_dict
-          where dictname = ${fromWrite(dictname)(Write.fromPut(Meta.StringMeta.put))} AND dictnamespace = ${fromWrite(dictnamespace)(Write.fromPut(Meta.LongMeta.put))}
+          where "dictname" = ${fromWrite(dictname)(Write.fromPut(Meta.StringMeta.put))} AND "dictnamespace" = ${fromWrite(dictnamespace)(Write.fromPut(Meta.LongMeta.put))}
        """.query(PgTsDictRow.read).option
   }
   override def update(row: PgTsDictRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_dict
-          set dictname = ${fromWrite(row.dictname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              dictnamespace = ${fromWrite(row.dictnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              dictowner = ${fromWrite(row.dictowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              dicttemplate = ${fromWrite(row.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              dictinitoption = ${fromWrite(row.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))}
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}"""
+          set "dictname" = ${fromWrite(row.dictname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "dictnamespace" = ${fromWrite(row.dictnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "dictowner" = ${fromWrite(row.dictowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "dicttemplate" = ${fromWrite(row.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "dictinitoption" = ${fromWrite(row.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))}
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -66,7 +66,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
     UpdateBuilder("pg_catalog.pg_ts_dict", PgTsDictFields, PgTsDictRow.read)
   }
   override def upsert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
-    sql"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
+    sql"""insert into pg_catalog.pg_ts_dict("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgTsDictId.put))}::oid,
             ${fromWrite(unsaved.dictname)(Write.fromPut(Meta.StringMeta.put))}::name,
@@ -75,14 +75,14 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
             ${fromWrite(unsaved.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))}
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            dictname = EXCLUDED.dictname,
-            dictnamespace = EXCLUDED.dictnamespace,
-            dictowner = EXCLUDED.dictowner,
-            dicttemplate = EXCLUDED.dicttemplate,
-            dictinitoption = EXCLUDED.dictinitoption
-          returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
+            "dictname" = EXCLUDED."dictname",
+            "dictnamespace" = EXCLUDED."dictnamespace",
+            "dictowner" = EXCLUDED."dictowner",
+            "dicttemplate" = EXCLUDED."dicttemplate",
+            "dictinitoption" = EXCLUDED."dictinitoption"
+          returning "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption"
        """.query(PgTsDictRow.read).unique
   }
 }

@@ -21,46 +21,46 @@ import typo.dsl.UpdateBuilder
 
 object PgRewriteRepoImpl extends PgRewriteRepo {
   override def delete(oid: PgRewriteId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_rewrite where oid = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_rewrite where "oid" = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgRewriteFields, PgRewriteRow] = {
     DeleteBuilder("pg_catalog.pg_rewrite", PgRewriteFields)
   }
   override def insert(unsaved: PgRewriteRow): ConnectionIO[PgRewriteRow] = {
-    sql"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)
+    sql"""insert into pg_catalog.pg_rewrite("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgRewriteId.put))}::oid, ${fromWrite(unsaved.rulename)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.evClass)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.evType)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.evEnabled)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.isInstead)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.evQual)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.evAction)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree)
-          returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
+          returning "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action"
        """.query(PgRewriteRow.read).unique
   }
   override def select: SelectBuilder[PgRewriteFields, PgRewriteRow] = {
     SelectBuilderSql("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgRewriteRow] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite".query(PgRewriteRow.read).stream
+    sql"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action" from pg_catalog.pg_rewrite""".query(PgRewriteRow.read).stream
   }
   override def selectById(oid: PgRewriteId): ConnectionIO[Option[PgRewriteRow]] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}".query(PgRewriteRow.read).option
+    sql"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action" from pg_catalog.pg_rewrite where "oid" = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}""".query(PgRewriteRow.read).option
   }
   override def selectByIds(oids: Array[PgRewriteId]): Stream[ConnectionIO, PgRewriteRow] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ANY(${oids})".query(PgRewriteRow.read).stream
+    sql"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action" from pg_catalog.pg_rewrite where "oid" = ANY(${oids})""".query(PgRewriteRow.read).stream
   }
   override def selectByUnique(evClass: /* oid */ Long, rulename: String): ConnectionIO[Option[PgRewriteRow]] = {
-    sql"""select ev_class, rulename
+    sql"""select "ev_class", "rulename"
           from pg_catalog.pg_rewrite
-          where ev_class = ${fromWrite(evClass)(Write.fromPut(Meta.LongMeta.put))} AND rulename = ${fromWrite(rulename)(Write.fromPut(Meta.StringMeta.put))}
+          where "ev_class" = ${fromWrite(evClass)(Write.fromPut(Meta.LongMeta.put))} AND "rulename" = ${fromWrite(rulename)(Write.fromPut(Meta.StringMeta.put))}
        """.query(PgRewriteRow.read).option
   }
   override def update(row: PgRewriteRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_rewrite
-          set rulename = ${fromWrite(row.rulename)(Write.fromPut(Meta.StringMeta.put))}::name,
-              ev_class = ${fromWrite(row.evClass)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              ev_type = ${fromWrite(row.evType)(Write.fromPut(Meta.StringMeta.put))}::char,
-              ev_enabled = ${fromWrite(row.evEnabled)(Write.fromPut(Meta.StringMeta.put))}::char,
-              is_instead = ${fromWrite(row.isInstead)(Write.fromPut(Meta.BooleanMeta.put))},
-              ev_qual = ${fromWrite(row.evQual)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree,
-              ev_action = ${fromWrite(row.evAction)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
-          where oid = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}"""
+          set "rulename" = ${fromWrite(row.rulename)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "ev_class" = ${fromWrite(row.evClass)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "ev_type" = ${fromWrite(row.evType)(Write.fromPut(Meta.StringMeta.put))}::char,
+              "ev_enabled" = ${fromWrite(row.evEnabled)(Write.fromPut(Meta.StringMeta.put))}::char,
+              "is_instead" = ${fromWrite(row.isInstead)(Write.fromPut(Meta.BooleanMeta.put))},
+              "ev_qual" = ${fromWrite(row.evQual)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree,
+              "ev_action" = ${fromWrite(row.evAction)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -69,7 +69,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
     UpdateBuilder("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.read)
   }
   override def upsert(unsaved: PgRewriteRow): ConnectionIO[PgRewriteRow] = {
-    sql"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)
+    sql"""insert into pg_catalog.pg_rewrite("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgRewriteId.put))}::oid,
             ${fromWrite(unsaved.rulename)(Write.fromPut(Meta.StringMeta.put))}::name,
@@ -80,16 +80,16 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
             ${fromWrite(unsaved.evQual)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree,
             ${fromWrite(unsaved.evAction)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            rulename = EXCLUDED.rulename,
-            ev_class = EXCLUDED.ev_class,
-            ev_type = EXCLUDED.ev_type,
-            ev_enabled = EXCLUDED.ev_enabled,
-            is_instead = EXCLUDED.is_instead,
-            ev_qual = EXCLUDED.ev_qual,
-            ev_action = EXCLUDED.ev_action
-          returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
+            "rulename" = EXCLUDED."rulename",
+            "ev_class" = EXCLUDED."ev_class",
+            "ev_type" = EXCLUDED."ev_type",
+            "ev_enabled" = EXCLUDED."ev_enabled",
+            "is_instead" = EXCLUDED."is_instead",
+            "ev_qual" = EXCLUDED."ev_qual",
+            "ev_action" = EXCLUDED."ev_action"
+          returning "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action"
        """.query(PgRewriteRow.read).unique
   }
 }

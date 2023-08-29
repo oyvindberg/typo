@@ -18,6 +18,6 @@ object CollationsViewRepoImpl extends CollationsViewRepo {
     SelectBuilderSql("information_schema.collations", CollationsViewFields, CollationsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CollationsViewRow] = {
-    sql"""select "collation_catalog", "collation_schema", "collation_name", pad_attribute from information_schema.collations""".query(CollationsViewRow.read).stream
+    sql"""select "collation_catalog", "collation_schema", "collation_name", "pad_attribute" from information_schema.collations""".query(CollationsViewRow.read).stream
   }
 }

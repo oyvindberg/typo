@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgPublicationRepoImpl extends PgPublicationRepo {
   override def delete(oid: PgPublicationId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_publication where oid = ${ParameterValue(oid, null, PgPublicationId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_publication where "oid" = ${ParameterValue(oid, null, PgPublicationId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgPublicationFields, PgPublicationRow] = {
     DeleteBuilder("pg_catalog.pg_publication", PgPublicationFields)
   }
   override def insert(unsaved: PgPublicationRow)(implicit c: Connection): PgPublicationRow = {
-    SQL"""insert into pg_catalog.pg_publication(oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot)
+    SQL"""insert into pg_catalog.pg_publication("oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot")
           values (${ParameterValue(unsaved.oid, null, PgPublicationId.toStatement)}::oid, ${ParameterValue(unsaved.pubname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.pubowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.puballtables, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.pubinsert, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.pubupdate, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.pubdelete, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.pubtruncate, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.pubviaroot, null, ToStatement.booleanToStatement)})
-          returning oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot
+          returning "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot"
        """
       .executeInsert(PgPublicationRow.rowParser(1).single)
     
@@ -35,49 +35,49 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
     SelectBuilderSql("pg_catalog.pg_publication", PgPublicationFields, PgPublicationRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPublicationRow] = {
-    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot
+    SQL"""select "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot"
           from pg_catalog.pg_publication
        """.as(PgPublicationRow.rowParser(1).*)
   }
   override def selectById(oid: PgPublicationId)(implicit c: Connection): Option[PgPublicationRow] = {
-    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot
+    SQL"""select "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot"
           from pg_catalog.pg_publication
-          where oid = ${ParameterValue(oid, null, PgPublicationId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgPublicationId.toStatement)}
        """.as(PgPublicationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgPublicationId])(implicit c: Connection): List[PgPublicationRow] = {
-    SQL"""select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot
+    SQL"""select "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot"
           from pg_catalog.pg_publication
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgPublicationRow.rowParser(1).*)
     
   }
   override def selectByUnique(pubname: String)(implicit c: Connection): Option[PgPublicationRow] = {
-    SQL"""select pubname
+    SQL"""select "pubname"
           from pg_catalog.pg_publication
-          where pubname = ${ParameterValue(pubname, null, ToStatement.stringToStatement)}
+          where "pubname" = ${ParameterValue(pubname, null, ToStatement.stringToStatement)}
        """.as(PgPublicationRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgPublicationRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_publication
-          set pubname = ${ParameterValue(row.pubname, null, ToStatement.stringToStatement)}::name,
-              pubowner = ${ParameterValue(row.pubowner, null, ToStatement.longToStatement)}::oid,
-              puballtables = ${ParameterValue(row.puballtables, null, ToStatement.booleanToStatement)},
-              pubinsert = ${ParameterValue(row.pubinsert, null, ToStatement.booleanToStatement)},
-              pubupdate = ${ParameterValue(row.pubupdate, null, ToStatement.booleanToStatement)},
-              pubdelete = ${ParameterValue(row.pubdelete, null, ToStatement.booleanToStatement)},
-              pubtruncate = ${ParameterValue(row.pubtruncate, null, ToStatement.booleanToStatement)},
-              pubviaroot = ${ParameterValue(row.pubviaroot, null, ToStatement.booleanToStatement)}
-          where oid = ${ParameterValue(oid, null, PgPublicationId.toStatement)}
+          set "pubname" = ${ParameterValue(row.pubname, null, ToStatement.stringToStatement)}::name,
+              "pubowner" = ${ParameterValue(row.pubowner, null, ToStatement.longToStatement)}::oid,
+              "puballtables" = ${ParameterValue(row.puballtables, null, ToStatement.booleanToStatement)},
+              "pubinsert" = ${ParameterValue(row.pubinsert, null, ToStatement.booleanToStatement)},
+              "pubupdate" = ${ParameterValue(row.pubupdate, null, ToStatement.booleanToStatement)},
+              "pubdelete" = ${ParameterValue(row.pubdelete, null, ToStatement.booleanToStatement)},
+              "pubtruncate" = ${ParameterValue(row.pubtruncate, null, ToStatement.booleanToStatement)},
+              "pubviaroot" = ${ParameterValue(row.pubviaroot, null, ToStatement.booleanToStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgPublicationId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgPublicationFields, PgPublicationRow] = {
     UpdateBuilder("pg_catalog.pg_publication", PgPublicationFields, PgPublicationRow.rowParser)
   }
   override def upsert(unsaved: PgPublicationRow)(implicit c: Connection): PgPublicationRow = {
-    SQL"""insert into pg_catalog.pg_publication(oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot)
+    SQL"""insert into pg_catalog.pg_publication("oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot")
           values (
             ${ParameterValue(unsaved.oid, null, PgPublicationId.toStatement)}::oid,
             ${ParameterValue(unsaved.pubname, null, ToStatement.stringToStatement)}::name,
@@ -89,17 +89,17 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
             ${ParameterValue(unsaved.pubtruncate, null, ToStatement.booleanToStatement)},
             ${ParameterValue(unsaved.pubviaroot, null, ToStatement.booleanToStatement)}
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            pubname = EXCLUDED.pubname,
-            pubowner = EXCLUDED.pubowner,
-            puballtables = EXCLUDED.puballtables,
-            pubinsert = EXCLUDED.pubinsert,
-            pubupdate = EXCLUDED.pubupdate,
-            pubdelete = EXCLUDED.pubdelete,
-            pubtruncate = EXCLUDED.pubtruncate,
-            pubviaroot = EXCLUDED.pubviaroot
-          returning oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot
+            "pubname" = EXCLUDED."pubname",
+            "pubowner" = EXCLUDED."pubowner",
+            "puballtables" = EXCLUDED."puballtables",
+            "pubinsert" = EXCLUDED."pubinsert",
+            "pubupdate" = EXCLUDED."pubupdate",
+            "pubdelete" = EXCLUDED."pubdelete",
+            "pubtruncate" = EXCLUDED."pubtruncate",
+            "pubviaroot" = EXCLUDED."pubviaroot"
+          returning "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot"
        """
       .executeInsert(PgPublicationRow.rowParser(1).single)
     

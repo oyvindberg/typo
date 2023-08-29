@@ -18,6 +18,6 @@ object PgStatioAllTablesViewRepoImpl extends PgStatioAllTablesViewRepo {
     SelectBuilderSql("pg_catalog.pg_statio_all_tables", PgStatioAllTablesViewFields, PgStatioAllTablesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatioAllTablesViewRow] = {
-    sql"select relid, schemaname, relname, heap_blks_read, heap_blks_hit, idx_blks_read, idx_blks_hit, toast_blks_read, toast_blks_hit, tidx_blks_read, tidx_blks_hit from pg_catalog.pg_statio_all_tables".query(PgStatioAllTablesViewRow.read).stream
+    sql"""select "relid", "schemaname", "relname", "heap_blks_read", "heap_blks_hit", "idx_blks_read", "idx_blks_hit", "toast_blks_read", "toast_blks_hit", "tidx_blks_read", "tidx_blks_hit" from pg_catalog.pg_statio_all_tables""".query(PgStatioAllTablesViewRow.read).stream
   }
 }

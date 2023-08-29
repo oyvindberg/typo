@@ -20,32 +20,32 @@ import typo.dsl.UpdateBuilder
 
 object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
   override def delete(compositeId: PgSubscriptionRelId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_subscription_rel where srrelid = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND srsubid = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_subscription_rel where "srrelid" = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND "srsubid" = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
     DeleteBuilder("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields)
   }
   override def insert(unsaved: PgSubscriptionRelRow): ConnectionIO[PgSubscriptionRelRow] = {
-    sql"""insert into pg_catalog.pg_subscription_rel(srsubid, srrelid, srsubstate, srsublsn)
+    sql"""insert into pg_catalog.pg_subscription_rel("srsubid", "srrelid", "srsubstate", "srsublsn")
           values (${fromWrite(unsaved.srsubid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.srrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.srsubstate)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.srsublsn)(Write.fromPutOption(Meta.LongMeta.put))}::pg_lsn)
-          returning srsubid, srrelid, srsubstate, srsublsn
+          returning "srsubid", "srrelid", "srsubstate", "srsublsn"
        """.query(PgSubscriptionRelRow.read).unique
   }
   override def select: SelectBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
     SelectBuilderSql("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields, PgSubscriptionRelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgSubscriptionRelRow] = {
-    sql"select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel".query(PgSubscriptionRelRow.read).stream
+    sql"""select "srsubid", "srrelid", "srsubstate", "srsublsn" from pg_catalog.pg_subscription_rel""".query(PgSubscriptionRelRow.read).stream
   }
   override def selectById(compositeId: PgSubscriptionRelId): ConnectionIO[Option[PgSubscriptionRelRow]] = {
-    sql"select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel where srrelid = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND srsubid = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}".query(PgSubscriptionRelRow.read).option
+    sql"""select "srsubid", "srrelid", "srsubstate", "srsublsn" from pg_catalog.pg_subscription_rel where "srrelid" = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND "srsubid" = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}""".query(PgSubscriptionRelRow.read).option
   }
   override def update(row: PgSubscriptionRelRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_subscription_rel
-          set srsubstate = ${fromWrite(row.srsubstate)(Write.fromPut(Meta.StringMeta.put))}::char,
-              srsublsn = ${fromWrite(row.srsublsn)(Write.fromPutOption(Meta.LongMeta.put))}::pg_lsn
-          where srrelid = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND srsubid = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}"""
+          set "srsubstate" = ${fromWrite(row.srsubstate)(Write.fromPut(Meta.StringMeta.put))}::char,
+              "srsublsn" = ${fromWrite(row.srsublsn)(Write.fromPutOption(Meta.LongMeta.put))}::pg_lsn
+          where "srrelid" = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND "srsubid" = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -54,18 +54,18 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
     UpdateBuilder("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields, PgSubscriptionRelRow.read)
   }
   override def upsert(unsaved: PgSubscriptionRelRow): ConnectionIO[PgSubscriptionRelRow] = {
-    sql"""insert into pg_catalog.pg_subscription_rel(srsubid, srrelid, srsubstate, srsublsn)
+    sql"""insert into pg_catalog.pg_subscription_rel("srsubid", "srrelid", "srsubstate", "srsublsn")
           values (
             ${fromWrite(unsaved.srsubid)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.srrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.srsubstate)(Write.fromPut(Meta.StringMeta.put))}::char,
             ${fromWrite(unsaved.srsublsn)(Write.fromPutOption(Meta.LongMeta.put))}::pg_lsn
           )
-          on conflict (srrelid, srsubid)
+          on conflict ("srrelid", "srsubid")
           do update set
-            srsubstate = EXCLUDED.srsubstate,
-            srsublsn = EXCLUDED.srsublsn
-          returning srsubid, srrelid, srsubstate, srsublsn
+            "srsubstate" = EXCLUDED."srsubstate",
+            "srsublsn" = EXCLUDED."srsublsn"
+          returning "srsubid", "srrelid", "srsubstate", "srsublsn"
        """.query(PgSubscriptionRelRow.read).unique
   }
 }

@@ -18,6 +18,6 @@ object VsalespersonsalesbyfiscalyearsViewRepoImpl extends Vsalespersonsalesbyfis
     SelectBuilderSql("sales.vsalespersonsalesbyfiscalyears", VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VsalespersonsalesbyfiscalyearsViewRow] = {
-    sql"select SalesPersonID, FullName, JobTitle, SalesTerritory, 2012, 2013, 2014 from sales.vsalespersonsalesbyfiscalyears".query(VsalespersonsalesbyfiscalyearsViewRow.read).stream
+    sql"""select "SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014" from sales.vsalespersonsalesbyfiscalyears""".query(VsalespersonsalesbyfiscalyearsViewRow.read).stream
   }
 }

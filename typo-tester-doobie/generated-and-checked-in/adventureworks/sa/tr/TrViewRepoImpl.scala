@@ -18,6 +18,6 @@ object TrViewRepoImpl extends TrViewRepo {
     SelectBuilderSql("sa.tr", TrViewFields, TrViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, TrViewRow] = {
-    sql"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sa.tr""".query(TrViewRow.read).stream
+    sql"""select "id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sa.tr""".query(TrViewRow.read).stream
   }
 }

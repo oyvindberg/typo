@@ -24,16 +24,16 @@ object SqlPartsRepoImpl extends SqlPartsRepo {
     DeleteBuilder("information_schema.sql_parts", SqlPartsFields)
   }
   override def insert(unsaved: SqlPartsRow): ConnectionIO[SqlPartsRow] = {
-    sql"""insert into information_schema.sql_parts(feature_id, feature_name, is_supported, is_verified_by, "comments")
+    sql"""insert into information_schema.sql_parts("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")
           values (${fromWrite(unsaved.featureId)(Write.fromPutOption(CharacterData.put))}::varchar, ${fromWrite(unsaved.featureName)(Write.fromPutOption(CharacterData.put))}::varchar, ${fromWrite(unsaved.isSupported)(Write.fromPutOption(YesOrNo.put))}::varchar, ${fromWrite(unsaved.isVerifiedBy)(Write.fromPutOption(CharacterData.put))}::varchar, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::varchar)
-          returning feature_id, feature_name, is_supported, is_verified_by, "comments"
+          returning "feature_id", "feature_name", "is_supported", "is_verified_by", "comments"
        """.query(SqlPartsRow.read).unique
   }
   override def select: SelectBuilder[SqlPartsFields, SqlPartsRow] = {
     SelectBuilderSql("information_schema.sql_parts", SqlPartsFields, SqlPartsRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SqlPartsRow] = {
-    sql"""select feature_id, feature_name, is_supported, is_verified_by, "comments" from information_schema.sql_parts""".query(SqlPartsRow.read).stream
+    sql"""select "feature_id", "feature_name", "is_supported", "is_verified_by", "comments" from information_schema.sql_parts""".query(SqlPartsRow.read).stream
   }
   override def update: UpdateBuilder[SqlPartsFields, SqlPartsRow] = {
     UpdateBuilder("information_schema.sql_parts", SqlPartsFields, SqlPartsRow.read)

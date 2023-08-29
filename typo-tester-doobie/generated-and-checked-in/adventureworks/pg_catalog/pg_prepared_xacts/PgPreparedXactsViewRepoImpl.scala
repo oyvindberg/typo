@@ -18,6 +18,6 @@ object PgPreparedXactsViewRepoImpl extends PgPreparedXactsViewRepo {
     SelectBuilderSql("pg_catalog.pg_prepared_xacts", PgPreparedXactsViewFields, PgPreparedXactsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgPreparedXactsViewRow] = {
-    sql"""select "transaction", gid, "prepared"::text, "owner", "database" from pg_catalog.pg_prepared_xacts""".query(PgPreparedXactsViewRow.read).stream
+    sql"""select "transaction", "gid", "prepared"::text, "owner", "database" from pg_catalog.pg_prepared_xacts""".query(PgPreparedXactsViewRow.read).stream
   }
 }

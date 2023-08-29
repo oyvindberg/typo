@@ -21,43 +21,43 @@ import typo.dsl.UpdateBuilder
 
 object PgTransformRepoImpl extends PgTransformRepo {
   override def delete(oid: PgTransformId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_transform where oid = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_transform where "oid" = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTransformFields, PgTransformRow] = {
     DeleteBuilder("pg_catalog.pg_transform", PgTransformFields)
   }
   override def insert(unsaved: PgTransformRow): ConnectionIO[PgTransformRow] = {
-    sql"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)
+    sql"""insert into pg_catalog.pg_transform("oid", "trftype", "trflang", "trffromsql", "trftosql")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTransformId.put))}::oid, ${fromWrite(unsaved.trftype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.trflang)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.trffromsql)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.trftosql)(Write.fromPut(TypoRegproc.put))}::regproc)
-          returning oid, trftype, trflang, trffromsql, trftosql
+          returning "oid", "trftype", "trflang", "trffromsql", "trftosql"
        """.query(PgTransformRow.read).unique
   }
   override def select: SelectBuilder[PgTransformFields, PgTransformRow] = {
     SelectBuilderSql("pg_catalog.pg_transform", PgTransformFields, PgTransformRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTransformRow] = {
-    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform".query(PgTransformRow.read).stream
+    sql"""select "oid", "trftype", "trflang", "trffromsql", "trftosql" from pg_catalog.pg_transform""".query(PgTransformRow.read).stream
   }
   override def selectById(oid: PgTransformId): ConnectionIO[Option[PgTransformRow]] = {
-    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}".query(PgTransformRow.read).option
+    sql"""select "oid", "trftype", "trflang", "trffromsql", "trftosql" from pg_catalog.pg_transform where "oid" = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}""".query(PgTransformRow.read).option
   }
   override def selectByIds(oids: Array[PgTransformId]): Stream[ConnectionIO, PgTransformRow] = {
-    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ANY(${oids})".query(PgTransformRow.read).stream
+    sql"""select "oid", "trftype", "trflang", "trffromsql", "trftosql" from pg_catalog.pg_transform where "oid" = ANY(${oids})""".query(PgTransformRow.read).stream
   }
   override def selectByUnique(trftype: /* oid */ Long, trflang: /* oid */ Long): ConnectionIO[Option[PgTransformRow]] = {
-    sql"""select trftype, trflang
+    sql"""select "trftype", "trflang"
           from pg_catalog.pg_transform
-          where trftype = ${fromWrite(trftype)(Write.fromPut(Meta.LongMeta.put))} AND trflang = ${fromWrite(trflang)(Write.fromPut(Meta.LongMeta.put))}
+          where "trftype" = ${fromWrite(trftype)(Write.fromPut(Meta.LongMeta.put))} AND "trflang" = ${fromWrite(trflang)(Write.fromPut(Meta.LongMeta.put))}
        """.query(PgTransformRow.read).option
   }
   override def update(row: PgTransformRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_transform
-          set trftype = ${fromWrite(row.trftype)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              trflang = ${fromWrite(row.trflang)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              trffromsql = ${fromWrite(row.trffromsql)(Write.fromPut(TypoRegproc.put))}::regproc,
-              trftosql = ${fromWrite(row.trftosql)(Write.fromPut(TypoRegproc.put))}::regproc
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}"""
+          set "trftype" = ${fromWrite(row.trftype)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "trflang" = ${fromWrite(row.trflang)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "trffromsql" = ${fromWrite(row.trffromsql)(Write.fromPut(TypoRegproc.put))}::regproc,
+              "trftosql" = ${fromWrite(row.trftosql)(Write.fromPut(TypoRegproc.put))}::regproc
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -66,7 +66,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
     UpdateBuilder("pg_catalog.pg_transform", PgTransformFields, PgTransformRow.read)
   }
   override def upsert(unsaved: PgTransformRow): ConnectionIO[PgTransformRow] = {
-    sql"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)
+    sql"""insert into pg_catalog.pg_transform("oid", "trftype", "trflang", "trffromsql", "trftosql")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgTransformId.put))}::oid,
             ${fromWrite(unsaved.trftype)(Write.fromPut(Meta.LongMeta.put))}::oid,
@@ -74,13 +74,13 @@ object PgTransformRepoImpl extends PgTransformRepo {
             ${fromWrite(unsaved.trffromsql)(Write.fromPut(TypoRegproc.put))}::regproc,
             ${fromWrite(unsaved.trftosql)(Write.fromPut(TypoRegproc.put))}::regproc
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            trftype = EXCLUDED.trftype,
-            trflang = EXCLUDED.trflang,
-            trffromsql = EXCLUDED.trffromsql,
-            trftosql = EXCLUDED.trftosql
-          returning oid, trftype, trflang, trffromsql, trftosql
+            "trftype" = EXCLUDED."trftype",
+            "trflang" = EXCLUDED."trflang",
+            "trffromsql" = EXCLUDED."trffromsql",
+            "trftosql" = EXCLUDED."trftosql"
+          returning "oid", "trftype", "trflang", "trffromsql", "trftosql"
        """.query(PgTransformRow.read).unique
   }
 }

@@ -18,6 +18,6 @@ object SchemataViewRepoImpl extends SchemataViewRepo {
     SelectBuilderSql("information_schema.schemata", SchemataViewFields, SchemataViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SchemataViewRow] = {
-    sql"""select "catalog_name", "schema_name", schema_owner, default_character_set_catalog, default_character_set_schema, default_character_set_name, sql_path from information_schema.schemata""".query(SchemataViewRow.read).stream
+    sql"""select "catalog_name", "schema_name", "schema_owner", "default_character_set_catalog", "default_character_set_schema", "default_character_set_name", "sql_path" from information_schema.schemata""".query(SchemataViewRow.read).stream
   }
 }

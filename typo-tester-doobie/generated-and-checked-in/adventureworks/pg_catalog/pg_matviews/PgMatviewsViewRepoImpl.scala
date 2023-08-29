@@ -18,6 +18,6 @@ object PgMatviewsViewRepoImpl extends PgMatviewsViewRepo {
     SelectBuilderSql("pg_catalog.pg_matviews", PgMatviewsViewFields, PgMatviewsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgMatviewsViewRow] = {
-    sql"""select schemaname, matviewname, matviewowner, "tablespace", hasindexes, ispopulated, definition from pg_catalog.pg_matviews""".query(PgMatviewsViewRow.read).stream
+    sql"""select "schemaname", "matviewname", "matviewowner", "tablespace", "hasindexes", "ispopulated", "definition" from pg_catalog.pg_matviews""".query(PgMatviewsViewRow.read).stream
   }
 }

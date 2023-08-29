@@ -18,6 +18,6 @@ object UmViewRepoImpl extends UmViewRepo {
     SelectBuilderSql("pr.um", UmViewFields, UmViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, UmViewRow] = {
-    sql"""select "id", unitmeasurecode, "name", modifieddate::text from pr.um""".query(UmViewRow.read).stream
+    sql"""select "id", "unitmeasurecode", "name", "modifieddate"::text from pr.um""".query(UmViewRow.read).stream
   }
 }

@@ -23,9 +23,9 @@ object SqlFeaturesRepoImpl extends SqlFeaturesRepo {
     DeleteBuilder("information_schema.sql_features", SqlFeaturesFields)
   }
   override def insert(unsaved: SqlFeaturesRow)(implicit c: Connection): SqlFeaturesRow = {
-    SQL"""insert into information_schema.sql_features(feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, "comments")
+    SQL"""insert into information_schema.sql_features("feature_id", "feature_name", "sub_feature_id", "sub_feature_name", "is_supported", "is_verified_by", "comments")
           values (${ParameterValue(unsaved.featureId, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.featureName, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.subFeatureId, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.subFeatureName, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.isSupported, null, ToStatement.optionToStatement(YesOrNo.toStatement, YesOrNo.parameterMetadata))}::varchar, ${ParameterValue(unsaved.isVerifiedBy, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar)
-          returning feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, "comments"
+          returning "feature_id", "feature_name", "sub_feature_id", "sub_feature_name", "is_supported", "is_verified_by", "comments"
        """
       .executeInsert(SqlFeaturesRow.rowParser(1).single)
     
@@ -34,7 +34,7 @@ object SqlFeaturesRepoImpl extends SqlFeaturesRepo {
     SelectBuilderSql("information_schema.sql_features", SqlFeaturesFields, SqlFeaturesRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SqlFeaturesRow] = {
-    SQL"""select feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, "comments"
+    SQL"""select "feature_id", "feature_name", "sub_feature_id", "sub_feature_name", "is_supported", "is_verified_by", "comments"
           from information_schema.sql_features
        """.as(SqlFeaturesRow.rowParser(1).*)
   }

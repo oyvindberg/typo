@@ -17,7 +17,7 @@ object DViewRepoImpl extends DViewRepo {
     SelectBuilderSql("hr.d", DViewFields, DViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DViewRow] = {
-    SQL"""select "id", departmentid, "name", groupname, modifieddate::text
+    SQL"""select "id", "departmentid", "name", "groupname", "modifieddate"::text
           from hr.d
        """.as(DViewRow.rowParser(1).*)
   }

@@ -18,6 +18,6 @@ object PgSeclabelsViewRepoImpl extends PgSeclabelsViewRepo {
     SelectBuilderSql("pg_catalog.pg_seclabels", PgSeclabelsViewFields, PgSeclabelsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgSeclabelsViewRow] = {
-    sql"""select objoid, classoid, objsubid, objtype, objnamespace, objname, provider, "label" from pg_catalog.pg_seclabels""".query(PgSeclabelsViewRow.read).stream
+    sql"""select "objoid", "classoid", "objsubid", "objtype", "objnamespace", "objname", "provider", "label" from pg_catalog.pg_seclabels""".query(PgSeclabelsViewRow.read).stream
   }
 }

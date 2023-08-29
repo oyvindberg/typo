@@ -18,6 +18,6 @@ object PgTimezoneAbbrevsViewRepoImpl extends PgTimezoneAbbrevsViewRepo {
     SelectBuilderSql("pg_catalog.pg_timezone_abbrevs", PgTimezoneAbbrevsViewFields, PgTimezoneAbbrevsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTimezoneAbbrevsViewRow] = {
-    sql"select abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_abbrevs".query(PgTimezoneAbbrevsViewRow.read).stream
+    sql"""select "abbrev", "utc_offset", "is_dst" from pg_catalog.pg_timezone_abbrevs""".query(PgTimezoneAbbrevsViewRow.read).stream
   }
 }

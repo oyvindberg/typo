@@ -18,6 +18,6 @@ object PgPublicationTablesViewRepoImpl extends PgPublicationTablesViewRepo {
     SelectBuilderSql("pg_catalog.pg_publication_tables", PgPublicationTablesViewFields, PgPublicationTablesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgPublicationTablesViewRow] = {
-    sql"select pubname, schemaname, tablename from pg_catalog.pg_publication_tables".query(PgPublicationTablesViewRow.read).stream
+    sql"""select "pubname", "schemaname", "tablename" from pg_catalog.pg_publication_tables""".query(PgPublicationTablesViewRow.read).stream
   }
 }

@@ -17,8 +17,8 @@ object CViewRepoImpl extends CViewRepo {
     SelectBuilderSql("sa.c", CViewFields, CViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CViewRow] = {
-    SQL"""select "id", customerid, personid, storeid, territoryid, rowguid, modifieddate::text
-          from sa."c"
+    SQL"""select "id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
+          from sa.c
        """.as(CViewRow.rowParser(1).*)
   }
 }

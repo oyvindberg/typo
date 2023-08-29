@@ -18,6 +18,6 @@ object CheckConstraintRoutineUsageViewRepoImpl extends CheckConstraintRoutineUsa
     SelectBuilderSql("information_schema.check_constraint_routine_usage", CheckConstraintRoutineUsageViewFields, CheckConstraintRoutineUsageViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CheckConstraintRoutineUsageViewRow] = {
-    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", specific_catalog, specific_schema, "specific_name" from information_schema.check_constraint_routine_usage""".query(CheckConstraintRoutineUsageViewRow.read).stream
+    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", "specific_catalog", "specific_schema", "specific_name" from information_schema.check_constraint_routine_usage""".query(CheckConstraintRoutineUsageViewRow.read).stream
   }
 }

@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_publication_rel where oid = ${ParameterValue(oid, null, PgPublicationRelId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_publication_rel where "oid" = ${ParameterValue(oid, null, PgPublicationRelId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
     DeleteBuilder("pg_catalog.pg_publication_rel", PgPublicationRelFields)
   }
   override def insert(unsaved: PgPublicationRelRow)(implicit c: Connection): PgPublicationRelRow = {
-    SQL"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)
+    SQL"""insert into pg_catalog.pg_publication_rel("oid", "prpubid", "prrelid")
           values (${ParameterValue(unsaved.oid, null, PgPublicationRelId.toStatement)}::oid, ${ParameterValue(unsaved.prpubid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.prrelid, null, ToStatement.longToStatement)}::oid)
-          returning oid, prpubid, prrelid
+          returning "oid", "prpubid", "prrelid"
        """
       .executeInsert(PgPublicationRelRow.rowParser(1).single)
     
@@ -35,53 +35,53 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
     SelectBuilderSql("pg_catalog.pg_publication_rel", PgPublicationRelFields, PgPublicationRelRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPublicationRelRow] = {
-    SQL"""select oid, prpubid, prrelid
+    SQL"""select "oid", "prpubid", "prrelid"
           from pg_catalog.pg_publication_rel
        """.as(PgPublicationRelRow.rowParser(1).*)
   }
   override def selectById(oid: PgPublicationRelId)(implicit c: Connection): Option[PgPublicationRelRow] = {
-    SQL"""select oid, prpubid, prrelid
+    SQL"""select "oid", "prpubid", "prrelid"
           from pg_catalog.pg_publication_rel
-          where oid = ${ParameterValue(oid, null, PgPublicationRelId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgPublicationRelId.toStatement)}
        """.as(PgPublicationRelRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgPublicationRelId])(implicit c: Connection): List[PgPublicationRelRow] = {
-    SQL"""select oid, prpubid, prrelid
+    SQL"""select "oid", "prpubid", "prrelid"
           from pg_catalog.pg_publication_rel
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgPublicationRelRow.rowParser(1).*)
     
   }
   override def selectByUnique(prrelid: /* oid */ Long, prpubid: /* oid */ Long)(implicit c: Connection): Option[PgPublicationRelRow] = {
-    SQL"""select prrelid, prpubid
+    SQL"""select "prrelid", "prpubid"
           from pg_catalog.pg_publication_rel
-          where prrelid = ${ParameterValue(prrelid, null, ToStatement.longToStatement)} AND prpubid = ${ParameterValue(prpubid, null, ToStatement.longToStatement)}
+          where "prrelid" = ${ParameterValue(prrelid, null, ToStatement.longToStatement)} AND "prpubid" = ${ParameterValue(prpubid, null, ToStatement.longToStatement)}
        """.as(PgPublicationRelRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgPublicationRelRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_publication_rel
-          set prpubid = ${ParameterValue(row.prpubid, null, ToStatement.longToStatement)}::oid,
-              prrelid = ${ParameterValue(row.prrelid, null, ToStatement.longToStatement)}::oid
-          where oid = ${ParameterValue(oid, null, PgPublicationRelId.toStatement)}
+          set "prpubid" = ${ParameterValue(row.prpubid, null, ToStatement.longToStatement)}::oid,
+              "prrelid" = ${ParameterValue(row.prrelid, null, ToStatement.longToStatement)}::oid
+          where "oid" = ${ParameterValue(oid, null, PgPublicationRelId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
     UpdateBuilder("pg_catalog.pg_publication_rel", PgPublicationRelFields, PgPublicationRelRow.rowParser)
   }
   override def upsert(unsaved: PgPublicationRelRow)(implicit c: Connection): PgPublicationRelRow = {
-    SQL"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)
+    SQL"""insert into pg_catalog.pg_publication_rel("oid", "prpubid", "prrelid")
           values (
             ${ParameterValue(unsaved.oid, null, PgPublicationRelId.toStatement)}::oid,
             ${ParameterValue(unsaved.prpubid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.prrelid, null, ToStatement.longToStatement)}::oid
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            prpubid = EXCLUDED.prpubid,
-            prrelid = EXCLUDED.prrelid
-          returning oid, prpubid, prrelid
+            "prpubid" = EXCLUDED."prpubid",
+            "prrelid" = EXCLUDED."prrelid"
+          returning "oid", "prpubid", "prrelid"
        """
       .executeInsert(PgPublicationRelRow.rowParser(1).single)
     

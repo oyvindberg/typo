@@ -18,6 +18,6 @@ object PgPreparedStatementsViewRepoImpl extends PgPreparedStatementsViewRepo {
     SelectBuilderSql("pg_catalog.pg_prepared_statements", PgPreparedStatementsViewFields, PgPreparedStatementsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgPreparedStatementsViewRow] = {
-    sql"""select "name", "statement", prepare_time::text, parameter_types, from_sql, generic_plans, custom_plans from pg_catalog.pg_prepared_statements""".query(PgPreparedStatementsViewRow.read).stream
+    sql"""select "name", "statement", "prepare_time"::text, "parameter_types", "from_sql", "generic_plans", "custom_plans" from pg_catalog.pg_prepared_statements""".query(PgPreparedStatementsViewRow.read).stream
   }
 }

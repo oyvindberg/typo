@@ -24,16 +24,16 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
     DeleteBuilder("information_schema.sql_sizing", SqlSizingFields)
   }
   override def insert(unsaved: SqlSizingRow): ConnectionIO[SqlSizingRow] = {
-    sql"""insert into information_schema.sql_sizing(sizing_id, sizing_name, supported_value, "comments")
+    sql"""insert into information_schema.sql_sizing("sizing_id", "sizing_name", "supported_value", "comments")
           values (${fromWrite(unsaved.sizingId)(Write.fromPutOption(CardinalNumber.put))}::int4, ${fromWrite(unsaved.sizingName)(Write.fromPutOption(CharacterData.put))}::varchar, ${fromWrite(unsaved.supportedValue)(Write.fromPutOption(CardinalNumber.put))}::int4, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::varchar)
-          returning sizing_id, sizing_name, supported_value, "comments"
+          returning "sizing_id", "sizing_name", "supported_value", "comments"
        """.query(SqlSizingRow.read).unique
   }
   override def select: SelectBuilder[SqlSizingFields, SqlSizingRow] = {
     SelectBuilderSql("information_schema.sql_sizing", SqlSizingFields, SqlSizingRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SqlSizingRow] = {
-    sql"""select sizing_id, sizing_name, supported_value, "comments" from information_schema.sql_sizing""".query(SqlSizingRow.read).stream
+    sql"""select "sizing_id", "sizing_name", "supported_value", "comments" from information_schema.sql_sizing""".query(SqlSizingRow.read).stream
   }
   override def update: UpdateBuilder[SqlSizingFields, SqlSizingRow] = {
     UpdateBuilder("information_schema.sql_sizing", SqlSizingFields, SqlSizingRow.read)

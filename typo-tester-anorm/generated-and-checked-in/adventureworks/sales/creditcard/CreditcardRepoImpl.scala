@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.creditcard where creditcardid = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.creditcard where "creditcardid" = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
     DeleteBuilder("sales.creditcard", CreditcardFields)
   }
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
-    SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
+    SQL"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
           values (${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4, ${ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.cardnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.expmonth, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.expyear, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
+          returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
     
@@ -56,13 +56,13 @@ object CreditcardRepoImpl extends CreditcardRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.creditcard default values
-            returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
+            returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
          """
         .executeInsert(CreditcardRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.creditcard(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
+                  returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(CreditcardRow.rowParser(1).single)
@@ -73,39 +73,39 @@ object CreditcardRepoImpl extends CreditcardRepo {
     SelectBuilderSql("sales.creditcard", CreditcardFields, CreditcardRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
+    SQL"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
           from sales.creditcard
        """.as(CreditcardRow.rowParser(1).*)
   }
   override def selectById(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
+    SQL"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
           from sales.creditcard
-          where creditcardid = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
+          where "creditcardid" = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.as(CreditcardRow.rowParser(1).singleOpt)
   }
   override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
+    SQL"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
           from sales.creditcard
-          where creditcardid = ANY(${creditcardids})
+          where "creditcardid" = ANY(${creditcardids})
        """.as(CreditcardRow.rowParser(1).*)
     
   }
   override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {
     val creditcardid = row.creditcardid
     SQL"""update sales.creditcard
-          set cardtype = ${ParameterValue(row.cardtype, null, ToStatement.stringToStatement)},
-              cardnumber = ${ParameterValue(row.cardnumber, null, ToStatement.stringToStatement)},
-              expmonth = ${ParameterValue(row.expmonth, null, ToStatement.intToStatement)}::int2,
-              expyear = ${ParameterValue(row.expyear, null, ToStatement.intToStatement)}::int2,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where creditcardid = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
+          set "cardtype" = ${ParameterValue(row.cardtype, null, ToStatement.stringToStatement)},
+              "cardnumber" = ${ParameterValue(row.cardnumber, null, ToStatement.stringToStatement)},
+              "expmonth" = ${ParameterValue(row.expmonth, null, ToStatement.intToStatement)}::int2,
+              "expyear" = ${ParameterValue(row.expyear, null, ToStatement.intToStatement)}::int2,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "creditcardid" = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
     UpdateBuilder("sales.creditcard", CreditcardFields, CreditcardRow.rowParser)
   }
   override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
-    SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
+    SQL"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
           values (
             ${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4,
             ${ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)},
@@ -114,14 +114,14 @@ object CreditcardRepoImpl extends CreditcardRepo {
             ${ParameterValue(unsaved.expyear, null, ToStatement.intToStatement)}::int2,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (creditcardid)
+          on conflict ("creditcardid")
           do update set
-            cardtype = EXCLUDED.cardtype,
-            cardnumber = EXCLUDED.cardnumber,
-            expmonth = EXCLUDED.expmonth,
-            expyear = EXCLUDED.expyear,
-            modifieddate = EXCLUDED.modifieddate
-          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
+            "cardtype" = EXCLUDED."cardtype",
+            "cardnumber" = EXCLUDED."cardnumber",
+            "expmonth" = EXCLUDED."expmonth",
+            "expyear" = EXCLUDED."expyear",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
     

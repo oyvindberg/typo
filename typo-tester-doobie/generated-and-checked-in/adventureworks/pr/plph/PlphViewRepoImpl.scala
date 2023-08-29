@@ -18,6 +18,6 @@ object PlphViewRepoImpl extends PlphViewRepo {
     SelectBuilderSql("pr.plph", PlphViewFields, PlphViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PlphViewRow] = {
-    sql"""select "id", productid, startdate::text, enddate::text, listprice, modifieddate::text from pr.plph""".query(PlphViewRow.read).stream
+    sql"""select "id", "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from pr.plph""".query(PlphViewRow.read).stream
   }
 }

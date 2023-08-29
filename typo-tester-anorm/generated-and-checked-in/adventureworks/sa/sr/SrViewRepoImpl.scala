@@ -17,7 +17,7 @@ object SrViewRepoImpl extends SrViewRepo {
     SelectBuilderSql("sa.sr", SrViewFields, SrViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SrViewRow] = {
-    SQL"""select "id", salesreasonid, "name", reasontype, modifieddate::text
+    SQL"""select "id", "salesreasonid", "name", "reasontype", "modifieddate"::text
           from sa.sr
        """.as(SrViewRow.rowParser(1).*)
   }

@@ -18,6 +18,6 @@ object UserMappingsViewRepoImpl extends UserMappingsViewRepo {
     SelectBuilderSql("information_schema.user_mappings", UserMappingsViewFields, UserMappingsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, UserMappingsViewRow] = {
-    sql"select authorization_identifier, foreign_server_catalog, foreign_server_name from information_schema.user_mappings".query(UserMappingsViewRow.read).stream
+    sql"""select "authorization_identifier", "foreign_server_catalog", "foreign_server_name" from information_schema.user_mappings""".query(UserMappingsViewRow.read).stream
   }
 }

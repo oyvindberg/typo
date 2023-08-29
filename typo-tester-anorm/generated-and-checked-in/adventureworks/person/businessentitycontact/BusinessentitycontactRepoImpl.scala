@@ -26,15 +26,15 @@ import typo.dsl.UpdateBuilder
 
 object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def delete(compositeId: BusinessentitycontactId)(implicit c: Connection): Boolean = {
-    SQL"delete from person.businessentitycontact where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND personid = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND contacttypeid = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from person.businessentitycontact where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "personid" = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND "contacttypeid" = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     DeleteBuilder("person.businessentitycontact", BusinessentitycontactFields)
   }
   override def insert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
-    SQL"""insert into person.businessentitycontact(businessentityid, personid, contacttypeid, rowguid, modifieddate)
+    SQL"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.personid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.contacttypeid, null, ContacttypeId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
+          returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
        """
       .executeInsert(BusinessentitycontactRow.rowParser(1).single)
     
@@ -56,13 +56,13 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.businessentitycontact default values
-            returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
+            returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
          """
         .executeInsert(BusinessentitycontactRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.businessentitycontact(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
+                  returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(BusinessentitycontactRow.rowParser(1).single)
@@ -73,29 +73,29 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     SelectBuilderSql("person.businessentitycontact", BusinessentitycontactFields, BusinessentitycontactRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[BusinessentitycontactRow] = {
-    SQL"""select businessentityid, personid, contacttypeid, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
           from person.businessentitycontact
        """.as(BusinessentitycontactRow.rowParser(1).*)
   }
   override def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow] = {
-    SQL"""select businessentityid, personid, contacttypeid, rowguid, modifieddate::text
+    SQL"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
           from person.businessentitycontact
-          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND personid = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND contacttypeid = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}
+          where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "personid" = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND "contacttypeid" = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}
        """.as(BusinessentitycontactRow.rowParser(1).singleOpt)
   }
   override def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.businessentitycontact
-          set rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where businessentityid = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND personid = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND contacttypeid = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}
+          set "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "personid" = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND "contacttypeid" = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     UpdateBuilder("person.businessentitycontact", BusinessentitycontactFields, BusinessentitycontactRow.rowParser)
   }
   override def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
-    SQL"""insert into person.businessentitycontact(businessentityid, personid, contacttypeid, rowguid, modifieddate)
+    SQL"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.personid, null, BusinessentityId.toStatement)}::int4,
@@ -103,11 +103,11 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (businessentityid, personid, contacttypeid)
+          on conflict ("businessentityid", "personid", "contacttypeid")
           do update set
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
        """
       .executeInsert(BusinessentitycontactRow.rowParser(1).single)
     

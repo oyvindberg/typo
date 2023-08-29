@@ -18,6 +18,6 @@ object CcViewRepoImpl extends CcViewRepo {
     SelectBuilderSql("sa.cc", CcViewFields, CcViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CcViewRow] = {
-    sql"""select "id", creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sa.cc""".query(CcViewRow.read).stream
+    sql"""select "id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sa.cc""".query(CcViewRow.read).stream
   }
 }

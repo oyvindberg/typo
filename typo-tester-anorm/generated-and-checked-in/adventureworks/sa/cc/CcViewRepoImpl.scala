@@ -17,7 +17,7 @@ object CcViewRepoImpl extends CcViewRepo {
     SelectBuilderSql("sa.cc", CcViewFields, CcViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CcViewRow] = {
-    SQL"""select "id", creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
+    SQL"""select "id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
           from sa.cc
        """.as(CcViewRow.rowParser(1).*)
   }

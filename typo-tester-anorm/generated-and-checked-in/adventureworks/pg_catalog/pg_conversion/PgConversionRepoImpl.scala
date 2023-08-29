@@ -19,15 +19,15 @@ import typo.dsl.UpdateBuilder
 
 object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_conversion where oid = ${ParameterValue(oid, null, PgConversionId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_conversion where "oid" = ${ParameterValue(oid, null, PgConversionId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgConversionFields, PgConversionRow] = {
     DeleteBuilder("pg_catalog.pg_conversion", PgConversionFields)
   }
   override def insert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow = {
-    SQL"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
+    SQL"""insert into pg_catalog.pg_conversion("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")
           values (${ParameterValue(unsaved.oid, null, PgConversionId.toStatement)}::oid, ${ParameterValue(unsaved.conname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.connamespace, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.conowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.conforencoding, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.contoencoding, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.conproc, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.condefault, null, ToStatement.booleanToStatement)})
-          returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
+          returning "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault"
        """
       .executeInsert(PgConversionRow.rowParser(1).single)
     
@@ -36,55 +36,55 @@ object PgConversionRepoImpl extends PgConversionRepo {
     SelectBuilderSql("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgConversionRow] = {
-    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
+    SQL"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault"
           from pg_catalog.pg_conversion
        """.as(PgConversionRow.rowParser(1).*)
   }
   override def selectById(oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow] = {
-    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
+    SQL"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault"
           from pg_catalog.pg_conversion
-          where oid = ${ParameterValue(oid, null, PgConversionId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgConversionId.toStatement)}
        """.as(PgConversionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgConversionId])(implicit c: Connection): List[PgConversionRow] = {
-    SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
+    SQL"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault"
           from pg_catalog.pg_conversion
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgConversionRow.rowParser(1).*)
     
   }
   override def selectByUnique(conname: String, connamespace: /* oid */ Long)(implicit c: Connection): Option[PgConversionRow] = {
-    SQL"""select conname, connamespace
+    SQL"""select "conname", "connamespace"
           from pg_catalog.pg_conversion
-          where conname = ${ParameterValue(conname, null, ToStatement.stringToStatement)} AND connamespace = ${ParameterValue(connamespace, null, ToStatement.longToStatement)}
+          where "conname" = ${ParameterValue(conname, null, ToStatement.stringToStatement)} AND "connamespace" = ${ParameterValue(connamespace, null, ToStatement.longToStatement)}
        """.as(PgConversionRow.rowParser(1).singleOpt)
     
   }
   override def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow] = {
-    SQL"""select connamespace, conforencoding, contoencoding, oid
+    SQL"""select "connamespace", "conforencoding", "contoencoding", "oid"
           from pg_catalog.pg_conversion
-          where connamespace = ${ParameterValue(connamespace, null, ToStatement.longToStatement)} AND conforencoding = ${ParameterValue(conforencoding, null, ToStatement.intToStatement)} AND contoencoding = ${ParameterValue(contoencoding, null, ToStatement.intToStatement)} AND oid = ${ParameterValue(oid, null, PgConversionId.toStatement)}
+          where "connamespace" = ${ParameterValue(connamespace, null, ToStatement.longToStatement)} AND "conforencoding" = ${ParameterValue(conforencoding, null, ToStatement.intToStatement)} AND "contoencoding" = ${ParameterValue(contoencoding, null, ToStatement.intToStatement)} AND "oid" = ${ParameterValue(oid, null, PgConversionId.toStatement)}
        """.as(PgConversionRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgConversionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_conversion
-          set conname = ${ParameterValue(row.conname, null, ToStatement.stringToStatement)}::name,
-              connamespace = ${ParameterValue(row.connamespace, null, ToStatement.longToStatement)}::oid,
-              conowner = ${ParameterValue(row.conowner, null, ToStatement.longToStatement)}::oid,
-              conforencoding = ${ParameterValue(row.conforencoding, null, ToStatement.intToStatement)}::int4,
-              contoencoding = ${ParameterValue(row.contoencoding, null, ToStatement.intToStatement)}::int4,
-              conproc = ${ParameterValue(row.conproc, null, TypoRegproc.toStatement)}::regproc,
-              condefault = ${ParameterValue(row.condefault, null, ToStatement.booleanToStatement)}
-          where oid = ${ParameterValue(oid, null, PgConversionId.toStatement)}
+          set "conname" = ${ParameterValue(row.conname, null, ToStatement.stringToStatement)}::name,
+              "connamespace" = ${ParameterValue(row.connamespace, null, ToStatement.longToStatement)}::oid,
+              "conowner" = ${ParameterValue(row.conowner, null, ToStatement.longToStatement)}::oid,
+              "conforencoding" = ${ParameterValue(row.conforencoding, null, ToStatement.intToStatement)}::int4,
+              "contoencoding" = ${ParameterValue(row.contoencoding, null, ToStatement.intToStatement)}::int4,
+              "conproc" = ${ParameterValue(row.conproc, null, TypoRegproc.toStatement)}::regproc,
+              "condefault" = ${ParameterValue(row.condefault, null, ToStatement.booleanToStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgConversionId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgConversionFields, PgConversionRow] = {
     UpdateBuilder("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.rowParser)
   }
   override def upsert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow = {
-    SQL"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
+    SQL"""insert into pg_catalog.pg_conversion("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")
           values (
             ${ParameterValue(unsaved.oid, null, PgConversionId.toStatement)}::oid,
             ${ParameterValue(unsaved.conname, null, ToStatement.stringToStatement)}::name,
@@ -95,16 +95,16 @@ object PgConversionRepoImpl extends PgConversionRepo {
             ${ParameterValue(unsaved.conproc, null, TypoRegproc.toStatement)}::regproc,
             ${ParameterValue(unsaved.condefault, null, ToStatement.booleanToStatement)}
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            conname = EXCLUDED.conname,
-            connamespace = EXCLUDED.connamespace,
-            conowner = EXCLUDED.conowner,
-            conforencoding = EXCLUDED.conforencoding,
-            contoencoding = EXCLUDED.contoencoding,
-            conproc = EXCLUDED.conproc,
-            condefault = EXCLUDED.condefault
-          returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
+            "conname" = EXCLUDED."conname",
+            "connamespace" = EXCLUDED."connamespace",
+            "conowner" = EXCLUDED."conowner",
+            "conforencoding" = EXCLUDED."conforencoding",
+            "contoencoding" = EXCLUDED."contoencoding",
+            "conproc" = EXCLUDED."conproc",
+            "condefault" = EXCLUDED."condefault"
+          returning "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault"
        """
       .executeInsert(PgConversionRow.rowParser(1).single)
     

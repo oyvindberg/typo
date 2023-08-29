@@ -18,6 +18,6 @@ object CrcViewRepoImpl extends CrcViewRepo {
     SelectBuilderSql("sa.crc", CrcViewFields, CrcViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CrcViewRow] = {
-    sql"select countryregioncode, currencycode, modifieddate::text from sa.crc".query(CrcViewRow.read).stream
+    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sa.crc""".query(CrcViewRow.read).stream
   }
 }

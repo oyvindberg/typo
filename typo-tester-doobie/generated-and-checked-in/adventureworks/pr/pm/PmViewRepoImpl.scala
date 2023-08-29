@@ -18,6 +18,6 @@ object PmViewRepoImpl extends PmViewRepo {
     SelectBuilderSql("pr.pm", PmViewFields, PmViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PmViewRow] = {
-    sql"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from pr.pm""".query(PmViewRow.read).stream
+    sql"""select "id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from pr.pm""".query(PmViewRow.read).stream
   }
 }

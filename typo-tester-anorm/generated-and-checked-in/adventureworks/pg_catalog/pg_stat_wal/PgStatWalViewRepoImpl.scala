@@ -17,7 +17,7 @@ object PgStatWalViewRepoImpl extends PgStatWalViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_wal", PgStatWalViewFields, PgStatWalViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatWalViewRow] = {
-    SQL"""select wal_records, wal_fpi, wal_bytes, wal_buffers_full, wal_write, wal_sync, wal_write_time, wal_sync_time, stats_reset::text
+    SQL"""select "wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset"::text
           from pg_catalog.pg_stat_wal
        """.as(PgStatWalViewRow.rowParser(1).*)
   }

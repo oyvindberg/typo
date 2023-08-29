@@ -18,6 +18,6 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
     SelectBuilderSql("sales.vstorewithdemographics", VstorewithdemographicsViewFields, VstorewithdemographicsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VstorewithdemographicsViewRow] = {
-    sql"""select businessentityid, "name", AnnualSales::numeric, AnnualRevenue::numeric, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees from sales.vstorewithdemographics""".query(VstorewithdemographicsViewRow.read).stream
+    sql"""select "businessentityid", "name", "AnnualSales"::numeric, "AnnualRevenue"::numeric, "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees" from sales.vstorewithdemographics""".query(VstorewithdemographicsViewRow.read).stream
   }
 }

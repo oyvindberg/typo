@@ -24,15 +24,15 @@ import typo.dsl.UpdateBuilder
 
 object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
-    SQL"delete from humanresources.department where departmentid = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from humanresources.department where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
     DeleteBuilder("humanresources.department", DepartmentFields)
   }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
-    SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
+    SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
           values (${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning departmentid, "name", groupname, modifieddate::text
+          returning "departmentid", "name", "groupname", "modifieddate"::text
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
     
@@ -53,13 +53,13 @@ object DepartmentRepoImpl extends DepartmentRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into humanresources.department default values
-            returning departmentid, "name", groupname, modifieddate::text
+            returning "departmentid", "name", "groupname", "modifieddate"::text
          """
         .executeInsert(DepartmentRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.department(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning departmentid, "name", groupname, modifieddate::text
+                  returning "departmentid", "name", "groupname", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(DepartmentRow.rowParser(1).single)
@@ -70,20 +70,20 @@ object DepartmentRepoImpl extends DepartmentRepo {
     SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
-    SQL"""select departmentid, "name", groupname, modifieddate::text
+    SQL"""select "departmentid", "name", "groupname", "modifieddate"::text
           from humanresources.department
        """.as(DepartmentRow.rowParser(1).*)
   }
   override def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow] = {
-    SQL"""select departmentid, "name", groupname, modifieddate::text
+    SQL"""select "departmentid", "name", "groupname", "modifieddate"::text
           from humanresources.department
-          where departmentid = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
+          where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
        """.as(DepartmentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
-    SQL"""select departmentid, "name", groupname, modifieddate::text
+    SQL"""select "departmentid", "name", "groupname", "modifieddate"::text
           from humanresources.department
-          where departmentid = ANY(${departmentids})
+          where "departmentid" = ANY(${departmentids})
        """.as(DepartmentRow.rowParser(1).*)
     
   }
@@ -91,28 +91,28 @@ object DepartmentRepoImpl extends DepartmentRepo {
     val departmentid = row.departmentid
     SQL"""update humanresources.department
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              groupname = ${ParameterValue(row.groupname, null, Name.toStatement)}::varchar,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where departmentid = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
+              "groupname" = ${ParameterValue(row.groupname, null, Name.toStatement)}::varchar,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilder("humanresources.department", DepartmentFields, DepartmentRow.rowParser)
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
-    SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
+    SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
           values (
             ${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (departmentid)
+          on conflict ("departmentid")
           do update set
             "name" = EXCLUDED."name",
-            groupname = EXCLUDED.groupname,
-            modifieddate = EXCLUDED.modifieddate
-          returning departmentid, "name", groupname, modifieddate::text
+            "groupname" = EXCLUDED."groupname",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "departmentid", "name", "groupname", "modifieddate"::text
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
     

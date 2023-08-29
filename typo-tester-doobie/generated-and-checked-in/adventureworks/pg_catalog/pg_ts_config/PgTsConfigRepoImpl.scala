@@ -20,43 +20,43 @@ import typo.dsl.UpdateBuilder
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_config where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_ts_config where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTsConfigFields, PgTsConfigRow] = {
     DeleteBuilder("pg_catalog.pg_ts_config", PgTsConfigFields)
   }
   override def insert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow] = {
-    sql"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
+    sql"""insert into pg_catalog.pg_ts_config("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsConfigId.put))}::oid, ${fromWrite(unsaved.cfgname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid)
-          returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
+          returning "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser"
        """.query(PgTsConfigRow.read).unique
   }
   override def select: SelectBuilder[PgTsConfigFields, PgTsConfigRow] = {
     SelectBuilderSql("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTsConfigRow] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config".query(PgTsConfigRow.read).stream
+    sql"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser" from pg_catalog.pg_ts_config""".query(PgTsConfigRow.read).stream
   }
   override def selectById(oid: PgTsConfigId): ConnectionIO[Option[PgTsConfigRow]] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}".query(PgTsConfigRow.read).option
+    sql"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser" from pg_catalog.pg_ts_config where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}""".query(PgTsConfigRow.read).option
   }
   override def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${oids})".query(PgTsConfigRow.read).stream
+    sql"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser" from pg_catalog.pg_ts_config where "oid" = ANY(${oids})""".query(PgTsConfigRow.read).stream
   }
   override def selectByUnique(cfgname: String, cfgnamespace: /* oid */ Long): ConnectionIO[Option[PgTsConfigRow]] = {
-    sql"""select cfgname, cfgnamespace
+    sql"""select "cfgname", "cfgnamespace"
           from pg_catalog.pg_ts_config
-          where cfgname = ${fromWrite(cfgname)(Write.fromPut(Meta.StringMeta.put))} AND cfgnamespace = ${fromWrite(cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}
+          where "cfgname" = ${fromWrite(cfgname)(Write.fromPut(Meta.StringMeta.put))} AND "cfgnamespace" = ${fromWrite(cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}
        """.query(PgTsConfigRow.read).option
   }
   override def update(row: PgTsConfigRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_config
-          set cfgname = ${fromWrite(row.cfgname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              cfgnamespace = ${fromWrite(row.cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              cfgowner = ${fromWrite(row.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              cfgparser = ${fromWrite(row.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}"""
+          set "cfgname" = ${fromWrite(row.cfgname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "cfgnamespace" = ${fromWrite(row.cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "cfgowner" = ${fromWrite(row.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "cfgparser" = ${fromWrite(row.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -65,7 +65,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     UpdateBuilder("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.read)
   }
   override def upsert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow] = {
-    sql"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
+    sql"""insert into pg_catalog.pg_ts_config("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgTsConfigId.put))}::oid,
             ${fromWrite(unsaved.cfgname)(Write.fromPut(Meta.StringMeta.put))}::name,
@@ -73,13 +73,13 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
             ${fromWrite(unsaved.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            cfgname = EXCLUDED.cfgname,
-            cfgnamespace = EXCLUDED.cfgnamespace,
-            cfgowner = EXCLUDED.cfgowner,
-            cfgparser = EXCLUDED.cfgparser
-          returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
+            "cfgname" = EXCLUDED."cfgname",
+            "cfgnamespace" = EXCLUDED."cfgnamespace",
+            "cfgowner" = EXCLUDED."cfgowner",
+            "cfgparser" = EXCLUDED."cfgparser"
+          returning "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser"
        """.query(PgTsConfigRow.read).unique
   }
 }

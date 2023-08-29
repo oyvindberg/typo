@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.shoppingcartitem where shoppingcartitemid = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields)
   }
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
-    SQL"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
+    SQL"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (${ParameterValue(unsaved.shoppingcartitemid, null, ShoppingcartitemId.toStatement)}::int4, ${ParameterValue(unsaved.shoppingcartid, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.datecreated, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
+          returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """
       .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     
@@ -62,13 +62,13 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.shoppingcartitem default values
-            returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
+            returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
          """
         .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.shoppingcartitem(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
+                  returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(ShoppingcartitemRow.rowParser(1).single)
@@ -79,39 +79,39 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
+    SQL"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
           from sales.shoppingcartitem
        """.as(ShoppingcartitemRow.rowParser(1).*)
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
+    SQL"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
           from sales.shoppingcartitem
-          where shoppingcartitemid = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}
+          where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}
        """.as(ShoppingcartitemRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
+    SQL"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
           from sales.shoppingcartitem
-          where shoppingcartitemid = ANY(${shoppingcartitemids})
+          where "shoppingcartitemid" = ANY(${shoppingcartitemids})
        """.as(ShoppingcartitemRow.rowParser(1).*)
     
   }
   override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
     val shoppingcartitemid = row.shoppingcartitemid
     SQL"""update sales.shoppingcartitem
-          set shoppingcartid = ${ParameterValue(row.shoppingcartid, null, ToStatement.stringToStatement)},
-              quantity = ${ParameterValue(row.quantity, null, ToStatement.intToStatement)}::int4,
-              productid = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
-              datecreated = ${ParameterValue(row.datecreated, null, TypoLocalDateTime.toStatement)}::timestamp,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where shoppingcartitemid = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}
+          set "shoppingcartid" = ${ParameterValue(row.shoppingcartid, null, ToStatement.stringToStatement)},
+              "quantity" = ${ParameterValue(row.quantity, null, ToStatement.intToStatement)}::int4,
+              "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
+              "datecreated" = ${ParameterValue(row.datecreated, null, TypoLocalDateTime.toStatement)}::timestamp,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.rowParser)
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
-    SQL"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
+    SQL"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (
             ${ParameterValue(unsaved.shoppingcartitemid, null, ShoppingcartitemId.toStatement)}::int4,
             ${ParameterValue(unsaved.shoppingcartid, null, ToStatement.stringToStatement)},
@@ -120,14 +120,14 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             ${ParameterValue(unsaved.datecreated, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (shoppingcartitemid)
+          on conflict ("shoppingcartitemid")
           do update set
-            shoppingcartid = EXCLUDED.shoppingcartid,
-            quantity = EXCLUDED.quantity,
-            productid = EXCLUDED.productid,
-            datecreated = EXCLUDED.datecreated,
-            modifieddate = EXCLUDED.modifieddate
-          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
+            "shoppingcartid" = EXCLUDED."shoppingcartid",
+            "quantity" = EXCLUDED."quantity",
+            "productid" = EXCLUDED."productid",
+            "datecreated" = EXCLUDED."datecreated",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """
       .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     

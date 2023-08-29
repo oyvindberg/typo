@@ -16,8 +16,7 @@ object sqlCast {
     */
   def toPg(dbType: db.Type, udtName: Option[String]): Option[String] =
     dbType match {
-      case db.Type.EnumRef(name) =>
-        Some(tableName.toCode(name).render.asString)
+      case db.Type.EnumRef(name)                               => Some(name.render.asString)
       case db.Type.Boolean | db.Type.Text | db.Type.VarChar(_) => None
       case _                                                   => udtName
     }

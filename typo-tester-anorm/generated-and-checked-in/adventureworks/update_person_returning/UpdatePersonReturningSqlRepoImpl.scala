@@ -22,7 +22,7 @@ object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
               where modifieddate < ${ParameterValue(cutoff, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp
               returning firstname, modifieddate
             )
-            select row.firstname, row.modifieddate::text
+            select row."firstname", row."modifieddate"::text
             from row"""
     sql.as(UpdatePersonReturningSqlRow.rowParser(1).*)
   }

@@ -18,6 +18,6 @@ object PgTablesViewRepoImpl extends PgTablesViewRepo {
     SelectBuilderSql("pg_catalog.pg_tables", PgTablesViewFields, PgTablesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTablesViewRow] = {
-    sql"""select schemaname, tablename, tableowner, "tablespace", hasindexes, hasrules, hastriggers, rowsecurity from pg_catalog.pg_tables""".query(PgTablesViewRow.read).stream
+    sql"""select "schemaname", "tablename", "tableowner", "tablespace", "hasindexes", "hasrules", "hastriggers", "rowsecurity" from pg_catalog.pg_tables""".query(PgTablesViewRow.read).stream
   }
 }

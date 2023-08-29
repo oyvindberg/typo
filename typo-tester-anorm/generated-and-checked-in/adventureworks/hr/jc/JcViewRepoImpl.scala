@@ -17,7 +17,7 @@ object JcViewRepoImpl extends JcViewRepo {
     SelectBuilderSql("hr.jc", JcViewFields, JcViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[JcViewRow] = {
-    SQL"""select "id", jobcandidateid, businessentityid, resume, modifieddate::text
+    SQL"""select "id", "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
           from hr.jc
        """.as(JcViewRow.rowParser(1).*)
   }

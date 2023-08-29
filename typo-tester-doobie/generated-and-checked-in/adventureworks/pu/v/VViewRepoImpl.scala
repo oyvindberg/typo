@@ -18,6 +18,6 @@ object VViewRepoImpl extends VViewRepo {
     SelectBuilderSql("pu.v", VViewFields, VViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VViewRow] = {
-    sql"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from pu.v""".query(VViewRow.read).stream
+    sql"""select "id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from pu.v""".query(VViewRow.read).stream
   }
 }

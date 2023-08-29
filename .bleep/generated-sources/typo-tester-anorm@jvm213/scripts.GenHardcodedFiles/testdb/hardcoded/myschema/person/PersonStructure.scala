@@ -33,7 +33,7 @@ class PersonStructure[Row](val prefix: Option[String], val extract: Row => Perso
   override val maritalStatusId = new Field[MaritalStatusId, Row](prefix, "marital_status_id", None, None)(x => extract(x).maritalStatusId, (row, value) => merge(row, extract(row).copy(maritalStatusId = value)))
   override val workEmail = new OptField[/* max 254 chars */ String, Row](prefix, "work_email", None, None)(x => extract(x).workEmail, (row, value) => merge(row, extract(row).copy(workEmail = value)))
   override val sector = new Field[Sector, Row](prefix, "sector", None, Some("myschema.sector"))(x => extract(x).sector, (row, value) => merge(row, extract(row).copy(sector = value)))
-  override val favoriteNumber = new Field[Number, Row](prefix, "favorite_number", None, Some("""myschema."number""""))(x => extract(x).favoriteNumber, (row, value) => merge(row, extract(row).copy(favoriteNumber = value)))
+  override val favoriteNumber = new Field[Number, Row](prefix, "favorite_number", None, Some("myschema.number"))(x => extract(x).favoriteNumber, (row, value) => merge(row, extract(row).copy(favoriteNumber = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](id, favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, maritalStatusId, workEmail, sector, favoriteNumber)

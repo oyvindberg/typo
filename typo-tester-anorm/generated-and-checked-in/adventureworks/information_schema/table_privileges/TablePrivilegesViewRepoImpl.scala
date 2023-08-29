@@ -17,7 +17,7 @@ object TablePrivilegesViewRepoImpl extends TablePrivilegesViewRepo {
     SelectBuilderSql("information_schema.table_privileges", TablePrivilegesViewFields, TablePrivilegesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[TablePrivilegesViewRow] = {
-    SQL"""select grantor, grantee, table_catalog, table_schema, "table_name", privilege_type, is_grantable, with_hierarchy
+    SQL"""select "grantor", "grantee", "table_catalog", "table_schema", "table_name", "privilege_type", "is_grantable", "with_hierarchy"
           from information_schema.table_privileges
        """.as(TablePrivilegesViewRow.rowParser(1).*)
   }

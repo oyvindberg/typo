@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
-    SQL"delete from sales.countryregioncurrency where countryregioncode = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND currencycode = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from sales.countryregioncurrency where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields)
   }
   override def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
-    SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
+    SQL"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
           values (${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning countryregioncode, currencycode, modifieddate::text
+          returning "countryregioncode", "currencycode", "modifieddate"::text
        """
       .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
     
@@ -50,13 +50,13 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.countryregioncurrency default values
-            returning countryregioncode, currencycode, modifieddate::text
+            returning "countryregioncode", "currencycode", "modifieddate"::text
          """
         .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.countryregioncurrency(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning countryregioncode, currencycode, modifieddate::text
+                  returning "countryregioncode", "currencycode", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
@@ -67,37 +67,37 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
-    SQL"""select countryregioncode, currencycode, modifieddate::text
+    SQL"""select "countryregioncode", "currencycode", "modifieddate"::text
           from sales.countryregioncurrency
        """.as(CountryregioncurrencyRow.rowParser(1).*)
   }
   override def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
-    SQL"""select countryregioncode, currencycode, modifieddate::text
+    SQL"""select "countryregioncode", "currencycode", "modifieddate"::text
           from sales.countryregioncurrency
-          where countryregioncode = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND currencycode = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
+          where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
        """.as(CountryregioncurrencyRow.rowParser(1).singleOpt)
   }
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.countryregioncurrency
-          set modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where countryregioncode = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND currencycode = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
+          set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.rowParser)
   }
   override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
-    SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
+    SQL"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
           values (
             ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)},
             ${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (countryregioncode, currencycode)
+          on conflict ("countryregioncode", "currencycode")
           do update set
-            modifieddate = EXCLUDED.modifieddate
-          returning countryregioncode, currencycode, modifieddate::text
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "countryregioncode", "currencycode", "modifieddate"::text
        """
       .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
     

@@ -18,6 +18,6 @@ object PgShmemAllocationsViewRepoImpl extends PgShmemAllocationsViewRepo {
     SelectBuilderSql("pg_catalog.pg_shmem_allocations", PgShmemAllocationsViewFields, PgShmemAllocationsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgShmemAllocationsViewRow] = {
-    sql"""select "name", "off", "size", allocated_size from pg_catalog.pg_shmem_allocations""".query(PgShmemAllocationsViewRow.read).stream
+    sql"""select "name", "off", "size", "allocated_size" from pg_catalog.pg_shmem_allocations""".query(PgShmemAllocationsViewRow.read).stream
   }
 }

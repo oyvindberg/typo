@@ -27,15 +27,15 @@ import typo.dsl.UpdateBuilder
 
 object ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
-    SQL"delete from production.productreview where productreviewid = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from production.productreview where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
     DeleteBuilder("production.productreview", ProductreviewFields)
   }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
-    SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
+    SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (${ParameterValue(unsaved.productreviewid, null, ProductreviewId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.reviewername, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.emailaddress, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rating, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
+          returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """
       .executeInsert(ProductreviewRow.rowParser(1).single)
     
@@ -63,13 +63,13 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productreview default values
-            returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
+            returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
          """
         .executeInsert(ProductreviewRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productreview(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
+                  returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(ProductreviewRow.rowParser(1).single)
@@ -80,41 +80,41 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     SelectBuilderSql("production.productreview", ProductreviewFields, ProductreviewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
+    SQL"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
           from production.productreview
        """.as(ProductreviewRow.rowParser(1).*)
   }
   override def selectById(productreviewid: ProductreviewId)(implicit c: Connection): Option[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
+    SQL"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
           from production.productreview
-          where productreviewid = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}
+          where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}
        """.as(ProductreviewRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): List[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
+    SQL"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
           from production.productreview
-          where productreviewid = ANY(${productreviewids})
+          where "productreviewid" = ANY(${productreviewids})
        """.as(ProductreviewRow.rowParser(1).*)
     
   }
   override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
     val productreviewid = row.productreviewid
     SQL"""update production.productreview
-          set productid = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
-              reviewername = ${ParameterValue(row.reviewername, null, Name.toStatement)}::varchar,
-              reviewdate = ${ParameterValue(row.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp,
-              emailaddress = ${ParameterValue(row.emailaddress, null, ToStatement.stringToStatement)},
-              rating = ${ParameterValue(row.rating, null, ToStatement.intToStatement)}::int4,
+          set "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
+              "reviewername" = ${ParameterValue(row.reviewername, null, Name.toStatement)}::varchar,
+              "reviewdate" = ${ParameterValue(row.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp,
+              "emailaddress" = ${ParameterValue(row.emailaddress, null, ToStatement.stringToStatement)},
+              "rating" = ${ParameterValue(row.rating, null, ToStatement.intToStatement)}::int4,
               "comments" = ${ParameterValue(row.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where productreviewid = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
     UpdateBuilder("production.productreview", ProductreviewFields, ProductreviewRow.rowParser)
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
-    SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
+    SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (
             ${ParameterValue(unsaved.productreviewid, null, ProductreviewId.toStatement)}::int4,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
@@ -125,16 +125,16 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (productreviewid)
+          on conflict ("productreviewid")
           do update set
-            productid = EXCLUDED.productid,
-            reviewername = EXCLUDED.reviewername,
-            reviewdate = EXCLUDED.reviewdate,
-            emailaddress = EXCLUDED.emailaddress,
-            rating = EXCLUDED.rating,
+            "productid" = EXCLUDED."productid",
+            "reviewername" = EXCLUDED."reviewername",
+            "reviewdate" = EXCLUDED."reviewdate",
+            "emailaddress" = EXCLUDED."emailaddress",
+            "rating" = EXCLUDED."rating",
             "comments" = EXCLUDED."comments",
-            modifieddate = EXCLUDED.modifieddate
-          returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """
       .executeInsert(ProductreviewRow.rowParser(1).single)
     

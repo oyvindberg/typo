@@ -18,6 +18,6 @@ object PgStatProgressVacuumViewRepoImpl extends PgStatProgressVacuumViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_progress_vacuum", PgStatProgressVacuumViewFields, PgStatProgressVacuumViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatProgressVacuumViewRow] = {
-    sql"select pid, datid, datname, relid, phase, heap_blks_total, heap_blks_scanned, heap_blks_vacuumed, index_vacuum_count, max_dead_tuples, num_dead_tuples from pg_catalog.pg_stat_progress_vacuum".query(PgStatProgressVacuumViewRow.read).stream
+    sql"""select "pid", "datid", "datname", "relid", "phase", "heap_blks_total", "heap_blks_scanned", "heap_blks_vacuumed", "index_vacuum_count", "max_dead_tuples", "num_dead_tuples" from pg_catalog.pg_stat_progress_vacuum""".query(PgStatProgressVacuumViewRow.read).stream
   }
 }

@@ -21,42 +21,42 @@ import typo.dsl.UpdateBuilder
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_namespace where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_namespace where "oid" = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgNamespaceFields, PgNamespaceRow] = {
     DeleteBuilder("pg_catalog.pg_namespace", PgNamespaceFields)
   }
   override def insert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
-    sql"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
+    sql"""insert into pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgNamespaceId.put))}::oid, ${fromWrite(unsaved.nspname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
-          returning oid, nspname, nspowner, nspacl
+          returning "oid", "nspname", "nspowner", "nspacl"
        """.query(PgNamespaceRow.read).unique
   }
   override def select: SelectBuilder[PgNamespaceFields, PgNamespaceRow] = {
     SelectBuilderSql("pg_catalog.pg_namespace", PgNamespaceFields, PgNamespaceRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgNamespaceRow] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace".query(PgNamespaceRow.read).stream
+    sql"""select "oid", "nspname", "nspowner", "nspacl" from pg_catalog.pg_namespace""".query(PgNamespaceRow.read).stream
   }
   override def selectById(oid: PgNamespaceId): ConnectionIO[Option[PgNamespaceRow]] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}".query(PgNamespaceRow.read).option
+    sql"""select "oid", "nspname", "nspowner", "nspacl" from pg_catalog.pg_namespace where "oid" = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}""".query(PgNamespaceRow.read).option
   }
   override def selectByIds(oids: Array[PgNamespaceId]): Stream[ConnectionIO, PgNamespaceRow] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY(${oids})".query(PgNamespaceRow.read).stream
+    sql"""select "oid", "nspname", "nspowner", "nspacl" from pg_catalog.pg_namespace where "oid" = ANY(${oids})""".query(PgNamespaceRow.read).stream
   }
   override def selectByUnique(nspname: String): ConnectionIO[Option[PgNamespaceRow]] = {
-    sql"""select nspname
+    sql"""select "nspname"
           from pg_catalog.pg_namespace
-          where nspname = ${fromWrite(nspname)(Write.fromPut(Meta.StringMeta.put))}
+          where "nspname" = ${fromWrite(nspname)(Write.fromPut(Meta.StringMeta.put))}
        """.query(PgNamespaceRow.read).option
   }
   override def update(row: PgNamespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_namespace
-          set nspname = ${fromWrite(row.nspname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              nspowner = ${fromWrite(row.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              nspacl = ${fromWrite(row.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}"""
+          set "nspname" = ${fromWrite(row.nspname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "nspowner" = ${fromWrite(row.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              "nspacl" = ${fromWrite(row.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -65,19 +65,19 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     UpdateBuilder("pg_catalog.pg_namespace", PgNamespaceFields, PgNamespaceRow.read)
   }
   override def upsert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
-    sql"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
+    sql"""insert into pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgNamespaceId.put))}::oid,
             ${fromWrite(unsaved.nspname)(Write.fromPut(Meta.StringMeta.put))}::name,
             ${fromWrite(unsaved.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            nspname = EXCLUDED.nspname,
-            nspowner = EXCLUDED.nspowner,
-            nspacl = EXCLUDED.nspacl
-          returning oid, nspname, nspowner, nspacl
+            "nspname" = EXCLUDED."nspname",
+            "nspowner" = EXCLUDED."nspowner",
+            "nspacl" = EXCLUDED."nspacl"
+          returning "oid", "nspname", "nspowner", "nspacl"
        """.query(PgNamespaceRow.read).unique
   }
 }

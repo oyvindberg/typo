@@ -23,9 +23,9 @@ object SqlPartsRepoImpl extends SqlPartsRepo {
     DeleteBuilder("information_schema.sql_parts", SqlPartsFields)
   }
   override def insert(unsaved: SqlPartsRow)(implicit c: Connection): SqlPartsRow = {
-    SQL"""insert into information_schema.sql_parts(feature_id, feature_name, is_supported, is_verified_by, "comments")
+    SQL"""insert into information_schema.sql_parts("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")
           values (${ParameterValue(unsaved.featureId, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.featureName, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.isSupported, null, ToStatement.optionToStatement(YesOrNo.toStatement, YesOrNo.parameterMetadata))}::varchar, ${ParameterValue(unsaved.isVerifiedBy, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(CharacterData.toStatement, CharacterData.parameterMetadata))}::varchar)
-          returning feature_id, feature_name, is_supported, is_verified_by, "comments"
+          returning "feature_id", "feature_name", "is_supported", "is_verified_by", "comments"
        """
       .executeInsert(SqlPartsRow.rowParser(1).single)
     
@@ -34,7 +34,7 @@ object SqlPartsRepoImpl extends SqlPartsRepo {
     SelectBuilderSql("information_schema.sql_parts", SqlPartsFields, SqlPartsRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SqlPartsRow] = {
-    SQL"""select feature_id, feature_name, is_supported, is_verified_by, "comments"
+    SQL"""select "feature_id", "feature_name", "is_supported", "is_verified_by", "comments"
           from information_schema.sql_parts
        """.as(SqlPartsRow.rowParser(1).*)
   }

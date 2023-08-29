@@ -21,42 +21,42 @@ import typo.dsl.UpdateBuilder
 
 object PgAmRepoImpl extends PgAmRepo {
   override def delete(oid: PgAmId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_am where oid = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_am where "oid" = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgAmFields, PgAmRow] = {
     DeleteBuilder("pg_catalog.pg_am", PgAmFields)
   }
   override def insert(unsaved: PgAmRow): ConnectionIO[PgAmRow] = {
-    sql"""insert into pg_catalog.pg_am(oid, amname, amhandler, amtype)
+    sql"""insert into pg_catalog.pg_am("oid", "amname", "amhandler", "amtype")
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgAmId.put))}::oid, ${fromWrite(unsaved.amname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.amhandler)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.amtype)(Write.fromPut(Meta.StringMeta.put))}::char)
-          returning oid, amname, amhandler, amtype
+          returning "oid", "amname", "amhandler", "amtype"
        """.query(PgAmRow.read).unique
   }
   override def select: SelectBuilder[PgAmFields, PgAmRow] = {
     SelectBuilderSql("pg_catalog.pg_am", PgAmFields, PgAmRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgAmRow] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am".query(PgAmRow.read).stream
+    sql"""select "oid", "amname", "amhandler", "amtype" from pg_catalog.pg_am""".query(PgAmRow.read).stream
   }
   override def selectById(oid: PgAmId): ConnectionIO[Option[PgAmRow]] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}".query(PgAmRow.read).option
+    sql"""select "oid", "amname", "amhandler", "amtype" from pg_catalog.pg_am where "oid" = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}""".query(PgAmRow.read).option
   }
   override def selectByIds(oids: Array[PgAmId]): Stream[ConnectionIO, PgAmRow] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ANY(${oids})".query(PgAmRow.read).stream
+    sql"""select "oid", "amname", "amhandler", "amtype" from pg_catalog.pg_am where "oid" = ANY(${oids})""".query(PgAmRow.read).stream
   }
   override def selectByUnique(amname: String): ConnectionIO[Option[PgAmRow]] = {
-    sql"""select amname
+    sql"""select "amname"
           from pg_catalog.pg_am
-          where amname = ${fromWrite(amname)(Write.fromPut(Meta.StringMeta.put))}
+          where "amname" = ${fromWrite(amname)(Write.fromPut(Meta.StringMeta.put))}
        """.query(PgAmRow.read).option
   }
   override def update(row: PgAmRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_am
-          set amname = ${fromWrite(row.amname)(Write.fromPut(Meta.StringMeta.put))}::name,
-              amhandler = ${fromWrite(row.amhandler)(Write.fromPut(TypoRegproc.put))}::regproc,
-              amtype = ${fromWrite(row.amtype)(Write.fromPut(Meta.StringMeta.put))}::char
-          where oid = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}"""
+          set "amname" = ${fromWrite(row.amname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              "amhandler" = ${fromWrite(row.amhandler)(Write.fromPut(TypoRegproc.put))}::regproc,
+              "amtype" = ${fromWrite(row.amtype)(Write.fromPut(Meta.StringMeta.put))}::char
+          where "oid" = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -65,19 +65,19 @@ object PgAmRepoImpl extends PgAmRepo {
     UpdateBuilder("pg_catalog.pg_am", PgAmFields, PgAmRow.read)
   }
   override def upsert(unsaved: PgAmRow): ConnectionIO[PgAmRow] = {
-    sql"""insert into pg_catalog.pg_am(oid, amname, amhandler, amtype)
+    sql"""insert into pg_catalog.pg_am("oid", "amname", "amhandler", "amtype")
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgAmId.put))}::oid,
             ${fromWrite(unsaved.amname)(Write.fromPut(Meta.StringMeta.put))}::name,
             ${fromWrite(unsaved.amhandler)(Write.fromPut(TypoRegproc.put))}::regproc,
             ${fromWrite(unsaved.amtype)(Write.fromPut(Meta.StringMeta.put))}::char
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            amname = EXCLUDED.amname,
-            amhandler = EXCLUDED.amhandler,
-            amtype = EXCLUDED.amtype
-          returning oid, amname, amhandler, amtype
+            "amname" = EXCLUDED."amname",
+            "amhandler" = EXCLUDED."amhandler",
+            "amtype" = EXCLUDED."amtype"
+          returning "oid", "amname", "amhandler", "amtype"
        """.query(PgAmRow.read).unique
   }
 }

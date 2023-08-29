@@ -17,7 +17,7 @@ object ConstraintTableUsageViewRepoImpl extends ConstraintTableUsageViewRepo {
     SelectBuilderSql("information_schema.constraint_table_usage", ConstraintTableUsageViewFields, ConstraintTableUsageViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ConstraintTableUsageViewRow] = {
-    SQL"""select table_catalog, table_schema, "table_name", "constraint_catalog", "constraint_schema", "constraint_name"
+    SQL"""select "table_catalog", "table_schema", "table_name", "constraint_catalog", "constraint_schema", "constraint_name"
           from information_schema.constraint_table_usage
        """.as(ConstraintTableUsageViewRow.rowParser(1).*)
   }

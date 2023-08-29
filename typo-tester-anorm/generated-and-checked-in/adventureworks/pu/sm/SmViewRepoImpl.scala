@@ -17,7 +17,7 @@ object SmViewRepoImpl extends SmViewRepo {
     SelectBuilderSql("pu.sm", SmViewFields, SmViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SmViewRow] = {
-    SQL"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
+    SQL"""select "id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
           from pu.sm
        """.as(SmViewRow.rowParser(1).*)
   }

@@ -40,15 +40,15 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
-      .map(c => maybeQuoted(c.dbName) ++ (if (isRead) sqlCast.fromPgCode(c) else sc.Code.Empty))
+      .map(c => c.dbName.code ++ (if (isRead) sqlCast.fromPgCode(c) else sc.Code.Empty))
       .mkCode(", ")
 
   def matchId(id: IdComputed): sc.Code =
     id match {
       case id: IdComputed.Unary =>
-        code"${maybeQuoted(id.col.dbName)} = ${runtimeInterpolateValue(id.paramName, id.tpe)}"
+        code"${id.col.dbName.code} = ${runtimeInterpolateValue(id.paramName, id.tpe)}"
       case composite: IdComputed.Composite =>
-        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
+        code"${composite.cols.map(cc => code"${cc.dbName.code} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
@@ -209,7 +209,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
-                 |where ${maybeQuoted(unaryId.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})
+                 |where ${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})
                  |""".stripMargin
         }
 
@@ -223,7 +223,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
-                 |where ${cols.map(c => code"${maybeQuoted(c.dbName)} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
+                 |where ${cols.map(c => code"${c.dbName.code} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
 
@@ -262,7 +262,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
             code"case $fieldValue.${col.name}(value) => $NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue(value, null, ${lookupToStatementFor(col.tpe)}))"
           }
         val where: sc.Code =
-          id.cols.map { col => code"${maybeQuoted(col.dbName)} = {${col.name}}" }.mkCode(" AND ")
+          id.cols.map { col => code"${col.dbName.code} = {${col.name}}" }.mkCode(" AND ")
 
         val idCases: NonEmptyList[sc.Code] =
           id match {
@@ -297,7 +297,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.Update(relName, _, id, param, colsUnsaved) =>
         val sql = SQL {
           val setCols = colsUnsaved.map { col =>
-            code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}"
+            code"${col.dbName.code} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}"
           }
           code"""|update $relName
                  |set ${setCols.mkCode(",\n")}
@@ -328,7 +328,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
         val pickExcludedCols = cols.toList
           .filterNot(c => id.cols.exists(_.name == c.name))
-          .map { c => code"${maybeQuoted(c.dbName)} = EXCLUDED.${maybeQuoted(c.dbName)}" }
+          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
 
         val sql = SQL {
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
@@ -415,7 +415,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                 code"""|with $row as (
                        |  $renderedScript
                        |)
-                       |select ${cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")}
+                       |select ${cols.map(c => code"$row.${c.dbName.code}${sqlCast.fromPgCode(c)}").mkCode(", ")}
                        |from $row""".stripMargin
             }
 

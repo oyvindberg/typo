@@ -18,15 +18,15 @@ import typo.dsl.UpdateBuilder
 
 object PgAmopRepoImpl extends PgAmopRepo {
   override def delete(oid: PgAmopId)(implicit c: Connection): Boolean = {
-    SQL"delete from pg_catalog.pg_amop where oid = ${ParameterValue(oid, null, PgAmopId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from pg_catalog.pg_amop where "oid" = ${ParameterValue(oid, null, PgAmopId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PgAmopFields, PgAmopRow] = {
     DeleteBuilder("pg_catalog.pg_amop", PgAmopFields)
   }
   override def insert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow = {
-    SQL"""insert into pg_catalog.pg_amop(oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily)
+    SQL"""insert into pg_catalog.pg_amop("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")
           values (${ParameterValue(unsaved.oid, null, PgAmopId.toStatement)}::oid, ${ParameterValue(unsaved.amopfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amoplefttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amoprighttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopstrategy, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.amoppurpose, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.amopopr, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopmethod, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopsortfamily, null, ToStatement.longToStatement)}::oid)
-          returning oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
+          returning "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily"
        """
       .executeInsert(PgAmopRow.rowParser(1).single)
     
@@ -35,56 +35,56 @@ object PgAmopRepoImpl extends PgAmopRepo {
     SelectBuilderSql("pg_catalog.pg_amop", PgAmopFields, PgAmopRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
+    SQL"""select "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily"
           from pg_catalog.pg_amop
        """.as(PgAmopRow.rowParser(1).*)
   }
   override def selectById(oid: PgAmopId)(implicit c: Connection): Option[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
+    SQL"""select "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily"
           from pg_catalog.pg_amop
-          where oid = ${ParameterValue(oid, null, PgAmopId.toStatement)}
+          where "oid" = ${ParameterValue(oid, null, PgAmopId.toStatement)}
        """.as(PgAmopRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgAmopId])(implicit c: Connection): List[PgAmopRow] = {
-    SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
+    SQL"""select "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily"
           from pg_catalog.pg_amop
-          where oid = ANY(${oids})
+          where "oid" = ANY(${oids})
        """.as(PgAmopRow.rowParser(1).*)
     
   }
   override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
-    SQL"""select amopfamily, amoplefttype, amoprighttype, amopstrategy
+    SQL"""select "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy"
           from pg_catalog.pg_amop
-          where amopfamily = ${ParameterValue(amopfamily, null, ToStatement.longToStatement)} AND amoplefttype = ${ParameterValue(amoplefttype, null, ToStatement.longToStatement)} AND amoprighttype = ${ParameterValue(amoprighttype, null, ToStatement.longToStatement)} AND amopstrategy = ${ParameterValue(amopstrategy, null, ToStatement.intToStatement)}
+          where "amopfamily" = ${ParameterValue(amopfamily, null, ToStatement.longToStatement)} AND "amoplefttype" = ${ParameterValue(amoplefttype, null, ToStatement.longToStatement)} AND "amoprighttype" = ${ParameterValue(amoprighttype, null, ToStatement.longToStatement)} AND "amopstrategy" = ${ParameterValue(amopstrategy, null, ToStatement.intToStatement)}
        """.as(PgAmopRow.rowParser(1).singleOpt)
     
   }
   override def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long)(implicit c: Connection): Option[PgAmopRow] = {
-    SQL"""select amopopr, amoppurpose, amopfamily
+    SQL"""select "amopopr", "amoppurpose", "amopfamily"
           from pg_catalog.pg_amop
-          where amopopr = ${ParameterValue(amopopr, null, ToStatement.longToStatement)} AND amoppurpose = ${ParameterValue(amoppurpose, null, ToStatement.stringToStatement)} AND amopfamily = ${ParameterValue(amopfamily, null, ToStatement.longToStatement)}
+          where "amopopr" = ${ParameterValue(amopopr, null, ToStatement.longToStatement)} AND "amoppurpose" = ${ParameterValue(amoppurpose, null, ToStatement.stringToStatement)} AND "amopfamily" = ${ParameterValue(amopfamily, null, ToStatement.longToStatement)}
        """.as(PgAmopRow.rowParser(1).singleOpt)
     
   }
   override def update(row: PgAmopRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
     SQL"""update pg_catalog.pg_amop
-          set amopfamily = ${ParameterValue(row.amopfamily, null, ToStatement.longToStatement)}::oid,
-              amoplefttype = ${ParameterValue(row.amoplefttype, null, ToStatement.longToStatement)}::oid,
-              amoprighttype = ${ParameterValue(row.amoprighttype, null, ToStatement.longToStatement)}::oid,
-              amopstrategy = ${ParameterValue(row.amopstrategy, null, ToStatement.intToStatement)}::int2,
-              amoppurpose = ${ParameterValue(row.amoppurpose, null, ToStatement.stringToStatement)}::char,
-              amopopr = ${ParameterValue(row.amopopr, null, ToStatement.longToStatement)}::oid,
-              amopmethod = ${ParameterValue(row.amopmethod, null, ToStatement.longToStatement)}::oid,
-              amopsortfamily = ${ParameterValue(row.amopsortfamily, null, ToStatement.longToStatement)}::oid
-          where oid = ${ParameterValue(oid, null, PgAmopId.toStatement)}
+          set "amopfamily" = ${ParameterValue(row.amopfamily, null, ToStatement.longToStatement)}::oid,
+              "amoplefttype" = ${ParameterValue(row.amoplefttype, null, ToStatement.longToStatement)}::oid,
+              "amoprighttype" = ${ParameterValue(row.amoprighttype, null, ToStatement.longToStatement)}::oid,
+              "amopstrategy" = ${ParameterValue(row.amopstrategy, null, ToStatement.intToStatement)}::int2,
+              "amoppurpose" = ${ParameterValue(row.amoppurpose, null, ToStatement.stringToStatement)}::char,
+              "amopopr" = ${ParameterValue(row.amopopr, null, ToStatement.longToStatement)}::oid,
+              "amopmethod" = ${ParameterValue(row.amopmethod, null, ToStatement.longToStatement)}::oid,
+              "amopsortfamily" = ${ParameterValue(row.amopsortfamily, null, ToStatement.longToStatement)}::oid
+          where "oid" = ${ParameterValue(oid, null, PgAmopId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PgAmopFields, PgAmopRow] = {
     UpdateBuilder("pg_catalog.pg_amop", PgAmopFields, PgAmopRow.rowParser)
   }
   override def upsert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow = {
-    SQL"""insert into pg_catalog.pg_amop(oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily)
+    SQL"""insert into pg_catalog.pg_amop("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")
           values (
             ${ParameterValue(unsaved.oid, null, PgAmopId.toStatement)}::oid,
             ${ParameterValue(unsaved.amopfamily, null, ToStatement.longToStatement)}::oid,
@@ -96,17 +96,17 @@ object PgAmopRepoImpl extends PgAmopRepo {
             ${ParameterValue(unsaved.amopmethod, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.amopsortfamily, null, ToStatement.longToStatement)}::oid
           )
-          on conflict (oid)
+          on conflict ("oid")
           do update set
-            amopfamily = EXCLUDED.amopfamily,
-            amoplefttype = EXCLUDED.amoplefttype,
-            amoprighttype = EXCLUDED.amoprighttype,
-            amopstrategy = EXCLUDED.amopstrategy,
-            amoppurpose = EXCLUDED.amoppurpose,
-            amopopr = EXCLUDED.amopopr,
-            amopmethod = EXCLUDED.amopmethod,
-            amopsortfamily = EXCLUDED.amopsortfamily
-          returning oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
+            "amopfamily" = EXCLUDED."amopfamily",
+            "amoplefttype" = EXCLUDED."amoplefttype",
+            "amoprighttype" = EXCLUDED."amoprighttype",
+            "amopstrategy" = EXCLUDED."amopstrategy",
+            "amoppurpose" = EXCLUDED."amoppurpose",
+            "amopopr" = EXCLUDED."amopopr",
+            "amopmethod" = EXCLUDED."amopmethod",
+            "amopsortfamily" = EXCLUDED."amopsortfamily"
+          returning "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily"
        """
       .executeInsert(PgAmopRow.rowParser(1).single)
     

@@ -18,6 +18,6 @@ object PgHbaFileRulesViewRepoImpl extends PgHbaFileRulesViewRepo {
     SelectBuilderSql("pg_catalog.pg_hba_file_rules", PgHbaFileRulesViewFields, PgHbaFileRulesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgHbaFileRulesViewRow] = {
-    sql"""select line_number, "type", "database", user_name, address, netmask, auth_method, "options", "error" from pg_catalog.pg_hba_file_rules""".query(PgHbaFileRulesViewRow.read).stream
+    sql"""select "line_number", "type", "database", "user_name", "address", "netmask", "auth_method", "options", "error" from pg_catalog.pg_hba_file_rules""".query(PgHbaFileRulesViewRow.read).stream
   }
 }

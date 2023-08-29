@@ -18,6 +18,6 @@ object PodViewRepoImpl extends PodViewRepo {
     SelectBuilderSql("pu.pod", PodViewFields, PodViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PodViewRow] = {
-    sql"""select "id", purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from pu.pod""".query(PodViewRow.read).stream
+    sql"""select "id", "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from pu.pod""".query(PodViewRow.read).stream
   }
 }

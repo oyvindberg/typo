@@ -18,6 +18,6 @@ object PgUserMappingsViewRepoImpl extends PgUserMappingsViewRepo {
     SelectBuilderSql("pg_catalog.pg_user_mappings", PgUserMappingsViewFields, PgUserMappingsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgUserMappingsViewRow] = {
-    sql"select umid, srvid, srvname, umuser, usename, umoptions from pg_catalog.pg_user_mappings".query(PgUserMappingsViewRow.read).stream
+    sql"""select "umid", "srvid", "srvname", "umuser", "usename", "umoptions" from pg_catalog.pg_user_mappings""".query(PgUserMappingsViewRow.read).stream
   }
 }

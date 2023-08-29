@@ -25,15 +25,15 @@ import typo.dsl.UpdateBuilder
 
 object ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
-    SQL"delete from purchasing.shipmethod where shipmethodid = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}".executeUpdate() > 0
+    SQL"""delete from purchasing.shipmethod where "shipmethodid" = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
     DeleteBuilder("purchasing.shipmethod", ShipmethodFields)
   }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
-    SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
+    SQL"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
+          returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
     
@@ -65,13 +65,13 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into purchasing.shipmethod default values
-            returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
+            returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
          """
         .executeInsert(ShipmethodRow.rowParser(1).single)
     } else {
       val q = s"""insert into purchasing.shipmethod(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
+                  returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
                """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(ShipmethodRow.rowParser(1).single)
@@ -82,20 +82,20 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     SelectBuilderSql("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
+    SQL"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
           from purchasing.shipmethod
        """.as(ShipmethodRow.rowParser(1).*)
   }
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
-    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
+    SQL"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
           from purchasing.shipmethod
-          where shipmethodid = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}
+          where "shipmethodid" = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}
        """.as(ShipmethodRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
+    SQL"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
           from purchasing.shipmethod
-          where shipmethodid = ANY(${shipmethodids})
+          where "shipmethodid" = ANY(${shipmethodids})
        """.as(ShipmethodRow.rowParser(1).*)
     
   }
@@ -103,18 +103,18 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     val shipmethodid = row.shipmethodid
     SQL"""update purchasing.shipmethod
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
-              shipbase = ${ParameterValue(row.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              shiprate = ${ParameterValue(row.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              rowguid = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
-              modifieddate = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where shipmethodid = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}
+              "shipbase" = ${ParameterValue(row.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "shiprate" = ${ParameterValue(row.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
+              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+          where "shipmethodid" = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilder("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.rowParser)
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
-    SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
+    SQL"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -123,14 +123,14 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
-          on conflict (shipmethodid)
+          on conflict ("shipmethodid")
           do update set
             "name" = EXCLUDED."name",
-            shipbase = EXCLUDED.shipbase,
-            shiprate = EXCLUDED.shiprate,
-            rowguid = EXCLUDED.rowguid,
-            modifieddate = EXCLUDED.modifieddate
-          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
+            "shipbase" = EXCLUDED."shipbase",
+            "shiprate" = EXCLUDED."shiprate",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
     

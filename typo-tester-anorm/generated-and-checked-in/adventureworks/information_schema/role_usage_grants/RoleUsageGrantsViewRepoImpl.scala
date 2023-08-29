@@ -17,7 +17,7 @@ object RoleUsageGrantsViewRepoImpl extends RoleUsageGrantsViewRepo {
     SelectBuilderSql("information_schema.role_usage_grants", RoleUsageGrantsViewFields, RoleUsageGrantsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[RoleUsageGrantsViewRow] = {
-    SQL"""select grantor, grantee, object_catalog, object_schema, object_name, object_type, privilege_type, is_grantable
+    SQL"""select "grantor", "grantee", "object_catalog", "object_schema", "object_name", "object_type", "privilege_type", "is_grantable"
           from information_schema.role_usage_grants
        """.as(RoleUsageGrantsViewRow.rowParser(1).*)
   }

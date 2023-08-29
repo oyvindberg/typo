@@ -17,8 +17,8 @@ object AViewRepoImpl extends AViewRepo {
     SelectBuilderSql("pe.a", AViewFields, AViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[AViewRow] = {
-    SQL"""select "id", addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
-          from pe."a"
+    SQL"""select "id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
+          from pe.a
        """.as(AViewRow.rowParser(1).*)
   }
 }

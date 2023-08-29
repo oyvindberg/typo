@@ -18,6 +18,6 @@ object PgStatUserFunctionsViewRepoImpl extends PgStatUserFunctionsViewRepo {
     SelectBuilderSql("pg_catalog.pg_stat_user_functions", PgStatUserFunctionsViewFields, PgStatUserFunctionsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatUserFunctionsViewRow] = {
-    sql"select funcid, schemaname, funcname, calls, total_time, self_time from pg_catalog.pg_stat_user_functions".query(PgStatUserFunctionsViewRow.read).stream
+    sql"""select "funcid", "schemaname", "funcname", "calls", "total_time", "self_time" from pg_catalog.pg_stat_user_functions""".query(PgStatUserFunctionsViewRow.read).stream
   }
 }

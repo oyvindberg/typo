@@ -18,6 +18,6 @@ object SpqhViewRepoImpl extends SpqhViewRepo {
     SelectBuilderSql("sa.spqh", SpqhViewFields, SpqhViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SpqhViewRow] = {
-    sql"""select "id", businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sa.spqh""".query(SpqhViewRow.read).stream
+    sql"""select "id", "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sa.spqh""".query(SpqhViewRow.read).stream
   }
 }

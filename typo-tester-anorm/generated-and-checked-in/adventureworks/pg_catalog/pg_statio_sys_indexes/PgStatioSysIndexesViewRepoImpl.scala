@@ -17,7 +17,7 @@ object PgStatioSysIndexesViewRepoImpl extends PgStatioSysIndexesViewRepo {
     SelectBuilderSql("pg_catalog.pg_statio_sys_indexes", PgStatioSysIndexesViewFields, PgStatioSysIndexesViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatioSysIndexesViewRow] = {
-    SQL"""select relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit
+    SQL"""select "relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_blks_read", "idx_blks_hit"
           from pg_catalog.pg_statio_sys_indexes
        """.as(PgStatioSysIndexesViewRow.rowParser(1).*)
   }

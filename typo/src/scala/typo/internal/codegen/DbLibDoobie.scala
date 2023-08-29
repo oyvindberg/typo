@@ -35,7 +35,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
-      .map(c => maybeQuoted(c.dbName) ++ (if (isRead) sqlCast.fromPgCode(c) else sc.Code.Empty))
+      .map(c => c.dbName.code ++ (if (isRead) sqlCast.fromPgCode(c) else sc.Code.Empty))
       .mkCode(", ")
 
   def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code =
@@ -51,9 +51,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   def matchId(id: IdComputed): sc.Code =
     id match {
       case id: IdComputed.Unary =>
-        code"${maybeQuoted(id.col.dbName)} = ${runtimeInterpolateValue(id.paramName, id.tpe)}"
+        code"${id.col.dbName.code} = ${runtimeInterpolateValue(id.paramName, id.tpe)}"
       case composite: IdComputed.Composite =>
-        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
+        code"${composite.cols.map(cc => code"${cc.dbName.code} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
@@ -120,14 +120,14 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val joinedColNames = dbNames(cols, isRead = true)
 
         val sql = SQL(
-          code"""select $joinedColNames from $relName where ${code"${maybeQuoted(unaryId.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
+          code"""select $joinedColNames from $relName where ${code"${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
         )
         code"""$sql.query($rowType.$readName).stream"""
       case RepoMethod.SelectByUnique(relName, cols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
-                 |where ${cols.map(c => code"${maybeQuoted(c.dbName)} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
+                 |where ${cols.map(c => code"${c.dbName.code} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
         code"""$sql.query($rowType.$readName).option"""
@@ -135,7 +135,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases: NonEmptyList[sc.Code] =
           cols.map { col =>
-            val fr = frInterpolate(code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}")
+            val fr = frInterpolate(code"${col.dbName.code} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}")
             code"case $fieldValue.${col.name}(value) => $fr"
           }
 
@@ -150,7 +150,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
           cases0.map { col =>
-            val fr = frInterpolate(code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}${sqlCast.toPgCode(col)}")
+            val fr = frInterpolate(code"${col.dbName.code} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}${sqlCast.toPgCode(col)}")
             code"case $fieldValue.${col.name}(value) => $fr"
           }
 
@@ -177,7 +177,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.Update(relName, _, id, param, colsNotId) =>
         val sql = SQL(
           code"""update $relName
-                |set ${colsNotId.map { col => code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}" }.mkCode(",\n")}
+                |set ${colsNotId.map { col => code"${col.dbName.code} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}" }.mkCode(",\n")}
                 |where ${matchId(id)}""".stripMargin
         )
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
@@ -189,13 +189,13 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
           val set = frInterpolate(code"${runtimeInterpolateValue(code"${unsavedParam.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}")
-          code"""Some(($Fragment.const(${sc.s(maybeQuoted(col.dbName))}), $set))"""
+          code"""Some(($Fragment.const(${sc.s(col.dbName.code)}), $set))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, _), origType) =>
           val setValue = frInterpolate(code"${runtimeInterpolateValue(code"value: $origType", origType)}${sqlCast.toPgCode(col)}")
           code"""|${unsavedParam.name}.$ident match {
                  |  case ${default.Defaulted}.${default.UseDefault} => None
-                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($Fragment.const(${sc.s(maybeQuoted(col.dbName))}), $setValue))
+                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($Fragment.const(${sc.s(col.dbName.code)}), $setValue))
                  |}"""
         }
 
@@ -230,7 +230,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
         val pickExcludedCols = cols.toList
           .filterNot(c => id.cols.exists(_.name == c.name))
-          .map { c => code"${maybeQuoted(c.dbName)} = EXCLUDED.${maybeQuoted(c.dbName)}" }
+          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
 
         val sql = SQL {
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
@@ -285,7 +285,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                 code"""|with $row as (
                        |  $renderedScript
                        |)
-                       |select ${cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")}
+                       |select ${cols.map(c => code"$row.${c.dbName.code}${sqlCast.fromPgCode(c)}").mkCode(", ")}
                        |from $row""".stripMargin
             }
 

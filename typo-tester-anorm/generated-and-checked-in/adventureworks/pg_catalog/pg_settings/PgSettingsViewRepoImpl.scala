@@ -17,7 +17,7 @@ object PgSettingsViewRepoImpl extends PgSettingsViewRepo {
     SelectBuilderSql("pg_catalog.pg_settings", PgSettingsViewFields, PgSettingsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgSettingsViewRow] = {
-    SQL"""select "name", setting, unit, category, short_desc, extra_desc, context, vartype, "source", min_val, max_val, enumvals, boot_val, reset_val, sourcefile, sourceline, pending_restart
+    SQL"""select "name", "setting", "unit", "category", "short_desc", "extra_desc", "context", "vartype", "source", "min_val", "max_val", "enumvals", "boot_val", "reset_val", "sourcefile", "sourceline", "pending_restart"
           from pg_catalog.pg_settings
        """.as(PgSettingsViewRow.rowParser(1).*)
   }

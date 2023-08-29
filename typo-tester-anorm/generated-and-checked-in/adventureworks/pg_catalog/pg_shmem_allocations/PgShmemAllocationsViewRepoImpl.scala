@@ -17,7 +17,7 @@ object PgShmemAllocationsViewRepoImpl extends PgShmemAllocationsViewRepo {
     SelectBuilderSql("pg_catalog.pg_shmem_allocations", PgShmemAllocationsViewFields, PgShmemAllocationsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgShmemAllocationsViewRow] = {
-    SQL"""select "name", "off", "size", allocated_size
+    SQL"""select "name", "off", "size", "allocated_size"
           from pg_catalog.pg_shmem_allocations
        """.as(PgShmemAllocationsViewRow.rowParser(1).*)
   }

@@ -17,7 +17,7 @@ object BeaViewRepoImpl extends BeaViewRepo {
     SelectBuilderSql("pe.bea", BeaViewFields, BeaViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[BeaViewRow] = {
-    SQL"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
+    SQL"""select "id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
           from pe.bea
        """.as(BeaViewRow.rowParser(1).*)
   }
