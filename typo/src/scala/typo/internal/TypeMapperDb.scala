@@ -12,9 +12,17 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
 
     fromDomain.orElse(dbTypeFrom(c.udtName.get, c.characterMaximumLength))
   }
-
+  object ArrayName {
+    def unapply(udtName: String): Option[String] = {
+      udtName.split('.') match {
+        case Array(schema, name) if name.startsWith("_") => Some(s"$schema.${name.drop(1)}")
+        case Array(name) if name.startsWith("_")         => Some(name.drop(1))
+        case _                                           => None
+      }
+    }
+  }
   def dbTypeFrom(udtName: String, characterMaximumLength: Option[Int]): Option[db.Type] = {
-    udtName match {
+    udtName.replaceAll("\"", "") match {
       case "bool"                              => Some(db.Type.Boolean)
       case "box"                               => Some(db.Type.PGbox)
       case "bpchar"                            => Some(db.Type.Bpchar(characterMaximumLength))
@@ -67,10 +75,11 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
       case "regrole"                           => Some(db.Type.regrole)
       case "regtype"                           => Some(db.Type.regtype)
       case "xid"                               => Some(db.Type.xid)
-      case str if str.startsWith("_")          => dbTypeFrom(udtName.drop(1), characterMaximumLength).map(tpe => db.Type.Array(tpe))
+      case ArrayName(underlying) =>
+        dbTypeFrom(underlying, characterMaximumLength).map(tpe => db.Type.Array(tpe))
       case typeName =>
         enumsByName
-          .get(typeName.replaceAll("\"", ""))
+          .get(typeName)
           .map(`enum` => db.Type.EnumRef(`enum`.name))
           .orElse(domainsByName.get(typeName).map(domain => db.Type.DomainRef(domain.name)))
     }
