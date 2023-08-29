@@ -9,7 +9,7 @@ import typo.generated.information_schema.key_column_usage.{KeyColumnUsageViewRep
 import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsViewRepoImpl, ReferentialConstraintsViewRow}
 import typo.generated.information_schema.table_constraints.{TableConstraintsViewRepoImpl, TableConstraintsViewRow}
 import typo.generated.information_schema.tables.{TablesViewRepoImpl, TablesViewRow}
-import typo.internal.analysis.{DecomposedSql, JdbcMetadata, NullabilityFromExplain}
+import typo.internal.analysis.{DecomposedSql, JdbcMetadata, MaybeReturnsRows, NullabilityFromExplain, ParsedName}
 import typo.internal.metadb.{Enums, ForeignKeys, PrimaryKeys, UniqueKeys}
 import typo.internal.{DebugJson, TypeMapperDb}
 
@@ -104,7 +104,45 @@ object MetaDb {
           val decomposedSql = DecomposedSql.parse(sqlContent)
           val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked
           val nullabilityInfo = NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
-          (relationName, db.View(relationName, decomposedSql, jdbcMetadata, nullabilityInfo, isMaterialized = viewRow.relkind == "m"))
+          val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+            jdbcMetadata.columns match {
+              case MaybeReturnsRows.Query(columns) =>
+                columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)).toMap
+              case MaybeReturnsRows.Update =>
+                Map.empty
+            }
+
+          val cols: NonEmptyList[(db.Col, ParsedName)] =
+            jdbcMetadata.columns match {
+              case MaybeReturnsRows.Query(metadataCols) =>
+                metadataCols.zipWithIndex.map { case (mdCol, idx) =>
+                  val nullability: Nullability =
+                    mdCol.parsedColumnName.nullability.getOrElse {
+                      if (nullabilityInfo.exists(_.values(idx))) Nullability.Nullable
+                      else mdCol.isNullable.toNullability
+                    }
+
+                  val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)).getOrElse {
+                    System.err.println(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
+                    db.Type.Text
+                  }
+
+                  val dbCol = db.Col(
+                    name = mdCol.name,
+                    tpe = dbType,
+                    udtName = None,
+                    columnDefault = None,
+                    comment = comments.get((relationName, mdCol.name)),
+                    jsonDescription = DebugJson(mdCol),
+                    nullability = nullability
+                  )
+                  (dbCol, mdCol.parsedColumnName)
+                }
+
+              case MaybeReturnsRows.Update => ???
+            }
+
+          (relationName, db.View(relationName, decomposedSql, cols, deps, isMaterialized = viewRow.relkind == "m"))
         }
       }.toMap
 
