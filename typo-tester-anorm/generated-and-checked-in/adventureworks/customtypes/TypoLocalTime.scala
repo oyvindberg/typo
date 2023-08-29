@@ -23,7 +23,8 @@ case class TypoLocalTime(value: LocalTime)
 
 object TypoLocalTime {
   def apply(value: LocalTime): TypoLocalTime = new TypoLocalTime(value.truncatedTo(ChronoUnit.MICROS))
-  def now = TypoLocalTime(LocalTime.now)
+  def apply(str: String): TypoLocalTime = apply(LocalTime.parse(str))
+  def now: TypoLocalTime = TypoLocalTime(LocalTime.now)
   implicit lazy val arrayColumn: Column[Array[TypoLocalTime]] = Column.nonNull[Array[TypoLocalTime]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>

@@ -43,7 +43,8 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
     objBody = Some { target =>
-      code"def now = $target(${sc.Type.LocalDate}.now)"
+      code"""|def now = $target(${sc.Type.LocalDate}.now)
+             |def apply(str: ${sc.Type.String}): $target = $target(${sc.Type.LocalDate}.parse(str))""".stripMargin
     }
   )
   lazy val TypoLocalTime = CustomType(
@@ -64,7 +65,8 @@ class CustomTypes(pkg: sc.QIdent) {
     ),
     objBody = Some { target =>
       code"""|def apply(value: ${sc.Type.LocalTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
-             |def now = $target(${sc.Type.LocalTime}.now)""".stripMargin
+             |def apply(str: ${sc.Type.String}): $target = apply(${sc.Type.LocalTime}.parse(str))
+             |def now: $target = $target(${sc.Type.LocalTime}.now)""".stripMargin
     }
   )
 
@@ -85,9 +87,9 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
     objBody = Some { target =>
-      code"""|val parser: ${sc.Type.DateTimeFormatter} =
-             |  new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).toFormatter
+      code"""|val parser: ${sc.Type.DateTimeFormatter} = new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).toFormatter
              |def apply(value: ${sc.Type.LocalDateTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
+             |def apply(str: ${sc.Type.String}): $target = apply(${sc.Type.LocalDateTime}.parse(str, parser))
              |def now = $target(${sc.Type.LocalDateTime}.now)
              |""".stripMargin
     }
@@ -109,8 +111,7 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
     objBody = Some { target =>
-      code"""|val parser: ${sc.Type.DateTimeFormatter} =
-             |  new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
+      code"""|val parser: ${sc.Type.DateTimeFormatter} = new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
              |def apply(value: ${sc.Type.OffsetDateTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))  
              |def now = $target(${sc.Type.OffsetDateTime}.now)
              |""".stripMargin
@@ -134,9 +135,9 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
     objBody = Some { target =>
-      code"""|val parser: ${sc.Type.DateTimeFormatter} =
-             |  new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
+      code"""|val parser: ${sc.Type.DateTimeFormatter} = new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
              |def apply(value: ${sc.Type.OffsetTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
+             |def apply(str: ${sc.Type.String}): $target = apply(${sc.Type.OffsetTime}.parse(str, parser))
              |def now = $target(${sc.Type.OffsetTime}.now)
              |""".stripMargin
     }

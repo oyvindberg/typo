@@ -20,7 +20,8 @@ case class TypoLocalTime(value: LocalTime)
 
 object TypoLocalTime {
   def apply(value: LocalTime): TypoLocalTime = new TypoLocalTime(value.truncatedTo(ChronoUnit.MICROS))
-  def now = TypoLocalTime(LocalTime.now)
+  def apply(str: String): TypoLocalTime = apply(LocalTime.parse(str))
+  def now: TypoLocalTime = TypoLocalTime(LocalTime.now)
   implicit lazy val arrayGet: Get[Array[TypoLocalTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_time"))
     .map(_.map(v => TypoLocalTime(LocalTime.parse(v.asInstanceOf[String]))))
   implicit lazy val arrayPut: Put[Array[TypoLocalTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_time"), "time")

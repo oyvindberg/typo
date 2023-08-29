@@ -22,9 +22,9 @@ import typo.dsl.Bijection
 case class TypoLocalDateTime(value: LocalDateTime)
 
 object TypoLocalDateTime {
-  val parser: DateTimeFormatter =
-    new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).toFormatter
+  val parser: DateTimeFormatter = new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).toFormatter
   def apply(value: LocalDateTime): TypoLocalDateTime = new TypoLocalDateTime(value.truncatedTo(ChronoUnit.MICROS))
+  def apply(str: String): TypoLocalDateTime = apply(LocalDateTime.parse(str, parser))
   def now = TypoLocalDateTime(LocalDateTime.now)
   implicit lazy val arrayGet: Get[Array[TypoLocalDateTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_timestamp"))
     .map(_.map(v => TypoLocalDateTime(LocalDateTime.parse(v.asInstanceOf[String], parser))))

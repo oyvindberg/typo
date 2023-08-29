@@ -22,9 +22,9 @@ import typo.dsl.Bijection
 case class TypoOffsetTime(value: OffsetTime)
 
 object TypoOffsetTime {
-  val parser: DateTimeFormatter =
-    new DateTimeFormatterBuilder().appendPattern("HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
+  val parser: DateTimeFormatter = new DateTimeFormatterBuilder().appendPattern("HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
   def apply(value: OffsetTime): TypoOffsetTime = new TypoOffsetTime(value.truncatedTo(ChronoUnit.MICROS))
+  def apply(str: String): TypoOffsetTime = apply(OffsetTime.parse(str, parser))
   def now = TypoOffsetTime(OffsetTime.now)
   implicit lazy val arrayGet: Get[Array[TypoOffsetTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_timetz"))
     .map(_.map(v => TypoOffsetTime(OffsetTime.parse(v.asInstanceOf[String], parser))))

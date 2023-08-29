@@ -19,6 +19,7 @@ case class TypoLocalDate(value: LocalDate)
 
 object TypoLocalDate {
   def now = TypoLocalDate(LocalDate.now)
+  def apply(str: String): TypoLocalDate = TypoLocalDate(LocalDate.parse(str))
   implicit lazy val arrayGet: Get[Array[TypoLocalDate]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_date"))
     .map(_.map(v => TypoLocalDate(LocalDate.parse(v.asInstanceOf[String]))))
   implicit lazy val arrayPut: Put[Array[TypoLocalDate]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_date"), "date")

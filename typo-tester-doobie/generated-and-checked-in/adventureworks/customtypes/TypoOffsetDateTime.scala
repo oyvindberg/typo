@@ -22,8 +22,7 @@ import typo.dsl.Bijection
 case class TypoOffsetDateTime(value: OffsetDateTime)
 
 object TypoOffsetDateTime {
-  val parser: DateTimeFormatter =
-    new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
+  val parser: DateTimeFormatter = new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
   def apply(value: OffsetDateTime): TypoOffsetDateTime = new TypoOffsetDateTime(value.truncatedTo(ChronoUnit.MICROS))  
   def now = TypoOffsetDateTime(OffsetDateTime.now)
   implicit lazy val arrayGet: Get[Array[TypoOffsetDateTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_timestamptz"))

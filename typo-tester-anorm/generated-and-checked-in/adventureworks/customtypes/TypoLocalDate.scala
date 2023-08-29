@@ -22,6 +22,7 @@ case class TypoLocalDate(value: LocalDate)
 
 object TypoLocalDate {
   def now = TypoLocalDate(LocalDate.now)
+  def apply(str: String): TypoLocalDate = TypoLocalDate(LocalDate.parse(str))
   implicit lazy val arrayColumn: Column[Array[TypoLocalDate]] = Column.nonNull[Array[TypoLocalDate]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
