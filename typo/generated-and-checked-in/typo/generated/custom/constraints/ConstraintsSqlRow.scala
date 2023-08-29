@@ -21,7 +21,6 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import typo.generated.information_schema.SqlIdentifier
 
 case class ConstraintsSqlRow(
   /** Points to [[information_schema.table_constraints.TableConstraintsViewRow.tableSchema]]
@@ -30,8 +29,8 @@ case class ConstraintsSqlRow(
   /** Points to [[information_schema.table_constraints.TableConstraintsViewRow.tableName]]
       debug: {"baseColumnName":"table_name","baseRelationName":"information_schema.table_constraints","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_name"},"columnName":"table_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"table_constraints"} */
   tableName: Option[/* nullability unknown */ String],
-  /** debug: {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"parsedColumnName":{"name":"columns"},"columnName":"columns","columnType":"Array","columnTypeName":"\"information_schema\".\"_sql_identifier\"","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
-  columns: /* nullability unknown */ Option[Array[SqlIdentifier]],
+  /** debug: {"columnClassName":"java.sql.Array","columnDisplaySize":2147483647,"parsedColumnName":{"name":"columns"},"columnName":"columns","columnType":"Array","columnTypeName":"_name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
+  columns: /* nullability unknown */ Option[Array[String]],
   /** Points to [[information_schema.table_constraints.TableConstraintsViewRow.constraintName]]
       debug: {"baseColumnName":"constraint_name","baseRelationName":"information_schema.table_constraints","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_name"},"columnName":"constraint_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"table_constraints"} */
   constraintName: Option[/* nullability unknown */ String],
@@ -46,7 +45,7 @@ object ConstraintsSqlRow {
         ConstraintsSqlRow(
           tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
           tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
-          columns = json.\("columns").toOption.map(_.as(Reads.ArrayReads[SqlIdentifier](SqlIdentifier.reads, implicitly))),
+          columns = json.\("columns").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
           constraintName = json.\("constraint_name").toOption.map(_.as(Reads.StringReads)),
           checkClause = json.\("check_clause").toOption.map(_.as(Reads.StringReads))
         )
@@ -58,7 +57,7 @@ object ConstraintsSqlRow {
       ConstraintsSqlRow(
         tableSchema = row(idx + 0)(Column.columnToOption(Column.columnToString)),
         tableName = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        columns = row(idx + 2)(Column.columnToOption(SqlIdentifier.arrayColumn)),
+        columns = row(idx + 2)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
         constraintName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
         checkClause = row(idx + 4)(Column.columnToOption(Column.columnToString))
       )
@@ -68,7 +67,7 @@ object ConstraintsSqlRow {
     new JsObject(ListMap[String, JsValue](
       "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
       "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
-      "columns" -> Writes.OptionWrites(Writes.arrayWrites[SqlIdentifier](implicitly, SqlIdentifier.writes)).writes(o.columns),
+      "columns" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.columns),
       "constraint_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintName),
       "check_clause" -> Writes.OptionWrites(Writes.StringWrites).writes(o.checkClause)
     ))

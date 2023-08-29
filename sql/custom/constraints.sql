@@ -1,7 +1,7 @@
-with cols as (SELECT nc.nspname::information_schema.sql_identifier AS table_schema,
-                     c.relname::information_schema.sql_identifier  AS table_name,
-                     a.attname::information_schema.sql_identifier  AS column_name,
-                     a.attnum::information_schema.cardinal_number  AS ordinal_position
+with cols as (SELECT nc.nspname AS table_schema,
+                     c.relname  AS table_name,
+                     a.attname  AS column_name,
+                     a.attnum  AS ordinal_position
               FROM pg_attribute a
                        LEFT JOIN pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
                        JOIN (pg_class c JOIN pg_namespace nc ON c.relnamespace = nc.oid) ON a.attrelid = c.oid
