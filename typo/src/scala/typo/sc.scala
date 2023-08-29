@@ -102,6 +102,7 @@ object sc {
     val JavaInteger = Qualified("java.lang.Integer")
     val JavaLong = Qualified("java.lang.Long")
     val JavaFloat = Qualified("java.lang.Float")
+    val JavaShort = Qualified("java.lang.Short")
 
     val String = Qualified("java.lang.String")
     val Connection = Qualified("java.sql.Connection")
@@ -164,6 +165,7 @@ object sc {
     val DateTimeFormatterBuilder = Qualified("java.time.format.DateTimeFormatterBuilder")
     val ChronoField = Qualified("java.time.temporal.ChronoField")
     val ChronoUnit = Qualified("java.time.temporal.ChronoUnit")
+    val Numeric = Qualified("scala.math.Numeric")
 
     object dsl {
       val Bijection = Qualified("typo.dsl.Bijection")

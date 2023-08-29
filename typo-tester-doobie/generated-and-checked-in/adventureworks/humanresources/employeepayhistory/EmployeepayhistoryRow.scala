@@ -8,6 +8,7 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -25,28 +26,28 @@ case class EmployeepayhistoryRow(
   /** Salary hourly rate. */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly */
-  payfrequency: Int,
+  payfrequency: TypoShort,
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmployeepayhistoryId = EmployeepayhistoryId(businessentityid, ratechangedate)
  }
 
 object EmployeepayhistoryRow {
-  implicit lazy val decoder: Decoder[EmployeepayhistoryRow] = Decoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeInt, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[EmployeepayhistoryRow] = Encoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeInt, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[EmployeepayhistoryRow] = Decoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoShort, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, TypoShort.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[EmployeepayhistoryRow] = Encoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoShort, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, TypoShort.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[EmployeepayhistoryRow] = new Read[EmployeepayhistoryRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EmployeepayhistoryRow(
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       ratechangedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
       rate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
-      payfrequency = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      payfrequency = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )

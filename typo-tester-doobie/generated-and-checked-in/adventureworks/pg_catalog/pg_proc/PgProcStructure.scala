@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -37,8 +38,8 @@ class PgProcStructure[Row](val prefix: Option[String], val extract: Row => PgPro
   override val proretset = new Field[Boolean, Row](prefix, "proretset", None, None)(x => extract(x).proretset, (row, value) => merge(row, extract(row).copy(proretset = value)))
   override val provolatile = new Field[String, Row](prefix, "provolatile", None, Some("char"))(x => extract(x).provolatile, (row, value) => merge(row, extract(row).copy(provolatile = value)))
   override val proparallel = new Field[String, Row](prefix, "proparallel", None, Some("char"))(x => extract(x).proparallel, (row, value) => merge(row, extract(row).copy(proparallel = value)))
-  override val pronargs = new Field[Int, Row](prefix, "pronargs", None, Some("int2"))(x => extract(x).pronargs, (row, value) => merge(row, extract(row).copy(pronargs = value)))
-  override val pronargdefaults = new Field[Int, Row](prefix, "pronargdefaults", None, Some("int2"))(x => extract(x).pronargdefaults, (row, value) => merge(row, extract(row).copy(pronargdefaults = value)))
+  override val pronargs = new Field[TypoShort, Row](prefix, "pronargs", None, Some("int2"))(x => extract(x).pronargs, (row, value) => merge(row, extract(row).copy(pronargs = value)))
+  override val pronargdefaults = new Field[TypoShort, Row](prefix, "pronargdefaults", None, Some("int2"))(x => extract(x).pronargdefaults, (row, value) => merge(row, extract(row).copy(pronargdefaults = value)))
   override val prorettype = new Field[/* oid */ Long, Row](prefix, "prorettype", None, Some("oid"))(x => extract(x).prorettype, (row, value) => merge(row, extract(row).copy(prorettype = value)))
   override val proargtypes = new Field[TypoOidVector, Row](prefix, "proargtypes", None, Some("oidvector"))(x => extract(x).proargtypes, (row, value) => merge(row, extract(row).copy(proargtypes = value)))
   override val proallargtypes = new OptField[Array[/* oid */ Long], Row](prefix, "proallargtypes", None, Some("_oid"))(x => extract(x).proallargtypes, (row, value) => merge(row, extract(row).copy(proallargtypes = value)))

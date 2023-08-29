@@ -8,6 +8,7 @@ package pg_catalog
 package pg_constraint
 
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -36,8 +37,8 @@ class PgConstraintStructure[Row](val prefix: Option[String], val extract: Row =>
   override val conislocal = new Field[Boolean, Row](prefix, "conislocal", None, None)(x => extract(x).conislocal, (row, value) => merge(row, extract(row).copy(conislocal = value)))
   override val coninhcount = new Field[Int, Row](prefix, "coninhcount", None, Some("int4"))(x => extract(x).coninhcount, (row, value) => merge(row, extract(row).copy(coninhcount = value)))
   override val connoinherit = new Field[Boolean, Row](prefix, "connoinherit", None, None)(x => extract(x).connoinherit, (row, value) => merge(row, extract(row).copy(connoinherit = value)))
-  override val conkey = new OptField[Array[Int], Row](prefix, "conkey", None, Some("_int2"))(x => extract(x).conkey, (row, value) => merge(row, extract(row).copy(conkey = value)))
-  override val confkey = new OptField[Array[Int], Row](prefix, "confkey", None, Some("_int2"))(x => extract(x).confkey, (row, value) => merge(row, extract(row).copy(confkey = value)))
+  override val conkey = new OptField[Array[TypoShort], Row](prefix, "conkey", None, Some("_int2"))(x => extract(x).conkey, (row, value) => merge(row, extract(row).copy(conkey = value)))
+  override val confkey = new OptField[Array[TypoShort], Row](prefix, "confkey", None, Some("_int2"))(x => extract(x).confkey, (row, value) => merge(row, extract(row).copy(confkey = value)))
   override val conpfeqop = new OptField[Array[/* oid */ Long], Row](prefix, "conpfeqop", None, Some("_oid"))(x => extract(x).conpfeqop, (row, value) => merge(row, extract(row).copy(conpfeqop = value)))
   override val conppeqop = new OptField[Array[/* oid */ Long], Row](prefix, "conppeqop", None, Some("_oid"))(x => extract(x).conppeqop, (row, value) => merge(row, extract(row).copy(conppeqop = value)))
   override val conffeqop = new OptField[Array[/* oid */ Long], Row](prefix, "conffeqop", None, Some("_oid"))(x => extract(x).conffeqop, (row, value) => merge(row, extract(row).copy(conffeqop = value)))

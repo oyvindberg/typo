@@ -8,6 +8,7 @@ package production
 package billofmaterials
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import typo.dsl.SqlExpr.Field
@@ -21,7 +22,7 @@ trait BillofmaterialsFields[Row] {
   val startdate: Field[TypoLocalDateTime, Row]
   val enddate: OptField[TypoLocalDateTime, Row]
   val unitmeasurecode: Field[UnitmeasureId, Row]
-  val bomlevel: Field[Int, Row]
+  val bomlevel: Field[TypoShort, Row]
   val perassemblyqty: Field[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

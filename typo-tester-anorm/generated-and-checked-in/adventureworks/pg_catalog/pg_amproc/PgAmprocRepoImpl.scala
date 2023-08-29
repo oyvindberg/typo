@@ -8,6 +8,7 @@ package pg_catalog
 package pg_amproc
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
@@ -26,7 +27,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   }
   override def insert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow = {
     SQL"""insert into pg_catalog.pg_amproc("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")
-          values (${ParameterValue(unsaved.oid, null, PgAmprocId.toStatement)}::oid, ${ParameterValue(unsaved.amprocfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amproclefttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amprocrighttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amprocnum, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.amproc, null, TypoRegproc.toStatement)}::regproc)
+          values (${ParameterValue(unsaved.oid, null, PgAmprocId.toStatement)}::oid, ${ParameterValue(unsaved.amprocfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amproclefttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amprocrighttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amprocnum, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.amproc, null, TypoRegproc.toStatement)}::regproc)
           returning "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc"
        """
       .executeInsert(PgAmprocRow.rowParser(1).single)
@@ -53,10 +54,10 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
        """.as(PgAmprocRow.rowParser(1).*)
     
   }
-  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int)(implicit c: Connection): Option[PgAmprocRow] = {
+  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: TypoShort)(implicit c: Connection): Option[PgAmprocRow] = {
     SQL"""select "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum"
           from pg_catalog.pg_amproc
-          where "amprocfamily" = ${ParameterValue(amprocfamily, null, ToStatement.longToStatement)} AND "amproclefttype" = ${ParameterValue(amproclefttype, null, ToStatement.longToStatement)} AND "amprocrighttype" = ${ParameterValue(amprocrighttype, null, ToStatement.longToStatement)} AND "amprocnum" = ${ParameterValue(amprocnum, null, ToStatement.intToStatement)}
+          where "amprocfamily" = ${ParameterValue(amprocfamily, null, ToStatement.longToStatement)} AND "amproclefttype" = ${ParameterValue(amproclefttype, null, ToStatement.longToStatement)} AND "amprocrighttype" = ${ParameterValue(amprocrighttype, null, ToStatement.longToStatement)} AND "amprocnum" = ${ParameterValue(amprocnum, null, TypoShort.toStatement)}
        """.as(PgAmprocRow.rowParser(1).singleOpt)
     
   }
@@ -66,7 +67,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
           set "amprocfamily" = ${ParameterValue(row.amprocfamily, null, ToStatement.longToStatement)}::oid,
               "amproclefttype" = ${ParameterValue(row.amproclefttype, null, ToStatement.longToStatement)}::oid,
               "amprocrighttype" = ${ParameterValue(row.amprocrighttype, null, ToStatement.longToStatement)}::oid,
-              "amprocnum" = ${ParameterValue(row.amprocnum, null, ToStatement.intToStatement)}::int2,
+              "amprocnum" = ${ParameterValue(row.amprocnum, null, TypoShort.toStatement)}::int2,
               "amproc" = ${ParameterValue(row.amproc, null, TypoRegproc.toStatement)}::regproc
           where "oid" = ${ParameterValue(oid, null, PgAmprocId.toStatement)}
        """.executeUpdate() > 0
@@ -81,7 +82,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
             ${ParameterValue(unsaved.amprocfamily, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.amproclefttype, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.amprocrighttype, null, ToStatement.longToStatement)}::oid,
-            ${ParameterValue(unsaved.amprocnum, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.amprocnum, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.amproc, null, TypoRegproc.toStatement)}::regproc
           )
           on conflict ("oid")

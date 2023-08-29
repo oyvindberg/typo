@@ -8,6 +8,7 @@ package purchasing
 package purchaseorderdetail
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import doobie.enumerated.Nullability
@@ -26,7 +27,7 @@ case class PurchaseorderdetailRow(
   /** Date the product is expected to be received. */
   duedate: TypoLocalDateTime,
   /** Quantity ordered. */
-  orderqty: Int,
+  orderqty: TypoShort,
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
@@ -42,14 +43,14 @@ case class PurchaseorderdetailRow(
  }
 
 object PurchaseorderdetailRow {
-  implicit lazy val decoder: Decoder[PurchaseorderdetailRow] = Decoder.forProduct9[PurchaseorderdetailRow, PurchaseorderheaderId, Int, TypoLocalDateTime, Int, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(PurchaseorderdetailRow.apply)(PurchaseorderheaderId.decoder, Decoder.decodeInt, TypoLocalDateTime.decoder, Decoder.decodeInt, ProductId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[PurchaseorderdetailRow] = Encoder.forProduct9[PurchaseorderdetailRow, PurchaseorderheaderId, Int, TypoLocalDateTime, Int, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(x => (x.purchaseorderid, x.purchaseorderdetailid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.modifieddate))(PurchaseorderheaderId.encoder, Encoder.encodeInt, TypoLocalDateTime.encoder, Encoder.encodeInt, ProductId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[PurchaseorderdetailRow] = Decoder.forProduct9[PurchaseorderdetailRow, PurchaseorderheaderId, Int, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(PurchaseorderdetailRow.apply)(PurchaseorderheaderId.decoder, Decoder.decodeInt, TypoLocalDateTime.decoder, TypoShort.decoder, ProductId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PurchaseorderdetailRow] = Encoder.forProduct9[PurchaseorderdetailRow, PurchaseorderheaderId, Int, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(x => (x.purchaseorderid, x.purchaseorderdetailid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.modifieddate))(PurchaseorderheaderId.encoder, Encoder.encodeInt, TypoLocalDateTime.encoder, TypoShort.encoder, ProductId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PurchaseorderdetailRow] = new Read[PurchaseorderdetailRow](
     gets = List(
       (PurchaseorderheaderId.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (ProductId.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
@@ -60,7 +61,7 @@ object PurchaseorderdetailRow {
       purchaseorderid = PurchaseorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
       purchaseorderdetailid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
       duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
-      orderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      orderqty = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
       productid = ProductId.get.unsafeGetNonNullable(rs, i + 4),
       unitprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 5),
       receivedqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6),

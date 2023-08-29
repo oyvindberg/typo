@@ -8,6 +8,7 @@ package pg_catalog
 package pg_attrdef
 
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
@@ -26,7 +27,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   }
   override def insert(unsaved: PgAttrdefRow)(implicit c: Connection): PgAttrdefRow = {
     SQL"""insert into pg_catalog.pg_attrdef("oid", "adrelid", "adnum", "adbin")
-          values (${ParameterValue(unsaved.oid, null, PgAttrdefId.toStatement)}::oid, ${ParameterValue(unsaved.adrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.adnum, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.adbin, null, TypoPgNodeTree.toStatement)}::pg_node_tree)
+          values (${ParameterValue(unsaved.oid, null, PgAttrdefId.toStatement)}::oid, ${ParameterValue(unsaved.adrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.adnum, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.adbin, null, TypoPgNodeTree.toStatement)}::pg_node_tree)
           returning "oid", "adrelid", "adnum", "adbin"
        """
       .executeInsert(PgAttrdefRow.rowParser(1).single)
@@ -53,10 +54,10 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
        """.as(PgAttrdefRow.rowParser(1).*)
     
   }
-  override def selectByUnique(adrelid: /* oid */ Long, adnum: Int)(implicit c: Connection): Option[PgAttrdefRow] = {
+  override def selectByUnique(adrelid: /* oid */ Long, adnum: TypoShort)(implicit c: Connection): Option[PgAttrdefRow] = {
     SQL"""select "adrelid", "adnum"
           from pg_catalog.pg_attrdef
-          where "adrelid" = ${ParameterValue(adrelid, null, ToStatement.longToStatement)} AND "adnum" = ${ParameterValue(adnum, null, ToStatement.intToStatement)}
+          where "adrelid" = ${ParameterValue(adrelid, null, ToStatement.longToStatement)} AND "adnum" = ${ParameterValue(adnum, null, TypoShort.toStatement)}
        """.as(PgAttrdefRow.rowParser(1).singleOpt)
     
   }
@@ -64,7 +65,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
     val oid = row.oid
     SQL"""update pg_catalog.pg_attrdef
           set "adrelid" = ${ParameterValue(row.adrelid, null, ToStatement.longToStatement)}::oid,
-              "adnum" = ${ParameterValue(row.adnum, null, ToStatement.intToStatement)}::int2,
+              "adnum" = ${ParameterValue(row.adnum, null, TypoShort.toStatement)}::int2,
               "adbin" = ${ParameterValue(row.adbin, null, TypoPgNodeTree.toStatement)}::pg_node_tree
           where "oid" = ${ParameterValue(oid, null, PgAttrdefId.toStatement)}
        """.executeUpdate() > 0
@@ -77,7 +78,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
           values (
             ${ParameterValue(unsaved.oid, null, PgAttrdefId.toStatement)}::oid,
             ${ParameterValue(unsaved.adrelid, null, ToStatement.longToStatement)}::oid,
-            ${ParameterValue(unsaved.adnum, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.adnum, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.adbin, null, TypoPgNodeTree.toStatement)}::pg_node_tree
           )
           on conflict ("oid")

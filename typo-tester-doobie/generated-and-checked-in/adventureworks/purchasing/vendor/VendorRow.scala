@@ -8,6 +8,7 @@ package purchasing
 package vendor
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
@@ -28,7 +29,7 @@ case class VendorRow(
   /** Company name. */
   name: Name,
   /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average */
-  creditrating: Int,
+  creditrating: TypoShort,
   /** 0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product. */
   preferredvendorstatus: Flag,
   /** 0 = Vendor no longer used. 1 = Vendor is actively used. */
@@ -39,14 +40,14 @@ case class VendorRow(
 )
 
 object VendorRow {
-  implicit lazy val decoder: Decoder[VendorRow] = Decoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, Int, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VendorRow.apply)(BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, Decoder.decodeInt, Flag.decoder, Flag.decoder, Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[VendorRow] = Encoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, Int, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))(BusinessentityId.encoder, AccountNumber.encoder, Name.encoder, Encoder.encodeInt, Flag.encoder, Flag.encoder, Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[VendorRow] = Decoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, TypoShort, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VendorRow.apply)(BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, TypoShort.decoder, Flag.decoder, Flag.decoder, Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[VendorRow] = Encoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, TypoShort, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))(BusinessentityId.encoder, AccountNumber.encoder, Name.encoder, TypoShort.encoder, Flag.encoder, Flag.encoder, Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
   implicit lazy val read: Read[VendorRow] = new Read[VendorRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (AccountNumber.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -56,7 +57,7 @@ object VendorRow {
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       accountnumber = AccountNumber.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      creditrating = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      creditrating = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
       preferredvendorstatus = Flag.get.unsafeGetNonNullable(rs, i + 4),
       activeflag = Flag.get.unsafeGetNonNullable(rs, i + 5),
       purchasingwebserviceurl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),

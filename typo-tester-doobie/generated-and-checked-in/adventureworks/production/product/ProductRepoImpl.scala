@@ -9,6 +9,7 @@ package product
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -36,7 +37,7 @@ object ProductRepoImpl extends ProductRepo {
   }
   override def insert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.makeflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.finishedgoodsflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.safetystocklevel)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.reorderpoint)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4, ${fromWrite(unsaved.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4, ${fromWrite(unsaved.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.makeflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.finishedgoodsflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.safetystocklevel)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.reorderpoint)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4, ${fromWrite(unsaved.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4, ${fromWrite(unsaved.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
        """.query(ProductRow.read).unique
   }
@@ -45,8 +46,8 @@ object ProductRepoImpl extends ProductRepo {
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
       Some((Fragment.const(s""""productnumber""""), fr"${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))}")),
       Some((Fragment.const(s""""color""""), fr"${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""safetystocklevel""""), fr"${fromWrite(unsaved.safetystocklevel)(Write.fromPut(Meta.IntMeta.put))}::int2")),
-      Some((Fragment.const(s""""reorderpoint""""), fr"${fromWrite(unsaved.reorderpoint)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""safetystocklevel""""), fr"${fromWrite(unsaved.safetystocklevel)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const(s""""reorderpoint""""), fr"${fromWrite(unsaved.reorderpoint)(Write.fromPut(TypoShort.put))}::int2")),
       Some((Fragment.const(s""""standardcost""""), fr"${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       Some((Fragment.const(s""""listprice""""), fr"${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       Some((Fragment.const(s""""size""""), fr"${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))}")),
@@ -118,8 +119,8 @@ object ProductRepoImpl extends ProductRepo {
               "makeflag" = ${fromWrite(row.makeflag)(Write.fromPut(Flag.put))}::bool,
               "finishedgoodsflag" = ${fromWrite(row.finishedgoodsflag)(Write.fromPut(Flag.put))}::bool,
               "color" = ${fromWrite(row.color)(Write.fromPutOption(Meta.StringMeta.put))},
-              "safetystocklevel" = ${fromWrite(row.safetystocklevel)(Write.fromPut(Meta.IntMeta.put))}::int2,
-              "reorderpoint" = ${fromWrite(row.reorderpoint)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "safetystocklevel" = ${fromWrite(row.safetystocklevel)(Write.fromPut(TypoShort.put))}::int2,
+              "reorderpoint" = ${fromWrite(row.reorderpoint)(Write.fromPut(TypoShort.put))}::int2,
               "standardcost" = ${fromWrite(row.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "listprice" = ${fromWrite(row.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "size" = ${fromWrite(row.size)(Write.fromPutOption(Meta.StringMeta.put))},
@@ -154,8 +155,8 @@ object ProductRepoImpl extends ProductRepo {
             ${fromWrite(unsaved.makeflag)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.finishedgoodsflag)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.safetystocklevel)(Write.fromPut(Meta.IntMeta.put))}::int2,
-            ${fromWrite(unsaved.reorderpoint)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.safetystocklevel)(Write.fromPut(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.reorderpoint)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
             ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
             ${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))},

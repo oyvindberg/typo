@@ -10,6 +10,7 @@ package pg_type
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -27,7 +28,7 @@ case class PgTypeRow(
   typname: String,
   typnamespace: /* oid */ Long,
   typowner: /* oid */ Long,
-  typlen: Int,
+  typlen: TypoShort,
   typbyval: Boolean,
   typtype: String,
   typcategory: String,
@@ -65,7 +66,7 @@ object PgTypeRow {
           typname = json.\("typname").as(Reads.StringReads),
           typnamespace = json.\("typnamespace").as(Reads.LongReads),
           typowner = json.\("typowner").as(Reads.LongReads),
-          typlen = json.\("typlen").as(Reads.IntReads),
+          typlen = json.\("typlen").as(TypoShort.reads),
           typbyval = json.\("typbyval").as(Reads.BooleanReads),
           typtype = json.\("typtype").as(Reads.StringReads),
           typcategory = json.\("typcategory").as(Reads.StringReads),
@@ -104,7 +105,7 @@ object PgTypeRow {
         typname = row(idx + 1)(Column.columnToString),
         typnamespace = row(idx + 2)(Column.columnToLong),
         typowner = row(idx + 3)(Column.columnToLong),
-        typlen = row(idx + 4)(Column.columnToInt),
+        typlen = row(idx + 4)(TypoShort.column),
         typbyval = row(idx + 5)(Column.columnToBoolean),
         typtype = row(idx + 6)(Column.columnToString),
         typcategory = row(idx + 7)(Column.columnToString),
@@ -141,7 +142,7 @@ object PgTypeRow {
       "typname" -> Writes.StringWrites.writes(o.typname),
       "typnamespace" -> Writes.LongWrites.writes(o.typnamespace),
       "typowner" -> Writes.LongWrites.writes(o.typowner),
-      "typlen" -> Writes.IntWrites.writes(o.typlen),
+      "typlen" -> TypoShort.writes.writes(o.typlen),
       "typbyval" -> Writes.BooleanWrites.writes(o.typbyval),
       "typtype" -> Writes.StringWrites.writes(o.typtype),
       "typcategory" -> Writes.StringWrites.writes(o.typcategory),

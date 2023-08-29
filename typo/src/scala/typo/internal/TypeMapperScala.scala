@@ -66,7 +66,7 @@ case class TypeMapperScala(
       case db.Type.Float8          => sc.Type.Double
       case db.Type.Hstore          => customTypes.TypoHStore.typoType
       case db.Type.Inet            => customTypes.TypoInet.typoType
-      case db.Type.Int2            => sc.Type.Int // jdbc driver seems to return ints instead of shorts
+      case db.Type.Int2            => customTypes.TypoShort.typoType
       case db.Type.Int4            => sc.Type.Int
       case db.Type.Int8            => sc.Type.Long
       case db.Type.Json            => customTypes.TypoJson.typoType

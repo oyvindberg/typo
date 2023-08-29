@@ -8,6 +8,7 @@ package pr
 package d
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
@@ -40,7 +41,7 @@ case class DViewRow(
   /** Points to [[production.document.DocumentRow.changenumber]] */
   changenumber: Int,
   /** Points to [[production.document.DocumentRow.status]] */
-  status: Int,
+  status: TypoShort,
   /** Points to [[production.document.DocumentRow.documentsummary]] */
   documentsummary: Option[String],
   /** Points to [[production.document.DocumentRow.document]] */
@@ -64,7 +65,7 @@ object DViewRow {
           fileextension = json.\("fileextension").toOption.map(_.as(Reads.StringReads)),
           revision = json.\("revision").as(Reads.StringReads),
           changenumber = json.\("changenumber").as(Reads.IntReads),
-          status = json.\("status").as(Reads.IntReads),
+          status = json.\("status").as(TypoShort.reads),
           documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
           document = json.\("document").toOption.map(_.as(Reads.ByteReads)),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
@@ -84,7 +85,7 @@ object DViewRow {
         fileextension = row(idx + 4)(Column.columnToOption(Column.columnToString)),
         revision = row(idx + 5)(Column.columnToString),
         changenumber = row(idx + 6)(Column.columnToInt),
-        status = row(idx + 7)(Column.columnToInt),
+        status = row(idx + 7)(TypoShort.column),
         documentsummary = row(idx + 8)(Column.columnToOption(Column.columnToString)),
         document = row(idx + 9)(Column.columnToOption(Column.columnToByte)),
         rowguid = row(idx + 10)(Column.columnToUUID),
@@ -102,7 +103,7 @@ object DViewRow {
       "fileextension" -> Writes.OptionWrites(Writes.StringWrites).writes(o.fileextension),
       "revision" -> Writes.StringWrites.writes(o.revision),
       "changenumber" -> Writes.IntWrites.writes(o.changenumber),
-      "status" -> Writes.IntWrites.writes(o.status),
+      "status" -> TypoShort.writes.writes(o.status),
       "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
       "document" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.document),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),

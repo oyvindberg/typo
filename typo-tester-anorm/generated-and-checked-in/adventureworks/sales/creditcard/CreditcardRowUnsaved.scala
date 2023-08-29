@@ -9,6 +9,7 @@ package creditcard
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -26,9 +27,9 @@ case class CreditcardRowUnsaved(
   /** Credit card number. */
   cardnumber: /* max 25 chars */ String,
   /** Credit card expiration month. */
-  expmonth: Int,
+  expmonth: TypoShort,
   /** Credit card expiration year. */
-  expyear: Int,
+  expyear: TypoShort,
   /** Default: nextval('sales.creditcard_creditcardid_seq'::regclass)
       Primary key for CreditCard records. */
   creditcardid: Defaulted[/* user-picked */ CustomCreditcardId] = Defaulted.UseDefault,
@@ -57,8 +58,8 @@ object CreditcardRowUnsaved {
         CreditcardRowUnsaved(
           cardtype = json.\("cardtype").as(Reads.StringReads),
           cardnumber = json.\("cardnumber").as(Reads.StringReads),
-          expmonth = json.\("expmonth").as(Reads.IntReads),
-          expyear = json.\("expyear").as(Reads.IntReads),
+          expmonth = json.\("expmonth").as(TypoShort.reads),
+          expyear = json.\("expyear").as(TypoShort.reads),
           creditcardid = json.\("creditcardid").as(Defaulted.reads(CustomCreditcardId.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
@@ -69,8 +70,8 @@ object CreditcardRowUnsaved {
     new JsObject(ListMap[String, JsValue](
       "cardtype" -> Writes.StringWrites.writes(o.cardtype),
       "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
-      "expmonth" -> Writes.IntWrites.writes(o.expmonth),
-      "expyear" -> Writes.IntWrites.writes(o.expyear),
+      "expmonth" -> TypoShort.writes.writes(o.expmonth),
+      "expyear" -> TypoShort.writes.writes(o.expyear),
       "creditcardid" -> Defaulted.writes(CustomCreditcardId.writes).writes(o.creditcardid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))

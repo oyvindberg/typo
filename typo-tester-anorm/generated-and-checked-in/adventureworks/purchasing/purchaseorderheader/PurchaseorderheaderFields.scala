@@ -8,6 +8,7 @@ package purchasing
 package purchaseorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import typo.dsl.SqlExpr.Field
@@ -16,8 +17,8 @@ import typo.dsl.SqlExpr.OptField
 
 trait PurchaseorderheaderFields[Row] {
   val purchaseorderid: IdField[PurchaseorderheaderId, Row]
-  val revisionnumber: Field[Int, Row]
-  val status: Field[Int, Row]
+  val revisionnumber: Field[TypoShort, Row]
+  val status: Field[TypoShort, Row]
   val employeeid: Field[BusinessentityId, Row]
   val vendorid: Field[BusinessentityId, Row]
   val shipmethodid: Field[ShipmethodId, Row]

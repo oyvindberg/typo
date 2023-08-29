@@ -8,6 +8,7 @@ package pr
 package p
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
@@ -43,9 +44,9 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.color]] */
   color: Option[/* max 15 chars */ String],
   /** Points to [[production.product.ProductRow.safetystocklevel]] */
-  safetystocklevel: Int,
+  safetystocklevel: TypoShort,
   /** Points to [[production.product.ProductRow.reorderpoint]] */
-  reorderpoint: Int,
+  reorderpoint: TypoShort,
   /** Points to [[production.product.ProductRow.standardcost]] */
   standardcost: BigDecimal,
   /** Points to [[production.product.ProductRow.listprice]] */
@@ -93,8 +94,8 @@ object PViewRow {
           makeflag = json.\("makeflag").as(Flag.reads),
           finishedgoodsflag = json.\("finishedgoodsflag").as(Flag.reads),
           color = json.\("color").toOption.map(_.as(Reads.StringReads)),
-          safetystocklevel = json.\("safetystocklevel").as(Reads.IntReads),
-          reorderpoint = json.\("reorderpoint").as(Reads.IntReads),
+          safetystocklevel = json.\("safetystocklevel").as(TypoShort.reads),
+          reorderpoint = json.\("reorderpoint").as(TypoShort.reads),
           standardcost = json.\("standardcost").as(Reads.bigDecReads),
           listprice = json.\("listprice").as(Reads.bigDecReads),
           size = json.\("size").toOption.map(_.as(Reads.StringReads)),
@@ -126,8 +127,8 @@ object PViewRow {
         makeflag = row(idx + 4)(Flag.column),
         finishedgoodsflag = row(idx + 5)(Flag.column),
         color = row(idx + 6)(Column.columnToOption(Column.columnToString)),
-        safetystocklevel = row(idx + 7)(Column.columnToInt),
-        reorderpoint = row(idx + 8)(Column.columnToInt),
+        safetystocklevel = row(idx + 7)(TypoShort.column),
+        reorderpoint = row(idx + 8)(TypoShort.column),
         standardcost = row(idx + 9)(Column.columnToScalaBigDecimal),
         listprice = row(idx + 10)(Column.columnToScalaBigDecimal),
         size = row(idx + 11)(Column.columnToOption(Column.columnToString)),
@@ -157,8 +158,8 @@ object PViewRow {
       "makeflag" -> Flag.writes.writes(o.makeflag),
       "finishedgoodsflag" -> Flag.writes.writes(o.finishedgoodsflag),
       "color" -> Writes.OptionWrites(Writes.StringWrites).writes(o.color),
-      "safetystocklevel" -> Writes.IntWrites.writes(o.safetystocklevel),
-      "reorderpoint" -> Writes.IntWrites.writes(o.reorderpoint),
+      "safetystocklevel" -> TypoShort.writes.writes(o.safetystocklevel),
+      "reorderpoint" -> TypoShort.writes.writes(o.reorderpoint),
       "standardcost" -> Writes.BigDecimalWrites.writes(o.standardcost),
       "listprice" -> Writes.BigDecimalWrites.writes(o.listprice),
       "size" -> Writes.OptionWrites(Writes.StringWrites).writes(o.size),

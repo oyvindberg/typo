@@ -9,6 +9,7 @@ package creditcard
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -32,7 +33,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
   }
   override def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
-          values (${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.expmonth)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.expyear)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """.query(CreditcardRow.read).unique
   }
@@ -40,8 +41,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
     val fs = List(
       Some((Fragment.const(s""""cardtype""""), fr"${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}")),
       Some((Fragment.const(s""""cardnumber""""), fr"${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""expmonth""""), fr"${fromWrite(unsaved.expmonth)(Write.fromPut(Meta.IntMeta.put))}::int2")),
-      Some((Fragment.const(s""""expyear""""), fr"${fromWrite(unsaved.expyear)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""expmonth""""), fr"${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const(s""""expyear""""), fr"${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2")),
       unsaved.creditcardid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s""""creditcardid""""), fr"${fromWrite(value: /* user-picked */ CustomCreditcardId)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4"))
@@ -83,8 +84,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
     sql"""update sales.creditcard
           set "cardtype" = ${fromWrite(row.cardtype)(Write.fromPut(Meta.StringMeta.put))},
               "cardnumber" = ${fromWrite(row.cardnumber)(Write.fromPut(Meta.StringMeta.put))},
-              "expmonth" = ${fromWrite(row.expmonth)(Write.fromPut(Meta.IntMeta.put))}::int2,
-              "expyear" = ${fromWrite(row.expyear)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "expmonth" = ${fromWrite(row.expmonth)(Write.fromPut(TypoShort.put))}::int2,
+              "expyear" = ${fromWrite(row.expyear)(Write.fromPut(TypoShort.put))}::int2,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}"""
       .update
@@ -100,8 +101,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
             ${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4,
             ${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))},
             ${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.expmonth)(Write.fromPut(Meta.IntMeta.put))}::int2,
-            ${fromWrite(unsaved.expyear)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("creditcardid")

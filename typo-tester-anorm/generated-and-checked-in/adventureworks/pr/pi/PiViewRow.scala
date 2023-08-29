@@ -8,6 +8,7 @@ package pr
 package pi
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import anorm.Column
@@ -33,9 +34,9 @@ case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.shelf]] */
   shelf: /* max 10 chars */ String,
   /** Points to [[production.productinventory.ProductinventoryRow.bin]] */
-  bin: Int,
+  bin: TypoShort,
   /** Points to [[production.productinventory.ProductinventoryRow.quantity]] */
-  quantity: Int,
+  quantity: TypoShort,
   /** Points to [[production.productinventory.ProductinventoryRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[production.productinventory.ProductinventoryRow.modifieddate]] */
@@ -50,8 +51,8 @@ object PiViewRow {
           productid = json.\("productid").as(ProductId.reads),
           locationid = json.\("locationid").as(LocationId.reads),
           shelf = json.\("shelf").as(Reads.StringReads),
-          bin = json.\("bin").as(Reads.IntReads),
-          quantity = json.\("quantity").as(Reads.IntReads),
+          bin = json.\("bin").as(TypoShort.reads),
+          quantity = json.\("quantity").as(TypoShort.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -65,8 +66,8 @@ object PiViewRow {
         productid = row(idx + 1)(ProductId.column),
         locationid = row(idx + 2)(LocationId.column),
         shelf = row(idx + 3)(Column.columnToString),
-        bin = row(idx + 4)(Column.columnToInt),
-        quantity = row(idx + 5)(Column.columnToInt),
+        bin = row(idx + 4)(TypoShort.column),
+        quantity = row(idx + 5)(TypoShort.column),
         rowguid = row(idx + 6)(Column.columnToUUID),
         modifieddate = row(idx + 7)(TypoLocalDateTime.column)
       )
@@ -78,8 +79,8 @@ object PiViewRow {
       "productid" -> ProductId.writes.writes(o.productid),
       "locationid" -> LocationId.writes.writes(o.locationid),
       "shelf" -> Writes.StringWrites.writes(o.shelf),
-      "bin" -> Writes.IntWrites.writes(o.bin),
-      "quantity" -> Writes.IntWrites.writes(o.quantity),
+      "bin" -> TypoShort.writes.writes(o.bin),
+      "quantity" -> TypoShort.writes.writes(o.quantity),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

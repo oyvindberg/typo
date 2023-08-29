@@ -8,6 +8,7 @@ package pr
 package w
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId
@@ -24,7 +25,7 @@ class WViewStructure[Row](val prefix: Option[String], val extract: Row => WViewR
   override val workorderid = new Field[WorkorderId, Row](prefix, "workorderid", None, None)(x => extract(x).workorderid, (row, value) => merge(row, extract(row).copy(workorderid = value)))
   override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
   override val orderqty = new Field[Int, Row](prefix, "orderqty", None, None)(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
-  override val scrappedqty = new Field[Int, Row](prefix, "scrappedqty", None, None)(x => extract(x).scrappedqty, (row, value) => merge(row, extract(row).copy(scrappedqty = value)))
+  override val scrappedqty = new Field[TypoShort, Row](prefix, "scrappedqty", None, None)(x => extract(x).scrappedqty, (row, value) => merge(row, extract(row).copy(scrappedqty = value)))
   override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
   override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
   override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), None)(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))

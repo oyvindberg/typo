@@ -8,6 +8,7 @@ package production
 package workorder
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import anorm.Column
@@ -31,7 +32,7 @@ case class WorkorderRow(
   /** Product quantity to build. */
   orderqty: Int,
   /** Quantity that failed inspection. */
-  scrappedqty: Int,
+  scrappedqty: TypoShort,
   /** Work order start date. */
   startdate: TypoLocalDateTime,
   /** Work order end date. */
@@ -51,7 +52,7 @@ object WorkorderRow {
           workorderid = json.\("workorderid").as(WorkorderId.reads),
           productid = json.\("productid").as(ProductId.reads),
           orderqty = json.\("orderqty").as(Reads.IntReads),
-          scrappedqty = json.\("scrappedqty").as(Reads.IntReads),
+          scrappedqty = json.\("scrappedqty").as(TypoShort.reads),
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
           enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           duedate = json.\("duedate").as(TypoLocalDateTime.reads),
@@ -67,7 +68,7 @@ object WorkorderRow {
         workorderid = row(idx + 0)(WorkorderId.column),
         productid = row(idx + 1)(ProductId.column),
         orderqty = row(idx + 2)(Column.columnToInt),
-        scrappedqty = row(idx + 3)(Column.columnToInt),
+        scrappedqty = row(idx + 3)(TypoShort.column),
         startdate = row(idx + 4)(TypoLocalDateTime.column),
         enddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
         duedate = row(idx + 6)(TypoLocalDateTime.column),
@@ -81,7 +82,7 @@ object WorkorderRow {
       "workorderid" -> WorkorderId.writes.writes(o.workorderid),
       "productid" -> ProductId.writes.writes(o.productid),
       "orderqty" -> Writes.IntWrites.writes(o.orderqty),
-      "scrappedqty" -> Writes.IntWrites.writes(o.scrappedqty),
+      "scrappedqty" -> TypoShort.writes.writes(o.scrappedqty),
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
       "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),

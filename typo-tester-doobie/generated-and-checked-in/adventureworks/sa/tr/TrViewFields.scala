@@ -8,6 +8,7 @@ package sa
 package tr
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
@@ -18,7 +19,7 @@ trait TrViewFields[Row] {
   val id: Field[SalestaxrateId, Row]
   val salestaxrateid: Field[SalestaxrateId, Row]
   val stateprovinceid: Field[StateprovinceId, Row]
-  val taxtype: Field[Int, Row]
+  val taxtype: Field[TypoShort, Row]
   val taxrate: Field[BigDecimal, Row]
   val name: Field[Name, Row]
   val rowguid: Field[UUID, Row]

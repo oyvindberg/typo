@@ -9,6 +9,7 @@ package productinventory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import java.util.UUID
@@ -32,16 +33,16 @@ case class ProductinventoryRowUnsaved(
   /** Storage compartment within an inventory location. */
   shelf: /* max 10 chars */ String,
   /** Storage container on a shelf in an inventory location. */
-  bin: Int,
+  bin: TypoShort,
   /** Default: 0
       Quantity of products in the inventory location. */
-  quantity: Defaulted[Int] = Defaulted.UseDefault,
+  quantity: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(quantityDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductinventoryRow =
+  def toRow(quantityDefault: => TypoShort, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductinventoryRow =
     ProductinventoryRow(
       productid = productid,
       locationid = locationid,
@@ -68,8 +69,8 @@ object ProductinventoryRowUnsaved {
           productid = json.\("productid").as(ProductId.reads),
           locationid = json.\("locationid").as(LocationId.reads),
           shelf = json.\("shelf").as(Reads.StringReads),
-          bin = json.\("bin").as(Reads.IntReads),
-          quantity = json.\("quantity").as(Defaulted.reads(Reads.IntReads)),
+          bin = json.\("bin").as(TypoShort.reads),
+          quantity = json.\("quantity").as(Defaulted.reads(TypoShort.reads)),
           rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
@@ -81,8 +82,8 @@ object ProductinventoryRowUnsaved {
       "productid" -> ProductId.writes.writes(o.productid),
       "locationid" -> LocationId.writes.writes(o.locationid),
       "shelf" -> Writes.StringWrites.writes(o.shelf),
-      "bin" -> Writes.IntWrites.writes(o.bin),
-      "quantity" -> Defaulted.writes(Writes.IntWrites).writes(o.quantity),
+      "bin" -> TypoShort.writes.writes(o.bin),
+      "quantity" -> Defaulted.writes(TypoShort.writes).writes(o.quantity),
       "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))

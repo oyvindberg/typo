@@ -8,6 +8,7 @@ package pr
 package p
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
@@ -26,8 +27,8 @@ trait PViewFields[Row] {
   val makeflag: Field[Flag, Row]
   val finishedgoodsflag: Field[Flag, Row]
   val color: OptField[/* max 15 chars */ String, Row]
-  val safetystocklevel: Field[Int, Row]
-  val reorderpoint: Field[Int, Row]
+  val safetystocklevel: Field[TypoShort, Row]
+  val reorderpoint: Field[TypoShort, Row]
   val standardcost: Field[BigDecimal, Row]
   val listprice: Field[BigDecimal, Row]
   val size: OptField[/* max 5 chars */ String, Row]

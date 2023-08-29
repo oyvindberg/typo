@@ -8,6 +8,7 @@ package production
 package workorderrouting
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import typo.dsl.SqlExpr.Field
@@ -17,7 +18,7 @@ import typo.dsl.SqlExpr.OptField
 trait WorkorderroutingFields[Row] {
   val workorderid: IdField[WorkorderId, Row]
   val productid: IdField[Int, Row]
-  val operationsequence: IdField[Int, Row]
+  val operationsequence: IdField[TypoShort, Row]
   val locationid: Field[LocationId, Row]
   val scheduledstartdate: Field[TypoLocalDateTime, Row]
   val scheduledenddate: Field[TypoLocalDateTime, Row]

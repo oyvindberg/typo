@@ -1,6 +1,6 @@
 package adventureworks.production.product
 
-import adventureworks.customtypes.{Defaulted, TypoLocalDateTime, TypoXml}
+import adventureworks.customtypes.{Defaulted, TypoLocalDateTime, TypoShort, TypoXml}
 import adventureworks.production.productcategory.*
 import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
@@ -77,8 +77,8 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         name = Name("name"),
         productnumber = "productnumber",
         color = Some("color"),
-        safetystocklevel = 16,
-        reorderpoint = 18,
+        safetystocklevel = TypoShort(16),
+        reorderpoint = TypoShort(18),
         standardcost = 20,
         listprice = 22,
         size = Some("size"),
@@ -141,7 +141,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val update = productRepo.update
         .setComputedValue(_.name)(p => (p.reverse.upper || Name("flaff")).substring(2, 4))
         .setValue(_.listprice)(BigDecimal(2))
-        .setComputedValue(_.reorderpoint)(_ plus 22)
+        .setComputedValue(_.reorderpoint)(_ plus TypoShort(22))
         .setComputedValue(_.sizeunitmeasurecode)(_ => Some(unitmeasure.unitmeasurecode))
         .setComputedValue(_.sellstartdate)(_ => sellStartDate)
         .where(_.productid === saved1.productid)
@@ -150,7 +150,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val List(updated) = update.executeReturnChanged()
       assert(updated.name === Name("MANf"))
       assert(updated.listprice === BigDecimal(2))
-      assert(updated.reorderpoint === 40)
+      assert(updated.reorderpoint === TypoShort(40))
       assert(updated.sellstartdate === sellStartDate)
 
       val q = productRepo.select

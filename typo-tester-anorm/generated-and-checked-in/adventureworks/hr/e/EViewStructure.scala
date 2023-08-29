@@ -9,6 +9,7 @@ package e
 
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID
@@ -31,8 +32,8 @@ class EViewStructure[Row](val prefix: Option[String], val extract: Row => EViewR
   override val gender = new Field[/* bpchar, max 1 chars */ String, Row](prefix, "gender", None, None)(x => extract(x).gender, (row, value) => merge(row, extract(row).copy(gender = value)))
   override val hiredate = new Field[TypoLocalDate, Row](prefix, "hiredate", Some("text"), None)(x => extract(x).hiredate, (row, value) => merge(row, extract(row).copy(hiredate = value)))
   override val salariedflag = new Field[Flag, Row](prefix, "salariedflag", None, None)(x => extract(x).salariedflag, (row, value) => merge(row, extract(row).copy(salariedflag = value)))
-  override val vacationhours = new Field[Int, Row](prefix, "vacationhours", None, None)(x => extract(x).vacationhours, (row, value) => merge(row, extract(row).copy(vacationhours = value)))
-  override val sickleavehours = new Field[Int, Row](prefix, "sickleavehours", None, None)(x => extract(x).sickleavehours, (row, value) => merge(row, extract(row).copy(sickleavehours = value)))
+  override val vacationhours = new Field[TypoShort, Row](prefix, "vacationhours", None, None)(x => extract(x).vacationhours, (row, value) => merge(row, extract(row).copy(vacationhours = value)))
+  override val sickleavehours = new Field[TypoShort, Row](prefix, "sickleavehours", None, None)(x => extract(x).sickleavehours, (row, value) => merge(row, extract(row).copy(sickleavehours = value)))
   override val currentflag = new Field[Flag, Row](prefix, "currentflag", None, None)(x => extract(x).currentflag, (row, value) => merge(row, extract(row).copy(currentflag = value)))
   override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))

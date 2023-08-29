@@ -8,6 +8,7 @@ package pr
 package bom
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -22,7 +23,7 @@ trait BomViewFields[Row] {
   val startdate: Field[TypoLocalDateTime, Row]
   val enddate: OptField[TypoLocalDateTime, Row]
   val unitmeasurecode: Field[UnitmeasureId, Row]
-  val bomlevel: Field[Int, Row]
+  val bomlevel: Field[TypoShort, Row]
   val perassemblyqty: Field[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

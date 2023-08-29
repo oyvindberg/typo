@@ -9,6 +9,7 @@ package billofmaterials
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import doobie.free.connection.ConnectionIO
@@ -32,7 +33,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
-          values (${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}::int4, ${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4, ${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.bomlevel)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}::int4, ${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4, ${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
        """.query(BillofmaterialsRow.read).unique
   }
@@ -42,7 +43,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       Some((Fragment.const(s""""componentid""""), fr"${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4")),
       Some((Fragment.const(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
       Some((Fragment.const(s""""unitmeasurecode""""), fr"${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar")),
-      Some((Fragment.const(s""""bomlevel""""), fr"${fromWrite(unsaved.bomlevel)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""bomlevel""""), fr"${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2")),
       unsaved.billofmaterialsid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s""""billofmaterialsid""""), fr"${fromWrite(value: BillofmaterialsId)(Write.fromPut(BillofmaterialsId.put))}::int4"))
@@ -95,7 +96,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               "startdate" = ${fromWrite(row.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
               "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
               "unitmeasurecode" = ${fromWrite(row.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
-              "bomlevel" = ${fromWrite(row.bomlevel)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "bomlevel" = ${fromWrite(row.bomlevel)(Write.fromPut(TypoShort.put))}::int2,
               "perassemblyqty" = ${fromWrite(row.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}"""
@@ -115,7 +116,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
             ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
             ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
-            ${fromWrite(unsaved.bomlevel)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )

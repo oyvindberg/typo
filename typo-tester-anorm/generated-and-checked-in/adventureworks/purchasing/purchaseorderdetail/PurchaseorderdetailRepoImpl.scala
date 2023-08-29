@@ -9,6 +9,7 @@ package purchaseorderdetail
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.NamedParameter
@@ -33,7 +34,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   }
   override def insert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
     SQL"""insert into purchasing.purchaseorderdetail("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")
-          values (${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.purchaseorderdetailid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.receivedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rejectedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.purchaseorderdetailid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.orderqty, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.receivedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rejectedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
        """
       .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
@@ -43,7 +44,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     val namedParameters = List(
       Some((NamedParameter("purchaseorderid", ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)), "::int4")),
       Some((NamedParameter("duedate", ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
-      Some((NamedParameter("orderqty", ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("orderqty", ParameterValue(unsaved.orderqty, null, TypoShort.toStatement)), "::int2")),
       Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
       Some((NamedParameter("unitprice", ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
       Some((NamedParameter("receivedqty", ParameterValue(unsaved.receivedqty, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
@@ -91,7 +92,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     val compositeId = row.compositeId
     SQL"""update purchasing.purchaseorderdetail
           set "duedate" = ${ParameterValue(row.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
-              "orderqty" = ${ParameterValue(row.orderqty, null, ToStatement.intToStatement)}::int2,
+              "orderqty" = ${ParameterValue(row.orderqty, null, TypoShort.toStatement)}::int2,
               "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
               "unitprice" = ${ParameterValue(row.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "receivedqty" = ${ParameterValue(row.receivedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
@@ -109,7 +110,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
             ${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4,
             ${ParameterValue(unsaved.purchaseorderdetailid, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
-            ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.orderqty, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.receivedqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,

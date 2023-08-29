@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -39,8 +40,8 @@ case class PgProcRow(
   proretset: Boolean,
   provolatile: String,
   proparallel: String,
-  pronargs: Int,
-  pronargdefaults: Int,
+  pronargs: TypoShort,
+  pronargdefaults: TypoShort,
   prorettype: /* oid */ Long,
   proargtypes: TypoOidVector,
   proallargtypes: Option[Array[/* oid */ Long]],
@@ -79,8 +80,8 @@ object PgProcRow {
         proretset = orThrow(c.get("proretset")(Decoder.decodeBoolean)),
         provolatile = orThrow(c.get("provolatile")(Decoder.decodeString)),
         proparallel = orThrow(c.get("proparallel")(Decoder.decodeString)),
-        pronargs = orThrow(c.get("pronargs")(Decoder.decodeInt)),
-        pronargdefaults = orThrow(c.get("pronargdefaults")(Decoder.decodeInt)),
+        pronargs = orThrow(c.get("pronargs")(TypoShort.decoder)),
+        pronargdefaults = orThrow(c.get("pronargdefaults")(TypoShort.decoder)),
         prorettype = orThrow(c.get("prorettype")(Decoder.decodeLong)),
         proargtypes = orThrow(c.get("proargtypes")(TypoOidVector.decoder)),
         proallargtypes = orThrow(c.get("proallargtypes")(Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))),
@@ -114,8 +115,8 @@ object PgProcRow {
       "proretset" -> Encoder.encodeBoolean.apply(row.proretset),
       "provolatile" -> Encoder.encodeString.apply(row.provolatile),
       "proparallel" -> Encoder.encodeString.apply(row.proparallel),
-      "pronargs" -> Encoder.encodeInt.apply(row.pronargs),
-      "pronargdefaults" -> Encoder.encodeInt.apply(row.pronargdefaults),
+      "pronargs" -> TypoShort.encoder.apply(row.pronargs),
+      "pronargdefaults" -> TypoShort.encoder.apply(row.pronargdefaults),
       "prorettype" -> Encoder.encodeLong.apply(row.prorettype),
       "proargtypes" -> TypoOidVector.encoder.apply(row.proargtypes),
       "proallargtypes" -> Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)).apply(row.proallargtypes),
@@ -148,8 +149,8 @@ object PgProcRow {
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (TypoOidVector.get, Nullability.NoNulls),
       (adventureworks.LongArrayMeta.get, Nullability.Nullable),
@@ -180,8 +181,8 @@ object PgProcRow {
       proretset = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 13),
       provolatile = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 14),
       proparallel = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 15),
-      pronargs = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 16),
-      pronargdefaults = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 17),
+      pronargs = TypoShort.get.unsafeGetNonNullable(rs, i + 16),
+      pronargdefaults = TypoShort.get.unsafeGetNonNullable(rs, i + 17),
       prorettype = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 18),
       proargtypes = TypoOidVector.get.unsafeGetNonNullable(rs, i + 19),
       proallargtypes = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 20),

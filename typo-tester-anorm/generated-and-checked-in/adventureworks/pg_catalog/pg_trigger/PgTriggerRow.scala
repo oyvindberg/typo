@@ -9,6 +9,7 @@ package pg_trigger
 
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -27,7 +28,7 @@ case class PgTriggerRow(
   tgparentid: /* oid */ Long,
   tgname: String,
   tgfoid: /* oid */ Long,
-  tgtype: Int,
+  tgtype: TypoShort,
   tgenabled: String,
   tgisinternal: Boolean,
   tgconstrrelid: /* oid */ Long,
@@ -35,7 +36,7 @@ case class PgTriggerRow(
   tgconstraint: /* oid */ Long,
   tgdeferrable: Boolean,
   tginitdeferred: Boolean,
-  tgnargs: Int,
+  tgnargs: TypoShort,
   tgattr: TypoInt2Vector,
   tgargs: Array[Byte],
   tgqual: Option[TypoPgNodeTree],
@@ -52,7 +53,7 @@ object PgTriggerRow {
           tgparentid = json.\("tgparentid").as(Reads.LongReads),
           tgname = json.\("tgname").as(Reads.StringReads),
           tgfoid = json.\("tgfoid").as(Reads.LongReads),
-          tgtype = json.\("tgtype").as(Reads.IntReads),
+          tgtype = json.\("tgtype").as(TypoShort.reads),
           tgenabled = json.\("tgenabled").as(Reads.StringReads),
           tgisinternal = json.\("tgisinternal").as(Reads.BooleanReads),
           tgconstrrelid = json.\("tgconstrrelid").as(Reads.LongReads),
@@ -60,7 +61,7 @@ object PgTriggerRow {
           tgconstraint = json.\("tgconstraint").as(Reads.LongReads),
           tgdeferrable = json.\("tgdeferrable").as(Reads.BooleanReads),
           tginitdeferred = json.\("tginitdeferred").as(Reads.BooleanReads),
-          tgnargs = json.\("tgnargs").as(Reads.IntReads),
+          tgnargs = json.\("tgnargs").as(TypoShort.reads),
           tgattr = json.\("tgattr").as(TypoInt2Vector.reads),
           tgargs = json.\("tgargs").as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly)),
           tgqual = json.\("tgqual").toOption.map(_.as(TypoPgNodeTree.reads)),
@@ -78,7 +79,7 @@ object PgTriggerRow {
         tgparentid = row(idx + 2)(Column.columnToLong),
         tgname = row(idx + 3)(Column.columnToString),
         tgfoid = row(idx + 4)(Column.columnToLong),
-        tgtype = row(idx + 5)(Column.columnToInt),
+        tgtype = row(idx + 5)(TypoShort.column),
         tgenabled = row(idx + 6)(Column.columnToString),
         tgisinternal = row(idx + 7)(Column.columnToBoolean),
         tgconstrrelid = row(idx + 8)(Column.columnToLong),
@@ -86,7 +87,7 @@ object PgTriggerRow {
         tgconstraint = row(idx + 10)(Column.columnToLong),
         tgdeferrable = row(idx + 11)(Column.columnToBoolean),
         tginitdeferred = row(idx + 12)(Column.columnToBoolean),
-        tgnargs = row(idx + 13)(Column.columnToInt),
+        tgnargs = row(idx + 13)(TypoShort.column),
         tgattr = row(idx + 14)(TypoInt2Vector.column),
         tgargs = row(idx + 15)(Column.columnToByteArray),
         tgqual = row(idx + 16)(Column.columnToOption(TypoPgNodeTree.column)),
@@ -102,7 +103,7 @@ object PgTriggerRow {
       "tgparentid" -> Writes.LongWrites.writes(o.tgparentid),
       "tgname" -> Writes.StringWrites.writes(o.tgname),
       "tgfoid" -> Writes.LongWrites.writes(o.tgfoid),
-      "tgtype" -> Writes.IntWrites.writes(o.tgtype),
+      "tgtype" -> TypoShort.writes.writes(o.tgtype),
       "tgenabled" -> Writes.StringWrites.writes(o.tgenabled),
       "tgisinternal" -> Writes.BooleanWrites.writes(o.tgisinternal),
       "tgconstrrelid" -> Writes.LongWrites.writes(o.tgconstrrelid),
@@ -110,7 +111,7 @@ object PgTriggerRow {
       "tgconstraint" -> Writes.LongWrites.writes(o.tgconstraint),
       "tgdeferrable" -> Writes.BooleanWrites.writes(o.tgdeferrable),
       "tginitdeferred" -> Writes.BooleanWrites.writes(o.tginitdeferred),
-      "tgnargs" -> Writes.IntWrites.writes(o.tgnargs),
+      "tgnargs" -> TypoShort.writes.writes(o.tgnargs),
       "tgattr" -> TypoInt2Vector.writes.writes(o.tgattr),
       "tgargs" -> Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites).writes(o.tgargs),
       "tgqual" -> Writes.OptionWrites(TypoPgNodeTree.writes).writes(o.tgqual),

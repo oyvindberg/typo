@@ -327,6 +327,53 @@ class CustomTypes(pkg: sc.QIdent) {
     )
   )
 
+  lazy val TypoShort = CustomType(
+    comment = "Short primitive",
+    sqlType = "int2",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoShort")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.Short, None)
+    ),
+    isNull = p => code"$p != null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.JavaInteger,
+      toTypo = (expr, target) => code"$target($expr.toShort)"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.JavaInteger,
+      fromTypo = (expr, _) => code"$expr.value.toInt"
+    ),
+    toTypoInArray = Some(
+      CustomType.ToTypo(
+        jdbcType = sc.Type.JavaShort,
+        toTypo = (expr, target) => code"$target($expr)"
+      )
+    ),
+    fromTypoInArray = Some(
+      CustomType.FromTypo(
+        jdbcType = sc.Type.JavaShort,
+        fromTypo = (expr, _) => code"$expr.value: ${sc.Type.JavaShort}"
+      )
+    ),
+    objBody = Some(target => {
+      val numericOfTarget = sc.Type.Numeric.of(target)
+      code"""|implicit object numeric extends $numericOfTarget {
+               |    override def compare(x: $target, y: $target): ${sc.Type.Int} = ${sc.Type.JavaShort}.compare(x.value, y.value)
+               |    override def plus(x: $target, y: $target): $target = $target((x.value + y.value).toShort)
+               |    override def minus(x: $target, y: $target): $target = $target((x.value - y.value).toShort)
+               |    override def times(x: $target, y: $target): $target = $target((x.value * y.value).toShort)
+               |    override def negate(x: $target): $target = $target((-x.value).toShort)
+               |    override def fromInt(x: Int): $target = $target(x.toShort)
+               |    override def toInt(x: $target): ${sc.Type.Int} = x.toInt
+               |    override def toLong(x: $target): ${sc.Type.Long} = x.toLong
+               |    override def toFloat(x: $target): ${sc.Type.Float} = x.toFloat
+               |    override def toDouble(x: $target): ${sc.Type.Double} = x.toDouble
+               |    def parseString(str: String): Option[$target] = (str, Option.empty[$target])._2 // sorry mac, this was too much trouble to implement for 2.12
+               |  }
+               |""".stripMargin
+    })
+  )
+
   lazy val TypoXml = CustomType(
     comment = "XML",
     sqlType = "xml",
@@ -451,6 +498,7 @@ class CustomTypes(pkg: sc.QIdent) {
       TypoRegprocedure,
       TypoRegrole,
       TypoRegtype,
+      TypoShort,
       TypoXid,
       TypoXml
     )

@@ -10,6 +10,7 @@ package pg_index
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
@@ -28,7 +29,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
   }
   override def insert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
     SQL"""insert into pg_catalog.pg_index("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")
-          values (${ParameterValue(unsaved.indexrelid, null, PgIndexId.toStatement)}::oid, ${ParameterValue(unsaved.indrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.indnatts, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.indnkeyatts, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.indisunique, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisprimary, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisexclusion, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indimmediate, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisclustered, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisvalid, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indcheckxmin, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisready, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indislive, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisreplident, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indkey, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.indcollation, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.indclass, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.indoption, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.indexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree, ${ParameterValue(unsaved.indpred, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
+          values (${ParameterValue(unsaved.indexrelid, null, PgIndexId.toStatement)}::oid, ${ParameterValue(unsaved.indrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.indnatts, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.indnkeyatts, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.indisunique, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisprimary, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisexclusion, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indimmediate, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisclustered, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisvalid, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indcheckxmin, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisready, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indislive, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indisreplident, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.indkey, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.indcollation, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.indclass, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.indoption, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.indexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree, ${ParameterValue(unsaved.indpred, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
           returning "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred"
        """
       .executeInsert(PgIndexRow.rowParser(1).single)
@@ -59,8 +60,8 @@ object PgIndexRepoImpl extends PgIndexRepo {
     val indexrelid = row.indexrelid
     SQL"""update pg_catalog.pg_index
           set "indrelid" = ${ParameterValue(row.indrelid, null, ToStatement.longToStatement)}::oid,
-              "indnatts" = ${ParameterValue(row.indnatts, null, ToStatement.intToStatement)}::int2,
-              "indnkeyatts" = ${ParameterValue(row.indnkeyatts, null, ToStatement.intToStatement)}::int2,
+              "indnatts" = ${ParameterValue(row.indnatts, null, TypoShort.toStatement)}::int2,
+              "indnkeyatts" = ${ParameterValue(row.indnkeyatts, null, TypoShort.toStatement)}::int2,
               "indisunique" = ${ParameterValue(row.indisunique, null, ToStatement.booleanToStatement)},
               "indisprimary" = ${ParameterValue(row.indisprimary, null, ToStatement.booleanToStatement)},
               "indisexclusion" = ${ParameterValue(row.indisexclusion, null, ToStatement.booleanToStatement)},
@@ -88,8 +89,8 @@ object PgIndexRepoImpl extends PgIndexRepo {
           values (
             ${ParameterValue(unsaved.indexrelid, null, PgIndexId.toStatement)}::oid,
             ${ParameterValue(unsaved.indrelid, null, ToStatement.longToStatement)}::oid,
-            ${ParameterValue(unsaved.indnatts, null, ToStatement.intToStatement)}::int2,
-            ${ParameterValue(unsaved.indnkeyatts, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.indnatts, null, TypoShort.toStatement)}::int2,
+            ${ParameterValue(unsaved.indnkeyatts, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.indisunique, null, ToStatement.booleanToStatement)},
             ${ParameterValue(unsaved.indisprimary, null, ToStatement.booleanToStatement)},
             ${ParameterValue(unsaved.indisexclusion, null, ToStatement.booleanToStatement)},

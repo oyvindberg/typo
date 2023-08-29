@@ -8,22 +8,23 @@ package pg_catalog
 package pg_statistic
 
 import adventureworks.customtypes.TypoAnyArray
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatisticFields[Row] {
   val starelid: IdField[/* oid */ Long, Row]
-  val staattnum: IdField[Int, Row]
+  val staattnum: IdField[TypoShort, Row]
   val stainherit: IdField[Boolean, Row]
   val stanullfrac: Field[Float, Row]
   val stawidth: Field[Int, Row]
   val stadistinct: Field[Float, Row]
-  val stakind1: Field[Int, Row]
-  val stakind2: Field[Int, Row]
-  val stakind3: Field[Int, Row]
-  val stakind4: Field[Int, Row]
-  val stakind5: Field[Int, Row]
+  val stakind1: Field[TypoShort, Row]
+  val stakind2: Field[TypoShort, Row]
+  val stakind3: Field[TypoShort, Row]
+  val stakind4: Field[TypoShort, Row]
+  val stakind5: Field[TypoShort, Row]
   val staop1: Field[/* oid */ Long, Row]
   val staop2: Field[/* oid */ Long, Row]
   val staop3: Field[/* oid */ Long, Row]

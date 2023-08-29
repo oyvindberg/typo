@@ -7,13 +7,14 @@ package adventureworks
 package pg_catalog
 package pg_attribute
 
+import adventureworks.customtypes.TypoShort
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the composite primary key of table `pg_catalog.pg_attribute` */
-case class PgAttributeId(attrelid: /* oid */ Long, attnum: Int)
+case class PgAttributeId(attrelid: /* oid */ Long, attnum: TypoShort)
 object PgAttributeId {
-  implicit lazy val decoder: Decoder[PgAttributeId] = Decoder.forProduct2[PgAttributeId, /* oid */ Long, Int]("attrelid", "attnum")(PgAttributeId.apply)(Decoder.decodeLong, Decoder.decodeInt)
-  implicit lazy val encoder: Encoder[PgAttributeId] = Encoder.forProduct2[PgAttributeId, /* oid */ Long, Int]("attrelid", "attnum")(x => (x.attrelid, x.attnum))(Encoder.encodeLong, Encoder.encodeInt)
-  implicit lazy val ordering: Ordering[PgAttributeId] = Ordering.by(x => (x.attrelid, x.attnum))
+  implicit lazy val decoder: Decoder[PgAttributeId] = Decoder.forProduct2[PgAttributeId, /* oid */ Long, TypoShort]("attrelid", "attnum")(PgAttributeId.apply)(Decoder.decodeLong, TypoShort.decoder)
+  implicit lazy val encoder: Encoder[PgAttributeId] = Encoder.forProduct2[PgAttributeId, /* oid */ Long, TypoShort]("attrelid", "attnum")(x => (x.attrelid, x.attnum))(Encoder.encodeLong, TypoShort.encoder)
+  implicit def ordering(implicit O0: Ordering[TypoShort]): Ordering[PgAttributeId] = Ordering.by(x => (x.attrelid, x.attnum))
 }

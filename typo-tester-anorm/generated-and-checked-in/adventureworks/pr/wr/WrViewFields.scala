@@ -8,6 +8,7 @@ package pr
 package wr
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import typo.dsl.SqlExpr.Field
@@ -17,7 +18,7 @@ trait WrViewFields[Row] {
   val id: Field[WorkorderId, Row]
   val workorderid: Field[WorkorderId, Row]
   val productid: Field[Int, Row]
-  val operationsequence: Field[Int, Row]
+  val operationsequence: Field[TypoShort, Row]
   val locationid: Field[LocationId, Row]
   val scheduledstartdate: Field[TypoLocalDateTime, Row]
   val scheduledenddate: Field[TypoLocalDateTime, Row]

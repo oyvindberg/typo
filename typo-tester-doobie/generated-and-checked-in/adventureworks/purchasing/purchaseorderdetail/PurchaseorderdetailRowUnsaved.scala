@@ -9,6 +9,7 @@ package purchaseorderdetail
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import io.circe.Decoder
@@ -22,7 +23,7 @@ case class PurchaseorderdetailRowUnsaved(
   /** Date the product is expected to be received. */
   duedate: TypoLocalDateTime,
   /** Quantity ordered. */
-  orderqty: Int,
+  orderqty: TypoShort,
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
@@ -58,6 +59,6 @@ case class PurchaseorderdetailRowUnsaved(
     )
 }
 object PurchaseorderdetailRowUnsaved {
-  implicit lazy val decoder: Decoder[PurchaseorderdetailRowUnsaved] = Decoder.forProduct9[PurchaseorderdetailRowUnsaved, PurchaseorderheaderId, TypoLocalDateTime, Int, ProductId, BigDecimal, BigDecimal, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime]]("purchaseorderid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "purchaseorderdetailid", "modifieddate")(PurchaseorderdetailRowUnsaved.apply)(PurchaseorderheaderId.decoder, TypoLocalDateTime.decoder, Decoder.decodeInt, ProductId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PurchaseorderdetailRowUnsaved] = Encoder.forProduct9[PurchaseorderdetailRowUnsaved, PurchaseorderheaderId, TypoLocalDateTime, Int, ProductId, BigDecimal, BigDecimal, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime]]("purchaseorderid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "purchaseorderdetailid", "modifieddate")(x => (x.purchaseorderid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.purchaseorderdetailid, x.modifieddate))(PurchaseorderheaderId.encoder, TypoLocalDateTime.encoder, Encoder.encodeInt, ProductId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PurchaseorderdetailRowUnsaved] = Decoder.forProduct9[PurchaseorderdetailRowUnsaved, PurchaseorderheaderId, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime]]("purchaseorderid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "purchaseorderdetailid", "modifieddate")(PurchaseorderdetailRowUnsaved.apply)(PurchaseorderheaderId.decoder, TypoLocalDateTime.decoder, TypoShort.decoder, ProductId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PurchaseorderdetailRowUnsaved] = Encoder.forProduct9[PurchaseorderdetailRowUnsaved, PurchaseorderheaderId, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime]]("purchaseorderid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "purchaseorderdetailid", "modifieddate")(x => (x.purchaseorderid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.purchaseorderdetailid, x.modifieddate))(PurchaseorderheaderId.encoder, TypoLocalDateTime.encoder, TypoShort.encoder, ProductId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

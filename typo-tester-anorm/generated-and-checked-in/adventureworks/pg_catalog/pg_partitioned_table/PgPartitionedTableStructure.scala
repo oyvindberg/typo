@@ -10,6 +10,7 @@ package pg_partitioned_table
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -22,7 +23,7 @@ class PgPartitionedTableStructure[Row](val prefix: Option[String], val extract: 
 
   override val partrelid = new IdField[PgPartitionedTableId, Row](prefix, "partrelid", None, Some("oid"))(x => extract(x).partrelid, (row, value) => merge(row, extract(row).copy(partrelid = value)))
   override val partstrat = new Field[String, Row](prefix, "partstrat", None, Some("char"))(x => extract(x).partstrat, (row, value) => merge(row, extract(row).copy(partstrat = value)))
-  override val partnatts = new Field[Int, Row](prefix, "partnatts", None, Some("int2"))(x => extract(x).partnatts, (row, value) => merge(row, extract(row).copy(partnatts = value)))
+  override val partnatts = new Field[TypoShort, Row](prefix, "partnatts", None, Some("int2"))(x => extract(x).partnatts, (row, value) => merge(row, extract(row).copy(partnatts = value)))
   override val partdefid = new Field[/* oid */ Long, Row](prefix, "partdefid", None, Some("oid"))(x => extract(x).partdefid, (row, value) => merge(row, extract(row).copy(partdefid = value)))
   override val partattrs = new Field[TypoInt2Vector, Row](prefix, "partattrs", None, Some("int2vector"))(x => extract(x).partattrs, (row, value) => merge(row, extract(row).copy(partattrs = value)))
   override val partclass = new Field[TypoOidVector, Row](prefix, "partclass", None, Some("oidvector"))(x => extract(x).partclass, (row, value) => merge(row, extract(row).copy(partclass = value)))

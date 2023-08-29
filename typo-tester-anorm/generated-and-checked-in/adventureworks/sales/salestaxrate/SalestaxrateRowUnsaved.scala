@@ -9,6 +9,7 @@ package salestaxrate
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import java.util.UUID
@@ -27,7 +28,7 @@ case class SalestaxrateRowUnsaved(
       Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** 1 = Tax applied to retail transactions, 2 = Tax applied to wholesale transactions, 3 = Tax applied to all sales (retail and wholesale) transactions. */
-  taxtype: Int,
+  taxtype: TypoShort,
   /** Tax rate description. */
   name: Name,
   /** Default: nextval('sales.salestaxrate_salestaxrateid_seq'::regclass)
@@ -69,7 +70,7 @@ object SalestaxrateRowUnsaved {
       Try(
         SalestaxrateRowUnsaved(
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
-          taxtype = json.\("taxtype").as(Reads.IntReads),
+          taxtype = json.\("taxtype").as(TypoShort.reads),
           name = json.\("name").as(Name.reads),
           salestaxrateid = json.\("salestaxrateid").as(Defaulted.reads(SalestaxrateId.reads)),
           taxrate = json.\("taxrate").as(Defaulted.reads(Reads.bigDecReads)),
@@ -82,7 +83,7 @@ object SalestaxrateRowUnsaved {
   implicit lazy val writes: OWrites[SalestaxrateRowUnsaved] = OWrites[SalestaxrateRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
-      "taxtype" -> Writes.IntWrites.writes(o.taxtype),
+      "taxtype" -> TypoShort.writes.writes(o.taxtype),
       "name" -> Name.writes.writes(o.name),
       "salestaxrateid" -> Defaulted.writes(SalestaxrateId.writes).writes(o.salestaxrateid),
       "taxrate" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.taxrate),

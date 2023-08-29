@@ -8,6 +8,7 @@ package pg_catalog
 package pg_aggregate
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -20,7 +21,7 @@ class PgAggregateStructure[Row](val prefix: Option[String], val extract: Row => 
 
   override val aggfnoid = new IdField[PgAggregateId, Row](prefix, "aggfnoid", None, Some("regproc"))(x => extract(x).aggfnoid, (row, value) => merge(row, extract(row).copy(aggfnoid = value)))
   override val aggkind = new Field[String, Row](prefix, "aggkind", None, Some("char"))(x => extract(x).aggkind, (row, value) => merge(row, extract(row).copy(aggkind = value)))
-  override val aggnumdirectargs = new Field[Int, Row](prefix, "aggnumdirectargs", None, Some("int2"))(x => extract(x).aggnumdirectargs, (row, value) => merge(row, extract(row).copy(aggnumdirectargs = value)))
+  override val aggnumdirectargs = new Field[TypoShort, Row](prefix, "aggnumdirectargs", None, Some("int2"))(x => extract(x).aggnumdirectargs, (row, value) => merge(row, extract(row).copy(aggnumdirectargs = value)))
   override val aggtransfn = new Field[TypoRegproc, Row](prefix, "aggtransfn", None, Some("regproc"))(x => extract(x).aggtransfn, (row, value) => merge(row, extract(row).copy(aggtransfn = value)))
   override val aggfinalfn = new Field[TypoRegproc, Row](prefix, "aggfinalfn", None, Some("regproc"))(x => extract(x).aggfinalfn, (row, value) => merge(row, extract(row).copy(aggfinalfn = value)))
   override val aggcombinefn = new Field[TypoRegproc, Row](prefix, "aggcombinefn", None, Some("regproc"))(x => extract(x).aggcombinefn, (row, value) => merge(row, extract(row).copy(aggcombinefn = value)))

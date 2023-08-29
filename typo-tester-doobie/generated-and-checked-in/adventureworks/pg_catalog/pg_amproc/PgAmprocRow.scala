@@ -8,6 +8,7 @@ package pg_catalog
 package pg_amproc
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -20,20 +21,20 @@ case class PgAmprocRow(
   amprocfamily: /* oid */ Long,
   amproclefttype: /* oid */ Long,
   amprocrighttype: /* oid */ Long,
-  amprocnum: Int,
+  amprocnum: TypoShort,
   amproc: TypoRegproc
 )
 
 object PgAmprocRow {
-  implicit lazy val decoder: Decoder[PgAmprocRow] = Decoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(PgAmprocRow.apply)(PgAmprocId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, TypoRegproc.decoder)
-  implicit lazy val encoder: Encoder[PgAmprocRow] = Encoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(x => (x.oid, x.amprocfamily, x.amproclefttype, x.amprocrighttype, x.amprocnum, x.amproc))(PgAmprocId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, TypoRegproc.encoder)
+  implicit lazy val decoder: Decoder[PgAmprocRow] = Decoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoShort, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(PgAmprocRow.apply)(PgAmprocId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, TypoShort.decoder, TypoRegproc.decoder)
+  implicit lazy val encoder: Encoder[PgAmprocRow] = Encoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoShort, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(x => (x.oid, x.amprocfamily, x.amproclefttype, x.amprocrighttype, x.amprocnum, x.amproc))(PgAmprocId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, TypoShort.encoder, TypoRegproc.encoder)
   implicit lazy val read: Read[PgAmprocRow] = new Read[PgAmprocRow](
     gets = List(
       (PgAmprocId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (TypoRegproc.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgAmprocRow(
@@ -41,7 +42,7 @@ object PgAmprocRow {
       amprocfamily = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
       amproclefttype = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
       amprocrighttype = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      amprocnum = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
+      amprocnum = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
       amproc = TypoRegproc.get.unsafeGetNonNullable(rs, i + 5)
     )
   )

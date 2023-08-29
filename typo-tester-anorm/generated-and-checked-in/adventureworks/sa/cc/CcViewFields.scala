@@ -8,6 +8,7 @@ package sa
 package cc
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.SqlExpr.Field
 
@@ -16,8 +17,8 @@ trait CcViewFields[Row] {
   val creditcardid: Field[/* user-picked */ CustomCreditcardId, Row]
   val cardtype: Field[/* max 50 chars */ String, Row]
   val cardnumber: Field[/* max 25 chars */ String, Row]
-  val expmonth: Field[Int, Row]
-  val expyear: Field[Int, Row]
+  val expmonth: Field[TypoShort, Row]
+  val expyear: Field[TypoShort, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object CcViewFields extends CcViewStructure[CcViewRow](None, identity, (_, x) => x)

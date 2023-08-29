@@ -9,6 +9,7 @@ package pg_attribute
 
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoAnyArray
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -26,8 +27,8 @@ case class PgAttributeRow(
   attname: String,
   atttypid: /* oid */ Long,
   attstattarget: Int,
-  attlen: Int,
-  attnum: Int,
+  attlen: TypoShort,
+  attnum: TypoShort,
   attndims: Int,
   attcacheoff: Int,
   atttypmod: Int,
@@ -60,8 +61,8 @@ object PgAttributeRow {
           attname = json.\("attname").as(Reads.StringReads),
           atttypid = json.\("atttypid").as(Reads.LongReads),
           attstattarget = json.\("attstattarget").as(Reads.IntReads),
-          attlen = json.\("attlen").as(Reads.IntReads),
-          attnum = json.\("attnum").as(Reads.IntReads),
+          attlen = json.\("attlen").as(TypoShort.reads),
+          attnum = json.\("attnum").as(TypoShort.reads),
           attndims = json.\("attndims").as(Reads.IntReads),
           attcacheoff = json.\("attcacheoff").as(Reads.IntReads),
           atttypmod = json.\("atttypmod").as(Reads.IntReads),
@@ -93,8 +94,8 @@ object PgAttributeRow {
         attname = row(idx + 1)(Column.columnToString),
         atttypid = row(idx + 2)(Column.columnToLong),
         attstattarget = row(idx + 3)(Column.columnToInt),
-        attlen = row(idx + 4)(Column.columnToInt),
-        attnum = row(idx + 5)(Column.columnToInt),
+        attlen = row(idx + 4)(TypoShort.column),
+        attnum = row(idx + 5)(TypoShort.column),
         attndims = row(idx + 6)(Column.columnToInt),
         attcacheoff = row(idx + 7)(Column.columnToInt),
         atttypmod = row(idx + 8)(Column.columnToInt),
@@ -124,8 +125,8 @@ object PgAttributeRow {
       "attname" -> Writes.StringWrites.writes(o.attname),
       "atttypid" -> Writes.LongWrites.writes(o.atttypid),
       "attstattarget" -> Writes.IntWrites.writes(o.attstattarget),
-      "attlen" -> Writes.IntWrites.writes(o.attlen),
-      "attnum" -> Writes.IntWrites.writes(o.attnum),
+      "attlen" -> TypoShort.writes.writes(o.attlen),
+      "attnum" -> TypoShort.writes.writes(o.attnum),
       "attndims" -> Writes.IntWrites.writes(o.attndims),
       "attcacheoff" -> Writes.IntWrites.writes(o.attcacheoff),
       "atttypmod" -> Writes.IntWrites.writes(o.atttypmod),

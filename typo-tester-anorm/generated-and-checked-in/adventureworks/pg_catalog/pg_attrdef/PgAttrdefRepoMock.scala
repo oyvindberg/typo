@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_attrdef
 
+import adventureworks.customtypes.TypoShort
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
@@ -44,7 +45,7 @@ class PgAttrdefRepoMock(map: scala.collection.mutable.Map[PgAttrdefId, PgAttrdef
   override def selectByIds(oids: Array[PgAttrdefId])(implicit c: Connection): List[PgAttrdefRow] = {
     oids.flatMap(map.get).toList
   }
-  override def selectByUnique(adrelid: /* oid */ Long, adnum: Int)(implicit c: Connection): Option[PgAttrdefRow] = {
+  override def selectByUnique(adrelid: /* oid */ Long, adnum: TypoShort)(implicit c: Connection): Option[PgAttrdefRow] = {
     map.values.find(v => adrelid == v.adrelid && adnum == v.adnum)
   }
   override def update(row: PgAttrdefRow)(implicit c: Connection): Boolean = {

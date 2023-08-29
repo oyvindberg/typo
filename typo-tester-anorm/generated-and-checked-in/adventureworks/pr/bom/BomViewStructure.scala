@@ -8,6 +8,7 @@ package pr
 package bom
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -27,7 +28,7 @@ class BomViewStructure[Row](val prefix: Option[String], val extract: Row => BomV
   override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
   override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
   override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, None)(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
-  override val bomlevel = new Field[Int, Row](prefix, "bomlevel", None, None)(x => extract(x).bomlevel, (row, value) => merge(row, extract(row).copy(bomlevel = value)))
+  override val bomlevel = new Field[TypoShort, Row](prefix, "bomlevel", None, None)(x => extract(x).bomlevel, (row, value) => merge(row, extract(row).copy(bomlevel = value)))
   override val perassemblyqty = new Field[BigDecimal, Row](prefix, "perassemblyqty", None, None)(x => extract(x).perassemblyqty, (row, value) => merge(row, extract(row).copy(perassemblyqty = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 

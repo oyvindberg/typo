@@ -8,6 +8,7 @@ package production
 package productinventory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import java.util.UUID
@@ -18,8 +19,8 @@ trait ProductinventoryFields[Row] {
   val productid: IdField[ProductId, Row]
   val locationid: IdField[LocationId, Row]
   val shelf: Field[/* max 10 chars */ String, Row]
-  val bin: Field[Int, Row]
-  val quantity: Field[Int, Row]
+  val bin: Field[TypoShort, Row]
+  val quantity: Field[TypoShort, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

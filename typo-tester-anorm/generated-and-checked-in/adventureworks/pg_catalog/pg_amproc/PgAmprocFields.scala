@@ -8,6 +8,7 @@ package pg_catalog
 package pg_amproc
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
@@ -16,7 +17,7 @@ trait PgAmprocFields[Row] {
   val amprocfamily: Field[/* oid */ Long, Row]
   val amproclefttype: Field[/* oid */ Long, Row]
   val amprocrighttype: Field[/* oid */ Long, Row]
-  val amprocnum: Field[Int, Row]
+  val amprocnum: Field[TypoShort, Row]
   val amproc: Field[TypoRegproc, Row]
 }
 object PgAmprocFields extends PgAmprocStructure[PgAmprocRow](None, identity, (_, x) => x)

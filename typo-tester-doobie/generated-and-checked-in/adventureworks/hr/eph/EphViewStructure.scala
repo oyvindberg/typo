@@ -8,6 +8,7 @@ package hr
 package eph
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -21,7 +22,7 @@ class EphViewStructure[Row](val prefix: Option[String], val extract: Row => EphV
   override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
   override val ratechangedate = new Field[TypoLocalDateTime, Row](prefix, "ratechangedate", Some("text"), None)(x => extract(x).ratechangedate, (row, value) => merge(row, extract(row).copy(ratechangedate = value)))
   override val rate = new Field[BigDecimal, Row](prefix, "rate", None, None)(x => extract(x).rate, (row, value) => merge(row, extract(row).copy(rate = value)))
-  override val payfrequency = new Field[Int, Row](prefix, "payfrequency", None, None)(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
+  override val payfrequency = new Field[TypoShort, Row](prefix, "payfrequency", None, None)(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

@@ -8,6 +8,7 @@ package production
 package billofmaterials
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.Column
@@ -39,7 +40,7 @@ case class BillofmaterialsRow(
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Indicates the depth the component is from its parent (AssemblyID). */
-  bomlevel: Int,
+  bomlevel: TypoShort,
   /** Quantity of the component needed to create the assembly. */
   perassemblyqty: BigDecimal,
   modifieddate: TypoLocalDateTime
@@ -55,7 +56,7 @@ object BillofmaterialsRow {
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
           enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
-          bomlevel = json.\("bomlevel").as(Reads.IntReads),
+          bomlevel = json.\("bomlevel").as(TypoShort.reads),
           perassemblyqty = json.\("perassemblyqty").as(Reads.bigDecReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -71,7 +72,7 @@ object BillofmaterialsRow {
         startdate = row(idx + 3)(TypoLocalDateTime.column),
         enddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
         unitmeasurecode = row(idx + 5)(UnitmeasureId.column),
-        bomlevel = row(idx + 6)(Column.columnToInt),
+        bomlevel = row(idx + 6)(TypoShort.column),
         perassemblyqty = row(idx + 7)(Column.columnToScalaBigDecimal),
         modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
@@ -85,7 +86,7 @@ object BillofmaterialsRow {
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
       "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
-      "bomlevel" -> Writes.IntWrites.writes(o.bomlevel),
+      "bomlevel" -> TypoShort.writes.writes(o.bomlevel),
       "perassemblyqty" -> Writes.BigDecimalWrites.writes(o.perassemblyqty),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

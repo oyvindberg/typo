@@ -9,6 +9,7 @@ package employeepayhistory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -29,7 +30,7 @@ case class EmployeepayhistoryRowUnsaved(
   /** Salary hourly rate. */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly */
-  payfrequency: Int,
+  payfrequency: TypoShort,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
@@ -52,7 +53,7 @@ object EmployeepayhistoryRowUnsaved {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           ratechangedate = json.\("ratechangedate").as(TypoLocalDateTime.reads),
           rate = json.\("rate").as(Reads.bigDecReads),
-          payfrequency = json.\("payfrequency").as(Reads.IntReads),
+          payfrequency = json.\("payfrequency").as(TypoShort.reads),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -63,7 +64,7 @@ object EmployeepayhistoryRowUnsaved {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "ratechangedate" -> TypoLocalDateTime.writes.writes(o.ratechangedate),
       "rate" -> Writes.BigDecimalWrites.writes(o.rate),
-      "payfrequency" -> Writes.IntWrites.writes(o.payfrequency),
+      "payfrequency" -> TypoShort.writes.writes(o.payfrequency),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

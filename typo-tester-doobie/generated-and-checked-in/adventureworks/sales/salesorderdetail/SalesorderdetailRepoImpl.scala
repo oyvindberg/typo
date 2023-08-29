@@ -9,6 +9,7 @@ package salesorderdetail
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
@@ -34,7 +35,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   }
   override def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4, ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4, ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """.query(SalesorderdetailRow.read).unique
   }
@@ -42,7 +43,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     val fs = List(
       Some((Fragment.const(s""""salesorderid""""), fr"${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4")),
       Some((Fragment.const(s""""carriertrackingnumber""""), fr"${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2")),
       Some((Fragment.const(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
       Some((Fragment.const(s""""specialofferid""""), fr"${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4")),
       Some((Fragment.const(s""""unitprice""""), fr"${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
@@ -91,7 +92,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     val compositeId = row.compositeId
     sql"""update sales.salesorderdetail
           set "carriertrackingnumber" = ${fromWrite(row.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))},
-              "orderqty" = ${fromWrite(row.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "orderqty" = ${fromWrite(row.orderqty)(Write.fromPut(TypoShort.put))}::int2,
               "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
               "specialofferid" = ${fromWrite(row.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4,
               "unitprice" = ${fromWrite(row.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
@@ -112,7 +113,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             ${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4,
             ${fromWrite(unsaved.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4,
             ${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4,
             ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,

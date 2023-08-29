@@ -8,6 +8,7 @@ package pg_catalog
 package pg_statistic
 
 import adventureworks.customtypes.TypoAnyArray
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -19,16 +20,16 @@ class PgStatisticStructure[Row](val prefix: Option[String], val extract: Row => 
     with PgStatisticFields[Row] { outer =>
 
   override val starelid = new IdField[/* oid */ Long, Row](prefix, "starelid", None, Some("oid"))(x => extract(x).starelid, (row, value) => merge(row, extract(row).copy(starelid = value)))
-  override val staattnum = new IdField[Int, Row](prefix, "staattnum", None, Some("int2"))(x => extract(x).staattnum, (row, value) => merge(row, extract(row).copy(staattnum = value)))
+  override val staattnum = new IdField[TypoShort, Row](prefix, "staattnum", None, Some("int2"))(x => extract(x).staattnum, (row, value) => merge(row, extract(row).copy(staattnum = value)))
   override val stainherit = new IdField[Boolean, Row](prefix, "stainherit", None, None)(x => extract(x).stainherit, (row, value) => merge(row, extract(row).copy(stainherit = value)))
   override val stanullfrac = new Field[Float, Row](prefix, "stanullfrac", None, Some("float4"))(x => extract(x).stanullfrac, (row, value) => merge(row, extract(row).copy(stanullfrac = value)))
   override val stawidth = new Field[Int, Row](prefix, "stawidth", None, Some("int4"))(x => extract(x).stawidth, (row, value) => merge(row, extract(row).copy(stawidth = value)))
   override val stadistinct = new Field[Float, Row](prefix, "stadistinct", None, Some("float4"))(x => extract(x).stadistinct, (row, value) => merge(row, extract(row).copy(stadistinct = value)))
-  override val stakind1 = new Field[Int, Row](prefix, "stakind1", None, Some("int2"))(x => extract(x).stakind1, (row, value) => merge(row, extract(row).copy(stakind1 = value)))
-  override val stakind2 = new Field[Int, Row](prefix, "stakind2", None, Some("int2"))(x => extract(x).stakind2, (row, value) => merge(row, extract(row).copy(stakind2 = value)))
-  override val stakind3 = new Field[Int, Row](prefix, "stakind3", None, Some("int2"))(x => extract(x).stakind3, (row, value) => merge(row, extract(row).copy(stakind3 = value)))
-  override val stakind4 = new Field[Int, Row](prefix, "stakind4", None, Some("int2"))(x => extract(x).stakind4, (row, value) => merge(row, extract(row).copy(stakind4 = value)))
-  override val stakind5 = new Field[Int, Row](prefix, "stakind5", None, Some("int2"))(x => extract(x).stakind5, (row, value) => merge(row, extract(row).copy(stakind5 = value)))
+  override val stakind1 = new Field[TypoShort, Row](prefix, "stakind1", None, Some("int2"))(x => extract(x).stakind1, (row, value) => merge(row, extract(row).copy(stakind1 = value)))
+  override val stakind2 = new Field[TypoShort, Row](prefix, "stakind2", None, Some("int2"))(x => extract(x).stakind2, (row, value) => merge(row, extract(row).copy(stakind2 = value)))
+  override val stakind3 = new Field[TypoShort, Row](prefix, "stakind3", None, Some("int2"))(x => extract(x).stakind3, (row, value) => merge(row, extract(row).copy(stakind3 = value)))
+  override val stakind4 = new Field[TypoShort, Row](prefix, "stakind4", None, Some("int2"))(x => extract(x).stakind4, (row, value) => merge(row, extract(row).copy(stakind4 = value)))
+  override val stakind5 = new Field[TypoShort, Row](prefix, "stakind5", None, Some("int2"))(x => extract(x).stakind5, (row, value) => merge(row, extract(row).copy(stakind5 = value)))
   override val staop1 = new Field[/* oid */ Long, Row](prefix, "staop1", None, Some("oid"))(x => extract(x).staop1, (row, value) => merge(row, extract(row).copy(staop1 = value)))
   override val staop2 = new Field[/* oid */ Long, Row](prefix, "staop2", None, Some("oid"))(x => extract(x).staop2, (row, value) => merge(row, extract(row).copy(staop2 = value)))
   override val staop3 = new Field[/* oid */ Long, Row](prefix, "staop3", None, Some("oid"))(x => extract(x).staop3, (row, value) => merge(row, extract(row).copy(staop3 = value)))

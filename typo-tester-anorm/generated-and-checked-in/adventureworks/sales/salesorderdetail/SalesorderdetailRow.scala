@@ -8,6 +8,7 @@ package sales
 package salesorderdetail
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
@@ -33,7 +34,7 @@ case class SalesorderdetailRow(
   /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Quantity ordered per product. */
-  orderqty: Int,
+  orderqty: TypoShort,
   /** Product sold to customer. Foreign key to Product.ProductID.
       Points to [[specialofferproduct.SpecialofferproductRow.productid]] */
   productid: ProductId,
@@ -57,7 +58,7 @@ object SalesorderdetailRow {
           salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
           salesorderdetailid = json.\("salesorderdetailid").as(Reads.IntReads),
           carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as(Reads.StringReads)),
-          orderqty = json.\("orderqty").as(Reads.IntReads),
+          orderqty = json.\("orderqty").as(TypoShort.reads),
           productid = json.\("productid").as(ProductId.reads),
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
           unitprice = json.\("unitprice").as(Reads.bigDecReads),
@@ -74,7 +75,7 @@ object SalesorderdetailRow {
         salesorderid = row(idx + 0)(SalesorderheaderId.column),
         salesorderdetailid = row(idx + 1)(Column.columnToInt),
         carriertrackingnumber = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        orderqty = row(idx + 3)(Column.columnToInt),
+        orderqty = row(idx + 3)(TypoShort.column),
         productid = row(idx + 4)(ProductId.column),
         specialofferid = row(idx + 5)(SpecialofferId.column),
         unitprice = row(idx + 6)(Column.columnToScalaBigDecimal),
@@ -89,7 +90,7 @@ object SalesorderdetailRow {
       "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
       "salesorderdetailid" -> Writes.IntWrites.writes(o.salesorderdetailid),
       "carriertrackingnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.carriertrackingnumber),
-      "orderqty" -> Writes.IntWrites.writes(o.orderqty),
+      "orderqty" -> TypoShort.writes.writes(o.orderqty),
       "productid" -> ProductId.writes.writes(o.productid),
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
       "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),

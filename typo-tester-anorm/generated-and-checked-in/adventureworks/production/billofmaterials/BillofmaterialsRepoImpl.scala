@@ -9,6 +9,7 @@ package billofmaterials
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.NamedParameter
@@ -33,7 +34,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   }
   override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
-          values (${ParameterValue(unsaved.billofmaterialsid, null, BillofmaterialsId.toStatement)}::int4, ${ParameterValue(unsaved.productassemblyid, null, ToStatement.optionToStatement(ProductId.toStatement, ProductId.parameterMetadata))}::int4, ${ParameterValue(unsaved.componentid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.bomlevel, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.perassemblyqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.billofmaterialsid, null, BillofmaterialsId.toStatement)}::int4, ${ParameterValue(unsaved.productassemblyid, null, ToStatement.optionToStatement(ProductId.toStatement, ProductId.parameterMetadata))}::int4, ${ParameterValue(unsaved.componentid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.bomlevel, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.perassemblyqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
        """
       .executeInsert(BillofmaterialsRow.rowParser(1).single)
@@ -45,7 +46,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       Some((NamedParameter("componentid", ParameterValue(unsaved.componentid, null, ProductId.toStatement)), "::int4")),
       Some((NamedParameter("enddate", ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
       Some((NamedParameter("unitmeasurecode", ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)), "::bpchar")),
-      Some((NamedParameter("bomlevel", ParameterValue(unsaved.bomlevel, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("bomlevel", ParameterValue(unsaved.bomlevel, null, TypoShort.toStatement)), "::int2")),
       unsaved.billofmaterialsid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("billofmaterialsid", ParameterValue(value, null, BillofmaterialsId.toStatement)), "::int4"))
@@ -108,7 +109,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               "startdate" = ${ParameterValue(row.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
               "enddate" = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
               "unitmeasurecode" = ${ParameterValue(row.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar,
-              "bomlevel" = ${ParameterValue(row.bomlevel, null, ToStatement.intToStatement)}::int2,
+              "bomlevel" = ${ParameterValue(row.bomlevel, null, TypoShort.toStatement)}::int2,
               "perassemblyqty" = ${ParameterValue(row.perassemblyqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "billofmaterialsid" = ${ParameterValue(billofmaterialsid, null, BillofmaterialsId.toStatement)}
@@ -126,7 +127,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
             ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar,
-            ${ParameterValue(unsaved.bomlevel, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.bomlevel, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.perassemblyqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )

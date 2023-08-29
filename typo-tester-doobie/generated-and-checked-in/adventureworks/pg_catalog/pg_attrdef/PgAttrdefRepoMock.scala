@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_attrdef
 
+import adventureworks.customtypes.TypoShort
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
@@ -48,7 +49,7 @@ class PgAttrdefRepoMock(map: scala.collection.mutable.Map[PgAttrdefId, PgAttrdef
   override def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
-  override def selectByUnique(adrelid: /* oid */ Long, adnum: Int): ConnectionIO[Option[PgAttrdefRow]] = {
+  override def selectByUnique(adrelid: /* oid */ Long, adnum: TypoShort): ConnectionIO[Option[PgAttrdefRow]] = {
     delay(map.values.find(v => adrelid == v.adrelid && adnum == v.adnum))
   }
   override def update(row: PgAttrdefRow): ConnectionIO[Boolean] = {

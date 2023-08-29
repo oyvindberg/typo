@@ -9,6 +9,7 @@ package salesorderheader
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -72,13 +73,13 @@ case class SalesorderheaderRowUnsaved(
   salesorderid: Defaulted[SalesorderheaderId] = Defaulted.UseDefault,
   /** Default: 0
       Incremental number to track changes to the sales order over time. */
-  revisionnumber: Defaulted[Int] = Defaulted.UseDefault,
+  revisionnumber: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: now()
       Dates the sales order was created. */
   orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 1
       Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
-  status: Defaulted[Int] = Defaulted.UseDefault,
+  status: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: true
       0 = Order placed by sales person. 1 = Order placed online by customer. */
   onlineorderflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -96,7 +97,7 @@ case class SalesorderheaderRowUnsaved(
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => Int, orderdateDefault: => TypoLocalDateTime, statusDefault: => Int, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderheaderRow =
+  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => TypoShort, orderdateDefault: => TypoLocalDateTime, statusDefault: => TypoShort, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderheaderRow =
     SalesorderheaderRow(
       duedate = duedate,
       shipdate = shipdate,
@@ -179,9 +180,9 @@ object SalesorderheaderRowUnsaved {
         totaldue = orThrow(c.get("totaldue")(Decoder.decodeOption(Decoder.decodeBigDecimal))),
         comment = orThrow(c.get("comment")(Decoder.decodeOption(Decoder.decodeString))),
         salesorderid = orThrow(c.get("salesorderid")(Defaulted.decoder(SalesorderheaderId.decoder))),
-        revisionnumber = orThrow(c.get("revisionnumber")(Defaulted.decoder(Decoder.decodeInt))),
+        revisionnumber = orThrow(c.get("revisionnumber")(Defaulted.decoder(TypoShort.decoder))),
         orderdate = orThrow(c.get("orderdate")(Defaulted.decoder(TypoLocalDateTime.decoder))),
-        status = orThrow(c.get("status")(Defaulted.decoder(Decoder.decodeInt))),
+        status = orThrow(c.get("status")(Defaulted.decoder(TypoShort.decoder))),
         onlineorderflag = orThrow(c.get("onlineorderflag")(Defaulted.decoder(Flag.decoder))),
         subtotal = orThrow(c.get("subtotal")(Defaulted.decoder(Decoder.decodeBigDecimal))),
         taxamt = orThrow(c.get("taxamt")(Defaulted.decoder(Decoder.decodeBigDecimal))),
@@ -209,9 +210,9 @@ object SalesorderheaderRowUnsaved {
       "totaldue" -> Encoder.encodeOption(Encoder.encodeBigDecimal).apply(row.totaldue),
       "comment" -> Encoder.encodeOption(Encoder.encodeString).apply(row.comment),
       "salesorderid" -> Defaulted.encoder(SalesorderheaderId.encoder).apply(row.salesorderid),
-      "revisionnumber" -> Defaulted.encoder(Encoder.encodeInt).apply(row.revisionnumber),
+      "revisionnumber" -> Defaulted.encoder(TypoShort.encoder).apply(row.revisionnumber),
       "orderdate" -> Defaulted.encoder(TypoLocalDateTime.encoder).apply(row.orderdate),
-      "status" -> Defaulted.encoder(Encoder.encodeInt).apply(row.status),
+      "status" -> Defaulted.encoder(TypoShort.encoder).apply(row.status),
       "onlineorderflag" -> Defaulted.encoder(Flag.encoder).apply(row.onlineorderflag),
       "subtotal" -> Defaulted.encoder(Encoder.encodeBigDecimal).apply(row.subtotal),
       "taxamt" -> Defaulted.encoder(Encoder.encodeBigDecimal).apply(row.taxamt),

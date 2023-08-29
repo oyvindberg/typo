@@ -9,6 +9,7 @@ package pg_trigger
 
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -19,7 +20,7 @@ trait PgTriggerFields[Row] {
   val tgparentid: Field[/* oid */ Long, Row]
   val tgname: Field[String, Row]
   val tgfoid: Field[/* oid */ Long, Row]
-  val tgtype: Field[Int, Row]
+  val tgtype: Field[TypoShort, Row]
   val tgenabled: Field[String, Row]
   val tgisinternal: Field[Boolean, Row]
   val tgconstrrelid: Field[/* oid */ Long, Row]
@@ -27,7 +28,7 @@ trait PgTriggerFields[Row] {
   val tgconstraint: Field[/* oid */ Long, Row]
   val tgdeferrable: Field[Boolean, Row]
   val tginitdeferred: Field[Boolean, Row]
-  val tgnargs: Field[Int, Row]
+  val tgnargs: Field[TypoShort, Row]
   val tgattr: Field[TypoInt2Vector, Row]
   val tgargs: Field[Array[Byte], Row]
   val tgqual: OptField[TypoPgNodeTree, Row]

@@ -9,6 +9,7 @@ package employeepayhistory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
@@ -23,7 +24,7 @@ case class EmployeepayhistoryRowUnsaved(
   /** Salary hourly rate. */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly */
-  payfrequency: Int,
+  payfrequency: TypoShort,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
@@ -40,6 +41,6 @@ case class EmployeepayhistoryRowUnsaved(
     )
 }
 object EmployeepayhistoryRowUnsaved {
-  implicit lazy val decoder: Decoder[EmployeepayhistoryRowUnsaved] = Decoder.forProduct5[EmployeepayhistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, Defaulted[TypoLocalDateTime]]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRowUnsaved.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeInt, Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[EmployeepayhistoryRowUnsaved] = Encoder.forProduct5[EmployeepayhistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, Defaulted[TypoLocalDateTime]]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeInt, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[EmployeepayhistoryRowUnsaved] = Decoder.forProduct5[EmployeepayhistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoShort, Defaulted[TypoLocalDateTime]]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRowUnsaved.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, TypoShort.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[EmployeepayhistoryRowUnsaved] = Encoder.forProduct5[EmployeepayhistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoShort, Defaulted[TypoLocalDateTime]]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, TypoShort.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
 }

@@ -9,6 +9,7 @@ package salesorderdetail
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
@@ -30,7 +31,7 @@ case class SalesorderdetailRowUnsaved(
   /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Quantity ordered per product. */
-  orderqty: Int,
+  orderqty: TypoShort,
   /** Product sold to customer. Foreign key to Product.ProductID.
       Points to [[specialofferproduct.SpecialofferproductRow.productid]] */
   productid: ProductId,
@@ -82,7 +83,7 @@ object SalesorderdetailRowUnsaved {
         SalesorderdetailRowUnsaved(
           salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
           carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as(Reads.StringReads)),
-          orderqty = json.\("orderqty").as(Reads.IntReads),
+          orderqty = json.\("orderqty").as(TypoShort.reads),
           productid = json.\("productid").as(ProductId.reads),
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
           unitprice = json.\("unitprice").as(Reads.bigDecReads),
@@ -98,7 +99,7 @@ object SalesorderdetailRowUnsaved {
     new JsObject(ListMap[String, JsValue](
       "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
       "carriertrackingnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.carriertrackingnumber),
-      "orderqty" -> Writes.IntWrites.writes(o.orderqty),
+      "orderqty" -> TypoShort.writes.writes(o.orderqty),
       "productid" -> ProductId.writes.writes(o.productid),
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
       "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),

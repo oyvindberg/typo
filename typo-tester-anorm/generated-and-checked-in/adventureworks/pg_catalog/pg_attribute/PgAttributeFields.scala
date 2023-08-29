@@ -9,6 +9,7 @@ package pg_attribute
 
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoAnyArray
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -18,8 +19,8 @@ trait PgAttributeFields[Row] {
   val attname: Field[String, Row]
   val atttypid: Field[/* oid */ Long, Row]
   val attstattarget: Field[Int, Row]
-  val attlen: Field[Int, Row]
-  val attnum: IdField[Int, Row]
+  val attlen: Field[TypoShort, Row]
+  val attnum: IdField[TypoShort, Row]
   val attndims: Field[Int, Row]
   val attcacheoff: Field[Int, Row]
   val atttypmod: Field[Int, Row]

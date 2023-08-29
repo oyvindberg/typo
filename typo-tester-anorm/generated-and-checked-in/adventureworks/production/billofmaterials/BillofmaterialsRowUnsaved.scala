@@ -9,6 +9,7 @@ package billofmaterials
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import play.api.libs.json.JsObject
@@ -34,7 +35,7 @@ case class BillofmaterialsRowUnsaved(
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Indicates the depth the component is from its parent (AssemblyID). */
-  bomlevel: Int,
+  bomlevel: TypoShort,
   /** Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass)
       Primary key for BillOfMaterials records. */
   billofmaterialsid: Defaulted[BillofmaterialsId] = Defaulted.UseDefault,
@@ -80,7 +81,7 @@ object BillofmaterialsRowUnsaved {
           componentid = json.\("componentid").as(ProductId.reads),
           enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
-          bomlevel = json.\("bomlevel").as(Reads.IntReads),
+          bomlevel = json.\("bomlevel").as(TypoShort.reads),
           billofmaterialsid = json.\("billofmaterialsid").as(Defaulted.reads(BillofmaterialsId.reads)),
           startdate = json.\("startdate").as(Defaulted.reads(TypoLocalDateTime.reads)),
           perassemblyqty = json.\("perassemblyqty").as(Defaulted.reads(Reads.bigDecReads)),
@@ -95,7 +96,7 @@ object BillofmaterialsRowUnsaved {
       "componentid" -> ProductId.writes.writes(o.componentid),
       "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
-      "bomlevel" -> Writes.IntWrites.writes(o.bomlevel),
+      "bomlevel" -> TypoShort.writes.writes(o.bomlevel),
       "billofmaterialsid" -> Defaulted.writes(BillofmaterialsId.writes).writes(o.billofmaterialsid),
       "startdate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.startdate),
       "perassemblyqty" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.perassemblyqty),

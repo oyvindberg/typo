@@ -9,6 +9,7 @@ package workorderrouting
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import play.api.libs.json.JsObject
@@ -28,7 +29,7 @@ case class WorkorderroutingRowUnsaved(
   /** Primary key. Foreign key to Product.ProductID. */
   productid: Int,
   /** Primary key. Indicates the manufacturing process sequence. */
-  operationsequence: Int,
+  operationsequence: TypoShort,
   /** Manufacturing location where the part is processed. Foreign key to Location.LocationID.
       Points to [[location.LocationRow.locationid]] */
   locationid: LocationId,
@@ -74,7 +75,7 @@ object WorkorderroutingRowUnsaved {
         WorkorderroutingRowUnsaved(
           workorderid = json.\("workorderid").as(WorkorderId.reads),
           productid = json.\("productid").as(Reads.IntReads),
-          operationsequence = json.\("operationsequence").as(Reads.IntReads),
+          operationsequence = json.\("operationsequence").as(TypoShort.reads),
           locationid = json.\("locationid").as(LocationId.reads),
           scheduledstartdate = json.\("scheduledstartdate").as(TypoLocalDateTime.reads),
           scheduledenddate = json.\("scheduledenddate").as(TypoLocalDateTime.reads),
@@ -92,7 +93,7 @@ object WorkorderroutingRowUnsaved {
     new JsObject(ListMap[String, JsValue](
       "workorderid" -> WorkorderId.writes.writes(o.workorderid),
       "productid" -> Writes.IntWrites.writes(o.productid),
-      "operationsequence" -> Writes.IntWrites.writes(o.operationsequence),
+      "operationsequence" -> TypoShort.writes.writes(o.operationsequence),
       "locationid" -> LocationId.writes.writes(o.locationid),
       "scheduledstartdate" -> TypoLocalDateTime.writes.writes(o.scheduledstartdate),
       "scheduledenddate" -> TypoLocalDateTime.writes.writes(o.scheduledenddate),

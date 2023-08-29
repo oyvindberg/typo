@@ -8,6 +8,7 @@ package pg_catalog
 package pg_aggregate
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
@@ -27,7 +28,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
   }
   override def insert(unsaved: PgAggregateRow)(implicit c: Connection): PgAggregateRow = {
     SQL"""insert into pg_catalog.pg_aggregate("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")
-          values (${ParameterValue(unsaved.aggfnoid, null, PgAggregateId.toStatement)}::regproc, ${ParameterValue(unsaved.aggkind, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggnumdirectargs, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.aggtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggfinalfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggcombinefn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggserialfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggdeserialfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggmtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggminvtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggmfinalfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggfinalextra, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.aggmfinalextra, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.aggfinalmodify, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggmfinalmodify, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggsortop, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggtranstype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggtransspace, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.aggmtranstype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggmtransspace, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.agginitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.aggminitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
+          values (${ParameterValue(unsaved.aggfnoid, null, PgAggregateId.toStatement)}::regproc, ${ParameterValue(unsaved.aggkind, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggnumdirectargs, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.aggtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggfinalfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggcombinefn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggserialfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggdeserialfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggmtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggminvtransfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggmfinalfn, null, TypoRegproc.toStatement)}::regproc, ${ParameterValue(unsaved.aggfinalextra, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.aggmfinalextra, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.aggfinalmodify, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggmfinalmodify, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.aggsortop, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggtranstype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggtransspace, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.aggmtranstype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.aggmtransspace, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.agginitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.aggminitval, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
           returning "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval"
        """
       .executeInsert(PgAggregateRow.rowParser(1).single)
@@ -58,7 +59,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
     val aggfnoid = row.aggfnoid
     SQL"""update pg_catalog.pg_aggregate
           set "aggkind" = ${ParameterValue(row.aggkind, null, ToStatement.stringToStatement)}::char,
-              "aggnumdirectargs" = ${ParameterValue(row.aggnumdirectargs, null, ToStatement.intToStatement)}::int2,
+              "aggnumdirectargs" = ${ParameterValue(row.aggnumdirectargs, null, TypoShort.toStatement)}::int2,
               "aggtransfn" = ${ParameterValue(row.aggtransfn, null, TypoRegproc.toStatement)}::regproc,
               "aggfinalfn" = ${ParameterValue(row.aggfinalfn, null, TypoRegproc.toStatement)}::regproc,
               "aggcombinefn" = ${ParameterValue(row.aggcombinefn, null, TypoRegproc.toStatement)}::regproc,
@@ -89,7 +90,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
           values (
             ${ParameterValue(unsaved.aggfnoid, null, PgAggregateId.toStatement)}::regproc,
             ${ParameterValue(unsaved.aggkind, null, ToStatement.stringToStatement)}::char,
-            ${ParameterValue(unsaved.aggnumdirectargs, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.aggnumdirectargs, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.aggtransfn, null, TypoRegproc.toStatement)}::regproc,
             ${ParameterValue(unsaved.aggfinalfn, null, TypoRegproc.toStatement)}::regproc,
             ${ParameterValue(unsaved.aggcombinefn, null, TypoRegproc.toStatement)}::regproc,

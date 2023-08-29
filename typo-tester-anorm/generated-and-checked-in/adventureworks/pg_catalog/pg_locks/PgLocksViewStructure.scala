@@ -8,6 +8,7 @@ package pg_catalog
 package pg_locks
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -21,12 +22,12 @@ class PgLocksViewStructure[Row](val prefix: Option[String], val extract: Row => 
   override val database = new OptField[/* oid */ Long, Row](prefix, "database", None, None)(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
   override val relation = new OptField[/* oid */ Long, Row](prefix, "relation", None, None)(x => extract(x).relation, (row, value) => merge(row, extract(row).copy(relation = value)))
   override val page = new OptField[Int, Row](prefix, "page", None, None)(x => extract(x).page, (row, value) => merge(row, extract(row).copy(page = value)))
-  override val tuple = new OptField[Int, Row](prefix, "tuple", None, None)(x => extract(x).tuple, (row, value) => merge(row, extract(row).copy(tuple = value)))
+  override val tuple = new OptField[TypoShort, Row](prefix, "tuple", None, None)(x => extract(x).tuple, (row, value) => merge(row, extract(row).copy(tuple = value)))
   override val virtualxid = new OptField[String, Row](prefix, "virtualxid", None, None)(x => extract(x).virtualxid, (row, value) => merge(row, extract(row).copy(virtualxid = value)))
   override val transactionid = new OptField[TypoXid, Row](prefix, "transactionid", None, None)(x => extract(x).transactionid, (row, value) => merge(row, extract(row).copy(transactionid = value)))
   override val classid = new OptField[/* oid */ Long, Row](prefix, "classid", None, None)(x => extract(x).classid, (row, value) => merge(row, extract(row).copy(classid = value)))
   override val objid = new OptField[/* oid */ Long, Row](prefix, "objid", None, None)(x => extract(x).objid, (row, value) => merge(row, extract(row).copy(objid = value)))
-  override val objsubid = new OptField[Int, Row](prefix, "objsubid", None, None)(x => extract(x).objsubid, (row, value) => merge(row, extract(row).copy(objsubid = value)))
+  override val objsubid = new OptField[TypoShort, Row](prefix, "objsubid", None, None)(x => extract(x).objsubid, (row, value) => merge(row, extract(row).copy(objsubid = value)))
   override val virtualtransaction = new OptField[String, Row](prefix, "virtualtransaction", None, None)(x => extract(x).virtualtransaction, (row, value) => merge(row, extract(row).copy(virtualtransaction = value)))
   override val pid = new OptField[Int, Row](prefix, "pid", None, None)(x => extract(x).pid, (row, value) => merge(row, extract(row).copy(pid = value)))
   override val mode = new OptField[String, Row](prefix, "mode", None, None)(x => extract(x).mode, (row, value) => merge(row, extract(row).copy(mode = value)))

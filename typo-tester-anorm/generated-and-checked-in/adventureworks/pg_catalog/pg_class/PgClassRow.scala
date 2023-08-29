@@ -9,6 +9,7 @@ package pg_class
 
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import anorm.Column
 import anorm.RowParser
@@ -40,8 +41,8 @@ case class PgClassRow(
   relisshared: Boolean,
   relpersistence: String,
   relkind: String,
-  relnatts: Int,
-  relchecks: Int,
+  relnatts: TypoShort,
+  relchecks: TypoShort,
   relhasrules: Boolean,
   relhastriggers: Boolean,
   relhassubclass: Boolean,
@@ -79,8 +80,8 @@ object PgClassRow {
           relisshared = json.\("relisshared").as(Reads.BooleanReads),
           relpersistence = json.\("relpersistence").as(Reads.StringReads),
           relkind = json.\("relkind").as(Reads.StringReads),
-          relnatts = json.\("relnatts").as(Reads.IntReads),
-          relchecks = json.\("relchecks").as(Reads.IntReads),
+          relnatts = json.\("relnatts").as(TypoShort.reads),
+          relchecks = json.\("relchecks").as(TypoShort.reads),
           relhasrules = json.\("relhasrules").as(Reads.BooleanReads),
           relhastriggers = json.\("relhastriggers").as(Reads.BooleanReads),
           relhassubclass = json.\("relhassubclass").as(Reads.BooleanReads),
@@ -119,8 +120,8 @@ object PgClassRow {
         relisshared = row(idx + 14)(Column.columnToBoolean),
         relpersistence = row(idx + 15)(Column.columnToString),
         relkind = row(idx + 16)(Column.columnToString),
-        relnatts = row(idx + 17)(Column.columnToInt),
-        relchecks = row(idx + 18)(Column.columnToInt),
+        relnatts = row(idx + 17)(TypoShort.column),
+        relchecks = row(idx + 18)(TypoShort.column),
         relhasrules = row(idx + 19)(Column.columnToBoolean),
         relhastriggers = row(idx + 20)(Column.columnToBoolean),
         relhassubclass = row(idx + 21)(Column.columnToBoolean),
@@ -157,8 +158,8 @@ object PgClassRow {
       "relisshared" -> Writes.BooleanWrites.writes(o.relisshared),
       "relpersistence" -> Writes.StringWrites.writes(o.relpersistence),
       "relkind" -> Writes.StringWrites.writes(o.relkind),
-      "relnatts" -> Writes.IntWrites.writes(o.relnatts),
-      "relchecks" -> Writes.IntWrites.writes(o.relchecks),
+      "relnatts" -> TypoShort.writes.writes(o.relnatts),
+      "relchecks" -> TypoShort.writes.writes(o.relchecks),
       "relhasrules" -> Writes.BooleanWrites.writes(o.relhasrules),
       "relhastriggers" -> Writes.BooleanWrites.writes(o.relhastriggers),
       "relhassubclass" -> Writes.BooleanWrites.writes(o.relhassubclass),

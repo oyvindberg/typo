@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amproc
 
+import adventureworks.customtypes.TypoShort
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
@@ -44,7 +45,7 @@ class PgAmprocRepoMock(map: scala.collection.mutable.Map[PgAmprocId, PgAmprocRow
   override def selectByIds(oids: Array[PgAmprocId])(implicit c: Connection): List[PgAmprocRow] = {
     oids.flatMap(map.get).toList
   }
-  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int)(implicit c: Connection): Option[PgAmprocRow] = {
+  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: TypoShort)(implicit c: Connection): Option[PgAmprocRow] = {
     map.values.find(v => amprocfamily == v.amprocfamily && amproclefttype == v.amproclefttype && amprocrighttype == v.amprocrighttype && amprocnum == v.amprocnum)
   }
   override def update(row: PgAmprocRow)(implicit c: Connection): Boolean = {

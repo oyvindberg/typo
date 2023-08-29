@@ -10,6 +10,7 @@ package pg_partitioned_table
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -20,7 +21,7 @@ import java.sql.ResultSet
 case class PgPartitionedTableRow(
   partrelid: PgPartitionedTableId,
   partstrat: String,
-  partnatts: Int,
+  partnatts: TypoShort,
   partdefid: /* oid */ Long,
   partattrs: TypoInt2Vector,
   partclass: TypoOidVector,
@@ -29,13 +30,13 @@ case class PgPartitionedTableRow(
 )
 
 object PgPartitionedTableRow {
-  implicit lazy val decoder: Decoder[PgPartitionedTableRow] = Decoder.forProduct8[PgPartitionedTableRow, PgPartitionedTableId, String, Int, /* oid */ Long, TypoInt2Vector, TypoOidVector, TypoOidVector, Option[TypoPgNodeTree]]("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")(PgPartitionedTableRow.apply)(PgPartitionedTableId.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeLong, TypoInt2Vector.decoder, TypoOidVector.decoder, TypoOidVector.decoder, Decoder.decodeOption(TypoPgNodeTree.decoder))
-  implicit lazy val encoder: Encoder[PgPartitionedTableRow] = Encoder.forProduct8[PgPartitionedTableRow, PgPartitionedTableId, String, Int, /* oid */ Long, TypoInt2Vector, TypoOidVector, TypoOidVector, Option[TypoPgNodeTree]]("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")(x => (x.partrelid, x.partstrat, x.partnatts, x.partdefid, x.partattrs, x.partclass, x.partcollation, x.partexprs))(PgPartitionedTableId.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeLong, TypoInt2Vector.encoder, TypoOidVector.encoder, TypoOidVector.encoder, Encoder.encodeOption(TypoPgNodeTree.encoder))
+  implicit lazy val decoder: Decoder[PgPartitionedTableRow] = Decoder.forProduct8[PgPartitionedTableRow, PgPartitionedTableId, String, TypoShort, /* oid */ Long, TypoInt2Vector, TypoOidVector, TypoOidVector, Option[TypoPgNodeTree]]("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")(PgPartitionedTableRow.apply)(PgPartitionedTableId.decoder, Decoder.decodeString, TypoShort.decoder, Decoder.decodeLong, TypoInt2Vector.decoder, TypoOidVector.decoder, TypoOidVector.decoder, Decoder.decodeOption(TypoPgNodeTree.decoder))
+  implicit lazy val encoder: Encoder[PgPartitionedTableRow] = Encoder.forProduct8[PgPartitionedTableRow, PgPartitionedTableId, String, TypoShort, /* oid */ Long, TypoInt2Vector, TypoOidVector, TypoOidVector, Option[TypoPgNodeTree]]("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")(x => (x.partrelid, x.partstrat, x.partnatts, x.partdefid, x.partattrs, x.partclass, x.partcollation, x.partexprs))(PgPartitionedTableId.encoder, Encoder.encodeString, TypoShort.encoder, Encoder.encodeLong, TypoInt2Vector.encoder, TypoOidVector.encoder, TypoOidVector.encoder, Encoder.encodeOption(TypoPgNodeTree.encoder))
   implicit lazy val read: Read[PgPartitionedTableRow] = new Read[PgPartitionedTableRow](
     gets = List(
       (PgPartitionedTableId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (TypoInt2Vector.get, Nullability.NoNulls),
       (TypoOidVector.get, Nullability.NoNulls),
@@ -45,7 +46,7 @@ object PgPartitionedTableRow {
     unsafeGet = (rs: ResultSet, i: Int) => PgPartitionedTableRow(
       partrelid = PgPartitionedTableId.get.unsafeGetNonNullable(rs, i + 0),
       partstrat = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      partnatts = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      partnatts = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
       partdefid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
       partattrs = TypoInt2Vector.get.unsafeGetNonNullable(rs, i + 4),
       partclass = TypoOidVector.get.unsafeGetNonNullable(rs, i + 5),

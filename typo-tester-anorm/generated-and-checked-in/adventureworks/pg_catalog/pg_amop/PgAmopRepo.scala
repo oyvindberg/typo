@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import adventureworks.customtypes.TypoShort
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -20,7 +21,7 @@ trait PgAmopRepo {
   def selectAll(implicit c: Connection): List[PgAmopRow]
   def selectById(oid: PgAmopId)(implicit c: Connection): Option[PgAmopRow]
   def selectByIds(oids: Array[PgAmopId])(implicit c: Connection): List[PgAmopRow]
-  def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow]
+  def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: TypoShort)(implicit c: Connection): Option[PgAmopRow]
   def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long)(implicit c: Connection): Option[PgAmopRow]
   def update(row: PgAmopRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgAmopFields, PgAmopRow]

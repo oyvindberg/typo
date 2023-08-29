@@ -8,6 +8,7 @@ package purchasing
 package purchaseorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import typo.dsl.SqlExpr.Field
@@ -21,8 +22,8 @@ class PurchaseorderheaderStructure[Row](val prefix: Option[String], val extract:
     with PurchaseorderheaderFields[Row] { outer =>
 
   override val purchaseorderid = new IdField[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, Some("int4"))(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
-  override val revisionnumber = new Field[Int, Row](prefix, "revisionnumber", None, Some("int2"))(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
-  override val status = new Field[Int, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
+  override val revisionnumber = new Field[TypoShort, Row](prefix, "revisionnumber", None, Some("int2"))(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
+  override val status = new Field[TypoShort, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
   override val employeeid = new Field[BusinessentityId, Row](prefix, "employeeid", None, Some("int4"))(x => extract(x).employeeid, (row, value) => merge(row, extract(row).copy(employeeid = value)))
   override val vendorid = new Field[BusinessentityId, Row](prefix, "vendorid", None, Some("int4"))(x => extract(x).vendorid, (row, value) => merge(row, extract(row).copy(vendorid = value)))
   override val shipmethodid = new Field[ShipmethodId, Row](prefix, "shipmethodid", None, Some("int4"))(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))

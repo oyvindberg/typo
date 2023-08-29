@@ -9,6 +9,7 @@ package employeepayhistory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -32,7 +33,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   }
   override def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
     SQL"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
-          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.payfrequency, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.payfrequency, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
        """
       .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
@@ -43,7 +44,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
       Some((NamedParameter("ratechangedate", ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
       Some((NamedParameter("rate", ParameterValue(unsaved.rate, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
-      Some((NamedParameter("payfrequency", ParameterValue(unsaved.payfrequency, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("payfrequency", ParameterValue(unsaved.payfrequency, null, TypoShort.toStatement)), "::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
@@ -83,7 +84,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     val compositeId = row.compositeId
     SQL"""update humanresources.employeepayhistory
           set "rate" = ${ParameterValue(row.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              "payfrequency" = ${ParameterValue(row.payfrequency, null, ToStatement.intToStatement)}::int2,
+              "payfrequency" = ${ParameterValue(row.payfrequency, null, TypoShort.toStatement)}::int2,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}
        """.executeUpdate() > 0
@@ -97,7 +98,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-            ${ParameterValue(unsaved.payfrequency, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.payfrequency, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict ("businessentityid", "ratechangedate")

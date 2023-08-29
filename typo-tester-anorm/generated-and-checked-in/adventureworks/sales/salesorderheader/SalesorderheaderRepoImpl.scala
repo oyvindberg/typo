@@ -9,6 +9,7 @@ package salesorderheader
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -42,7 +43,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   }
   override def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
     SQL"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
-          values (${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.revisionnumber, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.onlineorderflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.purchaseordernumber, null, ToStatement.optionToStatement(OrderNumber.toStatement, OrderNumber.parameterMetadata))}::varchar, ${ParameterValue(unsaved.accountnumber, null, ToStatement.optionToStatement(AccountNumber.toStatement, AccountNumber.parameterMetadata))}::varchar, ${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4, ${ParameterValue(unsaved.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.billtoaddressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.shiptoaddressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.creditcardid, null, ToStatement.optionToStatement(CustomCreditcardId.toStatement, CustomCreditcardId.parameterMetadata))}::int4, ${ParameterValue(unsaved.creditcardapprovalcode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.currencyrateid, null, ToStatement.optionToStatement(CurrencyrateId.toStatement, CurrencyrateId.parameterMetadata))}::int4, ${ParameterValue(unsaved.subtotal, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.taxamt, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.totaldue, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.comment, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.revisionnumber, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.status, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.onlineorderflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.purchaseordernumber, null, ToStatement.optionToStatement(OrderNumber.toStatement, OrderNumber.parameterMetadata))}::varchar, ${ParameterValue(unsaved.accountnumber, null, ToStatement.optionToStatement(AccountNumber.toStatement, AccountNumber.parameterMetadata))}::varchar, ${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4, ${ParameterValue(unsaved.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.billtoaddressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.shiptoaddressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.creditcardid, null, ToStatement.optionToStatement(CustomCreditcardId.toStatement, CustomCreditcardId.parameterMetadata))}::int4, ${ParameterValue(unsaved.creditcardapprovalcode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.currencyrateid, null, ToStatement.optionToStatement(CurrencyrateId.toStatement, CurrencyrateId.parameterMetadata))}::int4, ${ParameterValue(unsaved.subtotal, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.taxamt, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.totaldue, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.comment, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalesorderheaderRow.rowParser(1).single)
@@ -71,7 +72,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue(value, null, TypoShort.toStatement)), "::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
@@ -79,7 +80,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       },
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue(value, null, TypoShort.toStatement)), "::int2"))
       },
       unsaved.onlineorderflag match {
         case Defaulted.UseDefault => None
@@ -146,11 +147,11 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean = {
     val salesorderid = row.salesorderid
     SQL"""update sales.salesorderheader
-          set "revisionnumber" = ${ParameterValue(row.revisionnumber, null, ToStatement.intToStatement)}::int2,
+          set "revisionnumber" = ${ParameterValue(row.revisionnumber, null, TypoShort.toStatement)}::int2,
               "orderdate" = ${ParameterValue(row.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp,
               "duedate" = ${ParameterValue(row.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
               "shipdate" = ${ParameterValue(row.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
-              "status" = ${ParameterValue(row.status, null, ToStatement.intToStatement)}::int2,
+              "status" = ${ParameterValue(row.status, null, TypoShort.toStatement)}::int2,
               "onlineorderflag" = ${ParameterValue(row.onlineorderflag, null, Flag.toStatement)}::bool,
               "purchaseordernumber" = ${ParameterValue(row.purchaseordernumber, null, ToStatement.optionToStatement(OrderNumber.toStatement, OrderNumber.parameterMetadata))}::varchar,
               "accountnumber" = ${ParameterValue(row.accountnumber, null, ToStatement.optionToStatement(AccountNumber.toStatement, AccountNumber.parameterMetadata))}::varchar,
@@ -180,11 +181,11 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     SQL"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4,
-            ${ParameterValue(unsaved.revisionnumber, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.revisionnumber, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
-            ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.status, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.onlineorderflag, null, Flag.toStatement)}::bool,
             ${ParameterValue(unsaved.purchaseordernumber, null, ToStatement.optionToStatement(OrderNumber.toStatement, OrderNumber.parameterMetadata))}::varchar,
             ${ParameterValue(unsaved.accountnumber, null, ToStatement.optionToStatement(AccountNumber.toStatement, AccountNumber.parameterMetadata))}::varchar,

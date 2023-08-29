@@ -10,6 +10,7 @@ package pg_index
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -22,8 +23,8 @@ class PgIndexStructure[Row](val prefix: Option[String], val extract: Row => PgIn
 
   override val indexrelid = new IdField[PgIndexId, Row](prefix, "indexrelid", None, Some("oid"))(x => extract(x).indexrelid, (row, value) => merge(row, extract(row).copy(indexrelid = value)))
   override val indrelid = new Field[/* oid */ Long, Row](prefix, "indrelid", None, Some("oid"))(x => extract(x).indrelid, (row, value) => merge(row, extract(row).copy(indrelid = value)))
-  override val indnatts = new Field[Int, Row](prefix, "indnatts", None, Some("int2"))(x => extract(x).indnatts, (row, value) => merge(row, extract(row).copy(indnatts = value)))
-  override val indnkeyatts = new Field[Int, Row](prefix, "indnkeyatts", None, Some("int2"))(x => extract(x).indnkeyatts, (row, value) => merge(row, extract(row).copy(indnkeyatts = value)))
+  override val indnatts = new Field[TypoShort, Row](prefix, "indnatts", None, Some("int2"))(x => extract(x).indnatts, (row, value) => merge(row, extract(row).copy(indnatts = value)))
+  override val indnkeyatts = new Field[TypoShort, Row](prefix, "indnkeyatts", None, Some("int2"))(x => extract(x).indnkeyatts, (row, value) => merge(row, extract(row).copy(indnkeyatts = value)))
   override val indisunique = new Field[Boolean, Row](prefix, "indisunique", None, None)(x => extract(x).indisunique, (row, value) => merge(row, extract(row).copy(indisunique = value)))
   override val indisprimary = new Field[Boolean, Row](prefix, "indisprimary", None, None)(x => extract(x).indisprimary, (row, value) => merge(row, extract(row).copy(indisprimary = value)))
   override val indisexclusion = new Field[Boolean, Row](prefix, "indisexclusion", None, None)(x => extract(x).indisexclusion, (row, value) => merge(row, extract(row).copy(indisexclusion = value)))

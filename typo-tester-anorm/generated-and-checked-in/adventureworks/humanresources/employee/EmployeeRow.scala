@@ -9,6 +9,7 @@ package employee
 
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.Column
@@ -45,9 +46,9 @@ case class EmployeeRow(
   /** Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
   salariedflag: Flag,
   /** Number of available vacation hours. */
-  vacationhours: Int,
+  vacationhours: TypoShort,
   /** Number of available sick leave hours. */
-  sickleavehours: Int,
+  sickleavehours: TypoShort,
   /** 0 = Inactive, 1 = Active */
   currentflag: Flag,
   rowguid: UUID,
@@ -69,8 +70,8 @@ object EmployeeRow {
           gender = json.\("gender").as(Reads.StringReads),
           hiredate = json.\("hiredate").as(TypoLocalDate.reads),
           salariedflag = json.\("salariedflag").as(Flag.reads),
-          vacationhours = json.\("vacationhours").as(Reads.IntReads),
-          sickleavehours = json.\("sickleavehours").as(Reads.IntReads),
+          vacationhours = json.\("vacationhours").as(TypoShort.reads),
+          sickleavehours = json.\("sickleavehours").as(TypoShort.reads),
           currentflag = json.\("currentflag").as(Flag.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
@@ -91,8 +92,8 @@ object EmployeeRow {
         gender = row(idx + 6)(Column.columnToString),
         hiredate = row(idx + 7)(TypoLocalDate.column),
         salariedflag = row(idx + 8)(Flag.column),
-        vacationhours = row(idx + 9)(Column.columnToInt),
-        sickleavehours = row(idx + 10)(Column.columnToInt),
+        vacationhours = row(idx + 9)(TypoShort.column),
+        sickleavehours = row(idx + 10)(TypoShort.column),
         currentflag = row(idx + 11)(Flag.column),
         rowguid = row(idx + 12)(Column.columnToUUID),
         modifieddate = row(idx + 13)(TypoLocalDateTime.column),
@@ -111,8 +112,8 @@ object EmployeeRow {
       "gender" -> Writes.StringWrites.writes(o.gender),
       "hiredate" -> TypoLocalDate.writes.writes(o.hiredate),
       "salariedflag" -> Flag.writes.writes(o.salariedflag),
-      "vacationhours" -> Writes.IntWrites.writes(o.vacationhours),
-      "sickleavehours" -> Writes.IntWrites.writes(o.sickleavehours),
+      "vacationhours" -> TypoShort.writes.writes(o.vacationhours),
+      "sickleavehours" -> TypoShort.writes.writes(o.sickleavehours),
       "currentflag" -> Flag.writes.writes(o.currentflag),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),

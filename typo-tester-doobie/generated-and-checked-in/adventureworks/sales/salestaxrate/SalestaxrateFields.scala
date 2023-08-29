@@ -8,6 +8,7 @@ package sales
 package salestaxrate
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import java.util.UUID
@@ -17,7 +18,7 @@ import typo.dsl.SqlExpr.IdField
 trait SalestaxrateFields[Row] {
   val salestaxrateid: IdField[SalestaxrateId, Row]
   val stateprovinceid: Field[StateprovinceId, Row]
-  val taxtype: Field[Int, Row]
+  val taxtype: Field[TypoShort, Row]
   val taxrate: Field[BigDecimal, Row]
   val name: Field[Name, Row]
   val rowguid: Field[UUID, Row]

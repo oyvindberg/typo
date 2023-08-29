@@ -9,6 +9,7 @@ package document
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID
@@ -35,7 +36,7 @@ case class DocumentRowUnsaved(
   /** Revision number of the document. */
   revision: /* bpchar, max 5 chars */ String,
   /** 1 = Pending approval, 2 = Approved, 3 = Obsolete */
-  status: Int,
+  status: TypoShort,
   /** Document abstract. */
   documentsummary: Option[String],
   /** Complete document. */
@@ -96,7 +97,7 @@ object DocumentRowUnsaved {
           filename = json.\("filename").as(Reads.StringReads),
           fileextension = json.\("fileextension").toOption.map(_.as(Reads.StringReads)),
           revision = json.\("revision").as(Reads.StringReads),
-          status = json.\("status").as(Reads.IntReads),
+          status = json.\("status").as(TypoShort.reads),
           documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
           document = json.\("document").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
           folderflag = json.\("folderflag").as(Defaulted.reads(Flag.reads)),
@@ -115,7 +116,7 @@ object DocumentRowUnsaved {
       "filename" -> Writes.StringWrites.writes(o.filename),
       "fileextension" -> Writes.OptionWrites(Writes.StringWrites).writes(o.fileextension),
       "revision" -> Writes.StringWrites.writes(o.revision),
-      "status" -> Writes.IntWrites.writes(o.status),
+      "status" -> TypoShort.writes.writes(o.status),
       "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
       "document" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.document),
       "folderflag" -> Defaulted.writes(Flag.writes).writes(o.folderflag),

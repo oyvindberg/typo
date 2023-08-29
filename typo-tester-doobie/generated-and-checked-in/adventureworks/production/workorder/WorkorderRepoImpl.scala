@@ -9,6 +9,7 @@ package workorder
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import doobie.free.connection.ConnectionIO
@@ -32,7 +33,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
-          values (${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.scrappedqty)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.scrappedqty)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """.query(WorkorderRow.read).unique
   }
@@ -40,7 +41,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     val fs = List(
       Some((Fragment.const(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
       Some((Fragment.const(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const(s""""scrappedqty""""), fr"${fromWrite(unsaved.scrappedqty)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""scrappedqty""""), fr"${fromWrite(unsaved.scrappedqty)(Write.fromPut(TypoShort.put))}::int2")),
       Some((Fragment.const(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
       Some((Fragment.const(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
       Some((Fragment.const(s""""duedate""""), fr"${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
@@ -86,7 +87,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     sql"""update production.workorder
           set "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
               "orderqty" = ${fromWrite(row.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "scrappedqty" = ${fromWrite(row.scrappedqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "scrappedqty" = ${fromWrite(row.scrappedqty)(Write.fromPut(TypoShort.put))}::int2,
               "startdate" = ${fromWrite(row.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
               "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
               "duedate" = ${fromWrite(row.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
@@ -106,7 +107,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
             ${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4,
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.scrappedqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.scrappedqty)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
             ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
             ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,

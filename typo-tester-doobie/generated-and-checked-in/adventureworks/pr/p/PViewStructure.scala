@@ -8,6 +8,7 @@ package pr
 package p
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
@@ -31,8 +32,8 @@ class PViewStructure[Row](val prefix: Option[String], val extract: Row => PViewR
   override val makeflag = new Field[Flag, Row](prefix, "makeflag", None, None)(x => extract(x).makeflag, (row, value) => merge(row, extract(row).copy(makeflag = value)))
   override val finishedgoodsflag = new Field[Flag, Row](prefix, "finishedgoodsflag", None, None)(x => extract(x).finishedgoodsflag, (row, value) => merge(row, extract(row).copy(finishedgoodsflag = value)))
   override val color = new OptField[/* max 15 chars */ String, Row](prefix, "color", None, None)(x => extract(x).color, (row, value) => merge(row, extract(row).copy(color = value)))
-  override val safetystocklevel = new Field[Int, Row](prefix, "safetystocklevel", None, None)(x => extract(x).safetystocklevel, (row, value) => merge(row, extract(row).copy(safetystocklevel = value)))
-  override val reorderpoint = new Field[Int, Row](prefix, "reorderpoint", None, None)(x => extract(x).reorderpoint, (row, value) => merge(row, extract(row).copy(reorderpoint = value)))
+  override val safetystocklevel = new Field[TypoShort, Row](prefix, "safetystocklevel", None, None)(x => extract(x).safetystocklevel, (row, value) => merge(row, extract(row).copy(safetystocklevel = value)))
+  override val reorderpoint = new Field[TypoShort, Row](prefix, "reorderpoint", None, None)(x => extract(x).reorderpoint, (row, value) => merge(row, extract(row).copy(reorderpoint = value)))
   override val standardcost = new Field[BigDecimal, Row](prefix, "standardcost", None, None)(x => extract(x).standardcost, (row, value) => merge(row, extract(row).copy(standardcost = value)))
   override val listprice = new Field[BigDecimal, Row](prefix, "listprice", None, None)(x => extract(x).listprice, (row, value) => merge(row, extract(row).copy(listprice = value)))
   override val size = new OptField[/* max 5 chars */ String, Row](prefix, "size", None, None)(x => extract(x).size, (row, value) => merge(row, extract(row).copy(size = value)))

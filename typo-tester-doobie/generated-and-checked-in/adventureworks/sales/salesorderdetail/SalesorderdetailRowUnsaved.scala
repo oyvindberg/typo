@@ -9,6 +9,7 @@ package salesorderdetail
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
@@ -24,7 +25,7 @@ case class SalesorderdetailRowUnsaved(
   /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Quantity ordered per product. */
-  orderqty: Int,
+  orderqty: TypoShort,
   /** Product sold to customer. Foreign key to Product.ProductID.
       Points to [[specialofferproduct.SpecialofferproductRow.productid]] */
   productid: ProductId,
@@ -71,6 +72,6 @@ case class SalesorderdetailRowUnsaved(
     )
 }
 object SalesorderdetailRowUnsaved {
-  implicit lazy val decoder: Decoder[SalesorderdetailRowUnsaved] = Decoder.forProduct10[SalesorderdetailRowUnsaved, SalesorderheaderId, Option[/* max 25 chars */ String], Int, ProductId, SpecialofferId, BigDecimal, Defaulted[Int], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate")(SalesorderdetailRowUnsaved.apply)(SalesorderheaderId.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeInt, ProductId.decoder, SpecialofferId.decoder, Decoder.decodeBigDecimal, Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SalesorderdetailRowUnsaved] = Encoder.forProduct10[SalesorderdetailRowUnsaved, SalesorderheaderId, Option[/* max 25 chars */ String], Int, ProductId, SpecialofferId, BigDecimal, Defaulted[Int], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate")(x => (x.salesorderid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.salesorderdetailid, x.unitpricediscount, x.rowguid, x.modifieddate))(SalesorderheaderId.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeInt, ProductId.encoder, SpecialofferId.encoder, Encoder.encodeBigDecimal, Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SalesorderdetailRowUnsaved] = Decoder.forProduct10[SalesorderdetailRowUnsaved, SalesorderheaderId, Option[/* max 25 chars */ String], TypoShort, ProductId, SpecialofferId, BigDecimal, Defaulted[Int], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate")(SalesorderdetailRowUnsaved.apply)(SalesorderheaderId.decoder, Decoder.decodeOption(Decoder.decodeString), TypoShort.decoder, ProductId.decoder, SpecialofferId.decoder, Decoder.decodeBigDecimal, Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[SalesorderdetailRowUnsaved] = Encoder.forProduct10[SalesorderdetailRowUnsaved, SalesorderheaderId, Option[/* max 25 chars */ String], TypoShort, ProductId, SpecialofferId, BigDecimal, Defaulted[Int], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate")(x => (x.salesorderid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.salesorderdetailid, x.unitpricediscount, x.rowguid, x.modifieddate))(SalesorderheaderId.encoder, Encoder.encodeOption(Encoder.encodeString), TypoShort.encoder, ProductId.encoder, SpecialofferId.encoder, Encoder.encodeBigDecimal, Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

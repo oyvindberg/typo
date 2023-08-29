@@ -10,6 +10,7 @@ package pg_partitioned_table
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
@@ -28,7 +29,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   }
   override def insert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
     SQL"""insert into pg_catalog.pg_partitioned_table("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")
-          values (${ParameterValue(unsaved.partrelid, null, PgPartitionedTableId.toStatement)}::oid, ${ParameterValue(unsaved.partstrat, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.partnatts, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.partdefid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.partattrs, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.partclass, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.partcollation, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.partexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
+          values (${ParameterValue(unsaved.partrelid, null, PgPartitionedTableId.toStatement)}::oid, ${ParameterValue(unsaved.partstrat, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.partnatts, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.partdefid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.partattrs, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.partclass, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.partcollation, null, TypoOidVector.toStatement)}::oidvector, ${ParameterValue(unsaved.partexprs, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree)
           returning "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs"
        """
       .executeInsert(PgPartitionedTableRow.rowParser(1).single)
@@ -59,7 +60,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     val partrelid = row.partrelid
     SQL"""update pg_catalog.pg_partitioned_table
           set "partstrat" = ${ParameterValue(row.partstrat, null, ToStatement.stringToStatement)}::char,
-              "partnatts" = ${ParameterValue(row.partnatts, null, ToStatement.intToStatement)}::int2,
+              "partnatts" = ${ParameterValue(row.partnatts, null, TypoShort.toStatement)}::int2,
               "partdefid" = ${ParameterValue(row.partdefid, null, ToStatement.longToStatement)}::oid,
               "partattrs" = ${ParameterValue(row.partattrs, null, TypoInt2Vector.toStatement)}::int2vector,
               "partclass" = ${ParameterValue(row.partclass, null, TypoOidVector.toStatement)}::oidvector,
@@ -76,7 +77,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
           values (
             ${ParameterValue(unsaved.partrelid, null, PgPartitionedTableId.toStatement)}::oid,
             ${ParameterValue(unsaved.partstrat, null, ToStatement.stringToStatement)}::char,
-            ${ParameterValue(unsaved.partnatts, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.partnatts, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.partdefid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.partattrs, null, TypoInt2Vector.toStatement)}::int2vector,
             ${ParameterValue(unsaved.partclass, null, TypoOidVector.toStatement)}::oidvector,

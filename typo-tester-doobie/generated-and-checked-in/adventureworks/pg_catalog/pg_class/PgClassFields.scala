@@ -9,6 +9,7 @@ package pg_class
 
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
@@ -32,8 +33,8 @@ trait PgClassFields[Row] {
   val relisshared: Field[Boolean, Row]
   val relpersistence: Field[String, Row]
   val relkind: Field[String, Row]
-  val relnatts: Field[Int, Row]
-  val relchecks: Field[Int, Row]
+  val relnatts: Field[TypoShort, Row]
+  val relchecks: Field[TypoShort, Row]
   val relhasrules: Field[Boolean, Row]
   val relhastriggers: Field[Boolean, Row]
   val relhassubclass: Field[Boolean, Row]

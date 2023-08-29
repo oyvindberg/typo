@@ -8,6 +8,7 @@ package sa
 package soh
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -38,7 +39,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.salesorderid]] */
   salesorderid: SalesorderheaderId,
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.revisionnumber]] */
-  revisionnumber: Int,
+  revisionnumber: TypoShort,
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.orderdate]] */
   orderdate: TypoLocalDateTime,
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.duedate]] */
@@ -46,7 +47,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.shipdate]] */
   shipdate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.status]] */
-  status: Int,
+  status: TypoShort,
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.onlineorderflag]] */
   onlineorderflag: Flag,
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.purchaseordernumber]] */
@@ -93,11 +94,11 @@ object SohViewRow {
         SohViewRow(
           id = json.\("id").as(SalesorderheaderId.reads),
           salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
-          revisionnumber = json.\("revisionnumber").as(Reads.IntReads),
+          revisionnumber = json.\("revisionnumber").as(TypoShort.reads),
           orderdate = json.\("orderdate").as(TypoLocalDateTime.reads),
           duedate = json.\("duedate").as(TypoLocalDateTime.reads),
           shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          status = json.\("status").as(Reads.IntReads),
+          status = json.\("status").as(TypoShort.reads),
           onlineorderflag = json.\("onlineorderflag").as(Flag.reads),
           purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as(OrderNumber.reads)),
           accountnumber = json.\("accountnumber").toOption.map(_.as(AccountNumber.reads)),
@@ -126,11 +127,11 @@ object SohViewRow {
       SohViewRow(
         id = row(idx + 0)(SalesorderheaderId.column),
         salesorderid = row(idx + 1)(SalesorderheaderId.column),
-        revisionnumber = row(idx + 2)(Column.columnToInt),
+        revisionnumber = row(idx + 2)(TypoShort.column),
         orderdate = row(idx + 3)(TypoLocalDateTime.column),
         duedate = row(idx + 4)(TypoLocalDateTime.column),
         shipdate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
-        status = row(idx + 6)(Column.columnToInt),
+        status = row(idx + 6)(TypoShort.column),
         onlineorderflag = row(idx + 7)(Flag.column),
         purchaseordernumber = row(idx + 8)(Column.columnToOption(OrderNumber.column)),
         accountnumber = row(idx + 9)(Column.columnToOption(AccountNumber.column)),
@@ -157,11 +158,11 @@ object SohViewRow {
     new JsObject(ListMap[String, JsValue](
       "id" -> SalesorderheaderId.writes.writes(o.id),
       "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
-      "revisionnumber" -> Writes.IntWrites.writes(o.revisionnumber),
+      "revisionnumber" -> TypoShort.writes.writes(o.revisionnumber),
       "orderdate" -> TypoLocalDateTime.writes.writes(o.orderdate),
       "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
       "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
-      "status" -> Writes.IntWrites.writes(o.status),
+      "status" -> TypoShort.writes.writes(o.status),
       "onlineorderflag" -> Flag.writes.writes(o.onlineorderflag),
       "purchaseordernumber" -> Writes.OptionWrites(OrderNumber.writes).writes(o.purchaseordernumber),
       "accountnumber" -> Writes.OptionWrites(AccountNumber.writes).writes(o.accountnumber),

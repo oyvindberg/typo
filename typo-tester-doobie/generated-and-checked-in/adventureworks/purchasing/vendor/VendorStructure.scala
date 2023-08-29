@@ -8,6 +8,7 @@ package purchasing
 package vendor
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
@@ -25,7 +26,7 @@ class VendorStructure[Row](val prefix: Option[String], val extract: Row => Vendo
   override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
   override val accountnumber = new Field[AccountNumber, Row](prefix, "accountnumber", None, Some("varchar"))(x => extract(x).accountnumber, (row, value) => merge(row, extract(row).copy(accountnumber = value)))
   override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val creditrating = new Field[Int, Row](prefix, "creditrating", None, Some("int2"))(x => extract(x).creditrating, (row, value) => merge(row, extract(row).copy(creditrating = value)))
+  override val creditrating = new Field[TypoShort, Row](prefix, "creditrating", None, Some("int2"))(x => extract(x).creditrating, (row, value) => merge(row, extract(row).copy(creditrating = value)))
   override val preferredvendorstatus = new Field[Flag, Row](prefix, "preferredvendorstatus", None, Some("bool"))(x => extract(x).preferredvendorstatus, (row, value) => merge(row, extract(row).copy(preferredvendorstatus = value)))
   override val activeflag = new Field[Flag, Row](prefix, "activeflag", None, Some("bool"))(x => extract(x).activeflag, (row, value) => merge(row, extract(row).copy(activeflag = value)))
   override val purchasingwebserviceurl = new OptField[/* max 1024 chars */ String, Row](prefix, "purchasingwebserviceurl", None, None)(x => extract(x).purchasingwebserviceurl, (row, value) => merge(row, extract(row).copy(purchasingwebserviceurl = value)))

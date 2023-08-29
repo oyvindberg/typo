@@ -8,6 +8,7 @@ package pg_catalog
 package pg_statistic
 
 import adventureworks.customtypes.TypoAnyArray
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -22,16 +23,16 @@ import scala.util.Try
 
 case class PgStatisticRow(
   starelid: /* oid */ Long,
-  staattnum: Int,
+  staattnum: TypoShort,
   stainherit: Boolean,
   stanullfrac: Float,
   stawidth: Int,
   stadistinct: Float,
-  stakind1: Int,
-  stakind2: Int,
-  stakind3: Int,
-  stakind4: Int,
-  stakind5: Int,
+  stakind1: TypoShort,
+  stakind2: TypoShort,
+  stakind3: TypoShort,
+  stakind4: TypoShort,
+  stakind5: TypoShort,
   staop1: /* oid */ Long,
   staop2: /* oid */ Long,
   staop3: /* oid */ Long,
@@ -61,16 +62,16 @@ object PgStatisticRow {
       Try(
         PgStatisticRow(
           starelid = json.\("starelid").as(Reads.LongReads),
-          staattnum = json.\("staattnum").as(Reads.IntReads),
+          staattnum = json.\("staattnum").as(TypoShort.reads),
           stainherit = json.\("stainherit").as(Reads.BooleanReads),
           stanullfrac = json.\("stanullfrac").as(Reads.FloatReads),
           stawidth = json.\("stawidth").as(Reads.IntReads),
           stadistinct = json.\("stadistinct").as(Reads.FloatReads),
-          stakind1 = json.\("stakind1").as(Reads.IntReads),
-          stakind2 = json.\("stakind2").as(Reads.IntReads),
-          stakind3 = json.\("stakind3").as(Reads.IntReads),
-          stakind4 = json.\("stakind4").as(Reads.IntReads),
-          stakind5 = json.\("stakind5").as(Reads.IntReads),
+          stakind1 = json.\("stakind1").as(TypoShort.reads),
+          stakind2 = json.\("stakind2").as(TypoShort.reads),
+          stakind3 = json.\("stakind3").as(TypoShort.reads),
+          stakind4 = json.\("stakind4").as(TypoShort.reads),
+          stakind5 = json.\("stakind5").as(TypoShort.reads),
           staop1 = json.\("staop1").as(Reads.LongReads),
           staop2 = json.\("staop2").as(Reads.LongReads),
           staop3 = json.\("staop3").as(Reads.LongReads),
@@ -99,16 +100,16 @@ object PgStatisticRow {
     Success(
       PgStatisticRow(
         starelid = row(idx + 0)(Column.columnToLong),
-        staattnum = row(idx + 1)(Column.columnToInt),
+        staattnum = row(idx + 1)(TypoShort.column),
         stainherit = row(idx + 2)(Column.columnToBoolean),
         stanullfrac = row(idx + 3)(Column.columnToFloat),
         stawidth = row(idx + 4)(Column.columnToInt),
         stadistinct = row(idx + 5)(Column.columnToFloat),
-        stakind1 = row(idx + 6)(Column.columnToInt),
-        stakind2 = row(idx + 7)(Column.columnToInt),
-        stakind3 = row(idx + 8)(Column.columnToInt),
-        stakind4 = row(idx + 9)(Column.columnToInt),
-        stakind5 = row(idx + 10)(Column.columnToInt),
+        stakind1 = row(idx + 6)(TypoShort.column),
+        stakind2 = row(idx + 7)(TypoShort.column),
+        stakind3 = row(idx + 8)(TypoShort.column),
+        stakind4 = row(idx + 9)(TypoShort.column),
+        stakind5 = row(idx + 10)(TypoShort.column),
         staop1 = row(idx + 11)(Column.columnToLong),
         staop2 = row(idx + 12)(Column.columnToLong),
         staop3 = row(idx + 13)(Column.columnToLong),
@@ -135,16 +136,16 @@ object PgStatisticRow {
   implicit lazy val writes: OWrites[PgStatisticRow] = OWrites[PgStatisticRow](o =>
     new JsObject(ListMap[String, JsValue](
       "starelid" -> Writes.LongWrites.writes(o.starelid),
-      "staattnum" -> Writes.IntWrites.writes(o.staattnum),
+      "staattnum" -> TypoShort.writes.writes(o.staattnum),
       "stainherit" -> Writes.BooleanWrites.writes(o.stainherit),
       "stanullfrac" -> Writes.FloatWrites.writes(o.stanullfrac),
       "stawidth" -> Writes.IntWrites.writes(o.stawidth),
       "stadistinct" -> Writes.FloatWrites.writes(o.stadistinct),
-      "stakind1" -> Writes.IntWrites.writes(o.stakind1),
-      "stakind2" -> Writes.IntWrites.writes(o.stakind2),
-      "stakind3" -> Writes.IntWrites.writes(o.stakind3),
-      "stakind4" -> Writes.IntWrites.writes(o.stakind4),
-      "stakind5" -> Writes.IntWrites.writes(o.stakind5),
+      "stakind1" -> TypoShort.writes.writes(o.stakind1),
+      "stakind2" -> TypoShort.writes.writes(o.stakind2),
+      "stakind3" -> TypoShort.writes.writes(o.stakind3),
+      "stakind4" -> TypoShort.writes.writes(o.stakind4),
+      "stakind5" -> TypoShort.writes.writes(o.stakind5),
       "staop1" -> Writes.LongWrites.writes(o.staop1),
       "staop2" -> Writes.LongWrites.writes(o.staop2),
       "staop3" -> Writes.LongWrites.writes(o.staop3),

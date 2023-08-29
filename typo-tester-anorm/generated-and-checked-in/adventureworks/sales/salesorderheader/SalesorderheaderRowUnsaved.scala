@@ -9,6 +9,7 @@ package salesorderheader
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -74,13 +75,13 @@ case class SalesorderheaderRowUnsaved(
   salesorderid: Defaulted[SalesorderheaderId] = Defaulted.UseDefault,
   /** Default: 0
       Incremental number to track changes to the sales order over time. */
-  revisionnumber: Defaulted[Int] = Defaulted.UseDefault,
+  revisionnumber: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: now()
       Dates the sales order was created. */
   orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 1
       Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
-  status: Defaulted[Int] = Defaulted.UseDefault,
+  status: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: true
       0 = Order placed by sales person. 1 = Order placed online by customer. */
   onlineorderflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -98,7 +99,7 @@ case class SalesorderheaderRowUnsaved(
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => Int, orderdateDefault: => TypoLocalDateTime, statusDefault: => Int, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderheaderRow =
+  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => TypoShort, orderdateDefault: => TypoLocalDateTime, statusDefault: => TypoShort, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderheaderRow =
     SalesorderheaderRow(
       duedate = duedate,
       shipdate = shipdate,
@@ -177,9 +178,9 @@ object SalesorderheaderRowUnsaved {
           totaldue = json.\("totaldue").toOption.map(_.as(Reads.bigDecReads)),
           comment = json.\("comment").toOption.map(_.as(Reads.StringReads)),
           salesorderid = json.\("salesorderid").as(Defaulted.reads(SalesorderheaderId.reads)),
-          revisionnumber = json.\("revisionnumber").as(Defaulted.reads(Reads.IntReads)),
+          revisionnumber = json.\("revisionnumber").as(Defaulted.reads(TypoShort.reads)),
           orderdate = json.\("orderdate").as(Defaulted.reads(TypoLocalDateTime.reads)),
-          status = json.\("status").as(Defaulted.reads(Reads.IntReads)),
+          status = json.\("status").as(Defaulted.reads(TypoShort.reads)),
           onlineorderflag = json.\("onlineorderflag").as(Defaulted.reads(Flag.reads)),
           subtotal = json.\("subtotal").as(Defaulted.reads(Reads.bigDecReads)),
           taxamt = json.\("taxamt").as(Defaulted.reads(Reads.bigDecReads)),
@@ -208,9 +209,9 @@ object SalesorderheaderRowUnsaved {
       "totaldue" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.totaldue),
       "comment" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comment),
       "salesorderid" -> Defaulted.writes(SalesorderheaderId.writes).writes(o.salesorderid),
-      "revisionnumber" -> Defaulted.writes(Writes.IntWrites).writes(o.revisionnumber),
+      "revisionnumber" -> Defaulted.writes(TypoShort.writes).writes(o.revisionnumber),
       "orderdate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.orderdate),
-      "status" -> Defaulted.writes(Writes.IntWrites).writes(o.status),
+      "status" -> Defaulted.writes(TypoShort.writes).writes(o.status),
       "onlineorderflag" -> Defaulted.writes(Flag.writes).writes(o.onlineorderflag),
       "subtotal" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.subtotal),
       "taxamt" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.taxamt),

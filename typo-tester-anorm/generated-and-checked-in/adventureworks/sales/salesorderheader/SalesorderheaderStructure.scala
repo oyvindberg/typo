@@ -8,6 +8,7 @@ package sales
 package salesorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -30,11 +31,11 @@ class SalesorderheaderStructure[Row](val prefix: Option[String], val extract: Ro
     with SalesorderheaderFields[Row] { outer =>
 
   override val salesorderid = new IdField[SalesorderheaderId, Row](prefix, "salesorderid", None, Some("int4"))(x => extract(x).salesorderid, (row, value) => merge(row, extract(row).copy(salesorderid = value)))
-  override val revisionnumber = new Field[Int, Row](prefix, "revisionnumber", None, Some("int2"))(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
+  override val revisionnumber = new Field[TypoShort, Row](prefix, "revisionnumber", None, Some("int2"))(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
   override val orderdate = new Field[TypoLocalDateTime, Row](prefix, "orderdate", Some("text"), Some("timestamp"))(x => extract(x).orderdate, (row, value) => merge(row, extract(row).copy(orderdate = value)))
   override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), Some("timestamp"))(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
   override val shipdate = new OptField[TypoLocalDateTime, Row](prefix, "shipdate", Some("text"), Some("timestamp"))(x => extract(x).shipdate, (row, value) => merge(row, extract(row).copy(shipdate = value)))
-  override val status = new Field[Int, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
+  override val status = new Field[TypoShort, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
   override val onlineorderflag = new Field[Flag, Row](prefix, "onlineorderflag", None, Some("bool"))(x => extract(x).onlineorderflag, (row, value) => merge(row, extract(row).copy(onlineorderflag = value)))
   override val purchaseordernumber = new OptField[OrderNumber, Row](prefix, "purchaseordernumber", None, Some("varchar"))(x => extract(x).purchaseordernumber, (row, value) => merge(row, extract(row).copy(purchaseordernumber = value)))
   override val accountnumber = new OptField[AccountNumber, Row](prefix, "accountnumber", None, Some("varchar"))(x => extract(x).accountnumber, (row, value) => merge(row, extract(row).copy(accountnumber = value)))

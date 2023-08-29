@@ -8,6 +8,7 @@ package sa
 package soh
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -26,11 +27,11 @@ import typo.dsl.SqlExpr.OptField
 trait SohViewFields[Row] {
   val id: Field[SalesorderheaderId, Row]
   val salesorderid: Field[SalesorderheaderId, Row]
-  val revisionnumber: Field[Int, Row]
+  val revisionnumber: Field[TypoShort, Row]
   val orderdate: Field[TypoLocalDateTime, Row]
   val duedate: Field[TypoLocalDateTime, Row]
   val shipdate: OptField[TypoLocalDateTime, Row]
-  val status: Field[Int, Row]
+  val status: Field[TypoShort, Row]
   val onlineorderflag: Field[Flag, Row]
   val purchaseordernumber: OptField[OrderNumber, Row]
   val accountnumber: OptField[AccountNumber, Row]

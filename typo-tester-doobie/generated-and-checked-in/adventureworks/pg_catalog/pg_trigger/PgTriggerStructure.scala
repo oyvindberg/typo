@@ -9,6 +9,7 @@ package pg_trigger
 
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -24,7 +25,7 @@ class PgTriggerStructure[Row](val prefix: Option[String], val extract: Row => Pg
   override val tgparentid = new Field[/* oid */ Long, Row](prefix, "tgparentid", None, Some("oid"))(x => extract(x).tgparentid, (row, value) => merge(row, extract(row).copy(tgparentid = value)))
   override val tgname = new Field[String, Row](prefix, "tgname", None, Some("name"))(x => extract(x).tgname, (row, value) => merge(row, extract(row).copy(tgname = value)))
   override val tgfoid = new Field[/* oid */ Long, Row](prefix, "tgfoid", None, Some("oid"))(x => extract(x).tgfoid, (row, value) => merge(row, extract(row).copy(tgfoid = value)))
-  override val tgtype = new Field[Int, Row](prefix, "tgtype", None, Some("int2"))(x => extract(x).tgtype, (row, value) => merge(row, extract(row).copy(tgtype = value)))
+  override val tgtype = new Field[TypoShort, Row](prefix, "tgtype", None, Some("int2"))(x => extract(x).tgtype, (row, value) => merge(row, extract(row).copy(tgtype = value)))
   override val tgenabled = new Field[String, Row](prefix, "tgenabled", None, Some("char"))(x => extract(x).tgenabled, (row, value) => merge(row, extract(row).copy(tgenabled = value)))
   override val tgisinternal = new Field[Boolean, Row](prefix, "tgisinternal", None, None)(x => extract(x).tgisinternal, (row, value) => merge(row, extract(row).copy(tgisinternal = value)))
   override val tgconstrrelid = new Field[/* oid */ Long, Row](prefix, "tgconstrrelid", None, Some("oid"))(x => extract(x).tgconstrrelid, (row, value) => merge(row, extract(row).copy(tgconstrrelid = value)))
@@ -32,7 +33,7 @@ class PgTriggerStructure[Row](val prefix: Option[String], val extract: Row => Pg
   override val tgconstraint = new Field[/* oid */ Long, Row](prefix, "tgconstraint", None, Some("oid"))(x => extract(x).tgconstraint, (row, value) => merge(row, extract(row).copy(tgconstraint = value)))
   override val tgdeferrable = new Field[Boolean, Row](prefix, "tgdeferrable", None, None)(x => extract(x).tgdeferrable, (row, value) => merge(row, extract(row).copy(tgdeferrable = value)))
   override val tginitdeferred = new Field[Boolean, Row](prefix, "tginitdeferred", None, None)(x => extract(x).tginitdeferred, (row, value) => merge(row, extract(row).copy(tginitdeferred = value)))
-  override val tgnargs = new Field[Int, Row](prefix, "tgnargs", None, Some("int2"))(x => extract(x).tgnargs, (row, value) => merge(row, extract(row).copy(tgnargs = value)))
+  override val tgnargs = new Field[TypoShort, Row](prefix, "tgnargs", None, Some("int2"))(x => extract(x).tgnargs, (row, value) => merge(row, extract(row).copy(tgnargs = value)))
   override val tgattr = new Field[TypoInt2Vector, Row](prefix, "tgattr", None, Some("int2vector"))(x => extract(x).tgattr, (row, value) => merge(row, extract(row).copy(tgattr = value)))
   override val tgargs = new Field[Array[Byte], Row](prefix, "tgargs", None, Some("bytea"))(x => extract(x).tgargs, (row, value) => merge(row, extract(row).copy(tgargs = value)))
   override val tgqual = new OptField[TypoPgNodeTree, Row](prefix, "tgqual", None, Some("pg_node_tree"))(x => extract(x).tgqual, (row, value) => merge(row, extract(row).copy(tgqual = value)))

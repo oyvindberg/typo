@@ -9,6 +9,7 @@ package purchaseorderheader
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.NamedParameter
@@ -33,7 +34,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   }
   override def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
-          values (${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.revisionnumber, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.employeeid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.vendorid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.subtotal, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.taxamt, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.revisionnumber, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.status, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.employeeid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.vendorid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.subtotal, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.taxamt, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
        """
       .executeInsert(PurchaseorderheaderRow.rowParser(1).single)
@@ -51,11 +52,11 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("revisionnumber", ParameterValue(value, null, TypoShort.toStatement)), "::int2"))
       },
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("status", ParameterValue(value, null, TypoShort.toStatement)), "::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
@@ -118,8 +119,8 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
     val purchaseorderid = row.purchaseorderid
     SQL"""update purchasing.purchaseorderheader
-          set "revisionnumber" = ${ParameterValue(row.revisionnumber, null, ToStatement.intToStatement)}::int2,
-              "status" = ${ParameterValue(row.status, null, ToStatement.intToStatement)}::int2,
+          set "revisionnumber" = ${ParameterValue(row.revisionnumber, null, TypoShort.toStatement)}::int2,
+              "status" = ${ParameterValue(row.status, null, TypoShort.toStatement)}::int2,
               "employeeid" = ${ParameterValue(row.employeeid, null, BusinessentityId.toStatement)}::int4,
               "vendorid" = ${ParameterValue(row.vendorid, null, BusinessentityId.toStatement)}::int4,
               "shipmethodid" = ${ParameterValue(row.shipmethodid, null, ShipmethodId.toStatement)}::int4,
@@ -139,8 +140,8 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     SQL"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
           values (
             ${ParameterValue(unsaved.purchaseorderid, null, PurchaseorderheaderId.toStatement)}::int4,
-            ${ParameterValue(unsaved.revisionnumber, null, ToStatement.intToStatement)}::int2,
-            ${ParameterValue(unsaved.status, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.revisionnumber, null, TypoShort.toStatement)}::int2,
+            ${ParameterValue(unsaved.status, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.employeeid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.vendorid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4,

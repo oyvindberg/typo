@@ -10,6 +10,7 @@ package pg_type
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -26,7 +27,7 @@ case class PgTypeRow(
   typname: String,
   typnamespace: /* oid */ Long,
   typowner: /* oid */ Long,
-  typlen: Int,
+  typlen: TypoShort,
   typbyval: Boolean,
   typtype: String,
   typcategory: String,
@@ -68,7 +69,7 @@ object PgTypeRow {
         typname = orThrow(c.get("typname")(Decoder.decodeString)),
         typnamespace = orThrow(c.get("typnamespace")(Decoder.decodeLong)),
         typowner = orThrow(c.get("typowner")(Decoder.decodeLong)),
-        typlen = orThrow(c.get("typlen")(Decoder.decodeInt)),
+        typlen = orThrow(c.get("typlen")(TypoShort.decoder)),
         typbyval = orThrow(c.get("typbyval")(Decoder.decodeBoolean)),
         typtype = orThrow(c.get("typtype")(Decoder.decodeString)),
         typcategory = orThrow(c.get("typcategory")(Decoder.decodeString)),
@@ -105,7 +106,7 @@ object PgTypeRow {
       "typname" -> Encoder.encodeString.apply(row.typname),
       "typnamespace" -> Encoder.encodeLong.apply(row.typnamespace),
       "typowner" -> Encoder.encodeLong.apply(row.typowner),
-      "typlen" -> Encoder.encodeInt.apply(row.typlen),
+      "typlen" -> TypoShort.encoder.apply(row.typlen),
       "typbyval" -> Encoder.encodeBoolean.apply(row.typbyval),
       "typtype" -> Encoder.encodeString.apply(row.typtype),
       "typcategory" -> Encoder.encodeString.apply(row.typcategory),
@@ -141,7 +142,7 @@ object PgTypeRow {
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
@@ -175,7 +176,7 @@ object PgTypeRow {
       typname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
       typnamespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
       typowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      typlen = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
+      typlen = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
       typbyval = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 5),
       typtype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
       typcategory = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 7),

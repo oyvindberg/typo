@@ -9,6 +9,7 @@ package vendor
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
@@ -34,7 +35,7 @@ object VendorRepoImpl extends VendorRepo {
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.preferredvendorstatus)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.activeflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.creditrating)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.preferredvendorstatus)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.activeflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
        """.query(VendorRow.read).unique
   }
@@ -43,7 +44,7 @@ object VendorRepoImpl extends VendorRepo {
       Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
       Some((Fragment.const(s""""accountnumber""""), fr"${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar")),
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const(s""""creditrating""""), fr"${fromWrite(unsaved.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""creditrating""""), fr"${fromWrite(unsaved.creditrating)(Write.fromPut(TypoShort.put))}::int2")),
       Some((Fragment.const(s""""purchasingwebserviceurl""""), fr"${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.preferredvendorstatus match {
         case Defaulted.UseDefault => None
@@ -90,7 +91,7 @@ object VendorRepoImpl extends VendorRepo {
     sql"""update purchasing.vendor
           set "accountnumber" = ${fromWrite(row.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar,
               "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "creditrating" = ${fromWrite(row.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "creditrating" = ${fromWrite(row.creditrating)(Write.fromPut(TypoShort.put))}::int2,
               "preferredvendorstatus" = ${fromWrite(row.preferredvendorstatus)(Write.fromPut(Flag.put))}::bool,
               "activeflag" = ${fromWrite(row.activeflag)(Write.fromPut(Flag.put))}::bool,
               "purchasingwebserviceurl" = ${fromWrite(row.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))},
@@ -109,7 +110,7 @@ object VendorRepoImpl extends VendorRepo {
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.creditrating)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.creditrating)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.preferredvendorstatus)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.activeflag)(Write.fromPut(Flag.put))}::bool,
             ${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))},

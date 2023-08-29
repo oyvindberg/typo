@@ -9,6 +9,7 @@ package workorder
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import play.api.libs.json.JsObject
@@ -28,7 +29,7 @@ case class WorkorderRowUnsaved(
   /** Product quantity to build. */
   orderqty: Int,
   /** Quantity that failed inspection. */
-  scrappedqty: Int,
+  scrappedqty: TypoShort,
   /** Work order start date. */
   startdate: TypoLocalDateTime,
   /** Work order end date. */
@@ -69,7 +70,7 @@ object WorkorderRowUnsaved {
         WorkorderRowUnsaved(
           productid = json.\("productid").as(ProductId.reads),
           orderqty = json.\("orderqty").as(Reads.IntReads),
-          scrappedqty = json.\("scrappedqty").as(Reads.IntReads),
+          scrappedqty = json.\("scrappedqty").as(TypoShort.reads),
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
           enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           duedate = json.\("duedate").as(TypoLocalDateTime.reads),
@@ -84,7 +85,7 @@ object WorkorderRowUnsaved {
     new JsObject(ListMap[String, JsValue](
       "productid" -> ProductId.writes.writes(o.productid),
       "orderqty" -> Writes.IntWrites.writes(o.orderqty),
-      "scrappedqty" -> Writes.IntWrites.writes(o.scrappedqty),
+      "scrappedqty" -> TypoShort.writes.writes(o.scrappedqty),
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
       "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),

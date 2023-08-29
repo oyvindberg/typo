@@ -10,6 +10,7 @@ package pg_partitioned_table
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -25,7 +26,7 @@ import scala.util.Try
 case class PgPartitionedTableRow(
   partrelid: PgPartitionedTableId,
   partstrat: String,
-  partnatts: Int,
+  partnatts: TypoShort,
   partdefid: /* oid */ Long,
   partattrs: TypoInt2Vector,
   partclass: TypoOidVector,
@@ -39,7 +40,7 @@ object PgPartitionedTableRow {
         PgPartitionedTableRow(
           partrelid = json.\("partrelid").as(PgPartitionedTableId.reads),
           partstrat = json.\("partstrat").as(Reads.StringReads),
-          partnatts = json.\("partnatts").as(Reads.IntReads),
+          partnatts = json.\("partnatts").as(TypoShort.reads),
           partdefid = json.\("partdefid").as(Reads.LongReads),
           partattrs = json.\("partattrs").as(TypoInt2Vector.reads),
           partclass = json.\("partclass").as(TypoOidVector.reads),
@@ -54,7 +55,7 @@ object PgPartitionedTableRow {
       PgPartitionedTableRow(
         partrelid = row(idx + 0)(PgPartitionedTableId.column),
         partstrat = row(idx + 1)(Column.columnToString),
-        partnatts = row(idx + 2)(Column.columnToInt),
+        partnatts = row(idx + 2)(TypoShort.column),
         partdefid = row(idx + 3)(Column.columnToLong),
         partattrs = row(idx + 4)(TypoInt2Vector.column),
         partclass = row(idx + 5)(TypoOidVector.column),
@@ -67,7 +68,7 @@ object PgPartitionedTableRow {
     new JsObject(ListMap[String, JsValue](
       "partrelid" -> PgPartitionedTableId.writes.writes(o.partrelid),
       "partstrat" -> Writes.StringWrites.writes(o.partstrat),
-      "partnatts" -> Writes.IntWrites.writes(o.partnatts),
+      "partnatts" -> TypoShort.writes.writes(o.partnatts),
       "partdefid" -> Writes.LongWrites.writes(o.partdefid),
       "partattrs" -> TypoInt2Vector.writes.writes(o.partattrs),
       "partclass" -> TypoOidVector.writes.writes(o.partclass),

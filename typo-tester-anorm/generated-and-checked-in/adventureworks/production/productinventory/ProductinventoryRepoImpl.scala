@@ -9,6 +9,7 @@ package productinventory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import anorm.NamedParameter
@@ -33,7 +34,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   }
   override def insert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
-          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2, ${ParameterValue(unsaved.shelf, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.bin, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2, ${ParameterValue(unsaved.shelf, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.bin, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.quantity, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
        """
       .executeInsert(ProductinventoryRow.rowParser(1).single)
@@ -44,10 +45,10 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
       Some((NamedParameter("locationid", ParameterValue(unsaved.locationid, null, LocationId.toStatement)), "::int2")),
       Some((NamedParameter("shelf", ParameterValue(unsaved.shelf, null, ToStatement.stringToStatement)), "")),
-      Some((NamedParameter("bin", ParameterValue(unsaved.bin, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("bin", ParameterValue(unsaved.bin, null, TypoShort.toStatement)), "::int2")),
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("quantity", ParameterValue(value, null, ToStatement.intToStatement)), "::int2"))
+        case Defaulted.Provided(value) => Some((NamedParameter("quantity", ParameterValue(value, null, TypoShort.toStatement)), "::int2"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
@@ -92,8 +93,8 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     val compositeId = row.compositeId
     SQL"""update production.productinventory
           set "shelf" = ${ParameterValue(row.shelf, null, ToStatement.stringToStatement)},
-              "bin" = ${ParameterValue(row.bin, null, ToStatement.intToStatement)}::int2,
-              "quantity" = ${ParameterValue(row.quantity, null, ToStatement.intToStatement)}::int2,
+              "bin" = ${ParameterValue(row.bin, null, TypoShort.toStatement)}::int2,
+              "quantity" = ${ParameterValue(row.quantity, null, TypoShort.toStatement)}::int2,
               "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "locationid" = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}
@@ -108,8 +109,8 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2,
             ${ParameterValue(unsaved.shelf, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.bin, null, ToStatement.intToStatement)}::int2,
-            ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.bin, null, TypoShort.toStatement)}::int2,
+            ${ParameterValue(unsaved.quantity, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )

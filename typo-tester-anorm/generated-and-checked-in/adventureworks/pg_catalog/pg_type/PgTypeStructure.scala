@@ -10,6 +10,7 @@ package pg_type
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -24,7 +25,7 @@ class PgTypeStructure[Row](val prefix: Option[String], val extract: Row => PgTyp
   override val typname = new Field[String, Row](prefix, "typname", None, Some("name"))(x => extract(x).typname, (row, value) => merge(row, extract(row).copy(typname = value)))
   override val typnamespace = new Field[/* oid */ Long, Row](prefix, "typnamespace", None, Some("oid"))(x => extract(x).typnamespace, (row, value) => merge(row, extract(row).copy(typnamespace = value)))
   override val typowner = new Field[/* oid */ Long, Row](prefix, "typowner", None, Some("oid"))(x => extract(x).typowner, (row, value) => merge(row, extract(row).copy(typowner = value)))
-  override val typlen = new Field[Int, Row](prefix, "typlen", None, Some("int2"))(x => extract(x).typlen, (row, value) => merge(row, extract(row).copy(typlen = value)))
+  override val typlen = new Field[TypoShort, Row](prefix, "typlen", None, Some("int2"))(x => extract(x).typlen, (row, value) => merge(row, extract(row).copy(typlen = value)))
   override val typbyval = new Field[Boolean, Row](prefix, "typbyval", None, None)(x => extract(x).typbyval, (row, value) => merge(row, extract(row).copy(typbyval = value)))
   override val typtype = new Field[String, Row](prefix, "typtype", None, Some("char"))(x => extract(x).typtype, (row, value) => merge(row, extract(row).copy(typtype = value)))
   override val typcategory = new Field[String, Row](prefix, "typcategory", None, Some("char"))(x => extract(x).typcategory, (row, value) => merge(row, extract(row).copy(typcategory = value)))

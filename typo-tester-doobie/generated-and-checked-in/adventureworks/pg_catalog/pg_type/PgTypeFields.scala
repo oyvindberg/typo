@@ -10,6 +10,7 @@ package pg_type
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -19,7 +20,7 @@ trait PgTypeFields[Row] {
   val typname: Field[String, Row]
   val typnamespace: Field[/* oid */ Long, Row]
   val typowner: Field[/* oid */ Long, Row]
-  val typlen: Field[Int, Row]
+  val typlen: Field[TypoShort, Row]
   val typbyval: Field[Boolean, Row]
   val typtype: Field[String, Row]
   val typcategory: Field[String, Row]

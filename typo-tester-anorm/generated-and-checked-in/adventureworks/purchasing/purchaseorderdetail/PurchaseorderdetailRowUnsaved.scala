@@ -9,6 +9,7 @@ package purchaseorderdetail
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import play.api.libs.json.JsObject
@@ -28,7 +29,7 @@ case class PurchaseorderdetailRowUnsaved(
   /** Date the product is expected to be received. */
   duedate: TypoLocalDateTime,
   /** Quantity ordered. */
-  orderqty: Int,
+  orderqty: TypoShort,
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
@@ -69,7 +70,7 @@ object PurchaseorderdetailRowUnsaved {
         PurchaseorderdetailRowUnsaved(
           purchaseorderid = json.\("purchaseorderid").as(PurchaseorderheaderId.reads),
           duedate = json.\("duedate").as(TypoLocalDateTime.reads),
-          orderqty = json.\("orderqty").as(Reads.IntReads),
+          orderqty = json.\("orderqty").as(TypoShort.reads),
           productid = json.\("productid").as(ProductId.reads),
           unitprice = json.\("unitprice").as(Reads.bigDecReads),
           receivedqty = json.\("receivedqty").as(Reads.bigDecReads),
@@ -84,7 +85,7 @@ object PurchaseorderdetailRowUnsaved {
     new JsObject(ListMap[String, JsValue](
       "purchaseorderid" -> PurchaseorderheaderId.writes.writes(o.purchaseorderid),
       "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
-      "orderqty" -> Writes.IntWrites.writes(o.orderqty),
+      "orderqty" -> TypoShort.writes.writes(o.orderqty),
       "productid" -> ProductId.writes.writes(o.productid),
       "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),
       "receivedqty" -> Writes.BigDecimalWrites.writes(o.receivedqty),

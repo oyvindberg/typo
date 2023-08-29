@@ -8,6 +8,7 @@ package pu
 package pod
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.Column
@@ -32,7 +33,7 @@ case class PodViewRow(
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.duedate]] */
   duedate: TypoLocalDateTime,
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.orderqty]] */
-  orderqty: Int,
+  orderqty: TypoShort,
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.productid]] */
   productid: ProductId,
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.unitprice]] */
@@ -53,7 +54,7 @@ object PodViewRow {
           purchaseorderid = json.\("purchaseorderid").as(PurchaseorderheaderId.reads),
           purchaseorderdetailid = json.\("purchaseorderdetailid").as(Reads.IntReads),
           duedate = json.\("duedate").as(TypoLocalDateTime.reads),
-          orderqty = json.\("orderqty").as(Reads.IntReads),
+          orderqty = json.\("orderqty").as(TypoShort.reads),
           productid = json.\("productid").as(ProductId.reads),
           unitprice = json.\("unitprice").as(Reads.bigDecReads),
           receivedqty = json.\("receivedqty").as(Reads.bigDecReads),
@@ -70,7 +71,7 @@ object PodViewRow {
         purchaseorderid = row(idx + 1)(PurchaseorderheaderId.column),
         purchaseorderdetailid = row(idx + 2)(Column.columnToInt),
         duedate = row(idx + 3)(TypoLocalDateTime.column),
-        orderqty = row(idx + 4)(Column.columnToInt),
+        orderqty = row(idx + 4)(TypoShort.column),
         productid = row(idx + 5)(ProductId.column),
         unitprice = row(idx + 6)(Column.columnToScalaBigDecimal),
         receivedqty = row(idx + 7)(Column.columnToScalaBigDecimal),
@@ -85,7 +86,7 @@ object PodViewRow {
       "purchaseorderid" -> PurchaseorderheaderId.writes.writes(o.purchaseorderid),
       "purchaseorderdetailid" -> Writes.IntWrites.writes(o.purchaseorderdetailid),
       "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
-      "orderqty" -> Writes.IntWrites.writes(o.orderqty),
+      "orderqty" -> TypoShort.writes.writes(o.orderqty),
       "productid" -> ProductId.writes.writes(o.productid),
       "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),
       "receivedqty" -> Writes.BigDecimalWrites.writes(o.receivedqty),

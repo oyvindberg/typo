@@ -8,6 +8,7 @@ package production
 package product
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -40,9 +41,9 @@ case class ProductRow(
   /** Product color. */
   color: Option[/* max 15 chars */ String],
   /** Minimum inventory quantity. */
-  safetystocklevel: Int,
+  safetystocklevel: TypoShort,
   /** Inventory level that triggers a purchase order or work order. */
-  reorderpoint: Int,
+  reorderpoint: TypoShort,
   /** Standard cost of the product. */
   standardcost: BigDecimal,
   /** Selling price. */
@@ -91,8 +92,8 @@ object ProductRow {
           makeflag = json.\("makeflag").as(Flag.reads),
           finishedgoodsflag = json.\("finishedgoodsflag").as(Flag.reads),
           color = json.\("color").toOption.map(_.as(Reads.StringReads)),
-          safetystocklevel = json.\("safetystocklevel").as(Reads.IntReads),
-          reorderpoint = json.\("reorderpoint").as(Reads.IntReads),
+          safetystocklevel = json.\("safetystocklevel").as(TypoShort.reads),
+          reorderpoint = json.\("reorderpoint").as(TypoShort.reads),
           standardcost = json.\("standardcost").as(Reads.bigDecReads),
           listprice = json.\("listprice").as(Reads.bigDecReads),
           size = json.\("size").toOption.map(_.as(Reads.StringReads)),
@@ -123,8 +124,8 @@ object ProductRow {
         makeflag = row(idx + 3)(Flag.column),
         finishedgoodsflag = row(idx + 4)(Flag.column),
         color = row(idx + 5)(Column.columnToOption(Column.columnToString)),
-        safetystocklevel = row(idx + 6)(Column.columnToInt),
-        reorderpoint = row(idx + 7)(Column.columnToInt),
+        safetystocklevel = row(idx + 6)(TypoShort.column),
+        reorderpoint = row(idx + 7)(TypoShort.column),
         standardcost = row(idx + 8)(Column.columnToScalaBigDecimal),
         listprice = row(idx + 9)(Column.columnToScalaBigDecimal),
         size = row(idx + 10)(Column.columnToOption(Column.columnToString)),
@@ -153,8 +154,8 @@ object ProductRow {
       "makeflag" -> Flag.writes.writes(o.makeflag),
       "finishedgoodsflag" -> Flag.writes.writes(o.finishedgoodsflag),
       "color" -> Writes.OptionWrites(Writes.StringWrites).writes(o.color),
-      "safetystocklevel" -> Writes.IntWrites.writes(o.safetystocklevel),
-      "reorderpoint" -> Writes.IntWrites.writes(o.reorderpoint),
+      "safetystocklevel" -> TypoShort.writes.writes(o.safetystocklevel),
+      "reorderpoint" -> TypoShort.writes.writes(o.reorderpoint),
       "standardcost" -> Writes.BigDecimalWrites.writes(o.standardcost),
       "listprice" -> Writes.BigDecimalWrites.writes(o.listprice),
       "size" -> Writes.OptionWrites(Writes.StringWrites).writes(o.size),

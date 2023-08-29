@@ -8,6 +8,7 @@ package pg_catalog
 package pg_attrdef
 
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -23,7 +24,7 @@ import scala.util.Try
 case class PgAttrdefRow(
   oid: PgAttrdefId,
   adrelid: /* oid */ Long,
-  adnum: Int,
+  adnum: TypoShort,
   adbin: TypoPgNodeTree
 )
 
@@ -33,7 +34,7 @@ object PgAttrdefRow {
         PgAttrdefRow(
           oid = json.\("oid").as(PgAttrdefId.reads),
           adrelid = json.\("adrelid").as(Reads.LongReads),
-          adnum = json.\("adnum").as(Reads.IntReads),
+          adnum = json.\("adnum").as(TypoShort.reads),
           adbin = json.\("adbin").as(TypoPgNodeTree.reads)
         )
       )
@@ -44,7 +45,7 @@ object PgAttrdefRow {
       PgAttrdefRow(
         oid = row(idx + 0)(PgAttrdefId.column),
         adrelid = row(idx + 1)(Column.columnToLong),
-        adnum = row(idx + 2)(Column.columnToInt),
+        adnum = row(idx + 2)(TypoShort.column),
         adbin = row(idx + 3)(TypoPgNodeTree.column)
       )
     )
@@ -53,7 +54,7 @@ object PgAttrdefRow {
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgAttrdefId.writes.writes(o.oid),
       "adrelid" -> Writes.LongWrites.writes(o.adrelid),
-      "adnum" -> Writes.IntWrites.writes(o.adnum),
+      "adnum" -> TypoShort.writes.writes(o.adnum),
       "adbin" -> TypoPgNodeTree.writes.writes(o.adbin)
     ))
   )

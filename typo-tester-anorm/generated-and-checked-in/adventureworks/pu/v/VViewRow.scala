@@ -8,6 +8,7 @@ package pu
 package v
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
@@ -34,7 +35,7 @@ case class VViewRow(
   /** Points to [[purchasing.vendor.VendorRow.name]] */
   name: Name,
   /** Points to [[purchasing.vendor.VendorRow.creditrating]] */
-  creditrating: Int,
+  creditrating: TypoShort,
   /** Points to [[purchasing.vendor.VendorRow.preferredvendorstatus]] */
   preferredvendorstatus: Flag,
   /** Points to [[purchasing.vendor.VendorRow.activeflag]] */
@@ -53,7 +54,7 @@ object VViewRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           accountnumber = json.\("accountnumber").as(AccountNumber.reads),
           name = json.\("name").as(Name.reads),
-          creditrating = json.\("creditrating").as(Reads.IntReads),
+          creditrating = json.\("creditrating").as(TypoShort.reads),
           preferredvendorstatus = json.\("preferredvendorstatus").as(Flag.reads),
           activeflag = json.\("activeflag").as(Flag.reads),
           purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as(Reads.StringReads)),
@@ -69,7 +70,7 @@ object VViewRow {
         businessentityid = row(idx + 1)(BusinessentityId.column),
         accountnumber = row(idx + 2)(AccountNumber.column),
         name = row(idx + 3)(Name.column),
-        creditrating = row(idx + 4)(Column.columnToInt),
+        creditrating = row(idx + 4)(TypoShort.column),
         preferredvendorstatus = row(idx + 5)(Flag.column),
         activeflag = row(idx + 6)(Flag.column),
         purchasingwebserviceurl = row(idx + 7)(Column.columnToOption(Column.columnToString)),
@@ -83,7 +84,7 @@ object VViewRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "accountnumber" -> AccountNumber.writes.writes(o.accountnumber),
       "name" -> Name.writes.writes(o.name),
-      "creditrating" -> Writes.IntWrites.writes(o.creditrating),
+      "creditrating" -> TypoShort.writes.writes(o.creditrating),
       "preferredvendorstatus" -> Flag.writes.writes(o.preferredvendorstatus),
       "activeflag" -> Flag.writes.writes(o.activeflag),
       "purchasingwebserviceurl" -> Writes.OptionWrites(Writes.StringWrites).writes(o.purchasingwebserviceurl),

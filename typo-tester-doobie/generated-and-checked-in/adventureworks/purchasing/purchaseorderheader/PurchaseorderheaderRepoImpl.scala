@@ -9,6 +9,7 @@ package purchaseorderheader
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import doobie.free.connection.ConnectionIO
@@ -32,7 +33,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   }
   override def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
-          values (${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4, ${fromWrite(unsaved.revisionnumber)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.status)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.employeeid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.vendorid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.orderdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.shipdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.subtotal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.taxamt)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.freight)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4, ${fromWrite(unsaved.revisionnumber)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.employeeid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.vendorid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.orderdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.shipdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.subtotal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.taxamt)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.freight)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
        """.query(PurchaseorderheaderRow.read).unique
   }
@@ -48,11 +49,11 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""revisionnumber""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""revisionnumber""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
       },
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""status""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""status""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
@@ -105,8 +106,8 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean] = {
     val purchaseorderid = row.purchaseorderid
     sql"""update purchasing.purchaseorderheader
-          set "revisionnumber" = ${fromWrite(row.revisionnumber)(Write.fromPut(Meta.IntMeta.put))}::int2,
-              "status" = ${fromWrite(row.status)(Write.fromPut(Meta.IntMeta.put))}::int2,
+          set "revisionnumber" = ${fromWrite(row.revisionnumber)(Write.fromPut(TypoShort.put))}::int2,
+              "status" = ${fromWrite(row.status)(Write.fromPut(TypoShort.put))}::int2,
               "employeeid" = ${fromWrite(row.employeeid)(Write.fromPut(BusinessentityId.put))}::int4,
               "vendorid" = ${fromWrite(row.vendorid)(Write.fromPut(BusinessentityId.put))}::int4,
               "shipmethodid" = ${fromWrite(row.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4,
@@ -128,8 +129,8 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
           values (
             ${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4,
-            ${fromWrite(unsaved.revisionnumber)(Write.fromPut(Meta.IntMeta.put))}::int2,
-            ${fromWrite(unsaved.status)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.revisionnumber)(Write.fromPut(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.employeeid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.vendorid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4,

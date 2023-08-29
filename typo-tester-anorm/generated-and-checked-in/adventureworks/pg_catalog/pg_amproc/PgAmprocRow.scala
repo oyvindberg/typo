@@ -8,6 +8,7 @@ package pg_catalog
 package pg_amproc
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -25,7 +26,7 @@ case class PgAmprocRow(
   amprocfamily: /* oid */ Long,
   amproclefttype: /* oid */ Long,
   amprocrighttype: /* oid */ Long,
-  amprocnum: Int,
+  amprocnum: TypoShort,
   amproc: TypoRegproc
 )
 
@@ -37,7 +38,7 @@ object PgAmprocRow {
           amprocfamily = json.\("amprocfamily").as(Reads.LongReads),
           amproclefttype = json.\("amproclefttype").as(Reads.LongReads),
           amprocrighttype = json.\("amprocrighttype").as(Reads.LongReads),
-          amprocnum = json.\("amprocnum").as(Reads.IntReads),
+          amprocnum = json.\("amprocnum").as(TypoShort.reads),
           amproc = json.\("amproc").as(TypoRegproc.reads)
         )
       )
@@ -50,7 +51,7 @@ object PgAmprocRow {
         amprocfamily = row(idx + 1)(Column.columnToLong),
         amproclefttype = row(idx + 2)(Column.columnToLong),
         amprocrighttype = row(idx + 3)(Column.columnToLong),
-        amprocnum = row(idx + 4)(Column.columnToInt),
+        amprocnum = row(idx + 4)(TypoShort.column),
         amproc = row(idx + 5)(TypoRegproc.column)
       )
     )
@@ -61,7 +62,7 @@ object PgAmprocRow {
       "amprocfamily" -> Writes.LongWrites.writes(o.amprocfamily),
       "amproclefttype" -> Writes.LongWrites.writes(o.amproclefttype),
       "amprocrighttype" -> Writes.LongWrites.writes(o.amprocrighttype),
-      "amprocnum" -> Writes.IntWrites.writes(o.amprocnum),
+      "amprocnum" -> TypoShort.writes.writes(o.amprocnum),
       "amproc" -> TypoRegproc.writes.writes(o.amproc)
     ))
   )

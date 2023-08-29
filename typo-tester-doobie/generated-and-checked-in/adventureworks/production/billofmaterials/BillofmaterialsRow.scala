@@ -8,6 +8,7 @@ package production
 package billofmaterials
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import doobie.enumerated.Nullability
@@ -34,15 +35,15 @@ case class BillofmaterialsRow(
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Indicates the depth the component is from its parent (AssemblyID). */
-  bomlevel: Int,
+  bomlevel: TypoShort,
   /** Quantity of the component needed to create the assembly. */
   perassemblyqty: BigDecimal,
   modifieddate: TypoLocalDateTime
 )
 
 object BillofmaterialsRow {
-  implicit lazy val decoder: Decoder[BillofmaterialsRow] = Decoder.forProduct9[BillofmaterialsRow, BillofmaterialsId, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, Int, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BillofmaterialsRow.apply)(BillofmaterialsId.decoder, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[BillofmaterialsRow] = Encoder.forProduct9[BillofmaterialsRow, BillofmaterialsId, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, Int, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(BillofmaterialsId.encoder, Encoder.encodeOption(ProductId.encoder), ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[BillofmaterialsRow] = Decoder.forProduct9[BillofmaterialsRow, BillofmaterialsId, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BillofmaterialsRow.apply)(BillofmaterialsId.decoder, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BillofmaterialsRow] = Encoder.forProduct9[BillofmaterialsRow, BillofmaterialsId, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(BillofmaterialsId.encoder, Encoder.encodeOption(ProductId.encoder), ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, TypoShort.encoder, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BillofmaterialsRow] = new Read[BillofmaterialsRow](
     gets = List(
       (BillofmaterialsId.get, Nullability.NoNulls),
@@ -51,7 +52,7 @@ object BillofmaterialsRow {
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.Nullable),
       (UnitmeasureId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
@@ -62,7 +63,7 @@ object BillofmaterialsRow {
       startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
       enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
       unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 5),
-      bomlevel = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
+      bomlevel = TypoShort.get.unsafeGetNonNullable(rs, i + 6),
       perassemblyqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 7),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
     )

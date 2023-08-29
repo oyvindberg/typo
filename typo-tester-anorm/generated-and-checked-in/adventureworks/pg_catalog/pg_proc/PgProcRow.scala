@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -40,8 +41,8 @@ case class PgProcRow(
   proretset: Boolean,
   provolatile: String,
   proparallel: String,
-  pronargs: Int,
-  pronargdefaults: Int,
+  pronargs: TypoShort,
+  pronargdefaults: TypoShort,
   prorettype: /* oid */ Long,
   proargtypes: TypoOidVector,
   proallargtypes: Option[Array[/* oid */ Long]],
@@ -76,8 +77,8 @@ object PgProcRow {
           proretset = json.\("proretset").as(Reads.BooleanReads),
           provolatile = json.\("provolatile").as(Reads.StringReads),
           proparallel = json.\("proparallel").as(Reads.StringReads),
-          pronargs = json.\("pronargs").as(Reads.IntReads),
-          pronargdefaults = json.\("pronargdefaults").as(Reads.IntReads),
+          pronargs = json.\("pronargs").as(TypoShort.reads),
+          pronargdefaults = json.\("pronargdefaults").as(TypoShort.reads),
           prorettype = json.\("prorettype").as(Reads.LongReads),
           proargtypes = json.\("proargtypes").as(TypoOidVector.reads),
           proallargtypes = json.\("proallargtypes").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
@@ -113,8 +114,8 @@ object PgProcRow {
         proretset = row(idx + 13)(Column.columnToBoolean),
         provolatile = row(idx + 14)(Column.columnToString),
         proparallel = row(idx + 15)(Column.columnToString),
-        pronargs = row(idx + 16)(Column.columnToInt),
-        pronargdefaults = row(idx + 17)(Column.columnToInt),
+        pronargs = row(idx + 16)(TypoShort.column),
+        pronargdefaults = row(idx + 17)(TypoShort.column),
         prorettype = row(idx + 18)(Column.columnToLong),
         proargtypes = row(idx + 19)(TypoOidVector.column),
         proallargtypes = row(idx + 20)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
@@ -148,8 +149,8 @@ object PgProcRow {
       "proretset" -> Writes.BooleanWrites.writes(o.proretset),
       "provolatile" -> Writes.StringWrites.writes(o.provolatile),
       "proparallel" -> Writes.StringWrites.writes(o.proparallel),
-      "pronargs" -> Writes.IntWrites.writes(o.pronargs),
-      "pronargdefaults" -> Writes.IntWrites.writes(o.pronargdefaults),
+      "pronargs" -> TypoShort.writes.writes(o.pronargs),
+      "pronargdefaults" -> TypoShort.writes.writes(o.pronargdefaults),
       "prorettype" -> Writes.LongWrites.writes(o.prorettype),
       "proargtypes" -> TypoOidVector.writes.writes(o.proargtypes),
       "proallargtypes" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.proallargtypes),

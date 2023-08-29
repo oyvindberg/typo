@@ -8,6 +8,7 @@ package pg_catalog
 package pg_aggregate
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -18,7 +19,7 @@ import java.sql.ResultSet
 case class PgAggregateRow(
   aggfnoid: PgAggregateId,
   aggkind: String,
-  aggnumdirectargs: Int,
+  aggnumdirectargs: TypoShort,
   aggtransfn: TypoRegproc,
   aggfinalfn: TypoRegproc,
   aggcombinefn: TypoRegproc,
@@ -41,13 +42,13 @@ case class PgAggregateRow(
 )
 
 object PgAggregateRow {
-  implicit lazy val decoder: Decoder[PgAggregateRow] = Decoder.forProduct22[PgAggregateRow, PgAggregateId, String, Int, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, Boolean, Boolean, String, String, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, Int, Option[String], Option[String]]("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")(PgAggregateRow.apply)(PgAggregateId.decoder, Decoder.decodeString, Decoder.decodeInt, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit lazy val encoder: Encoder[PgAggregateRow] = Encoder.forProduct22[PgAggregateRow, PgAggregateId, String, Int, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, Boolean, Boolean, String, String, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, Int, Option[String], Option[String]]("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")(x => (x.aggfnoid, x.aggkind, x.aggnumdirectargs, x.aggtransfn, x.aggfinalfn, x.aggcombinefn, x.aggserialfn, x.aggdeserialfn, x.aggmtransfn, x.aggminvtransfn, x.aggmfinalfn, x.aggfinalextra, x.aggmfinalextra, x.aggfinalmodify, x.aggmfinalmodify, x.aggsortop, x.aggtranstype, x.aggtransspace, x.aggmtranstype, x.aggmtransspace, x.agginitval, x.aggminitval))(PgAggregateId.encoder, Encoder.encodeString, Encoder.encodeInt, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val decoder: Decoder[PgAggregateRow] = Decoder.forProduct22[PgAggregateRow, PgAggregateId, String, TypoShort, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, Boolean, Boolean, String, String, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, Int, Option[String], Option[String]]("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")(PgAggregateRow.apply)(PgAggregateId.decoder, Decoder.decodeString, TypoShort.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgAggregateRow] = Encoder.forProduct22[PgAggregateRow, PgAggregateId, String, TypoShort, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, Boolean, Boolean, String, String, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, Int, Option[String], Option[String]]("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")(x => (x.aggfnoid, x.aggkind, x.aggnumdirectargs, x.aggtransfn, x.aggfinalfn, x.aggcombinefn, x.aggserialfn, x.aggdeserialfn, x.aggmtransfn, x.aggminvtransfn, x.aggmfinalfn, x.aggfinalextra, x.aggmfinalextra, x.aggfinalmodify, x.aggmfinalmodify, x.aggsortop, x.aggtranstype, x.aggtransspace, x.aggmtranstype, x.aggmtransspace, x.agginitval, x.aggminitval))(PgAggregateId.encoder, Encoder.encodeString, TypoShort.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgAggregateRow] = new Read[PgAggregateRow](
     gets = List(
       (PgAggregateId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (TypoRegproc.get, Nullability.NoNulls),
       (TypoRegproc.get, Nullability.NoNulls),
       (TypoRegproc.get, Nullability.NoNulls),
@@ -71,7 +72,7 @@ object PgAggregateRow {
     unsafeGet = (rs: ResultSet, i: Int) => PgAggregateRow(
       aggfnoid = PgAggregateId.get.unsafeGetNonNullable(rs, i + 0),
       aggkind = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      aggnumdirectargs = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      aggnumdirectargs = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
       aggtransfn = TypoRegproc.get.unsafeGetNonNullable(rs, i + 3),
       aggfinalfn = TypoRegproc.get.unsafeGetNonNullable(rs, i + 4),
       aggcombinefn = TypoRegproc.get.unsafeGetNonNullable(rs, i + 5),

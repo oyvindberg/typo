@@ -8,6 +8,7 @@ package pg_catalog
 package pg_amproc
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -21,7 +22,7 @@ class PgAmprocStructure[Row](val prefix: Option[String], val extract: Row => PgA
   override val amprocfamily = new Field[/* oid */ Long, Row](prefix, "amprocfamily", None, Some("oid"))(x => extract(x).amprocfamily, (row, value) => merge(row, extract(row).copy(amprocfamily = value)))
   override val amproclefttype = new Field[/* oid */ Long, Row](prefix, "amproclefttype", None, Some("oid"))(x => extract(x).amproclefttype, (row, value) => merge(row, extract(row).copy(amproclefttype = value)))
   override val amprocrighttype = new Field[/* oid */ Long, Row](prefix, "amprocrighttype", None, Some("oid"))(x => extract(x).amprocrighttype, (row, value) => merge(row, extract(row).copy(amprocrighttype = value)))
-  override val amprocnum = new Field[Int, Row](prefix, "amprocnum", None, Some("int2"))(x => extract(x).amprocnum, (row, value) => merge(row, extract(row).copy(amprocnum = value)))
+  override val amprocnum = new Field[TypoShort, Row](prefix, "amprocnum", None, Some("int2"))(x => extract(x).amprocnum, (row, value) => merge(row, extract(row).copy(amprocnum = value)))
   override val amproc = new Field[TypoRegproc, Row](prefix, "amproc", None, Some("regproc"))(x => extract(x).amproc, (row, value) => merge(row, extract(row).copy(amproc = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

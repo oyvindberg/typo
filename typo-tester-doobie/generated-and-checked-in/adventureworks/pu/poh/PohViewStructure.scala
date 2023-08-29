@@ -8,6 +8,7 @@ package pu
 package poh
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
@@ -22,8 +23,8 @@ class PohViewStructure[Row](val prefix: Option[String], val extract: Row => PohV
 
   override val id = new Field[PurchaseorderheaderId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
   override val purchaseorderid = new Field[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, None)(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
-  override val revisionnumber = new Field[Int, Row](prefix, "revisionnumber", None, None)(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
-  override val status = new Field[Int, Row](prefix, "status", None, None)(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
+  override val revisionnumber = new Field[TypoShort, Row](prefix, "revisionnumber", None, None)(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
+  override val status = new Field[TypoShort, Row](prefix, "status", None, None)(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
   override val employeeid = new Field[BusinessentityId, Row](prefix, "employeeid", None, None)(x => extract(x).employeeid, (row, value) => merge(row, extract(row).copy(employeeid = value)))
   override val vendorid = new Field[BusinessentityId, Row](prefix, "vendorid", None, None)(x => extract(x).vendorid, (row, value) => merge(row, extract(row).copy(vendorid = value)))
   override val shipmethodid = new Field[ShipmethodId, Row](prefix, "shipmethodid", None, None)(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))

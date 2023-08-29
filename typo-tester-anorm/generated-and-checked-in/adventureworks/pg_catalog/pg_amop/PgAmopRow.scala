@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -24,7 +25,7 @@ case class PgAmopRow(
   amopfamily: /* oid */ Long,
   amoplefttype: /* oid */ Long,
   amoprighttype: /* oid */ Long,
-  amopstrategy: Int,
+  amopstrategy: TypoShort,
   amoppurpose: String,
   amopopr: /* oid */ Long,
   amopmethod: /* oid */ Long,
@@ -39,7 +40,7 @@ object PgAmopRow {
           amopfamily = json.\("amopfamily").as(Reads.LongReads),
           amoplefttype = json.\("amoplefttype").as(Reads.LongReads),
           amoprighttype = json.\("amoprighttype").as(Reads.LongReads),
-          amopstrategy = json.\("amopstrategy").as(Reads.IntReads),
+          amopstrategy = json.\("amopstrategy").as(TypoShort.reads),
           amoppurpose = json.\("amoppurpose").as(Reads.StringReads),
           amopopr = json.\("amopopr").as(Reads.LongReads),
           amopmethod = json.\("amopmethod").as(Reads.LongReads),
@@ -55,7 +56,7 @@ object PgAmopRow {
         amopfamily = row(idx + 1)(Column.columnToLong),
         amoplefttype = row(idx + 2)(Column.columnToLong),
         amoprighttype = row(idx + 3)(Column.columnToLong),
-        amopstrategy = row(idx + 4)(Column.columnToInt),
+        amopstrategy = row(idx + 4)(TypoShort.column),
         amoppurpose = row(idx + 5)(Column.columnToString),
         amopopr = row(idx + 6)(Column.columnToLong),
         amopmethod = row(idx + 7)(Column.columnToLong),
@@ -69,7 +70,7 @@ object PgAmopRow {
       "amopfamily" -> Writes.LongWrites.writes(o.amopfamily),
       "amoplefttype" -> Writes.LongWrites.writes(o.amoplefttype),
       "amoprighttype" -> Writes.LongWrites.writes(o.amoprighttype),
-      "amopstrategy" -> Writes.IntWrites.writes(o.amopstrategy),
+      "amopstrategy" -> TypoShort.writes.writes(o.amopstrategy),
       "amoppurpose" -> Writes.StringWrites.writes(o.amoppurpose),
       "amopopr" -> Writes.LongWrites.writes(o.amopopr),
       "amopmethod" -> Writes.LongWrites.writes(o.amopmethod),

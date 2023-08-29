@@ -8,6 +8,7 @@ package sales
 package salestaxrate
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -25,7 +26,7 @@ case class SalestaxrateRow(
       Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** 1 = Tax applied to retail transactions, 2 = Tax applied to wholesale transactions, 3 = Tax applied to all sales (retail and wholesale) transactions. */
-  taxtype: Int,
+  taxtype: TypoShort,
   /** Tax rate amount. */
   taxrate: BigDecimal,
   /** Tax rate description. */
@@ -35,13 +36,13 @@ case class SalestaxrateRow(
 )
 
 object SalestaxrateRow {
-  implicit lazy val decoder: Decoder[SalestaxrateRow] = Decoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(SalestaxrateRow.apply)(SalestaxrateId.decoder, StateprovinceId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SalestaxrateRow] = Encoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(SalestaxrateId.encoder, StateprovinceId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SalestaxrateRow] = Decoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, TypoShort, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(SalestaxrateRow.apply)(SalestaxrateId.decoder, StateprovinceId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SalestaxrateRow] = Encoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, TypoShort, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(SalestaxrateId.encoder, StateprovinceId.encoder, TypoShort.encoder, Encoder.encodeBigDecimal, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SalestaxrateRow] = new Read[SalestaxrateRow](
     gets = List(
       (SalestaxrateId.get, Nullability.NoNulls),
       (StateprovinceId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
@@ -50,7 +51,7 @@ object SalestaxrateRow {
     unsafeGet = (rs: ResultSet, i: Int) => SalestaxrateRow(
       salestaxrateid = SalestaxrateId.get.unsafeGetNonNullable(rs, i + 0),
       stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 1),
-      taxtype = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      taxtype = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
       taxrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
       name = Name.get.unsafeGetNonNullable(rs, i + 4),
       rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 5),

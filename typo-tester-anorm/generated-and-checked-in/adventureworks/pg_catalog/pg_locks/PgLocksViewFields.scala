@@ -8,6 +8,7 @@ package pg_catalog
 package pg_locks
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.OptField
 
@@ -16,12 +17,12 @@ trait PgLocksViewFields[Row] {
   val database: OptField[/* oid */ Long, Row]
   val relation: OptField[/* oid */ Long, Row]
   val page: OptField[Int, Row]
-  val tuple: OptField[Int, Row]
+  val tuple: OptField[TypoShort, Row]
   val virtualxid: OptField[String, Row]
   val transactionid: OptField[TypoXid, Row]
   val classid: OptField[/* oid */ Long, Row]
   val objid: OptField[/* oid */ Long, Row]
-  val objsubid: OptField[Int, Row]
+  val objsubid: OptField[TypoShort, Row]
   val virtualtransaction: OptField[String, Row]
   val pid: OptField[Int, Row]
   val mode: OptField[String, Row]

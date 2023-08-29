@@ -8,6 +8,7 @@ package production
 package workorder
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import typo.dsl.SqlExpr.Field
@@ -18,7 +19,7 @@ trait WorkorderFields[Row] {
   val workorderid: IdField[WorkorderId, Row]
   val productid: Field[ProductId, Row]
   val orderqty: Field[Int, Row]
-  val scrappedqty: Field[Int, Row]
+  val scrappedqty: Field[TypoShort, Row]
   val startdate: Field[TypoLocalDateTime, Row]
   val enddate: OptField[TypoLocalDateTime, Row]
   val duedate: Field[TypoLocalDateTime, Row]

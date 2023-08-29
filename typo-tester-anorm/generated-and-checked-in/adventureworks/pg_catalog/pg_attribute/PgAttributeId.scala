@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_attribute
 
+import adventureworks.customtypes.TypoShort
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -17,14 +18,14 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `pg_catalog.pg_attribute` */
-case class PgAttributeId(attrelid: /* oid */ Long, attnum: Int)
+case class PgAttributeId(attrelid: /* oid */ Long, attnum: TypoShort)
 object PgAttributeId {
-  implicit lazy val ordering: Ordering[PgAttributeId] = Ordering.by(x => (x.attrelid, x.attnum))
+  implicit def ordering(implicit O0: Ordering[TypoShort]): Ordering[PgAttributeId] = Ordering.by(x => (x.attrelid, x.attnum))
   implicit lazy val reads: Reads[PgAttributeId] = Reads[PgAttributeId](json => JsResult.fromTry(
       Try(
         PgAttributeId(
           attrelid = json.\("attrelid").as(Reads.LongReads),
-          attnum = json.\("attnum").as(Reads.IntReads)
+          attnum = json.\("attnum").as(TypoShort.reads)
         )
       )
     ),
@@ -32,7 +33,7 @@ object PgAttributeId {
   implicit lazy val writes: OWrites[PgAttributeId] = OWrites[PgAttributeId](o =>
     new JsObject(ListMap[String, JsValue](
       "attrelid" -> Writes.LongWrites.writes(o.attrelid),
-      "attnum" -> Writes.IntWrites.writes(o.attnum)
+      "attnum" -> TypoShort.writes.writes(o.attnum)
     ))
   )
 }

@@ -9,6 +9,7 @@ package workorder
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import anorm.NamedParameter
@@ -33,7 +34,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
-          values (${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.scrappedqty, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.scrappedqty, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
@@ -43,7 +44,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     val namedParameters = List(
       Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
       Some((NamedParameter("orderqty", ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)), "::int4")),
-      Some((NamedParameter("scrappedqty", ParameterValue(unsaved.scrappedqty, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("scrappedqty", ParameterValue(unsaved.scrappedqty, null, TypoShort.toStatement)), "::int2")),
       Some((NamedParameter("startdate", ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
       Some((NamedParameter("enddate", ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))), "::timestamp")),
       Some((NamedParameter("duedate", ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)), "::timestamp")),
@@ -99,7 +100,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     SQL"""update production.workorder
           set "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
               "orderqty" = ${ParameterValue(row.orderqty, null, ToStatement.intToStatement)}::int4,
-              "scrappedqty" = ${ParameterValue(row.scrappedqty, null, ToStatement.intToStatement)}::int2,
+              "scrappedqty" = ${ParameterValue(row.scrappedqty, null, TypoShort.toStatement)}::int2,
               "startdate" = ${ParameterValue(row.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
               "enddate" = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
               "duedate" = ${ParameterValue(row.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -117,7 +118,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
             ${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int4,
-            ${ParameterValue(unsaved.scrappedqty, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.scrappedqty, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
             ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,

@@ -9,6 +9,7 @@ package salestaxrate
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import anorm.NamedParameter
@@ -33,7 +34,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
-          values (${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.taxtype, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
@@ -42,7 +43,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
     val namedParameters = List(
       Some((NamedParameter("stateprovinceid", ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)), "::int4")),
-      Some((NamedParameter("taxtype", ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("taxtype", ParameterValue(unsaved.taxtype, null, TypoShort.toStatement)), "::int2")),
       Some((NamedParameter("name", ParameterValue(unsaved.name, null, Name.toStatement)), "::varchar")),
       unsaved.salestaxrateid match {
         case Defaulted.UseDefault => None
@@ -102,7 +103,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     val salestaxrateid = row.salestaxrateid
     SQL"""update sales.salestaxrate
           set "stateprovinceid" = ${ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
-              "taxtype" = ${ParameterValue(row.taxtype, null, ToStatement.intToStatement)}::int2,
+              "taxtype" = ${ParameterValue(row.taxtype, null, TypoShort.toStatement)}::int2,
               "taxrate" = ${ParameterValue(row.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
@@ -118,7 +119,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           values (
             ${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4,
             ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
-            ${ParameterValue(unsaved.taxtype, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.taxtype, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
             ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,

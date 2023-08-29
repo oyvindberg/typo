@@ -8,6 +8,7 @@ package pu
 package pod
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import typo.dsl.SqlExpr.Field
@@ -17,7 +18,7 @@ trait PodViewFields[Row] {
   val purchaseorderid: Field[PurchaseorderheaderId, Row]
   val purchaseorderdetailid: Field[Int, Row]
   val duedate: Field[TypoLocalDateTime, Row]
-  val orderqty: Field[Int, Row]
+  val orderqty: Field[TypoShort, Row]
   val productid: Field[ProductId, Row]
   val unitprice: Field[BigDecimal, Row]
   val receivedqty: Field[BigDecimal, Row]

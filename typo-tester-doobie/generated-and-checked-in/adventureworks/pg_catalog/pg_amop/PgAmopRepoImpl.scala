@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import adventureworks.customtypes.TypoShort
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
@@ -27,7 +28,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
   }
   override def insert(unsaved: PgAmopRow): ConnectionIO[PgAmopRow] = {
     sql"""insert into pg_catalog.pg_amop("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")
-          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAmopId.put))}::oid, ${fromWrite(unsaved.amopfamily)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amoplefttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amoprighttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amopstrategy)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.amoppurpose)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.amopopr)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amopmethod)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amopsortfamily)(Write.fromPut(Meta.LongMeta.put))}::oid)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAmopId.put))}::oid, ${fromWrite(unsaved.amopfamily)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amoplefttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amoprighttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amopstrategy)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.amoppurpose)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.amopopr)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amopmethod)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amopsortfamily)(Write.fromPut(Meta.LongMeta.put))}::oid)
           returning "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily"
        """.query(PgAmopRow.read).unique
   }
@@ -43,10 +44,10 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def selectByIds(oids: Array[PgAmopId]): Stream[ConnectionIO, PgAmopRow] = {
     sql"""select "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily" from pg_catalog.pg_amop where "oid" = ANY(${oids})""".query(PgAmopRow.read).stream
   }
-  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int): ConnectionIO[Option[PgAmopRow]] = {
+  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: TypoShort): ConnectionIO[Option[PgAmopRow]] = {
     sql"""select "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy"
           from pg_catalog.pg_amop
-          where "amopfamily" = ${fromWrite(amopfamily)(Write.fromPut(Meta.LongMeta.put))} AND "amoplefttype" = ${fromWrite(amoplefttype)(Write.fromPut(Meta.LongMeta.put))} AND "amoprighttype" = ${fromWrite(amoprighttype)(Write.fromPut(Meta.LongMeta.put))} AND "amopstrategy" = ${fromWrite(amopstrategy)(Write.fromPut(Meta.IntMeta.put))}
+          where "amopfamily" = ${fromWrite(amopfamily)(Write.fromPut(Meta.LongMeta.put))} AND "amoplefttype" = ${fromWrite(amoplefttype)(Write.fromPut(Meta.LongMeta.put))} AND "amoprighttype" = ${fromWrite(amoprighttype)(Write.fromPut(Meta.LongMeta.put))} AND "amopstrategy" = ${fromWrite(amopstrategy)(Write.fromPut(TypoShort.put))}
        """.query(PgAmopRow.read).option
   }
   override def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long): ConnectionIO[Option[PgAmopRow]] = {
@@ -61,7 +62,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
           set "amopfamily" = ${fromWrite(row.amopfamily)(Write.fromPut(Meta.LongMeta.put))}::oid,
               "amoplefttype" = ${fromWrite(row.amoplefttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
               "amoprighttype" = ${fromWrite(row.amoprighttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              "amopstrategy" = ${fromWrite(row.amopstrategy)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "amopstrategy" = ${fromWrite(row.amopstrategy)(Write.fromPut(TypoShort.put))}::int2,
               "amoppurpose" = ${fromWrite(row.amoppurpose)(Write.fromPut(Meta.StringMeta.put))}::char,
               "amopopr" = ${fromWrite(row.amopopr)(Write.fromPut(Meta.LongMeta.put))}::oid,
               "amopmethod" = ${fromWrite(row.amopmethod)(Write.fromPut(Meta.LongMeta.put))}::oid,
@@ -81,7 +82,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
             ${fromWrite(unsaved.amopfamily)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.amoplefttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.amoprighttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
-            ${fromWrite(unsaved.amopstrategy)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.amopstrategy)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.amoppurpose)(Write.fromPut(Meta.StringMeta.put))}::char,
             ${fromWrite(unsaved.amopopr)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.amopmethod)(Write.fromPut(Meta.LongMeta.put))}::oid,

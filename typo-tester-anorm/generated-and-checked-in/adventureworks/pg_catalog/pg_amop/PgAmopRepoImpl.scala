@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import adventureworks.customtypes.TypoShort
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
@@ -25,7 +26,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
   }
   override def insert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow = {
     SQL"""insert into pg_catalog.pg_amop("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")
-          values (${ParameterValue(unsaved.oid, null, PgAmopId.toStatement)}::oid, ${ParameterValue(unsaved.amopfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amoplefttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amoprighttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopstrategy, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.amoppurpose, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.amopopr, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopmethod, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopsortfamily, null, ToStatement.longToStatement)}::oid)
+          values (${ParameterValue(unsaved.oid, null, PgAmopId.toStatement)}::oid, ${ParameterValue(unsaved.amopfamily, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amoplefttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amoprighttype, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopstrategy, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.amoppurpose, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.amopopr, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopmethod, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.amopsortfamily, null, ToStatement.longToStatement)}::oid)
           returning "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily"
        """
       .executeInsert(PgAmopRow.rowParser(1).single)
@@ -52,10 +53,10 @@ object PgAmopRepoImpl extends PgAmopRepo {
        """.as(PgAmopRow.rowParser(1).*)
     
   }
-  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
+  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: TypoShort)(implicit c: Connection): Option[PgAmopRow] = {
     SQL"""select "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy"
           from pg_catalog.pg_amop
-          where "amopfamily" = ${ParameterValue(amopfamily, null, ToStatement.longToStatement)} AND "amoplefttype" = ${ParameterValue(amoplefttype, null, ToStatement.longToStatement)} AND "amoprighttype" = ${ParameterValue(amoprighttype, null, ToStatement.longToStatement)} AND "amopstrategy" = ${ParameterValue(amopstrategy, null, ToStatement.intToStatement)}
+          where "amopfamily" = ${ParameterValue(amopfamily, null, ToStatement.longToStatement)} AND "amoplefttype" = ${ParameterValue(amoplefttype, null, ToStatement.longToStatement)} AND "amoprighttype" = ${ParameterValue(amoprighttype, null, ToStatement.longToStatement)} AND "amopstrategy" = ${ParameterValue(amopstrategy, null, TypoShort.toStatement)}
        """.as(PgAmopRow.rowParser(1).singleOpt)
     
   }
@@ -72,7 +73,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
           set "amopfamily" = ${ParameterValue(row.amopfamily, null, ToStatement.longToStatement)}::oid,
               "amoplefttype" = ${ParameterValue(row.amoplefttype, null, ToStatement.longToStatement)}::oid,
               "amoprighttype" = ${ParameterValue(row.amoprighttype, null, ToStatement.longToStatement)}::oid,
-              "amopstrategy" = ${ParameterValue(row.amopstrategy, null, ToStatement.intToStatement)}::int2,
+              "amopstrategy" = ${ParameterValue(row.amopstrategy, null, TypoShort.toStatement)}::int2,
               "amoppurpose" = ${ParameterValue(row.amoppurpose, null, ToStatement.stringToStatement)}::char,
               "amopopr" = ${ParameterValue(row.amopopr, null, ToStatement.longToStatement)}::oid,
               "amopmethod" = ${ParameterValue(row.amopmethod, null, ToStatement.longToStatement)}::oid,
@@ -90,7 +91,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
             ${ParameterValue(unsaved.amopfamily, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.amoplefttype, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.amoprighttype, null, ToStatement.longToStatement)}::oid,
-            ${ParameterValue(unsaved.amopstrategy, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.amopstrategy, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.amoppurpose, null, ToStatement.stringToStatement)}::char,
             ${ParameterValue(unsaved.amopopr, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.amopmethod, null, ToStatement.longToStatement)}::oid,

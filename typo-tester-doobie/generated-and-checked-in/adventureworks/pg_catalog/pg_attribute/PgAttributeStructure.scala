@@ -9,6 +9,7 @@ package pg_attribute
 
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoAnyArray
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -23,8 +24,8 @@ class PgAttributeStructure[Row](val prefix: Option[String], val extract: Row => 
   override val attname = new Field[String, Row](prefix, "attname", None, Some("name"))(x => extract(x).attname, (row, value) => merge(row, extract(row).copy(attname = value)))
   override val atttypid = new Field[/* oid */ Long, Row](prefix, "atttypid", None, Some("oid"))(x => extract(x).atttypid, (row, value) => merge(row, extract(row).copy(atttypid = value)))
   override val attstattarget = new Field[Int, Row](prefix, "attstattarget", None, Some("int4"))(x => extract(x).attstattarget, (row, value) => merge(row, extract(row).copy(attstattarget = value)))
-  override val attlen = new Field[Int, Row](prefix, "attlen", None, Some("int2"))(x => extract(x).attlen, (row, value) => merge(row, extract(row).copy(attlen = value)))
-  override val attnum = new IdField[Int, Row](prefix, "attnum", None, Some("int2"))(x => extract(x).attnum, (row, value) => merge(row, extract(row).copy(attnum = value)))
+  override val attlen = new Field[TypoShort, Row](prefix, "attlen", None, Some("int2"))(x => extract(x).attlen, (row, value) => merge(row, extract(row).copy(attlen = value)))
+  override val attnum = new IdField[TypoShort, Row](prefix, "attnum", None, Some("int2"))(x => extract(x).attnum, (row, value) => merge(row, extract(row).copy(attnum = value)))
   override val attndims = new Field[Int, Row](prefix, "attndims", None, Some("int4"))(x => extract(x).attndims, (row, value) => merge(row, extract(row).copy(attndims = value)))
   override val attcacheoff = new Field[Int, Row](prefix, "attcacheoff", None, Some("int4"))(x => extract(x).attcacheoff, (row, value) => merge(row, extract(row).copy(attcacheoff = value)))
   override val atttypmod = new Field[Int, Row](prefix, "atttypmod", None, Some("int4"))(x => extract(x).atttypmod, (row, value) => merge(row, extract(row).copy(atttypmod = value)))

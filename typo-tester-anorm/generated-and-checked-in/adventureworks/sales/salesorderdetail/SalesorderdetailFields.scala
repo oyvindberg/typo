@@ -8,6 +8,7 @@ package sales
 package salesorderdetail
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
@@ -20,7 +21,7 @@ trait SalesorderdetailFields[Row] {
   val salesorderid: IdField[SalesorderheaderId, Row]
   val salesorderdetailid: IdField[Int, Row]
   val carriertrackingnumber: OptField[/* max 25 chars */ String, Row]
-  val orderqty: Field[Int, Row]
+  val orderqty: Field[TypoShort, Row]
   val productid: Field[ProductId, Row]
   val specialofferid: Field[SpecialofferId, Row]
   val unitprice: Field[BigDecimal, Row]

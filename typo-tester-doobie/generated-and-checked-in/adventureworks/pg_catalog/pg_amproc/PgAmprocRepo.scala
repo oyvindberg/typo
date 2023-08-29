@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amproc
 
+import adventureworks.customtypes.TypoShort
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
 import typo.dsl.DeleteBuilder
@@ -21,7 +22,7 @@ trait PgAmprocRepo {
   def selectAll: Stream[ConnectionIO, PgAmprocRow]
   def selectById(oid: PgAmprocId): ConnectionIO[Option[PgAmprocRow]]
   def selectByIds(oids: Array[PgAmprocId]): Stream[ConnectionIO, PgAmprocRow]
-  def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int): ConnectionIO[Option[PgAmprocRow]]
+  def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: TypoShort): ConnectionIO[Option[PgAmprocRow]]
   def update(row: PgAmprocRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgAmprocFields, PgAmprocRow]
   def upsert(unsaved: PgAmprocRow): ConnectionIO[PgAmprocRow]

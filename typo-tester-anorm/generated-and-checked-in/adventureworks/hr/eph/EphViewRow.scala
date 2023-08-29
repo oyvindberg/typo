@@ -8,6 +8,7 @@ package hr
 package eph
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser
@@ -31,7 +32,7 @@ case class EphViewRow(
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.rate]] */
   rate: BigDecimal,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.payfrequency]] */
-  payfrequency: Int,
+  payfrequency: TypoShort,
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -44,7 +45,7 @@ object EphViewRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           ratechangedate = json.\("ratechangedate").as(TypoLocalDateTime.reads),
           rate = json.\("rate").as(Reads.bigDecReads),
-          payfrequency = json.\("payfrequency").as(Reads.IntReads),
+          payfrequency = json.\("payfrequency").as(TypoShort.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -57,7 +58,7 @@ object EphViewRow {
         businessentityid = row(idx + 1)(BusinessentityId.column),
         ratechangedate = row(idx + 2)(TypoLocalDateTime.column),
         rate = row(idx + 3)(Column.columnToScalaBigDecimal),
-        payfrequency = row(idx + 4)(Column.columnToInt),
+        payfrequency = row(idx + 4)(TypoShort.column),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
@@ -68,7 +69,7 @@ object EphViewRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "ratechangedate" -> TypoLocalDateTime.writes.writes(o.ratechangedate),
       "rate" -> Writes.BigDecimalWrites.writes(o.rate),
-      "payfrequency" -> Writes.IntWrites.writes(o.payfrequency),
+      "payfrequency" -> TypoShort.writes.writes(o.payfrequency),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

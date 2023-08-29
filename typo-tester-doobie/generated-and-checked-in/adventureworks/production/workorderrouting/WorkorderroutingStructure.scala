@@ -8,6 +8,7 @@ package production
 package workorderrouting
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import typo.dsl.SqlExpr.Field
@@ -22,7 +23,7 @@ class WorkorderroutingStructure[Row](val prefix: Option[String], val extract: Ro
 
   override val workorderid = new IdField[WorkorderId, Row](prefix, "workorderid", None, Some("int4"))(x => extract(x).workorderid, (row, value) => merge(row, extract(row).copy(workorderid = value)))
   override val productid = new IdField[Int, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-  override val operationsequence = new IdField[Int, Row](prefix, "operationsequence", None, Some("int2"))(x => extract(x).operationsequence, (row, value) => merge(row, extract(row).copy(operationsequence = value)))
+  override val operationsequence = new IdField[TypoShort, Row](prefix, "operationsequence", None, Some("int2"))(x => extract(x).operationsequence, (row, value) => merge(row, extract(row).copy(operationsequence = value)))
   override val locationid = new Field[LocationId, Row](prefix, "locationid", None, Some("int2"))(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
   override val scheduledstartdate = new Field[TypoLocalDateTime, Row](prefix, "scheduledstartdate", Some("text"), Some("timestamp"))(x => extract(x).scheduledstartdate, (row, value) => merge(row, extract(row).copy(scheduledstartdate = value)))
   override val scheduledenddate = new Field[TypoLocalDateTime, Row](prefix, "scheduledenddate", Some("text"), Some("timestamp"))(x => extract(x).scheduledenddate, (row, value) => merge(row, extract(row).copy(scheduledenddate = value)))

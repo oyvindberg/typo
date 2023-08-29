@@ -8,6 +8,7 @@ package pg_catalog
 package pg_constraint
 
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -39,8 +40,8 @@ case class PgConstraintRow(
   conislocal: Boolean,
   coninhcount: Int,
   connoinherit: Boolean,
-  conkey: Option[Array[Int]],
-  confkey: Option[Array[Int]],
+  conkey: Option[Array[TypoShort]],
+  confkey: Option[Array[TypoShort]],
   conpfeqop: Option[Array[/* oid */ Long]],
   conppeqop: Option[Array[/* oid */ Long]],
   conffeqop: Option[Array[/* oid */ Long]],
@@ -70,8 +71,8 @@ object PgConstraintRow {
           conislocal = json.\("conislocal").as(Reads.BooleanReads),
           coninhcount = json.\("coninhcount").as(Reads.IntReads),
           connoinherit = json.\("connoinherit").as(Reads.BooleanReads),
-          conkey = json.\("conkey").toOption.map(_.as(Reads.ArrayReads[Int](Reads.IntReads, implicitly))),
-          confkey = json.\("confkey").toOption.map(_.as(Reads.ArrayReads[Int](Reads.IntReads, implicitly))),
+          conkey = json.\("conkey").toOption.map(_.as(Reads.ArrayReads[TypoShort](TypoShort.reads, implicitly))),
+          confkey = json.\("confkey").toOption.map(_.as(Reads.ArrayReads[TypoShort](TypoShort.reads, implicitly))),
           conpfeqop = json.\("conpfeqop").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
           conppeqop = json.\("conppeqop").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
           conffeqop = json.\("conffeqop").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
@@ -102,8 +103,8 @@ object PgConstraintRow {
         conislocal = row(idx + 15)(Column.columnToBoolean),
         coninhcount = row(idx + 16)(Column.columnToInt),
         connoinherit = row(idx + 17)(Column.columnToBoolean),
-        conkey = row(idx + 18)(Column.columnToOption(Column.columnToArray[Int](Column.columnToInt, implicitly))),
-        confkey = row(idx + 19)(Column.columnToOption(Column.columnToArray[Int](Column.columnToInt, implicitly))),
+        conkey = row(idx + 18)(Column.columnToOption(TypoShort.arrayColumn)),
+        confkey = row(idx + 19)(Column.columnToOption(TypoShort.arrayColumn)),
         conpfeqop = row(idx + 20)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
         conppeqop = row(idx + 21)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
         conffeqop = row(idx + 22)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
@@ -132,8 +133,8 @@ object PgConstraintRow {
       "conislocal" -> Writes.BooleanWrites.writes(o.conislocal),
       "coninhcount" -> Writes.IntWrites.writes(o.coninhcount),
       "connoinherit" -> Writes.BooleanWrites.writes(o.connoinherit),
-      "conkey" -> Writes.OptionWrites(Writes.arrayWrites[Int](implicitly, Writes.IntWrites)).writes(o.conkey),
-      "confkey" -> Writes.OptionWrites(Writes.arrayWrites[Int](implicitly, Writes.IntWrites)).writes(o.confkey),
+      "conkey" -> Writes.OptionWrites(Writes.arrayWrites[TypoShort](implicitly, TypoShort.writes)).writes(o.conkey),
+      "confkey" -> Writes.OptionWrites(Writes.arrayWrites[TypoShort](implicitly, TypoShort.writes)).writes(o.confkey),
       "conpfeqop" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.conpfeqop),
       "conppeqop" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.conppeqop),
       "conffeqop" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.conffeqop),

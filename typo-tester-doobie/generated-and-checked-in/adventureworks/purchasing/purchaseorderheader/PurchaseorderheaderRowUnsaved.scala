@@ -9,6 +9,7 @@ package purchaseorderheader
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import io.circe.Decoder
@@ -32,10 +33,10 @@ case class PurchaseorderheaderRowUnsaved(
   purchaseorderid: Defaulted[PurchaseorderheaderId] = Defaulted.UseDefault,
   /** Default: 0
       Incremental number to track changes to the purchase order over time. */
-  revisionnumber: Defaulted[Int] = Defaulted.UseDefault,
+  revisionnumber: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: 1
       Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete */
-  status: Defaulted[Int] = Defaulted.UseDefault,
+  status: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: now()
       Purchase order creation date. */
   orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
@@ -51,7 +52,7 @@ case class PurchaseorderheaderRowUnsaved(
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(purchaseorderidDefault: => PurchaseorderheaderId, revisionnumberDefault: => Int, statusDefault: => Int, orderdateDefault: => TypoLocalDateTime, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): PurchaseorderheaderRow =
+  def toRow(purchaseorderidDefault: => PurchaseorderheaderId, revisionnumberDefault: => TypoShort, statusDefault: => TypoShort, orderdateDefault: => TypoLocalDateTime, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): PurchaseorderheaderRow =
     PurchaseorderheaderRow(
       employeeid = employeeid,
       vendorid = vendorid,
@@ -92,6 +93,6 @@ case class PurchaseorderheaderRowUnsaved(
     )
 }
 object PurchaseorderheaderRowUnsaved {
-  implicit lazy val decoder: Decoder[PurchaseorderheaderRowUnsaved] = Decoder.forProduct12[PurchaseorderheaderRowUnsaved, BusinessentityId, BusinessentityId, ShipmethodId, Option[TypoLocalDateTime], Defaulted[PurchaseorderheaderId], Defaulted[Int], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate")(PurchaseorderheaderRowUnsaved.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ShipmethodId.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Defaulted.decoder(PurchaseorderheaderId.decoder), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PurchaseorderheaderRowUnsaved] = Encoder.forProduct12[PurchaseorderheaderRowUnsaved, BusinessentityId, BusinessentityId, ShipmethodId, Option[TypoLocalDateTime], Defaulted[PurchaseorderheaderId], Defaulted[Int], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.employeeid, x.vendorid, x.shipmethodid, x.shipdate, x.purchaseorderid, x.revisionnumber, x.status, x.orderdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ShipmethodId.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Defaulted.encoder(PurchaseorderheaderId.encoder), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PurchaseorderheaderRowUnsaved] = Decoder.forProduct12[PurchaseorderheaderRowUnsaved, BusinessentityId, BusinessentityId, ShipmethodId, Option[TypoLocalDateTime], Defaulted[PurchaseorderheaderId], Defaulted[TypoShort], Defaulted[TypoShort], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate")(PurchaseorderheaderRowUnsaved.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ShipmethodId.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Defaulted.decoder(PurchaseorderheaderId.decoder), Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PurchaseorderheaderRowUnsaved] = Encoder.forProduct12[PurchaseorderheaderRowUnsaved, BusinessentityId, BusinessentityId, ShipmethodId, Option[TypoLocalDateTime], Defaulted[PurchaseorderheaderId], Defaulted[TypoShort], Defaulted[TypoShort], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.employeeid, x.vendorid, x.shipmethodid, x.shipdate, x.purchaseorderid, x.revisionnumber, x.status, x.orderdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ShipmethodId.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Defaulted.encoder(PurchaseorderheaderId.encoder), Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

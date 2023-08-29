@@ -8,6 +8,7 @@ package pr
 package w
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId
@@ -33,7 +34,7 @@ case class WViewRow(
   /** Points to [[production.workorder.WorkorderRow.orderqty]] */
   orderqty: Int,
   /** Points to [[production.workorder.WorkorderRow.scrappedqty]] */
-  scrappedqty: Int,
+  scrappedqty: TypoShort,
   /** Points to [[production.workorder.WorkorderRow.startdate]] */
   startdate: TypoLocalDateTime,
   /** Points to [[production.workorder.WorkorderRow.enddate]] */
@@ -54,7 +55,7 @@ object WViewRow {
           workorderid = json.\("workorderid").as(WorkorderId.reads),
           productid = json.\("productid").as(ProductId.reads),
           orderqty = json.\("orderqty").as(Reads.IntReads),
-          scrappedqty = json.\("scrappedqty").as(Reads.IntReads),
+          scrappedqty = json.\("scrappedqty").as(TypoShort.reads),
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
           enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           duedate = json.\("duedate").as(TypoLocalDateTime.reads),
@@ -71,7 +72,7 @@ object WViewRow {
         workorderid = row(idx + 1)(WorkorderId.column),
         productid = row(idx + 2)(ProductId.column),
         orderqty = row(idx + 3)(Column.columnToInt),
-        scrappedqty = row(idx + 4)(Column.columnToInt),
+        scrappedqty = row(idx + 4)(TypoShort.column),
         startdate = row(idx + 5)(TypoLocalDateTime.column),
         enddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column)),
         duedate = row(idx + 7)(TypoLocalDateTime.column),
@@ -86,7 +87,7 @@ object WViewRow {
       "workorderid" -> WorkorderId.writes.writes(o.workorderid),
       "productid" -> ProductId.writes.writes(o.productid),
       "orderqty" -> Writes.IntWrites.writes(o.orderqty),
-      "scrappedqty" -> Writes.IntWrites.writes(o.scrappedqty),
+      "scrappedqty" -> TypoShort.writes.writes(o.scrappedqty),
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
       "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -20,7 +21,7 @@ class PgAmopStructure[Row](val prefix: Option[String], val extract: Row => PgAmo
   override val amopfamily = new Field[/* oid */ Long, Row](prefix, "amopfamily", None, Some("oid"))(x => extract(x).amopfamily, (row, value) => merge(row, extract(row).copy(amopfamily = value)))
   override val amoplefttype = new Field[/* oid */ Long, Row](prefix, "amoplefttype", None, Some("oid"))(x => extract(x).amoplefttype, (row, value) => merge(row, extract(row).copy(amoplefttype = value)))
   override val amoprighttype = new Field[/* oid */ Long, Row](prefix, "amoprighttype", None, Some("oid"))(x => extract(x).amoprighttype, (row, value) => merge(row, extract(row).copy(amoprighttype = value)))
-  override val amopstrategy = new Field[Int, Row](prefix, "amopstrategy", None, Some("int2"))(x => extract(x).amopstrategy, (row, value) => merge(row, extract(row).copy(amopstrategy = value)))
+  override val amopstrategy = new Field[TypoShort, Row](prefix, "amopstrategy", None, Some("int2"))(x => extract(x).amopstrategy, (row, value) => merge(row, extract(row).copy(amopstrategy = value)))
   override val amoppurpose = new Field[String, Row](prefix, "amoppurpose", None, Some("char"))(x => extract(x).amoppurpose, (row, value) => merge(row, extract(row).copy(amoppurpose = value)))
   override val amopopr = new Field[/* oid */ Long, Row](prefix, "amopopr", None, Some("oid"))(x => extract(x).amopopr, (row, value) => merge(row, extract(row).copy(amopopr = value)))
   override val amopmethod = new Field[/* oid */ Long, Row](prefix, "amopmethod", None, Some("oid"))(x => extract(x).amopmethod, (row, value) => merge(row, extract(row).copy(amopmethod = value)))

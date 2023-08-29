@@ -8,6 +8,7 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
@@ -16,7 +17,7 @@ trait EmployeepayhistoryFields[Row] {
   val businessentityid: IdField[BusinessentityId, Row]
   val ratechangedate: IdField[TypoLocalDateTime, Row]
   val rate: Field[BigDecimal, Row]
-  val payfrequency: Field[Int, Row]
+  val payfrequency: Field[TypoShort, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object EmployeepayhistoryFields extends EmployeepayhistoryStructure[EmployeepayhistoryRow](None, identity, (_, x) => x)

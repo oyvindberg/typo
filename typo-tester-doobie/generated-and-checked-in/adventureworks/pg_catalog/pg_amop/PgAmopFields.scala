@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
@@ -15,7 +16,7 @@ trait PgAmopFields[Row] {
   val amopfamily: Field[/* oid */ Long, Row]
   val amoplefttype: Field[/* oid */ Long, Row]
   val amoprighttype: Field[/* oid */ Long, Row]
-  val amopstrategy: Field[Int, Row]
+  val amopstrategy: Field[TypoShort, Row]
   val amoppurpose: Field[String, Row]
   val amopopr: Field[/* oid */ Long, Row]
   val amopmethod: Field[/* oid */ Long, Row]

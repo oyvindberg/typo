@@ -8,6 +8,7 @@ package production
 package productinventory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import anorm.Column
@@ -33,9 +34,9 @@ case class ProductinventoryRow(
   /** Storage compartment within an inventory location. */
   shelf: /* max 10 chars */ String,
   /** Storage container on a shelf in an inventory location. */
-  bin: Int,
+  bin: TypoShort,
   /** Quantity of products in the inventory location. */
-  quantity: Int,
+  quantity: TypoShort,
   rowguid: UUID,
   modifieddate: TypoLocalDateTime
 ){
@@ -49,8 +50,8 @@ object ProductinventoryRow {
           productid = json.\("productid").as(ProductId.reads),
           locationid = json.\("locationid").as(LocationId.reads),
           shelf = json.\("shelf").as(Reads.StringReads),
-          bin = json.\("bin").as(Reads.IntReads),
-          quantity = json.\("quantity").as(Reads.IntReads),
+          bin = json.\("bin").as(TypoShort.reads),
+          quantity = json.\("quantity").as(TypoShort.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -63,8 +64,8 @@ object ProductinventoryRow {
         productid = row(idx + 0)(ProductId.column),
         locationid = row(idx + 1)(LocationId.column),
         shelf = row(idx + 2)(Column.columnToString),
-        bin = row(idx + 3)(Column.columnToInt),
-        quantity = row(idx + 4)(Column.columnToInt),
+        bin = row(idx + 3)(TypoShort.column),
+        quantity = row(idx + 4)(TypoShort.column),
         rowguid = row(idx + 5)(Column.columnToUUID),
         modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
@@ -75,8 +76,8 @@ object ProductinventoryRow {
       "productid" -> ProductId.writes.writes(o.productid),
       "locationid" -> LocationId.writes.writes(o.locationid),
       "shelf" -> Writes.StringWrites.writes(o.shelf),
-      "bin" -> Writes.IntWrites.writes(o.bin),
-      "quantity" -> Writes.IntWrites.writes(o.quantity),
+      "bin" -> TypoShort.writes.writes(o.bin),
+      "quantity" -> TypoShort.writes.writes(o.quantity),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

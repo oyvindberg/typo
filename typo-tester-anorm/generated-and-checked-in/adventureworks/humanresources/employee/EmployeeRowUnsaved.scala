@@ -10,6 +10,7 @@ package employee
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID
@@ -46,10 +47,10 @@ case class EmployeeRowUnsaved(
   salariedflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: 0
       Number of available vacation hours. */
-  vacationhours: Defaulted[Int] = Defaulted.UseDefault,
+  vacationhours: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: 0
       Number of available sick leave hours. */
-  sickleavehours: Defaulted[Int] = Defaulted.UseDefault,
+  sickleavehours: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: true
       0 = Inactive, 1 = Active */
   currentflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -61,7 +62,7 @@ case class EmployeeRowUnsaved(
       Where the employee is located in corporate hierarchy. */
   organizationnode: Defaulted[Option[String]] = Defaulted.UseDefault
 ) {
-  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => Int, sickleavehoursDefault: => Int, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
+  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => TypoShort, sickleavehoursDefault: => TypoShort, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
     EmployeeRow(
       businessentityid = businessentityid,
       nationalidnumber = nationalidnumber,
@@ -114,8 +115,8 @@ object EmployeeRowUnsaved {
           gender = json.\("gender").as(Reads.StringReads),
           hiredate = json.\("hiredate").as(TypoLocalDate.reads),
           salariedflag = json.\("salariedflag").as(Defaulted.reads(Flag.reads)),
-          vacationhours = json.\("vacationhours").as(Defaulted.reads(Reads.IntReads)),
-          sickleavehours = json.\("sickleavehours").as(Defaulted.reads(Reads.IntReads)),
+          vacationhours = json.\("vacationhours").as(Defaulted.reads(TypoShort.reads)),
+          sickleavehours = json.\("sickleavehours").as(Defaulted.reads(TypoShort.reads)),
           currentflag = json.\("currentflag").as(Defaulted.reads(Flag.reads)),
           rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads)),
@@ -135,8 +136,8 @@ object EmployeeRowUnsaved {
       "gender" -> Writes.StringWrites.writes(o.gender),
       "hiredate" -> TypoLocalDate.writes.writes(o.hiredate),
       "salariedflag" -> Defaulted.writes(Flag.writes).writes(o.salariedflag),
-      "vacationhours" -> Defaulted.writes(Writes.IntWrites).writes(o.vacationhours),
-      "sickleavehours" -> Defaulted.writes(Writes.IntWrites).writes(o.sickleavehours),
+      "vacationhours" -> Defaulted.writes(TypoShort.writes).writes(o.vacationhours),
+      "sickleavehours" -> Defaulted.writes(TypoShort.writes).writes(o.sickleavehours),
       "currentflag" -> Defaulted.writes(Flag.writes).writes(o.currentflag),
       "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate),

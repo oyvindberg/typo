@@ -1,6 +1,6 @@
 package adventureworks.humanresources.employee
 
-import adventureworks.customtypes.{Defaulted, TypoLocalDate, TypoLocalDateTime, TypoXml}
+import adventureworks.customtypes.{Defaulted, TypoLocalDate, TypoLocalDateTime, TypoShort, TypoXml}
 import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
 import adventureworks.person.person.{PersonRepoImpl, PersonRowUnsaved}
 import adventureworks.public.{Flag, Name}
@@ -54,8 +54,8 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
         gender = "F",
         hiredate = TypoLocalDate(LocalDate.now().minusYears(1)),
         salariedflag = Defaulted.Provided(Flag(true)),
-        vacationhours = Defaulted.Provided(1),
-        sickleavehours = Defaulted.Provided(2),
+        vacationhours = Defaulted.Provided(TypoShort(1)),
+        sickleavehours = Defaulted.Provided(TypoShort(2)),
         currentflag = Defaulted.Provided(Flag(true)),
         rowguid = Defaulted.Provided(UUID.randomUUID()),
         modifieddate = Defaulted.Provided(TypoLocalDateTime.now),
@@ -109,8 +109,8 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           unsaved.hiredate,
           // below: these are assertions for the static default values
           Flag(true),
-          0,
-          0,
+          TypoShort(0),
+          TypoShort(0),
           Flag(true),
           _,
           _,

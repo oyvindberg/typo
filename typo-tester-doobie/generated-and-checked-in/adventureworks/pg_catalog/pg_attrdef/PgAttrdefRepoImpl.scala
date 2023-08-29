@@ -8,6 +8,7 @@ package pg_catalog
 package pg_attrdef
 
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
@@ -28,7 +29,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   }
   override def insert(unsaved: PgAttrdefRow): ConnectionIO[PgAttrdefRow] = {
     sql"""insert into pg_catalog.pg_attrdef("oid", "adrelid", "adnum", "adbin")
-          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAttrdefId.put))}::oid, ${fromWrite(unsaved.adrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.adnum)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.adbin)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAttrdefId.put))}::oid, ${fromWrite(unsaved.adrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.adnum)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.adbin)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree)
           returning "oid", "adrelid", "adnum", "adbin"
        """.query(PgAttrdefRow.read).unique
   }
@@ -44,17 +45,17 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow] = {
     sql"""select "oid", "adrelid", "adnum", "adbin" from pg_catalog.pg_attrdef where "oid" = ANY(${oids})""".query(PgAttrdefRow.read).stream
   }
-  override def selectByUnique(adrelid: /* oid */ Long, adnum: Int): ConnectionIO[Option[PgAttrdefRow]] = {
+  override def selectByUnique(adrelid: /* oid */ Long, adnum: TypoShort): ConnectionIO[Option[PgAttrdefRow]] = {
     sql"""select "adrelid", "adnum"
           from pg_catalog.pg_attrdef
-          where "adrelid" = ${fromWrite(adrelid)(Write.fromPut(Meta.LongMeta.put))} AND "adnum" = ${fromWrite(adnum)(Write.fromPut(Meta.IntMeta.put))}
+          where "adrelid" = ${fromWrite(adrelid)(Write.fromPut(Meta.LongMeta.put))} AND "adnum" = ${fromWrite(adnum)(Write.fromPut(TypoShort.put))}
        """.query(PgAttrdefRow.read).option
   }
   override def update(row: PgAttrdefRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_attrdef
           set "adrelid" = ${fromWrite(row.adrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              "adnum" = ${fromWrite(row.adnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "adnum" = ${fromWrite(row.adnum)(Write.fromPut(TypoShort.put))}::int2,
               "adbin" = ${fromWrite(row.adbin)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
           where "oid" = ${fromWrite(oid)(Write.fromPut(PgAttrdefId.put))}"""
       .update
@@ -69,7 +70,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
           values (
             ${fromWrite(unsaved.oid)(Write.fromPut(PgAttrdefId.put))}::oid,
             ${fromWrite(unsaved.adrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
-            ${fromWrite(unsaved.adnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.adnum)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.adbin)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
           )
           on conflict ("oid")

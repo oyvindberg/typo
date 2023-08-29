@@ -8,6 +8,7 @@ package production
 package document
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.Column
@@ -40,7 +41,7 @@ case class DocumentRow(
   /** Engineering change approval number. */
   changenumber: Int,
   /** 1 = Pending approval, 2 = Approved, 3 = Obsolete */
-  status: Int,
+  status: TypoShort,
   /** Document abstract. */
   documentsummary: Option[String],
   /** Complete document. */
@@ -63,7 +64,7 @@ object DocumentRow {
           fileextension = json.\("fileextension").toOption.map(_.as(Reads.StringReads)),
           revision = json.\("revision").as(Reads.StringReads),
           changenumber = json.\("changenumber").as(Reads.IntReads),
-          status = json.\("status").as(Reads.IntReads),
+          status = json.\("status").as(TypoShort.reads),
           documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
           document = json.\("document").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
@@ -83,7 +84,7 @@ object DocumentRow {
         fileextension = row(idx + 4)(Column.columnToOption(Column.columnToString)),
         revision = row(idx + 5)(Column.columnToString),
         changenumber = row(idx + 6)(Column.columnToInt),
-        status = row(idx + 7)(Column.columnToInt),
+        status = row(idx + 7)(TypoShort.column),
         documentsummary = row(idx + 8)(Column.columnToOption(Column.columnToString)),
         document = row(idx + 9)(Column.columnToOption(Column.columnToByteArray)),
         rowguid = row(idx + 10)(Column.columnToUUID),
@@ -101,7 +102,7 @@ object DocumentRow {
       "fileextension" -> Writes.OptionWrites(Writes.StringWrites).writes(o.fileextension),
       "revision" -> Writes.StringWrites.writes(o.revision),
       "changenumber" -> Writes.IntWrites.writes(o.changenumber),
-      "status" -> Writes.IntWrites.writes(o.status),
+      "status" -> TypoShort.writes.writes(o.status),
       "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
       "document" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.document),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),

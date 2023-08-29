@@ -58,6 +58,8 @@ object ComputedTestInserts {
               case _ => None
             }
 
+          case customTypes.TypoShort.typoType =>
+            Some(code"${customTypes.TypoShort.typoType}($random.nextInt(Short.MaxValue).toShort)")
           case customTypes.TypoLocalDate.typoType =>
             Some(code"${customTypes.TypoLocalDate.typoType}($defaultLocalDate)")
           case customTypes.TypoLocalTime.typoType =>

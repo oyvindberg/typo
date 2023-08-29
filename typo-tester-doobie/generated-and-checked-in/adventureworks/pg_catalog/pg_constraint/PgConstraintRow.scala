@@ -8,6 +8,7 @@ package pg_catalog
 package pg_constraint
 
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -38,8 +39,8 @@ case class PgConstraintRow(
   conislocal: Boolean,
   coninhcount: Int,
   connoinherit: Boolean,
-  conkey: Option[Array[Int]],
-  confkey: Option[Array[Int]],
+  conkey: Option[Array[TypoShort]],
+  confkey: Option[Array[TypoShort]],
   conpfeqop: Option[Array[/* oid */ Long]],
   conppeqop: Option[Array[/* oid */ Long]],
   conffeqop: Option[Array[/* oid */ Long]],
@@ -73,8 +74,8 @@ object PgConstraintRow {
         conislocal = orThrow(c.get("conislocal")(Decoder.decodeBoolean)),
         coninhcount = orThrow(c.get("coninhcount")(Decoder.decodeInt)),
         connoinherit = orThrow(c.get("connoinherit")(Decoder.decodeBoolean)),
-        conkey = orThrow(c.get("conkey")(Decoder.decodeOption(Decoder.decodeArray[Int](Decoder.decodeInt, implicitly)))),
-        confkey = orThrow(c.get("confkey")(Decoder.decodeOption(Decoder.decodeArray[Int](Decoder.decodeInt, implicitly)))),
+        conkey = orThrow(c.get("conkey")(Decoder.decodeOption(Decoder.decodeArray[TypoShort](TypoShort.decoder, implicitly)))),
+        confkey = orThrow(c.get("confkey")(Decoder.decodeOption(Decoder.decodeArray[TypoShort](TypoShort.decoder, implicitly)))),
         conpfeqop = orThrow(c.get("conpfeqop")(Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))),
         conppeqop = orThrow(c.get("conppeqop")(Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))),
         conffeqop = orThrow(c.get("conffeqop")(Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))),
@@ -103,8 +104,8 @@ object PgConstraintRow {
       "conislocal" -> Encoder.encodeBoolean.apply(row.conislocal),
       "coninhcount" -> Encoder.encodeInt.apply(row.coninhcount),
       "connoinherit" -> Encoder.encodeBoolean.apply(row.connoinherit),
-      "conkey" -> Encoder.encodeOption(Encoder.encodeIterable[Int, Array](Encoder.encodeInt, implicitly)).apply(row.conkey),
-      "confkey" -> Encoder.encodeOption(Encoder.encodeIterable[Int, Array](Encoder.encodeInt, implicitly)).apply(row.confkey),
+      "conkey" -> Encoder.encodeOption(Encoder.encodeIterable[TypoShort, Array](TypoShort.encoder, implicitly)).apply(row.conkey),
+      "confkey" -> Encoder.encodeOption(Encoder.encodeIterable[TypoShort, Array](TypoShort.encoder, implicitly)).apply(row.confkey),
       "conpfeqop" -> Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)).apply(row.conpfeqop),
       "conppeqop" -> Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)).apply(row.conppeqop),
       "conffeqop" -> Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)).apply(row.conffeqop),
@@ -132,8 +133,8 @@ object PgConstraintRow {
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
-      (adventureworks.IntegerArrayMeta.get, Nullability.Nullable),
-      (adventureworks.IntegerArrayMeta.get, Nullability.Nullable),
+      (TypoShort.arrayGet, Nullability.Nullable),
+      (TypoShort.arrayGet, Nullability.Nullable),
       (adventureworks.LongArrayMeta.get, Nullability.Nullable),
       (adventureworks.LongArrayMeta.get, Nullability.Nullable),
       (adventureworks.LongArrayMeta.get, Nullability.Nullable),
@@ -159,8 +160,8 @@ object PgConstraintRow {
       conislocal = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 15),
       coninhcount = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 16),
       connoinherit = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 17),
-      conkey = adventureworks.IntegerArrayMeta.get.unsafeGetNullable(rs, i + 18),
-      confkey = adventureworks.IntegerArrayMeta.get.unsafeGetNullable(rs, i + 19),
+      conkey = TypoShort.arrayGet.unsafeGetNullable(rs, i + 18),
+      confkey = TypoShort.arrayGet.unsafeGetNullable(rs, i + 19),
       conpfeqop = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 20),
       conppeqop = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 21),
       conffeqop = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 22),

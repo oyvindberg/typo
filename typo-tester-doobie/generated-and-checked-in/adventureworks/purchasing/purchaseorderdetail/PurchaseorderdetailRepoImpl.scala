@@ -9,6 +9,7 @@ package purchaseorderdetail
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import doobie.free.connection.ConnectionIO
@@ -32,7 +33,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   }
   override def insert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     sql"""insert into purchasing.purchaseorderdetail("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")
-          values (${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4, ${fromWrite(unsaved.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rejectedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4, ${fromWrite(unsaved.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rejectedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
        """.query(PurchaseorderdetailRow.read).unique
   }
@@ -40,7 +41,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     val fs = List(
       Some((Fragment.const(s""""purchaseorderid""""), fr"${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4")),
       Some((Fragment.const(s""""duedate""""), fr"${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2")),
       Some((Fragment.const(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
       Some((Fragment.const(s""""unitprice""""), fr"${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       Some((Fragment.const(s""""receivedqty""""), fr"${fromWrite(unsaved.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
@@ -82,7 +83,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     val compositeId = row.compositeId
     sql"""update purchasing.purchaseorderdetail
           set "duedate" = ${fromWrite(row.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "orderqty" = ${fromWrite(row.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "orderqty" = ${fromWrite(row.orderqty)(Write.fromPut(TypoShort.put))}::int2,
               "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
               "unitprice" = ${fromWrite(row.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "receivedqty" = ${fromWrite(row.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
@@ -102,7 +103,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
             ${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4,
             ${fromWrite(unsaved.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4,
             ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
             ${fromWrite(unsaved.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,

@@ -8,6 +8,7 @@ package sales
 package salesorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -35,7 +36,7 @@ case class SalesorderheaderRow(
   /** Primary key. */
   salesorderid: SalesorderheaderId,
   /** Incremental number to track changes to the sales order over time. */
-  revisionnumber: Int,
+  revisionnumber: TypoShort,
   /** Dates the sales order was created. */
   orderdate: TypoLocalDateTime,
   /** Date the order is due to the customer. */
@@ -43,7 +44,7 @@ case class SalesorderheaderRow(
   /** Date the order was shipped to the customer. */
   shipdate: Option[TypoLocalDateTime],
   /** Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
-  status: Int,
+  status: TypoShort,
   /** 0 = Order placed by sales person. 1 = Order placed online by customer. */
   onlineorderflag: Flag,
   /** Customer purchase order number reference. */
@@ -95,11 +96,11 @@ object SalesorderheaderRow {
       Try(
         SalesorderheaderRow(
           salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
-          revisionnumber = json.\("revisionnumber").as(Reads.IntReads),
+          revisionnumber = json.\("revisionnumber").as(TypoShort.reads),
           orderdate = json.\("orderdate").as(TypoLocalDateTime.reads),
           duedate = json.\("duedate").as(TypoLocalDateTime.reads),
           shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          status = json.\("status").as(Reads.IntReads),
+          status = json.\("status").as(TypoShort.reads),
           onlineorderflag = json.\("onlineorderflag").as(Flag.reads),
           purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as(OrderNumber.reads)),
           accountnumber = json.\("accountnumber").toOption.map(_.as(AccountNumber.reads)),
@@ -127,11 +128,11 @@ object SalesorderheaderRow {
     Success(
       SalesorderheaderRow(
         salesorderid = row(idx + 0)(SalesorderheaderId.column),
-        revisionnumber = row(idx + 1)(Column.columnToInt),
+        revisionnumber = row(idx + 1)(TypoShort.column),
         orderdate = row(idx + 2)(TypoLocalDateTime.column),
         duedate = row(idx + 3)(TypoLocalDateTime.column),
         shipdate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
-        status = row(idx + 5)(Column.columnToInt),
+        status = row(idx + 5)(TypoShort.column),
         onlineorderflag = row(idx + 6)(Flag.column),
         purchaseordernumber = row(idx + 7)(Column.columnToOption(OrderNumber.column)),
         accountnumber = row(idx + 8)(Column.columnToOption(AccountNumber.column)),
@@ -157,11 +158,11 @@ object SalesorderheaderRow {
   implicit lazy val writes: OWrites[SalesorderheaderRow] = OWrites[SalesorderheaderRow](o =>
     new JsObject(ListMap[String, JsValue](
       "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
-      "revisionnumber" -> Writes.IntWrites.writes(o.revisionnumber),
+      "revisionnumber" -> TypoShort.writes.writes(o.revisionnumber),
       "orderdate" -> TypoLocalDateTime.writes.writes(o.orderdate),
       "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
       "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
-      "status" -> Writes.IntWrites.writes(o.status),
+      "status" -> TypoShort.writes.writes(o.status),
       "onlineorderflag" -> Flag.writes.writes(o.onlineorderflag),
       "purchaseordernumber" -> Writes.OptionWrites(OrderNumber.writes).writes(o.purchaseordernumber),
       "accountnumber" -> Writes.OptionWrites(AccountNumber.writes).writes(o.accountnumber),

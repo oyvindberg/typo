@@ -10,6 +10,7 @@ package pg_index
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -17,8 +18,8 @@ import typo.dsl.SqlExpr.OptField
 trait PgIndexFields[Row] {
   val indexrelid: IdField[PgIndexId, Row]
   val indrelid: Field[/* oid */ Long, Row]
-  val indnatts: Field[Int, Row]
-  val indnkeyatts: Field[Int, Row]
+  val indnatts: Field[TypoShort, Row]
+  val indnkeyatts: Field[TypoShort, Row]
   val indisunique: Field[Boolean, Row]
   val indisprimary: Field[Boolean, Row]
   val indisexclusion: Field[Boolean, Row]

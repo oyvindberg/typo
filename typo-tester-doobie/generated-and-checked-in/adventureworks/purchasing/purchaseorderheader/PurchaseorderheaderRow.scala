@@ -8,6 +8,7 @@ package purchasing
 package purchaseorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import doobie.enumerated.Nullability
@@ -21,9 +22,9 @@ case class PurchaseorderheaderRow(
   /** Primary key. */
   purchaseorderid: PurchaseorderheaderId,
   /** Incremental number to track changes to the purchase order over time. */
-  revisionnumber: Int,
+  revisionnumber: TypoShort,
   /** Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete */
-  status: Int,
+  status: TypoShort,
   /** Employee who created the purchase order. Foreign key to Employee.BusinessEntityID.
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   employeeid: BusinessentityId,
@@ -47,13 +48,13 @@ case class PurchaseorderheaderRow(
 )
 
 object PurchaseorderheaderRow {
-  implicit lazy val decoder: Decoder[PurchaseorderheaderRow] = Decoder.forProduct12[PurchaseorderheaderRow, PurchaseorderheaderId, Int, Int, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(PurchaseorderheaderRow.apply)(PurchaseorderheaderId.decoder, Decoder.decodeInt, Decoder.decodeInt, BusinessentityId.decoder, BusinessentityId.decoder, ShipmethodId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[PurchaseorderheaderRow] = Encoder.forProduct12[PurchaseorderheaderRow, PurchaseorderheaderId, Int, Int, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(PurchaseorderheaderId.encoder, Encoder.encodeInt, Encoder.encodeInt, BusinessentityId.encoder, BusinessentityId.encoder, ShipmethodId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[PurchaseorderheaderRow] = Decoder.forProduct12[PurchaseorderheaderRow, PurchaseorderheaderId, TypoShort, TypoShort, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(PurchaseorderheaderRow.apply)(PurchaseorderheaderId.decoder, TypoShort.decoder, TypoShort.decoder, BusinessentityId.decoder, BusinessentityId.decoder, ShipmethodId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PurchaseorderheaderRow] = Encoder.forProduct12[PurchaseorderheaderRow, PurchaseorderheaderId, TypoShort, TypoShort, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(PurchaseorderheaderId.encoder, TypoShort.encoder, TypoShort.encoder, BusinessentityId.encoder, BusinessentityId.encoder, ShipmethodId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PurchaseorderheaderRow] = new Read[PurchaseorderheaderRow](
     gets = List(
       (PurchaseorderheaderId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (ShipmethodId.get, Nullability.NoNulls),
@@ -66,8 +67,8 @@ object PurchaseorderheaderRow {
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderheaderRow(
       purchaseorderid = PurchaseorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
-      revisionnumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
-      status = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      revisionnumber = TypoShort.get.unsafeGetNonNullable(rs, i + 1),
+      status = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
       employeeid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 3),
       vendorid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 4),
       shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 5),

@@ -8,6 +8,7 @@ package pg_catalog
 package pg_attrdef
 
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -18,24 +19,24 @@ import java.sql.ResultSet
 case class PgAttrdefRow(
   oid: PgAttrdefId,
   adrelid: /* oid */ Long,
-  adnum: Int,
+  adnum: TypoShort,
   adbin: TypoPgNodeTree
 )
 
 object PgAttrdefRow {
-  implicit lazy val decoder: Decoder[PgAttrdefRow] = Decoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, Int, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(PgAttrdefRow.apply)(PgAttrdefId.decoder, Decoder.decodeLong, Decoder.decodeInt, TypoPgNodeTree.decoder)
-  implicit lazy val encoder: Encoder[PgAttrdefRow] = Encoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, Int, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(x => (x.oid, x.adrelid, x.adnum, x.adbin))(PgAttrdefId.encoder, Encoder.encodeLong, Encoder.encodeInt, TypoPgNodeTree.encoder)
+  implicit lazy val decoder: Decoder[PgAttrdefRow] = Decoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, TypoShort, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(PgAttrdefRow.apply)(PgAttrdefId.decoder, Decoder.decodeLong, TypoShort.decoder, TypoPgNodeTree.decoder)
+  implicit lazy val encoder: Encoder[PgAttrdefRow] = Encoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, TypoShort, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(x => (x.oid, x.adrelid, x.adnum, x.adbin))(PgAttrdefId.encoder, Encoder.encodeLong, TypoShort.encoder, TypoPgNodeTree.encoder)
   implicit lazy val read: Read[PgAttrdefRow] = new Read[PgAttrdefRow](
     gets = List(
       (PgAttrdefId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (TypoPgNodeTree.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgAttrdefRow(
       oid = PgAttrdefId.get.unsafeGetNonNullable(rs, i + 0),
       adrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
-      adnum = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      adnum = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
       adbin = TypoPgNodeTree.get.unsafeGetNonNullable(rs, i + 3)
     )
   )

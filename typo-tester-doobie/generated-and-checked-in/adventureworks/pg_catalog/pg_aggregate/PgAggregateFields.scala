@@ -8,6 +8,7 @@ package pg_catalog
 package pg_aggregate
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -15,7 +16,7 @@ import typo.dsl.SqlExpr.OptField
 trait PgAggregateFields[Row] {
   val aggfnoid: IdField[PgAggregateId, Row]
   val aggkind: Field[String, Row]
-  val aggnumdirectargs: Field[Int, Row]
+  val aggnumdirectargs: Field[TypoShort, Row]
   val aggtransfn: Field[TypoRegproc, Row]
   val aggfinalfn: Field[TypoRegproc, Row]
   val aggcombinefn: Field[TypoRegproc, Row]

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_attrdef
 
+import adventureworks.customtypes.TypoShort
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -20,7 +21,7 @@ trait PgAttrdefRepo {
   def selectAll(implicit c: Connection): List[PgAttrdefRow]
   def selectById(oid: PgAttrdefId)(implicit c: Connection): Option[PgAttrdefRow]
   def selectByIds(oids: Array[PgAttrdefId])(implicit c: Connection): List[PgAttrdefRow]
-  def selectByUnique(adrelid: /* oid */ Long, adnum: Int)(implicit c: Connection): Option[PgAttrdefRow]
+  def selectByUnique(adrelid: /* oid */ Long, adnum: TypoShort)(implicit c: Connection): Option[PgAttrdefRow]
   def update(row: PgAttrdefRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PgAttrdefFields, PgAttrdefRow]
   def upsert(unsaved: PgAttrdefRow)(implicit c: Connection): PgAttrdefRow

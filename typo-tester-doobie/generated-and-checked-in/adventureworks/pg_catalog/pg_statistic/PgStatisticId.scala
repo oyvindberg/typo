@@ -7,13 +7,14 @@ package adventureworks
 package pg_catalog
 package pg_statistic
 
+import adventureworks.customtypes.TypoShort
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the composite primary key of table `pg_catalog.pg_statistic` */
-case class PgStatisticId(starelid: /* oid */ Long, staattnum: Int, stainherit: Boolean)
+case class PgStatisticId(starelid: /* oid */ Long, staattnum: TypoShort, stainherit: Boolean)
 object PgStatisticId {
-  implicit lazy val decoder: Decoder[PgStatisticId] = Decoder.forProduct3[PgStatisticId, /* oid */ Long, Int, Boolean]("starelid", "staattnum", "stainherit")(PgStatisticId.apply)(Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeBoolean)
-  implicit lazy val encoder: Encoder[PgStatisticId] = Encoder.forProduct3[PgStatisticId, /* oid */ Long, Int, Boolean]("starelid", "staattnum", "stainherit")(x => (x.starelid, x.staattnum, x.stainherit))(Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeBoolean)
-  implicit lazy val ordering: Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
+  implicit lazy val decoder: Decoder[PgStatisticId] = Decoder.forProduct3[PgStatisticId, /* oid */ Long, TypoShort, Boolean]("starelid", "staattnum", "stainherit")(PgStatisticId.apply)(Decoder.decodeLong, TypoShort.decoder, Decoder.decodeBoolean)
+  implicit lazy val encoder: Encoder[PgStatisticId] = Encoder.forProduct3[PgStatisticId, /* oid */ Long, TypoShort, Boolean]("starelid", "staattnum", "stainherit")(x => (x.starelid, x.staattnum, x.stainherit))(Encoder.encodeLong, TypoShort.encoder, Encoder.encodeBoolean)
+  implicit def ordering(implicit O0: Ordering[TypoShort]): Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
 }

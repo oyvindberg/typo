@@ -8,6 +8,7 @@ package sales
 package salestaxrate
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import anorm.Column
@@ -30,7 +31,7 @@ case class SalestaxrateRow(
       Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** 1 = Tax applied to retail transactions, 2 = Tax applied to wholesale transactions, 3 = Tax applied to all sales (retail and wholesale) transactions. */
-  taxtype: Int,
+  taxtype: TypoShort,
   /** Tax rate amount. */
   taxrate: BigDecimal,
   /** Tax rate description. */
@@ -45,7 +46,7 @@ object SalestaxrateRow {
         SalestaxrateRow(
           salestaxrateid = json.\("salestaxrateid").as(SalestaxrateId.reads),
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
-          taxtype = json.\("taxtype").as(Reads.IntReads),
+          taxtype = json.\("taxtype").as(TypoShort.reads),
           taxrate = json.\("taxrate").as(Reads.bigDecReads),
           name = json.\("name").as(Name.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
@@ -59,7 +60,7 @@ object SalestaxrateRow {
       SalestaxrateRow(
         salestaxrateid = row(idx + 0)(SalestaxrateId.column),
         stateprovinceid = row(idx + 1)(StateprovinceId.column),
-        taxtype = row(idx + 2)(Column.columnToInt),
+        taxtype = row(idx + 2)(TypoShort.column),
         taxrate = row(idx + 3)(Column.columnToScalaBigDecimal),
         name = row(idx + 4)(Name.column),
         rowguid = row(idx + 5)(Column.columnToUUID),
@@ -71,7 +72,7 @@ object SalestaxrateRow {
     new JsObject(ListMap[String, JsValue](
       "salestaxrateid" -> SalestaxrateId.writes.writes(o.salestaxrateid),
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
-      "taxtype" -> Writes.IntWrites.writes(o.taxtype),
+      "taxtype" -> TypoShort.writes.writes(o.taxtype),
       "taxrate" -> Writes.BigDecimalWrites.writes(o.taxrate),
       "name" -> Name.writes.writes(o.name),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),

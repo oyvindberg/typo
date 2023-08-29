@@ -9,6 +9,7 @@ package productinventory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import doobie.free.connection.ConnectionIO
@@ -33,7 +34,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   }
   override def insert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2, ${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.bin)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2, ${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.quantity)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
        """.query(ProductinventoryRow.read).unique
   }
@@ -42,10 +43,10 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       Some((Fragment.const(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
       Some((Fragment.const(s""""locationid""""), fr"${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2")),
       Some((Fragment.const(s""""shelf""""), fr"${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""bin""""), fr"${fromWrite(unsaved.bin)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""bin""""), fr"${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2")),
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""quantity""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""quantity""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
@@ -84,8 +85,8 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     val compositeId = row.compositeId
     sql"""update production.productinventory
           set "shelf" = ${fromWrite(row.shelf)(Write.fromPut(Meta.StringMeta.put))},
-              "bin" = ${fromWrite(row.bin)(Write.fromPut(Meta.IntMeta.put))}::int2,
-              "quantity" = ${fromWrite(row.quantity)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "bin" = ${fromWrite(row.bin)(Write.fromPut(TypoShort.put))}::int2,
+              "quantity" = ${fromWrite(row.quantity)(Write.fromPut(TypoShort.put))}::int2,
               "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}"""
@@ -102,8 +103,8 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2,
             ${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.bin)(Write.fromPut(Meta.IntMeta.put))}::int2,
-            ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.quantity)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )

@@ -8,6 +8,7 @@ package pu
 package v
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
@@ -20,7 +21,7 @@ trait VViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
   val accountnumber: Field[AccountNumber, Row]
   val name: Field[Name, Row]
-  val creditrating: Field[Int, Row]
+  val creditrating: Field[TypoShort, Row]
   val preferredvendorstatus: Field[Flag, Row]
   val activeflag: Field[Flag, Row]
   val purchasingwebserviceurl: OptField[/* max 1024 chars */ String, Row]

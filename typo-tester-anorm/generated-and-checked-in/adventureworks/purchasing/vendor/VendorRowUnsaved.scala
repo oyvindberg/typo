@@ -9,6 +9,7 @@ package vendor
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
@@ -32,7 +33,7 @@ case class VendorRowUnsaved(
   /** Company name. */
   name: Name,
   /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average */
-  creditrating: Int,
+  creditrating: TypoShort,
   /** Vendor URL. */
   purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   /** Default: true
@@ -72,7 +73,7 @@ object VendorRowUnsaved {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           accountnumber = json.\("accountnumber").as(AccountNumber.reads),
           name = json.\("name").as(Name.reads),
-          creditrating = json.\("creditrating").as(Reads.IntReads),
+          creditrating = json.\("creditrating").as(TypoShort.reads),
           purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as(Reads.StringReads)),
           preferredvendorstatus = json.\("preferredvendorstatus").as(Defaulted.reads(Flag.reads)),
           activeflag = json.\("activeflag").as(Defaulted.reads(Flag.reads)),
@@ -86,7 +87,7 @@ object VendorRowUnsaved {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "accountnumber" -> AccountNumber.writes.writes(o.accountnumber),
       "name" -> Name.writes.writes(o.name),
-      "creditrating" -> Writes.IntWrites.writes(o.creditrating),
+      "creditrating" -> TypoShort.writes.writes(o.creditrating),
       "purchasingwebserviceurl" -> Writes.OptionWrites(Writes.StringWrites).writes(o.purchasingwebserviceurl),
       "preferredvendorstatus" -> Defaulted.writes(Flag.writes).writes(o.preferredvendorstatus),
       "activeflag" -> Defaulted.writes(Flag.writes).writes(o.activeflag),

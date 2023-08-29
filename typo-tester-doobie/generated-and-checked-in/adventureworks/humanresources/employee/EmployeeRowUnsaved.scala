@@ -10,6 +10,7 @@ package employee
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import io.circe.Decoder
@@ -40,10 +41,10 @@ case class EmployeeRowUnsaved(
   salariedflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: 0
       Number of available vacation hours. */
-  vacationhours: Defaulted[Int] = Defaulted.UseDefault,
+  vacationhours: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: 0
       Number of available sick leave hours. */
-  sickleavehours: Defaulted[Int] = Defaulted.UseDefault,
+  sickleavehours: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: true
       0 = Inactive, 1 = Active */
   currentflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -55,7 +56,7 @@ case class EmployeeRowUnsaved(
       Where the employee is located in corporate hierarchy. */
   organizationnode: Defaulted[Option[String]] = Defaulted.UseDefault
 ) {
-  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => Int, sickleavehoursDefault: => Int, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
+  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => TypoShort, sickleavehoursDefault: => TypoShort, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
     EmployeeRow(
       businessentityid = businessentityid,
       nationalidnumber = nationalidnumber,
@@ -96,6 +97,6 @@ case class EmployeeRowUnsaved(
     )
 }
 object EmployeeRowUnsaved {
-  implicit lazy val decoder: Decoder[EmployeeRowUnsaved] = Decoder.forProduct15[EmployeeRowUnsaved, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Defaulted[Flag], Defaulted[Int], Defaulted[Int], Defaulted[Flag], Defaulted[UUID], Defaulted[TypoLocalDateTime], Defaulted[Option[String]]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Defaulted.decoder(Flag.decoder), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(Flag.decoder), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(Decoder.decodeOption(Decoder.decodeString)))
-  implicit lazy val encoder: Encoder[EmployeeRowUnsaved] = Encoder.forProduct15[EmployeeRowUnsaved, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Defaulted[Flag], Defaulted[Int], Defaulted[Int], Defaulted[Flag], Defaulted[UUID], Defaulted[TypoLocalDateTime], Defaulted[Option[String]]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Defaulted.encoder(Flag.encoder), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(Flag.encoder), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(Encoder.encodeOption(Encoder.encodeString)))
+  implicit lazy val decoder: Decoder[EmployeeRowUnsaved] = Decoder.forProduct15[EmployeeRowUnsaved, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Defaulted[Flag], Defaulted[TypoShort], Defaulted[TypoShort], Defaulted[Flag], Defaulted[UUID], Defaulted[TypoLocalDateTime], Defaulted[Option[String]]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Defaulted.decoder(Flag.decoder), Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(Decoder.decodeOption(Decoder.decodeString)))
+  implicit lazy val encoder: Encoder[EmployeeRowUnsaved] = Encoder.forProduct15[EmployeeRowUnsaved, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Defaulted[Flag], Defaulted[TypoShort], Defaulted[TypoShort], Defaulted[Flag], Defaulted[UUID], Defaulted[TypoLocalDateTime], Defaulted[Option[String]]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Defaulted.encoder(Flag.encoder), Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(Encoder.encodeOption(Encoder.encodeString)))
 }

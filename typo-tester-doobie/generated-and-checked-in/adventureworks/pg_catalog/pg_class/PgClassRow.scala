@@ -9,6 +9,7 @@ package pg_class
 
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -39,8 +40,8 @@ case class PgClassRow(
   relisshared: Boolean,
   relpersistence: String,
   relkind: String,
-  relnatts: Int,
-  relchecks: Int,
+  relnatts: TypoShort,
+  relchecks: TypoShort,
   relhasrules: Boolean,
   relhastriggers: Boolean,
   relhassubclass: Boolean,
@@ -82,8 +83,8 @@ object PgClassRow {
         relisshared = orThrow(c.get("relisshared")(Decoder.decodeBoolean)),
         relpersistence = orThrow(c.get("relpersistence")(Decoder.decodeString)),
         relkind = orThrow(c.get("relkind")(Decoder.decodeString)),
-        relnatts = orThrow(c.get("relnatts")(Decoder.decodeInt)),
-        relchecks = orThrow(c.get("relchecks")(Decoder.decodeInt)),
+        relnatts = orThrow(c.get("relnatts")(TypoShort.decoder)),
+        relchecks = orThrow(c.get("relchecks")(TypoShort.decoder)),
         relhasrules = orThrow(c.get("relhasrules")(Decoder.decodeBoolean)),
         relhastriggers = orThrow(c.get("relhastriggers")(Decoder.decodeBoolean)),
         relhassubclass = orThrow(c.get("relhassubclass")(Decoder.decodeBoolean)),
@@ -120,8 +121,8 @@ object PgClassRow {
       "relisshared" -> Encoder.encodeBoolean.apply(row.relisshared),
       "relpersistence" -> Encoder.encodeString.apply(row.relpersistence),
       "relkind" -> Encoder.encodeString.apply(row.relkind),
-      "relnatts" -> Encoder.encodeInt.apply(row.relnatts),
-      "relchecks" -> Encoder.encodeInt.apply(row.relchecks),
+      "relnatts" -> TypoShort.encoder.apply(row.relnatts),
+      "relchecks" -> TypoShort.encoder.apply(row.relchecks),
       "relhasrules" -> Encoder.encodeBoolean.apply(row.relhasrules),
       "relhastriggers" -> Encoder.encodeBoolean.apply(row.relhastriggers),
       "relhassubclass" -> Encoder.encodeBoolean.apply(row.relhassubclass),
@@ -157,8 +158,8 @@ object PgClassRow {
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
@@ -192,8 +193,8 @@ object PgClassRow {
       relisshared = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 14),
       relpersistence = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 15),
       relkind = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 16),
-      relnatts = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 17),
-      relchecks = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 18),
+      relnatts = TypoShort.get.unsafeGetNonNullable(rs, i + 17),
+      relchecks = TypoShort.get.unsafeGetNonNullable(rs, i + 18),
       relhasrules = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 19),
       relhastriggers = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 20),
       relhassubclass = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 21),

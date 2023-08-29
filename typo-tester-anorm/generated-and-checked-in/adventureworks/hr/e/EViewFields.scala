@@ -9,6 +9,7 @@ package e
 
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID
@@ -26,8 +27,8 @@ trait EViewFields[Row] {
   val gender: Field[/* bpchar, max 1 chars */ String, Row]
   val hiredate: Field[TypoLocalDate, Row]
   val salariedflag: Field[Flag, Row]
-  val vacationhours: Field[Int, Row]
-  val sickleavehours: Field[Int, Row]
+  val vacationhours: Field[TypoShort, Row]
+  val sickleavehours: Field[TypoShort, Row]
   val currentflag: Field[Flag, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

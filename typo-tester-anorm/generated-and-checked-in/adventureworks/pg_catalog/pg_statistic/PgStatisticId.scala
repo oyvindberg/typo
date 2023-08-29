@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_statistic
 
+import adventureworks.customtypes.TypoShort
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -17,14 +18,14 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `pg_catalog.pg_statistic` */
-case class PgStatisticId(starelid: /* oid */ Long, staattnum: Int, stainherit: Boolean)
+case class PgStatisticId(starelid: /* oid */ Long, staattnum: TypoShort, stainherit: Boolean)
 object PgStatisticId {
-  implicit lazy val ordering: Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
+  implicit def ordering(implicit O0: Ordering[TypoShort]): Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
   implicit lazy val reads: Reads[PgStatisticId] = Reads[PgStatisticId](json => JsResult.fromTry(
       Try(
         PgStatisticId(
           starelid = json.\("starelid").as(Reads.LongReads),
-          staattnum = json.\("staattnum").as(Reads.IntReads),
+          staattnum = json.\("staattnum").as(TypoShort.reads),
           stainherit = json.\("stainherit").as(Reads.BooleanReads)
         )
       )
@@ -33,7 +34,7 @@ object PgStatisticId {
   implicit lazy val writes: OWrites[PgStatisticId] = OWrites[PgStatisticId](o =>
     new JsObject(ListMap[String, JsValue](
       "starelid" -> Writes.LongWrites.writes(o.starelid),
-      "staattnum" -> Writes.IntWrites.writes(o.staattnum),
+      "staattnum" -> TypoShort.writes.writes(o.staattnum),
       "stainherit" -> Writes.BooleanWrites.writes(o.stainherit)
     ))
   )

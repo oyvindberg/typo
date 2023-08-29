@@ -8,6 +8,7 @@ package production
 package document
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID
@@ -23,7 +24,7 @@ trait DocumentFields[Row] {
   val fileextension: OptField[/* max 8 chars */ String, Row]
   val revision: Field[/* bpchar, max 5 chars */ String, Row]
   val changenumber: Field[Int, Row]
-  val status: Field[Int, Row]
+  val status: Field[TypoShort, Row]
   val documentsummary: OptField[String, Row]
   val document: OptField[Array[Byte], Row]
   val rowguid: Field[UUID, Row]

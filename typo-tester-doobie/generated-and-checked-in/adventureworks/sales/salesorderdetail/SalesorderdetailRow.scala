@@ -8,6 +8,7 @@ package sales
 package salesorderdetail
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
@@ -28,7 +29,7 @@ case class SalesorderdetailRow(
   /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Quantity ordered per product. */
-  orderqty: Int,
+  orderqty: TypoShort,
   /** Product sold to customer. Foreign key to Product.ProductID.
       Points to [[specialofferproduct.SpecialofferproductRow.productid]] */
   productid: ProductId,
@@ -46,14 +47,14 @@ case class SalesorderdetailRow(
  }
 
 object SalesorderdetailRow {
-  implicit lazy val decoder: Decoder[SalesorderdetailRow] = Decoder.forProduct10[SalesorderdetailRow, SalesorderheaderId, Int, Option[/* max 25 chars */ String], Int, ProductId, SpecialofferId, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(SalesorderdetailRow.apply)(SalesorderheaderId.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeInt, ProductId.decoder, SpecialofferId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SalesorderdetailRow] = Encoder.forProduct10[SalesorderdetailRow, SalesorderheaderId, Int, Option[/* max 25 chars */ String], Int, ProductId, SpecialofferId, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(x => (x.salesorderid, x.salesorderdetailid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.unitpricediscount, x.rowguid, x.modifieddate))(SalesorderheaderId.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeInt, ProductId.encoder, SpecialofferId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SalesorderdetailRow] = Decoder.forProduct10[SalesorderdetailRow, SalesorderheaderId, Int, Option[/* max 25 chars */ String], TypoShort, ProductId, SpecialofferId, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(SalesorderdetailRow.apply)(SalesorderheaderId.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), TypoShort.decoder, ProductId.decoder, SpecialofferId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SalesorderdetailRow] = Encoder.forProduct10[SalesorderdetailRow, SalesorderheaderId, Int, Option[/* max 25 chars */ String], TypoShort, ProductId, SpecialofferId, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(x => (x.salesorderid, x.salesorderdetailid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.unitpricediscount, x.rowguid, x.modifieddate))(SalesorderheaderId.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), TypoShort.encoder, ProductId.encoder, SpecialofferId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SalesorderdetailRow] = new Read[SalesorderdetailRow](
     gets = List(
       (SalesorderheaderId.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (ProductId.get, Nullability.NoNulls),
       (SpecialofferId.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
@@ -65,7 +66,7 @@ object SalesorderdetailRow {
       salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
       salesorderdetailid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
       carriertrackingnumber = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      orderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      orderqty = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
       productid = ProductId.get.unsafeGetNonNullable(rs, i + 4),
       specialofferid = SpecialofferId.get.unsafeGetNonNullable(rs, i + 5),
       unitprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6),

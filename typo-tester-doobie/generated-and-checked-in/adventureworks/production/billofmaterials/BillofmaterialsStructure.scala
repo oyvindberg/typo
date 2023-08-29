@@ -8,6 +8,7 @@ package production
 package billofmaterials
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import typo.dsl.SqlExpr.Field
@@ -26,7 +27,7 @@ class BillofmaterialsStructure[Row](val prefix: Option[String], val extract: Row
   override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), Some("timestamp"))(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
   override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), Some("timestamp"))(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
   override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, Some("bpchar"))(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
-  override val bomlevel = new Field[Int, Row](prefix, "bomlevel", None, Some("int2"))(x => extract(x).bomlevel, (row, value) => merge(row, extract(row).copy(bomlevel = value)))
+  override val bomlevel = new Field[TypoShort, Row](prefix, "bomlevel", None, Some("int2"))(x => extract(x).bomlevel, (row, value) => merge(row, extract(row).copy(bomlevel = value)))
   override val perassemblyqty = new Field[BigDecimal, Row](prefix, "perassemblyqty", None, Some("numeric"))(x => extract(x).perassemblyqty, (row, value) => merge(row, extract(row).copy(perassemblyqty = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 

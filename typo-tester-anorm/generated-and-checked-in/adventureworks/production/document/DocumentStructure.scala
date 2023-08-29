@@ -8,6 +8,7 @@ package production
 package document
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID
@@ -28,7 +29,7 @@ class DocumentStructure[Row](val prefix: Option[String], val extract: Row => Doc
   override val fileextension = new OptField[/* max 8 chars */ String, Row](prefix, "fileextension", None, None)(x => extract(x).fileextension, (row, value) => merge(row, extract(row).copy(fileextension = value)))
   override val revision = new Field[/* bpchar, max 5 chars */ String, Row](prefix, "revision", None, Some("bpchar"))(x => extract(x).revision, (row, value) => merge(row, extract(row).copy(revision = value)))
   override val changenumber = new Field[Int, Row](prefix, "changenumber", None, Some("int4"))(x => extract(x).changenumber, (row, value) => merge(row, extract(row).copy(changenumber = value)))
-  override val status = new Field[Int, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
+  override val status = new Field[TypoShort, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
   override val documentsummary = new OptField[String, Row](prefix, "documentsummary", None, None)(x => extract(x).documentsummary, (row, value) => merge(row, extract(row).copy(documentsummary = value)))
   override val document = new OptField[Array[Byte], Row](prefix, "document", None, Some("bytea"))(x => extract(x).document, (row, value) => merge(row, extract(row).copy(document = value)))
   override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))

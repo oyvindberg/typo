@@ -8,6 +8,7 @@ package purchasing
 package purchaseorderdetail
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import typo.dsl.SqlExpr.Field
@@ -22,7 +23,7 @@ class PurchaseorderdetailStructure[Row](val prefix: Option[String], val extract:
   override val purchaseorderid = new IdField[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, Some("int4"))(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
   override val purchaseorderdetailid = new IdField[Int, Row](prefix, "purchaseorderdetailid", None, Some("int4"))(x => extract(x).purchaseorderdetailid, (row, value) => merge(row, extract(row).copy(purchaseorderdetailid = value)))
   override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), Some("timestamp"))(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
-  override val orderqty = new Field[Int, Row](prefix, "orderqty", None, Some("int2"))(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
+  override val orderqty = new Field[TypoShort, Row](prefix, "orderqty", None, Some("int2"))(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
   override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
   override val unitprice = new Field[BigDecimal, Row](prefix, "unitprice", None, Some("numeric"))(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
   override val receivedqty = new Field[BigDecimal, Row](prefix, "receivedqty", None, Some("numeric"))(x => extract(x).receivedqty, (row, value) => merge(row, extract(row).copy(receivedqty = value)))

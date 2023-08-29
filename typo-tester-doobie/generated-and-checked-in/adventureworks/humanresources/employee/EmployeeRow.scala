@@ -9,6 +9,7 @@ package employee
 
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.enumerated.Nullability
@@ -40,9 +41,9 @@ case class EmployeeRow(
   /** Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
   salariedflag: Flag,
   /** Number of available vacation hours. */
-  vacationhours: Int,
+  vacationhours: TypoShort,
   /** Number of available sick leave hours. */
-  sickleavehours: Int,
+  sickleavehours: TypoShort,
   /** 0 = Inactive, 1 = Active */
   currentflag: Flag,
   rowguid: UUID,
@@ -52,8 +53,8 @@ case class EmployeeRow(
 )
 
 object EmployeeRow {
-  implicit lazy val decoder: Decoder[EmployeeRow] = Decoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, Int, Int, Flag, UUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRow.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Flag.decoder, Decoder.decodeInt, Decoder.decodeInt, Flag.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder, Decoder.decodeOption(Decoder.decodeString))
-  implicit lazy val encoder: Encoder[EmployeeRow] = Encoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, Int, Int, Flag, UUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Flag.encoder, Encoder.encodeInt, Encoder.encodeInt, Flag.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder, Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val decoder: Decoder[EmployeeRow] = Decoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, TypoShort, TypoShort, Flag, UUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRow.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Flag.decoder, TypoShort.decoder, TypoShort.decoder, Flag.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder, Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[EmployeeRow] = Encoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, TypoShort, TypoShort, Flag, UUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Flag.encoder, TypoShort.encoder, TypoShort.encoder, Flag.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder, Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[EmployeeRow] = new Read[EmployeeRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
@@ -65,8 +66,8 @@ object EmployeeRow {
       (Meta.StringMeta.get, Nullability.NoNulls),
       (TypoLocalDate.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
@@ -82,8 +83,8 @@ object EmployeeRow {
       gender = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
       hiredate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 7),
       salariedflag = Flag.get.unsafeGetNonNullable(rs, i + 8),
-      vacationhours = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 9),
-      sickleavehours = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 10),
+      vacationhours = TypoShort.get.unsafeGetNonNullable(rs, i + 9),
+      sickleavehours = TypoShort.get.unsafeGetNonNullable(rs, i + 10),
       currentflag = Flag.get.unsafeGetNonNullable(rs, i + 11),
       rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 12),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 13),

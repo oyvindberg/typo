@@ -8,6 +8,7 @@ package pr
 package w
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId
@@ -19,7 +20,7 @@ trait WViewFields[Row] {
   val workorderid: Field[WorkorderId, Row]
   val productid: Field[ProductId, Row]
   val orderqty: Field[Int, Row]
-  val scrappedqty: Field[Int, Row]
+  val scrappedqty: Field[TypoShort, Row]
   val startdate: Field[TypoLocalDateTime, Row]
   val enddate: OptField[TypoLocalDateTime, Row]
   val duedate: Field[TypoLocalDateTime, Row]

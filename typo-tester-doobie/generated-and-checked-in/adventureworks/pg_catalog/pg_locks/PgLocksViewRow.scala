@@ -8,6 +8,7 @@ package pg_catalog
 package pg_locks
 
 import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -21,12 +22,12 @@ case class PgLocksViewRow(
   database: /* nullability unknown */ Option[/* oid */ Long],
   relation: /* nullability unknown */ Option[/* oid */ Long],
   page: /* nullability unknown */ Option[Int],
-  tuple: /* nullability unknown */ Option[Int],
+  tuple: /* nullability unknown */ Option[TypoShort],
   virtualxid: /* nullability unknown */ Option[String],
   transactionid: /* nullability unknown */ Option[TypoXid],
   classid: /* nullability unknown */ Option[/* oid */ Long],
   objid: /* nullability unknown */ Option[/* oid */ Long],
-  objsubid: /* nullability unknown */ Option[Int],
+  objsubid: /* nullability unknown */ Option[TypoShort],
   virtualtransaction: /* nullability unknown */ Option[String],
   pid: /* nullability unknown */ Option[Int],
   mode: /* nullability unknown */ Option[String],
@@ -36,20 +37,20 @@ case class PgLocksViewRow(
 )
 
 object PgLocksViewRow {
-  implicit lazy val decoder: Decoder[PgLocksViewRow] = Decoder.forProduct16[PgLocksViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[TypoXid], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[TypoOffsetDateTime]]("locktype", "database", "relation", "page", "tuple", "virtualxid", "transactionid", "classid", "objid", "objsubid", "virtualtransaction", "pid", "mode", "granted", "fastpath", "waitstart")(PgLocksViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[PgLocksViewRow] = Encoder.forProduct16[PgLocksViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[TypoXid], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[TypoOffsetDateTime]]("locktype", "database", "relation", "page", "tuple", "virtualxid", "transactionid", "classid", "objid", "objsubid", "virtualtransaction", "pid", "mode", "granted", "fastpath", "waitstart")(x => (x.locktype, x.database, x.relation, x.page, x.tuple, x.virtualxid, x.transactionid, x.classid, x.objid, x.objsubid, x.virtualtransaction, x.pid, x.mode, x.granted, x.fastpath, x.waitstart))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[PgLocksViewRow] = Decoder.forProduct16[PgLocksViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[TypoShort], /* nullability unknown */ Option[String], /* nullability unknown */ Option[TypoXid], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[TypoShort], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[TypoOffsetDateTime]]("locktype", "database", "relation", "page", "tuple", "virtualxid", "transactionid", "classid", "objid", "objsubid", "virtualtransaction", "pid", "mode", "granted", "fastpath", "waitstart")(PgLocksViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoShort.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoShort.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(TypoOffsetDateTime.decoder))
+  implicit lazy val encoder: Encoder[PgLocksViewRow] = Encoder.forProduct16[PgLocksViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[TypoShort], /* nullability unknown */ Option[String], /* nullability unknown */ Option[TypoXid], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[/* oid */ Long], /* nullability unknown */ Option[TypoShort], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[TypoOffsetDateTime]]("locktype", "database", "relation", "page", "tuple", "virtualxid", "transactionid", "classid", "objid", "objsubid", "virtualtransaction", "pid", "mode", "granted", "fastpath", "waitstart")(x => (x.locktype, x.database, x.relation, x.page, x.tuple, x.virtualxid, x.transactionid, x.classid, x.objid, x.objsubid, x.virtualtransaction, x.pid, x.mode, x.granted, x.fastpath, x.waitstart))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoShort.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoShort.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(TypoOffsetDateTime.encoder))
   implicit lazy val read: Read[PgLocksViewRow] = new Read[PgLocksViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
+      (TypoShort.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (TypoXid.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
+      (TypoShort.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.IntMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -62,12 +63,12 @@ object PgLocksViewRow {
       database = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
       relation = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
       page = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
-      tuple = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      tuple = TypoShort.get.unsafeGetNullable(rs, i + 4),
       virtualxid = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
       transactionid = TypoXid.get.unsafeGetNullable(rs, i + 6),
       classid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
       objid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
-      objsubid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 9),
+      objsubid = TypoShort.get.unsafeGetNullable(rs, i + 9),
       virtualtransaction = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
       pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 11),
       mode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),

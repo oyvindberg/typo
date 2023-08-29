@@ -8,6 +8,7 @@ package pg_catalog
 package pg_constraint
 
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -31,8 +32,8 @@ trait PgConstraintFields[Row] {
   val conislocal: Field[Boolean, Row]
   val coninhcount: Field[Int, Row]
   val connoinherit: Field[Boolean, Row]
-  val conkey: OptField[Array[Int], Row]
-  val confkey: OptField[Array[Int], Row]
+  val conkey: OptField[Array[TypoShort], Row]
+  val confkey: OptField[Array[TypoShort], Row]
   val conpfeqop: OptField[Array[/* oid */ Long], Row]
   val conppeqop: OptField[Array[/* oid */ Long], Row]
   val conffeqop: OptField[Array[/* oid */ Long], Row]

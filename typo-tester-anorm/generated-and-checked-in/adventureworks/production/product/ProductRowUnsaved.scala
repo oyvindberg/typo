@@ -9,6 +9,7 @@ package product
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -33,9 +34,9 @@ case class ProductRowUnsaved(
   /** Product color. */
   color: Option[/* max 15 chars */ String],
   /** Minimum inventory quantity. */
-  safetystocklevel: Int,
+  safetystocklevel: TypoShort,
   /** Inventory level that triggers a purchase order or work order. */
-  reorderpoint: Int,
+  reorderpoint: TypoShort,
   /** Standard cost of the product. */
   standardcost: BigDecimal,
   /** Selling price. */
@@ -135,8 +136,8 @@ object ProductRowUnsaved {
           name = json.\("name").as(Name.reads),
           productnumber = json.\("productnumber").as(Reads.StringReads),
           color = json.\("color").toOption.map(_.as(Reads.StringReads)),
-          safetystocklevel = json.\("safetystocklevel").as(Reads.IntReads),
-          reorderpoint = json.\("reorderpoint").as(Reads.IntReads),
+          safetystocklevel = json.\("safetystocklevel").as(TypoShort.reads),
+          reorderpoint = json.\("reorderpoint").as(TypoShort.reads),
           standardcost = json.\("standardcost").as(Reads.bigDecReads),
           listprice = json.\("listprice").as(Reads.bigDecReads),
           size = json.\("size").toOption.map(_.as(Reads.StringReads)),
@@ -166,8 +167,8 @@ object ProductRowUnsaved {
       "name" -> Name.writes.writes(o.name),
       "productnumber" -> Writes.StringWrites.writes(o.productnumber),
       "color" -> Writes.OptionWrites(Writes.StringWrites).writes(o.color),
-      "safetystocklevel" -> Writes.IntWrites.writes(o.safetystocklevel),
-      "reorderpoint" -> Writes.IntWrites.writes(o.reorderpoint),
+      "safetystocklevel" -> TypoShort.writes.writes(o.safetystocklevel),
+      "reorderpoint" -> TypoShort.writes.writes(o.reorderpoint),
       "standardcost" -> Writes.BigDecimalWrites.writes(o.standardcost),
       "listprice" -> Writes.BigDecimalWrites.writes(o.listprice),
       "size" -> Writes.OptionWrites(Writes.StringWrites).writes(o.size),

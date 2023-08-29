@@ -8,6 +8,7 @@ package pr
 package pi
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
@@ -28,9 +29,9 @@ case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.shelf]] */
   shelf: /* max 10 chars */ String,
   /** Points to [[production.productinventory.ProductinventoryRow.bin]] */
-  bin: Int,
+  bin: TypoShort,
   /** Points to [[production.productinventory.ProductinventoryRow.quantity]] */
-  quantity: Int,
+  quantity: TypoShort,
   /** Points to [[production.productinventory.ProductinventoryRow.rowguid]] */
   rowguid: UUID,
   /** Points to [[production.productinventory.ProductinventoryRow.modifieddate]] */
@@ -38,16 +39,16 @@ case class PiViewRow(
 )
 
 object PiViewRow {
-  implicit lazy val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(ProductId.decoder, ProductId.decoder, LocationId.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, ProductId.encoder, LocationId.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, UUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(ProductId.decoder, ProductId.decoder, LocationId.decoder, Decoder.decodeString, TypoShort.decoder, TypoShort.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, UUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, ProductId.encoder, LocationId.encoder, Encoder.encodeString, TypoShort.encoder, TypoShort.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PiViewRow] = new Read[PiViewRow](
     gets = List(
       (ProductId.get, Nullability.NoNulls),
       (ProductId.get, Nullability.NoNulls),
       (LocationId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
@@ -56,8 +57,8 @@ object PiViewRow {
       productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
       locationid = LocationId.get.unsafeGetNonNullable(rs, i + 2),
       shelf = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      bin = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
-      quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 5),
+      bin = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
+      quantity = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
       rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 6),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
     )

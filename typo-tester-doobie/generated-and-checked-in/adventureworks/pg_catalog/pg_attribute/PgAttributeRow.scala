@@ -9,6 +9,7 @@ package pg_attribute
 
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoAnyArray
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -25,8 +26,8 @@ case class PgAttributeRow(
   attname: String,
   atttypid: /* oid */ Long,
   attstattarget: Int,
-  attlen: Int,
-  attnum: Int,
+  attlen: TypoShort,
+  attnum: TypoShort,
   attndims: Int,
   attcacheoff: Int,
   atttypmod: Int,
@@ -63,8 +64,8 @@ object PgAttributeRow {
         attname = orThrow(c.get("attname")(Decoder.decodeString)),
         atttypid = orThrow(c.get("atttypid")(Decoder.decodeLong)),
         attstattarget = orThrow(c.get("attstattarget")(Decoder.decodeInt)),
-        attlen = orThrow(c.get("attlen")(Decoder.decodeInt)),
-        attnum = orThrow(c.get("attnum")(Decoder.decodeInt)),
+        attlen = orThrow(c.get("attlen")(TypoShort.decoder)),
+        attnum = orThrow(c.get("attnum")(TypoShort.decoder)),
         attndims = orThrow(c.get("attndims")(Decoder.decodeInt)),
         attcacheoff = orThrow(c.get("attcacheoff")(Decoder.decodeInt)),
         atttypmod = orThrow(c.get("atttypmod")(Decoder.decodeInt)),
@@ -94,8 +95,8 @@ object PgAttributeRow {
       "attname" -> Encoder.encodeString.apply(row.attname),
       "atttypid" -> Encoder.encodeLong.apply(row.atttypid),
       "attstattarget" -> Encoder.encodeInt.apply(row.attstattarget),
-      "attlen" -> Encoder.encodeInt.apply(row.attlen),
-      "attnum" -> Encoder.encodeInt.apply(row.attnum),
+      "attlen" -> TypoShort.encoder.apply(row.attlen),
+      "attnum" -> TypoShort.encoder.apply(row.attnum),
       "attndims" -> Encoder.encodeInt.apply(row.attndims),
       "attcacheoff" -> Encoder.encodeInt.apply(row.attcacheoff),
       "atttypmod" -> Encoder.encodeInt.apply(row.atttypmod),
@@ -124,8 +125,8 @@ object PgAttributeRow {
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
@@ -152,8 +153,8 @@ object PgAttributeRow {
       attname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
       atttypid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
       attstattarget = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
-      attlen = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
-      attnum = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 5),
+      attlen = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
+      attnum = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
       attndims = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
       attcacheoff = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
       atttypmod = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 8),

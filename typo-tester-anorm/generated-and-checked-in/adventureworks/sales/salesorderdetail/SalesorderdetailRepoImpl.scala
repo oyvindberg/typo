@@ -9,6 +9,7 @@ package salesorderdetail
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
@@ -35,7 +36,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   }
   override def insert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     SQL"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
-          values (${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.salesorderdetailid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4, ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.unitpricediscount, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.salesorderdetailid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.orderqty, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4, ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.unitpricediscount, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalesorderdetailRow.rowParser(1).single)
@@ -45,7 +46,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     val namedParameters = List(
       Some((NamedParameter("salesorderid", ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)), "::int4")),
       Some((NamedParameter("carriertrackingnumber", ParameterValue(unsaved.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))), "")),
-      Some((NamedParameter("orderqty", ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("orderqty", ParameterValue(unsaved.orderqty, null, TypoShort.toStatement)), "::int2")),
       Some((NamedParameter("productid", ParameterValue(unsaved.productid, null, ProductId.toStatement)), "::int4")),
       Some((NamedParameter("specialofferid", ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)), "::int4")),
       Some((NamedParameter("unitprice", ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
@@ -100,7 +101,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     val compositeId = row.compositeId
     SQL"""update sales.salesorderdetail
           set "carriertrackingnumber" = ${ParameterValue(row.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              "orderqty" = ${ParameterValue(row.orderqty, null, ToStatement.intToStatement)}::int2,
+              "orderqty" = ${ParameterValue(row.orderqty, null, TypoShort.toStatement)}::int2,
               "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
               "specialofferid" = ${ParameterValue(row.specialofferid, null, SpecialofferId.toStatement)}::int4,
               "unitprice" = ${ParameterValue(row.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
@@ -119,7 +120,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             ${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4,
             ${ParameterValue(unsaved.salesorderdetailid, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-            ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.orderqty, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4,
             ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric,

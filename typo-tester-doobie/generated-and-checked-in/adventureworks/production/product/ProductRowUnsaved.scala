@@ -9,6 +9,7 @@ package product
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -31,9 +32,9 @@ case class ProductRowUnsaved(
   /** Product color. */
   color: Option[/* max 15 chars */ String],
   /** Minimum inventory quantity. */
-  safetystocklevel: Int,
+  safetystocklevel: TypoShort,
   /** Inventory level that triggers a purchase order or work order. */
-  reorderpoint: Int,
+  reorderpoint: TypoShort,
   /** Standard cost of the product. */
   standardcost: BigDecimal,
   /** Selling price. */
@@ -137,8 +138,8 @@ object ProductRowUnsaved {
         name = orThrow(c.get("name")(Name.decoder)),
         productnumber = orThrow(c.get("productnumber")(Decoder.decodeString)),
         color = orThrow(c.get("color")(Decoder.decodeOption(Decoder.decodeString))),
-        safetystocklevel = orThrow(c.get("safetystocklevel")(Decoder.decodeInt)),
-        reorderpoint = orThrow(c.get("reorderpoint")(Decoder.decodeInt)),
+        safetystocklevel = orThrow(c.get("safetystocklevel")(TypoShort.decoder)),
+        reorderpoint = orThrow(c.get("reorderpoint")(TypoShort.decoder)),
         standardcost = orThrow(c.get("standardcost")(Decoder.decodeBigDecimal)),
         listprice = orThrow(c.get("listprice")(Decoder.decodeBigDecimal)),
         size = orThrow(c.get("size")(Decoder.decodeOption(Decoder.decodeString))),
@@ -167,8 +168,8 @@ object ProductRowUnsaved {
       "name" -> Name.encoder.apply(row.name),
       "productnumber" -> Encoder.encodeString.apply(row.productnumber),
       "color" -> Encoder.encodeOption(Encoder.encodeString).apply(row.color),
-      "safetystocklevel" -> Encoder.encodeInt.apply(row.safetystocklevel),
-      "reorderpoint" -> Encoder.encodeInt.apply(row.reorderpoint),
+      "safetystocklevel" -> TypoShort.encoder.apply(row.safetystocklevel),
+      "reorderpoint" -> TypoShort.encoder.apply(row.reorderpoint),
       "standardcost" -> Encoder.encodeBigDecimal.apply(row.standardcost),
       "listprice" -> Encoder.encodeBigDecimal.apply(row.listprice),
       "size" -> Encoder.encodeOption(Encoder.encodeString).apply(row.size),

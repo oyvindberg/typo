@@ -8,6 +8,7 @@ package pr
 package bom
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -39,7 +40,7 @@ case class BomViewRow(
   /** Points to [[production.billofmaterials.BillofmaterialsRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.bomlevel]] */
-  bomlevel: Int,
+  bomlevel: TypoShort,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.perassemblyqty]] */
   perassemblyqty: BigDecimal,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.modifieddate]] */
@@ -57,7 +58,7 @@ object BomViewRow {
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
           enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
-          bomlevel = json.\("bomlevel").as(Reads.IntReads),
+          bomlevel = json.\("bomlevel").as(TypoShort.reads),
           perassemblyqty = json.\("perassemblyqty").as(Reads.bigDecReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -74,7 +75,7 @@ object BomViewRow {
         startdate = row(idx + 4)(TypoLocalDateTime.column),
         enddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
         unitmeasurecode = row(idx + 6)(UnitmeasureId.column),
-        bomlevel = row(idx + 7)(Column.columnToInt),
+        bomlevel = row(idx + 7)(TypoShort.column),
         perassemblyqty = row(idx + 8)(Column.columnToScalaBigDecimal),
         modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
@@ -89,7 +90,7 @@ object BomViewRow {
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
       "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
-      "bomlevel" -> Writes.IntWrites.writes(o.bomlevel),
+      "bomlevel" -> TypoShort.writes.writes(o.bomlevel),
       "perassemblyqty" -> Writes.BigDecimalWrites.writes(o.perassemblyqty),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

@@ -8,6 +8,7 @@ package sales
 package salestaxrate
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import java.util.UUID
@@ -22,7 +23,7 @@ class SalestaxrateStructure[Row](val prefix: Option[String], val extract: Row =>
 
   override val salestaxrateid = new IdField[SalestaxrateId, Row](prefix, "salestaxrateid", None, Some("int4"))(x => extract(x).salestaxrateid, (row, value) => merge(row, extract(row).copy(salestaxrateid = value)))
   override val stateprovinceid = new Field[StateprovinceId, Row](prefix, "stateprovinceid", None, Some("int4"))(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
-  override val taxtype = new Field[Int, Row](prefix, "taxtype", None, Some("int2"))(x => extract(x).taxtype, (row, value) => merge(row, extract(row).copy(taxtype = value)))
+  override val taxtype = new Field[TypoShort, Row](prefix, "taxtype", None, Some("int2"))(x => extract(x).taxtype, (row, value) => merge(row, extract(row).copy(taxtype = value)))
   override val taxrate = new Field[BigDecimal, Row](prefix, "taxrate", None, Some("numeric"))(x => extract(x).taxrate, (row, value) => merge(row, extract(row).copy(taxrate = value)))
   override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))

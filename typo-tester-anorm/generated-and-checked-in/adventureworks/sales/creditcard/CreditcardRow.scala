@@ -8,6 +8,7 @@ package sales
 package creditcard
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
 import anorm.Column
 import anorm.RowParser
@@ -29,9 +30,9 @@ case class CreditcardRow(
   /** Credit card number. */
   cardnumber: /* max 25 chars */ String,
   /** Credit card expiration month. */
-  expmonth: Int,
+  expmonth: TypoShort,
   /** Credit card expiration year. */
-  expyear: Int,
+  expyear: TypoShort,
   modifieddate: TypoLocalDateTime
 )
 
@@ -42,8 +43,8 @@ object CreditcardRow {
           creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads),
           cardtype = json.\("cardtype").as(Reads.StringReads),
           cardnumber = json.\("cardnumber").as(Reads.StringReads),
-          expmonth = json.\("expmonth").as(Reads.IntReads),
-          expyear = json.\("expyear").as(Reads.IntReads),
+          expmonth = json.\("expmonth").as(TypoShort.reads),
+          expyear = json.\("expyear").as(TypoShort.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -55,8 +56,8 @@ object CreditcardRow {
         creditcardid = row(idx + 0)(/* user-picked */ CustomCreditcardId.column),
         cardtype = row(idx + 1)(Column.columnToString),
         cardnumber = row(idx + 2)(Column.columnToString),
-        expmonth = row(idx + 3)(Column.columnToInt),
-        expyear = row(idx + 4)(Column.columnToInt),
+        expmonth = row(idx + 3)(TypoShort.column),
+        expyear = row(idx + 4)(TypoShort.column),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
@@ -66,8 +67,8 @@ object CreditcardRow {
       "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid),
       "cardtype" -> Writes.StringWrites.writes(o.cardtype),
       "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
-      "expmonth" -> Writes.IntWrites.writes(o.expmonth),
-      "expyear" -> Writes.IntWrites.writes(o.expyear),
+      "expmonth" -> TypoShort.writes.writes(o.expmonth),
+      "expyear" -> TypoShort.writes.writes(o.expyear),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

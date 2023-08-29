@@ -10,6 +10,7 @@ package pg_index
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -25,8 +26,8 @@ import scala.util.Try
 case class PgIndexRow(
   indexrelid: PgIndexId,
   indrelid: /* oid */ Long,
-  indnatts: Int,
-  indnkeyatts: Int,
+  indnatts: TypoShort,
+  indnkeyatts: TypoShort,
   indisunique: Boolean,
   indisprimary: Boolean,
   indisexclusion: Boolean,
@@ -51,8 +52,8 @@ object PgIndexRow {
         PgIndexRow(
           indexrelid = json.\("indexrelid").as(PgIndexId.reads),
           indrelid = json.\("indrelid").as(Reads.LongReads),
-          indnatts = json.\("indnatts").as(Reads.IntReads),
-          indnkeyatts = json.\("indnkeyatts").as(Reads.IntReads),
+          indnatts = json.\("indnatts").as(TypoShort.reads),
+          indnkeyatts = json.\("indnkeyatts").as(TypoShort.reads),
           indisunique = json.\("indisunique").as(Reads.BooleanReads),
           indisprimary = json.\("indisprimary").as(Reads.BooleanReads),
           indisexclusion = json.\("indisexclusion").as(Reads.BooleanReads),
@@ -78,8 +79,8 @@ object PgIndexRow {
       PgIndexRow(
         indexrelid = row(idx + 0)(PgIndexId.column),
         indrelid = row(idx + 1)(Column.columnToLong),
-        indnatts = row(idx + 2)(Column.columnToInt),
-        indnkeyatts = row(idx + 3)(Column.columnToInt),
+        indnatts = row(idx + 2)(TypoShort.column),
+        indnkeyatts = row(idx + 3)(TypoShort.column),
         indisunique = row(idx + 4)(Column.columnToBoolean),
         indisprimary = row(idx + 5)(Column.columnToBoolean),
         indisexclusion = row(idx + 6)(Column.columnToBoolean),
@@ -103,8 +104,8 @@ object PgIndexRow {
     new JsObject(ListMap[String, JsValue](
       "indexrelid" -> PgIndexId.writes.writes(o.indexrelid),
       "indrelid" -> Writes.LongWrites.writes(o.indrelid),
-      "indnatts" -> Writes.IntWrites.writes(o.indnatts),
-      "indnkeyatts" -> Writes.IntWrites.writes(o.indnkeyatts),
+      "indnatts" -> TypoShort.writes.writes(o.indnatts),
+      "indnkeyatts" -> TypoShort.writes.writes(o.indnkeyatts),
       "indisunique" -> Writes.BooleanWrites.writes(o.indisunique),
       "indisprimary" -> Writes.BooleanWrites.writes(o.indisprimary),
       "indisexclusion" -> Writes.BooleanWrites.writes(o.indisexclusion),

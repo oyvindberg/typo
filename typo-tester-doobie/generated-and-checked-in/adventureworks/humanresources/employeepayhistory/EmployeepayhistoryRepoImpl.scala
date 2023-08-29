@@ -9,6 +9,7 @@ package employeepayhistory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -31,7 +32,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   }
   override def insert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.payfrequency)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.payfrequency)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
        """.query(EmployeepayhistoryRow.read).unique
   }
@@ -40,7 +41,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
       Some((Fragment.const(s""""ratechangedate""""), fr"${fromWrite(unsaved.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
       Some((Fragment.const(s""""rate""""), fr"${fromWrite(unsaved.rate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const(s""""payfrequency""""), fr"${fromWrite(unsaved.payfrequency)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s""""payfrequency""""), fr"${fromWrite(unsaved.payfrequency)(Write.fromPut(TypoShort.put))}::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
@@ -74,7 +75,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     val compositeId = row.compositeId
     sql"""update humanresources.employeepayhistory
           set "rate" = ${fromWrite(row.rate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "payfrequency" = ${fromWrite(row.payfrequency)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "payfrequency" = ${fromWrite(row.payfrequency)(Write.fromPut(TypoShort.put))}::int2,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}"""
       .update
@@ -90,7 +91,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
             ${fromWrite(unsaved.rate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.payfrequency)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.payfrequency)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("businessentityid", "ratechangedate")

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import adventureworks.customtypes.TypoShort
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
@@ -44,7 +45,7 @@ class PgAmopRepoMock(map: scala.collection.mutable.Map[PgAmopId, PgAmopRow] = sc
   override def selectByIds(oids: Array[PgAmopId])(implicit c: Connection): List[PgAmopRow] = {
     oids.flatMap(map.get).toList
   }
-  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: Int)(implicit c: Connection): Option[PgAmopRow] = {
+  override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: TypoShort)(implicit c: Connection): Option[PgAmopRow] = {
     map.values.find(v => amopfamily == v.amopfamily && amoplefttype == v.amoplefttype && amoprighttype == v.amoprighttype && amopstrategy == v.amopstrategy)
   }
   override def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long)(implicit c: Connection): Option[PgAmopRow] = {

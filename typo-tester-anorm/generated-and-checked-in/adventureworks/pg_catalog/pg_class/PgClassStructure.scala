@@ -9,6 +9,7 @@ package pg_class
 
 import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -37,8 +38,8 @@ class PgClassStructure[Row](val prefix: Option[String], val extract: Row => PgCl
   override val relisshared = new Field[Boolean, Row](prefix, "relisshared", None, None)(x => extract(x).relisshared, (row, value) => merge(row, extract(row).copy(relisshared = value)))
   override val relpersistence = new Field[String, Row](prefix, "relpersistence", None, Some("char"))(x => extract(x).relpersistence, (row, value) => merge(row, extract(row).copy(relpersistence = value)))
   override val relkind = new Field[String, Row](prefix, "relkind", None, Some("char"))(x => extract(x).relkind, (row, value) => merge(row, extract(row).copy(relkind = value)))
-  override val relnatts = new Field[Int, Row](prefix, "relnatts", None, Some("int2"))(x => extract(x).relnatts, (row, value) => merge(row, extract(row).copy(relnatts = value)))
-  override val relchecks = new Field[Int, Row](prefix, "relchecks", None, Some("int2"))(x => extract(x).relchecks, (row, value) => merge(row, extract(row).copy(relchecks = value)))
+  override val relnatts = new Field[TypoShort, Row](prefix, "relnatts", None, Some("int2"))(x => extract(x).relnatts, (row, value) => merge(row, extract(row).copy(relnatts = value)))
+  override val relchecks = new Field[TypoShort, Row](prefix, "relchecks", None, Some("int2"))(x => extract(x).relchecks, (row, value) => merge(row, extract(row).copy(relchecks = value)))
   override val relhasrules = new Field[Boolean, Row](prefix, "relhasrules", None, None)(x => extract(x).relhasrules, (row, value) => merge(row, extract(row).copy(relhasrules = value)))
   override val relhastriggers = new Field[Boolean, Row](prefix, "relhastriggers", None, None)(x => extract(x).relhastriggers, (row, value) => merge(row, extract(row).copy(relhastriggers = value)))
   override val relhassubclass = new Field[Boolean, Row](prefix, "relhassubclass", None, None)(x => extract(x).relhassubclass, (row, value) => merge(row, extract(row).copy(relhassubclass = value)))

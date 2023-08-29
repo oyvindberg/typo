@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -19,7 +20,7 @@ case class PgAmopRow(
   amopfamily: /* oid */ Long,
   amoplefttype: /* oid */ Long,
   amoprighttype: /* oid */ Long,
-  amopstrategy: Int,
+  amopstrategy: TypoShort,
   amoppurpose: String,
   amopopr: /* oid */ Long,
   amopmethod: /* oid */ Long,
@@ -27,15 +28,15 @@ case class PgAmopRow(
 )
 
 object PgAmopRow {
-  implicit lazy val decoder: Decoder[PgAmopRow] = Decoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(PgAmopRow.apply)(PgAmopId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
-  implicit lazy val encoder: Encoder[PgAmopRow] = Encoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(x => (x.oid, x.amopfamily, x.amoplefttype, x.amoprighttype, x.amopstrategy, x.amoppurpose, x.amopopr, x.amopmethod, x.amopsortfamily))(PgAmopId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val decoder: Decoder[PgAmopRow] = Decoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoShort, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(PgAmopRow.apply)(PgAmopId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, TypoShort.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgAmopRow] = Encoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoShort, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(x => (x.oid, x.amopfamily, x.amoplefttype, x.amoprighttype, x.amopstrategy, x.amoppurpose, x.amopopr, x.amopmethod, x.amopsortfamily))(PgAmopId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, TypoShort.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
   implicit lazy val read: Read[PgAmopRow] = new Read[PgAmopRow](
     gets = List(
       (PgAmopId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
@@ -46,7 +47,7 @@ object PgAmopRow {
       amopfamily = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
       amoplefttype = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
       amoprighttype = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
-      amopstrategy = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
+      amopstrategy = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
       amoppurpose = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
       amopopr = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
       amopmethod = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),

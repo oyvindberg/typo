@@ -8,6 +8,7 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -21,7 +22,7 @@ class EmployeepayhistoryStructure[Row](val prefix: Option[String], val extract: 
   override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
   override val ratechangedate = new IdField[TypoLocalDateTime, Row](prefix, "ratechangedate", Some("text"), Some("timestamp"))(x => extract(x).ratechangedate, (row, value) => merge(row, extract(row).copy(ratechangedate = value)))
   override val rate = new Field[BigDecimal, Row](prefix, "rate", None, Some("numeric"))(x => extract(x).rate, (row, value) => merge(row, extract(row).copy(rate = value)))
-  override val payfrequency = new Field[Int, Row](prefix, "payfrequency", None, Some("int2"))(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
+  override val payfrequency = new Field[TypoShort, Row](prefix, "payfrequency", None, Some("int2"))(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

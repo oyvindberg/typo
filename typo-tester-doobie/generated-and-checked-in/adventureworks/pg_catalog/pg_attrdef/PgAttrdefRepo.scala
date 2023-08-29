@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_attrdef
 
+import adventureworks.customtypes.TypoShort
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
 import typo.dsl.DeleteBuilder
@@ -21,7 +22,7 @@ trait PgAttrdefRepo {
   def selectAll: Stream[ConnectionIO, PgAttrdefRow]
   def selectById(oid: PgAttrdefId): ConnectionIO[Option[PgAttrdefRow]]
   def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow]
-  def selectByUnique(adrelid: /* oid */ Long, adnum: Int): ConnectionIO[Option[PgAttrdefRow]]
+  def selectByUnique(adrelid: /* oid */ Long, adnum: TypoShort): ConnectionIO[Option[PgAttrdefRow]]
   def update(row: PgAttrdefRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PgAttrdefFields, PgAttrdefRow]
   def upsert(unsaved: PgAttrdefRow): ConnectionIO[PgAttrdefRow]

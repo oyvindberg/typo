@@ -10,6 +10,7 @@ package pg_partitioned_table
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -17,7 +18,7 @@ import typo.dsl.SqlExpr.OptField
 trait PgPartitionedTableFields[Row] {
   val partrelid: IdField[PgPartitionedTableId, Row]
   val partstrat: Field[String, Row]
-  val partnatts: Field[Int, Row]
+  val partnatts: Field[TypoShort, Row]
   val partdefid: Field[/* oid */ Long, Row]
   val partattrs: Field[TypoInt2Vector, Row]
   val partclass: Field[TypoOidVector, Row]

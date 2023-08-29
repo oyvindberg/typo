@@ -9,6 +9,7 @@ package creditcard
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -32,7 +33,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
   }
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
-          values (${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4, ${ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.cardnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.expmonth, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.expyear, null, ToStatement.intToStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4, ${ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.cardnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.expmonth, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.expyear, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
@@ -42,8 +43,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
     val namedParameters = List(
       Some((NamedParameter("cardtype", ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)), "")),
       Some((NamedParameter("cardnumber", ParameterValue(unsaved.cardnumber, null, ToStatement.stringToStatement)), "")),
-      Some((NamedParameter("expmonth", ParameterValue(unsaved.expmonth, null, ToStatement.intToStatement)), "::int2")),
-      Some((NamedParameter("expyear", ParameterValue(unsaved.expyear, null, ToStatement.intToStatement)), "::int2")),
+      Some((NamedParameter("expmonth", ParameterValue(unsaved.expmonth, null, TypoShort.toStatement)), "::int2")),
+      Some((NamedParameter("expyear", ParameterValue(unsaved.expyear, null, TypoShort.toStatement)), "::int2")),
       unsaved.creditcardid match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("creditcardid", ParameterValue(value, null, /* user-picked */ CustomCreditcardId.toStatement)), "::int4"))
@@ -95,8 +96,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
     SQL"""update sales.creditcard
           set "cardtype" = ${ParameterValue(row.cardtype, null, ToStatement.stringToStatement)},
               "cardnumber" = ${ParameterValue(row.cardnumber, null, ToStatement.stringToStatement)},
-              "expmonth" = ${ParameterValue(row.expmonth, null, ToStatement.intToStatement)}::int2,
-              "expyear" = ${ParameterValue(row.expyear, null, ToStatement.intToStatement)}::int2,
+              "expmonth" = ${ParameterValue(row.expmonth, null, TypoShort.toStatement)}::int2,
+              "expyear" = ${ParameterValue(row.expyear, null, TypoShort.toStatement)}::int2,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "creditcardid" = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.executeUpdate() > 0
@@ -110,8 +111,8 @@ object CreditcardRepoImpl extends CreditcardRepo {
             ${ParameterValue(unsaved.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}::int4,
             ${ParameterValue(unsaved.cardtype, null, ToStatement.stringToStatement)},
             ${ParameterValue(unsaved.cardnumber, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.expmonth, null, ToStatement.intToStatement)}::int2,
-            ${ParameterValue(unsaved.expyear, null, ToStatement.intToStatement)}::int2,
+            ${ParameterValue(unsaved.expmonth, null, TypoShort.toStatement)}::int2,
+            ${ParameterValue(unsaved.expyear, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict ("creditcardid")

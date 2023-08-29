@@ -9,6 +9,7 @@ package purchaseorderheader
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import play.api.libs.json.JsObject
@@ -38,10 +39,10 @@ case class PurchaseorderheaderRowUnsaved(
   purchaseorderid: Defaulted[PurchaseorderheaderId] = Defaulted.UseDefault,
   /** Default: 0
       Incremental number to track changes to the purchase order over time. */
-  revisionnumber: Defaulted[Int] = Defaulted.UseDefault,
+  revisionnumber: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: 1
       Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete */
-  status: Defaulted[Int] = Defaulted.UseDefault,
+  status: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: now()
       Purchase order creation date. */
   orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
@@ -57,7 +58,7 @@ case class PurchaseorderheaderRowUnsaved(
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(purchaseorderidDefault: => PurchaseorderheaderId, revisionnumberDefault: => Int, statusDefault: => Int, orderdateDefault: => TypoLocalDateTime, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): PurchaseorderheaderRow =
+  def toRow(purchaseorderidDefault: => PurchaseorderheaderId, revisionnumberDefault: => TypoShort, statusDefault: => TypoShort, orderdateDefault: => TypoLocalDateTime, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): PurchaseorderheaderRow =
     PurchaseorderheaderRow(
       employeeid = employeeid,
       vendorid = vendorid,
@@ -106,8 +107,8 @@ object PurchaseorderheaderRowUnsaved {
           shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
           shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
           purchaseorderid = json.\("purchaseorderid").as(Defaulted.reads(PurchaseorderheaderId.reads)),
-          revisionnumber = json.\("revisionnumber").as(Defaulted.reads(Reads.IntReads)),
-          status = json.\("status").as(Defaulted.reads(Reads.IntReads)),
+          revisionnumber = json.\("revisionnumber").as(Defaulted.reads(TypoShort.reads)),
+          status = json.\("status").as(Defaulted.reads(TypoShort.reads)),
           orderdate = json.\("orderdate").as(Defaulted.reads(TypoLocalDateTime.reads)),
           subtotal = json.\("subtotal").as(Defaulted.reads(Reads.bigDecReads)),
           taxamt = json.\("taxamt").as(Defaulted.reads(Reads.bigDecReads)),
@@ -124,8 +125,8 @@ object PurchaseorderheaderRowUnsaved {
       "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
       "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
       "purchaseorderid" -> Defaulted.writes(PurchaseorderheaderId.writes).writes(o.purchaseorderid),
-      "revisionnumber" -> Defaulted.writes(Writes.IntWrites).writes(o.revisionnumber),
-      "status" -> Defaulted.writes(Writes.IntWrites).writes(o.status),
+      "revisionnumber" -> Defaulted.writes(TypoShort.writes).writes(o.revisionnumber),
+      "status" -> Defaulted.writes(TypoShort.writes).writes(o.status),
       "orderdate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.orderdate),
       "subtotal" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.subtotal),
       "taxamt" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.taxamt),

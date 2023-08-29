@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoAclItem
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -32,8 +33,8 @@ trait PgProcFields[Row] {
   val proretset: Field[Boolean, Row]
   val provolatile: Field[String, Row]
   val proparallel: Field[String, Row]
-  val pronargs: Field[Int, Row]
-  val pronargdefaults: Field[Int, Row]
+  val pronargs: Field[TypoShort, Row]
+  val pronargdefaults: Field[TypoShort, Row]
   val prorettype: Field[/* oid */ Long, Row]
   val proargtypes: Field[TypoOidVector, Row]
   val proallargtypes: OptField[Array[/* oid */ Long], Row]

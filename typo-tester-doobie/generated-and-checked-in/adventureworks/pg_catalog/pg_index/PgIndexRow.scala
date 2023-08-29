@@ -10,6 +10,7 @@ package pg_index
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -20,8 +21,8 @@ import java.sql.ResultSet
 case class PgIndexRow(
   indexrelid: PgIndexId,
   indrelid: /* oid */ Long,
-  indnatts: Int,
-  indnkeyatts: Int,
+  indnatts: TypoShort,
+  indnkeyatts: TypoShort,
   indisunique: Boolean,
   indisprimary: Boolean,
   indisexclusion: Boolean,
@@ -41,14 +42,14 @@ case class PgIndexRow(
 )
 
 object PgIndexRow {
-  implicit lazy val decoder: Decoder[PgIndexRow] = Decoder.forProduct20[PgIndexRow, PgIndexId, /* oid */ Long, Int, Int, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, TypoInt2Vector, TypoOidVector, TypoOidVector, TypoInt2Vector, Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")(PgIndexRow.apply)(PgIndexId.decoder, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, TypoInt2Vector.decoder, TypoOidVector.decoder, TypoOidVector.decoder, TypoInt2Vector.decoder, Decoder.decodeOption(TypoPgNodeTree.decoder), Decoder.decodeOption(TypoPgNodeTree.decoder))
-  implicit lazy val encoder: Encoder[PgIndexRow] = Encoder.forProduct20[PgIndexRow, PgIndexId, /* oid */ Long, Int, Int, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, TypoInt2Vector, TypoOidVector, TypoOidVector, TypoInt2Vector, Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")(x => (x.indexrelid, x.indrelid, x.indnatts, x.indnkeyatts, x.indisunique, x.indisprimary, x.indisexclusion, x.indimmediate, x.indisclustered, x.indisvalid, x.indcheckxmin, x.indisready, x.indislive, x.indisreplident, x.indkey, x.indcollation, x.indclass, x.indoption, x.indexprs, x.indpred))(PgIndexId.encoder, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, TypoInt2Vector.encoder, TypoOidVector.encoder, TypoOidVector.encoder, TypoInt2Vector.encoder, Encoder.encodeOption(TypoPgNodeTree.encoder), Encoder.encodeOption(TypoPgNodeTree.encoder))
+  implicit lazy val decoder: Decoder[PgIndexRow] = Decoder.forProduct20[PgIndexRow, PgIndexId, /* oid */ Long, TypoShort, TypoShort, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, TypoInt2Vector, TypoOidVector, TypoOidVector, TypoInt2Vector, Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")(PgIndexRow.apply)(PgIndexId.decoder, Decoder.decodeLong, TypoShort.decoder, TypoShort.decoder, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, TypoInt2Vector.decoder, TypoOidVector.decoder, TypoOidVector.decoder, TypoInt2Vector.decoder, Decoder.decodeOption(TypoPgNodeTree.decoder), Decoder.decodeOption(TypoPgNodeTree.decoder))
+  implicit lazy val encoder: Encoder[PgIndexRow] = Encoder.forProduct20[PgIndexRow, PgIndexId, /* oid */ Long, TypoShort, TypoShort, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, TypoInt2Vector, TypoOidVector, TypoOidVector, TypoInt2Vector, Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")(x => (x.indexrelid, x.indrelid, x.indnatts, x.indnkeyatts, x.indisunique, x.indisprimary, x.indisexclusion, x.indimmediate, x.indisclustered, x.indisvalid, x.indcheckxmin, x.indisready, x.indislive, x.indisreplident, x.indkey, x.indcollation, x.indclass, x.indoption, x.indexprs, x.indpred))(PgIndexId.encoder, Encoder.encodeLong, TypoShort.encoder, TypoShort.encoder, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, TypoInt2Vector.encoder, TypoOidVector.encoder, TypoOidVector.encoder, TypoInt2Vector.encoder, Encoder.encodeOption(TypoPgNodeTree.encoder), Encoder.encodeOption(TypoPgNodeTree.encoder))
   implicit lazy val read: Read[PgIndexRow] = new Read[PgIndexRow](
     gets = List(
       (PgIndexId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
@@ -69,8 +70,8 @@ object PgIndexRow {
     unsafeGet = (rs: ResultSet, i: Int) => PgIndexRow(
       indexrelid = PgIndexId.get.unsafeGetNonNullable(rs, i + 0),
       indrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
-      indnatts = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      indnkeyatts = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      indnatts = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
+      indnkeyatts = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
       indisunique = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 4),
       indisprimary = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 5),
       indisexclusion = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 6),

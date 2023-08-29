@@ -9,6 +9,7 @@ package vendor
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
@@ -26,7 +27,7 @@ case class VendorRowUnsaved(
   /** Company name. */
   name: Name,
   /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average */
-  creditrating: Int,
+  creditrating: TypoShort,
   /** Vendor URL. */
   purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   /** Default: true
@@ -60,6 +61,6 @@ case class VendorRowUnsaved(
     )
 }
 object VendorRowUnsaved {
-  implicit lazy val decoder: Decoder[VendorRowUnsaved] = Decoder.forProduct8[VendorRowUnsaved, BusinessentityId, AccountNumber, Name, Int, Option[/* max 1024 chars */ String], Defaulted[Flag], Defaulted[Flag], Defaulted[TypoLocalDateTime]]("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate")(VendorRowUnsaved.apply)(BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(Flag.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[VendorRowUnsaved] = Encoder.forProduct8[VendorRowUnsaved, BusinessentityId, AccountNumber, Name, Int, Option[/* max 1024 chars */ String], Defaulted[Flag], Defaulted[Flag], Defaulted[TypoLocalDateTime]]("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.purchasingwebserviceurl, x.preferredvendorstatus, x.activeflag, x.modifieddate))(BusinessentityId.encoder, AccountNumber.encoder, Name.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(Flag.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[VendorRowUnsaved] = Decoder.forProduct8[VendorRowUnsaved, BusinessentityId, AccountNumber, Name, TypoShort, Option[/* max 1024 chars */ String], Defaulted[Flag], Defaulted[Flag], Defaulted[TypoLocalDateTime]]("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate")(VendorRowUnsaved.apply)(BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, TypoShort.decoder, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(Flag.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[VendorRowUnsaved] = Encoder.forProduct8[VendorRowUnsaved, BusinessentityId, AccountNumber, Name, TypoShort, Option[/* max 1024 chars */ String], Defaulted[Flag], Defaulted[Flag], Defaulted[TypoLocalDateTime]]("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.purchasingwebserviceurl, x.preferredvendorstatus, x.activeflag, x.modifieddate))(BusinessentityId.encoder, AccountNumber.encoder, Name.encoder, TypoShort.encoder, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(Flag.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

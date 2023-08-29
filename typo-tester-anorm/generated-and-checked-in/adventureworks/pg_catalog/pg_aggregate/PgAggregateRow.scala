@@ -8,6 +8,7 @@ package pg_catalog
 package pg_aggregate
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -23,7 +24,7 @@ import scala.util.Try
 case class PgAggregateRow(
   aggfnoid: PgAggregateId,
   aggkind: String,
-  aggnumdirectargs: Int,
+  aggnumdirectargs: TypoShort,
   aggtransfn: TypoRegproc,
   aggfinalfn: TypoRegproc,
   aggcombinefn: TypoRegproc,
@@ -51,7 +52,7 @@ object PgAggregateRow {
         PgAggregateRow(
           aggfnoid = json.\("aggfnoid").as(PgAggregateId.reads),
           aggkind = json.\("aggkind").as(Reads.StringReads),
-          aggnumdirectargs = json.\("aggnumdirectargs").as(Reads.IntReads),
+          aggnumdirectargs = json.\("aggnumdirectargs").as(TypoShort.reads),
           aggtransfn = json.\("aggtransfn").as(TypoRegproc.reads),
           aggfinalfn = json.\("aggfinalfn").as(TypoRegproc.reads),
           aggcombinefn = json.\("aggcombinefn").as(TypoRegproc.reads),
@@ -80,7 +81,7 @@ object PgAggregateRow {
       PgAggregateRow(
         aggfnoid = row(idx + 0)(PgAggregateId.column),
         aggkind = row(idx + 1)(Column.columnToString),
-        aggnumdirectargs = row(idx + 2)(Column.columnToInt),
+        aggnumdirectargs = row(idx + 2)(TypoShort.column),
         aggtransfn = row(idx + 3)(TypoRegproc.column),
         aggfinalfn = row(idx + 4)(TypoRegproc.column),
         aggcombinefn = row(idx + 5)(TypoRegproc.column),
@@ -107,7 +108,7 @@ object PgAggregateRow {
     new JsObject(ListMap[String, JsValue](
       "aggfnoid" -> PgAggregateId.writes.writes(o.aggfnoid),
       "aggkind" -> Writes.StringWrites.writes(o.aggkind),
-      "aggnumdirectargs" -> Writes.IntWrites.writes(o.aggnumdirectargs),
+      "aggnumdirectargs" -> TypoShort.writes.writes(o.aggnumdirectargs),
       "aggtransfn" -> TypoRegproc.writes.writes(o.aggtransfn),
       "aggfinalfn" -> TypoRegproc.writes.writes(o.aggfinalfn),
       "aggcombinefn" -> TypoRegproc.writes.writes(o.aggcombinefn),

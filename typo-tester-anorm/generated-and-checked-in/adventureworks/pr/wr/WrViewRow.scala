@@ -8,6 +8,7 @@ package pr
 package wr
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import anorm.Column
@@ -30,7 +31,7 @@ case class WrViewRow(
   /** Points to [[production.workorderrouting.WorkorderroutingRow.productid]] */
   productid: Int,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.operationsequence]] */
-  operationsequence: Int,
+  operationsequence: TypoShort,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.locationid]] */
   locationid: LocationId,
   /** Points to [[production.workorderrouting.WorkorderroutingRow.scheduledstartdate]] */
@@ -58,7 +59,7 @@ object WrViewRow {
           id = json.\("id").as(WorkorderId.reads),
           workorderid = json.\("workorderid").as(WorkorderId.reads),
           productid = json.\("productid").as(Reads.IntReads),
-          operationsequence = json.\("operationsequence").as(Reads.IntReads),
+          operationsequence = json.\("operationsequence").as(TypoShort.reads),
           locationid = json.\("locationid").as(LocationId.reads),
           scheduledstartdate = json.\("scheduledstartdate").as(TypoLocalDateTime.reads),
           scheduledenddate = json.\("scheduledenddate").as(TypoLocalDateTime.reads),
@@ -78,7 +79,7 @@ object WrViewRow {
         id = row(idx + 0)(WorkorderId.column),
         workorderid = row(idx + 1)(WorkorderId.column),
         productid = row(idx + 2)(Column.columnToInt),
-        operationsequence = row(idx + 3)(Column.columnToInt),
+        operationsequence = row(idx + 3)(TypoShort.column),
         locationid = row(idx + 4)(LocationId.column),
         scheduledstartdate = row(idx + 5)(TypoLocalDateTime.column),
         scheduledenddate = row(idx + 6)(TypoLocalDateTime.column),
@@ -96,7 +97,7 @@ object WrViewRow {
       "id" -> WorkorderId.writes.writes(o.id),
       "workorderid" -> WorkorderId.writes.writes(o.workorderid),
       "productid" -> Writes.IntWrites.writes(o.productid),
-      "operationsequence" -> Writes.IntWrites.writes(o.operationsequence),
+      "operationsequence" -> TypoShort.writes.writes(o.operationsequence),
       "locationid" -> LocationId.writes.writes(o.locationid),
       "scheduledstartdate" -> TypoLocalDateTime.writes.writes(o.scheduledstartdate),
       "scheduledenddate" -> TypoLocalDateTime.writes.writes(o.scheduledenddate),

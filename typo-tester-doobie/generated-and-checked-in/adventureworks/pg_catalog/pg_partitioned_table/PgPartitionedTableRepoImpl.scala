@@ -10,6 +10,7 @@ package pg_partitioned_table
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoOidVector
 import adventureworks.customtypes.TypoPgNodeTree
+import adventureworks.customtypes.TypoShort
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
@@ -30,7 +31,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   }
   override def insert(unsaved: PgPartitionedTableRow): ConnectionIO[PgPartitionedTableRow] = {
     sql"""insert into pg_catalog.pg_partitioned_table("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")
-          values (${fromWrite(unsaved.partrelid)(Write.fromPut(PgPartitionedTableId.put))}::oid, ${fromWrite(unsaved.partstrat)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.partnatts)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.partdefid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.partattrs)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.partclass)(Write.fromPut(TypoOidVector.put))}::oidvector, ${fromWrite(unsaved.partcollation)(Write.fromPut(TypoOidVector.put))}::oidvector, ${fromWrite(unsaved.partexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree)
+          values (${fromWrite(unsaved.partrelid)(Write.fromPut(PgPartitionedTableId.put))}::oid, ${fromWrite(unsaved.partstrat)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.partnatts)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.partdefid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.partattrs)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.partclass)(Write.fromPut(TypoOidVector.put))}::oidvector, ${fromWrite(unsaved.partcollation)(Write.fromPut(TypoOidVector.put))}::oidvector, ${fromWrite(unsaved.partexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree)
           returning "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs"
        """.query(PgPartitionedTableRow.read).unique
   }
@@ -50,7 +51,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     val partrelid = row.partrelid
     sql"""update pg_catalog.pg_partitioned_table
           set "partstrat" = ${fromWrite(row.partstrat)(Write.fromPut(Meta.StringMeta.put))}::char,
-              "partnatts" = ${fromWrite(row.partnatts)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "partnatts" = ${fromWrite(row.partnatts)(Write.fromPut(TypoShort.put))}::int2,
               "partdefid" = ${fromWrite(row.partdefid)(Write.fromPut(Meta.LongMeta.put))}::oid,
               "partattrs" = ${fromWrite(row.partattrs)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
               "partclass" = ${fromWrite(row.partclass)(Write.fromPut(TypoOidVector.put))}::oidvector,
@@ -69,7 +70,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
           values (
             ${fromWrite(unsaved.partrelid)(Write.fromPut(PgPartitionedTableId.put))}::oid,
             ${fromWrite(unsaved.partstrat)(Write.fromPut(Meta.StringMeta.put))}::char,
-            ${fromWrite(unsaved.partnatts)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.partnatts)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.partdefid)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.partattrs)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
             ${fromWrite(unsaved.partclass)(Write.fromPut(TypoOidVector.put))}::oidvector,

@@ -9,6 +9,7 @@ package e
 
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.Column
@@ -46,9 +47,9 @@ case class EViewRow(
   /** Points to [[humanresources.employee.EmployeeRow.salariedflag]] */
   salariedflag: Flag,
   /** Points to [[humanresources.employee.EmployeeRow.vacationhours]] */
-  vacationhours: Int,
+  vacationhours: TypoShort,
   /** Points to [[humanresources.employee.EmployeeRow.sickleavehours]] */
-  sickleavehours: Int,
+  sickleavehours: TypoShort,
   /** Points to [[humanresources.employee.EmployeeRow.currentflag]] */
   currentflag: Flag,
   /** Points to [[humanresources.employee.EmployeeRow.rowguid]] */
@@ -73,8 +74,8 @@ object EViewRow {
           gender = json.\("gender").as(Reads.StringReads),
           hiredate = json.\("hiredate").as(TypoLocalDate.reads),
           salariedflag = json.\("salariedflag").as(Flag.reads),
-          vacationhours = json.\("vacationhours").as(Reads.IntReads),
-          sickleavehours = json.\("sickleavehours").as(Reads.IntReads),
+          vacationhours = json.\("vacationhours").as(TypoShort.reads),
+          sickleavehours = json.\("sickleavehours").as(TypoShort.reads),
           currentflag = json.\("currentflag").as(Flag.reads),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
@@ -96,8 +97,8 @@ object EViewRow {
         gender = row(idx + 7)(Column.columnToString),
         hiredate = row(idx + 8)(TypoLocalDate.column),
         salariedflag = row(idx + 9)(Flag.column),
-        vacationhours = row(idx + 10)(Column.columnToInt),
-        sickleavehours = row(idx + 11)(Column.columnToInt),
+        vacationhours = row(idx + 10)(TypoShort.column),
+        sickleavehours = row(idx + 11)(TypoShort.column),
         currentflag = row(idx + 12)(Flag.column),
         rowguid = row(idx + 13)(Column.columnToUUID),
         modifieddate = row(idx + 14)(TypoLocalDateTime.column),
@@ -117,8 +118,8 @@ object EViewRow {
       "gender" -> Writes.StringWrites.writes(o.gender),
       "hiredate" -> TypoLocalDate.writes.writes(o.hiredate),
       "salariedflag" -> Flag.writes.writes(o.salariedflag),
-      "vacationhours" -> Writes.IntWrites.writes(o.vacationhours),
-      "sickleavehours" -> Writes.IntWrites.writes(o.sickleavehours),
+      "vacationhours" -> TypoShort.writes.writes(o.vacationhours),
+      "sickleavehours" -> TypoShort.writes.writes(o.sickleavehours),
       "currentflag" -> Flag.writes.writes(o.currentflag),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),

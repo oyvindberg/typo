@@ -8,6 +8,7 @@ package sales
 package salesorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -34,7 +35,7 @@ case class SalesorderheaderRow(
   /** Primary key. */
   salesorderid: SalesorderheaderId,
   /** Incremental number to track changes to the sales order over time. */
-  revisionnumber: Int,
+  revisionnumber: TypoShort,
   /** Dates the sales order was created. */
   orderdate: TypoLocalDateTime,
   /** Date the order is due to the customer. */
@@ -42,7 +43,7 @@ case class SalesorderheaderRow(
   /** Date the order was shipped to the customer. */
   shipdate: Option[TypoLocalDateTime],
   /** Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
-  status: Int,
+  status: TypoShort,
   /** 0 = Order placed by sales person. 1 = Order placed online by customer. */
   onlineorderflag: Flag,
   /** Customer purchase order number reference. */
@@ -98,11 +99,11 @@ object SalesorderheaderRow {
       }
       SalesorderheaderRow(
         salesorderid = orThrow(c.get("salesorderid")(SalesorderheaderId.decoder)),
-        revisionnumber = orThrow(c.get("revisionnumber")(Decoder.decodeInt)),
+        revisionnumber = orThrow(c.get("revisionnumber")(TypoShort.decoder)),
         orderdate = orThrow(c.get("orderdate")(TypoLocalDateTime.decoder)),
         duedate = orThrow(c.get("duedate")(TypoLocalDateTime.decoder)),
         shipdate = orThrow(c.get("shipdate")(Decoder.decodeOption(TypoLocalDateTime.decoder))),
-        status = orThrow(c.get("status")(Decoder.decodeInt)),
+        status = orThrow(c.get("status")(TypoShort.decoder)),
         onlineorderflag = orThrow(c.get("onlineorderflag")(Flag.decoder)),
         purchaseordernumber = orThrow(c.get("purchaseordernumber")(Decoder.decodeOption(OrderNumber.decoder))),
         accountnumber = orThrow(c.get("accountnumber")(Decoder.decodeOption(AccountNumber.decoder))),
@@ -128,11 +129,11 @@ object SalesorderheaderRow {
   implicit lazy val encoder: Encoder[SalesorderheaderRow] = Encoder[SalesorderheaderRow](row =>
     Json.obj(
       "salesorderid" -> SalesorderheaderId.encoder.apply(row.salesorderid),
-      "revisionnumber" -> Encoder.encodeInt.apply(row.revisionnumber),
+      "revisionnumber" -> TypoShort.encoder.apply(row.revisionnumber),
       "orderdate" -> TypoLocalDateTime.encoder.apply(row.orderdate),
       "duedate" -> TypoLocalDateTime.encoder.apply(row.duedate),
       "shipdate" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.shipdate),
-      "status" -> Encoder.encodeInt.apply(row.status),
+      "status" -> TypoShort.encoder.apply(row.status),
       "onlineorderflag" -> Flag.encoder.apply(row.onlineorderflag),
       "purchaseordernumber" -> Encoder.encodeOption(OrderNumber.encoder).apply(row.purchaseordernumber),
       "accountnumber" -> Encoder.encodeOption(AccountNumber.encoder).apply(row.accountnumber),
@@ -157,11 +158,11 @@ object SalesorderheaderRow {
   implicit lazy val read: Read[SalesorderheaderRow] = new Read[SalesorderheaderRow](
     gets = List(
       (SalesorderheaderId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
       (OrderNumber.get, Nullability.Nullable),
       (AccountNumber.get, Nullability.Nullable),
@@ -184,11 +185,11 @@ object SalesorderheaderRow {
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SalesorderheaderRow(
       salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
-      revisionnumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
+      revisionnumber = TypoShort.get.unsafeGetNonNullable(rs, i + 1),
       orderdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
       duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
       shipdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
-      status = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 5),
+      status = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
       onlineorderflag = Flag.get.unsafeGetNonNullable(rs, i + 6),
       purchaseordernumber = OrderNumber.get.unsafeGetNullable(rs, i + 7),
       accountnumber = AccountNumber.get.unsafeGetNullable(rs, i + 8),

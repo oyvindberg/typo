@@ -8,6 +8,7 @@ package pg_catalog
 package pg_amproc
 
 import adventureworks.customtypes.TypoRegproc
+import adventureworks.customtypes.TypoShort
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
@@ -28,7 +29,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   }
   override def insert(unsaved: PgAmprocRow): ConnectionIO[PgAmprocRow] = {
     sql"""insert into pg_catalog.pg_amproc("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")
-          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAmprocId.put))}::oid, ${fromWrite(unsaved.amprocfamily)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amproclefttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amprocrighttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amprocnum)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.amproc)(Write.fromPut(TypoRegproc.put))}::regproc)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAmprocId.put))}::oid, ${fromWrite(unsaved.amprocfamily)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amproclefttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amprocrighttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amprocnum)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.amproc)(Write.fromPut(TypoRegproc.put))}::regproc)
           returning "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc"
        """.query(PgAmprocRow.read).unique
   }
@@ -44,10 +45,10 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   override def selectByIds(oids: Array[PgAmprocId]): Stream[ConnectionIO, PgAmprocRow] = {
     sql"""select "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc" from pg_catalog.pg_amproc where "oid" = ANY(${oids})""".query(PgAmprocRow.read).stream
   }
-  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int): ConnectionIO[Option[PgAmprocRow]] = {
+  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: TypoShort): ConnectionIO[Option[PgAmprocRow]] = {
     sql"""select "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum"
           from pg_catalog.pg_amproc
-          where "amprocfamily" = ${fromWrite(amprocfamily)(Write.fromPut(Meta.LongMeta.put))} AND "amproclefttype" = ${fromWrite(amproclefttype)(Write.fromPut(Meta.LongMeta.put))} AND "amprocrighttype" = ${fromWrite(amprocrighttype)(Write.fromPut(Meta.LongMeta.put))} AND "amprocnum" = ${fromWrite(amprocnum)(Write.fromPut(Meta.IntMeta.put))}
+          where "amprocfamily" = ${fromWrite(amprocfamily)(Write.fromPut(Meta.LongMeta.put))} AND "amproclefttype" = ${fromWrite(amproclefttype)(Write.fromPut(Meta.LongMeta.put))} AND "amprocrighttype" = ${fromWrite(amprocrighttype)(Write.fromPut(Meta.LongMeta.put))} AND "amprocnum" = ${fromWrite(amprocnum)(Write.fromPut(TypoShort.put))}
        """.query(PgAmprocRow.read).option
   }
   override def update(row: PgAmprocRow): ConnectionIO[Boolean] = {
@@ -56,7 +57,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
           set "amprocfamily" = ${fromWrite(row.amprocfamily)(Write.fromPut(Meta.LongMeta.put))}::oid,
               "amproclefttype" = ${fromWrite(row.amproclefttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
               "amprocrighttype" = ${fromWrite(row.amprocrighttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
-              "amprocnum" = ${fromWrite(row.amprocnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              "amprocnum" = ${fromWrite(row.amprocnum)(Write.fromPut(TypoShort.put))}::int2,
               "amproc" = ${fromWrite(row.amproc)(Write.fromPut(TypoRegproc.put))}::regproc
           where "oid" = ${fromWrite(oid)(Write.fromPut(PgAmprocId.put))}"""
       .update
@@ -73,7 +74,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
             ${fromWrite(unsaved.amprocfamily)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.amproclefttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.amprocrighttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
-            ${fromWrite(unsaved.amprocnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.amprocnum)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.amproc)(Write.fromPut(TypoRegproc.put))}::regproc
           )
           on conflict ("oid")

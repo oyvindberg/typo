@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_amproc
 
+import adventureworks.customtypes.TypoShort
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
@@ -48,7 +49,7 @@ class PgAmprocRepoMock(map: scala.collection.mutable.Map[PgAmprocId, PgAmprocRow
   override def selectByIds(oids: Array[PgAmprocId]): Stream[ConnectionIO, PgAmprocRow] = {
     Stream.emits(oids.flatMap(map.get).toList)
   }
-  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: Int): ConnectionIO[Option[PgAmprocRow]] = {
+  override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: TypoShort): ConnectionIO[Option[PgAmprocRow]] = {
     delay(map.values.find(v => amprocfamily == v.amprocfamily && amproclefttype == v.amproclefttype && amprocrighttype == v.amprocrighttype && amprocnum == v.amprocnum))
   }
   override def update(row: PgAmprocRow): ConnectionIO[Boolean] = {

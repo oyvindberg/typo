@@ -8,6 +8,7 @@ package pu
 package poh
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
@@ -29,9 +30,9 @@ case class PohViewRow(
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
   purchaseorderid: PurchaseorderheaderId,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.revisionnumber]] */
-  revisionnumber: Int,
+  revisionnumber: TypoShort,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.status]] */
-  status: Int,
+  status: TypoShort,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.employeeid]] */
   employeeid: BusinessentityId,
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.vendorid]] */
@@ -58,8 +59,8 @@ object PohViewRow {
         PohViewRow(
           id = json.\("id").as(PurchaseorderheaderId.reads),
           purchaseorderid = json.\("purchaseorderid").as(PurchaseorderheaderId.reads),
-          revisionnumber = json.\("revisionnumber").as(Reads.IntReads),
-          status = json.\("status").as(Reads.IntReads),
+          revisionnumber = json.\("revisionnumber").as(TypoShort.reads),
+          status = json.\("status").as(TypoShort.reads),
           employeeid = json.\("employeeid").as(BusinessentityId.reads),
           vendorid = json.\("vendorid").as(BusinessentityId.reads),
           shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
@@ -78,8 +79,8 @@ object PohViewRow {
       PohViewRow(
         id = row(idx + 0)(PurchaseorderheaderId.column),
         purchaseorderid = row(idx + 1)(PurchaseorderheaderId.column),
-        revisionnumber = row(idx + 2)(Column.columnToInt),
-        status = row(idx + 3)(Column.columnToInt),
+        revisionnumber = row(idx + 2)(TypoShort.column),
+        status = row(idx + 3)(TypoShort.column),
         employeeid = row(idx + 4)(BusinessentityId.column),
         vendorid = row(idx + 5)(BusinessentityId.column),
         shipmethodid = row(idx + 6)(ShipmethodId.column),
@@ -96,8 +97,8 @@ object PohViewRow {
     new JsObject(ListMap[String, JsValue](
       "id" -> PurchaseorderheaderId.writes.writes(o.id),
       "purchaseorderid" -> PurchaseorderheaderId.writes.writes(o.purchaseorderid),
-      "revisionnumber" -> Writes.IntWrites.writes(o.revisionnumber),
-      "status" -> Writes.IntWrites.writes(o.status),
+      "revisionnumber" -> TypoShort.writes.writes(o.revisionnumber),
+      "status" -> TypoShort.writes.writes(o.status),
       "employeeid" -> BusinessentityId.writes.writes(o.employeeid),
       "vendorid" -> BusinessentityId.writes.writes(o.vendorid),
       "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),

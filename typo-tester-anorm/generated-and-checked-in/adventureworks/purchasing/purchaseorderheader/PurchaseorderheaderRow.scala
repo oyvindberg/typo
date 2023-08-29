@@ -8,6 +8,7 @@ package purchasing
 package purchaseorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.Column
@@ -26,9 +27,9 @@ case class PurchaseorderheaderRow(
   /** Primary key. */
   purchaseorderid: PurchaseorderheaderId,
   /** Incremental number to track changes to the purchase order over time. */
-  revisionnumber: Int,
+  revisionnumber: TypoShort,
   /** Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete */
-  status: Int,
+  status: TypoShort,
   /** Employee who created the purchase order. Foreign key to Employee.BusinessEntityID.
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   employeeid: BusinessentityId,
@@ -56,8 +57,8 @@ object PurchaseorderheaderRow {
       Try(
         PurchaseorderheaderRow(
           purchaseorderid = json.\("purchaseorderid").as(PurchaseorderheaderId.reads),
-          revisionnumber = json.\("revisionnumber").as(Reads.IntReads),
-          status = json.\("status").as(Reads.IntReads),
+          revisionnumber = json.\("revisionnumber").as(TypoShort.reads),
+          status = json.\("status").as(TypoShort.reads),
           employeeid = json.\("employeeid").as(BusinessentityId.reads),
           vendorid = json.\("vendorid").as(BusinessentityId.reads),
           shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
@@ -75,8 +76,8 @@ object PurchaseorderheaderRow {
     Success(
       PurchaseorderheaderRow(
         purchaseorderid = row(idx + 0)(PurchaseorderheaderId.column),
-        revisionnumber = row(idx + 1)(Column.columnToInt),
-        status = row(idx + 2)(Column.columnToInt),
+        revisionnumber = row(idx + 1)(TypoShort.column),
+        status = row(idx + 2)(TypoShort.column),
         employeeid = row(idx + 3)(BusinessentityId.column),
         vendorid = row(idx + 4)(BusinessentityId.column),
         shipmethodid = row(idx + 5)(ShipmethodId.column),
@@ -92,8 +93,8 @@ object PurchaseorderheaderRow {
   implicit lazy val writes: OWrites[PurchaseorderheaderRow] = OWrites[PurchaseorderheaderRow](o =>
     new JsObject(ListMap[String, JsValue](
       "purchaseorderid" -> PurchaseorderheaderId.writes.writes(o.purchaseorderid),
-      "revisionnumber" -> Writes.IntWrites.writes(o.revisionnumber),
-      "status" -> Writes.IntWrites.writes(o.status),
+      "revisionnumber" -> TypoShort.writes.writes(o.revisionnumber),
+      "status" -> TypoShort.writes.writes(o.status),
       "employeeid" -> BusinessentityId.writes.writes(o.employeeid),
       "vendorid" -> BusinessentityId.writes.writes(o.vendorid),
       "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),

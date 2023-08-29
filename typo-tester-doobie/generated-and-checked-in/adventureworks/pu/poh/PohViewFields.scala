@@ -8,6 +8,7 @@ package pu
 package poh
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
@@ -17,8 +18,8 @@ import typo.dsl.SqlExpr.OptField
 trait PohViewFields[Row] {
   val id: Field[PurchaseorderheaderId, Row]
   val purchaseorderid: Field[PurchaseorderheaderId, Row]
-  val revisionnumber: Field[Int, Row]
-  val status: Field[Int, Row]
+  val revisionnumber: Field[TypoShort, Row]
+  val status: Field[TypoShort, Row]
   val employeeid: Field[BusinessentityId, Row]
   val vendorid: Field[BusinessentityId, Row]
   val shipmethodid: Field[ShipmethodId, Row]

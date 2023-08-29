@@ -8,6 +8,7 @@ package production
 package product
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoShort
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -39,9 +40,9 @@ case class ProductRow(
   /** Product color. */
   color: Option[/* max 15 chars */ String],
   /** Minimum inventory quantity. */
-  safetystocklevel: Int,
+  safetystocklevel: TypoShort,
   /** Inventory level that triggers a purchase order or work order. */
-  reorderpoint: Int,
+  reorderpoint: TypoShort,
   /** Standard cost of the product. */
   standardcost: BigDecimal,
   /** Selling price. */
@@ -94,8 +95,8 @@ object ProductRow {
         makeflag = orThrow(c.get("makeflag")(Flag.decoder)),
         finishedgoodsflag = orThrow(c.get("finishedgoodsflag")(Flag.decoder)),
         color = orThrow(c.get("color")(Decoder.decodeOption(Decoder.decodeString))),
-        safetystocklevel = orThrow(c.get("safetystocklevel")(Decoder.decodeInt)),
-        reorderpoint = orThrow(c.get("reorderpoint")(Decoder.decodeInt)),
+        safetystocklevel = orThrow(c.get("safetystocklevel")(TypoShort.decoder)),
+        reorderpoint = orThrow(c.get("reorderpoint")(TypoShort.decoder)),
         standardcost = orThrow(c.get("standardcost")(Decoder.decodeBigDecimal)),
         listprice = orThrow(c.get("listprice")(Decoder.decodeBigDecimal)),
         size = orThrow(c.get("size")(Decoder.decodeOption(Decoder.decodeString))),
@@ -124,8 +125,8 @@ object ProductRow {
       "makeflag" -> Flag.encoder.apply(row.makeflag),
       "finishedgoodsflag" -> Flag.encoder.apply(row.finishedgoodsflag),
       "color" -> Encoder.encodeOption(Encoder.encodeString).apply(row.color),
-      "safetystocklevel" -> Encoder.encodeInt.apply(row.safetystocklevel),
-      "reorderpoint" -> Encoder.encodeInt.apply(row.reorderpoint),
+      "safetystocklevel" -> TypoShort.encoder.apply(row.safetystocklevel),
+      "reorderpoint" -> TypoShort.encoder.apply(row.reorderpoint),
       "standardcost" -> Encoder.encodeBigDecimal.apply(row.standardcost),
       "listprice" -> Encoder.encodeBigDecimal.apply(row.listprice),
       "size" -> Encoder.encodeOption(Encoder.encodeString).apply(row.size),
@@ -153,8 +154,8 @@ object ProductRow {
       (Flag.get, Nullability.NoNulls),
       (Flag.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
+      (TypoShort.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -180,8 +181,8 @@ object ProductRow {
       makeflag = Flag.get.unsafeGetNonNullable(rs, i + 3),
       finishedgoodsflag = Flag.get.unsafeGetNonNullable(rs, i + 4),
       color = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      safetystocklevel = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
-      reorderpoint = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
+      safetystocklevel = TypoShort.get.unsafeGetNonNullable(rs, i + 6),
+      reorderpoint = TypoShort.get.unsafeGetNonNullable(rs, i + 7),
       standardcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
       listprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 9),
       size = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
