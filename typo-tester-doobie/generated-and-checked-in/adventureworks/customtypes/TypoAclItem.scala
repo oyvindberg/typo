@@ -19,7 +19,7 @@ case class TypoAclItem(value: String)
 
 object TypoAclItem {
   implicit lazy val arrayGet: Get[Array[TypoAclItem]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"))
-    .map(_.map(v => TypoAclItem(v.asInstanceOf[String])))
+    .map(_.map(v => TypoAclItem(v.asInstanceOf[PGobject].getValue)))
   implicit lazy val arrayPut: Put[Array[TypoAclItem]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"), "aclitem")
     .contramap(_.map(v => {
                             val obj = new PGobject

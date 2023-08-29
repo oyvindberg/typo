@@ -396,7 +396,7 @@ class CustomTypes(pkg: sc.QIdent) {
   lazy val TypoJson = obj("json", "TypoJson")
   lazy val TypoJsonb = obj("jsonb", "TypoJsonb")
   lazy val TypoInet = obj("inet", "TypoInet").copy(toTypoInArray = None)
-  lazy val TypoAclItem = obj("aclitem", "TypoAclItem")
+  lazy val TypoAclItem = obj("aclitem", "TypoAclItem").copy(toTypoInArray = None)
   lazy val TypoAnyArray = obj("anyarray", "TypoAnyArray")
   lazy val TypoInt2Vector = obj("int2vector", "TypoInt2Vector")
   lazy val TypoOidVector = obj("oidvector", "TypoOidVector")

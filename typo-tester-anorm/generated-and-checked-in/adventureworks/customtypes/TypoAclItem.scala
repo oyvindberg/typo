@@ -26,7 +26,7 @@ object TypoAclItem {
         case v: PgArray =>
          v.getArray match {
            case v: Array[?] =>
-             Right(v.map(v => TypoAclItem(v.asInstanceOf[String])))
+             Right(v.map(v => TypoAclItem(v.asInstanceOf[PGobject].getValue)))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoAclItem, got ${other.getClass.getName}"))
          }
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
