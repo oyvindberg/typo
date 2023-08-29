@@ -7,5 +7,4 @@ case class SqlFile(
     decomposedSql: DecomposedSql,
     jdbcMetadata: JdbcMetadata,
     nullableColumnsFromJoins: Option[NullabilityFromExplain.NullableIndices],
-    depsFromView: Map[db.ColName, (db.RelationName, db.ColName)]
 )

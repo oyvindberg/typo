@@ -17,7 +17,6 @@ object readSqlFileDirectories {
     findSqlFilesUnder(scriptsPath).flatMap { sqlFile =>
       val sqlContent = Files.readString(sqlFile)
       val decomposedSql = DecomposedSql.parse(sqlContent)
-      val relativePath = RelPath.relativeTo(scriptsPath, sqlFile)
 
       println(s"Parsing $sqlFile")
 
@@ -34,18 +33,13 @@ object readSqlFileDirectories {
                 System.err.println(s"Error while parsing $sqlFile : $msg. Will ignore the file.")
                 None
               case Right(jdbcMetadata) =>
-                val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
-                  queryType match {
-                    case SqlCommandType.SELECT => fetchDepsViaTemporaryView(decomposedSql, relativePath)
-                    case _                     => Map.empty
-                  }
                 val nullableColumnsFromJoins =
                   queryType match {
                     case SqlCommandType.SELECT => NullabilityFromExplain.from(decomposedSql, jdbcMetadata.params).nullableIndices
                     case _                     => None
                   }
 
-                Some(SqlFile(RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, jdbcMetadata, nullableColumnsFromJoins, deps))
+                Some(SqlFile(RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, jdbcMetadata, nullableColumnsFromJoins))
             }
           } catch {
             case e: PSQLException =>
@@ -59,21 +53,6 @@ object readSqlFileDirectories {
     val pc = c.unwrap(classOf[PgConnection])
     val q = pc.createQuery(decomposedSql.sqlWithNulls, true, false)
     q.query.getSqlCommand.getType
-  }
-
-  /** believe it or not the dependency information we get through prepared statements and for views are not the same. It's too valuable information to leave out, so let's try to read it from a
-    * temporary view.
-    */
-  def fetchDepsViaTemporaryView(decomposedSql: DecomposedSql, relativePath: RelPath)(implicit c: Connection): Map[db.ColName, (db.RelationName, db.ColName)] = {
-    val viewName = relativePath.segments.mkString("_").replace(".sql", "")
-    val sql = s"""create temporary view $viewName as (${decomposedSql.sqlWithNulls})"""
-    SQL(sql).execute()
-    val ret = ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
-      val table = db.RelationName(row.tableSchema.map(_.value), row.tableName)
-      (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
-    }.toMap
-    SQL(s"drop view $viewName").execute()
-    ret
   }
 
   def findSqlFilesUnder(scriptsPath: Path): List[Path] = {

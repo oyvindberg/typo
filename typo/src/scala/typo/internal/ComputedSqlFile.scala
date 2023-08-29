@@ -15,17 +15,13 @@ case class ComputedSqlFile(
 ) {
   val source: Source.SqlFile = Source.SqlFile(sqlFile.relPath)
 
-  val deps: Map[db.ColName, (db.RelationName, db.ColName)] = {
-    val fromCols = sqlFile.jdbcMetadata.columns match {
+  val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+    sqlFile.jdbcMetadata.columns match {
       case MaybeReturnsRows.Query(columns) =>
-        columns.toList.flatMap { col =>
-          col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)
-        }
-      case MaybeReturnsRows.Update => Nil
-
+        columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)).toMap
+      case MaybeReturnsRows.Update =>
+        Map.empty
     }
-    sqlFile.depsFromView ++ fromCols
-  }
 
   val maybeCols: MaybeReturnsRows[NonEmptyList[ComputedColumn]] =
     sqlFile.jdbcMetadata.columns.map { metadataCols =>
