@@ -28,13 +28,17 @@ case class SalesterritoryRow(
   countryregioncode: CountryregionId,
   /** Geographic area to which the sales territory belong. */
   group: /* max 50 chars */ String,
-  /** Sales in the territory year to date. */
+  /** Sales in the territory year to date.
+      Constraint CK_SalesTerritory_SalesYTD affecting columns "salesytd":  ((salesytd >= 0.00)) */
   salesytd: BigDecimal,
-  /** Sales in the territory the previous year. */
+  /** Sales in the territory the previous year.
+      Constraint CK_SalesTerritory_SalesLastYear affecting columns "saleslastyear":  ((saleslastyear >= 0.00)) */
   saleslastyear: BigDecimal,
-  /** Business costs in the territory year to date. */
+  /** Business costs in the territory year to date.
+      Constraint CK_SalesTerritory_CostYTD affecting columns "costytd":  ((costytd >= 0.00)) */
   costytd: BigDecimal,
-  /** Business costs in the territory the previous year. */
+  /** Business costs in the territory the previous year.
+      Constraint CK_SalesTerritory_CostLastYear affecting columns "costlastyear":  ((costlastyear >= 0.00)) */
   costlastyear: BigDecimal,
   rowguid: UUID,
   modifieddate: TypoLocalDateTime

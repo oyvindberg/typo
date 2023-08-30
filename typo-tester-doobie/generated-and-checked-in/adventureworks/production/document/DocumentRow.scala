@@ -35,7 +35,8 @@ case class DocumentRow(
   revision: /* bpchar, max 5 chars */ String,
   /** Engineering change approval number. */
   changenumber: Int,
-  /** 1 = Pending approval, 2 = Approved, 3 = Obsolete */
+  /** 1 = Pending approval, 2 = Approved, 3 = Obsolete
+      Constraint CK_Document_Status affecting columns "status":  (((status >= 1) AND (status <= 3))) */
   status: TypoShort,
   /** Document abstract. */
   documentsummary: Option[String],

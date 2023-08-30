@@ -63,7 +63,8 @@ case class ComputedSqlFile(
             columnDefault = None,
             comment = None,
             jsonDescription = DebugJson(col),
-            nullability = nullability
+            nullability = nullability,
+            constraints = Nil
           )
         )
       }

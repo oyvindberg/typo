@@ -23,7 +23,8 @@ case class PurchaseorderheaderRow(
   purchaseorderid: PurchaseorderheaderId,
   /** Incremental number to track changes to the purchase order over time. */
   revisionnumber: TypoShort,
-  /** Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete */
+  /** Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete
+      Constraint CK_PurchaseOrderHeader_Status affecting columns "status":  (((status >= 1) AND (status <= 4))) */
   status: TypoShort,
   /** Employee who created the purchase order. Foreign key to Employee.BusinessEntityID.
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
@@ -34,15 +35,20 @@ case class PurchaseorderheaderRow(
   /** Shipping method. Foreign key to ShipMethod.ShipMethodID.
       Points to [[shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
-  /** Purchase order creation date. */
+  /** Purchase order creation date.
+      Constraint CK_PurchaseOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   orderdate: TypoLocalDateTime,
-  /** Estimated shipment date from the vendor. */
+  /** Estimated shipment date from the vendor.
+      Constraint CK_PurchaseOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   shipdate: Option[TypoLocalDateTime],
-  /** Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID. */
+  /** Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID.
+      Constraint CK_PurchaseOrderHeader_SubTotal affecting columns "subtotal":  ((subtotal >= 0.00)) */
   subtotal: BigDecimal,
-  /** Tax amount. */
+  /** Tax amount.
+      Constraint CK_PurchaseOrderHeader_TaxAmt affecting columns "taxamt":  ((taxamt >= 0.00)) */
   taxamt: BigDecimal,
-  /** Shipping cost. */
+  /** Shipping cost.
+      Constraint CK_PurchaseOrderHeader_Freight affecting columns "freight":  ((freight >= 0.00)) */
   freight: BigDecimal,
   modifieddate: TypoLocalDateTime
 )

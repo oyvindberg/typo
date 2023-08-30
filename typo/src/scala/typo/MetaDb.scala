@@ -1,6 +1,7 @@
 package typo
 
 import typo.generated.custom.comments.{CommentsSqlRepoImpl, CommentsSqlRow}
+import typo.generated.custom.constraints.{ConstraintsSqlRepoImpl, ConstraintsSqlRow}
 import typo.generated.custom.domains.{DomainsSqlRepoImpl, DomainsSqlRow}
 import typo.generated.custom.enums.{EnumsSqlRepoImpl, EnumsSqlRow}
 import typo.generated.custom.view_find_all.*
@@ -32,7 +33,8 @@ object MetaDb {
       columns: List[ColumnsViewRow],
       views: List[ViewFindAllSqlRow],
       domains: List[DomainsSqlRow],
-      columnComments: List[CommentsSqlRow]
+      columnComments: List[CommentsSqlRow],
+      constraints: List[ConstraintsSqlRow]
   )
 
   object Input {
@@ -54,7 +56,8 @@ object MetaDb {
         columns = timed("columns")(ColumnsViewRepoImpl.selectAll),
         views = timed("views")(ViewFindAllSqlRepoImpl()),
         domains = timed("domains")(DomainsSqlRepoImpl()),
-        columnComments = timed("columnComments")(CommentsSqlRepoImpl())
+        columnComments = timed("columnComments")(CommentsSqlRepoImpl()),
+        constraints = timed("constraints")(ConstraintsSqlRepoImpl())
       )
     }
   }
@@ -86,6 +89,15 @@ object MetaDb {
         constraintDefinition = d.constraintDefinition
       )
     }
+
+    val constraints: Map[(db.RelationName, db.ColName), List[db.Constraint]] =
+      input.constraints
+        .collect { case ConstraintsSqlRow(tableSchema, Some(tableName), Some(columns), Some(constraintName), Some(checkClause)) =>
+          columns.map(column => (db.RelationName(tableSchema, tableName), db.ColName(column)) -> db.Constraint(constraintName, columns.map(db.ColName.apply).toList, checkClause))
+        }
+        .flatten
+        .groupBy { case (k, _) => k }
+        .map { case (k, rows) => (k, rows.map { case (_, c) => c }.sortBy(_.name)) }
 
     val typeMapperDb = TypeMapperDb(enums, domains)
 
@@ -127,14 +139,16 @@ object MetaDb {
                     db.Type.Text
                   }
 
+                  val coord = (relationName, mdCol.name)
                   val dbCol = db.Col(
                     name = mdCol.name,
                     tpe = dbType,
                     udtName = None,
                     columnDefault = None,
-                    comment = comments.get((relationName, mdCol.name)),
+                    comment = comments.get(coord),
                     jsonDescription = DebugJson(mdCol),
-                    nullability = nullability
+                    nullability = nullability,
+                    constraints = constraints.getOrElse(coord, Nil)
                   )
                   (dbCol, mdCol.parsedColumnName)
                 }
@@ -153,6 +167,14 @@ object MetaDb {
         if (views.contains(relationName)) None
         else {
           val columns = columnsByTable(relationName).sortBy(_.ordinalPosition)
+          val fks: List[db.ForeignKey] = foreignKeys.getOrElse(relationName, List.empty)
+
+          val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+            fks.flatMap { fk =>
+              val otherTable: db.RelationName = fk.otherTable
+              val value = fk.otherCols.map(cn => (otherTable, cn))
+              fk.cols.zip(value).toList
+            }.toMap
 
           val mappedCols: List[db.Col] =
             columns.map { c =>
@@ -170,26 +192,30 @@ object MetaDb {
                 System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${colName.value}. Falling back to text")
                 db.Type.Text
               }
+              val coord = (relationName, colName)
               db.Col(
                 name = colName,
                 columnDefault = c.columnDefault,
                 nullability = nullability,
                 tpe = tpe,
                 udtName = c.udtName,
-                comment = comments.get((relationName, colName)),
-                jsonDescription = jsonDescription
+                comment = comments.get(coord),
+                jsonDescription = jsonDescription,
+                constraints = constraints.getOrElse(coord, Nil) ++ deps.get(colName).flatMap(otherCoord => constraints.get(otherCoord)).getOrElse(Nil)
               )
             }
 
           for {
             mappedCols <- NonEmptyList.fromList(mappedCols)
-          } yield db.Table(
-            name = relationName,
-            cols = mappedCols,
-            primaryKey = primaryKeys.get(relationName),
-            uniqueKeys = uniqueKeys.getOrElse(relationName, List.empty),
-            foreignKeys = foreignKeys.getOrElse(relationName, List.empty)
-          )
+          } yield {
+            db.Table(
+              name = relationName,
+              cols = mappedCols,
+              primaryKey = primaryKeys.get(relationName),
+              uniqueKeys = uniqueKeys.getOrElse(relationName, List.empty),
+              foreignKeys = fks
+            )
+          }
         }
       }
 

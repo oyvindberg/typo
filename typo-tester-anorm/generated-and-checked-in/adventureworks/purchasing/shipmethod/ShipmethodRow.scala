@@ -27,9 +27,11 @@ case class ShipmethodRow(
   shipmethodid: ShipmethodId,
   /** Shipping company name. */
   name: Name,
-  /** Minimum shipping charge. */
+  /** Minimum shipping charge.
+      Constraint CK_ShipMethod_ShipBase affecting columns "shipbase":  ((shipbase > 0.00)) */
   shipbase: BigDecimal,
-  /** Shipping charge per pound. */
+  /** Shipping charge per pound.
+      Constraint CK_ShipMethod_ShipRate affecting columns "shiprate":  ((shiprate > 0.00)) */
   shiprate: BigDecimal,
   rowguid: UUID,
   modifieddate: TypoLocalDateTime

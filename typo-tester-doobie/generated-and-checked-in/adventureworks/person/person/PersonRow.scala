@@ -25,7 +25,8 @@ case class PersonRow(
   /** Primary key for Person records.
       Points to [[businessentity.BusinessentityRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  /** Primary type of person: SC = Store Contact, IN = Individual (retail) customer, SP = Sales person, EM = Employee (non-sales), VC = Vendor contact, GC = General contact */
+  /** Primary type of person: SC = Store Contact, IN = Individual (retail) customer, SP = Sales person, EM = Employee (non-sales), VC = Vendor contact, GC = General contact
+      Constraint CK_Person_PersonType affecting columns "persontype":  (((persontype IS NULL) OR (upper((persontype)::text) = ANY (ARRAY['SC'::text, 'VC'::text, 'IN'::text, 'EM'::text, 'SP'::text, 'GC'::text])))) */
   persontype: /* bpchar, max 2 chars */ String,
   /** 0 = The data in FirstName and LastName are stored in western style (first name, last name) order.  1 = Eastern style (last name, first name) order. */
   namestyle: NameStyle,
@@ -39,7 +40,8 @@ case class PersonRow(
   lastname: Name,
   /** Surname suffix. For example, Sr. or Jr. */
   suffix: Option[/* max 10 chars */ String],
-  /** 0 = Contact does not wish to receive e-mail promotions, 1 = Contact does wish to receive e-mail promotions from AdventureWorks, 2 = Contact does wish to receive e-mail promotions from AdventureWorks and selected partners. */
+  /** 0 = Contact does not wish to receive e-mail promotions, 1 = Contact does wish to receive e-mail promotions from AdventureWorks, 2 = Contact does wish to receive e-mail promotions from AdventureWorks and selected partners.
+      Constraint CK_Person_EmailPromotion affecting columns "emailpromotion":  (((emailpromotion >= 0) AND (emailpromotion <= 2))) */
   emailpromotion: Int,
   /** Additional contact information about the person stored in xml format. */
   additionalcontactinfo: Option[TypoXml],

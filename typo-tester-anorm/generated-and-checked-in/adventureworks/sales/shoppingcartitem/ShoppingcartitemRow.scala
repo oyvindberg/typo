@@ -26,7 +26,8 @@ case class ShoppingcartitemRow(
   shoppingcartitemid: ShoppingcartitemId,
   /** Shopping cart identification number. */
   shoppingcartid: /* max 50 chars */ String,
-  /** Product quantity ordered. */
+  /** Product quantity ordered.
+      Constraint CK_ShoppingCartItem_Quantity affecting columns "quantity":  ((quantity >= 1)) */
   quantity: Int,
   /** Product ordered. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */

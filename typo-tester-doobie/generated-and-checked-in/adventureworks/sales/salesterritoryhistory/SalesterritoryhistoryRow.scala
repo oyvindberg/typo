@@ -24,9 +24,11 @@ case class SalesterritoryhistoryRow(
   /** Primary key. Territory identification number. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
-  /** Primary key. Date the sales representive started work in the territory. */
+  /** Primary key. Date the sales representive started work in the territory.
+      Constraint CK_SalesTerritoryHistory_EndDate affecting columns "startdate", "enddate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
-  /** Date the sales representative left work in the territory. */
+  /** Date the sales representative left work in the territory.
+      Constraint CK_SalesTerritoryHistory_EndDate affecting columns "startdate", "enddate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
   rowguid: UUID,
   modifieddate: TypoLocalDateTime

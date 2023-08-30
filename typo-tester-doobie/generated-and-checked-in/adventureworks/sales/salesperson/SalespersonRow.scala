@@ -25,15 +25,20 @@ case class SalespersonRow(
   /** Territory currently assigned to. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
-  /** Projected yearly sales. */
+  /** Projected yearly sales.
+      Constraint CK_SalesPerson_SalesQuota affecting columns "salesquota":  ((salesquota > 0.00)) */
   salesquota: Option[BigDecimal],
-  /** Bonus due if quota is met. */
+  /** Bonus due if quota is met.
+      Constraint CK_SalesPerson_Bonus affecting columns "bonus":  ((bonus >= 0.00)) */
   bonus: BigDecimal,
-  /** Commision percent received per sale. */
+  /** Commision percent received per sale.
+      Constraint CK_SalesPerson_CommissionPct affecting columns "commissionpct":  ((commissionpct >= 0.00)) */
   commissionpct: BigDecimal,
-  /** Sales total year to date. */
+  /** Sales total year to date.
+      Constraint CK_SalesPerson_SalesYTD affecting columns "salesytd":  ((salesytd >= 0.00)) */
   salesytd: BigDecimal,
-  /** Sales total of previous year. */
+  /** Sales total of previous year.
+      Constraint CK_SalesPerson_SalesLastYear affecting columns "saleslastyear":  ((saleslastyear >= 0.00)) */
   saleslastyear: BigDecimal,
   rowguid: UUID,
   modifieddate: TypoLocalDateTime

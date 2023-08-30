@@ -20,11 +20,14 @@ case class ProductcosthistoryRow(
   /** Product identification number. Foreign key to Product.ProductID
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
-  /** Product cost start date. */
+  /** Product cost start date.
+      Constraint CK_ProductCostHistory_EndDate affecting columns "startdate", "enddate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
-  /** Product cost end date. */
+  /** Product cost end date.
+      Constraint CK_ProductCostHistory_EndDate affecting columns "startdate", "enddate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
-  /** Standard cost of the product. */
+  /** Standard cost of the product.
+      Constraint CK_ProductCostHistory_StandardCost affecting columns "standardcost":  ((standardcost >= 0.00)) */
   standardcost: BigDecimal,
   modifieddate: TypoLocalDateTime
 ){

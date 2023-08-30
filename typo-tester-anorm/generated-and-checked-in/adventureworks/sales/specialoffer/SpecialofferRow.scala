@@ -26,19 +26,24 @@ case class SpecialofferRow(
   specialofferid: SpecialofferId,
   /** Discount description. */
   description: /* max 255 chars */ String,
-  /** Discount precentage. */
+  /** Discount precentage.
+      Constraint CK_SpecialOffer_DiscountPct affecting columns "discountpct":  ((discountpct >= 0.00)) */
   discountpct: BigDecimal,
   /** Discount type category. */
   `type`: /* max 50 chars */ String,
   /** Group the discount applies to such as Reseller or Customer. */
   category: /* max 50 chars */ String,
-  /** Discount start date. */
+  /** Discount start date.
+      Constraint CK_SpecialOffer_EndDate affecting columns "startdate", "enddate":  ((enddate >= startdate)) */
   startdate: TypoLocalDateTime,
-  /** Discount end date. */
+  /** Discount end date.
+      Constraint CK_SpecialOffer_EndDate affecting columns "startdate", "enddate":  ((enddate >= startdate)) */
   enddate: TypoLocalDateTime,
-  /** Minimum discount percent allowed. */
+  /** Minimum discount percent allowed.
+      Constraint CK_SpecialOffer_MinQty affecting columns "minqty":  ((minqty >= 0)) */
   minqty: Int,
-  /** Maximum discount percent allowed. */
+  /** Maximum discount percent allowed.
+      Constraint CK_SpecialOffer_MaxQty affecting columns "maxqty":  ((maxqty >= 0)) */
   maxqty: Option[Int],
   rowguid: UUID,
   modifieddate: TypoLocalDateTime

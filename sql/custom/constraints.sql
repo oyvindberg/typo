@@ -21,7 +21,6 @@ from information_schema.table_constraints tc
          join pg_constraint pgc on pgc.conname = cc.constraint_name and pgc.connamespace = nsp.oid and pgc.contype = 'c'
          join cols col on col.table_schema = tc.table_schema and col.table_name = tc.table_name and
                           col.ordinal_position = ANY (pgc.conkey)
-where tc.constraint_schema not in ('pg_catalog', 'information_schema')
 group by tc.table_schema,
          tc.table_name,
          tc.constraint_name,

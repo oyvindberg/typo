@@ -33,7 +33,8 @@ case class VendorRow(
   accountnumber: AccountNumber,
   /** Company name. */
   name: Name,
-  /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average */
+  /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average
+      Constraint CK_Vendor_CreditRating affecting columns "creditrating":  (((creditrating >= 1) AND (creditrating <= 5))) */
   creditrating: TypoShort,
   /** 0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product. */
   preferredvendorstatus: Flag,

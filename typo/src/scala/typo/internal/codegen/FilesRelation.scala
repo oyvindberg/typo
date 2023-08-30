@@ -15,12 +15,13 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
     }
 
     val formattedCols = cols.map { col =>
-      val commentPieces = List(
+      val commentPieces = List[Iterable[String]](
         col.dbCol.comment,
-        col.pointsTo map { case (relationName, columnName) =>
+        col.pointsTo.map { case (relationName, columnName) =>
           val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, names.RowName.value.idents))
           s"Points to [[${sc.renderTree(shortened)}.${naming.field(columnName).value}]]"
         },
+        col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.code.render.asString).mkString(", ")}:  ${c.checkClause}"),
         if (options.debugTypes)
           col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
         else None

@@ -28,7 +28,8 @@ case class SalespersonquotahistoryRow(
   businessentityid: BusinessentityId,
   /** Sales quota date. */
   quotadate: TypoLocalDateTime,
-  /** Sales quota amount. */
+  /** Sales quota amount.
+      Constraint CK_SalesPersonQuotaHistory_SalesQuota affecting columns "salesquota":  ((salesquota > 0.00)) */
   salesquota: BigDecimal,
   rowguid: UUID,
   modifieddate: TypoLocalDateTime

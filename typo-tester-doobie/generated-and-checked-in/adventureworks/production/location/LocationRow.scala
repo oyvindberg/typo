@@ -21,9 +21,11 @@ case class LocationRow(
   locationid: LocationId,
   /** Location description. */
   name: Name,
-  /** Standard hourly cost of the manufacturing location. */
+  /** Standard hourly cost of the manufacturing location.
+      Constraint CK_Location_CostRate affecting columns "costrate":  ((costrate >= 0.00)) */
   costrate: BigDecimal,
-  /** Work capacity (in hours) of the manufacturing location. */
+  /** Work capacity (in hours) of the manufacturing location.
+      Constraint CK_Location_Availability affecting columns "availability":  ((availability >= 0.00)) */
   availability: BigDecimal,
   modifieddate: TypoLocalDateTime
 )

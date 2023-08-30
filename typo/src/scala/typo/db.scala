@@ -67,6 +67,9 @@ object db {
   case class Domain(name: RelationName, tpe: Type, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])
   case class StringEnum(name: RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
+
+  case class Constraint(name: String, columns: List[ColName], checkClause: String)
+
   case class Col(
       name: ColName,
       tpe: Type,
@@ -74,6 +77,7 @@ object db {
       nullability: Nullability,
       columnDefault: Option[String],
       comment: Option[String],
+      constraints: List[Constraint],
       jsonDescription: DebugJson
   )
   case class RelationName(schema: Option[String], name: String) {

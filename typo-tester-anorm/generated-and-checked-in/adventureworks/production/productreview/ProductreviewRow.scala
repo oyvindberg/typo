@@ -34,7 +34,8 @@ case class ProductreviewRow(
   reviewdate: TypoLocalDateTime,
   /** Reviewer's e-mail address. */
   emailaddress: /* max 50 chars */ String,
-  /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating. */
+  /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating.
+      Constraint CK_ProductReview_Rating affecting columns "rating":  (((rating >= 1) AND (rating <= 5))) */
   rating: Int,
   /** Reviewer's comments */
   comments: Option[/* max 3850 chars */ String],
