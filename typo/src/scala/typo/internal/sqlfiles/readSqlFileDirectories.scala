@@ -51,7 +51,7 @@ object readSqlFileDirectories {
   def queryTypeFor(decomposedSql: DecomposedSql, c: Connection): SqlCommandType = {
     val pc = c.unwrap(classOf[PgConnection])
     val q = pc.createQuery(decomposedSql.sqlWithNulls, true, false)
-    q.query.getSqlCommand.getType
+    Option(q.query.getSqlCommand).map(_.getType).getOrElse(SqlCommandType.BLANK)
   }
 
   def findSqlFilesUnder(scriptsPath: Path): List[Path] = {
