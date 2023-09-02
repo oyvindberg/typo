@@ -449,6 +449,7 @@ class CustomTypes(pkg: sc.QIdent) {
   lazy val TypoInt2Vector = obj("int2vector", "TypoInt2Vector")
   lazy val TypoOidVector = obj("oidvector", "TypoOidVector")
   lazy val TypoPgNodeTree = obj("pg_node_tree", "TypoPgNodeTree")
+  lazy val TypoRecord = obj("record", "TypoRecord").copy(toTypoInArray = None)
   lazy val TypoRegclass = obj("regclass", "TypoRegclass")
   lazy val TypoRegconfig = obj("regconfig", "TypoRegconfig")
   lazy val TypoRegdictionary = obj("regdictionary", "TypoRegdictionary")
@@ -489,6 +490,7 @@ class CustomTypes(pkg: sc.QIdent) {
       TypoPgNodeTree,
       TypoPoint,
       TypoPolygon,
+      TypoRecord,
       TypoRegclass,
       TypoRegconfig,
       TypoRegdictionary,

@@ -42,6 +42,7 @@ object db {
     case object int2vector extends Type
     case object oidvector extends Type
     case object pg_node_tree extends Type
+    case object record extends Type
     case object regclass extends Type
     case object regconfig extends Type
     case object regdictionary extends Type

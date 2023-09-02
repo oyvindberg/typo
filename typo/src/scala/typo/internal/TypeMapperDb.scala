@@ -64,6 +64,7 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
       case "int2vector"                        => Some(db.Type.int2vector)
       case "oidvector"                         => Some(db.Type.oidvector)
       case "pg_node_tree"                      => Some(db.Type.pg_node_tree)
+      case "record"                            => Some(db.Type.record)
       case "regclass"                          => Some(db.Type.regclass)
       case "regconfig"                         => Some(db.Type.regconfig)
       case "regdictionary"                     => Some(db.Type.regdictionary)

@@ -89,6 +89,7 @@ case class TypeMapperScala(
       case db.Type.int2vector      => customTypes.TypoInt2Vector.typoType
       case db.Type.oidvector       => customTypes.TypoOidVector.typoType
       case db.Type.pg_node_tree    => customTypes.TypoPgNodeTree.typoType
+      case db.Type.record          => customTypes.TypoRecord.typoType
       case db.Type.regclass        => customTypes.TypoRegclass.typoType
       case db.Type.regconfig       => customTypes.TypoRegconfig.typoType
       case db.Type.regdictionary   => customTypes.TypoRegdictionary.typoType

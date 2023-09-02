@@ -62,6 +62,8 @@ case class TypoPgNodeTree(value: String)
 case class TypoPoint(x: Double, y: Double)
 /** Polygon datatype in PostgreSQL */
 case class TypoPolygon(points: List[TypoPoint])
+/** record (via PGObject) */
+case class TypoRecord(value: String)
 /** regproc (via PGObject) */
 case class TypoRegproc(value: String)
 /** regtype (via PGObject) */
