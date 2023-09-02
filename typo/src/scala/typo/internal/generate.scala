@@ -33,7 +33,7 @@ object generate {
       naming = naming,
       typeOverride = publicOptions.typeOverride,
       generateMockRepos = publicOptions.generateMockRepos,
-      header = publicOptions.header,
+      fileHeader = publicOptions.fileHeader,
       enableFieldValue = publicOptions.enableFieldValue,
       enableDsl = publicOptions.enableDsl,
       enableTestInserts = publicOptions.enableTestInserts,
@@ -51,7 +51,7 @@ object generate {
         case (_, dbTable: db.Table, eval) =>
           ComputedTable(options, default, dbTable, naming, scalaTypeMapper, eval)
         case (_, dbView: db.View, eval) =>
-          ComputedView(dbView, naming, metaDb.typeMapperDb, scalaTypeMapper, eval, options.enableFieldValue, options.enableDsl)
+          ComputedView(dbView, naming, metaDb.typeMapperDb, scalaTypeMapper, eval, options.enableFieldValue.include(dbView.name), options.enableDsl)
       }
 
     // note, these statements will force the evaluation of some of the lazy values
@@ -98,18 +98,21 @@ object generate {
     // this should be a stop-gap solution anyway
     val pkgObject = FilePackageObject.packageObject(options)
 
-    val testDataFile = options.dbLib match {
-      case Some(dbLib) if options.enableTestInserts =>
-        val keptTables = computedRelations.collect { case x: ComputedTable if keptTypes(x.names.RepoImplName) => x }
-        val computed = ComputedTestInserts(options, customTypes, domains, enums, keptTables)
-        Some(FileTestInserts(computed, dbLib))
+    val testInsertsDataFile = options.dbLib match {
+      case Some(dbLib) =>
+        val keptTables =
+          computedRelations.collect { case x: ComputedTable if options.enableTestInserts.include(x.dbTable.name) && keptTypes(x.names.RepoImplName) => x }
+        if (keptTables.nonEmpty) {
+          val computed = ComputedTestInserts(options, customTypes, domains, enums, keptTables)
+          Some(FileTestInserts(computed, dbLib))
+        } else None
       case _ => None
     }
 
     val allFiles: Iterator[sc.File] = {
-      val withImports = (testDataFile.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkg, file))
+      val withImports = (testInsertsDataFile.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkg, file))
       val all = withImports ++ pkgObject.iterator
-      all.map(file => file.copy(contents = options.header.code ++ file.contents))
+      all.map(file => file.copy(contents = options.fileHeader.code ++ file.contents))
     }
 
     options.logger.info(s"Codegen complete")

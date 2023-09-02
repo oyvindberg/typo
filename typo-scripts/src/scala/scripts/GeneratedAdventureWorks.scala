@@ -46,7 +46,7 @@ object GeneratedAdventureWorks {
                 case ("sales.creditcard", "creditcardid") => "adventureworks.userdefined.CustomCreditcardId"
               },
               enableDsl = true,
-              enableTestInserts = true
+              enableTestInserts = Selector.All
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 

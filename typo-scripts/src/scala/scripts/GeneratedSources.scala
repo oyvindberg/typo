@@ -35,7 +35,7 @@ object GeneratedSources {
         pkg = "typo.generated",
         jsonLibs = List(JsonLibName.PlayJson),
         dbLib = Some(DbLibName.Anorm),
-        header = header,
+        fileHeader = header,
         debugTypes = true
       ),
       Selector.relationNames(

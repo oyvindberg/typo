@@ -11,10 +11,10 @@ case class InternalOptions(
     naming: Naming,
     typeOverride: TypeOverride,
     generateMockRepos: Selector,
-    header: String,
-    enableFieldValue: Boolean,
+    fileHeader: String,
+    enableFieldValue: Selector,
     enableDsl: Boolean,
-    enableTestInserts: Boolean,
+    enableTestInserts: Selector,
     keepDependencies: Boolean,
     debugTypes: Boolean
 )

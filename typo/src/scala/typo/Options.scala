@@ -4,19 +4,19 @@ case class Options(
     pkg: String,
     dbLib: Option[DbLibName],
     jsonLibs: List[JsonLibName] = Nil,
+    silentBanner: Boolean = false,
     logger: TypoLogger = TypoLogger.Console,
+    fileHeader: String = Options.header,
     naming: sc.QIdent => Naming = new Naming(_),
     typeOverride: TypeOverride = TypeOverride.Empty,
     nullabilityOverride: NullabilityOverride = NullabilityOverride.Empty,
     generateMockRepos: Selector = Selector.All,
-    header: String = Options.header,
-    enableFieldValue: Boolean = false,
+    enableFieldValue: Selector = Selector.None,
+    enableTestInserts: Selector = Selector.None,
     enableDsl: Boolean = false,
-    enableTestInserts: Boolean = false,
     debugTypes: Boolean = false,
     inlineImplicits: Boolean = true,
-    keepDependencies: Boolean = false,
-    silentBanner: Boolean = false
+    keepDependencies: Boolean = false
 )
 
 object Options {

@@ -34,7 +34,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
         val targetSources = buildDir.resolve(s"$projectName/generated-and-checked-in")
         List(false, true).flatMap { inlineImplicits =>
           generate(
-            Options(pkg = "adventureworks", dbLib, jsonLib, enableDsl = true, enableTestInserts = true, inlineImplicits = inlineImplicits),
+            Options(pkg = "adventureworks", dbLib, jsonLib, enableDsl = true, enableTestInserts = Selector.All, inlineImplicits = inlineImplicits),
             metadb,
             readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql")),
             Selector.All

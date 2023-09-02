@@ -113,7 +113,7 @@ case class ComputedTable(
     tpe
   }
 
-  val names = ComputedNames(naming, source, maybeId, options.enableFieldValue, options.enableDsl)
+  val names = ComputedNames(naming, source, maybeId, options.enableFieldValue.include(dbTable.name), options.enableDsl)
 
   val colsNotId: Option[NonEmptyList[ComputedColumn]] =
     maybeId.flatMap { id =>
