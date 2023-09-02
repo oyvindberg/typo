@@ -35,7 +35,7 @@ case class ComputedSqlFile(
 
         val dbType = typeMapperDb.dbTypeFrom(col.columnTypeName, Some(col.precision)).getOrElse {
           System.err.println(s"Couldn't translate type from file ${sqlFile.relPath} column ${col.name.value} with type ${col.columnTypeName}. Falling back to text")
-          db.Type.Text
+          db.Type.Unknown(col.columnTypeName)
         }
 
         // we let types flow through constraints down to this column, the point is to reuse id types downstream
@@ -87,7 +87,7 @@ case class ComputedSqlFile(
 
         val dbType = typeMapperDb.dbTypeFrom(jdbcParam.parameterTypeName, Some(jdbcParam.precision)).getOrElse {
           System.err.println(s"${sqlFile.relPath}: Couldn't translate type from param $maybeName with type ${jdbcParam.parameterTypeName}")
-          db.Type.Text
+          db.Type.Unknown(jdbcParam.parameterTypeName)
         }
 
         val tpe = scalaTypeMapper.sqlFile(

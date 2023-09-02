@@ -7,7 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext_data
 
-import anorm.ParameterMetaData
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgMcvList
+import adventureworks.customtypes.TypoUnknownPgNdistinct
+import adventureworks.customtypes.TypoUnknownPgStatistic
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
@@ -26,7 +29,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   }
   override def insert(unsaved: PgStatisticExtDataRow)(implicit c: Connection): PgStatisticExtDataRow = {
     SQL"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
-          values (${ParameterValue(unsaved.stxoid, null, PgStatisticExtDataId.toStatement)}::oid, ${ParameterValue(unsaved.stxdndistinct, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.stxddependencies, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.stxdmcv, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.stxdexpr, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
+          values (${ParameterValue(unsaved.stxoid, null, PgStatisticExtDataId.toStatement)}::oid, ${ParameterValue(unsaved.stxdndistinct, null, ToStatement.optionToStatement(TypoUnknownPgNdistinct.toStatement, TypoUnknownPgNdistinct.parameterMetadata))}::pg_ndistinct, ${ParameterValue(unsaved.stxddependencies, null, ToStatement.optionToStatement(TypoUnknownPgDependencies.toStatement, TypoUnknownPgDependencies.parameterMetadata))}::pg_dependencies, ${ParameterValue(unsaved.stxdmcv, null, ToStatement.optionToStatement(TypoUnknownPgMcvList.toStatement, TypoUnknownPgMcvList.parameterMetadata))}::pg_mcv_list, ${ParameterValue(unsaved.stxdexpr, null, ToStatement.optionToStatement(TypoUnknownPgStatistic.toStatement, TypoUnknownPgStatistic.parameterMetadata))}::_pg_statistic)
           returning "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
        """
       .executeInsert(PgStatisticExtDataRow.rowParser(1).single)
@@ -56,10 +59,10 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def update(row: PgStatisticExtDataRow)(implicit c: Connection): Boolean = {
     val stxoid = row.stxoid
     SQL"""update pg_catalog.pg_statistic_ext_data
-          set "stxdndistinct" = ${ParameterValue(row.stxdndistinct, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              "stxddependencies" = ${ParameterValue(row.stxddependencies, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              "stxdmcv" = ${ParameterValue(row.stxdmcv, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              "stxdexpr" = ${ParameterValue(row.stxdexpr, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+          set "stxdndistinct" = ${ParameterValue(row.stxdndistinct, null, ToStatement.optionToStatement(TypoUnknownPgNdistinct.toStatement, TypoUnknownPgNdistinct.parameterMetadata))}::pg_ndistinct,
+              "stxddependencies" = ${ParameterValue(row.stxddependencies, null, ToStatement.optionToStatement(TypoUnknownPgDependencies.toStatement, TypoUnknownPgDependencies.parameterMetadata))}::pg_dependencies,
+              "stxdmcv" = ${ParameterValue(row.stxdmcv, null, ToStatement.optionToStatement(TypoUnknownPgMcvList.toStatement, TypoUnknownPgMcvList.parameterMetadata))}::pg_mcv_list,
+              "stxdexpr" = ${ParameterValue(row.stxdexpr, null, ToStatement.optionToStatement(TypoUnknownPgStatistic.toStatement, TypoUnknownPgStatistic.parameterMetadata))}::_pg_statistic
           where "stxoid" = ${ParameterValue(stxoid, null, PgStatisticExtDataId.toStatement)}
        """.executeUpdate() > 0
   }
@@ -70,10 +73,10 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
     SQL"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
           values (
             ${ParameterValue(unsaved.stxoid, null, PgStatisticExtDataId.toStatement)}::oid,
-            ${ParameterValue(unsaved.stxdndistinct, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-            ${ParameterValue(unsaved.stxddependencies, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-            ${ParameterValue(unsaved.stxdmcv, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-            ${ParameterValue(unsaved.stxdexpr, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+            ${ParameterValue(unsaved.stxdndistinct, null, ToStatement.optionToStatement(TypoUnknownPgNdistinct.toStatement, TypoUnknownPgNdistinct.parameterMetadata))}::pg_ndistinct,
+            ${ParameterValue(unsaved.stxddependencies, null, ToStatement.optionToStatement(TypoUnknownPgDependencies.toStatement, TypoUnknownPgDependencies.parameterMetadata))}::pg_dependencies,
+            ${ParameterValue(unsaved.stxdmcv, null, ToStatement.optionToStatement(TypoUnknownPgMcvList.toStatement, TypoUnknownPgMcvList.parameterMetadata))}::pg_mcv_list,
+            ${ParameterValue(unsaved.stxdexpr, null, ToStatement.optionToStatement(TypoUnknownPgStatistic.toStatement, TypoUnknownPgStatistic.parameterMetadata))}::_pg_statistic
           )
           on conflict ("stxoid")
           do update set

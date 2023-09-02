@@ -77,3 +77,17 @@ case class TypoXid(value: String)
 /** XML */
 case class TypoXml(value: String)
 ```
+
+## Unknown types
+
+You may also come across column types typo doesn't know how to handle yet.
+You will see warnings in the log at generation-time like this:
+```
+typo: Couldn't translate type from relation pg_catalog.pg_statistic_ext_data column stxdndistinct with type Some(pg_ndistinct). Falling back to text
+```
+
+And then you'll see corresponding classes like this:
+```scala mdoc
+/** This is a type typo does not know how to handle yet. This falls back to casting to string and crossing fingers. Time to file an issue! :] */
+case class TypoUnknownPgNdistinct(value: String)
+```

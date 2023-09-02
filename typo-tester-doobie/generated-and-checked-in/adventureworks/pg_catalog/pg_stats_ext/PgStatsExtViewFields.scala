@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_stats_ext
 
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgNdistinct
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -19,8 +21,8 @@ trait PgStatsExtViewFields[Row] {
   val attnames: OptField[Array[String], Row]
   val exprs: OptField[Array[String], Row]
   val kinds: Field[Array[String], Row]
-  val nDistinct: OptField[String, Row]
-  val dependencies: OptField[String, Row]
+  val nDistinct: OptField[TypoUnknownPgNdistinct, Row]
+  val dependencies: OptField[TypoUnknownPgDependencies, Row]
   val mostCommonVals: OptField[Array[String], Row]
   val mostCommonValNulls: OptField[Array[Boolean], Row]
   val mostCommonFreqs: OptField[Array[Double], Row]

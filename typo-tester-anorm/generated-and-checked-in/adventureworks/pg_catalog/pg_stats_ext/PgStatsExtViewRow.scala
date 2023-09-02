@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_stats_ext
 
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgNdistinct
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -34,9 +36,9 @@ case class PgStatsExtViewRow(
   /** Points to [[pg_statistic_ext.PgStatisticExtRow.stxkind]] */
   kinds: Array[String],
   /** Points to [[pg_statistic_ext_data.PgStatisticExtDataRow.stxdndistinct]] */
-  nDistinct: Option[String],
+  nDistinct: Option[TypoUnknownPgNdistinct],
   /** Points to [[pg_statistic_ext_data.PgStatisticExtDataRow.stxddependencies]] */
-  dependencies: Option[String],
+  dependencies: Option[TypoUnknownPgDependencies],
   mostCommonVals: /* nullability unknown */ Option[Array[String]],
   mostCommonValNulls: /* nullability unknown */ Option[Array[Boolean]],
   mostCommonFreqs: /* nullability unknown */ Option[Array[Double]],
@@ -55,8 +57,8 @@ object PgStatsExtViewRow {
           attnames = json.\("attnames").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
           exprs = json.\("exprs").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
           kinds = json.\("kinds").as(Reads.ArrayReads[String](Reads.StringReads, implicitly)),
-          nDistinct = json.\("n_distinct").toOption.map(_.as(Reads.StringReads)),
-          dependencies = json.\("dependencies").toOption.map(_.as(Reads.StringReads)),
+          nDistinct = json.\("n_distinct").toOption.map(_.as(TypoUnknownPgNdistinct.reads)),
+          dependencies = json.\("dependencies").toOption.map(_.as(TypoUnknownPgDependencies.reads)),
           mostCommonVals = json.\("most_common_vals").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
           mostCommonValNulls = json.\("most_common_val_nulls").toOption.map(_.as(Reads.ArrayReads[Boolean](Reads.BooleanReads, implicitly))),
           mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as(Reads.ArrayReads[Double](Reads.DoubleReads, implicitly))),
@@ -76,8 +78,8 @@ object PgStatsExtViewRow {
         attnames = row(idx + 5)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
         exprs = row(idx + 6)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
         kinds = row(idx + 7)(Column.columnToArray[String](Column.columnToString, implicitly)),
-        nDistinct = row(idx + 8)(Column.columnToOption(Column.columnToString)),
-        dependencies = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        nDistinct = row(idx + 8)(Column.columnToOption(TypoUnknownPgNdistinct.column)),
+        dependencies = row(idx + 9)(Column.columnToOption(TypoUnknownPgDependencies.column)),
         mostCommonVals = row(idx + 10)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
         mostCommonValNulls = row(idx + 11)(Column.columnToOption(Column.columnToArray[Boolean](Column.columnToBoolean, implicitly))),
         mostCommonFreqs = row(idx + 12)(Column.columnToOption(Column.columnToArray[Double](Column.columnToDouble, implicitly))),
@@ -95,8 +97,8 @@ object PgStatsExtViewRow {
       "attnames" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.attnames),
       "exprs" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.exprs),
       "kinds" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.kinds),
-      "n_distinct" -> Writes.OptionWrites(Writes.StringWrites).writes(o.nDistinct),
-      "dependencies" -> Writes.OptionWrites(Writes.StringWrites).writes(o.dependencies),
+      "n_distinct" -> Writes.OptionWrites(TypoUnknownPgNdistinct.writes).writes(o.nDistinct),
+      "dependencies" -> Writes.OptionWrites(TypoUnknownPgDependencies.writes).writes(o.dependencies),
       "most_common_vals" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.mostCommonVals),
       "most_common_val_nulls" -> Writes.OptionWrites(Writes.arrayWrites[Boolean](implicitly, Writes.BooleanWrites)).writes(o.mostCommonValNulls),
       "most_common_freqs" -> Writes.OptionWrites(Writes.arrayWrites[Double](implicitly, Writes.DoubleWrites)).writes(o.mostCommonFreqs),

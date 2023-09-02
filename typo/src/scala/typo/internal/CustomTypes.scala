@@ -3,6 +3,8 @@ package internal
 
 import typo.internal.codegen.*
 
+import scala.collection.mutable
+
 class CustomTypes(pkg: sc.QIdent) {
 
   lazy val TypoBox = CustomType(
@@ -480,48 +482,70 @@ class CustomTypes(pkg: sc.QIdent) {
   lazy val TypoRegtype = obj("regtype", "TypoRegtype")
   lazy val TypoXid = obj("xid", "TypoXid")
 
-  val All: List[CustomType] =
-    List(
-      TypoAclItem,
-      TypoAnyArray,
-      TypoBox,
-      TypoBytea,
-      TypoCircle,
-      TypoHStore,
-      TypoInet,
-      TypoInet,
-      TypoInt2Vector,
-      TypoInterval,
-      TypoJson,
-      TypoJson,
-      TypoJsonb,
-      TypoJsonb,
-      TypoLine,
-      TypoLineSegment,
-      TypoLocalDate,
-      TypoLocalDateTime,
-      TypoLocalTime,
-      TypoMoney,
-      TypoOffsetDateTime,
-      TypoOffsetTime,
-      TypoOidVector,
-      TypoPath,
-      TypoPgNodeTree,
-      TypoPoint,
-      TypoPolygon,
-      TypoRecord,
-      TypoRegclass,
-      TypoRegconfig,
-      TypoRegdictionary,
-      TypoRegnamespace,
-      TypoRegoper,
-      TypoRegoperator,
-      TypoRegproc,
-      TypoRegprocedure,
-      TypoRegrole,
-      TypoRegtype,
-      TypoShort,
-      TypoXid,
-      TypoXml
+  val All: mutable.Map[sc.Type, CustomType] =
+    mutable.Map(
+      List(
+        TypoAclItem,
+        TypoAnyArray,
+        TypoBox,
+        TypoBytea,
+        TypoCircle,
+        TypoHStore,
+        TypoInet,
+        TypoInet,
+        TypoInt2Vector,
+        TypoInterval,
+        TypoJson,
+        TypoJson,
+        TypoJsonb,
+        TypoJsonb,
+        TypoLine,
+        TypoLineSegment,
+        TypoLocalDate,
+        TypoLocalDateTime,
+        TypoLocalTime,
+        TypoMoney,
+        TypoOffsetDateTime,
+        TypoOffsetTime,
+        TypoOidVector,
+        TypoPath,
+        TypoPgNodeTree,
+        TypoPoint,
+        TypoPolygon,
+        TypoRecord,
+        TypoRegclass,
+        TypoRegconfig,
+        TypoRegdictionary,
+        TypoRegnamespace,
+        TypoRegoper,
+        TypoRegoperator,
+        TypoRegproc,
+        TypoRegprocedure,
+        TypoRegrole,
+        TypoRegtype,
+        TypoShort,
+        TypoXid,
+        TypoXml
+      ).map(ct => (ct.typoType, ct))*
     )
+
+  def TypoUnknown(sqlType: String): CustomType = {
+    val ct = CustomType(
+      comment = "This is a type typo does not know how to handle yet. This falls back to casting to string and crossing fingers. Time to file an issue! :]",
+      sqlType = sqlType,
+      typoType = sc.Type.Qualified(pkg / sc.Ident(s"TypoUnknown${Naming.titleCase(sqlType)}")),
+      params = NonEmptyList(sc.Param(sc.Ident("value"), sc.Type.String, None)),
+      isNull = p => code"$p == null",
+      toTypo = CustomType.ToTypo(
+        jdbcType = sc.Type.String,
+        toTypo = (expr, target) => code"$target($expr)"
+      ),
+      fromTypo = CustomType.FromTypo(
+        jdbcType = sc.Type.String,
+        fromTypo = (expr, _) => code"$expr.value"
+      )
+    )
+    All(ct.typoType) = ct
+    ct
+  }
 }

@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_stats_ext
 
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgNdistinct
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -29,9 +31,9 @@ case class PgStatsExtViewRow(
   /** Points to [[pg_statistic_ext.PgStatisticExtRow.stxkind]] */
   kinds: Array[String],
   /** Points to [[pg_statistic_ext_data.PgStatisticExtDataRow.stxdndistinct]] */
-  nDistinct: Option[String],
+  nDistinct: Option[TypoUnknownPgNdistinct],
   /** Points to [[pg_statistic_ext_data.PgStatisticExtDataRow.stxddependencies]] */
-  dependencies: Option[String],
+  dependencies: Option[TypoUnknownPgDependencies],
   mostCommonVals: /* nullability unknown */ Option[Array[String]],
   mostCommonValNulls: /* nullability unknown */ Option[Array[Boolean]],
   mostCommonFreqs: /* nullability unknown */ Option[Array[Double]],
@@ -39,8 +41,8 @@ case class PgStatsExtViewRow(
 )
 
 object PgStatsExtViewRow {
-  implicit lazy val decoder: Decoder[PgStatsExtViewRow] = Decoder.forProduct14[PgStatsExtViewRow, String, String, Option[String], String, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[String]], Array[String], Option[String], Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[Boolean]], /* nullability unknown */ Option[Array[Double]], /* nullability unknown */ Option[Array[Double]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs")(PgStatsExtViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeArray[String](Decoder.decodeString, implicitly), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Boolean](Decoder.decodeBoolean, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Double](Decoder.decodeDouble, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Double](Decoder.decodeDouble, implicitly)))
-  implicit lazy val encoder: Encoder[PgStatsExtViewRow] = Encoder.forProduct14[PgStatsExtViewRow, String, String, Option[String], String, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[String]], Array[String], Option[String], Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[Boolean]], /* nullability unknown */ Option[Array[Double]], /* nullability unknown */ Option[Array[Double]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs")(x => (x.schemaname, x.tablename, x.statisticsSchemaname, x.statisticsName, x.statisticsOwner, x.attnames, x.exprs, x.kinds, x.nDistinct, x.dependencies, x.mostCommonVals, x.mostCommonValNulls, x.mostCommonFreqs, x.mostCommonBaseFreqs))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Boolean, Array](Encoder.encodeBoolean, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Double, Array](Encoder.encodeDouble, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Double, Array](Encoder.encodeDouble, implicitly)))
+  implicit lazy val decoder: Decoder[PgStatsExtViewRow] = Decoder.forProduct14[PgStatsExtViewRow, String, String, Option[String], String, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[String]], Array[String], Option[TypoUnknownPgNdistinct], Option[TypoUnknownPgDependencies], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[Boolean]], /* nullability unknown */ Option[Array[Double]], /* nullability unknown */ Option[Array[Double]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs")(PgStatsExtViewRow.apply)(Decoder.decodeString, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeArray[String](Decoder.decodeString, implicitly), Decoder.decodeOption(TypoUnknownPgNdistinct.decoder), Decoder.decodeOption(TypoUnknownPgDependencies.decoder), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Boolean](Decoder.decodeBoolean, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Double](Decoder.decodeDouble, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Double](Decoder.decodeDouble, implicitly)))
+  implicit lazy val encoder: Encoder[PgStatsExtViewRow] = Encoder.forProduct14[PgStatsExtViewRow, String, String, Option[String], String, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[String]], Array[String], Option[TypoUnknownPgNdistinct], Option[TypoUnknownPgDependencies], /* nullability unknown */ Option[Array[String]], /* nullability unknown */ Option[Array[Boolean]], /* nullability unknown */ Option[Array[Double]], /* nullability unknown */ Option[Array[Double]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs")(x => (x.schemaname, x.tablename, x.statisticsSchemaname, x.statisticsName, x.statisticsOwner, x.attnames, x.exprs, x.kinds, x.nDistinct, x.dependencies, x.mostCommonVals, x.mostCommonValNulls, x.mostCommonFreqs, x.mostCommonBaseFreqs))(Encoder.encodeString, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), Encoder.encodeOption(TypoUnknownPgNdistinct.encoder), Encoder.encodeOption(TypoUnknownPgDependencies.encoder), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Boolean, Array](Encoder.encodeBoolean, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Double, Array](Encoder.encodeDouble, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Double, Array](Encoder.encodeDouble, implicitly)))
   implicit lazy val read: Read[PgStatsExtViewRow] = new Read[PgStatsExtViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.NoNulls),
@@ -51,8 +53,8 @@ object PgStatsExtViewRow {
       (adventureworks.StringArrayMeta.get, Nullability.Nullable),
       (adventureworks.StringArrayMeta.get, Nullability.Nullable),
       (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoUnknownPgNdistinct.get, Nullability.Nullable),
+      (TypoUnknownPgDependencies.get, Nullability.Nullable),
       (adventureworks.StringArrayMeta.get, Nullability.Nullable),
       (adventureworks.BooleanArrayMeta.get, Nullability.Nullable),
       (adventureworks.DoubleArrayMeta.get, Nullability.Nullable),
@@ -67,8 +69,8 @@ object PgStatsExtViewRow {
       attnames = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 5),
       exprs = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 6),
       kinds = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 7),
-      nDistinct = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      dependencies = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      nDistinct = TypoUnknownPgNdistinct.get.unsafeGetNullable(rs, i + 8),
+      dependencies = TypoUnknownPgDependencies.get.unsafeGetNullable(rs, i + 9),
       mostCommonVals = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 10),
       mostCommonValNulls = adventureworks.BooleanArrayMeta.get.unsafeGetNullable(rs, i + 11),
       mostCommonFreqs = adventureworks.DoubleArrayMeta.get.unsafeGetNullable(rs, i + 12),

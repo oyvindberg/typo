@@ -7,15 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext_data
 
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgMcvList
+import adventureworks.customtypes.TypoUnknownPgNdistinct
+import adventureworks.customtypes.TypoUnknownPgStatistic
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatisticExtDataFields[Row] {
   val stxoid: IdField[PgStatisticExtDataId, Row]
-  val stxdndistinct: OptField[String, Row]
-  val stxddependencies: OptField[String, Row]
-  val stxdmcv: OptField[String, Row]
-  val stxdexpr: OptField[String, Row]
+  val stxdndistinct: OptField[TypoUnknownPgNdistinct, Row]
+  val stxddependencies: OptField[TypoUnknownPgDependencies, Row]
+  val stxdmcv: OptField[TypoUnknownPgMcvList, Row]
+  val stxdexpr: OptField[TypoUnknownPgStatistic, Row]
 }
 object PgStatisticExtDataFields extends PgStatisticExtDataStructure[PgStatisticExtDataRow](None, identity, (_, x) => x)
 

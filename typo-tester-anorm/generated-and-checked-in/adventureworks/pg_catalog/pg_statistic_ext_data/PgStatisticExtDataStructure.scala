@@ -7,6 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext_data
 
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgMcvList
+import adventureworks.customtypes.TypoUnknownPgNdistinct
+import adventureworks.customtypes.TypoUnknownPgStatistic
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -17,10 +21,10 @@ class PgStatisticExtDataStructure[Row](val prefix: Option[String], val extract: 
     with PgStatisticExtDataFields[Row] { outer =>
 
   override val stxoid = new IdField[PgStatisticExtDataId, Row](prefix, "stxoid", None, Some("oid"))(x => extract(x).stxoid, (row, value) => merge(row, extract(row).copy(stxoid = value)))
-  override val stxdndistinct = new OptField[String, Row](prefix, "stxdndistinct", None, None)(x => extract(x).stxdndistinct, (row, value) => merge(row, extract(row).copy(stxdndistinct = value)))
-  override val stxddependencies = new OptField[String, Row](prefix, "stxddependencies", None, None)(x => extract(x).stxddependencies, (row, value) => merge(row, extract(row).copy(stxddependencies = value)))
-  override val stxdmcv = new OptField[String, Row](prefix, "stxdmcv", None, None)(x => extract(x).stxdmcv, (row, value) => merge(row, extract(row).copy(stxdmcv = value)))
-  override val stxdexpr = new OptField[String, Row](prefix, "stxdexpr", None, None)(x => extract(x).stxdexpr, (row, value) => merge(row, extract(row).copy(stxdexpr = value)))
+  override val stxdndistinct = new OptField[TypoUnknownPgNdistinct, Row](prefix, "stxdndistinct", None, Some("pg_ndistinct"))(x => extract(x).stxdndistinct, (row, value) => merge(row, extract(row).copy(stxdndistinct = value)))
+  override val stxddependencies = new OptField[TypoUnknownPgDependencies, Row](prefix, "stxddependencies", None, Some("pg_dependencies"))(x => extract(x).stxddependencies, (row, value) => merge(row, extract(row).copy(stxddependencies = value)))
+  override val stxdmcv = new OptField[TypoUnknownPgMcvList, Row](prefix, "stxdmcv", None, Some("pg_mcv_list"))(x => extract(x).stxdmcv, (row, value) => merge(row, extract(row).copy(stxdmcv = value)))
+  override val stxdexpr = new OptField[TypoUnknownPgStatistic, Row](prefix, "stxdexpr", None, Some("_pg_statistic"))(x => extract(x).stxdexpr, (row, value) => merge(row, extract(row).copy(stxdexpr = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)

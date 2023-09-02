@@ -7,6 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext_data
 
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgMcvList
+import adventureworks.customtypes.TypoUnknownPgNdistinct
+import adventureworks.customtypes.TypoUnknownPgStatistic
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -21,10 +25,10 @@ import scala.util.Try
 
 case class PgStatisticExtDataRow(
   stxoid: PgStatisticExtDataId,
-  stxdndistinct: Option[String],
-  stxddependencies: Option[String],
-  stxdmcv: Option[String],
-  stxdexpr: Option[String]
+  stxdndistinct: Option[TypoUnknownPgNdistinct],
+  stxddependencies: Option[TypoUnknownPgDependencies],
+  stxdmcv: Option[TypoUnknownPgMcvList],
+  stxdexpr: Option[TypoUnknownPgStatistic]
 )
 
 object PgStatisticExtDataRow {
@@ -32,10 +36,10 @@ object PgStatisticExtDataRow {
       Try(
         PgStatisticExtDataRow(
           stxoid = json.\("stxoid").as(PgStatisticExtDataId.reads),
-          stxdndistinct = json.\("stxdndistinct").toOption.map(_.as(Reads.StringReads)),
-          stxddependencies = json.\("stxddependencies").toOption.map(_.as(Reads.StringReads)),
-          stxdmcv = json.\("stxdmcv").toOption.map(_.as(Reads.StringReads)),
-          stxdexpr = json.\("stxdexpr").toOption.map(_.as(Reads.StringReads))
+          stxdndistinct = json.\("stxdndistinct").toOption.map(_.as(TypoUnknownPgNdistinct.reads)),
+          stxddependencies = json.\("stxddependencies").toOption.map(_.as(TypoUnknownPgDependencies.reads)),
+          stxdmcv = json.\("stxdmcv").toOption.map(_.as(TypoUnknownPgMcvList.reads)),
+          stxdexpr = json.\("stxdexpr").toOption.map(_.as(TypoUnknownPgStatistic.reads))
         )
       )
     ),
@@ -44,20 +48,20 @@ object PgStatisticExtDataRow {
     Success(
       PgStatisticExtDataRow(
         stxoid = row(idx + 0)(PgStatisticExtDataId.column),
-        stxdndistinct = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        stxddependencies = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        stxdmcv = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        stxdexpr = row(idx + 4)(Column.columnToOption(Column.columnToString))
+        stxdndistinct = row(idx + 1)(Column.columnToOption(TypoUnknownPgNdistinct.column)),
+        stxddependencies = row(idx + 2)(Column.columnToOption(TypoUnknownPgDependencies.column)),
+        stxdmcv = row(idx + 3)(Column.columnToOption(TypoUnknownPgMcvList.column)),
+        stxdexpr = row(idx + 4)(Column.columnToOption(TypoUnknownPgStatistic.column))
       )
     )
   }
   implicit lazy val writes: OWrites[PgStatisticExtDataRow] = OWrites[PgStatisticExtDataRow](o =>
     new JsObject(ListMap[String, JsValue](
       "stxoid" -> PgStatisticExtDataId.writes.writes(o.stxoid),
-      "stxdndistinct" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stxdndistinct),
-      "stxddependencies" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stxddependencies),
-      "stxdmcv" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stxdmcv),
-      "stxdexpr" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stxdexpr)
+      "stxdndistinct" -> Writes.OptionWrites(TypoUnknownPgNdistinct.writes).writes(o.stxdndistinct),
+      "stxddependencies" -> Writes.OptionWrites(TypoUnknownPgDependencies.writes).writes(o.stxddependencies),
+      "stxdmcv" -> Writes.OptionWrites(TypoUnknownPgMcvList.writes).writes(o.stxdmcv),
+      "stxdexpr" -> Writes.OptionWrites(TypoUnknownPgStatistic.writes).writes(o.stxdexpr)
     ))
   )
 }

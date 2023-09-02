@@ -63,6 +63,7 @@ object db {
     case object UUID extends Type
     case object Xml extends Type
     case class VarChar(maxLength: Option[Int]) extends Type
+    case class Unknown(sqlType: String) extends Type
   }
 
   case class Domain(name: RelationName, tpe: Type, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])

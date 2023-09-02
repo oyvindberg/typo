@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_stats_ext
 
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgNdistinct
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -24,8 +26,8 @@ class PgStatsExtViewStructure[Row](val prefix: Option[String], val extract: Row 
   override val attnames = new OptField[Array[String], Row](prefix, "attnames", None, None)(x => extract(x).attnames, (row, value) => merge(row, extract(row).copy(attnames = value)))
   override val exprs = new OptField[Array[String], Row](prefix, "exprs", None, None)(x => extract(x).exprs, (row, value) => merge(row, extract(row).copy(exprs = value)))
   override val kinds = new Field[Array[String], Row](prefix, "kinds", None, None)(x => extract(x).kinds, (row, value) => merge(row, extract(row).copy(kinds = value)))
-  override val nDistinct = new OptField[String, Row](prefix, "n_distinct", None, None)(x => extract(x).nDistinct, (row, value) => merge(row, extract(row).copy(nDistinct = value)))
-  override val dependencies = new OptField[String, Row](prefix, "dependencies", None, None)(x => extract(x).dependencies, (row, value) => merge(row, extract(row).copy(dependencies = value)))
+  override val nDistinct = new OptField[TypoUnknownPgNdistinct, Row](prefix, "n_distinct", None, None)(x => extract(x).nDistinct, (row, value) => merge(row, extract(row).copy(nDistinct = value)))
+  override val dependencies = new OptField[TypoUnknownPgDependencies, Row](prefix, "dependencies", None, None)(x => extract(x).dependencies, (row, value) => merge(row, extract(row).copy(dependencies = value)))
   override val mostCommonVals = new OptField[Array[String], Row](prefix, "most_common_vals", None, None)(x => extract(x).mostCommonVals, (row, value) => merge(row, extract(row).copy(mostCommonVals = value)))
   override val mostCommonValNulls = new OptField[Array[Boolean], Row](prefix, "most_common_val_nulls", None, None)(x => extract(x).mostCommonValNulls, (row, value) => merge(row, extract(row).copy(mostCommonValNulls = value)))
   override val mostCommonFreqs = new OptField[Array[Double], Row](prefix, "most_common_freqs", None, None)(x => extract(x).mostCommonFreqs, (row, value) => merge(row, extract(row).copy(mostCommonFreqs = value)))

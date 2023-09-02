@@ -78,5 +78,8 @@ object Naming {
     camelCase(string.split('_'))
 
   def titleCase(name: String): String =
-    name.split('_').map(_.capitalize).mkString("")
+    titleCase(name.split('_'))
+
+  def titleCase(strings: Array[String]): String =
+    strings.map(_.capitalize).mkString("")
 }

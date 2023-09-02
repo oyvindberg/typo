@@ -78,7 +78,7 @@ object MetaDb {
         )
         .getOrElse {
           System.err.println(s"Couldn't translate type from domain $d")
-          db.Type.Text
+          db.Type.Unknown(d.`type`)
         }
 
       db.Domain(
@@ -136,7 +136,7 @@ object MetaDb {
 
                   val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)).getOrElse {
                     System.err.println(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
-                    db.Type.Text
+                    db.Type.Unknown(mdCol.columnTypeName)
                   }
 
                   val coord = (relationName, mdCol.name)
@@ -190,7 +190,7 @@ object MetaDb {
                 }
               val tpe = typeMapperDb.col(c).getOrElse {
                 System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${c.udtName}. Falling back to text")
-                db.Type.Text
+                db.Type.Unknown(c.udtName.get)
               }
               val coord = (relationName, colName)
               db.Col(

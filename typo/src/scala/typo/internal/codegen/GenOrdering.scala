@@ -25,7 +25,7 @@ class GenOrdering(customTypes: CustomTypes, pkg: sc.QIdent) {
         case sc.Type.Qualified(qident)
             if qident.idents.startsWith(pkg.idents)
             // custom types do not have ordering
-              && customTypes.All.forall(_.typoType != baseType) =>
+              && !customTypes.All.contains(baseType) =>
           true
         case _ => false
       }

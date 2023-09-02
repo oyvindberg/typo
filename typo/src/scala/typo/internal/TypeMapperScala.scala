@@ -114,6 +114,7 @@ case class TypeMapperScala(
           case Some(n) if n != 2147483647 => sc.Type.String.withComment(s"max $n chars")
           case _                          => sc.Type.String
         }
+      case db.Type.Unknown(sqlType) => customTypes.TypoUnknown(sqlType).typoType
     }
   }
 

@@ -7,11 +7,14 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext_data
 
+import adventureworks.customtypes.TypoUnknownPgDependencies
+import adventureworks.customtypes.TypoUnknownPgMcvList
+import adventureworks.customtypes.TypoUnknownPgNdistinct
+import adventureworks.customtypes.TypoUnknownPgStatistic
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
-import doobie.util.meta.Meta
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -27,7 +30,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   }
   override def insert(unsaved: PgStatisticExtDataRow): ConnectionIO[PgStatisticExtDataRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
-          values (${fromWrite(unsaved.stxoid)(Write.fromPut(PgStatisticExtDataId.put))}::oid, ${fromWrite(unsaved.stxdndistinct)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.stxddependencies)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.stxdmcv)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.stxdexpr)(Write.fromPutOption(Meta.StringMeta.put))})
+          values (${fromWrite(unsaved.stxoid)(Write.fromPut(PgStatisticExtDataId.put))}::oid, ${fromWrite(unsaved.stxdndistinct)(Write.fromPutOption(TypoUnknownPgNdistinct.put))}::pg_ndistinct, ${fromWrite(unsaved.stxddependencies)(Write.fromPutOption(TypoUnknownPgDependencies.put))}::pg_dependencies, ${fromWrite(unsaved.stxdmcv)(Write.fromPutOption(TypoUnknownPgMcvList.put))}::pg_mcv_list, ${fromWrite(unsaved.stxdexpr)(Write.fromPutOption(TypoUnknownPgStatistic.put))}::_pg_statistic)
           returning "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
        """.query(PgStatisticExtDataRow.read).unique
   }
@@ -46,10 +49,10 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def update(row: PgStatisticExtDataRow): ConnectionIO[Boolean] = {
     val stxoid = row.stxoid
     sql"""update pg_catalog.pg_statistic_ext_data
-          set "stxdndistinct" = ${fromWrite(row.stxdndistinct)(Write.fromPutOption(Meta.StringMeta.put))},
-              "stxddependencies" = ${fromWrite(row.stxddependencies)(Write.fromPutOption(Meta.StringMeta.put))},
-              "stxdmcv" = ${fromWrite(row.stxdmcv)(Write.fromPutOption(Meta.StringMeta.put))},
-              "stxdexpr" = ${fromWrite(row.stxdexpr)(Write.fromPutOption(Meta.StringMeta.put))}
+          set "stxdndistinct" = ${fromWrite(row.stxdndistinct)(Write.fromPutOption(TypoUnknownPgNdistinct.put))}::pg_ndistinct,
+              "stxddependencies" = ${fromWrite(row.stxddependencies)(Write.fromPutOption(TypoUnknownPgDependencies.put))}::pg_dependencies,
+              "stxdmcv" = ${fromWrite(row.stxdmcv)(Write.fromPutOption(TypoUnknownPgMcvList.put))}::pg_mcv_list,
+              "stxdexpr" = ${fromWrite(row.stxdexpr)(Write.fromPutOption(TypoUnknownPgStatistic.put))}::_pg_statistic
           where "stxoid" = ${fromWrite(stxoid)(Write.fromPut(PgStatisticExtDataId.put))}"""
       .update
       .run
@@ -62,10 +65,10 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
     sql"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
           values (
             ${fromWrite(unsaved.stxoid)(Write.fromPut(PgStatisticExtDataId.put))}::oid,
-            ${fromWrite(unsaved.stxdndistinct)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.stxddependencies)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.stxdmcv)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.stxdexpr)(Write.fromPutOption(Meta.StringMeta.put))}
+            ${fromWrite(unsaved.stxdndistinct)(Write.fromPutOption(TypoUnknownPgNdistinct.put))}::pg_ndistinct,
+            ${fromWrite(unsaved.stxddependencies)(Write.fromPutOption(TypoUnknownPgDependencies.put))}::pg_dependencies,
+            ${fromWrite(unsaved.stxdmcv)(Write.fromPutOption(TypoUnknownPgMcvList.put))}::pg_mcv_list,
+            ${fromWrite(unsaved.stxdexpr)(Write.fromPutOption(TypoUnknownPgStatistic.put))}::_pg_statistic
           )
           on conflict ("stxoid")
           do update set

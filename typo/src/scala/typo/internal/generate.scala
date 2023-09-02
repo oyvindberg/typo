@@ -76,7 +76,7 @@ object generate {
         List(FileDefault(default, options.jsonLibs).file),
         enums.map(enm => FileStringEnum(options, enm)),
         domains.map(d => FileDomain(d, options, genOrdering)),
-        customTypes.All.map(FileCustomType(options, genOrdering)),
+        customTypes.All.values.map(FileCustomType(options, genOrdering)),
         relationFilesByName.map { case (_, f) => f },
         sqlFileFiles
       ).flatten
