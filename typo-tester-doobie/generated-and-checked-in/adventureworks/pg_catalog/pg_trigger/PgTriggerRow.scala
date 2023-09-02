@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoShort
@@ -33,15 +34,15 @@ case class PgTriggerRow(
   tginitdeferred: Boolean,
   tgnargs: TypoShort,
   tgattr: TypoInt2Vector,
-  tgargs: Array[Byte],
+  tgargs: TypoBytea,
   tgqual: Option[TypoPgNodeTree],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
 )
 
 object PgTriggerRow {
-  implicit lazy val decoder: Decoder[PgTriggerRow] = Decoder.forProduct19[PgTriggerRow, PgTriggerId, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, TypoShort, String, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean, Boolean, TypoShort, TypoInt2Vector, Array[Byte], Option[TypoPgNodeTree], Option[String], Option[String]]("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")(PgTriggerRow.apply)(PgTriggerId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, TypoShort.decoder, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean, Decoder.decodeBoolean, TypoShort.decoder, TypoInt2Vector.decoder, Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly), Decoder.decodeOption(TypoPgNodeTree.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit lazy val encoder: Encoder[PgTriggerRow] = Encoder.forProduct19[PgTriggerRow, PgTriggerId, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, TypoShort, String, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean, Boolean, TypoShort, TypoInt2Vector, Array[Byte], Option[TypoPgNodeTree], Option[String], Option[String]]("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")(x => (x.oid, x.tgrelid, x.tgparentid, x.tgname, x.tgfoid, x.tgtype, x.tgenabled, x.tgisinternal, x.tgconstrrelid, x.tgconstrindid, x.tgconstraint, x.tgdeferrable, x.tginitdeferred, x.tgnargs, x.tgattr, x.tgargs, x.tgqual, x.tgoldtable, x.tgnewtable))(PgTriggerId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, TypoShort.encoder, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean, Encoder.encodeBoolean, TypoShort.encoder, TypoInt2Vector.encoder, Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly), Encoder.encodeOption(TypoPgNodeTree.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val decoder: Decoder[PgTriggerRow] = Decoder.forProduct19[PgTriggerRow, PgTriggerId, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, TypoShort, String, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean, Boolean, TypoShort, TypoInt2Vector, TypoBytea, Option[TypoPgNodeTree], Option[String], Option[String]]("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")(PgTriggerRow.apply)(PgTriggerId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, TypoShort.decoder, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean, Decoder.decodeBoolean, TypoShort.decoder, TypoInt2Vector.decoder, TypoBytea.decoder, Decoder.decodeOption(TypoPgNodeTree.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgTriggerRow] = Encoder.forProduct19[PgTriggerRow, PgTriggerId, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, TypoShort, String, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean, Boolean, TypoShort, TypoInt2Vector, TypoBytea, Option[TypoPgNodeTree], Option[String], Option[String]]("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")(x => (x.oid, x.tgrelid, x.tgparentid, x.tgname, x.tgfoid, x.tgtype, x.tgenabled, x.tgisinternal, x.tgconstrrelid, x.tgconstrindid, x.tgconstraint, x.tgdeferrable, x.tginitdeferred, x.tgnargs, x.tgattr, x.tgargs, x.tgqual, x.tgoldtable, x.tgnewtable))(PgTriggerId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, TypoShort.encoder, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean, Encoder.encodeBoolean, TypoShort.encoder, TypoInt2Vector.encoder, TypoBytea.encoder, Encoder.encodeOption(TypoPgNodeTree.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[PgTriggerRow] = new Read[PgTriggerRow](
     gets = List(
       (PgTriggerId.get, Nullability.NoNulls),
@@ -59,7 +60,7 @@ object PgTriggerRow {
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (TypoShort.get, Nullability.NoNulls),
       (TypoInt2Vector.get, Nullability.NoNulls),
-      (Meta.ByteArrayMeta.get, Nullability.NoNulls),
+      (TypoBytea.get, Nullability.NoNulls),
       (TypoPgNodeTree.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable)
@@ -80,7 +81,7 @@ object PgTriggerRow {
       tginitdeferred = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 12),
       tgnargs = TypoShort.get.unsafeGetNonNullable(rs, i + 13),
       tgattr = TypoInt2Vector.get.unsafeGetNonNullable(rs, i + 14),
-      tgargs = Meta.ByteArrayMeta.get.unsafeGetNonNullable(rs, i + 15),
+      tgargs = TypoBytea.get.unsafeGetNonNullable(rs, i + 15),
       tgqual = TypoPgNodeTree.get.unsafeGetNullable(rs, i + 16),
       tgoldtable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 17),
       tgnewtable = Meta.StringMeta.get.unsafeGetNullable(rs, i + 18)

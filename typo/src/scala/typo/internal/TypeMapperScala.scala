@@ -53,7 +53,7 @@ case class TypeMapperScala(
     tpe match {
       case db.Type.Array(_) => sys.error("no idea what to do with nested array types")
       case db.Type.Boolean  => sc.Type.Boolean
-      case db.Type.Bytea    => sc.Type.Array.of(sc.Type.Byte)
+      case db.Type.Bytea    => customTypes.TypoBytea.typoType
       case db.Type.Bpchar(maybeN) =>
         maybeN match {
           case Some(n) if n != 2147483647 => sc.Type.String.withComment(s"bpchar, max $n chars")

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoShort
@@ -30,7 +31,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
   }
   override def insert(unsaved: PgTriggerRow): ConnectionIO[PgTriggerRow] = {
     sql"""insert into pg_catalog.pg_trigger("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")
-          values (${fromWrite(unsaved.oid)(Write.fromPut(PgTriggerId.put))}::oid, ${fromWrite(unsaved.tgrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgparentid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tgfoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgtype)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.tgenabled)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.tgisinternal)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tgconstrrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgconstrindid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgconstraint)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgdeferrable)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tginitdeferred)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tgnargs)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.tgattr)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.tgargs)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgTriggerId.put))}::oid, ${fromWrite(unsaved.tgrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgparentid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tgfoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgtype)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.tgenabled)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.tgisinternal)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tgconstrrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgconstrindid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgconstraint)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgdeferrable)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tginitdeferred)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tgnargs)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.tgattr)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.tgargs)(Write.fromPut(TypoBytea.put))}::bytea, ${fromWrite(unsaved.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name)
           returning "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable"
        """.query(PgTriggerRow.read).unique
   }
@@ -69,7 +70,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
               "tginitdeferred" = ${fromWrite(row.tginitdeferred)(Write.fromPut(Meta.BooleanMeta.put))},
               "tgnargs" = ${fromWrite(row.tgnargs)(Write.fromPut(TypoShort.put))}::int2,
               "tgattr" = ${fromWrite(row.tgattr)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
-              "tgargs" = ${fromWrite(row.tgargs)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea,
+              "tgargs" = ${fromWrite(row.tgargs)(Write.fromPut(TypoBytea.put))}::bytea,
               "tgqual" = ${fromWrite(row.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
               "tgoldtable" = ${fromWrite(row.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name,
               "tgnewtable" = ${fromWrite(row.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name
@@ -99,7 +100,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
             ${fromWrite(unsaved.tginitdeferred)(Write.fromPut(Meta.BooleanMeta.put))},
             ${fromWrite(unsaved.tgnargs)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.tgattr)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
-            ${fromWrite(unsaved.tgargs)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea,
+            ${fromWrite(unsaved.tgargs)(Write.fromPut(TypoBytea.put))}::bytea,
             ${fromWrite(unsaved.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
             ${fromWrite(unsaved.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name,
             ${fromWrite(unsaved.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name

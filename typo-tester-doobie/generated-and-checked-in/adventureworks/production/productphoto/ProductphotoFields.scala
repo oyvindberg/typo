@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productphoto
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
@@ -14,9 +15,9 @@ import typo.dsl.SqlExpr.OptField
 
 trait ProductphotoFields[Row] {
   val productphotoid: IdField[ProductphotoId, Row]
-  val thumbnailphoto: OptField[Array[Byte], Row]
+  val thumbnailphoto: OptField[TypoBytea, Row]
   val thumbnailphotofilename: OptField[/* max 50 chars */ String, Row]
-  val largephoto: OptField[Array[Byte], Row]
+  val largephoto: OptField[TypoBytea, Row]
   val largephotofilename: OptField[/* max 50 chars */ String, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

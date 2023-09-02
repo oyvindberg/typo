@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productphoto
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -19,33 +20,33 @@ case class ProductphotoRow(
   /** Primary key for ProductPhoto records. */
   productphotoid: ProductphotoId,
   /** Small image of the product. */
-  thumbnailphoto: Option[Array[Byte]],
+  thumbnailphoto: Option[TypoBytea],
   /** Small image file name. */
   thumbnailphotofilename: Option[/* max 50 chars */ String],
   /** Large image of the product. */
-  largephoto: Option[Array[Byte]],
+  largephoto: Option[TypoBytea],
   /** Large image file name. */
   largephotofilename: Option[/* max 50 chars */ String],
   modifieddate: TypoLocalDateTime
 )
 
 object ProductphotoRow {
-  implicit lazy val decoder: Decoder[ProductphotoRow] = Decoder.forProduct6[ProductphotoRow, ProductphotoId, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(ProductphotoRow.apply)(ProductphotoId.decoder, Decoder.decodeOption(Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly)), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly)), Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[ProductphotoRow] = Encoder.forProduct6[ProductphotoRow, ProductphotoId, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(x => (x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate))(ProductphotoId.encoder, Encoder.encodeOption(Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly)), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly)), Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[ProductphotoRow] = Decoder.forProduct6[ProductphotoRow, ProductphotoId, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(ProductphotoRow.apply)(ProductphotoId.decoder, Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ProductphotoRow] = Encoder.forProduct6[ProductphotoRow, ProductphotoId, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(x => (x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate))(ProductphotoId.encoder, Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
   implicit lazy val read: Read[ProductphotoRow] = new Read[ProductphotoRow](
     gets = List(
       (ProductphotoId.get, Nullability.NoNulls),
-      (Meta.ByteArrayMeta.get, Nullability.Nullable),
+      (TypoBytea.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.ByteArrayMeta.get, Nullability.Nullable),
+      (TypoBytea.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductphotoRow(
       productphotoid = ProductphotoId.get.unsafeGetNonNullable(rs, i + 0),
-      thumbnailphoto = Meta.ByteArrayMeta.get.unsafeGetNullable(rs, i + 1),
+      thumbnailphoto = TypoBytea.get.unsafeGetNullable(rs, i + 1),
       thumbnailphotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      largephoto = Meta.ByteArrayMeta.get.unsafeGetNullable(rs, i + 3),
+      largephoto = TypoBytea.get.unsafeGetNullable(rs, i + 3),
       largephotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )

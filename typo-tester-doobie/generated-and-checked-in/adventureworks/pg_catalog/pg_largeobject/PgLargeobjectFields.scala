@@ -7,13 +7,14 @@ package adventureworks
 package pg_catalog
 package pg_largeobject
 
+import adventureworks.customtypes.TypoBytea
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait PgLargeobjectFields[Row] {
   val loid: IdField[/* oid */ Long, Row]
   val pageno: IdField[Int, Row]
-  val data: Field[Array[Byte], Row]
+  val data: Field[TypoBytea, Row]
 }
 object PgLargeobjectFields extends PgLargeobjectStructure[PgLargeobjectRow](None, identity, (_, x) => x)
 

@@ -22,6 +22,8 @@ case class TypoAclItem(value: String)
 case class TypoAnyArray(value: String)
 /** This represents the box datatype in PostgreSQL */
 case class TypoBox(x1: Double, y1: Double, x2: Double, y2: Double)
+/** This represents the bytea datatype in PostgreSQL */
+case class TypoBytea(value: Array[Byte])
 /** This represents circle datatype in PostgreSQL, consisting of a point and a radius */
 case class TypoCircle(center: TypoPoint, radius: Double)
 /** The text representation of an hstore, used for input and output, includes zero or more key => value pairs separated by commas */

@@ -8,6 +8,7 @@ package production
 package document
 
 import adventureworks.customtypes.Defaulted
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
@@ -34,7 +35,7 @@ object DocumentRepoImpl extends DocumentRepo {
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
-          values (${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.document)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
+          values (${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.query(DocumentRow.read).unique
   }
@@ -47,7 +48,7 @@ object DocumentRepoImpl extends DocumentRepo {
       Some((Fragment.const(s""""revision""""), fr"${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
       Some((Fragment.const(s""""status""""), fr"${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2")),
       Some((Fragment.const(s""""documentsummary""""), fr"${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""document""""), fr"${fromWrite(unsaved.document)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea")),
+      Some((Fragment.const(s""""document""""), fr"${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s""""folderflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
@@ -114,7 +115,7 @@ object DocumentRepoImpl extends DocumentRepo {
               "changenumber" = ${fromWrite(row.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4,
               "status" = ${fromWrite(row.status)(Write.fromPut(TypoShort.put))}::int2,
               "documentsummary" = ${fromWrite(row.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))},
-              "document" = ${fromWrite(row.document)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+              "document" = ${fromWrite(row.document)(Write.fromPutOption(TypoBytea.put))}::bytea,
               "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}"""
@@ -137,7 +138,7 @@ object DocumentRepoImpl extends DocumentRepo {
             ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4,
             ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2,
             ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.document)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+            ${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
             ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))}

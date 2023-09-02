@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoShort
@@ -30,7 +31,7 @@ trait PgTriggerFields[Row] {
   val tginitdeferred: Field[Boolean, Row]
   val tgnargs: Field[TypoShort, Row]
   val tgattr: Field[TypoInt2Vector, Row]
-  val tgargs: Field[Array[Byte], Row]
+  val tgargs: Field[TypoBytea, Row]
   val tgqual: OptField[TypoPgNodeTree, Row]
   val tgoldtable: OptField[String, Row]
   val tgnewtable: OptField[String, Row]

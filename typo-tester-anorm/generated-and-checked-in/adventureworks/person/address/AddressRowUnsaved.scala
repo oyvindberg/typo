@@ -8,6 +8,7 @@ package person
 package address
 
 import adventureworks.customtypes.Defaulted
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import java.util.UUID
@@ -34,7 +35,7 @@ case class AddressRowUnsaved(
   /** Postal code for the street address. */
   postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
-  spatiallocation: Option[Array[Byte]],
+  spatiallocation: Option[TypoBytea],
   /** Default: nextval('person.address_addressid_seq'::regclass)
       Primary key for Address records. */
   addressid: Defaulted[AddressId] = Defaulted.UseDefault,
@@ -74,7 +75,7 @@ object AddressRowUnsaved {
           city = json.\("city").as(Reads.StringReads),
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
           postalcode = json.\("postalcode").as(Reads.StringReads),
-          spatiallocation = json.\("spatiallocation").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          spatiallocation = json.\("spatiallocation").toOption.map(_.as(TypoBytea.reads)),
           addressid = json.\("addressid").as(Defaulted.reads(AddressId.reads)),
           rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
@@ -89,7 +90,7 @@ object AddressRowUnsaved {
       "city" -> Writes.StringWrites.writes(o.city),
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
       "postalcode" -> Writes.StringWrites.writes(o.postalcode),
-      "spatiallocation" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.spatiallocation),
+      "spatiallocation" -> Writes.OptionWrites(TypoBytea.writes).writes(o.spatiallocation),
       "addressid" -> Defaulted.writes(AddressId.writes).writes(o.addressid),
       "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)

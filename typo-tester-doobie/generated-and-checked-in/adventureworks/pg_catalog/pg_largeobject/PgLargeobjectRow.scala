@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_largeobject
 
+import adventureworks.customtypes.TypoBytea
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -17,24 +18,24 @@ import java.sql.ResultSet
 case class PgLargeobjectRow(
   loid: /* oid */ Long,
   pageno: Int,
-  data: Array[Byte]
+  data: TypoBytea
 ){
    val compositeId: PgLargeobjectId = PgLargeobjectId(loid, pageno)
  }
 
 object PgLargeobjectRow {
-  implicit lazy val decoder: Decoder[PgLargeobjectRow] = Decoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(PgLargeobjectRow.apply)(Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly))
-  implicit lazy val encoder: Encoder[PgLargeobjectRow] = Encoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(x => (x.loid, x.pageno, x.data))(Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly))
+  implicit lazy val decoder: Decoder[PgLargeobjectRow] = Decoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, TypoBytea]("loid", "pageno", "data")(PgLargeobjectRow.apply)(Decoder.decodeLong, Decoder.decodeInt, TypoBytea.decoder)
+  implicit lazy val encoder: Encoder[PgLargeobjectRow] = Encoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, TypoBytea]("loid", "pageno", "data")(x => (x.loid, x.pageno, x.data))(Encoder.encodeLong, Encoder.encodeInt, TypoBytea.encoder)
   implicit lazy val read: Read[PgLargeobjectRow] = new Read[PgLargeobjectRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.ByteArrayMeta.get, Nullability.NoNulls)
+      (TypoBytea.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgLargeobjectRow(
       loid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
       pageno = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
-      data = Meta.ByteArrayMeta.get.unsafeGetNonNullable(rs, i + 2)
+      data = TypoBytea.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

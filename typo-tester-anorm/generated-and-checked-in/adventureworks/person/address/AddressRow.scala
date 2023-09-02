@@ -7,6 +7,7 @@ package adventureworks
 package person
 package address
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import anorm.Column
@@ -37,7 +38,7 @@ case class AddressRow(
   /** Postal code for the street address. */
   postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
-  spatiallocation: Option[Array[Byte]],
+  spatiallocation: Option[TypoBytea],
   rowguid: UUID,
   modifieddate: TypoLocalDateTime
 )
@@ -52,7 +53,7 @@ object AddressRow {
           city = json.\("city").as(Reads.StringReads),
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
           postalcode = json.\("postalcode").as(Reads.StringReads),
-          spatiallocation = json.\("spatiallocation").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          spatiallocation = json.\("spatiallocation").toOption.map(_.as(TypoBytea.reads)),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -68,7 +69,7 @@ object AddressRow {
         city = row(idx + 3)(Column.columnToString),
         stateprovinceid = row(idx + 4)(StateprovinceId.column),
         postalcode = row(idx + 5)(Column.columnToString),
-        spatiallocation = row(idx + 6)(Column.columnToOption(Column.columnToByteArray)),
+        spatiallocation = row(idx + 6)(Column.columnToOption(TypoBytea.column)),
         rowguid = row(idx + 7)(Column.columnToUUID),
         modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
@@ -82,7 +83,7 @@ object AddressRow {
       "city" -> Writes.StringWrites.writes(o.city),
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
       "postalcode" -> Writes.StringWrites.writes(o.postalcode),
-      "spatiallocation" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.spatiallocation),
+      "spatiallocation" -> Writes.OptionWrites(TypoBytea.writes).writes(o.spatiallocation),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

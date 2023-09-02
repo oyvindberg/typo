@@ -8,6 +8,7 @@ package production
 package document
 
 import adventureworks.customtypes.Defaulted
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
@@ -40,7 +41,7 @@ case class DocumentRowUnsaved(
   /** Document abstract. */
   documentsummary: Option[String],
   /** Complete document. */
-  document: Option[Array[Byte]],
+  document: Option[TypoBytea],
   /** Default: false
       0 = This is a folder, 1 = This is a document. */
   folderflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -99,7 +100,7 @@ object DocumentRowUnsaved {
           revision = json.\("revision").as(Reads.StringReads),
           status = json.\("status").as(TypoShort.reads),
           documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
-          document = json.\("document").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          document = json.\("document").toOption.map(_.as(TypoBytea.reads)),
           folderflag = json.\("folderflag").as(Defaulted.reads(Flag.reads)),
           changenumber = json.\("changenumber").as(Defaulted.reads(Reads.IntReads)),
           rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
@@ -118,7 +119,7 @@ object DocumentRowUnsaved {
       "revision" -> Writes.StringWrites.writes(o.revision),
       "status" -> TypoShort.writes.writes(o.status),
       "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
-      "document" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.document),
+      "document" -> Writes.OptionWrites(TypoBytea.writes).writes(o.document),
       "folderflag" -> Defaulted.writes(Flag.writes).writes(o.folderflag),
       "changenumber" -> Defaulted.writes(Writes.IntWrites).writes(o.changenumber),
       "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),

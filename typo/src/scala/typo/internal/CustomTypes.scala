@@ -26,6 +26,24 @@ class CustomTypes(pkg: sc.QIdent) {
     )
   )
 
+  lazy val TypoBytea = CustomType(
+    comment = "This represents the bytea datatype in PostgreSQL",
+    sqlType = "bytea",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoBytea")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.Array.of(sc.Type.Byte), None)
+    ),
+    isNull = p => code"$p != null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.Array.of(sc.Type.Byte),
+      toTypo = (expr, target) => code"$target($expr)"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.Array.of(sc.Type.Byte),
+      fromTypo = (expr, _) => code"$expr.value"
+    )
+  )
+
   lazy val TypoLocalDate = CustomType(
     comment = "This is `java.time.LocalDate`, but transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
     sqlType = "date",
@@ -467,6 +485,7 @@ class CustomTypes(pkg: sc.QIdent) {
       TypoAclItem,
       TypoAnyArray,
       TypoBox,
+      TypoBytea,
       TypoCircle,
       TypoHStore,
       TypoInet,

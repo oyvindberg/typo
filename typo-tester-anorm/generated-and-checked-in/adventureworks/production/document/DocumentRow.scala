@@ -7,6 +7,7 @@ package adventureworks
 package production
 package document
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
@@ -46,7 +47,7 @@ case class DocumentRow(
   /** Document abstract. */
   documentsummary: Option[String],
   /** Complete document. */
-  document: Option[Array[Byte]],
+  document: Option[TypoBytea],
   /** ROWGUIDCOL number uniquely identifying the record. Required for FileStream. */
   rowguid: UUID,
   modifieddate: TypoLocalDateTime,
@@ -67,7 +68,7 @@ object DocumentRow {
           changenumber = json.\("changenumber").as(Reads.IntReads),
           status = json.\("status").as(TypoShort.reads),
           documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
-          document = json.\("document").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          document = json.\("document").toOption.map(_.as(TypoBytea.reads)),
           rowguid = json.\("rowguid").as(Reads.uuidReads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
           documentnode = json.\("documentnode").as(DocumentId.reads)
@@ -87,7 +88,7 @@ object DocumentRow {
         changenumber = row(idx + 6)(Column.columnToInt),
         status = row(idx + 7)(TypoShort.column),
         documentsummary = row(idx + 8)(Column.columnToOption(Column.columnToString)),
-        document = row(idx + 9)(Column.columnToOption(Column.columnToByteArray)),
+        document = row(idx + 9)(Column.columnToOption(TypoBytea.column)),
         rowguid = row(idx + 10)(Column.columnToUUID),
         modifieddate = row(idx + 11)(TypoLocalDateTime.column),
         documentnode = row(idx + 12)(DocumentId.column)
@@ -105,7 +106,7 @@ object DocumentRow {
       "changenumber" -> Writes.IntWrites.writes(o.changenumber),
       "status" -> TypoShort.writes.writes(o.status),
       "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
-      "document" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.document),
+      "document" -> Writes.OptionWrites(TypoBytea.writes).writes(o.document),
       "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
       "documentnode" -> DocumentId.writes.writes(o.documentnode)

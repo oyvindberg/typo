@@ -8,6 +8,7 @@ package production
 package productphoto
 
 import adventureworks.customtypes.Defaulted
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -30,15 +31,15 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   }
   override def insert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
     sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
-          values (${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.largephoto)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
        """.query(ProductphotoRow.read).unique
   }
   override def insert(unsaved: ProductphotoRowUnsaved): ConnectionIO[ProductphotoRow] = {
     val fs = List(
-      Some((Fragment.const(s""""thumbnailphoto""""), fr"${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea")),
+      Some((Fragment.const(s""""thumbnailphoto""""), fr"${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea")),
       Some((Fragment.const(s""""thumbnailphotofilename""""), fr"${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""largephoto""""), fr"${fromWrite(unsaved.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea")),
+      Some((Fragment.const(s""""largephoto""""), fr"${fromWrite(unsaved.largephoto)(Write.fromPutOption(TypoBytea.put))}::bytea")),
       Some((Fragment.const(s""""largephotofilename""""), fr"${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.productphotoid match {
         case Defaulted.UseDefault => None
@@ -79,9 +80,9 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def update(row: ProductphotoRow): ConnectionIO[Boolean] = {
     val productphotoid = row.productphotoid
     sql"""update production.productphoto
-          set "thumbnailphoto" = ${fromWrite(row.thumbnailphoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+          set "thumbnailphoto" = ${fromWrite(row.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea,
               "thumbnailphotofilename" = ${fromWrite(row.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
-              "largephoto" = ${fromWrite(row.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+              "largephoto" = ${fromWrite(row.largephoto)(Write.fromPutOption(TypoBytea.put))}::bytea,
               "largephotofilename" = ${fromWrite(row.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "productphotoid" = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}"""
@@ -96,9 +97,9 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           values (
             ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4,
-            ${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+            ${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea,
             ${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+            ${fromWrite(unsaved.largephoto)(Write.fromPutOption(TypoBytea.put))}::bytea,
             ${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
             ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )

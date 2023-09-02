@@ -7,6 +7,7 @@ package adventureworks
 package pe
 package a
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
@@ -22,7 +23,7 @@ trait AViewFields[Row] {
   val city: Field[/* max 30 chars */ String, Row]
   val stateprovinceid: Field[StateprovinceId, Row]
   val postalcode: Field[/* max 15 chars */ String, Row]
-  val spatiallocation: OptField[Byte, Row]
+  val spatiallocation: OptField[TypoBytea, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }

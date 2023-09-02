@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoShort
@@ -29,7 +30,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
   }
   override def insert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
     SQL"""insert into pg_catalog.pg_trigger("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")
-          values (${ParameterValue(unsaved.oid, null, PgTriggerId.toStatement)}::oid, ${ParameterValue(unsaved.tgrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgparentid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.tgfoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgtype, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.tgenabled, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.tgisinternal, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tgconstrrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgconstrindid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgconstraint, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgdeferrable, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tginitdeferred, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tgnargs, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.tgattr, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.tgargs, null, ToStatement.byteArrayToStatement)}::bytea, ${ParameterValue(unsaved.tgqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree, ${ParameterValue(unsaved.tgoldtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name, ${ParameterValue(unsaved.tgnewtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name)
+          values (${ParameterValue(unsaved.oid, null, PgTriggerId.toStatement)}::oid, ${ParameterValue(unsaved.tgrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgparentid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.tgfoid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgtype, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.tgenabled, null, ToStatement.stringToStatement)}::char, ${ParameterValue(unsaved.tgisinternal, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tgconstrrelid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgconstrindid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgconstraint, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.tgdeferrable, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tginitdeferred, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.tgnargs, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.tgattr, null, TypoInt2Vector.toStatement)}::int2vector, ${ParameterValue(unsaved.tgargs, null, TypoBytea.toStatement)}::bytea, ${ParameterValue(unsaved.tgqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree, ${ParameterValue(unsaved.tgoldtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name, ${ParameterValue(unsaved.tgnewtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name)
           returning "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable"
        """
       .executeInsert(PgTriggerRow.rowParser(1).single)
@@ -80,7 +81,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
               "tginitdeferred" = ${ParameterValue(row.tginitdeferred, null, ToStatement.booleanToStatement)},
               "tgnargs" = ${ParameterValue(row.tgnargs, null, TypoShort.toStatement)}::int2,
               "tgattr" = ${ParameterValue(row.tgattr, null, TypoInt2Vector.toStatement)}::int2vector,
-              "tgargs" = ${ParameterValue(row.tgargs, null, ToStatement.byteArrayToStatement)}::bytea,
+              "tgargs" = ${ParameterValue(row.tgargs, null, TypoBytea.toStatement)}::bytea,
               "tgqual" = ${ParameterValue(row.tgqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
               "tgoldtable" = ${ParameterValue(row.tgoldtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name,
               "tgnewtable" = ${ParameterValue(row.tgnewtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name
@@ -108,7 +109,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
             ${ParameterValue(unsaved.tginitdeferred, null, ToStatement.booleanToStatement)},
             ${ParameterValue(unsaved.tgnargs, null, TypoShort.toStatement)}::int2,
             ${ParameterValue(unsaved.tgattr, null, TypoInt2Vector.toStatement)}::int2vector,
-            ${ParameterValue(unsaved.tgargs, null, ToStatement.byteArrayToStatement)}::bytea,
+            ${ParameterValue(unsaved.tgargs, null, TypoBytea.toStatement)}::bytea,
             ${ParameterValue(unsaved.tgqual, null, ToStatement.optionToStatement(TypoPgNodeTree.toStatement, TypoPgNodeTree.parameterMetadata))}::pg_node_tree,
             ${ParameterValue(unsaved.tgoldtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name,
             ${ParameterValue(unsaved.tgnewtable, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::name

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_largeobject
 
+import adventureworks.customtypes.TypoBytea
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -18,7 +19,7 @@ class PgLargeobjectStructure[Row](val prefix: Option[String], val extract: Row =
 
   override val loid = new IdField[/* oid */ Long, Row](prefix, "loid", None, Some("oid"))(x => extract(x).loid, (row, value) => merge(row, extract(row).copy(loid = value)))
   override val pageno = new IdField[Int, Row](prefix, "pageno", None, Some("int4"))(x => extract(x).pageno, (row, value) => merge(row, extract(row).copy(pageno = value)))
-  override val data = new Field[Array[Byte], Row](prefix, "data", None, Some("bytea"))(x => extract(x).data, (row, value) => merge(row, extract(row).copy(data = value)))
+  override val data = new Field[TypoBytea, Row](prefix, "data", None, Some("bytea"))(x => extract(x).data, (row, value) => merge(row, extract(row).copy(data = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](loid, pageno, data)

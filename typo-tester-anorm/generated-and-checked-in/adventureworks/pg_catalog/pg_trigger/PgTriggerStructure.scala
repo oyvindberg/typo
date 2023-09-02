@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoShort
@@ -35,7 +36,7 @@ class PgTriggerStructure[Row](val prefix: Option[String], val extract: Row => Pg
   override val tginitdeferred = new Field[Boolean, Row](prefix, "tginitdeferred", None, None)(x => extract(x).tginitdeferred, (row, value) => merge(row, extract(row).copy(tginitdeferred = value)))
   override val tgnargs = new Field[TypoShort, Row](prefix, "tgnargs", None, Some("int2"))(x => extract(x).tgnargs, (row, value) => merge(row, extract(row).copy(tgnargs = value)))
   override val tgattr = new Field[TypoInt2Vector, Row](prefix, "tgattr", None, Some("int2vector"))(x => extract(x).tgattr, (row, value) => merge(row, extract(row).copy(tgattr = value)))
-  override val tgargs = new Field[Array[Byte], Row](prefix, "tgargs", None, Some("bytea"))(x => extract(x).tgargs, (row, value) => merge(row, extract(row).copy(tgargs = value)))
+  override val tgargs = new Field[TypoBytea, Row](prefix, "tgargs", None, Some("bytea"))(x => extract(x).tgargs, (row, value) => merge(row, extract(row).copy(tgargs = value)))
   override val tgqual = new OptField[TypoPgNodeTree, Row](prefix, "tgqual", None, Some("pg_node_tree"))(x => extract(x).tgqual, (row, value) => merge(row, extract(row).copy(tgqual = value)))
   override val tgoldtable = new OptField[String, Row](prefix, "tgoldtable", None, Some("name"))(x => extract(x).tgoldtable, (row, value) => merge(row, extract(row).copy(tgoldtable = value)))
   override val tgnewtable = new OptField[String, Row](prefix, "tgnewtable", None, Some("name"))(x => extract(x).tgnewtable, (row, value) => merge(row, extract(row).copy(tgnewtable = value)))

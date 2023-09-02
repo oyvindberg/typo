@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_largeobject
 
+import adventureworks.customtypes.TypoBytea
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
@@ -27,7 +28,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
   }
   override def insert(unsaved: PgLargeobjectRow): ConnectionIO[PgLargeobjectRow] = {
     sql"""insert into pg_catalog.pg_largeobject("loid", "pageno", "data")
-          values (${fromWrite(unsaved.loid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.pageno)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.data)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea)
+          values (${fromWrite(unsaved.loid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.pageno)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.data)(Write.fromPut(TypoBytea.put))}::bytea)
           returning "loid", "pageno", "data"
        """.query(PgLargeobjectRow.read).unique
   }
@@ -43,7 +44,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
   override def update(row: PgLargeobjectRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_largeobject
-          set "data" = ${fromWrite(row.data)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea
+          set "data" = ${fromWrite(row.data)(Write.fromPut(TypoBytea.put))}::bytea
           where "loid" = ${fromWrite(compositeId.loid)(Write.fromPut(Meta.LongMeta.put))} AND "pageno" = ${fromWrite(compositeId.pageno)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
@@ -57,7 +58,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           values (
             ${fromWrite(unsaved.loid)(Write.fromPut(Meta.LongMeta.put))}::oid,
             ${fromWrite(unsaved.pageno)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.data)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea
+            ${fromWrite(unsaved.data)(Write.fromPut(TypoBytea.put))}::bytea
           )
           on conflict ("loid", "pageno")
           do update set

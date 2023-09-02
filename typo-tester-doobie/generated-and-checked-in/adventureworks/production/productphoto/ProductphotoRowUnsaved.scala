@@ -8,6 +8,7 @@ package production
 package productphoto
 
 import adventureworks.customtypes.Defaulted
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder
@@ -15,11 +16,11 @@ import io.circe.Encoder
 /** This class corresponds to a row in table `production.productphoto` which has not been persisted yet */
 case class ProductphotoRowUnsaved(
   /** Small image of the product. */
-  thumbnailphoto: Option[Array[Byte]],
+  thumbnailphoto: Option[TypoBytea],
   /** Small image file name. */
   thumbnailphotofilename: Option[/* max 50 chars */ String],
   /** Large image of the product. */
-  largephoto: Option[Array[Byte]],
+  largephoto: Option[TypoBytea],
   /** Large image file name. */
   largephotofilename: Option[/* max 50 chars */ String],
   /** Default: nextval('production.productphoto_productphotoid_seq'::regclass)
@@ -45,6 +46,6 @@ case class ProductphotoRowUnsaved(
     )
 }
 object ProductphotoRowUnsaved {
-  implicit lazy val decoder: Decoder[ProductphotoRowUnsaved] = Decoder.forProduct6[ProductphotoRowUnsaved, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], Defaulted[ProductphotoId], Defaulted[TypoLocalDateTime]]("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate")(ProductphotoRowUnsaved.apply)(Decoder.decodeOption(Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly)), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly)), Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(ProductphotoId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[ProductphotoRowUnsaved] = Encoder.forProduct6[ProductphotoRowUnsaved, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], Defaulted[ProductphotoId], Defaulted[TypoLocalDateTime]]("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate")(x => (x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.productphotoid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly)), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly)), Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(ProductphotoId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[ProductphotoRowUnsaved] = Decoder.forProduct6[ProductphotoRowUnsaved, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], Defaulted[ProductphotoId], Defaulted[TypoLocalDateTime]]("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate")(ProductphotoRowUnsaved.apply)(Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(ProductphotoId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[ProductphotoRowUnsaved] = Encoder.forProduct6[ProductphotoRowUnsaved, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], Defaulted[ProductphotoId], Defaulted[TypoLocalDateTime]]("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate")(x => (x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.productphotoid, x.modifieddate))(Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(ProductphotoId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

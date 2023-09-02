@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoPgNodeTree
 import adventureworks.customtypes.TypoShort
@@ -38,7 +39,7 @@ case class PgTriggerRow(
   tginitdeferred: Boolean,
   tgnargs: TypoShort,
   tgattr: TypoInt2Vector,
-  tgargs: Array[Byte],
+  tgargs: TypoBytea,
   tgqual: Option[TypoPgNodeTree],
   tgoldtable: Option[String],
   tgnewtable: Option[String]
@@ -63,7 +64,7 @@ object PgTriggerRow {
           tginitdeferred = json.\("tginitdeferred").as(Reads.BooleanReads),
           tgnargs = json.\("tgnargs").as(TypoShort.reads),
           tgattr = json.\("tgattr").as(TypoInt2Vector.reads),
-          tgargs = json.\("tgargs").as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly)),
+          tgargs = json.\("tgargs").as(TypoBytea.reads),
           tgqual = json.\("tgqual").toOption.map(_.as(TypoPgNodeTree.reads)),
           tgoldtable = json.\("tgoldtable").toOption.map(_.as(Reads.StringReads)),
           tgnewtable = json.\("tgnewtable").toOption.map(_.as(Reads.StringReads))
@@ -89,7 +90,7 @@ object PgTriggerRow {
         tginitdeferred = row(idx + 12)(Column.columnToBoolean),
         tgnargs = row(idx + 13)(TypoShort.column),
         tgattr = row(idx + 14)(TypoInt2Vector.column),
-        tgargs = row(idx + 15)(Column.columnToByteArray),
+        tgargs = row(idx + 15)(TypoBytea.column),
         tgqual = row(idx + 16)(Column.columnToOption(TypoPgNodeTree.column)),
         tgoldtable = row(idx + 17)(Column.columnToOption(Column.columnToString)),
         tgnewtable = row(idx + 18)(Column.columnToOption(Column.columnToString))
@@ -113,7 +114,7 @@ object PgTriggerRow {
       "tginitdeferred" -> Writes.BooleanWrites.writes(o.tginitdeferred),
       "tgnargs" -> TypoShort.writes.writes(o.tgnargs),
       "tgattr" -> TypoInt2Vector.writes.writes(o.tgattr),
-      "tgargs" -> Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites).writes(o.tgargs),
+      "tgargs" -> TypoBytea.writes.writes(o.tgargs),
       "tgqual" -> Writes.OptionWrites(TypoPgNodeTree.writes).writes(o.tgqual),
       "tgoldtable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tgoldtable),
       "tgnewtable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tgnewtable)

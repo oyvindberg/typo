@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productphoto
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import anorm.Column
 import anorm.RowParser
@@ -24,11 +25,11 @@ case class ProductphotoRow(
   /** Primary key for ProductPhoto records. */
   productphotoid: ProductphotoId,
   /** Small image of the product. */
-  thumbnailphoto: Option[Array[Byte]],
+  thumbnailphoto: Option[TypoBytea],
   /** Small image file name. */
   thumbnailphotofilename: Option[/* max 50 chars */ String],
   /** Large image of the product. */
-  largephoto: Option[Array[Byte]],
+  largephoto: Option[TypoBytea],
   /** Large image file name. */
   largephotofilename: Option[/* max 50 chars */ String],
   modifieddate: TypoLocalDateTime
@@ -39,9 +40,9 @@ object ProductphotoRow {
       Try(
         ProductphotoRow(
           productphotoid = json.\("productphotoid").as(ProductphotoId.reads),
-          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as(TypoBytea.reads)),
           thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as(Reads.StringReads)),
-          largephoto = json.\("largephoto").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          largephoto = json.\("largephoto").toOption.map(_.as(TypoBytea.reads)),
           largephotofilename = json.\("largephotofilename").toOption.map(_.as(Reads.StringReads)),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
@@ -52,9 +53,9 @@ object ProductphotoRow {
     Success(
       ProductphotoRow(
         productphotoid = row(idx + 0)(ProductphotoId.column),
-        thumbnailphoto = row(idx + 1)(Column.columnToOption(Column.columnToByteArray)),
+        thumbnailphoto = row(idx + 1)(Column.columnToOption(TypoBytea.column)),
         thumbnailphotofilename = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        largephoto = row(idx + 3)(Column.columnToOption(Column.columnToByteArray)),
+        largephoto = row(idx + 3)(Column.columnToOption(TypoBytea.column)),
         largephotofilename = row(idx + 4)(Column.columnToOption(Column.columnToString)),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
@@ -63,9 +64,9 @@ object ProductphotoRow {
   implicit lazy val writes: OWrites[ProductphotoRow] = OWrites[ProductphotoRow](o =>
     new JsObject(ListMap[String, JsValue](
       "productphotoid" -> ProductphotoId.writes.writes(o.productphotoid),
-      "thumbnailphoto" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.thumbnailphoto),
+      "thumbnailphoto" -> Writes.OptionWrites(TypoBytea.writes).writes(o.thumbnailphoto),
       "thumbnailphotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.thumbnailphotofilename),
-      "largephoto" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.largephoto),
+      "largephoto" -> Writes.OptionWrites(TypoBytea.writes).writes(o.largephoto),
       "largephotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.largephotofilename),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))

@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package pp
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
 import typo.dsl.SqlExpr.Field
@@ -20,9 +21,9 @@ class PpViewStructure[Row](val prefix: Option[String], val extract: Row => PpVie
 
   override val id = new Field[ProductphotoId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
   override val productphotoid = new Field[ProductphotoId, Row](prefix, "productphotoid", None, None)(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
-  override val thumbnailphoto = new OptField[Byte, Row](prefix, "thumbnailphoto", None, None)(x => extract(x).thumbnailphoto, (row, value) => merge(row, extract(row).copy(thumbnailphoto = value)))
+  override val thumbnailphoto = new OptField[TypoBytea, Row](prefix, "thumbnailphoto", None, None)(x => extract(x).thumbnailphoto, (row, value) => merge(row, extract(row).copy(thumbnailphoto = value)))
   override val thumbnailphotofilename = new OptField[/* max 50 chars */ String, Row](prefix, "thumbnailphotofilename", None, None)(x => extract(x).thumbnailphotofilename, (row, value) => merge(row, extract(row).copy(thumbnailphotofilename = value)))
-  override val largephoto = new OptField[Byte, Row](prefix, "largephoto", None, None)(x => extract(x).largephoto, (row, value) => merge(row, extract(row).copy(largephoto = value)))
+  override val largephoto = new OptField[TypoBytea, Row](prefix, "largephoto", None, None)(x => extract(x).largephoto, (row, value) => merge(row, extract(row).copy(largephoto = value)))
   override val largephotofilename = new OptField[/* max 50 chars */ String, Row](prefix, "largephotofilename", None, None)(x => extract(x).largephotofilename, (row, value) => merge(row, extract(row).copy(largephotofilename = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 

@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package d
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
@@ -26,7 +27,7 @@ trait DViewFields[Row] {
   val changenumber: Field[Int, Row]
   val status: Field[TypoShort, Row]
   val documentsummary: OptField[String, Row]
-  val document: OptField[Byte, Row]
+  val document: OptField[TypoBytea, Row]
   val rowguid: Field[UUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
   val documentnode: Field[DocumentId, Row]

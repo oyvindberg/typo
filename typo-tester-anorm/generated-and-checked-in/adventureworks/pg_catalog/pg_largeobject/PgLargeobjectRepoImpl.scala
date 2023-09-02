@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_largeobject
 
+import adventureworks.customtypes.TypoBytea
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
@@ -25,7 +26,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
   }
   override def insert(unsaved: PgLargeobjectRow)(implicit c: Connection): PgLargeobjectRow = {
     SQL"""insert into pg_catalog.pg_largeobject("loid", "pageno", "data")
-          values (${ParameterValue(unsaved.loid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.pageno, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.data, null, ToStatement.byteArrayToStatement)}::bytea)
+          values (${ParameterValue(unsaved.loid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.pageno, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.data, null, TypoBytea.toStatement)}::bytea)
           returning "loid", "pageno", "data"
        """
       .executeInsert(PgLargeobjectRow.rowParser(1).single)
@@ -48,7 +49,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
   override def update(row: PgLargeobjectRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update pg_catalog.pg_largeobject
-          set "data" = ${ParameterValue(row.data, null, ToStatement.byteArrayToStatement)}::bytea
+          set "data" = ${ParameterValue(row.data, null, TypoBytea.toStatement)}::bytea
           where "loid" = ${ParameterValue(compositeId.loid, null, ToStatement.longToStatement)} AND "pageno" = ${ParameterValue(compositeId.pageno, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
   }
@@ -60,7 +61,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           values (
             ${ParameterValue(unsaved.loid, null, ToStatement.longToStatement)}::oid,
             ${ParameterValue(unsaved.pageno, null, ToStatement.intToStatement)}::int4,
-            ${ParameterValue(unsaved.data, null, ToStatement.byteArrayToStatement)}::bytea
+            ${ParameterValue(unsaved.data, null, TypoBytea.toStatement)}::bytea
           )
           on conflict ("loid", "pageno")
           do update set

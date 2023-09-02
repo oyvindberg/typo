@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package d
 
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
@@ -31,7 +32,7 @@ class DViewStructure[Row](val prefix: Option[String], val extract: Row => DViewR
   override val changenumber = new Field[Int, Row](prefix, "changenumber", None, None)(x => extract(x).changenumber, (row, value) => merge(row, extract(row).copy(changenumber = value)))
   override val status = new Field[TypoShort, Row](prefix, "status", None, None)(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
   override val documentsummary = new OptField[String, Row](prefix, "documentsummary", None, None)(x => extract(x).documentsummary, (row, value) => merge(row, extract(row).copy(documentsummary = value)))
-  override val document = new OptField[Byte, Row](prefix, "document", None, None)(x => extract(x).document, (row, value) => merge(row, extract(row).copy(document = value)))
+  override val document = new OptField[TypoBytea, Row](prefix, "document", None, None)(x => extract(x).document, (row, value) => merge(row, extract(row).copy(document = value)))
   override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
   override val documentnode = new Field[DocumentId, Row](prefix, "documentnode", None, None)(x => extract(x).documentnode, (row, value) => merge(row, extract(row).copy(documentnode = value)))

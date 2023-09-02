@@ -25,6 +25,7 @@ For instance:
 ```scala mdoc
 
 import adventureworks.customtypes.Defaulted
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.person.address.{AddressId, AddressRow}
@@ -44,7 +45,7 @@ case class AddressRowUnsaved(
   /** Postal code for the street address. */
   postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
-  spatiallocation: Option[Array[Byte]],
+  spatiallocation: Option[TypoBytea],
   /** Default: nextval('person.address_addressid_seq'::regclass)
       Primary key for Address records. */
   addressid: Defaulted[AddressId] = Defaulted.UseDefault,

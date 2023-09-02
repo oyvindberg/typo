@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_largeobject
 
+import adventureworks.customtypes.TypoBytea
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -22,7 +23,7 @@ import scala.util.Try
 case class PgLargeobjectRow(
   loid: /* oid */ Long,
   pageno: Int,
-  data: Array[Byte]
+  data: TypoBytea
 ){
    val compositeId: PgLargeobjectId = PgLargeobjectId(loid, pageno)
  }
@@ -33,7 +34,7 @@ object PgLargeobjectRow {
         PgLargeobjectRow(
           loid = json.\("loid").as(Reads.LongReads),
           pageno = json.\("pageno").as(Reads.IntReads),
-          data = json.\("data").as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))
+          data = json.\("data").as(TypoBytea.reads)
         )
       )
     ),
@@ -43,7 +44,7 @@ object PgLargeobjectRow {
       PgLargeobjectRow(
         loid = row(idx + 0)(Column.columnToLong),
         pageno = row(idx + 1)(Column.columnToInt),
-        data = row(idx + 2)(Column.columnToByteArray)
+        data = row(idx + 2)(TypoBytea.column)
       )
     )
   }
@@ -51,7 +52,7 @@ object PgLargeobjectRow {
     new JsObject(ListMap[String, JsValue](
       "loid" -> Writes.LongWrites.writes(o.loid),
       "pageno" -> Writes.IntWrites.writes(o.pageno),
-      "data" -> Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites).writes(o.data)
+      "data" -> TypoBytea.writes.writes(o.data)
     ))
   )
 }
