@@ -84,6 +84,24 @@ jobs:
           bleep compile jvm3
           bleep test jvm3
 
+  build-docs:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bleep-build/bleep-setup-action@0.0.1
+      - uses: coursier/cache-action@v6
+        with:
+          extraFiles: bleep.yaml
+
+      - name: Start up Postgres
+        run: docker-compose up -d
+
+      - name: Build docs
+        run: |
+          bleep generate-docs
+
   release:
     timeout-minutes: 15
     runs-on: ubuntu-latest
