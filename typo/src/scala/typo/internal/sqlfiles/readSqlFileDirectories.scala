@@ -17,7 +17,7 @@ object readSqlFileDirectories {
       val sqlContent = Files.readString(sqlFile)
       val decomposedSql = DecomposedSql.parse(sqlContent)
 
-      println(s"Parsing $sqlFile")
+      println(s"Analyzing $sqlFile")
 
       val queryType = queryTypeFor(decomposedSql, c)
       queryType match {

@@ -38,8 +38,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
             metadb,
             readSqlFileDirectories(buildDir.resolve("adventureworks_sql")),
             Selector.All
-          )
-            .overwriteFolder(targetSources, relPath => relPath.mapSegments(_.drop(1)))
+          ).overwriteFolder(targetSources)
 
           crossIds.map { crossId =>
             val desc = s"${crossId.value}, lib=$lib, inlineImplicits=$inlineImplicits"

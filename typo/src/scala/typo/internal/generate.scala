@@ -105,7 +105,14 @@ object generate {
       case _ => None
     }
 
-    val allFiles = (testDataFile.toList ::: keptMostFiles).map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
-    Generated(allFiles.map(file => file.copy(contents = options.header.code ++ file.contents)))
+    val allFiles: Iterator[sc.File] = {
+      val withImports = (testDataFile.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkg, file))
+      val all = withImports ++ pkgObject.iterator
+      all.map(file => file.copy(contents = options.header.code ++ file.contents))
+    }
+
+    println("Codegen complete")
+
+    Generated(allFiles)
   }
 }

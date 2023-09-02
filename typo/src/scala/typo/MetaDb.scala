@@ -112,6 +112,8 @@ object MetaDb {
     val views: Map[db.RelationName, db.View] =
       input.views.flatMap { viewRow =>
         val relationName = db.RelationName(viewRow.tableSchema, viewRow.tableName.get)
+        println(s"Analyzing view ${relationName.value}")
+
         viewRow.viewDefinition.map { sqlContent =>
           val decomposedSql = DecomposedSql.parse(sqlContent)
           val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked

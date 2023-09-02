@@ -29,8 +29,8 @@ object GeneratedAdventureWorks {
         val metadb = MetaDb.fromDb
 
         val variants = List(
-          (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, String])),
-          (DbLibName.Doobie, JsonLibName.Circe, "typo-tester-doobie", new AtomicReference(Map.empty[RelPath, String]))
+          (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, sc.Code])),
+          (DbLibName.Doobie, JsonLibName.Circe, "typo-tester-doobie", new AtomicReference(Map.empty[RelPath, sc.Code]))
         )
 
         def go(): Unit = {
