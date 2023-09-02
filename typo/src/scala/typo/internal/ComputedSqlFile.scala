@@ -86,7 +86,7 @@ case class ComputedSqlFile(
         }
 
         val dbType = typeMapperDb.dbTypeFrom(jdbcParam.parameterTypeName, Some(jdbcParam.precision)).getOrElse {
-          System.err.println(s"${sqlFile.relPath}: Couldn't translate type from param $maybeName")
+          System.err.println(s"${sqlFile.relPath}: Couldn't translate type from param $maybeName with type ${jdbcParam.parameterTypeName}")
           db.Type.Text
         }
 

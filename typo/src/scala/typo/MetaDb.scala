@@ -189,7 +189,7 @@ object MetaDb {
                   case other       => throw new Exception(s"Unknown nullability: $other")
                 }
               val tpe = typeMapperDb.col(c).getOrElse {
-                System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${colName.value}. Falling back to text")
+                System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${c.udtName}. Falling back to text")
                 db.Type.Text
               }
               val coord = (relationName, colName)
