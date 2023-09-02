@@ -36,7 +36,7 @@ object Banner {
 
   def maybePrint(options: Options): Unit =
     if (!options.silentBanner && !printed) {
-      println(text(dslIsEnabled = options.enableDsl))
+      options.logger.info(text(dslIsEnabled = options.enableDsl))
       printed = true
     }
 }

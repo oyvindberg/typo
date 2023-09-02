@@ -18,7 +18,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
     implicit val c: Connection = DriverManager.getConnection(
       "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
     )
-    val metadb = MetaDb.fromDb
+    val metadb = MetaDb.fromDb(TypoLogger.Noop)
 
     val crossIds = List("jvm212", "jvm213", "jvm3").map(str => model.CrossId(str))
     val variants = List(
@@ -36,7 +36,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
           generate(
             Options(pkg = "adventureworks", dbLib, jsonLib, enableDsl = true, enableTestInserts = true, inlineImplicits = inlineImplicits),
             metadb,
-            readSqlFileDirectories(buildDir.resolve("adventureworks_sql")),
+            readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql")),
             Selector.All
           ).overwriteFolder(targetSources)
 

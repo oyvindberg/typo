@@ -12,24 +12,24 @@ import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import java.sql.Connection
 
 object readSqlFileDirectories {
-  def apply(scriptsPath: Path)(implicit c: Connection): List[SqlFile] =
+  def apply(logger: TypoLogger, scriptsPath: Path)(implicit c: Connection): List[SqlFile] =
     findSqlFilesUnder(scriptsPath).flatMap { sqlFile =>
       val sqlContent = Files.readString(sqlFile)
       val decomposedSql = DecomposedSql.parse(sqlContent)
 
-      println(s"Analyzing $sqlFile")
+      logger.info(s"Analyzing $sqlFile")
 
       val queryType = queryTypeFor(decomposedSql, c)
       queryType match {
         case SqlCommandType.BLANK =>
-          System.err.println(s"Skipping $sqlFile because it's empty")
+          logger.info(s"Skipping $sqlFile because it's empty")
           None
         case _ =>
           try {
             val maybeSqlData = JdbcMetadata.from(decomposedSql.sqlWithQuestionMarks)
             maybeSqlData match {
               case Left(msg) =>
-                System.err.println(s"Error while parsing $sqlFile : $msg. Will ignore the file.")
+                logger.warn(s"Error while parsing $sqlFile : $msg. Will ignore the file.")
                 None
               case Right(jdbcMetadata) =>
                 val nullableColumnsFromJoins =
@@ -42,7 +42,7 @@ object readSqlFileDirectories {
             }
           } catch {
             case e: PSQLException =>
-              System.err.println(s"Error while parsing $sqlFile : ${e.getMessage}. Will ignore the file.")
+              logger.warn(s"Error while parsing $sqlFile : ${e.getMessage}. Will ignore the file.")
               None
           }
       }

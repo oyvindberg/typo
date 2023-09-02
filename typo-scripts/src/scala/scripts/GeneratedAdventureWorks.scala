@@ -26,7 +26,7 @@ object GeneratedAdventureWorks {
           "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
         )
         val scriptsPath = buildDir.resolve("adventureworks_sql")
-        val metadb = MetaDb.fromDb
+        val metadb = MetaDb.fromDb(TypoLogger.Console)
 
         val variants = List(
           (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, sc.Code])),
@@ -34,7 +34,7 @@ object GeneratedAdventureWorks {
         )
 
         def go(): Unit = {
-          val newSqlScripts = readSqlFileDirectories(scriptsPath)
+          val newSqlScripts = readSqlFileDirectories(TypoLogger.Console, scriptsPath)
 
           variants.foreach { case (dbLib, jsonLib, projectPath, oldFilesRef) =>
             val options = Options(

@@ -7,6 +7,7 @@ import typo.internal.sqlfiles.SqlFile
 import typo.sc.Type
 
 case class ComputedSqlFile(
+    logger: TypoLogger,
     sqlFile: SqlFile,
     pkg0: sc.QIdent,
     naming: Naming,
@@ -34,7 +35,7 @@ case class ComputedSqlFile(
           }
 
         val dbType = typeMapperDb.dbTypeFrom(col.columnTypeName, Some(col.precision)).getOrElse {
-          System.err.println(s"Couldn't translate type from file ${sqlFile.relPath} column ${col.name.value} with type ${col.columnTypeName}. Falling back to text")
+          logger.warn(s"Couldn't translate type from file ${sqlFile.relPath} column ${col.name.value} with type ${col.columnTypeName}. Falling back to text")
           db.Type.Unknown(col.columnTypeName)
         }
 
@@ -86,7 +87,7 @@ case class ComputedSqlFile(
         }
 
         val dbType = typeMapperDb.dbTypeFrom(jdbcParam.parameterTypeName, Some(jdbcParam.precision)).getOrElse {
-          System.err.println(s"${sqlFile.relPath}: Couldn't translate type from param $maybeName with type ${jdbcParam.parameterTypeName}")
+          logger.warn(s"${sqlFile.relPath}: Couldn't translate type from param $maybeName with type ${jdbcParam.parameterTypeName}")
           db.Type.Unknown(jdbcParam.parameterTypeName)
         }
 

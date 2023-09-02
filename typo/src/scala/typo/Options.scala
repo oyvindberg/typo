@@ -4,6 +4,7 @@ case class Options(
     pkg: String,
     dbLib: Option[DbLibName],
     jsonLibs: List[JsonLibName] = Nil,
+    logger: TypoLogger = TypoLogger.Console,
     naming: sc.QIdent => Naming = new Naming(_),
     typeOverride: TypeOverride = TypeOverride.Empty,
     nullabilityOverride: NullabilityOverride = NullabilityOverride.Empty,

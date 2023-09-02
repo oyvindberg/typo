@@ -29,6 +29,7 @@ object generate {
         case DbLibName.Anorm  => new DbLibAnorm(pkg, publicOptions.inlineImplicits)
         case DbLibName.Doobie => new DbLibDoobie(pkg, publicOptions.inlineImplicits)
       },
+      logger = publicOptions.logger,
       naming = naming,
       typeOverride = publicOptions.typeOverride,
       generateMockRepos = publicOptions.generateMockRepos,
@@ -54,7 +55,7 @@ object generate {
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedSqlFiles = sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, metaDb.typeMapperDb, scalaTypeMapper, computeds.get))
+    val computedSqlFiles = sqlFiles.map(sqlScript => ComputedSqlFile(options.logger, sqlScript, options.pkg, naming, metaDb.typeMapperDb, scalaTypeMapper, computeds.get))
     computeds.foreach { case (relName, lazyValue) =>
       if (selector.include(relName)) lazyValue.get
     }
@@ -111,7 +112,7 @@ object generate {
       all.map(file => file.copy(contents = options.header.code ++ file.contents))
     }
 
-    println("Codegen complete")
+    options.logger.info(s"Codegen complete")
 
     Generated(allFiles)
   }

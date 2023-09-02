@@ -21,7 +21,7 @@ case class ComputedTable(
 
       maybeOtherTable match {
         case None =>
-          System.err.println(s"Circular: ${dbTable.name.value} => ${fk.otherTable.value}")
+          options.logger.warn(s"Circular: ${dbTable.name.value} => ${fk.otherTable.value}")
           Nil
         case Some(otherTable) =>
           val value = fk.otherCols.map(cn => (otherTable.source, cn))
@@ -95,7 +95,7 @@ case class ComputedTable(
             case Some(otherTable) =>
               otherTable.cols.find(_.dbName == otherColName).map(_.tpe)
             case None =>
-              System.err.println(s"Unexpected circular dependency involving ${dbTable.name.value} => ${otherTableSource.name.value}")
+              options.logger.warn(s"Unexpected circular dependency involving ${dbTable.name.value} => ${otherTableSource.name.value}")
               None
           }
 

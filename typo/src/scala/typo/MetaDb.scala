@@ -38,12 +38,12 @@ object MetaDb {
   )
 
   object Input {
-    def fromDb(implicit c: Connection): Input = {
+    def fromDb(logger: TypoLogger)(implicit c: Connection): Input = {
       def timed[T](name: String)(f: => T): T = {
         val start = System.currentTimeMillis()
         val result = f
         val end = System.currentTimeMillis()
-        println(s"fetched $name from PG in ${end - start}ms")
+        logger.info(s"fetched $name from PG in ${end - start}ms")
         result
       }
 
@@ -62,8 +62,8 @@ object MetaDb {
     }
   }
 
-  def fromDb(implicit c: Connection): MetaDb = {
-    val input = Input.fromDb
+  def fromDb(logger: TypoLogger)(implicit c: Connection): MetaDb = {
+    val input = Input.fromDb(logger)
 
     val foreignKeys = ForeignKeys(input.tableConstraints, input.keyColumnUsage, input.referentialConstraints)
     val primaryKeys = PrimaryKeys(input.tableConstraints, input.keyColumnUsage)
@@ -77,7 +77,7 @@ object MetaDb {
           characterMaximumLength = None // todo: this can likely be set
         )
         .getOrElse {
-          System.err.println(s"Couldn't translate type from domain $d")
+          logger.warn(s"Couldn't translate type from domain $d")
           db.Type.Unknown(d.`type`)
         }
 
@@ -112,7 +112,7 @@ object MetaDb {
     val views: Map[db.RelationName, db.View] =
       input.views.flatMap { viewRow =>
         val relationName = db.RelationName(viewRow.tableSchema, viewRow.tableName.get)
-        println(s"Analyzing view ${relationName.value}")
+        logger.info(s"Analyzing view ${relationName.value}")
 
         viewRow.viewDefinition.map { sqlContent =>
           val decomposedSql = DecomposedSql.parse(sqlContent)
@@ -137,7 +137,7 @@ object MetaDb {
                     }
 
                   val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)).getOrElse {
-                    System.err.println(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
+                    logger.warn(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
                     db.Type.Unknown(mdCol.columnTypeName)
                   }
 
@@ -191,7 +191,7 @@ object MetaDb {
                   case other       => throw new Exception(s"Unknown nullability: $other")
                 }
               val tpe = typeMapperDb.col(c).getOrElse {
-                System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${c.udtName}. Falling back to text")
+                logger.warn(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${c.udtName}. Falling back to text")
                 db.Type.Unknown(c.udtName.get)
               }
               val coord = (relationName, colName)

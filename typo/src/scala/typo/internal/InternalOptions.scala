@@ -7,6 +7,7 @@ case class InternalOptions(
     pkg: sc.QIdent,
     jsonLibs: List[JsonLib],
     dbLib: Option[DbLib],
+    logger: TypoLogger,
     naming: Naming,
     typeOverride: TypeOverride,
     generateMockRepos: Selector,
