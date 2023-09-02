@@ -40,6 +40,8 @@ object GenDocumentation extends BleepScript("GenDocumentation") {
     )
 
     args.headOption match {
+      case Some("mdoc") =>
+        mdoc.mdoc(args = Nil)
       case Some("dev") =>
         docusaurus.dev(started.executionContext)
       case Some("deploy") =>
