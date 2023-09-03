@@ -14,10 +14,10 @@ import java.sql.Connection
 object readSqlFileDirectories {
   def apply(logger: TypoLogger, scriptsPath: Path)(implicit c: Connection): List[SqlFile] =
     findSqlFilesUnder(scriptsPath).flatMap { sqlFile =>
+      logger.info(s"Analyzing $sqlFile")
+
       val sqlContent = Files.readString(sqlFile)
       val decomposedSql = DecomposedSql.parse(sqlContent)
-
-      logger.info(s"Analyzing $sqlFile")
 
       val queryType = queryTypeFor(decomposedSql, c)
       queryType match {

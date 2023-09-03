@@ -81,8 +81,9 @@ object DecomposedSql {
     var inSingleLineComment = false
     var inMultiLineComment = false
     var inDoubleСolon = false
+    var encounteredSemicolon = false
     var i = 0
-    while (i < length) {
+    while (i < length && !encounteredSemicolon) {
       var c = query.charAt(i)
       var keepC = true
       if (inSingleQuote) {
@@ -106,7 +107,10 @@ object DecomposedSql {
           inSingleLineComment = false;
         }
       } else {
-        if (c == '\'') {
+        if (c == ';') {
+          encounteredSemicolon = true
+          keepC = false
+        } else if (c == '\'') {
           inSingleQuote = true;
         } else if (c == '"') {
           inDoubleQuote = true;

@@ -17,8 +17,7 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
         DecomposedSql.SqlText(" AND cfield = "),
         DecomposedSql.NamedParam(parseName("param2")),
         DecomposedSql.SqlText(" and dfield = "),
-        DecomposedSql.NamedParam(parseName("param2")),
-        DecomposedSql.SqlText(";")
+        DecomposedSql.NamedParam(parseName("param2"))
       )
     )
     assert(actual === expected)
@@ -47,8 +46,7 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
         DecomposedSql.NamedParam(parseName("named_parameter1")),
         DecomposedSql.SqlText("""
                               |AND name = """.stripMargin),
-        DecomposedSql.NamedParam(parseName("named_parameter2")),
-        DecomposedSql.SqlText(";")
+        DecomposedSql.NamedParam(parseName("named_parameter2"))
       )
     )
     assert(actual === expected)
@@ -120,5 +118,17 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
       DecomposedSql.NamedParam(parseName("foo")) -> List(0, 1)
     )
     assert(actual.paramNamesWithIndices === expected)
+  }
+
+  test("ignorer semicolon and everything after (but keep in comments and string literals)") {
+    val actual = DecomposedSql.parse(
+      """|select /* ; */
+         | -- ;
+         |';';discard whatever after""".stripMargin
+    )
+    val expected = """select /* ; */
+                     | -- ;
+                     |';'""".stripMargin
+    assert(actual.sqlWithNulls === expected)
   }
 }
