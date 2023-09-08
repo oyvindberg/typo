@@ -92,3 +92,17 @@ create table pgtestnull
     numerics    numeric[]
 );
 
+create extension citext;
+
+CREATE TABLE users
+(
+    user_id     UUID        NOT NULL,
+    name        TEXT        NOT NULL,
+    last_name   TEXT        NULL,
+    email       CITEXT      NOT NULL,
+    password    TEXT        NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    verified_on TIMESTAMPTZ NULL,
+    CONSTRAINT users_user_id_pk PRIMARY KEY (user_id),
+    CONSTRAINT users_email_unique UNIQUE (email)
+);
