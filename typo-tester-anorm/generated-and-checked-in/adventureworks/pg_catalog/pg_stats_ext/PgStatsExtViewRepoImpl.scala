@@ -17,7 +17,7 @@ object PgStatsExtViewRepoImpl extends PgStatsExtViewRepo {
     SelectBuilderSql("pg_catalog.pg_stats_ext", PgStatsExtViewFields, PgStatsExtViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatsExtViewRow] = {
-    SQL"""select "schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs"
+    SQL"""select "schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct"::text, "dependencies"::text, "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs"
           from pg_catalog.pg_stats_ext
        """.as(PgStatsExtViewRow.rowParser(1).*)
   }

@@ -16,6 +16,7 @@ object sqlCast {
     */
   def toPg(dbType: db.Type, udtName: Option[String]): Option[String] =
     dbType match {
+      case db.Type.Unknown(sqlType)                            => Some(sqlType)
       case db.Type.EnumRef(name)                               => Some(name.render.asString)
       case db.Type.Boolean | db.Type.Text | db.Type.VarChar(_) => None
       case _                                                   => udtName
@@ -31,6 +32,10 @@ object sqlCast {
     */
   def fromPg(dbCol: db.Col): Option[String] =
     dbCol.tpe match {
+      case db.Type.Array(db.Type.Unknown(_)) =>
+        Some("text[]")
+      case db.Type.Unknown(_) =>
+        Some("text")
       case db.Type.PGmoney =>
         Some("numeric")
       case db.Type.Array(db.Type.PGmoney) =>

@@ -30,7 +30,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def insert(unsaved: PgStatisticExtDataRow)(implicit c: Connection): PgStatisticExtDataRow = {
     SQL"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
           values (${ParameterValue(unsaved.stxoid, null, PgStatisticExtDataId.toStatement)}::oid, ${ParameterValue(unsaved.stxdndistinct, null, ToStatement.optionToStatement(TypoUnknownPgNdistinct.toStatement, TypoUnknownPgNdistinct.parameterMetadata))}::pg_ndistinct, ${ParameterValue(unsaved.stxddependencies, null, ToStatement.optionToStatement(TypoUnknownPgDependencies.toStatement, TypoUnknownPgDependencies.parameterMetadata))}::pg_dependencies, ${ParameterValue(unsaved.stxdmcv, null, ToStatement.optionToStatement(TypoUnknownPgMcvList.toStatement, TypoUnknownPgMcvList.parameterMetadata))}::pg_mcv_list, ${ParameterValue(unsaved.stxdexpr, null, ToStatement.optionToStatement(TypoUnknownPgStatistic.toStatement, TypoUnknownPgStatistic.parameterMetadata))}::_pg_statistic)
-          returning "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
+          returning "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text
        """
       .executeInsert(PgStatisticExtDataRow.rowParser(1).single)
     
@@ -39,18 +39,18 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
     SelectBuilderSql("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields, PgStatisticExtDataRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatisticExtDataRow] = {
-    SQL"""select "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
+    SQL"""select "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text
           from pg_catalog.pg_statistic_ext_data
        """.as(PgStatisticExtDataRow.rowParser(1).*)
   }
   override def selectById(stxoid: PgStatisticExtDataId)(implicit c: Connection): Option[PgStatisticExtDataRow] = {
-    SQL"""select "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
+    SQL"""select "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text
           from pg_catalog.pg_statistic_ext_data
           where "stxoid" = ${ParameterValue(stxoid, null, PgStatisticExtDataId.toStatement)}
        """.as(PgStatisticExtDataRow.rowParser(1).singleOpt)
   }
   override def selectByIds(stxoids: Array[PgStatisticExtDataId])(implicit c: Connection): List[PgStatisticExtDataRow] = {
-    SQL"""select "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
+    SQL"""select "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text
           from pg_catalog.pg_statistic_ext_data
           where "stxoid" = ANY(${stxoids})
        """.as(PgStatisticExtDataRow.rowParser(1).*)
@@ -84,7 +84,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
             "stxddependencies" = EXCLUDED."stxddependencies",
             "stxdmcv" = EXCLUDED."stxdmcv",
             "stxdexpr" = EXCLUDED."stxdexpr"
-          returning "stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr"
+          returning "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text
        """
       .executeInsert(PgStatisticExtDataRow.rowParser(1).single)
     
