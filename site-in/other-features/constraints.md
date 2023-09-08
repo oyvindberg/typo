@@ -2,9 +2,9 @@
 title: Constraints
 ---
 
-typo covers a lot of ground in that it should generate all types correctly.
-However, to safely insert or update data into postgres, you also need to satisfy contraints.
-typo does a good job a helping out with foreign keys, but there are other types of constraints as well.
+Typo covers a lot of ground in that it should generate all types correctly.
+However, to safely insert or update data into PostgreSQL, you also need to satisfy contraints.
+Typo does a good job a helping out with foreign keys, but there are other types of constraints as well.
 
 For now the constraints are picked up and output as field comments for the `Row` types.
 

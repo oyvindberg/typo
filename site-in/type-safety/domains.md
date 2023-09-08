@@ -2,13 +2,13 @@
 title: Domains
 ---
 
-If you use domains in postgres like this:
+If you use domains in PostgreSQL like this:
 
 ```postgresql
 CREATE DOMAIN "OrderNumber" varchar(25) NULL;
 ```
 
-typo will generate a newtype for it with the corresponding type class instances:
+Typo will generate a newtype for it with the corresponding type class instances:
 
 ```scala
 /** Domain `public.OrderNumber`

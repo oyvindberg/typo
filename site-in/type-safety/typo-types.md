@@ -2,16 +2,25 @@
 title: Typo types
 ---
 
-typo generates some helper types if they are needed by your database schema.
+Typo generates some helper types if they are needed by your database schema.
 
 There are multiple reasons why this is sometimes necessary:
-- postgres driver has broken handling of offset date/time types. need to go through string in order to not lose offset/precision
+- PostgreSQL driver has broken handling of offset date/time types. need to go through string in order to not lose offset/precision
 - money type is broken in many interesting ways
-- possibility of transferring instances of a `Row` type to a platform which doesn't have the postgres driver jar available
+- possibility of transferring instances of a `Row` type to a platform which doesn't have the PostgreSQL driver jar available
 - a type to hang otherwise orphan type classes on
 
+## (In-)convenience
+The goal here is type-safety, not convenience. 
 
-The full list is here:
+You'll very likely map row types into your domain objects anyway, so mapping these types to what you want is typically trivial.
+The row types belong in the database layer, and so do these Typo types.
+
+
+That said, these types are primarily driven by the (self-imposed) constraint that typeclass instances be coherent -
+That is only one instance per type. This may change in the future.
+
+## Full list of types
 
 ```scala mdoc
 import java.time.*
@@ -80,7 +89,7 @@ case class TypoXml(value: String)
 
 ## Unknown types
 
-You may also come across column types typo doesn't know how to handle yet.
+You may also come across column types Typo doesn't know how to handle yet.
 You will see warnings in the log at generation-time like this:
 ```
 typo: Couldn't translate type from relation pg_catalog.pg_statistic_ext_data column stxdndistinct with type Some(pg_ndistinct). Falling back to text

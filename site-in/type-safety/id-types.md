@@ -1,5 +1,5 @@
 ---
-title: Id types
+title: Primary key types
 ---
 
 For every table with primary keys, a corresponding id type is created.

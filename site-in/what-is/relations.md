@@ -2,11 +2,21 @@
 title: Generated code for relations
 ---
 
-typo generates repositories for all tables and views (or a subset, if you prefer)  
+Typo takes the chore out of writing repository code to access your PostgreSQL database relations by automatically
+generating it for you. Whether you're dealing with tables or views, Typo's generated code simplifies database
+interaction, saving you time and effort. 
+
+It incorporates crucial database information such as strongly typed primary key types, comments, check constraints, and foreign keys. 
+This not only simplifies your code but also empowers developers with a deep understanding of the database structure. 
+
+With Typo, you can spend more time focusing on your application logic and less time on repetitive database access code, all while
+having the tools to perform CRUD operations efficiently. 
+
 
 ## Tables
 
-Given a table like this:
+For tables, Typo generates comprehensive repository code. Take for instance this table: 
+
 ```sql
 create table address
 (
@@ -15,7 +25,7 @@ create table address
     addressline1    varchar(60)                          not null,
     addressline2    varchar(60),
     city            varchar(30)                          not null,
-    stateprovinceid integer                              not null 
+    stateprovinceid integer                              not null
         constraint "FK_Address_StateProvince_StateProvinceID" references stateprovince,
     postalcode      varchar(15)                          not null,
     spatiallocation bytea,
@@ -33,7 +43,28 @@ comment on column address.postalcode is 'Postal code for the street address.';
 comment on column address.spatiallocation is 'Latitude and longitude of this address.';
 ```
 
-You'll get a row class like this:
+### Primary Key Types
+
+Typo generates strongly typed [primary key types](type-safety/id-types.md), ensuring correct usage and enforcement of data integrity. 
+You also get types for composite primary keys.
+
+```scala
+/** Type for the primary key of table `person.address` */
+case class AddressId(value: Int) extends AnyVal
+object AddressId {
+  // ...instances
+}
+```
+
+### Row Class
+
+You'll receive a meticulously crafted row case class that precisely mirrors your table structure. 
+The field names are beautified (see [Customize naming](customization/customize-naming.md) for how to tweak naming), 
+and the corresponding types are correct.
+
+Relevant column comments, check constraints and foreign keys are clearly marked, 
+making it easy to understand the purpose of every column.
+
 ```scala mdoc
 
 import adventureworks.customtypes.TypoLocalDateTime
@@ -62,7 +93,11 @@ case class AddressRow(
 )
 ```
 
-and a repo like this:
+### Repository interface
+
+Typo generates a repository interface tailored to your table, providing methods efficient CRUD (Create, Read, Update,
+Delete) operations at your fingertips.
+
 ```scala mdoc
 import adventureworks.person.address.{AddressFields, AddressRow}
 import java.sql.Connection
@@ -83,7 +118,11 @@ trait AddressRepo {
 }
 ```
 
-Since this particular table has auto-increment ID and default values, you will typically use this structure to insert new rows
+### Simplified Insertion
+
+Since Typo understands auto-increment IDs and default values, you can effortlessly insert new rows
+without the need for complex code. A special structure is provided for creating unsaved rows with default values.
+
 ```scala mdoc
 import adventureworks.customtypes.Defaulted
 
@@ -114,9 +153,11 @@ case class AddressRowUnsaved(
 
 ## Views
 
-Less code is generated for views. For now this is what it looks like:
+Typo also excels at simplifying code generation for views. 
+While less code is generated for views, it's still designed to make your life easier
 
-Given the following view:
+So given the following view:
+
 ```sql
 create view vemployee
             (businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype,
@@ -154,6 +195,7 @@ FROM humanresources.employee e
 ```
 
 You get the following row type:
+
 ```scala mdoc
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
@@ -197,7 +239,8 @@ case class VemployeeViewRow(
 )
 ```
 
-And this repo:
+And this repository interface, focused on selecting rows from the view.
+
 ```scala mdoc
 import adventureworks.humanresources.vemployee.{VemployeeViewFields, VemployeeViewRow}
 

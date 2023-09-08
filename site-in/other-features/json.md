@@ -2,10 +2,10 @@
 title: JSON codecs
 ---
 
-Since typo has the entire schema in memory anyway, it can also generate JSON codecs for you.
+Since Typo has the entire schema in memory anyway, it can also generate JSON codecs for you.
 
 If you want to transfer the row objects anywhere else than to and from
-postgres or write some generic code across tables, it's very convenient to be able to use 
+PostgreSQL or write some generic code across tables, it's very convenient to be able to use 
 
 You add the wanted JSON libraries to `typo.Options` when running typo to get the codecs.
 

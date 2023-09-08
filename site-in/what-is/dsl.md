@@ -2,39 +2,58 @@
 title: SQL DSL
 ---
 
-Yes, yes, yes. We all know SQL DSLs terrible. 
-But there are so many times you just need to grab some data, and it's *so* convenient to do it with a DSL.
 
-That's why typo ships an *optional* (but strongly recommended) SQL DSL. 
-It's optional because people seem to have strong feelings about the concept of SQL DSLs. 
+The Typo SQL DSL, an optional yet strongly recommended SQL DSL, can be an invaluable addition to your Scala toolbox,
+offering you a lot of convenience:
 
-## getting started
+**Simplicity**:
+It's simple. Both for the developer, and for the compiler!
 
-See [Getting started](setup.md) for some information about how to set up the DSL.
+Neither aggregation nor projection is allowed — you always work on whole rows.
+On the other hand, you get predicates, joins, ordering, pagination.
 
-## select DSL
+It's designed to cover the "I just need to fetch/update this data" scenario, without requiring you to break flow by creating an sql file.
+Whenever you need more flexibility, you should reach for [SQL files](what-is/sql-is-king.md)
 
-some features
-- type-safe
-- generates not-too-terrible SQL
-- arbitrarily deep joins
-- order by
-- expresses a rich set of predicates (sql operators, functions, string functions, comparisons, etc)
-- for instance string and array functions (!, [arrays](../type-safety/arrays.md) are incredibly difficult to use through JDBC)
-- set of operators and functions are extendable by user
-- works both when backed by [in-memory stubs](../other-features/testing-with-stubs.md) and by Postgres
+**Type Safety**:
+With the Typo DSL, you benefit from Scala's robust type system, ensuring that your queries are
+syntactically correct at compile time.
+Say goodbye to runtime errors caused by mismatched column names or data types.
+
+**Readability and Maintainability**:
+The Typo DSL promotes clean, expressive code, making it easier to understand and maintain your database queries.
+No more wrestling with long, convoluted SQL strings scattered throughout your codebase.
+
+**Tooling Integration**: Leverage the power of IDEs and code editors for autocomplete, refactoring, and error checking,
+as
+the Typo DSL seamlessly integrates with IDEs. This significantly boosts developer productivity.
 
 
-<video 
-    width="100%" 
-    controls 
-    autoplay="autoplay" 
-    src="https://user-images.githubusercontent.com/247937/257662719-2a295f48-7cd2-4c49-b043-90bc8511de67.mp4"
+
+## Select DSL
+
+Some features
+
+- Type-safe
+- Generates not-too-terrible SQL
+- Arbitrarily deep joins
+- Order by
+- Expresses a rich set of predicates (sql operators, functions, string functions, comparisons, etc)
+- Some functions defined for string and array types
+- Set of operators and functions are extendable by user
+- Works both when backed by [in-memory stubs](../other-features/testing-with-stubs.md) and by PostgreSQL
+
+<video
+width="100%"
+controls
+autoplay="autoplay"
+src="https://user-images.githubusercontent.com/247937/257662719-2a295f48-7cd2-4c49-b043-90bc8511de67.mp4"
 />
 
-## update DSL
+## Update DSL
 
-Can express batch updates, where you `set` arbitrary number of columns with an arbitrary number of (implicitly `AND`ed) predicates.
+Can express batch updates, where you `set` arbitrary number of columns with an arbitrary number of (implicitly `AND`ed)
+predicates.
 
 Column values can be computed from the original value in the column or from the entire row, as seen below
 
@@ -45,20 +64,27 @@ autoplay="autoplay"
 src="https://user-images.githubusercontent.com/247937/257148737-7b32df2c-af54-4397-85d3-eab863179d78.mp4"
 />
 
-## delete DSL
+## Delete DSL
 
 There is also a `delete` DSL, similar to `select` and `update`. It has no video yet, unfortunately.
 
-## usage example
+## Further reading
+
+- [Getting started](setup.md) for some information about how to set up the DSL.
+- [Limitations](limitations.md) for a caveat on how PostgreSQL infers nullability. 
+- [Customize sql files](customization/customize-sql-files.md) for how to override parameter/column names, types and nullability
+- [Dynamic queries](patterns/dynamic-queries.md) for how to introduce some amount of dynamism in your queries
+
+## Example usage:
 
 ```scala mdoc:invisible
 import java.sql.{Connection, DriverManager}
+
 implicit val c: Connection = DriverManager.getConnection("jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password")
 c.setAutoCommit(false)
 ```
 
-## imports for examples below
-```scala mdoc:silent
+```scala mdoc:invisible
 import java.time.LocalDateTime
 import adventureworks.customtypes.{Defaulted, TypoLocalDateTime, TypoShort, TypoUUID, TypoXml}
 import adventureworks.production.product.*
@@ -76,9 +102,7 @@ val productcategoryRepo: ProductcategoryRepo = ProductcategoryRepoImpl
 val productsubcategoryRepo: ProductsubcategoryRepo = ProductsubcategoryRepoImpl
 ```
 
-## inserts
-
-```scala mdoc
+```scala mdoc:invisible
 val unitmeasure = unitmeasureRepo.insert(
   UnitmeasureRowUnsaved(
     unitmeasurecode = UnitmeasureId("kgg"),
@@ -135,7 +159,6 @@ val unsaved1 = ProductRowUnsaved(
 val saved1 = productRepo.insert(unsaved1)
 ```
 
-## query dsl:
 ```scala mdoc
 productRepo.select
   .where(_.`class` === "H ")

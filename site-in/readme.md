@@ -1,51 +1,49 @@
 ---
-title: Intro / Motivation
+title: Introduction to Typo
 ---
 
-typo is a source code generator which uses postgres schema definitions and your sql definitions as sources of truth. 
+Typo is not just another source code generator; it's your trusted partner in database development. By harnessing the
+power of PostgreSQL schema definitions and your SQL code, Typo creates a seamless bridge between your database and your
+Scala code, all while putting type-safety and developer experience (DX) front and center.
 
-With a razor-sharp focus on type-safety and DX, hopefully you'll find the experience very pleasant.
+## The Motivation Behind Typo
 
-## Motivation
+### Building Safer Systems
 
-### Build safer systems
+In the world of software development, we rely on the compiler to catch errors and ensure the correctness of our code.
+But what happens when we venture into the unpredictable realm of external data sources, like databases?
 
-We use the compiler to verify our programs. All is great, until you need to interact with the messy outside world.
+Typo's core motivation is to bring contract-driven development to the database layer. Just as generating code from
+OpenAPI definitions ensures the correctness of your HTTP layer, Typo aims to deliver the same level of safety for
+database interactions. It achieves this by generating precise and correct code for your tables, views, and queries, all
+guided by PostgreSQL metadata tables.
 
-One of the best tools we have available to help the compiler verify our interactions with the outside world is contract-driven development.
+### Revolutionizing the SQL to JVM Workflow
 
-Say an API is described by an OpenApi definition.
-If you use that to generate code for the HTTP layer, you guarantee that you implement it correctly. Because if you don't, the compiler will helpfully guide you!
+The conventional workflow for SQL-to-JVM interaction often feels like a labyrinth of manual tasks and repetitive boilerplate:
 
-typo intends to provide the same safety in the database layer.
-It does this by generating correct code for all your tables, views and queries based on postgres metadata tables.
+1. You write SQL queries.
+2. IDEs may struggle to give you proper support while writing, especially if you interpolate and concatenate much
+3. Manual mapping of column names or indices to case class field names.
+4. Manual mapping of column names or indices to case class field types 
+5. String interpolation and type mapping may trigger cryptic errors for missing typeclass instances 
+6. The compiler cannot check the mappings, forcing you into writing tests.
+7. Writing and maintaining tests is tedious, and even slow to run.
 
-### Existing developer flow for SQL <-> JVM is terrible.
+But here's the kicker: Whenever you refactor your code, you find yourself revisiting all of these points.
 
-Typical current state of affairs:
+Typo changes the game.
+It streamlines steps 2-7, liberates you from boilerplate, and lets you focus on what truly matters: 
+building robust and maintainable database applications.
 
-- 1) you write some sql
-- 2) intellij may not inject sql support, connection and/or schema, so you're telling it what to do again
-- 3) you interpolate in some parameters, but the compiler yells at you for not having defined the right typeclass instances. Error messages are typically unhelpful
-- 4) you manually map a sequence of either column names or indices to a name in a case class
-- 5) you manually map a sequence of either column names or indices to a type in a case class. New typeclass instances to implement.
-- 6) the compiler checks none of the above, so now you're writing tests
-- 7) tests are tedious to write
+### Types of Database Interactions
 
-and then the worst: **Whenever you refactor you're stuck fighting with points 1-7, for all future.**
+Interactions with the database fall into four distinct categories, each with its unique challenges and requirements:
 
-You also typically write the same essential boilerplate for ~all tables.
+1. **CRUD Operations**: The bread and butter of database interactions. Typo offers [repository methods](what-is/relations.md) for simple and safe CRUD, and the [SQL DSL](what-is/dsl.md) can help you do it in batch.
+2. **Simple Reads**: Retrieving data from relations, often involving joins. Typo's [SQL DSL](what-is/dsl.md) is your go-to for these scenarios.
+3. **Complex Reads**: Aggregations, window functions, and advanced queries. In Typo, these interactions are best handled by [writing SQL files](what-is/sql-is-king.md).
+4. **Dynamic Queries**: Rare and resource-intensive, these custom queries require careful implementation. Typo leaves
+   this space open for you and your [existing database library](other-features/flexible.md), as more research is needed in this direction.
 
-typo provides a better workflow for points 2-7, and frees you from writing boilerplate. Keep reading to see more
-
-### Types of interaction with the database
-
-Interactions with the database can be grouped into four groups.
-The distinction is useful when determining which typo feature should be used.
-
-- create, update, delete. pure crud operations. In typo these are covered by [repository methods](what-is/relations.md) and [SQL DSL](what-is/dsl.md)
-- "simple" reads from relations. typically with joins, but without aggregations or selections. In typo these are covered by the [SQL DSL](what-is/dsl.md)
-- "complex reads" — aggregations, window functions — you name it! in typo these interactions are covered by [writing sql files](what-is/sql-is-king.md)
-- dynamic queries. 
-These are typically rare and expensive both to implement and run. typo does *not* currently solve this use case well, so you can fall back to your [existing database library](other-features/flexible.md) and implement this yourself. 
-Maybe we can come up with some generated solution for some use cases in the future! 
+Intrigued? Keep exploring to discover how Typo transforms your database development experience.

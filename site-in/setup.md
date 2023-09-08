@@ -2,17 +2,13 @@
 title: Getting started
 ---
 
-The typo code generator is shipped as a library, the easiest way to get started is something like this scala-cli script:
-
-put it in `gen-db.sc` and run `scala-cli gen-db.sc`
-
 ## Database library
 Note that you're supposed to bring your own database library. You choose either anorm or doobie in `Options` (see below),
 and you need to have that added to your build as well.
 
 ## Getting started with DSL
 
-If you want to use the [SQL DSL](what-is/dsl.md), you enable it by [customizing](customization.md) typo by setting `enableDsl = true`.
+If you want to use the [SQL DSL](what-is/dsl.md), you enable it by [customizing](customization/overview.md) Typo by setting `enableDsl = true`.
 
 ```scala mdoc:silent
 import typo.Options
@@ -29,7 +25,14 @@ You also need to add a dependency to your build in that case, which varies by da
 
 ## example script
 
+The Typo code generator is shipped as a library, the easiest way to get started is something like this scala-cli script:
+
+put it in `gen-db.sc` and run `scala-cli gen-db.sc`
+
 ```scala mdoc:silent
+//
+// remember to give the project a github star if you like it <3
+//
 //> using dep "com.olvind.typo::typo:@VERSION@"
 //> using scala "3.3.0"
 
@@ -55,7 +58,7 @@ val location = java.nio.file.Path.of(sys.props("user.dir"))
 // destination folder. All files in this dir will be overwritten!
 val targetDir = location.resolve("myproject/src/main/scala/org/foo/generated")
 
-// where typo will look for sql files
+// where Typo will look for sql files
 val scriptsFolder = location.resolve("sql")
 
 generateFromDb(options, scriptsPaths = List(scriptsFolder))
@@ -67,4 +70,4 @@ generateFromDb(options, scriptsPaths = List(scriptsFolder))
 
 ## sbt plugin
 
-It's natural to think an sbt plugin would be a good match for typo. This will likely be added in the future.
+It's natural to think an sbt plugin would be a good match for Typo. This will likely be added in the future.

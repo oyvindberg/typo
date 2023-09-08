@@ -10,8 +10,8 @@ but sometimes you want to observe mutations in the database as well.
 Sometimes spinning up a real database for this is the right answer, sometimes it's not.
 It is always slow, however, so it's way easier to get a fast test suite if you're not doing it.
 
-The argument for the approach taken by typo is that since the interaction between Scala
-and Postgres is guaranteed to be correct*, it is less important to back your tests with a real database.
+The argument for the approach taken by Typo is that since the interaction between Scala
+and PostgreSQL is guaranteed to be correct*, it is less important to back your tests with a real database.
 
 This leads us to stubs (called mocks in the generated code), implementations of the repository
 interfaces backed by a mutable `Map`. This can be generated for all tables with a primary key.
@@ -23,8 +23,8 @@ string operations and so on in your code, and test it in-memory!
 
 ### *Note
 
-typo guarantees schema correctness, but you can still break constraints.
-Or your tests need more advanced postgres functionality.
+Typo guarantees schema correctness, but you can still break constraints.
+Or your tests need more advanced PostgreSQL functionality.
 
 Stubs are obviously not a full replacement, but if they can be used for some non-zero percentage
 of your tests it's still very beneficial!

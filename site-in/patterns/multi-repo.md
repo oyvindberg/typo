@@ -6,15 +6,15 @@ There has been some comments about how [the generated repositories](what-is/rela
 For instance you may prefer that your repositories coordinate multiple tables.
 
 And that's more than fair - Often you need to coordinate multiple tables in a transaction.
-The only snag is that typo does not have the knowledge to write that code for you.
+The only snag is that Typo does not have the knowledge to write that code for you.
 
 ### So you write code yourself
 
 Enter the multi-repo pattern! 
 
-Here you take low-level typo repositories as parameters, and you write the higher-level flow yourself. 
+Here you take low-level Typo repositories as parameters, and you write the higher-level flow yourself. 
 
-You still get huge benefits from using typo in this case:
+You still get huge benefits from using Typo in this case:
 
 - All of this is typesafe
 - You get perfect auto-complete from your IDE
@@ -22,9 +22,9 @@ You still get huge benefits from using typo in this case:
 - It's fairly readable. 
 - It's testable! You can even wire in [stub repositories](other-features/testing-with-stubs.md) and test it all without a running database.
 
-Just have a look at the example and think how long it would take you to write this without typo.
+Just have a look at the example and think how long it would take you to write this without Typo.
 
-With typo, this example worked *the first time it was ran*.
+With Typo, this example worked *the first time it was ran*.
 
 ### Example
 

@@ -2,7 +2,7 @@
 title: Type flow
 ---
 
-typo follows "dependencies" between postgres columns (foreign keys and view dependencies) so the
+Typo follows "dependencies" between PostgreSQL columns (foreign keys and view dependencies) so the
 more specific types (like [id types](../type-safety/id-types.md) and [user-selected-types](../type-safety/user-selected-types.md)) can "flow"
 downstream from the base column to other tables which reference it.
 
@@ -15,7 +15,7 @@ look below for things like
 // Points to [[department.DepartmentRow.departmentid]]
 ```
 
-These are by the way scaladoc links which can be ctrl-clicked in intellij to go to that column.
+These are by the way scaladoc links which can be [ctrl-clicked](other-features/clickable-links.md) in intellij to go to that column.
 
 
 ## Example generated row with type flow
