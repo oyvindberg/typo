@@ -25,8 +25,8 @@ import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
 import adventureworks.customtypes.TypoPolygon
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
-import java.util.UUID
 import typo.dsl.SqlExpr.OptField
 
 trait PgtestnullFields[Row] {
@@ -49,7 +49,7 @@ trait PgtestnullFields[Row] {
   val time: OptField[TypoLocalTime, Row]
   val timez: OptField[TypoOffsetTime, Row]
   val date: OptField[TypoLocalDate, Row]
-  val uuid: OptField[UUID, Row]
+  val uuid: OptField[TypoUUID, Row]
   val numeric: OptField[BigDecimal, Row]
   val boxes: OptField[Array[TypoBox], Row]
   val circlees: OptField[Array[TypoCircle], Row]
@@ -70,7 +70,7 @@ trait PgtestnullFields[Row] {
   val times: OptField[Array[TypoLocalTime], Row]
   val timezs: OptField[Array[TypoOffsetTime], Row]
   val dates: OptField[Array[TypoLocalDate], Row]
-  val uuids: OptField[Array[UUID], Row]
+  val uuids: OptField[Array[TypoUUID], Row]
   val numerics: OptField[Array[BigDecimal], Row]
 }
 object PgtestnullFields extends PgtestnullStructure[PgtestnullRow](None, identity, (_, x) => x)

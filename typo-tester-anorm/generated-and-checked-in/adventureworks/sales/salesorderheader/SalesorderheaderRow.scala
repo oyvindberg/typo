@@ -9,6 +9,7 @@ package salesorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -22,7 +23,6 @@ import adventureworks.userdefined.CustomCreditcardId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -95,7 +95,7 @@ case class SalesorderheaderRow(
   totaldue: Option[BigDecimal],
   /** Sales representative comments. */
   comment: Option[/* max 128 chars */ String],
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -126,7 +126,7 @@ object SalesorderheaderRow {
           freight = json.\("freight").as(Reads.bigDecReads),
           totaldue = json.\("totaldue").toOption.map(_.as(Reads.bigDecReads)),
           comment = json.\("comment").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -158,7 +158,7 @@ object SalesorderheaderRow {
         freight = row(idx + 20)(Column.columnToScalaBigDecimal),
         totaldue = row(idx + 21)(Column.columnToOption(Column.columnToScalaBigDecimal)),
         comment = row(idx + 22)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 23)(Column.columnToUUID),
+        rowguid = row(idx + 23)(TypoUUID.column),
         modifieddate = row(idx + 24)(TypoLocalDateTime.column)
       )
     )
@@ -188,7 +188,7 @@ object SalesorderheaderRow {
       "freight" -> Writes.BigDecimalWrites.writes(o.freight),
       "totaldue" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.totaldue),
       "comment" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comment),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

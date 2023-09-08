@@ -25,6 +25,7 @@ import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
 import adventureworks.customtypes.TypoPolygon
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -35,7 +36,6 @@ import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.util.UUID
 import scala.util.Try
 
 case class PgtestnullRow(
@@ -58,7 +58,7 @@ case class PgtestnullRow(
   time: Option[TypoLocalTime],
   timez: Option[TypoOffsetTime],
   date: Option[TypoLocalDate],
-  uuid: Option[UUID],
+  uuid: Option[TypoUUID],
   numeric: Option[BigDecimal],
   boxes: Option[Array[TypoBox]],
   circlees: Option[Array[TypoCircle]],
@@ -79,7 +79,7 @@ case class PgtestnullRow(
   times: Option[Array[TypoLocalTime]],
   timezs: Option[Array[TypoOffsetTime]],
   dates: Option[Array[TypoLocalDate]],
-  uuids: Option[Array[UUID]],
+  uuids: Option[Array[TypoUUID]],
   numerics: Option[Array[BigDecimal]]
 )
 
@@ -110,7 +110,7 @@ object PgtestnullRow {
         time = orThrow(c.get("time")(Decoder.decodeOption(TypoLocalTime.decoder))),
         timez = orThrow(c.get("timez")(Decoder.decodeOption(TypoOffsetTime.decoder))),
         date = orThrow(c.get("date")(Decoder.decodeOption(TypoLocalDate.decoder))),
-        uuid = orThrow(c.get("uuid")(Decoder.decodeOption(Decoder.decodeUUID))),
+        uuid = orThrow(c.get("uuid")(Decoder.decodeOption(TypoUUID.decoder))),
         numeric = orThrow(c.get("numeric")(Decoder.decodeOption(Decoder.decodeBigDecimal))),
         boxes = orThrow(c.get("boxes")(Decoder.decodeOption(Decoder.decodeArray[TypoBox](TypoBox.decoder, implicitly)))),
         circlees = orThrow(c.get("circlees")(Decoder.decodeOption(Decoder.decodeArray[TypoCircle](TypoCircle.decoder, implicitly)))),
@@ -131,7 +131,7 @@ object PgtestnullRow {
         times = orThrow(c.get("times")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalTime](TypoLocalTime.decoder, implicitly)))),
         timezs = orThrow(c.get("timezs")(Decoder.decodeOption(Decoder.decodeArray[TypoOffsetTime](TypoOffsetTime.decoder, implicitly)))),
         dates = orThrow(c.get("dates")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalDate](TypoLocalDate.decoder, implicitly)))),
-        uuids = orThrow(c.get("uuids")(Decoder.decodeOption(Decoder.decodeArray[UUID](Decoder.decodeUUID, implicitly)))),
+        uuids = orThrow(c.get("uuids")(Decoder.decodeOption(Decoder.decodeArray[TypoUUID](TypoUUID.decoder, implicitly)))),
         numerics = orThrow(c.get("numerics")(Decoder.decodeOption(Decoder.decodeArray[BigDecimal](Decoder.decodeBigDecimal, implicitly))))
       )
     }
@@ -157,7 +157,7 @@ object PgtestnullRow {
       "time" -> Encoder.encodeOption(TypoLocalTime.encoder).apply(row.time),
       "timez" -> Encoder.encodeOption(TypoOffsetTime.encoder).apply(row.timez),
       "date" -> Encoder.encodeOption(TypoLocalDate.encoder).apply(row.date),
-      "uuid" -> Encoder.encodeOption(Encoder.encodeUUID).apply(row.uuid),
+      "uuid" -> Encoder.encodeOption(TypoUUID.encoder).apply(row.uuid),
       "numeric" -> Encoder.encodeOption(Encoder.encodeBigDecimal).apply(row.numeric),
       "boxes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoBox, Array](TypoBox.encoder, implicitly)).apply(row.boxes),
       "circlees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoCircle, Array](TypoCircle.encoder, implicitly)).apply(row.circlees),
@@ -178,7 +178,7 @@ object PgtestnullRow {
       "times" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalTime, Array](TypoLocalTime.encoder, implicitly)).apply(row.times),
       "timezs" -> Encoder.encodeOption(Encoder.encodeIterable[TypoOffsetTime, Array](TypoOffsetTime.encoder, implicitly)).apply(row.timezs),
       "dates" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalDate, Array](TypoLocalDate.encoder, implicitly)).apply(row.dates),
-      "uuids" -> Encoder.encodeOption(Encoder.encodeIterable[UUID, Array](Encoder.encodeUUID, implicitly)).apply(row.uuids),
+      "uuids" -> Encoder.encodeOption(Encoder.encodeIterable[TypoUUID, Array](TypoUUID.encoder, implicitly)).apply(row.uuids),
       "numerics" -> Encoder.encodeOption(Encoder.encodeIterable[BigDecimal, Array](Encoder.encodeBigDecimal, implicitly)).apply(row.numerics)
     )
   )
@@ -203,7 +203,7 @@ object PgtestnullRow {
       (TypoLocalTime.get, Nullability.Nullable),
       (TypoOffsetTime.get, Nullability.Nullable),
       (TypoLocalDate.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoUUID.get, Nullability.Nullable),
       (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
       (TypoBox.arrayGet, Nullability.Nullable),
       (TypoCircle.arrayGet, Nullability.Nullable),
@@ -224,7 +224,7 @@ object PgtestnullRow {
       (TypoLocalTime.arrayGet, Nullability.Nullable),
       (TypoOffsetTime.arrayGet, Nullability.Nullable),
       (TypoLocalDate.arrayGet, Nullability.Nullable),
-      (adventureworks.UUIDArrayMeta.get, Nullability.Nullable),
+      (TypoUUID.arrayGet, Nullability.Nullable),
       (adventureworks.BigDecimalMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgtestnullRow(
@@ -247,7 +247,7 @@ object PgtestnullRow {
       time = TypoLocalTime.get.unsafeGetNullable(rs, i + 16),
       timez = TypoOffsetTime.get.unsafeGetNullable(rs, i + 17),
       date = TypoLocalDate.get.unsafeGetNullable(rs, i + 18),
-      uuid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 19),
+      uuid = TypoUUID.get.unsafeGetNullable(rs, i + 19),
       numeric = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 20),
       boxes = TypoBox.arrayGet.unsafeGetNullable(rs, i + 21),
       circlees = TypoCircle.arrayGet.unsafeGetNullable(rs, i + 22),
@@ -268,7 +268,7 @@ object PgtestnullRow {
       times = TypoLocalTime.arrayGet.unsafeGetNullable(rs, i + 37),
       timezs = TypoOffsetTime.arrayGet.unsafeGetNullable(rs, i + 38),
       dates = TypoLocalDate.arrayGet.unsafeGetNullable(rs, i + 39),
-      uuids = adventureworks.UUIDArrayMeta.get.unsafeGetNullable(rs, i + 40),
+      uuids = TypoUUID.arrayGet.unsafeGetNullable(rs, i + 40),
       numerics = adventureworks.BigDecimalMeta.get.unsafeGetNullable(rs, i + 41)
     )
   )

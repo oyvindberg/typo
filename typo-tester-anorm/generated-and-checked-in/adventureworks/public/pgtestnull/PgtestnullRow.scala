@@ -25,11 +25,11 @@ import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
 import adventureworks.customtypes.TypoPolygon
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -59,7 +59,7 @@ case class PgtestnullRow(
   time: Option[TypoLocalTime],
   timez: Option[TypoOffsetTime],
   date: Option[TypoLocalDate],
-  uuid: Option[UUID],
+  uuid: Option[TypoUUID],
   numeric: Option[BigDecimal],
   boxes: Option[Array[TypoBox]],
   circlees: Option[Array[TypoCircle]],
@@ -80,7 +80,7 @@ case class PgtestnullRow(
   times: Option[Array[TypoLocalTime]],
   timezs: Option[Array[TypoOffsetTime]],
   dates: Option[Array[TypoLocalDate]],
-  uuids: Option[Array[UUID]],
+  uuids: Option[Array[TypoUUID]],
   numerics: Option[Array[BigDecimal]]
 )
 
@@ -107,7 +107,7 @@ object PgtestnullRow {
           time = json.\("time").toOption.map(_.as(TypoLocalTime.reads)),
           timez = json.\("timez").toOption.map(_.as(TypoOffsetTime.reads)),
           date = json.\("date").toOption.map(_.as(TypoLocalDate.reads)),
-          uuid = json.\("uuid").toOption.map(_.as(Reads.uuidReads)),
+          uuid = json.\("uuid").toOption.map(_.as(TypoUUID.reads)),
           numeric = json.\("numeric").toOption.map(_.as(Reads.bigDecReads)),
           boxes = json.\("boxes").toOption.map(_.as(Reads.ArrayReads[TypoBox](TypoBox.reads, implicitly))),
           circlees = json.\("circlees").toOption.map(_.as(Reads.ArrayReads[TypoCircle](TypoCircle.reads, implicitly))),
@@ -128,7 +128,7 @@ object PgtestnullRow {
           times = json.\("times").toOption.map(_.as(Reads.ArrayReads[TypoLocalTime](TypoLocalTime.reads, implicitly))),
           timezs = json.\("timezs").toOption.map(_.as(Reads.ArrayReads[TypoOffsetTime](TypoOffsetTime.reads, implicitly))),
           dates = json.\("dates").toOption.map(_.as(Reads.ArrayReads[TypoLocalDate](TypoLocalDate.reads, implicitly))),
-          uuids = json.\("uuids").toOption.map(_.as(Reads.ArrayReads[UUID](Reads.uuidReads, implicitly))),
+          uuids = json.\("uuids").toOption.map(_.as(Reads.ArrayReads[TypoUUID](TypoUUID.reads, implicitly))),
           numerics = json.\("numerics").toOption.map(_.as(Reads.ArrayReads[BigDecimal](Reads.bigDecReads, implicitly)))
         )
       )
@@ -156,7 +156,7 @@ object PgtestnullRow {
         time = row(idx + 16)(Column.columnToOption(TypoLocalTime.column)),
         timez = row(idx + 17)(Column.columnToOption(TypoOffsetTime.column)),
         date = row(idx + 18)(Column.columnToOption(TypoLocalDate.column)),
-        uuid = row(idx + 19)(Column.columnToOption(Column.columnToUUID)),
+        uuid = row(idx + 19)(Column.columnToOption(TypoUUID.column)),
         numeric = row(idx + 20)(Column.columnToOption(Column.columnToScalaBigDecimal)),
         boxes = row(idx + 21)(Column.columnToOption(TypoBox.arrayColumn)),
         circlees = row(idx + 22)(Column.columnToOption(TypoCircle.arrayColumn)),
@@ -177,7 +177,7 @@ object PgtestnullRow {
         times = row(idx + 37)(Column.columnToOption(TypoLocalTime.arrayColumn)),
         timezs = row(idx + 38)(Column.columnToOption(TypoOffsetTime.arrayColumn)),
         dates = row(idx + 39)(Column.columnToOption(TypoLocalDate.arrayColumn)),
-        uuids = row(idx + 40)(Column.columnToOption(Column.columnToArray[UUID](Column.columnToUUID, implicitly))),
+        uuids = row(idx + 40)(Column.columnToOption(TypoUUID.arrayColumn)),
         numerics = row(idx + 41)(Column.columnToOption(Column.columnToArray[BigDecimal](Column.columnToScalaBigDecimal, implicitly)))
       )
     )
@@ -203,7 +203,7 @@ object PgtestnullRow {
       "time" -> Writes.OptionWrites(TypoLocalTime.writes).writes(o.time),
       "timez" -> Writes.OptionWrites(TypoOffsetTime.writes).writes(o.timez),
       "date" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.date),
-      "uuid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.uuid),
+      "uuid" -> Writes.OptionWrites(TypoUUID.writes).writes(o.uuid),
       "numeric" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.numeric),
       "boxes" -> Writes.OptionWrites(Writes.arrayWrites[TypoBox](implicitly, TypoBox.writes)).writes(o.boxes),
       "circlees" -> Writes.OptionWrites(Writes.arrayWrites[TypoCircle](implicitly, TypoCircle.writes)).writes(o.circlees),
@@ -224,7 +224,7 @@ object PgtestnullRow {
       "times" -> Writes.OptionWrites(Writes.arrayWrites[TypoLocalTime](implicitly, TypoLocalTime.writes)).writes(o.times),
       "timezs" -> Writes.OptionWrites(Writes.arrayWrites[TypoOffsetTime](implicitly, TypoOffsetTime.writes)).writes(o.timezs),
       "dates" -> Writes.OptionWrites(Writes.arrayWrites[TypoLocalDate](implicitly, TypoLocalDate.writes)).writes(o.dates),
-      "uuids" -> Writes.OptionWrites(Writes.arrayWrites[UUID](implicitly, Writes.UuidWrites)).writes(o.uuids),
+      "uuids" -> Writes.OptionWrites(Writes.arrayWrites[TypoUUID](implicitly, TypoUUID.writes)).writes(o.uuids),
       "numerics" -> Writes.OptionWrites(Writes.arrayWrites[BigDecimal](implicitly, Writes.BigDecimalWrites)).writes(o.numerics)
     ))
   )

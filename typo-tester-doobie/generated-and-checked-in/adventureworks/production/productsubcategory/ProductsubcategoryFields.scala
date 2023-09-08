@@ -8,9 +8,9 @@ package production
 package productsubcategory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
@@ -18,7 +18,7 @@ trait ProductsubcategoryFields[Row] {
   val productsubcategoryid: IdField[ProductsubcategoryId, Row]
   val productcategoryid: Field[ProductcategoryId, Row]
   val name: Field[Name, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object ProductsubcategoryFields extends ProductsubcategoryStructure[ProductsubcategoryRow](None, identity, (_, x) => x)

@@ -25,8 +25,8 @@ import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
 import adventureworks.customtypes.TypoPolygon
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
@@ -54,7 +54,7 @@ class PgtestStructure[Row](val prefix: Option[String], val extract: Row => Pgtes
   override val time = new Field[TypoLocalTime, Row](prefix, "time", Some("text"), Some("time"))(x => extract(x).time, (row, value) => merge(row, extract(row).copy(time = value)))
   override val timez = new Field[TypoOffsetTime, Row](prefix, "timez", Some("text"), Some("timetz"))(x => extract(x).timez, (row, value) => merge(row, extract(row).copy(timez = value)))
   override val date = new Field[TypoLocalDate, Row](prefix, "date", Some("text"), Some("date"))(x => extract(x).date, (row, value) => merge(row, extract(row).copy(date = value)))
-  override val uuid = new Field[UUID, Row](prefix, "uuid", None, Some("uuid"))(x => extract(x).uuid, (row, value) => merge(row, extract(row).copy(uuid = value)))
+  override val uuid = new Field[TypoUUID, Row](prefix, "uuid", None, Some("uuid"))(x => extract(x).uuid, (row, value) => merge(row, extract(row).copy(uuid = value)))
   override val numeric = new Field[BigDecimal, Row](prefix, "numeric", None, Some("numeric"))(x => extract(x).numeric, (row, value) => merge(row, extract(row).copy(numeric = value)))
   override val boxes = new Field[Array[TypoBox], Row](prefix, "boxes", None, Some("_box"))(x => extract(x).boxes, (row, value) => merge(row, extract(row).copy(boxes = value)))
   override val circlees = new Field[Array[TypoCircle], Row](prefix, "circlees", None, Some("_circle"))(x => extract(x).circlees, (row, value) => merge(row, extract(row).copy(circlees = value)))
@@ -75,7 +75,7 @@ class PgtestStructure[Row](val prefix: Option[String], val extract: Row => Pgtes
   override val times = new Field[Array[TypoLocalTime], Row](prefix, "times", Some("text[]"), Some("_time"))(x => extract(x).times, (row, value) => merge(row, extract(row).copy(times = value)))
   override val timezs = new Field[Array[TypoOffsetTime], Row](prefix, "timezs", Some("text[]"), Some("_timetz"))(x => extract(x).timezs, (row, value) => merge(row, extract(row).copy(timezs = value)))
   override val dates = new Field[Array[TypoLocalDate], Row](prefix, "dates", Some("text[]"), Some("_date"))(x => extract(x).dates, (row, value) => merge(row, extract(row).copy(dates = value)))
-  override val uuids = new Field[Array[UUID], Row](prefix, "uuids", None, Some("_uuid"))(x => extract(x).uuids, (row, value) => merge(row, extract(row).copy(uuids = value)))
+  override val uuids = new Field[Array[TypoUUID], Row](prefix, "uuids", None, Some("_uuid"))(x => extract(x).uuids, (row, value) => merge(row, extract(row).copy(uuids = value)))
   override val numerics = new Field[Array[BigDecimal], Row](prefix, "numerics", None, Some("_numeric"))(x => extract(x).numerics, (row, value) => merge(row, extract(row).copy(numerics = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

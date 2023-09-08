@@ -9,11 +9,11 @@ package productmodel
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `production.productmodel` which has not been persisted yet */
 case class ProductmodelRowUnsaved(
@@ -27,11 +27,11 @@ case class ProductmodelRowUnsaved(
       Primary key for ProductModel records. */
   productmodelid: Defaulted[ProductmodelId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productmodelidDefault: => ProductmodelId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductmodelRow =
+  def toRow(productmodelidDefault: => ProductmodelId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): ProductmodelRow =
     ProductmodelRow(
       name = name,
       catalogdescription = catalogdescription,
@@ -51,6 +51,6 @@ case class ProductmodelRowUnsaved(
     )
 }
 object ProductmodelRowUnsaved {
-  implicit lazy val decoder: Decoder[ProductmodelRowUnsaved] = Decoder.forProduct6[ProductmodelRowUnsaved, Name, Option[TypoXml], Option[TypoXml], Defaulted[ProductmodelId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate")(ProductmodelRowUnsaved.apply)(Name.decoder, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Defaulted.decoder(ProductmodelId.decoder), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[ProductmodelRowUnsaved] = Encoder.forProduct6[ProductmodelRowUnsaved, Name, Option[TypoXml], Option[TypoXml], Defaulted[ProductmodelId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate")(x => (x.name, x.catalogdescription, x.instructions, x.productmodelid, x.rowguid, x.modifieddate))(Name.encoder, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Defaulted.encoder(ProductmodelId.encoder), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[ProductmodelRowUnsaved] = Decoder.forProduct6[ProductmodelRowUnsaved, Name, Option[TypoXml], Option[TypoXml], Defaulted[ProductmodelId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate")(ProductmodelRowUnsaved.apply)(Name.decoder, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Defaulted.decoder(ProductmodelId.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[ProductmodelRowUnsaved] = Encoder.forProduct6[ProductmodelRowUnsaved, Name, Option[TypoXml], Option[TypoXml], Defaulted[ProductmodelId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate")(x => (x.name, x.catalogdescription, x.instructions, x.productmodelid, x.rowguid, x.modifieddate))(Name.encoder, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Defaulted.encoder(ProductmodelId.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

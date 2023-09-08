@@ -8,6 +8,7 @@ package pe
 package sp
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag
@@ -19,7 +20,6 @@ import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
-import java.util.UUID
 
 case class SpViewRow(
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
@@ -37,14 +37,14 @@ case class SpViewRow(
   /** Points to [[person.stateprovince.StateprovinceRow.territoryid]] */
   territoryid: SalesterritoryId,
   /** Points to [[person.stateprovince.StateprovinceRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[person.stateprovince.StateprovinceRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object SpViewRow {
-  implicit lazy val decoder: Decoder[SpViewRow] = Decoder.forProduct9[SpViewRow, StateprovinceId, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(SpViewRow.apply)(StateprovinceId.decoder, StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SpViewRow] = Encoder.forProduct9[SpViewRow, StateprovinceId, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(StateprovinceId.encoder, StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SpViewRow] = Decoder.forProduct9[SpViewRow, StateprovinceId, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, TypoUUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(SpViewRow.apply)(StateprovinceId.decoder, StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SpViewRow] = Encoder.forProduct9[SpViewRow, StateprovinceId, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, TypoUUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(StateprovinceId.encoder, StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SpViewRow] = new Read[SpViewRow](
     gets = List(
       (StateprovinceId.get, Nullability.NoNulls),
@@ -54,7 +54,7 @@ object SpViewRow {
       (Flag.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
       (SalesterritoryId.get, Nullability.NoNulls),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
@@ -65,7 +65,7 @@ object SpViewRow {
       isonlystateprovinceflag = Flag.get.unsafeGetNonNullable(rs, i + 4),
       name = Name.get.unsafeGetNonNullable(rs, i + 5),
       territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 6),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 7),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 7),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
     )
   )

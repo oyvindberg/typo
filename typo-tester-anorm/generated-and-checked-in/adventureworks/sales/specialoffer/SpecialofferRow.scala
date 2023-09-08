@@ -8,10 +8,10 @@ package sales
 package specialoffer
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -45,7 +45,7 @@ case class SpecialofferRow(
   /** Maximum discount percent allowed.
       Constraint CK_SpecialOffer_MaxQty affecting columns "maxqty":  ((maxqty >= 0)) */
   maxqty: Option[Int],
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -62,7 +62,7 @@ object SpecialofferRow {
           enddate = json.\("enddate").as(TypoLocalDateTime.reads),
           minqty = json.\("minqty").as(Reads.IntReads),
           maxqty = json.\("maxqty").toOption.map(_.as(Reads.IntReads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -80,7 +80,7 @@ object SpecialofferRow {
         enddate = row(idx + 6)(TypoLocalDateTime.column),
         minqty = row(idx + 7)(Column.columnToInt),
         maxqty = row(idx + 8)(Column.columnToOption(Column.columnToInt)),
-        rowguid = row(idx + 9)(Column.columnToUUID),
+        rowguid = row(idx + 9)(TypoUUID.column),
         modifieddate = row(idx + 10)(TypoLocalDateTime.column)
       )
     )
@@ -96,7 +96,7 @@ object SpecialofferRow {
       "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
       "minqty" -> Writes.IntWrites.writes(o.minqty),
       "maxqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.maxqty),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

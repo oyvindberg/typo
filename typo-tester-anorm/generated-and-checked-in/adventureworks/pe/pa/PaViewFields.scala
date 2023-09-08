@@ -8,8 +8,8 @@ package pe
 package pa
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait PaViewFields[Row] {
@@ -17,7 +17,7 @@ trait PaViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
   val passwordhash: Field[/* max 128 chars */ String, Row]
   val passwordsalt: Field[/* max 10 chars */ String, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PaViewFields extends PaViewStructure[PaViewRow](None, identity, (_, x) => x)

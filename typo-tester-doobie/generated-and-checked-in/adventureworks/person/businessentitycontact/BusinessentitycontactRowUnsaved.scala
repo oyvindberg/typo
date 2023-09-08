@@ -9,11 +9,11 @@ package businessentitycontact
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `person.businessentitycontact` which has not been persisted yet */
 case class BusinessentitycontactRowUnsaved(
@@ -27,11 +27,11 @@ case class BusinessentitycontactRowUnsaved(
       Points to [[contacttype.ContacttypeRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): BusinessentitycontactRow =
+  def toRow(rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): BusinessentitycontactRow =
     BusinessentitycontactRow(
       businessentityid = businessentityid,
       personid = personid,
@@ -47,6 +47,6 @@ case class BusinessentitycontactRowUnsaved(
     )
 }
 object BusinessentitycontactRowUnsaved {
-  implicit lazy val decoder: Decoder[BusinessentitycontactRowUnsaved] = Decoder.forProduct5[BusinessentitycontactRowUnsaved, BusinessentityId, BusinessentityId, ContacttypeId, Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BusinessentitycontactRowUnsaved.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[BusinessentitycontactRowUnsaved] = Encoder.forProduct5[BusinessentitycontactRowUnsaved, BusinessentityId, BusinessentityId, ContacttypeId, Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[BusinessentitycontactRowUnsaved] = Decoder.forProduct5[BusinessentitycontactRowUnsaved, BusinessentityId, BusinessentityId, ContacttypeId, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BusinessentitycontactRowUnsaved.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[BusinessentitycontactRowUnsaved] = Encoder.forProduct5[BusinessentitycontactRowUnsaved, BusinessentityId, BusinessentityId, ContacttypeId, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

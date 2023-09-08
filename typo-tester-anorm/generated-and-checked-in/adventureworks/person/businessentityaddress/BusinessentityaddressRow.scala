@@ -8,19 +8,17 @@ package person
 package businessentityaddress
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,7 +32,7 @@ case class BusinessentityaddressRow(
   /** Primary key. Foreign key to AddressType.AddressTypeID.
       Points to [[addresstype.AddresstypeRow.addresstypeid]] */
   addresstypeid: AddresstypeId,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: BusinessentityaddressId = BusinessentityaddressId(businessentityid, addressid, addresstypeid)
@@ -47,7 +45,7 @@ object BusinessentityaddressRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           addressid = json.\("addressid").as(AddressId.reads),
           addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -59,7 +57,7 @@ object BusinessentityaddressRow {
         businessentityid = row(idx + 0)(BusinessentityId.column),
         addressid = row(idx + 1)(AddressId.column),
         addresstypeid = row(idx + 2)(AddresstypeId.column),
-        rowguid = row(idx + 3)(Column.columnToUUID),
+        rowguid = row(idx + 3)(TypoUUID.column),
         modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
@@ -69,7 +67,7 @@ object BusinessentityaddressRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "addressid" -> AddressId.writes.writes(o.addressid),
       "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

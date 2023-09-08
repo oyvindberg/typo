@@ -8,8 +8,8 @@ package sa
 package spqh
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait SpqhViewFields[Row] {
@@ -17,7 +17,7 @@ trait SpqhViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
   val quotadate: Field[TypoLocalDateTime, Row]
   val salesquota: Field[BigDecimal, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SpqhViewFields extends SpqhViewStructure[SpqhViewRow](None, identity, (_, x) => x)

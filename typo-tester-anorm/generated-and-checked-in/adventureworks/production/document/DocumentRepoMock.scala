@@ -7,8 +7,8 @@ package adventureworks
 package production
 package document
 
+import adventureworks.customtypes.TypoUUID
 import java.sql.Connection
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -49,7 +49,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow] = {
     documentnodes.flatMap(map.get).toList
   }
-  override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
+  override def selectByUnique(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow] = {
     map.values.find(v => rowguid == v.rowguid)
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {

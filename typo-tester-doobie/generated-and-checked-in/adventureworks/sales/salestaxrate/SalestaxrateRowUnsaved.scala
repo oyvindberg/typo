@@ -10,11 +10,11 @@ package salestaxrate
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `sales.salestaxrate` which has not been persisted yet */
 case class SalestaxrateRowUnsaved(
@@ -32,11 +32,11 @@ case class SalestaxrateRowUnsaved(
       Tax rate amount. */
   taxrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salestaxrateidDefault: => SalestaxrateId, taxrateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalestaxrateRow =
+  def toRow(salestaxrateidDefault: => SalestaxrateId, taxrateDefault: => BigDecimal, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SalestaxrateRow =
     SalestaxrateRow(
       stateprovinceid = stateprovinceid,
       taxtype = taxtype,
@@ -60,6 +60,6 @@ case class SalestaxrateRowUnsaved(
     )
 }
 object SalestaxrateRowUnsaved {
-  implicit lazy val decoder: Decoder[SalestaxrateRowUnsaved] = Decoder.forProduct7[SalestaxrateRowUnsaved, StateprovinceId, TypoShort, Name, Defaulted[SalestaxrateId], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate")(SalestaxrateRowUnsaved.apply)(StateprovinceId.decoder, TypoShort.decoder, Name.decoder, Defaulted.decoder(SalestaxrateId.decoder), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SalestaxrateRowUnsaved] = Encoder.forProduct7[SalestaxrateRowUnsaved, StateprovinceId, TypoShort, Name, Defaulted[SalestaxrateId], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate")(x => (x.stateprovinceid, x.taxtype, x.name, x.salestaxrateid, x.taxrate, x.rowguid, x.modifieddate))(StateprovinceId.encoder, TypoShort.encoder, Name.encoder, Defaulted.encoder(SalestaxrateId.encoder), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SalestaxrateRowUnsaved] = Decoder.forProduct7[SalestaxrateRowUnsaved, StateprovinceId, TypoShort, Name, Defaulted[SalestaxrateId], Defaulted[BigDecimal], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate")(SalestaxrateRowUnsaved.apply)(StateprovinceId.decoder, TypoShort.decoder, Name.decoder, Defaulted.decoder(SalestaxrateId.decoder), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[SalestaxrateRowUnsaved] = Encoder.forProduct7[SalestaxrateRowUnsaved, StateprovinceId, TypoShort, Name, Defaulted[SalestaxrateId], Defaulted[BigDecimal], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate")(x => (x.stateprovinceid, x.taxtype, x.name, x.salestaxrateid, x.taxrate, x.rowguid, x.modifieddate))(StateprovinceId.encoder, TypoShort.encoder, Name.encoder, Defaulted.encoder(SalestaxrateId.encoder), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

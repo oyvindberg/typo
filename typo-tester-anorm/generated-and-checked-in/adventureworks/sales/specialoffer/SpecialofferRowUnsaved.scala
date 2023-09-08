@@ -9,7 +9,7 @@ package specialoffer
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
-import java.util.UUID
+import adventureworks.customtypes.TypoUUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -43,11 +43,11 @@ case class SpecialofferRowUnsaved(
       Minimum discount percent allowed. */
   minqty: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(specialofferidDefault: => SpecialofferId, discountpctDefault: => BigDecimal, minqtyDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SpecialofferRow =
+  def toRow(specialofferidDefault: => SpecialofferId, discountpctDefault: => BigDecimal, minqtyDefault: => Int, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SpecialofferRow =
     SpecialofferRow(
       description = description,
       `type` = `type`,
@@ -90,7 +90,7 @@ object SpecialofferRowUnsaved {
           specialofferid = json.\("specialofferid").as(Defaulted.reads(SpecialofferId.reads)),
           discountpct = json.\("discountpct").as(Defaulted.reads(Reads.bigDecReads)),
           minqty = json.\("minqty").as(Defaulted.reads(Reads.IntReads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -107,7 +107,7 @@ object SpecialofferRowUnsaved {
       "specialofferid" -> Defaulted.writes(SpecialofferId.writes).writes(o.specialofferid),
       "discountpct" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.discountpct),
       "minqty" -> Defaulted.writes(Writes.IntWrites).writes(o.minqty),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

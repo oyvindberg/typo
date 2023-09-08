@@ -8,6 +8,7 @@ package production
 package productsubcategory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -15,7 +16,6 @@ import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
-import java.util.UUID
 
 case class ProductsubcategoryRow(
   /** Primary key for ProductSubcategory records. */
@@ -25,26 +25,26 @@ case class ProductsubcategoryRow(
   productcategoryid: ProductcategoryId,
   /** Subcategory description. */
   name: Name,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
 object ProductsubcategoryRow {
-  implicit lazy val decoder: Decoder[ProductsubcategoryRow] = Decoder.forProduct5[ProductsubcategoryRow, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(ProductsubcategoryRow.apply)(ProductsubcategoryId.decoder, ProductcategoryId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[ProductsubcategoryRow] = Encoder.forProduct5[ProductsubcategoryRow, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductsubcategoryId.encoder, ProductcategoryId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[ProductsubcategoryRow] = Decoder.forProduct5[ProductsubcategoryRow, ProductsubcategoryId, ProductcategoryId, Name, TypoUUID, TypoLocalDateTime]("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(ProductsubcategoryRow.apply)(ProductsubcategoryId.decoder, ProductcategoryId.decoder, Name.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ProductsubcategoryRow] = Encoder.forProduct5[ProductsubcategoryRow, ProductsubcategoryId, ProductcategoryId, Name, TypoUUID, TypoLocalDateTime]("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductsubcategoryId.encoder, ProductcategoryId.encoder, Name.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[ProductsubcategoryRow] = new Read[ProductsubcategoryRow](
     gets = List(
       (ProductsubcategoryId.get, Nullability.NoNulls),
       (ProductcategoryId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductsubcategoryRow(
       productsubcategoryid = ProductsubcategoryId.get.unsafeGetNonNullable(rs, i + 0),
       productcategoryid = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 1),
       name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 3),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 3),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )

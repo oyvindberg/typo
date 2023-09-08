@@ -8,16 +8,16 @@ package sa
 package sop
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait SopViewFields[Row] {
   val id: Field[SpecialofferId, Row]
   val specialofferid: Field[SpecialofferId, Row]
   val productid: Field[ProductId, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SopViewFields extends SopViewStructure[SopViewRow](None, identity, (_, x) => x)

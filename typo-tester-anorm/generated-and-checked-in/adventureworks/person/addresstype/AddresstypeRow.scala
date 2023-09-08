@@ -8,17 +8,15 @@ package person
 package addresstype
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -27,7 +25,7 @@ case class AddresstypeRow(
   addresstypeid: AddresstypeId,
   /** Address type description. For example, Billing, Home, or Shipping. */
   name: Name,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -37,7 +35,7 @@ object AddresstypeRow {
         AddresstypeRow(
           addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
           name = json.\("name").as(Name.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -48,7 +46,7 @@ object AddresstypeRow {
       AddresstypeRow(
         addresstypeid = row(idx + 0)(AddresstypeId.column),
         name = row(idx + 1)(Name.column),
-        rowguid = row(idx + 2)(Column.columnToUUID),
+        rowguid = row(idx + 2)(TypoUUID.column),
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
@@ -57,7 +55,7 @@ object AddresstypeRow {
     new JsObject(ListMap[String, JsValue](
       "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),
       "name" -> Name.writes.writes(o.name),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

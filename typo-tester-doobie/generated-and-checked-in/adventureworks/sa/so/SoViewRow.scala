@@ -8,6 +8,7 @@ package sa
 package so
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -15,7 +16,6 @@ import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
-import java.util.UUID
 
 case class SoViewRow(
   /** Points to [[sales.specialoffer.SpecialofferRow.specialofferid]] */
@@ -39,14 +39,14 @@ case class SoViewRow(
   /** Points to [[sales.specialoffer.SpecialofferRow.maxqty]] */
   maxqty: Option[Int],
   /** Points to [[sales.specialoffer.SpecialofferRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.specialoffer.SpecialofferRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object SoViewRow {
-  implicit lazy val decoder: Decoder[SoViewRow] = Decoder.forProduct12[SoViewRow, SpecialofferId, SpecialofferId, /* max 255 chars */ String, BigDecimal, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Int, Option[Int], UUID, TypoLocalDateTime]("id", "specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(SoViewRow.apply)(SpecialofferId.decoder, SpecialofferId.decoder, Decoder.decodeString, Decoder.decodeBigDecimal, Decoder.decodeString, Decoder.decodeString, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[SoViewRow] = Encoder.forProduct12[SoViewRow, SpecialofferId, SpecialofferId, /* max 255 chars */ String, BigDecimal, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Int, Option[Int], UUID, TypoLocalDateTime]("id", "specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(x => (x.id, x.specialofferid, x.description, x.discountpct, x.`type`, x.category, x.startdate, x.enddate, x.minqty, x.maxqty, x.rowguid, x.modifieddate))(SpecialofferId.encoder, SpecialofferId.encoder, Encoder.encodeString, Encoder.encodeBigDecimal, Encoder.encodeString, Encoder.encodeString, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[SoViewRow] = Decoder.forProduct12[SoViewRow, SpecialofferId, SpecialofferId, /* max 255 chars */ String, BigDecimal, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Int, Option[Int], TypoUUID, TypoLocalDateTime]("id", "specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(SoViewRow.apply)(SpecialofferId.decoder, SpecialofferId.decoder, Decoder.decodeString, Decoder.decodeBigDecimal, Decoder.decodeString, Decoder.decodeString, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeInt), TypoUUID.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SoViewRow] = Encoder.forProduct12[SoViewRow, SpecialofferId, SpecialofferId, /* max 255 chars */ String, BigDecimal, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Int, Option[Int], TypoUUID, TypoLocalDateTime]("id", "specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(x => (x.id, x.specialofferid, x.description, x.discountpct, x.`type`, x.category, x.startdate, x.enddate, x.minqty, x.maxqty, x.rowguid, x.modifieddate))(SpecialofferId.encoder, SpecialofferId.encoder, Encoder.encodeString, Encoder.encodeBigDecimal, Encoder.encodeString, Encoder.encodeString, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeInt), TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SoViewRow] = new Read[SoViewRow](
     gets = List(
       (SpecialofferId.get, Nullability.NoNulls),
@@ -59,7 +59,7 @@ object SoViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SoViewRow(
@@ -73,7 +73,7 @@ object SoViewRow {
       enddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7),
       minqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 8),
       maxqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 9),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 10),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 10),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11)
     )
   )

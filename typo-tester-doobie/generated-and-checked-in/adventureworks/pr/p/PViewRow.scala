@@ -9,6 +9,7 @@ package p
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
@@ -24,7 +25,6 @@ import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.util.UUID
 import scala.util.Try
 
 case class PViewRow(
@@ -77,7 +77,7 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.discontinueddate]] */
   discontinueddate: Option[TypoLocalDateTime],
   /** Points to [[production.product.ProductRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[production.product.ProductRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -114,7 +114,7 @@ object PViewRow {
         sellstartdate = orThrow(c.get("sellstartdate")(TypoLocalDateTime.decoder)),
         sellenddate = orThrow(c.get("sellenddate")(Decoder.decodeOption(TypoLocalDateTime.decoder))),
         discontinueddate = orThrow(c.get("discontinueddate")(Decoder.decodeOption(TypoLocalDateTime.decoder))),
-        rowguid = orThrow(c.get("rowguid")(Decoder.decodeUUID)),
+        rowguid = orThrow(c.get("rowguid")(TypoUUID.decoder)),
         modifieddate = orThrow(c.get("modifieddate")(TypoLocalDateTime.decoder))
       )
     }
@@ -145,7 +145,7 @@ object PViewRow {
       "sellstartdate" -> TypoLocalDateTime.encoder.apply(row.sellstartdate),
       "sellenddate" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.sellenddate),
       "discontinueddate" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.discontinueddate),
-      "rowguid" -> Encoder.encodeUUID.apply(row.rowguid),
+      "rowguid" -> TypoUUID.encoder.apply(row.rowguid),
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
@@ -175,7 +175,7 @@ object PViewRow {
       (TypoLocalDateTime.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.Nullable),
       (TypoLocalDateTime.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PViewRow(
@@ -203,7 +203,7 @@ object PViewRow {
       sellstartdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 21),
       sellenddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 22),
       discontinueddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 23),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 24),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 24),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 25)
     )
   )

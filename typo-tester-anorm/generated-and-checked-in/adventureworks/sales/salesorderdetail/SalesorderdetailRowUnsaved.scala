@@ -10,10 +10,10 @@ package salesorderdetail
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -47,11 +47,11 @@ case class SalesorderdetailRowUnsaved(
       Discount amount. */
   unitpricediscount: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesorderdetailidDefault: => Int, unitpricediscountDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderdetailRow =
+  def toRow(salesorderdetailidDefault: => Int, unitpricediscountDefault: => BigDecimal, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SalesorderdetailRow =
     SalesorderdetailRow(
       salesorderid = salesorderid,
       carriertrackingnumber = carriertrackingnumber,
@@ -89,7 +89,7 @@ object SalesorderdetailRowUnsaved {
           unitprice = json.\("unitprice").as(Reads.bigDecReads),
           salesorderdetailid = json.\("salesorderdetailid").as(Defaulted.reads(Reads.IntReads)),
           unitpricediscount = json.\("unitpricediscount").as(Defaulted.reads(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -105,7 +105,7 @@ object SalesorderdetailRowUnsaved {
       "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),
       "salesorderdetailid" -> Defaulted.writes(Writes.IntWrites).writes(o.salesorderdetailid),
       "unitpricediscount" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.unitpricediscount),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

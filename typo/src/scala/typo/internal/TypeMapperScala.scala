@@ -107,7 +107,7 @@ case class TypeMapperScala(
       case db.Type.TimeTz          => customTypes.TypoOffsetTime.typoType
       case db.Type.Timestamp       => customTypes.TypoLocalDateTime.typoType
       case db.Type.TimestampTz     => customTypes.TypoOffsetDateTime.typoType
-      case db.Type.UUID            => sc.Type.UUID
+      case db.Type.UUID            => customTypes.TypoUUID.typoType
       case db.Type.Xml             => customTypes.TypoXml.typoType
       case db.Type.VarChar(maybeN) =>
         maybeN match {

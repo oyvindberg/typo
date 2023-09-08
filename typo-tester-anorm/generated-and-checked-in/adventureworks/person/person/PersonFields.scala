@@ -8,12 +8,12 @@ package person
 package person
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -30,7 +30,7 @@ trait PersonFields[Row] {
   val emailpromotion: Field[Int, Row]
   val additionalcontactinfo: OptField[TypoXml, Row]
   val demographics: OptField[TypoXml, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PersonFields extends PersonStructure[PersonRow](None, identity, (_, x) => x)

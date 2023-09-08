@@ -9,12 +9,12 @@ package product
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -48,7 +48,7 @@ class ProductStructure[Row](val prefix: Option[String], val extract: Row => Prod
   override val sellstartdate = new Field[TypoLocalDateTime, Row](prefix, "sellstartdate", Some("text"), Some("timestamp"))(x => extract(x).sellstartdate, (row, value) => merge(row, extract(row).copy(sellstartdate = value)))
   override val sellenddate = new OptField[TypoLocalDateTime, Row](prefix, "sellenddate", Some("text"), Some("timestamp"))(x => extract(x).sellenddate, (row, value) => merge(row, extract(row).copy(sellenddate = value)))
   override val discontinueddate = new OptField[TypoLocalDateTime, Row](prefix, "discontinueddate", Some("text"), Some("timestamp"))(x => extract(x).discontinueddate, (row, value) => merge(row, extract(row).copy(discontinueddate = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

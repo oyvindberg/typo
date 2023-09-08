@@ -91,3 +91,4 @@ create table pgtestnull
     uuids       uuid[],
     numerics    numeric[]
 );
+

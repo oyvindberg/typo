@@ -8,23 +8,21 @@ package person
 package businessentity
 
 import adventureworks.customtypes.TypoLocalDateTime
-import anorm.Column
+import adventureworks.customtypes.TypoUUID
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BusinessentityRow(
   /** Primary key for all customers, vendors, and employees. */
   businessentityid: BusinessentityId,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -33,7 +31,7 @@ object BusinessentityRow {
       Try(
         BusinessentityRow(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -43,7 +41,7 @@ object BusinessentityRow {
     Success(
       BusinessentityRow(
         businessentityid = row(idx + 0)(BusinessentityId.column),
-        rowguid = row(idx + 1)(Column.columnToUUID),
+        rowguid = row(idx + 1)(TypoUUID.column),
         modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
@@ -51,7 +49,7 @@ object BusinessentityRow {
   implicit lazy val writes: OWrites[BusinessentityRow] = OWrites[BusinessentityRow](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

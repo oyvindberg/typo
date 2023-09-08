@@ -9,10 +9,10 @@ package password
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `person.password` which has not been persisted yet */
 case class PasswordRowUnsaved(
@@ -23,11 +23,11 @@ case class PasswordRowUnsaved(
   /** Random value concatenated with the password string before the password is hashed. */
   passwordsalt: /* max 10 chars */ String,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): PasswordRow =
+  def toRow(rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): PasswordRow =
     PasswordRow(
       businessentityid = businessentityid,
       passwordhash = passwordhash,
@@ -43,6 +43,6 @@ case class PasswordRowUnsaved(
     )
 }
 object PasswordRowUnsaved {
-  implicit lazy val decoder: Decoder[PasswordRowUnsaved] = Decoder.forProduct5[PasswordRowUnsaved, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PasswordRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[PasswordRowUnsaved] = Encoder.forProduct5[PasswordRowUnsaved, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PasswordRowUnsaved] = Decoder.forProduct5[PasswordRowUnsaved, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PasswordRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PasswordRowUnsaved] = Encoder.forProduct5[PasswordRowUnsaved, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

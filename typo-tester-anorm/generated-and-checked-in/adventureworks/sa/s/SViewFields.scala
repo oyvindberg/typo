@@ -8,10 +8,10 @@ package sa
 package s
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -21,7 +21,7 @@ trait SViewFields[Row] {
   val name: Field[Name, Row]
   val salespersonid: OptField[BusinessentityId, Row]
   val demographics: OptField[TypoXml, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SViewFields extends SViewStructure[SViewRow](None, identity, (_, x) => x)

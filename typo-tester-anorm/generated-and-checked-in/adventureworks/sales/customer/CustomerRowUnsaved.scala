@@ -9,9 +9,9 @@ package customer
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -36,11 +36,11 @@ case class CustomerRowUnsaved(
       Primary key. */
   customerid: Defaulted[CustomerId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(customeridDefault: => CustomerId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): CustomerRow =
+  def toRow(customeridDefault: => CustomerId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): CustomerRow =
     CustomerRow(
       personid = personid,
       storeid = storeid,
@@ -67,7 +67,7 @@ object CustomerRowUnsaved {
           storeid = json.\("storeid").toOption.map(_.as(BusinessentityId.reads)),
           territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
           customerid = json.\("customerid").as(Defaulted.reads(CustomerId.reads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -79,7 +79,7 @@ object CustomerRowUnsaved {
       "storeid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.storeid),
       "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
       "customerid" -> Defaulted.writes(CustomerId.writes).writes(o.customerid),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

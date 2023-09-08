@@ -7,9 +7,9 @@ package adventureworks
 package production
 package document
 
+import adventureworks.customtypes.TypoUUID
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
-import java.util.UUID
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
@@ -23,7 +23,7 @@ trait DocumentRepo {
   def selectAll: Stream[ConnectionIO, DocumentRow]
   def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]]
   def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow]
-  def selectByUnique(rowguid: UUID): ConnectionIO[Option[DocumentRow]]
+  def selectByUnique(rowguid: TypoUUID): ConnectionIO[Option[DocumentRow]]
   def update(row: DocumentRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[DocumentFields, DocumentRow]
   def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow]

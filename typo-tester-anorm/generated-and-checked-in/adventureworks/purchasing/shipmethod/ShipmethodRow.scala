@@ -8,11 +8,11 @@ package purchasing
 package shipmethod
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -33,7 +33,7 @@ case class ShipmethodRow(
   /** Shipping charge per pound.
       Constraint CK_ShipMethod_ShipRate affecting columns "shiprate":  ((shiprate > 0.00)) */
   shiprate: BigDecimal,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -45,7 +45,7 @@ object ShipmethodRow {
           name = json.\("name").as(Name.reads),
           shipbase = json.\("shipbase").as(Reads.bigDecReads),
           shiprate = json.\("shiprate").as(Reads.bigDecReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -58,7 +58,7 @@ object ShipmethodRow {
         name = row(idx + 1)(Name.column),
         shipbase = row(idx + 2)(Column.columnToScalaBigDecimal),
         shiprate = row(idx + 3)(Column.columnToScalaBigDecimal),
-        rowguid = row(idx + 4)(Column.columnToUUID),
+        rowguid = row(idx + 4)(TypoUUID.column),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
@@ -69,7 +69,7 @@ object ShipmethodRow {
       "name" -> Name.writes.writes(o.name),
       "shipbase" -> Writes.BigDecimalWrites.writes(o.shipbase),
       "shiprate" -> Writes.BigDecimalWrites.writes(o.shiprate),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

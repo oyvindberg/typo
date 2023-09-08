@@ -9,6 +9,7 @@ package salesorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -28,7 +29,6 @@ import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.util.UUID
 import scala.util.Try
 
 case class SalesorderheaderRow(
@@ -94,7 +94,7 @@ case class SalesorderheaderRow(
   totaldue: Option[BigDecimal],
   /** Sales representative comments. */
   comment: Option[/* max 128 chars */ String],
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -129,7 +129,7 @@ object SalesorderheaderRow {
         freight = orThrow(c.get("freight")(Decoder.decodeBigDecimal)),
         totaldue = orThrow(c.get("totaldue")(Decoder.decodeOption(Decoder.decodeBigDecimal))),
         comment = orThrow(c.get("comment")(Decoder.decodeOption(Decoder.decodeString))),
-        rowguid = orThrow(c.get("rowguid")(Decoder.decodeUUID)),
+        rowguid = orThrow(c.get("rowguid")(TypoUUID.decoder)),
         modifieddate = orThrow(c.get("modifieddate")(TypoLocalDateTime.decoder))
       )
     }
@@ -159,7 +159,7 @@ object SalesorderheaderRow {
       "freight" -> Encoder.encodeBigDecimal.apply(row.freight),
       "totaldue" -> Encoder.encodeOption(Encoder.encodeBigDecimal).apply(row.totaldue),
       "comment" -> Encoder.encodeOption(Encoder.encodeString).apply(row.comment),
-      "rowguid" -> Encoder.encodeUUID.apply(row.rowguid),
+      "rowguid" -> TypoUUID.encoder.apply(row.rowguid),
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
@@ -188,7 +188,7 @@ object SalesorderheaderRow {
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SalesorderheaderRow(
@@ -215,7 +215,7 @@ object SalesorderheaderRow {
       freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 20),
       totaldue = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 21),
       comment = Meta.StringMeta.get.unsafeGetNullable(rs, i + 22),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 23),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 23),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 24)
     )
   )

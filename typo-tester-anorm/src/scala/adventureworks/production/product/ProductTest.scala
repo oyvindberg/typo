@@ -1,6 +1,6 @@
 package adventureworks.production.product
 
-import adventureworks.customtypes.{Defaulted, TypoLocalDateTime, TypoShort, TypoXml}
+import adventureworks.customtypes.*
 import adventureworks.production.productcategory.*
 import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
@@ -12,7 +12,6 @@ import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
-import java.util.UUID
 import scala.util.Random
 
 class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
@@ -97,7 +96,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         productid = Defaulted.UseDefault,
         makeflag = Defaulted.Provided(Flag(true)),
         finishedgoodsflag = Defaulted.Provided(Flag(true)),
-        rowguid = Defaulted.Provided(UUID.randomUUID()),
+        rowguid = Defaulted.Provided(TypoUUID.randomUUID),
         modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
       )
 
@@ -210,11 +209,11 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
   test("in-memory") {
     runTest(
-      productRepo = new ProductRepoMock(_.toRow(ProductId(0), Flag.apply(true), Flag.apply(false), UUID.randomUUID(), TypoLocalDateTime.now)),
-      projectModelRepo = new ProductmodelRepoMock(_.toRow(ProductmodelId(0), UUID.randomUUID(), TypoLocalDateTime.now)),
+      productRepo = new ProductRepoMock(_.toRow(ProductId(0), Flag.apply(true), Flag.apply(false), TypoUUID.randomUUID, TypoLocalDateTime.now)),
+      projectModelRepo = new ProductmodelRepoMock(_.toRow(ProductmodelId(0), TypoUUID.randomUUID, TypoLocalDateTime.now)),
       unitmeasureRepo = new UnitmeasureRepoMock(_.toRow(TypoLocalDateTime.now)),
-      productcategoryRepo = new ProductcategoryRepoMock(_.toRow(ProductcategoryId(0), UUID.randomUUID(), TypoLocalDateTime.now)),
-      productsubcategoryRepo = new ProductsubcategoryRepoMock(_.toRow(ProductsubcategoryId(0), UUID.randomUUID(), TypoLocalDateTime.now))
+      productcategoryRepo = new ProductcategoryRepoMock(_.toRow(ProductcategoryId(0), TypoUUID.randomUUID, TypoLocalDateTime.now)),
+      productsubcategoryRepo = new ProductsubcategoryRepoMock(_.toRow(ProductsubcategoryId(0), TypoUUID.randomUUID, TypoLocalDateTime.now))
     )
   }
 

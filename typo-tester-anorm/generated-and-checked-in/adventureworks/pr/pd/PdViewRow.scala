@@ -8,11 +8,11 @@ package pr
 package pd
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productdescription.ProductdescriptionId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -30,7 +30,7 @@ case class PdViewRow(
   /** Points to [[production.productdescription.ProductdescriptionRow.description]] */
   description: /* max 400 chars */ String,
   /** Points to [[production.productdescription.ProductdescriptionRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[production.productdescription.ProductdescriptionRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -42,7 +42,7 @@ object PdViewRow {
           id = json.\("id").as(ProductdescriptionId.reads),
           productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
           description = json.\("description").as(Reads.StringReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -54,7 +54,7 @@ object PdViewRow {
         id = row(idx + 0)(ProductdescriptionId.column),
         productdescriptionid = row(idx + 1)(ProductdescriptionId.column),
         description = row(idx + 2)(Column.columnToString),
-        rowguid = row(idx + 3)(Column.columnToUUID),
+        rowguid = row(idx + 3)(TypoUUID.column),
         modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
@@ -64,7 +64,7 @@ object PdViewRow {
       "id" -> ProductdescriptionId.writes.writes(o.id),
       "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
       "description" -> Writes.StringWrites.writes(o.description),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

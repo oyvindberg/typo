@@ -11,9 +11,9 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -50,14 +50,14 @@ case class DocumentRowUnsaved(
   changenumber: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1()
       ROWGUIDCOL number uniquely identifying the record. Required for FileStream. */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: '/'::character varying
       Primary key for Document records. */
   documentnode: Defaulted[DocumentId] = Defaulted.UseDefault
 ) {
-  def toRow(folderflagDefault: => Flag, changenumberDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, documentnodeDefault: => DocumentId): DocumentRow =
+  def toRow(folderflagDefault: => Flag, changenumberDefault: => Int, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime, documentnodeDefault: => DocumentId): DocumentRow =
     DocumentRow(
       title = title,
       owner = owner,
@@ -103,7 +103,7 @@ object DocumentRowUnsaved {
           document = json.\("document").toOption.map(_.as(TypoBytea.reads)),
           folderflag = json.\("folderflag").as(Defaulted.reads(Flag.reads)),
           changenumber = json.\("changenumber").as(Defaulted.reads(Reads.IntReads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads)),
           documentnode = json.\("documentnode").as(Defaulted.reads(DocumentId.reads))
         )
@@ -122,7 +122,7 @@ object DocumentRowUnsaved {
       "document" -> Writes.OptionWrites(TypoBytea.writes).writes(o.document),
       "folderflag" -> Defaulted.writes(Flag.writes).writes(o.folderflag),
       "changenumber" -> Defaulted.writes(Writes.IntWrites).writes(o.changenumber),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate),
       "documentnode" -> Defaulted.writes(DocumentId.writes).writes(o.documentnode)
     ))

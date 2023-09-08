@@ -9,12 +9,12 @@ package person
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -52,11 +52,11 @@ case class PersonRowUnsaved(
       0 = Contact does not wish to receive e-mail promotions, 1 = Contact does wish to receive e-mail promotions from AdventureWorks, 2 = Contact does wish to receive e-mail promotions from AdventureWorks and selected partners. */
   emailpromotion: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(namestyleDefault: => NameStyle, emailpromotionDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): PersonRow =
+  def toRow(namestyleDefault: => NameStyle, emailpromotionDefault: => Int, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): PersonRow =
     PersonRow(
       businessentityid = businessentityid,
       persontype = persontype,
@@ -100,7 +100,7 @@ object PersonRowUnsaved {
           demographics = json.\("demographics").toOption.map(_.as(TypoXml.reads)),
           namestyle = json.\("namestyle").as(Defaulted.reads(NameStyle.reads)),
           emailpromotion = json.\("emailpromotion").as(Defaulted.reads(Reads.IntReads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -119,7 +119,7 @@ object PersonRowUnsaved {
       "demographics" -> Writes.OptionWrites(TypoXml.writes).writes(o.demographics),
       "namestyle" -> Defaulted.writes(NameStyle.writes).writes(o.namestyle),
       "emailpromotion" -> Defaulted.writes(Writes.IntWrites).writes(o.emailpromotion),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

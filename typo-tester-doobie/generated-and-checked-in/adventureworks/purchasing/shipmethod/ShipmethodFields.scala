@@ -8,8 +8,8 @@ package purchasing
 package shipmethod
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
@@ -18,7 +18,7 @@ trait ShipmethodFields[Row] {
   val name: Field[Name, Row]
   val shipbase: Field[BigDecimal, Row]
   val shiprate: Field[BigDecimal, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object ShipmethodFields extends ShipmethodStructure[ShipmethodRow](None, identity, (_, x) => x)

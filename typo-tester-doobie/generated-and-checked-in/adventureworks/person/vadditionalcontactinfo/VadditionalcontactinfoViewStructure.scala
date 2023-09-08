@@ -8,11 +8,11 @@ package person
 package vadditionalcontactinfo
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -37,7 +37,7 @@ class VadditionalcontactinfoViewStructure[Row](val prefix: Option[String], val e
   override val emailaddress = new OptField[TypoXml, Row](prefix, "emailaddress", None, None)(x => extract(x).emailaddress, (row, value) => merge(row, extract(row).copy(emailaddress = value)))
   override val emailspecialinstructions = new OptField[String, Row](prefix, "emailspecialinstructions", None, None)(x => extract(x).emailspecialinstructions, (row, value) => merge(row, extract(row).copy(emailspecialinstructions = value)))
   override val emailtelephonenumber = new OptField[TypoXml, Row](prefix, "emailtelephonenumber", None, None)(x => extract(x).emailtelephonenumber, (row, value) => merge(row, extract(row).copy(emailtelephonenumber = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

@@ -8,9 +8,9 @@ package production
 package productmodel
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -20,7 +20,7 @@ trait ProductmodelFields[Row] {
   val name: Field[Name, Row]
   val catalogdescription: OptField[TypoXml, Row]
   val instructions: OptField[TypoXml, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object ProductmodelFields extends ProductmodelStructure[ProductmodelRow](None, identity, (_, x) => x)

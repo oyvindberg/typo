@@ -8,12 +8,12 @@ package production
 package vproductmodelinstructions
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -36,7 +36,7 @@ case class VproductmodelinstructionsViewRow(
   LotSize: /* nullability unknown */ Option[Int],
   Step: /* nullability unknown */ Option[/* max 1024 chars */ String],
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -54,7 +54,7 @@ object VproductmodelinstructionsViewRow {
           LaborHours = json.\("LaborHours").toOption.map(_.as(Reads.bigDecReads)),
           LotSize = json.\("LotSize").toOption.map(_.as(Reads.IntReads)),
           Step = json.\("Step").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -72,7 +72,7 @@ object VproductmodelinstructionsViewRow {
         LaborHours = row(idx + 6)(Column.columnToOption(Column.columnToScalaBigDecimal)),
         LotSize = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
         Step = row(idx + 8)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 9)(Column.columnToUUID),
+        rowguid = row(idx + 9)(TypoUUID.column),
         modifieddate = row(idx + 10)(TypoLocalDateTime.column)
       )
     )
@@ -88,7 +88,7 @@ object VproductmodelinstructionsViewRow {
       "LaborHours" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.LaborHours),
       "LotSize" -> Writes.OptionWrites(Writes.IntWrites).writes(o.LotSize),
       "Step" -> Writes.OptionWrites(Writes.StringWrites).writes(o.Step),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

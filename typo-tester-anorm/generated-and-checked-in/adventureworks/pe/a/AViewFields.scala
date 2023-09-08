@@ -9,9 +9,9 @@ package a
 
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -24,7 +24,7 @@ trait AViewFields[Row] {
   val stateprovinceid: Field[StateprovinceId, Row]
   val postalcode: Field[/* max 15 chars */ String, Row]
   val spatiallocation: OptField[TypoBytea, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object AViewFields extends AViewStructure[AViewRow](None, identity, (_, x) => x)

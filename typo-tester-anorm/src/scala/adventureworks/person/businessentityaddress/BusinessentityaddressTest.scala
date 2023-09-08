@@ -1,6 +1,6 @@
 package adventureworks.person.businessentityaddress
 
-import adventureworks.customtypes.{Defaulted, TypoLocalDateTime}
+import adventureworks.customtypes.{Defaulted, TypoLocalDateTime, TypoUUID}
 import adventureworks.person.address.{AddressRepoImpl, AddressRowUnsaved}
 import adventureworks.person.addresstype.{AddresstypeRepoImpl, AddresstypeRowUnsaved}
 import adventureworks.person.businessentity.{BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
@@ -11,8 +11,6 @@ import adventureworks.sales.salesterritory.{SalesterritoryRepoImpl, Salesterrito
 import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-
-import java.util.UUID
 
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = BusinessentityaddressRepoImpl
@@ -67,7 +65,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
         businessentityid = businessentityRow.businessentityid,
         addressid = address.addressid,
         addresstypeid = addressType.addresstypeid,
-        rowguid = Defaulted.Provided(UUID.randomUUID()),
+        rowguid = Defaulted.Provided(TypoUUID.randomUUID),
         modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
       )
 

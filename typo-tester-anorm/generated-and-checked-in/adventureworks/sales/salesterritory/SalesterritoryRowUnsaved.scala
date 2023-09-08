@@ -9,9 +9,9 @@ package salesterritory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -46,11 +46,11 @@ case class SalesterritoryRowUnsaved(
       Business costs in the territory the previous year. */
   costlastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(territoryidDefault: => SalesterritoryId, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, costytdDefault: => BigDecimal, costlastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesterritoryRow =
+  def toRow(territoryidDefault: => SalesterritoryId, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, costytdDefault: => BigDecimal, costlastyearDefault: => BigDecimal, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SalesterritoryRow =
     SalesterritoryRow(
       name = name,
       countryregioncode = countryregioncode,
@@ -97,7 +97,7 @@ object SalesterritoryRowUnsaved {
           saleslastyear = json.\("saleslastyear").as(Defaulted.reads(Reads.bigDecReads)),
           costytd = json.\("costytd").as(Defaulted.reads(Reads.bigDecReads)),
           costlastyear = json.\("costlastyear").as(Defaulted.reads(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -113,7 +113,7 @@ object SalesterritoryRowUnsaved {
       "saleslastyear" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.saleslastyear),
       "costytd" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.costytd),
       "costlastyear" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.costlastyear),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

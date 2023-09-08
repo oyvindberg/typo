@@ -8,9 +8,9 @@ package sales
 package salesperson
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -23,7 +23,7 @@ trait SalespersonFields[Row] {
   val commissionpct: Field[BigDecimal, Row]
   val salesytd: Field[BigDecimal, Row]
   val saleslastyear: Field[BigDecimal, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SalespersonFields extends SalespersonStructure[SalespersonRow](None, identity, (_, x) => x)

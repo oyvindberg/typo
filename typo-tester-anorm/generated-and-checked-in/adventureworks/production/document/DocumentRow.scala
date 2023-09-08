@@ -10,12 +10,12 @@ package document
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -49,7 +49,7 @@ case class DocumentRow(
   /** Complete document. */
   document: Option[TypoBytea],
   /** ROWGUIDCOL number uniquely identifying the record. Required for FileStream. */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime,
   /** Primary key for Document records. */
   documentnode: DocumentId
@@ -69,7 +69,7 @@ object DocumentRow {
           status = json.\("status").as(TypoShort.reads),
           documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
           document = json.\("document").toOption.map(_.as(TypoBytea.reads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
           documentnode = json.\("documentnode").as(DocumentId.reads)
         )
@@ -89,7 +89,7 @@ object DocumentRow {
         status = row(idx + 7)(TypoShort.column),
         documentsummary = row(idx + 8)(Column.columnToOption(Column.columnToString)),
         document = row(idx + 9)(Column.columnToOption(TypoBytea.column)),
-        rowguid = row(idx + 10)(Column.columnToUUID),
+        rowguid = row(idx + 10)(TypoUUID.column),
         modifieddate = row(idx + 11)(TypoLocalDateTime.column),
         documentnode = row(idx + 12)(DocumentId.column)
       )
@@ -107,7 +107,7 @@ object DocumentRow {
       "status" -> TypoShort.writes.writes(o.status),
       "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
       "document" -> Writes.OptionWrites(TypoBytea.writes).writes(o.document),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
       "documentnode" -> DocumentId.writes.writes(o.documentnode)
     ))

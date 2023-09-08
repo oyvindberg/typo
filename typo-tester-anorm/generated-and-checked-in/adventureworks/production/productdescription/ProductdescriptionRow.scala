@@ -8,10 +8,10 @@ package production
 package productdescription
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -26,7 +26,7 @@ case class ProductdescriptionRow(
   productdescriptionid: ProductdescriptionId,
   /** Description of the product. */
   description: /* max 400 chars */ String,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -36,7 +36,7 @@ object ProductdescriptionRow {
         ProductdescriptionRow(
           productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
           description = json.\("description").as(Reads.StringReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -47,7 +47,7 @@ object ProductdescriptionRow {
       ProductdescriptionRow(
         productdescriptionid = row(idx + 0)(ProductdescriptionId.column),
         description = row(idx + 1)(Column.columnToString),
-        rowguid = row(idx + 2)(Column.columnToUUID),
+        rowguid = row(idx + 2)(TypoUUID.column),
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
@@ -56,7 +56,7 @@ object ProductdescriptionRow {
     new JsObject(ListMap[String, JsValue](
       "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
       "description" -> Writes.StringWrites.writes(o.description),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

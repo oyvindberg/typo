@@ -9,12 +9,12 @@ package productinventory
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -38,7 +38,7 @@ case class ProductinventoryRow(
   bin: TypoShort,
   /** Quantity of products in the inventory location. */
   quantity: TypoShort,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductinventoryId = ProductinventoryId(productid, locationid)
@@ -53,7 +53,7 @@ object ProductinventoryRow {
           shelf = json.\("shelf").as(Reads.StringReads),
           bin = json.\("bin").as(TypoShort.reads),
           quantity = json.\("quantity").as(TypoShort.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -67,7 +67,7 @@ object ProductinventoryRow {
         shelf = row(idx + 2)(Column.columnToString),
         bin = row(idx + 3)(TypoShort.column),
         quantity = row(idx + 4)(TypoShort.column),
-        rowguid = row(idx + 5)(Column.columnToUUID),
+        rowguid = row(idx + 5)(TypoUUID.column),
         modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
@@ -79,7 +79,7 @@ object ProductinventoryRow {
       "shelf" -> Writes.StringWrites.writes(o.shelf),
       "bin" -> TypoShort.writes.writes(o.bin),
       "quantity" -> TypoShort.writes.writes(o.quantity),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

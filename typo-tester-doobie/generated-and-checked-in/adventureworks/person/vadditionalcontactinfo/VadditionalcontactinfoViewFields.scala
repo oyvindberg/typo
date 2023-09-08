@@ -8,11 +8,11 @@ package person
 package vadditionalcontactinfo
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -32,7 +32,7 @@ trait VadditionalcontactinfoViewFields[Row] {
   val emailaddress: OptField[TypoXml, Row]
   val emailspecialinstructions: OptField[String, Row]
   val emailtelephonenumber: OptField[TypoXml, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object VadditionalcontactinfoViewFields extends VadditionalcontactinfoViewStructure[VadditionalcontactinfoViewRow](None, identity, (_, x) => x)

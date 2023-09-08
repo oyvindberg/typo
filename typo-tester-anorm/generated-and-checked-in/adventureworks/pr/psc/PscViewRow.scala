@@ -8,19 +8,17 @@ package pr
 package psc
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,7 +32,7 @@ case class PscViewRow(
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.name]] */
   name: Name,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -47,7 +45,7 @@ object PscViewRow {
           productsubcategoryid = json.\("productsubcategoryid").as(ProductsubcategoryId.reads),
           productcategoryid = json.\("productcategoryid").as(ProductcategoryId.reads),
           name = json.\("name").as(Name.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -60,7 +58,7 @@ object PscViewRow {
         productsubcategoryid = row(idx + 1)(ProductsubcategoryId.column),
         productcategoryid = row(idx + 2)(ProductcategoryId.column),
         name = row(idx + 3)(Name.column),
-        rowguid = row(idx + 4)(Column.columnToUUID),
+        rowguid = row(idx + 4)(TypoUUID.column),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
@@ -71,7 +69,7 @@ object PscViewRow {
       "productsubcategoryid" -> ProductsubcategoryId.writes.writes(o.productsubcategoryid),
       "productcategoryid" -> ProductcategoryId.writes.writes(o.productcategoryid),
       "name" -> Name.writes.writes(o.name),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

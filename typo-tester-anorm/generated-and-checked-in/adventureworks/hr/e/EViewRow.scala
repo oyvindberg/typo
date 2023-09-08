@@ -10,12 +10,12 @@ package e
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -53,7 +53,7 @@ case class EViewRow(
   /** Points to [[humanresources.employee.EmployeeRow.currentflag]] */
   currentflag: Flag,
   /** Points to [[humanresources.employee.EmployeeRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[humanresources.employee.EmployeeRow.modifieddate]] */
   modifieddate: TypoLocalDateTime,
   /** Points to [[humanresources.employee.EmployeeRow.organizationnode]] */
@@ -77,7 +77,7 @@ object EViewRow {
           vacationhours = json.\("vacationhours").as(TypoShort.reads),
           sickleavehours = json.\("sickleavehours").as(TypoShort.reads),
           currentflag = json.\("currentflag").as(Flag.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
           organizationnode = json.\("organizationnode").toOption.map(_.as(Reads.StringReads))
         )
@@ -100,7 +100,7 @@ object EViewRow {
         vacationhours = row(idx + 10)(TypoShort.column),
         sickleavehours = row(idx + 11)(TypoShort.column),
         currentflag = row(idx + 12)(Flag.column),
-        rowguid = row(idx + 13)(Column.columnToUUID),
+        rowguid = row(idx + 13)(TypoUUID.column),
         modifieddate = row(idx + 14)(TypoLocalDateTime.column),
         organizationnode = row(idx + 15)(Column.columnToOption(Column.columnToString))
       )
@@ -121,7 +121,7 @@ object EViewRow {
       "vacationhours" -> TypoShort.writes.writes(o.vacationhours),
       "sickleavehours" -> TypoShort.writes.writes(o.sickleavehours),
       "currentflag" -> Flag.writes.writes(o.currentflag),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
       "organizationnode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.organizationnode)
     ))

@@ -8,16 +8,16 @@ package pe
 package at
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait AtViewFields[Row] {
   val id: Field[AddresstypeId, Row]
   val addresstypeid: Field[AddresstypeId, Row]
   val name: Field[Name, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object AtViewFields extends AtViewStructure[AtViewRow](None, identity, (_, x) => x)

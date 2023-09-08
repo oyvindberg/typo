@@ -10,11 +10,11 @@ package productinventory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `production.productinventory` which has not been persisted yet */
 case class ProductinventoryRowUnsaved(
@@ -32,11 +32,11 @@ case class ProductinventoryRowUnsaved(
       Quantity of products in the inventory location. */
   quantity: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(quantityDefault: => TypoShort, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductinventoryRow =
+  def toRow(quantityDefault: => TypoShort, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): ProductinventoryRow =
     ProductinventoryRow(
       productid = productid,
       locationid = locationid,
@@ -57,6 +57,6 @@ case class ProductinventoryRowUnsaved(
     )
 }
 object ProductinventoryRowUnsaved {
-  implicit lazy val decoder: Decoder[ProductinventoryRowUnsaved] = Decoder.forProduct7[ProductinventoryRowUnsaved, ProductId, LocationId, /* max 10 chars */ String, TypoShort, Defaulted[TypoShort], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(ProductinventoryRowUnsaved.apply)(ProductId.decoder, LocationId.decoder, Decoder.decodeString, TypoShort.decoder, Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[ProductinventoryRowUnsaved] = Encoder.forProduct7[ProductinventoryRowUnsaved, ProductId, LocationId, /* max 10 chars */ String, TypoShort, Defaulted[TypoShort], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, LocationId.encoder, Encoder.encodeString, TypoShort.encoder, Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[ProductinventoryRowUnsaved] = Decoder.forProduct7[ProductinventoryRowUnsaved, ProductId, LocationId, /* max 10 chars */ String, TypoShort, Defaulted[TypoShort], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(ProductinventoryRowUnsaved.apply)(ProductId.decoder, LocationId.decoder, Decoder.decodeString, TypoShort.decoder, Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[ProductinventoryRowUnsaved] = Encoder.forProduct7[ProductinventoryRowUnsaved, ProductId, LocationId, /* max 10 chars */ String, TypoShort, Defaulted[TypoShort], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, LocationId.encoder, Encoder.encodeString, TypoShort.encoder, Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

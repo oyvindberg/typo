@@ -9,10 +9,10 @@ package tr
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait TrViewFields[Row] {
@@ -22,7 +22,7 @@ trait TrViewFields[Row] {
   val taxtype: Field[TypoShort, Row]
   val taxrate: Field[BigDecimal, Row]
   val name: Field[Name, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object TrViewFields extends TrViewStructure[TrViewRow](None, identity, (_, x) => x)

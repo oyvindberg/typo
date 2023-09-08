@@ -9,9 +9,9 @@ package pi
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait PiViewFields[Row] {
@@ -21,7 +21,7 @@ trait PiViewFields[Row] {
   val shelf: Field[/* max 10 chars */ String, Row]
   val bin: Field[TypoShort, Row]
   val quantity: Field[TypoShort, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PiViewFields extends PiViewStructure[PiViewRow](None, identity, (_, x) => x)

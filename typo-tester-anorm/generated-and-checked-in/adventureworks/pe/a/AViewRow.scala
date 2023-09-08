@@ -9,12 +9,12 @@ package a
 
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -42,7 +42,7 @@ case class AViewRow(
   /** Points to [[person.address.AddressRow.spatiallocation]] */
   spatiallocation: Option[TypoBytea],
   /** Points to [[person.address.AddressRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[person.address.AddressRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -59,7 +59,7 @@ object AViewRow {
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
           postalcode = json.\("postalcode").as(Reads.StringReads),
           spatiallocation = json.\("spatiallocation").toOption.map(_.as(TypoBytea.reads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -76,7 +76,7 @@ object AViewRow {
         stateprovinceid = row(idx + 5)(StateprovinceId.column),
         postalcode = row(idx + 6)(Column.columnToString),
         spatiallocation = row(idx + 7)(Column.columnToOption(TypoBytea.column)),
-        rowguid = row(idx + 8)(Column.columnToUUID),
+        rowguid = row(idx + 8)(TypoUUID.column),
         modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
@@ -91,7 +91,7 @@ object AViewRow {
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
       "postalcode" -> Writes.StringWrites.writes(o.postalcode),
       "spatiallocation" -> Writes.OptionWrites(TypoBytea.writes).writes(o.spatiallocation),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

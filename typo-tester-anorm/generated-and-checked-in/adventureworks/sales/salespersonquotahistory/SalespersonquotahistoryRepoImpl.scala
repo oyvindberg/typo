@@ -9,6 +9,7 @@ package salespersonquotahistory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -32,7 +33,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   }
   override def insert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     SQL"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
-          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.quotadate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.quotadate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
        """
       .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
@@ -45,7 +46,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       Some((NamedParameter("salesquota", ParameterValue(unsaved.salesquota, null, ToStatement.scalaBigDecimalToStatement)), "::numeric")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, TypoUUID.toStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -86,7 +87,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     val compositeId = row.compositeId
     SQL"""update sales.salespersonquotahistory
           set "salesquota" = ${ParameterValue(row.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "quotadate" = ${ParameterValue(compositeId.quotadate, null, TypoLocalDateTime.toStatement)}
        """.executeUpdate() > 0
@@ -100,7 +101,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.quotadate, null, TypoLocalDateTime.toStatement)}::timestamp,
             ${ParameterValue(unsaved.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
-            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict ("businessentityid", "quotadate")

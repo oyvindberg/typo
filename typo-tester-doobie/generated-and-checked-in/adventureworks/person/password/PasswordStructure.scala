@@ -8,8 +8,8 @@ package person
 package password
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -22,7 +22,7 @@ class PasswordStructure[Row](val prefix: Option[String], val extract: Row => Pas
   override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
   override val passwordhash = new Field[/* max 128 chars */ String, Row](prefix, "passwordhash", None, None)(x => extract(x).passwordhash, (row, value) => merge(row, extract(row).copy(passwordhash = value)))
   override val passwordsalt = new Field[/* max 10 chars */ String, Row](prefix, "passwordsalt", None, None)(x => extract(x).passwordsalt, (row, value) => merge(row, extract(row).copy(passwordsalt = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

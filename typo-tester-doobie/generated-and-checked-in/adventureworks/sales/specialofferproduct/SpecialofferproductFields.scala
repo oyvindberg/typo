@@ -8,16 +8,16 @@ package sales
 package specialofferproduct
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait SpecialofferproductFields[Row] {
   val specialofferid: IdField[SpecialofferId, Row]
   val productid: IdField[ProductId, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SpecialofferproductFields extends SpecialofferproductStructure[SpecialofferproductRow](None, identity, (_, x) => x)

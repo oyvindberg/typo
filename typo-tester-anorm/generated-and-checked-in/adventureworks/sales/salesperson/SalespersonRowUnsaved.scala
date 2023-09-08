@@ -9,9 +9,9 @@ package salesperson
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -44,11 +44,11 @@ case class SalespersonRowUnsaved(
       Sales total of previous year. */
   saleslastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(bonusDefault: => BigDecimal, commissionpctDefault: => BigDecimal, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalespersonRow =
+  def toRow(bonusDefault: => BigDecimal, commissionpctDefault: => BigDecimal, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SalespersonRow =
     SalespersonRow(
       businessentityid = businessentityid,
       territoryid = territoryid,
@@ -90,7 +90,7 @@ object SalespersonRowUnsaved {
           commissionpct = json.\("commissionpct").as(Defaulted.reads(Reads.bigDecReads)),
           salesytd = json.\("salesytd").as(Defaulted.reads(Reads.bigDecReads)),
           saleslastyear = json.\("saleslastyear").as(Defaulted.reads(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -105,7 +105,7 @@ object SalespersonRowUnsaved {
       "commissionpct" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.commissionpct),
       "salesytd" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.salesytd),
       "saleslastyear" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.saleslastyear),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

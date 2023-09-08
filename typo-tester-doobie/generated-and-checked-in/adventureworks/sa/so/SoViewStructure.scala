@@ -8,8 +8,8 @@ package sa
 package so
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.sales.specialoffer.SpecialofferId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -29,7 +29,7 @@ class SoViewStructure[Row](val prefix: Option[String], val extract: Row => SoVie
   override val enddate = new Field[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
   override val minqty = new Field[Int, Row](prefix, "minqty", None, None)(x => extract(x).minqty, (row, value) => merge(row, extract(row).copy(minqty = value)))
   override val maxqty = new OptField[Int, Row](prefix, "maxqty", None, None)(x => extract(x).maxqty, (row, value) => merge(row, extract(row).copy(maxqty = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

@@ -9,9 +9,9 @@ package salestaxrate
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -26,7 +26,7 @@ class SalestaxrateStructure[Row](val prefix: Option[String], val extract: Row =>
   override val taxtype = new Field[TypoShort, Row](prefix, "taxtype", None, Some("int2"))(x => extract(x).taxtype, (row, value) => merge(row, extract(row).copy(taxtype = value)))
   override val taxrate = new Field[BigDecimal, Row](prefix, "taxrate", None, Some("numeric"))(x => extract(x).taxrate, (row, value) => merge(row, extract(row).copy(taxrate = value)))
   override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

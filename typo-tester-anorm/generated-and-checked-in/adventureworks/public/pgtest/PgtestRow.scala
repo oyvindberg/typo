@@ -25,11 +25,11 @@ import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
 import adventureworks.customtypes.TypoPolygon
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -59,7 +59,7 @@ case class PgtestRow(
   time: TypoLocalTime,
   timez: TypoOffsetTime,
   date: TypoLocalDate,
-  uuid: UUID,
+  uuid: TypoUUID,
   numeric: BigDecimal,
   boxes: Array[TypoBox],
   circlees: Array[TypoCircle],
@@ -80,7 +80,7 @@ case class PgtestRow(
   times: Array[TypoLocalTime],
   timezs: Array[TypoOffsetTime],
   dates: Array[TypoLocalDate],
-  uuids: Array[UUID],
+  uuids: Array[TypoUUID],
   numerics: Array[BigDecimal]
 )
 
@@ -107,7 +107,7 @@ object PgtestRow {
           time = json.\("time").as(TypoLocalTime.reads),
           timez = json.\("timez").as(TypoOffsetTime.reads),
           date = json.\("date").as(TypoLocalDate.reads),
-          uuid = json.\("uuid").as(Reads.uuidReads),
+          uuid = json.\("uuid").as(TypoUUID.reads),
           numeric = json.\("numeric").as(Reads.bigDecReads),
           boxes = json.\("boxes").as(Reads.ArrayReads[TypoBox](TypoBox.reads, implicitly)),
           circlees = json.\("circlees").as(Reads.ArrayReads[TypoCircle](TypoCircle.reads, implicitly)),
@@ -128,7 +128,7 @@ object PgtestRow {
           times = json.\("times").as(Reads.ArrayReads[TypoLocalTime](TypoLocalTime.reads, implicitly)),
           timezs = json.\("timezs").as(Reads.ArrayReads[TypoOffsetTime](TypoOffsetTime.reads, implicitly)),
           dates = json.\("dates").as(Reads.ArrayReads[TypoLocalDate](TypoLocalDate.reads, implicitly)),
-          uuids = json.\("uuids").as(Reads.ArrayReads[UUID](Reads.uuidReads, implicitly)),
+          uuids = json.\("uuids").as(Reads.ArrayReads[TypoUUID](TypoUUID.reads, implicitly)),
           numerics = json.\("numerics").as(Reads.ArrayReads[BigDecimal](Reads.bigDecReads, implicitly))
         )
       )
@@ -156,7 +156,7 @@ object PgtestRow {
         time = row(idx + 16)(TypoLocalTime.column),
         timez = row(idx + 17)(TypoOffsetTime.column),
         date = row(idx + 18)(TypoLocalDate.column),
-        uuid = row(idx + 19)(Column.columnToUUID),
+        uuid = row(idx + 19)(TypoUUID.column),
         numeric = row(idx + 20)(Column.columnToScalaBigDecimal),
         boxes = row(idx + 21)(TypoBox.arrayColumn),
         circlees = row(idx + 22)(TypoCircle.arrayColumn),
@@ -177,7 +177,7 @@ object PgtestRow {
         times = row(idx + 37)(TypoLocalTime.arrayColumn),
         timezs = row(idx + 38)(TypoOffsetTime.arrayColumn),
         dates = row(idx + 39)(TypoLocalDate.arrayColumn),
-        uuids = row(idx + 40)(Column.columnToArray[UUID](Column.columnToUUID, implicitly)),
+        uuids = row(idx + 40)(TypoUUID.arrayColumn),
         numerics = row(idx + 41)(Column.columnToArray[BigDecimal](Column.columnToScalaBigDecimal, implicitly))
       )
     )
@@ -203,7 +203,7 @@ object PgtestRow {
       "time" -> TypoLocalTime.writes.writes(o.time),
       "timez" -> TypoOffsetTime.writes.writes(o.timez),
       "date" -> TypoLocalDate.writes.writes(o.date),
-      "uuid" -> Writes.UuidWrites.writes(o.uuid),
+      "uuid" -> TypoUUID.writes.writes(o.uuid),
       "numeric" -> Writes.BigDecimalWrites.writes(o.numeric),
       "boxes" -> Writes.arrayWrites[TypoBox](implicitly, TypoBox.writes).writes(o.boxes),
       "circlees" -> Writes.arrayWrites[TypoCircle](implicitly, TypoCircle.writes).writes(o.circlees),
@@ -224,7 +224,7 @@ object PgtestRow {
       "times" -> Writes.arrayWrites[TypoLocalTime](implicitly, TypoLocalTime.writes).writes(o.times),
       "timezs" -> Writes.arrayWrites[TypoOffsetTime](implicitly, TypoOffsetTime.writes).writes(o.timezs),
       "dates" -> Writes.arrayWrites[TypoLocalDate](implicitly, TypoLocalDate.writes).writes(o.dates),
-      "uuids" -> Writes.arrayWrites[UUID](implicitly, Writes.UuidWrites).writes(o.uuids),
+      "uuids" -> Writes.arrayWrites[TypoUUID](implicitly, TypoUUID.writes).writes(o.uuids),
       "numerics" -> Writes.arrayWrites[BigDecimal](implicitly, Writes.BigDecimalWrites).writes(o.numerics)
     ))
   )

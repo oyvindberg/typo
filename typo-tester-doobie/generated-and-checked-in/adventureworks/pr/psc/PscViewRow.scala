@@ -8,6 +8,7 @@ package pr
 package psc
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name
@@ -16,7 +17,6 @@ import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
-import java.util.UUID
 
 case class PscViewRow(
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.productsubcategoryid]] */
@@ -28,21 +28,21 @@ case class PscViewRow(
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.name]] */
   name: Name,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object PscViewRow {
-  implicit lazy val decoder: Decoder[PscViewRow] = Decoder.forProduct6[PscViewRow, ProductsubcategoryId, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(PscViewRow.apply)(ProductsubcategoryId.decoder, ProductsubcategoryId.decoder, ProductcategoryId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[PscViewRow] = Encoder.forProduct6[PscViewRow, ProductsubcategoryId, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductsubcategoryId.encoder, ProductsubcategoryId.encoder, ProductcategoryId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[PscViewRow] = Decoder.forProduct6[PscViewRow, ProductsubcategoryId, ProductsubcategoryId, ProductcategoryId, Name, TypoUUID, TypoLocalDateTime]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(PscViewRow.apply)(ProductsubcategoryId.decoder, ProductsubcategoryId.decoder, ProductcategoryId.decoder, Name.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PscViewRow] = Encoder.forProduct6[PscViewRow, ProductsubcategoryId, ProductsubcategoryId, ProductcategoryId, Name, TypoUUID, TypoLocalDateTime]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductsubcategoryId.encoder, ProductsubcategoryId.encoder, ProductcategoryId.encoder, Name.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PscViewRow] = new Read[PscViewRow](
     gets = List(
       (ProductsubcategoryId.get, Nullability.NoNulls),
       (ProductsubcategoryId.get, Nullability.NoNulls),
       (ProductcategoryId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PscViewRow(
@@ -50,7 +50,7 @@ object PscViewRow {
       productsubcategoryid = ProductsubcategoryId.get.unsafeGetNonNullable(rs, i + 1),
       productcategoryid = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 2),
       name = Name.get.unsafeGetNonNullable(rs, i + 3),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )

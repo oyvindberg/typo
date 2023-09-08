@@ -8,13 +8,13 @@ package person
 package businessentity
 
 import adventureworks.customtypes.TypoLocalDateTime
-import java.util.UUID
+import adventureworks.customtypes.TypoUUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
 trait BusinessentityFields[Row] {
   val businessentityid: IdField[BusinessentityId, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object BusinessentityFields extends BusinessentityStructure[BusinessentityRow](None, identity, (_, x) => x)

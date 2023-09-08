@@ -9,6 +9,7 @@ package productdescription
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -31,7 +32,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   }
   override def insert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
     SQL"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")
-          values (${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4, ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+          values (${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4, ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "productdescriptionid", "description", "rowguid", "modifieddate"::text
        """
       .executeInsert(ProductdescriptionRow.rowParser(1).single)
@@ -46,7 +47,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, ToStatement.uuidToStatement)), "::uuid"))
+        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, TypoUUID.toStatement)), "::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
@@ -94,7 +95,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     val productdescriptionid = row.productdescriptionid
     SQL"""update production.productdescription
           set "description" = ${ParameterValue(row.description, null, ToStatement.stringToStatement)},
-              "rowguid" = ${ParameterValue(row.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+              "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productdescriptionid" = ${ParameterValue(productdescriptionid, null, ProductdescriptionId.toStatement)}
        """.executeUpdate() > 0
@@ -107,7 +108,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           values (
             ${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4,
             ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.rowguid, null, ToStatement.uuidToStatement)}::uuid,
+            ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           )
           on conflict ("productdescriptionid")

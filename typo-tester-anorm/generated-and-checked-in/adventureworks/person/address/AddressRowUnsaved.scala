@@ -10,8 +10,8 @@ package address
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -40,11 +40,11 @@ case class AddressRowUnsaved(
       Primary key for Address records. */
   addressid: Defaulted[AddressId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(addressidDefault: => AddressId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): AddressRow =
+  def toRow(addressidDefault: => AddressId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): AddressRow =
     AddressRow(
       addressline1 = addressline1,
       addressline2 = addressline2,
@@ -77,7 +77,7 @@ object AddressRowUnsaved {
           postalcode = json.\("postalcode").as(Reads.StringReads),
           spatiallocation = json.\("spatiallocation").toOption.map(_.as(TypoBytea.reads)),
           addressid = json.\("addressid").as(Defaulted.reads(AddressId.reads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -92,7 +92,7 @@ object AddressRowUnsaved {
       "postalcode" -> Writes.StringWrites.writes(o.postalcode),
       "spatiallocation" -> Writes.OptionWrites(TypoBytea.writes).writes(o.spatiallocation),
       "addressid" -> Defaulted.writes(AddressId.writes).writes(o.addressid),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

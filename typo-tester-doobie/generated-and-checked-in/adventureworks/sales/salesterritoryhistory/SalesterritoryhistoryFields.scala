@@ -8,9 +8,9 @@ package sales
 package salesterritoryhistory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -20,7 +20,7 @@ trait SalesterritoryhistoryFields[Row] {
   val territoryid: IdField[SalesterritoryId, Row]
   val startdate: IdField[TypoLocalDateTime, Row]
   val enddate: OptField[TypoLocalDateTime, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SalesterritoryhistoryFields extends SalesterritoryhistoryStructure[SalesterritoryhistoryRow](None, identity, (_, x) => x)

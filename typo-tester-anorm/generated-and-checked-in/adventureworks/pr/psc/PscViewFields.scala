@@ -8,10 +8,10 @@ package pr
 package psc
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait PscViewFields[Row] {
@@ -19,7 +19,7 @@ trait PscViewFields[Row] {
   val productsubcategoryid: Field[ProductsubcategoryId, Row]
   val productcategoryid: Field[ProductcategoryId, Row]
   val name: Field[Name, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PscViewFields extends PscViewStructure[PscViewRow](None, identity, (_, x) => x)

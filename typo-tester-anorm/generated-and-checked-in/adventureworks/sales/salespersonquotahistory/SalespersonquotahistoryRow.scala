@@ -8,11 +8,11 @@ package sales
 package salespersonquotahistory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -31,7 +31,7 @@ case class SalespersonquotahistoryRow(
   /** Sales quota amount.
       Constraint CK_SalesPersonQuotaHistory_SalesQuota affecting columns "salesquota":  ((salesquota > 0.00)) */
   salesquota: BigDecimal,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalespersonquotahistoryId = SalespersonquotahistoryId(businessentityid, quotadate)
@@ -44,7 +44,7 @@ object SalespersonquotahistoryRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           quotadate = json.\("quotadate").as(TypoLocalDateTime.reads),
           salesquota = json.\("salesquota").as(Reads.bigDecReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -56,7 +56,7 @@ object SalespersonquotahistoryRow {
         businessentityid = row(idx + 0)(BusinessentityId.column),
         quotadate = row(idx + 1)(TypoLocalDateTime.column),
         salesquota = row(idx + 2)(Column.columnToScalaBigDecimal),
-        rowguid = row(idx + 3)(Column.columnToUUID),
+        rowguid = row(idx + 3)(TypoUUID.column),
         modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
@@ -66,7 +66,7 @@ object SalespersonquotahistoryRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "quotadate" -> TypoLocalDateTime.writes.writes(o.quotadate),
       "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

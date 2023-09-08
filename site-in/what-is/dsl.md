@@ -60,8 +60,7 @@ c.setAutoCommit(false)
 ## imports for examples below
 ```scala mdoc:silent
 import java.time.LocalDateTime
-import java.util.UUID
-import adventureworks.customtypes.{Defaulted, TypoLocalDateTime, TypoShort, TypoXml}
+import adventureworks.customtypes.{Defaulted, TypoLocalDateTime, TypoShort, TypoUUID, TypoXml}
 import adventureworks.production.product.*
 import adventureworks.production.productcategory.*
 import adventureworks.production.productmodel.*
@@ -129,7 +128,7 @@ val unsaved1 = ProductRowUnsaved(
   productid = Defaulted.UseDefault,
   makeflag = Defaulted.Provided(Flag(true)),
   finishedgoodsflag = Defaulted.Provided(Flag(true)),
-  rowguid = Defaulted.Provided(UUID.randomUUID()),
+  rowguid = Defaulted.Provided(TypoUUID.randomUUID),
   modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
 )
 

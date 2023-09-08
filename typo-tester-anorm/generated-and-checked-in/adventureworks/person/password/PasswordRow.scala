@@ -8,11 +8,11 @@ package person
 package password
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -29,7 +29,7 @@ case class PasswordRow(
   passwordhash: /* max 128 chars */ String,
   /** Random value concatenated with the password string before the password is hashed. */
   passwordsalt: /* max 10 chars */ String,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -40,7 +40,7 @@ object PasswordRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           passwordhash = json.\("passwordhash").as(Reads.StringReads),
           passwordsalt = json.\("passwordsalt").as(Reads.StringReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -52,7 +52,7 @@ object PasswordRow {
         businessentityid = row(idx + 0)(BusinessentityId.column),
         passwordhash = row(idx + 1)(Column.columnToString),
         passwordsalt = row(idx + 2)(Column.columnToString),
-        rowguid = row(idx + 3)(Column.columnToUUID),
+        rowguid = row(idx + 3)(TypoUUID.column),
         modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
@@ -62,7 +62,7 @@ object PasswordRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "passwordhash" -> Writes.StringWrites.writes(o.passwordhash),
       "passwordsalt" -> Writes.StringWrites.writes(o.passwordsalt),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

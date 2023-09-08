@@ -8,8 +8,8 @@ package purchasing
 package shipmethod
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -23,7 +23,7 @@ class ShipmethodStructure[Row](val prefix: Option[String], val extract: Row => S
   override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val shipbase = new Field[BigDecimal, Row](prefix, "shipbase", None, Some("numeric"))(x => extract(x).shipbase, (row, value) => merge(row, extract(row).copy(shipbase = value)))
   override val shiprate = new Field[BigDecimal, Row](prefix, "shiprate", None, Some("numeric"))(x => extract(x).shiprate, (row, value) => merge(row, extract(row).copy(shiprate = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

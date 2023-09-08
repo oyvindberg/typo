@@ -9,11 +9,11 @@ package address
 
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -39,7 +39,7 @@ case class AddressRow(
   postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
   spatiallocation: Option[TypoBytea],
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -54,7 +54,7 @@ object AddressRow {
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
           postalcode = json.\("postalcode").as(Reads.StringReads),
           spatiallocation = json.\("spatiallocation").toOption.map(_.as(TypoBytea.reads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -70,7 +70,7 @@ object AddressRow {
         stateprovinceid = row(idx + 4)(StateprovinceId.column),
         postalcode = row(idx + 5)(Column.columnToString),
         spatiallocation = row(idx + 6)(Column.columnToOption(TypoBytea.column)),
-        rowguid = row(idx + 7)(Column.columnToUUID),
+        rowguid = row(idx + 7)(TypoUUID.column),
         modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
@@ -84,7 +84,7 @@ object AddressRow {
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
       "postalcode" -> Writes.StringWrites.writes(o.postalcode),
       "spatiallocation" -> Writes.OptionWrites(TypoBytea.writes).writes(o.spatiallocation),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

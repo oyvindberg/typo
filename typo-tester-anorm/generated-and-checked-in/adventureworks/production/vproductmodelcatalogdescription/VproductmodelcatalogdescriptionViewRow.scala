@@ -8,12 +8,12 @@ package production
 package vproductmodelcatalogdescription
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -50,7 +50,7 @@ case class VproductmodelcatalogdescriptionViewRow(
   style: /* nullability unknown */ Option[/* max 256 chars */ String],
   riderexperience: /* nullability unknown */ Option[/* max 1024 chars */ String],
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -82,7 +82,7 @@ object VproductmodelcatalogdescriptionViewRow {
           productline = json.\("productline").toOption.map(_.as(Reads.StringReads)),
           style = json.\("style").toOption.map(_.as(Reads.StringReads)),
           riderexperience = json.\("riderexperience").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -114,7 +114,7 @@ object VproductmodelcatalogdescriptionViewRow {
         productline = row(idx + 20)(Column.columnToOption(Column.columnToString)),
         style = row(idx + 21)(Column.columnToOption(Column.columnToString)),
         riderexperience = row(idx + 22)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 23)(Column.columnToUUID),
+        rowguid = row(idx + 23)(TypoUUID.column),
         modifieddate = row(idx + 24)(TypoLocalDateTime.column)
       )
     )
@@ -144,7 +144,7 @@ object VproductmodelcatalogdescriptionViewRow {
       "productline" -> Writes.OptionWrites(Writes.StringWrites).writes(o.productline),
       "style" -> Writes.OptionWrites(Writes.StringWrites).writes(o.style),
       "riderexperience" -> Writes.OptionWrites(Writes.StringWrites).writes(o.riderexperience),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

@@ -8,11 +8,11 @@ package person
 package stateprovince
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 
@@ -23,7 +23,7 @@ trait StateprovinceFields[Row] {
   val isonlystateprovinceflag: Field[Flag, Row]
   val name: Field[Name, Row]
   val territoryid: Field[SalesterritoryId, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object StateprovinceFields extends StateprovinceStructure[StateprovinceRow](None, identity, (_, x) => x)

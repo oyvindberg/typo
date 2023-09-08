@@ -8,6 +8,7 @@ package production
 package vproductmodelcatalogdescription
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -19,7 +20,6 @@ import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.util.UUID
 import scala.util.Try
 
 case class VproductmodelcatalogdescriptionViewRow(
@@ -49,7 +49,7 @@ case class VproductmodelcatalogdescriptionViewRow(
   style: /* nullability unknown */ Option[/* max 256 chars */ String],
   riderexperience: /* nullability unknown */ Option[/* max 1024 chars */ String],
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -85,7 +85,7 @@ object VproductmodelcatalogdescriptionViewRow {
         productline = orThrow(c.get("productline")(Decoder.decodeOption(Decoder.decodeString))),
         style = orThrow(c.get("style")(Decoder.decodeOption(Decoder.decodeString))),
         riderexperience = orThrow(c.get("riderexperience")(Decoder.decodeOption(Decoder.decodeString))),
-        rowguid = orThrow(c.get("rowguid")(Decoder.decodeUUID)),
+        rowguid = orThrow(c.get("rowguid")(TypoUUID.decoder)),
         modifieddate = orThrow(c.get("modifieddate")(TypoLocalDateTime.decoder))
       )
     }
@@ -115,7 +115,7 @@ object VproductmodelcatalogdescriptionViewRow {
       "productline" -> Encoder.encodeOption(Encoder.encodeString).apply(row.productline),
       "style" -> Encoder.encodeOption(Encoder.encodeString).apply(row.style),
       "riderexperience" -> Encoder.encodeOption(Encoder.encodeString).apply(row.riderexperience),
-      "rowguid" -> Encoder.encodeUUID.apply(row.rowguid),
+      "rowguid" -> TypoUUID.encoder.apply(row.rowguid),
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
@@ -144,7 +144,7 @@ object VproductmodelcatalogdescriptionViewRow {
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VproductmodelcatalogdescriptionViewRow(
@@ -171,7 +171,7 @@ object VproductmodelcatalogdescriptionViewRow {
       productline = Meta.StringMeta.get.unsafeGetNullable(rs, i + 20),
       style = Meta.StringMeta.get.unsafeGetNullable(rs, i + 21),
       riderexperience = Meta.StringMeta.get.unsafeGetNullable(rs, i + 22),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 23),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 23),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 24)
     )
   )

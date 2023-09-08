@@ -8,12 +8,12 @@ package pe
 package sp
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait SpViewFields[Row] {
@@ -24,7 +24,7 @@ trait SpViewFields[Row] {
   val isonlystateprovinceflag: Field[Flag, Row]
   val name: Field[Name, Row]
   val territoryid: Field[SalesterritoryId, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SpViewFields extends SpViewStructure[SpViewRow](None, identity, (_, x) => x)

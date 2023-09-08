@@ -9,13 +9,13 @@ package p
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -44,7 +44,7 @@ trait PViewFields[Row] {
   val sellstartdate: Field[TypoLocalDateTime, Row]
   val sellenddate: OptField[TypoLocalDateTime, Row]
   val discontinueddate: OptField[TypoLocalDateTime, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PViewFields extends PViewStructure[PViewRow](None, identity, (_, x) => x)

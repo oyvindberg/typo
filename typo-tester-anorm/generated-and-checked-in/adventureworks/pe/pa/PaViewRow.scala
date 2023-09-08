@@ -8,11 +8,11 @@ package pe
 package pa
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -32,7 +32,7 @@ case class PaViewRow(
   /** Points to [[person.password.PasswordRow.passwordsalt]] */
   passwordsalt: /* max 10 chars */ String,
   /** Points to [[person.password.PasswordRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[person.password.PasswordRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -45,7 +45,7 @@ object PaViewRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           passwordhash = json.\("passwordhash").as(Reads.StringReads),
           passwordsalt = json.\("passwordsalt").as(Reads.StringReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -58,7 +58,7 @@ object PaViewRow {
         businessentityid = row(idx + 1)(BusinessentityId.column),
         passwordhash = row(idx + 2)(Column.columnToString),
         passwordsalt = row(idx + 3)(Column.columnToString),
-        rowguid = row(idx + 4)(Column.columnToUUID),
+        rowguid = row(idx + 4)(TypoUUID.column),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
@@ -69,7 +69,7 @@ object PaViewRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "passwordhash" -> Writes.StringWrites.writes(o.passwordhash),
       "passwordsalt" -> Writes.StringWrites.writes(o.passwordsalt),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

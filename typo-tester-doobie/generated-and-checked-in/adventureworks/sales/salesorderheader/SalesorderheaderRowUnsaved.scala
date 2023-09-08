@@ -10,6 +10,7 @@ package salesorderheader
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -25,7 +26,6 @@ import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import java.util.UUID
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesorderheader` which has not been persisted yet */
@@ -93,11 +93,11 @@ case class SalesorderheaderRowUnsaved(
       Shipping cost. */
   freight: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => TypoShort, orderdateDefault: => TypoLocalDateTime, statusDefault: => TypoShort, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderheaderRow =
+  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => TypoShort, orderdateDefault: => TypoLocalDateTime, statusDefault: => TypoShort, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SalesorderheaderRow =
     SalesorderheaderRow(
       duedate = duedate,
       shipdate = shipdate,
@@ -187,7 +187,7 @@ object SalesorderheaderRowUnsaved {
         subtotal = orThrow(c.get("subtotal")(Defaulted.decoder(Decoder.decodeBigDecimal))),
         taxamt = orThrow(c.get("taxamt")(Defaulted.decoder(Decoder.decodeBigDecimal))),
         freight = orThrow(c.get("freight")(Defaulted.decoder(Decoder.decodeBigDecimal))),
-        rowguid = orThrow(c.get("rowguid")(Defaulted.decoder(Decoder.decodeUUID))),
+        rowguid = orThrow(c.get("rowguid")(Defaulted.decoder(TypoUUID.decoder))),
         modifieddate = orThrow(c.get("modifieddate")(Defaulted.decoder(TypoLocalDateTime.decoder)))
       )
     }
@@ -217,7 +217,7 @@ object SalesorderheaderRowUnsaved {
       "subtotal" -> Defaulted.encoder(Encoder.encodeBigDecimal).apply(row.subtotal),
       "taxamt" -> Defaulted.encoder(Encoder.encodeBigDecimal).apply(row.taxamt),
       "freight" -> Defaulted.encoder(Encoder.encodeBigDecimal).apply(row.freight),
-      "rowguid" -> Defaulted.encoder(Encoder.encodeUUID).apply(row.rowguid),
+      "rowguid" -> Defaulted.encoder(TypoUUID.encoder).apply(row.rowguid),
       "modifieddate" -> Defaulted.encoder(TypoLocalDateTime.encoder).apply(row.modifieddate)
     )
   )

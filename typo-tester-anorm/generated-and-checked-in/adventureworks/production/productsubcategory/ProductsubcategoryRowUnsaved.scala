@@ -9,15 +9,14 @@ package productsubcategory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,11 +31,11 @@ case class ProductsubcategoryRowUnsaved(
       Primary key for ProductSubcategory records. */
   productsubcategoryid: Defaulted[ProductsubcategoryId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productsubcategoryidDefault: => ProductsubcategoryId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductsubcategoryRow =
+  def toRow(productsubcategoryidDefault: => ProductsubcategoryId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): ProductsubcategoryRow =
     ProductsubcategoryRow(
       productcategoryid = productcategoryid,
       name = name,
@@ -61,7 +60,7 @@ object ProductsubcategoryRowUnsaved {
           productcategoryid = json.\("productcategoryid").as(ProductcategoryId.reads),
           name = json.\("name").as(Name.reads),
           productsubcategoryid = json.\("productsubcategoryid").as(Defaulted.reads(ProductsubcategoryId.reads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -72,7 +71,7 @@ object ProductsubcategoryRowUnsaved {
       "productcategoryid" -> ProductcategoryId.writes.writes(o.productcategoryid),
       "name" -> Name.writes.writes(o.name),
       "productsubcategoryid" -> Defaulted.writes(ProductsubcategoryId.writes).writes(o.productsubcategoryid),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

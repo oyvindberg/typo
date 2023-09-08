@@ -9,10 +9,10 @@ package addresstype
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `person.addresstype` which has not been persisted yet */
 case class AddresstypeRowUnsaved(
@@ -22,11 +22,11 @@ case class AddresstypeRowUnsaved(
       Primary key for AddressType records. */
   addresstypeid: Defaulted[AddresstypeId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(addresstypeidDefault: => AddresstypeId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): AddresstypeRow =
+  def toRow(addresstypeidDefault: => AddresstypeId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): AddresstypeRow =
     AddresstypeRow(
       name = name,
       addresstypeid = addresstypeid match {
@@ -44,6 +44,6 @@ case class AddresstypeRowUnsaved(
     )
 }
 object AddresstypeRowUnsaved {
-  implicit lazy val decoder: Decoder[AddresstypeRowUnsaved] = Decoder.forProduct4[AddresstypeRowUnsaved, Name, Defaulted[AddresstypeId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "addresstypeid", "rowguid", "modifieddate")(AddresstypeRowUnsaved.apply)(Name.decoder, Defaulted.decoder(AddresstypeId.decoder), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[AddresstypeRowUnsaved] = Encoder.forProduct4[AddresstypeRowUnsaved, Name, Defaulted[AddresstypeId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "addresstypeid", "rowguid", "modifieddate")(x => (x.name, x.addresstypeid, x.rowguid, x.modifieddate))(Name.encoder, Defaulted.encoder(AddresstypeId.encoder), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[AddresstypeRowUnsaved] = Decoder.forProduct4[AddresstypeRowUnsaved, Name, Defaulted[AddresstypeId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("name", "addresstypeid", "rowguid", "modifieddate")(AddresstypeRowUnsaved.apply)(Name.decoder, Defaulted.decoder(AddresstypeId.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[AddresstypeRowUnsaved] = Encoder.forProduct4[AddresstypeRowUnsaved, Name, Defaulted[AddresstypeId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("name", "addresstypeid", "rowguid", "modifieddate")(x => (x.name, x.addresstypeid, x.rowguid, x.modifieddate))(Name.encoder, Defaulted.encoder(AddresstypeId.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

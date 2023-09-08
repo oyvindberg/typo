@@ -9,6 +9,7 @@ package salesorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -19,7 +20,6 @@ import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import adventureworks.userdefined.CustomCreditcardId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -53,7 +53,7 @@ class SalesorderheaderStructure[Row](val prefix: Option[String], val extract: Ro
   override val freight = new Field[BigDecimal, Row](prefix, "freight", None, Some("numeric"))(x => extract(x).freight, (row, value) => merge(row, extract(row).copy(freight = value)))
   override val totaldue = new OptField[BigDecimal, Row](prefix, "totaldue", None, Some("numeric"))(x => extract(x).totaldue, (row, value) => merge(row, extract(row).copy(totaldue = value)))
   override val comment = new OptField[/* max 128 chars */ String, Row](prefix, "comment", None, None)(x => extract(x).comment, (row, value) => merge(row, extract(row).copy(comment = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

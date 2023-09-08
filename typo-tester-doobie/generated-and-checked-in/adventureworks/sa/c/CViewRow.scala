@@ -8,6 +8,7 @@ package sa
 package c
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
@@ -16,7 +17,6 @@ import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
-import java.util.UUID
 
 case class CViewRow(
   /** Points to [[sales.customer.CustomerRow.customerid]] */
@@ -30,14 +30,14 @@ case class CViewRow(
   /** Points to [[sales.customer.CustomerRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
   /** Points to [[sales.customer.CustomerRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.customer.CustomerRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object CViewRow {
-  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct7[CViewRow, CustomerId, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CViewRow.apply)(CustomerId.decoder, CustomerId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct7[CViewRow, CustomerId, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(CustomerId.encoder, CustomerId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct7[CViewRow, CustomerId, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], TypoUUID, TypoLocalDateTime]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CViewRow.apply)(CustomerId.decoder, CustomerId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct7[CViewRow, CustomerId, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], TypoUUID, TypoLocalDateTime]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(CustomerId.encoder, CustomerId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CViewRow] = new Read[CViewRow](
     gets = List(
       (CustomerId.get, Nullability.NoNulls),
@@ -45,7 +45,7 @@ object CViewRow {
       (BusinessentityId.get, Nullability.Nullable),
       (BusinessentityId.get, Nullability.Nullable),
       (SalesterritoryId.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CViewRow(
@@ -54,7 +54,7 @@ object CViewRow {
       personid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
       storeid = BusinessentityId.get.unsafeGetNullable(rs, i + 3),
       territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 4),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 5),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
     )
   )

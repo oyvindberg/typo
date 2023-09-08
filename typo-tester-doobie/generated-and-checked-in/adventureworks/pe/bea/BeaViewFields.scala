@@ -8,10 +8,10 @@ package pe
 package bea
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait BeaViewFields[Row] {
@@ -19,7 +19,7 @@ trait BeaViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
   val addressid: Field[AddressId, Row]
   val addresstypeid: Field[AddresstypeId, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object BeaViewFields extends BeaViewStructure[BeaViewRow](None, identity, (_, x) => x)

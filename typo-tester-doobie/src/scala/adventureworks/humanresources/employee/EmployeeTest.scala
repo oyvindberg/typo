@@ -2,7 +2,7 @@ package adventureworks
 package humanresources
 package employee
 
-import adventureworks.customtypes.{Defaulted, TypoLocalDate, TypoLocalDateTime, TypoShort, TypoXml}
+import adventureworks.customtypes.*
 import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepoImpl, BusinessentityRowUnsaved}
 import adventureworks.person.person.{PersonRepoImpl, PersonRowUnsaved}
 import adventureworks.public.{Flag, Name}
@@ -12,7 +12,6 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDate
-import java.util.UUID
 
 class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = EmployeeRepoImpl
@@ -85,7 +84,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           vacationhours = Defaulted.Provided(TypoShort(1)),
           sickleavehours = Defaulted.Provided(TypoShort(2)),
           currentflag = Defaulted.Provided(Flag(true)),
-          rowguid = Defaulted.Provided(UUID.randomUUID()),
+          rowguid = Defaulted.Provided(TypoUUID.randomUUID),
           modifieddate = Defaulted.Provided(TypoLocalDateTime.now),
           organizationnode = Defaulted.Provided(Some("/"))
         )

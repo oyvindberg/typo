@@ -10,9 +10,9 @@ package salestaxrate
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -38,11 +38,11 @@ case class SalestaxrateRowUnsaved(
       Tax rate amount. */
   taxrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salestaxrateidDefault: => SalestaxrateId, taxrateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalestaxrateRow =
+  def toRow(salestaxrateidDefault: => SalestaxrateId, taxrateDefault: => BigDecimal, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SalestaxrateRow =
     SalestaxrateRow(
       stateprovinceid = stateprovinceid,
       taxtype = taxtype,
@@ -74,7 +74,7 @@ object SalestaxrateRowUnsaved {
           name = json.\("name").as(Name.reads),
           salestaxrateid = json.\("salestaxrateid").as(Defaulted.reads(SalestaxrateId.reads)),
           taxrate = json.\("taxrate").as(Defaulted.reads(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -87,7 +87,7 @@ object SalestaxrateRowUnsaved {
       "name" -> Name.writes.writes(o.name),
       "salestaxrateid" -> Defaulted.writes(SalestaxrateId.writes).writes(o.salestaxrateid),
       "taxrate" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.taxrate),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

@@ -8,9 +8,9 @@ package sales
 package salesterritory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -28,7 +28,7 @@ class SalesterritoryStructure[Row](val prefix: Option[String], val extract: Row 
   override val saleslastyear = new Field[BigDecimal, Row](prefix, "saleslastyear", None, Some("numeric"))(x => extract(x).saleslastyear, (row, value) => merge(row, extract(row).copy(saleslastyear = value)))
   override val costytd = new Field[BigDecimal, Row](prefix, "costytd", None, Some("numeric"))(x => extract(x).costytd, (row, value) => merge(row, extract(row).copy(costytd = value)))
   override val costlastyear = new Field[BigDecimal, Row](prefix, "costlastyear", None, Some("numeric"))(x => extract(x).costlastyear, (row, value) => merge(row, extract(row).copy(costlastyear = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

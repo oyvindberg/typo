@@ -9,13 +9,13 @@ package sod
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -45,7 +45,7 @@ case class SodViewRow(
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.unitpricediscount]] */
   unitpricediscount: BigDecimal,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -63,7 +63,7 @@ object SodViewRow {
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
           unitprice = json.\("unitprice").as(Reads.bigDecReads),
           unitpricediscount = json.\("unitpricediscount").as(Reads.bigDecReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -81,7 +81,7 @@ object SodViewRow {
         specialofferid = row(idx + 6)(SpecialofferId.column),
         unitprice = row(idx + 7)(Column.columnToScalaBigDecimal),
         unitpricediscount = row(idx + 8)(Column.columnToScalaBigDecimal),
-        rowguid = row(idx + 9)(Column.columnToUUID),
+        rowguid = row(idx + 9)(TypoUUID.column),
         modifieddate = row(idx + 10)(TypoLocalDateTime.column)
       )
     )
@@ -97,7 +97,7 @@ object SodViewRow {
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
       "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),
       "unitpricediscount" -> Writes.BigDecimalWrites.writes(o.unitpricediscount),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

@@ -9,10 +9,10 @@ package emailaddress
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `person.emailaddress` which has not been persisted yet */
 case class EmailaddressRowUnsaved(
@@ -25,11 +25,11 @@ case class EmailaddressRowUnsaved(
       Primary key. ID of this email address. */
   emailaddressid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(emailaddressidDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): EmailaddressRow =
+  def toRow(emailaddressidDefault: => Int, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): EmailaddressRow =
     EmailaddressRow(
       businessentityid = businessentityid,
       emailaddress = emailaddress,
@@ -48,6 +48,6 @@ case class EmailaddressRowUnsaved(
     )
 }
 object EmailaddressRowUnsaved {
-  implicit lazy val decoder: Decoder[EmailaddressRowUnsaved] = Decoder.forProduct5[EmailaddressRowUnsaved, BusinessentityId, Option[/* max 50 chars */ String], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate")(EmailaddressRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[EmailaddressRowUnsaved] = Encoder.forProduct5[EmailaddressRowUnsaved, BusinessentityId, Option[/* max 50 chars */ String], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate")(x => (x.businessentityid, x.emailaddress, x.emailaddressid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[EmailaddressRowUnsaved] = Decoder.forProduct5[EmailaddressRowUnsaved, BusinessentityId, Option[/* max 50 chars */ String], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate")(EmailaddressRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[EmailaddressRowUnsaved] = Encoder.forProduct5[EmailaddressRowUnsaved, BusinessentityId, Option[/* max 50 chars */ String], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate")(x => (x.businessentityid, x.emailaddress, x.emailaddressid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

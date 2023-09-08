@@ -10,12 +10,12 @@ package employee
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -57,7 +57,7 @@ case class EmployeeRow(
   sickleavehours: TypoShort,
   /** 0 = Inactive, 1 = Active */
   currentflag: Flag,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime,
   /** Where the employee is located in corporate hierarchy. */
   organizationnode: Option[String]
@@ -79,7 +79,7 @@ object EmployeeRow {
           vacationhours = json.\("vacationhours").as(TypoShort.reads),
           sickleavehours = json.\("sickleavehours").as(TypoShort.reads),
           currentflag = json.\("currentflag").as(Flag.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
           organizationnode = json.\("organizationnode").toOption.map(_.as(Reads.StringReads))
         )
@@ -101,7 +101,7 @@ object EmployeeRow {
         vacationhours = row(idx + 9)(TypoShort.column),
         sickleavehours = row(idx + 10)(TypoShort.column),
         currentflag = row(idx + 11)(Flag.column),
-        rowguid = row(idx + 12)(Column.columnToUUID),
+        rowguid = row(idx + 12)(TypoUUID.column),
         modifieddate = row(idx + 13)(TypoLocalDateTime.column),
         organizationnode = row(idx + 14)(Column.columnToOption(Column.columnToString))
       )
@@ -121,7 +121,7 @@ object EmployeeRow {
       "vacationhours" -> TypoShort.writes.writes(o.vacationhours),
       "sickleavehours" -> TypoShort.writes.writes(o.sickleavehours),
       "currentflag" -> Flag.writes.writes(o.currentflag),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
       "organizationnode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.organizationnode)
     ))

@@ -8,8 +8,8 @@ package pe
 package e
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -18,7 +18,7 @@ trait EViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
   val emailaddressid: Field[Int, Row]
   val emailaddress: OptField[/* max 50 chars */ String, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object EViewFields extends EViewStructure[EViewRow](None, identity, (_, x) => x)

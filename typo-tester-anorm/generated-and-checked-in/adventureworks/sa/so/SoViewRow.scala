@@ -8,11 +8,11 @@ package sa
 package so
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -44,7 +44,7 @@ case class SoViewRow(
   /** Points to [[sales.specialoffer.SpecialofferRow.maxqty]] */
   maxqty: Option[Int],
   /** Points to [[sales.specialoffer.SpecialofferRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.specialoffer.SpecialofferRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -63,7 +63,7 @@ object SoViewRow {
           enddate = json.\("enddate").as(TypoLocalDateTime.reads),
           minqty = json.\("minqty").as(Reads.IntReads),
           maxqty = json.\("maxqty").toOption.map(_.as(Reads.IntReads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -82,7 +82,7 @@ object SoViewRow {
         enddate = row(idx + 7)(TypoLocalDateTime.column),
         minqty = row(idx + 8)(Column.columnToInt),
         maxqty = row(idx + 9)(Column.columnToOption(Column.columnToInt)),
-        rowguid = row(idx + 10)(Column.columnToUUID),
+        rowguid = row(idx + 10)(TypoUUID.column),
         modifieddate = row(idx + 11)(TypoLocalDateTime.column)
       )
     )
@@ -99,7 +99,7 @@ object SoViewRow {
       "enddate" -> TypoLocalDateTime.writes.writes(o.enddate),
       "minqty" -> Writes.IntWrites.writes(o.minqty),
       "maxqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.maxqty),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

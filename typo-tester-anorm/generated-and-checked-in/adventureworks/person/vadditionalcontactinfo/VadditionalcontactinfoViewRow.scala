@@ -8,6 +8,7 @@ package person
 package vadditionalcontactinfo
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
@@ -15,7 +16,6 @@ import adventureworks.userdefined.FirstName
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -46,7 +46,7 @@ case class VadditionalcontactinfoViewRow(
   emailspecialinstructions: /* nullability unknown */ Option[String],
   emailtelephonenumber: /* nullability unknown */ Option[TypoXml],
   /** Points to [[person.PersonRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[person.PersonRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -70,7 +70,7 @@ object VadditionalcontactinfoViewRow {
           emailaddress = json.\("emailaddress").toOption.map(_.as(TypoXml.reads)),
           emailspecialinstructions = json.\("emailspecialinstructions").toOption.map(_.as(Reads.StringReads)),
           emailtelephonenumber = json.\("emailtelephonenumber").toOption.map(_.as(TypoXml.reads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -94,7 +94,7 @@ object VadditionalcontactinfoViewRow {
         emailaddress = row(idx + 12)(Column.columnToOption(TypoXml.column)),
         emailspecialinstructions = row(idx + 13)(Column.columnToOption(Column.columnToString)),
         emailtelephonenumber = row(idx + 14)(Column.columnToOption(TypoXml.column)),
-        rowguid = row(idx + 15)(Column.columnToUUID),
+        rowguid = row(idx + 15)(TypoUUID.column),
         modifieddate = row(idx + 16)(TypoLocalDateTime.column)
       )
     )
@@ -116,7 +116,7 @@ object VadditionalcontactinfoViewRow {
       "emailaddress" -> Writes.OptionWrites(TypoXml.writes).writes(o.emailaddress),
       "emailspecialinstructions" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailspecialinstructions),
       "emailtelephonenumber" -> Writes.OptionWrites(TypoXml.writes).writes(o.emailtelephonenumber),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

@@ -11,11 +11,11 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `production.document` which has not been persisted yet */
 case class DocumentRowUnsaved(
@@ -44,14 +44,14 @@ case class DocumentRowUnsaved(
   changenumber: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1()
       ROWGUIDCOL number uniquely identifying the record. Required for FileStream. */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: '/'::character varying
       Primary key for Document records. */
   documentnode: Defaulted[DocumentId] = Defaulted.UseDefault
 ) {
-  def toRow(folderflagDefault: => Flag, changenumberDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, documentnodeDefault: => DocumentId): DocumentRow =
+  def toRow(folderflagDefault: => Flag, changenumberDefault: => Int, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime, documentnodeDefault: => DocumentId): DocumentRow =
     DocumentRow(
       title = title,
       owner = owner,
@@ -84,6 +84,6 @@ case class DocumentRowUnsaved(
     )
 }
 object DocumentRowUnsaved {
-  implicit lazy val decoder: Decoder[DocumentRowUnsaved] = Decoder.forProduct13[DocumentRowUnsaved, /* max 50 chars */ String, BusinessentityId, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, TypoShort, Option[String], Option[TypoBytea], Defaulted[Flag], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode")(DocumentRowUnsaved.apply)(Decoder.decodeString, BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, TypoShort.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(DocumentId.decoder))
-  implicit lazy val encoder: Encoder[DocumentRowUnsaved] = Encoder.forProduct13[DocumentRowUnsaved, /* max 50 chars */ String, BusinessentityId, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, TypoShort, Option[String], Option[TypoBytea], Defaulted[Flag], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.filename, x.fileextension, x.revision, x.status, x.documentsummary, x.document, x.folderflag, x.changenumber, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeString, BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, TypoShort.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(DocumentId.encoder))
+  implicit lazy val decoder: Decoder[DocumentRowUnsaved] = Decoder.forProduct13[DocumentRowUnsaved, /* max 50 chars */ String, BusinessentityId, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, TypoShort, Option[String], Option[TypoBytea], Defaulted[Flag], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode")(DocumentRowUnsaved.apply)(Decoder.decodeString, BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, TypoShort.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(DocumentId.decoder))
+  implicit lazy val encoder: Encoder[DocumentRowUnsaved] = Encoder.forProduct13[DocumentRowUnsaved, /* max 50 chars */ String, BusinessentityId, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, TypoShort, Option[String], Option[TypoBytea], Defaulted[Flag], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.filename, x.fileextension, x.revision, x.status, x.documentsummary, x.document, x.folderflag, x.changenumber, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeString, BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, TypoShort.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(DocumentId.encoder))
 }

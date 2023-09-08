@@ -8,6 +8,7 @@ package person
 package person
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
@@ -16,7 +17,6 @@ import adventureworks.userdefined.FirstName
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -52,7 +52,7 @@ case class PersonRow(
   additionalcontactinfo: Option[TypoXml],
   /** Personal information such as hobbies, and income collected from online shoppers. Used for sales analysis. */
   demographics: Option[TypoXml],
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -71,7 +71,7 @@ object PersonRow {
           emailpromotion = json.\("emailpromotion").as(Reads.IntReads),
           additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as(TypoXml.reads)),
           demographics = json.\("demographics").toOption.map(_.as(TypoXml.reads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -91,7 +91,7 @@ object PersonRow {
         emailpromotion = row(idx + 8)(Column.columnToInt),
         additionalcontactinfo = row(idx + 9)(Column.columnToOption(TypoXml.column)),
         demographics = row(idx + 10)(Column.columnToOption(TypoXml.column)),
-        rowguid = row(idx + 11)(Column.columnToUUID),
+        rowguid = row(idx + 11)(TypoUUID.column),
         modifieddate = row(idx + 12)(TypoLocalDateTime.column)
       )
     )
@@ -109,7 +109,7 @@ object PersonRow {
       "emailpromotion" -> Writes.IntWrites.writes(o.emailpromotion),
       "additionalcontactinfo" -> Writes.OptionWrites(TypoXml.writes).writes(o.additionalcontactinfo),
       "demographics" -> Writes.OptionWrites(TypoXml.writes).writes(o.demographics),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

@@ -9,8 +9,8 @@ package salespersonquotahistory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -30,11 +30,11 @@ case class SalespersonquotahistoryRowUnsaved(
   /** Sales quota amount. */
   salesquota: BigDecimal,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalespersonquotahistoryRow =
+  def toRow(rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SalespersonquotahistoryRow =
     SalespersonquotahistoryRow(
       businessentityid = businessentityid,
       quotadate = quotadate,
@@ -56,7 +56,7 @@ object SalespersonquotahistoryRowUnsaved {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           quotadate = json.\("quotadate").as(TypoLocalDateTime.reads),
           salesquota = json.\("salesquota").as(Reads.bigDecReads),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -67,7 +67,7 @@ object SalespersonquotahistoryRowUnsaved {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "quotadate" -> TypoLocalDateTime.writes.writes(o.quotadate),
       "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

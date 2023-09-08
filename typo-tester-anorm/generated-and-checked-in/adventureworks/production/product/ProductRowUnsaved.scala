@@ -10,12 +10,12 @@ package product
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -81,11 +81,11 @@ case class ProductRowUnsaved(
       0 = Product is not a salable item. 1 = Product is salable. */
   finishedgoodsflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productidDefault: => ProductId, makeflagDefault: => Flag, finishedgoodsflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductRow =
+  def toRow(productidDefault: => ProductId, makeflagDefault: => Flag, finishedgoodsflagDefault: => Flag, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): ProductRow =
     ProductRow(
       name = name,
       productnumber = productnumber,
@@ -156,7 +156,7 @@ object ProductRowUnsaved {
           productid = json.\("productid").as(Defaulted.reads(ProductId.reads)),
           makeflag = json.\("makeflag").as(Defaulted.reads(Flag.reads)),
           finishedgoodsflag = json.\("finishedgoodsflag").as(Defaulted.reads(Flag.reads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -187,7 +187,7 @@ object ProductRowUnsaved {
       "productid" -> Defaulted.writes(ProductId.writes).writes(o.productid),
       "makeflag" -> Defaulted.writes(Flag.writes).writes(o.makeflag),
       "finishedgoodsflag" -> Defaulted.writes(Flag.writes).writes(o.finishedgoodsflag),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

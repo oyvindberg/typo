@@ -8,12 +8,12 @@ package sales
 package salesperson
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -45,7 +45,7 @@ case class SalespersonRow(
   /** Sales total of previous year.
       Constraint CK_SalesPerson_SalesLastYear affecting columns "saleslastyear":  ((saleslastyear >= 0.00)) */
   saleslastyear: BigDecimal,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -60,7 +60,7 @@ object SalespersonRow {
           commissionpct = json.\("commissionpct").as(Reads.bigDecReads),
           salesytd = json.\("salesytd").as(Reads.bigDecReads),
           saleslastyear = json.\("saleslastyear").as(Reads.bigDecReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -76,7 +76,7 @@ object SalespersonRow {
         commissionpct = row(idx + 4)(Column.columnToScalaBigDecimal),
         salesytd = row(idx + 5)(Column.columnToScalaBigDecimal),
         saleslastyear = row(idx + 6)(Column.columnToScalaBigDecimal),
-        rowguid = row(idx + 7)(Column.columnToUUID),
+        rowguid = row(idx + 7)(TypoUUID.column),
         modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
@@ -90,7 +90,7 @@ object SalespersonRow {
       "commissionpct" -> Writes.BigDecimalWrites.writes(o.commissionpct),
       "salesytd" -> Writes.BigDecimalWrites.writes(o.salesytd),
       "saleslastyear" -> Writes.BigDecimalWrites.writes(o.saleslastyear),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

@@ -8,10 +8,10 @@ package sa
 package st
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait StViewFields[Row] {
@@ -24,7 +24,7 @@ trait StViewFields[Row] {
   val saleslastyear: Field[BigDecimal, Row]
   val costytd: Field[BigDecimal, Row]
   val costlastyear: Field[BigDecimal, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object StViewFields extends StViewStructure[StViewRow](None, identity, (_, x) => x)

@@ -8,9 +8,9 @@ package production
 package vproductmodelcatalogdescription
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -38,7 +38,7 @@ trait VproductmodelcatalogdescriptionViewFields[Row] {
   val productline: OptField[/* max 256 chars */ String, Row]
   val style: OptField[/* max 256 chars */ String, Row]
   val riderexperience: OptField[/* max 1024 chars */ String, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object VproductmodelcatalogdescriptionViewFields extends VproductmodelcatalogdescriptionViewStructure[VproductmodelcatalogdescriptionViewRow](None, identity, (_, x) => x)

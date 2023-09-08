@@ -8,13 +8,13 @@ package sa
 package s
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -36,7 +36,7 @@ case class SViewRow(
   /** Points to [[sales.store.StoreRow.demographics]] */
   demographics: Option[TypoXml],
   /** Points to [[sales.store.StoreRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.store.StoreRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -50,7 +50,7 @@ object SViewRow {
           name = json.\("name").as(Name.reads),
           salespersonid = json.\("salespersonid").toOption.map(_.as(BusinessentityId.reads)),
           demographics = json.\("demographics").toOption.map(_.as(TypoXml.reads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -64,7 +64,7 @@ object SViewRow {
         name = row(idx + 2)(Name.column),
         salespersonid = row(idx + 3)(Column.columnToOption(BusinessentityId.column)),
         demographics = row(idx + 4)(Column.columnToOption(TypoXml.column)),
-        rowguid = row(idx + 5)(Column.columnToUUID),
+        rowguid = row(idx + 5)(TypoUUID.column),
         modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
@@ -76,7 +76,7 @@ object SViewRow {
       "name" -> Name.writes.writes(o.name),
       "salespersonid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.salespersonid),
       "demographics" -> Writes.OptionWrites(TypoXml.writes).writes(o.demographics),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

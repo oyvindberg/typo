@@ -9,9 +9,9 @@ package pi
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
@@ -26,7 +26,7 @@ class PiViewStructure[Row](val prefix: Option[String], val extract: Row => PiVie
   override val shelf = new Field[/* max 10 chars */ String, Row](prefix, "shelf", None, None)(x => extract(x).shelf, (row, value) => merge(row, extract(row).copy(shelf = value)))
   override val bin = new Field[TypoShort, Row](prefix, "bin", None, None)(x => extract(x).bin, (row, value) => merge(row, extract(row).copy(bin = value)))
   override val quantity = new Field[TypoShort, Row](prefix, "quantity", None, None)(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

@@ -27,9 +27,9 @@ For instance:
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.person.address.{AddressId, AddressRow}
-import java.util.UUID
 
 /** This class corresponds to a row in table `person.address` which has not been persisted yet */
 case class AddressRowUnsaved(
@@ -50,11 +50,11 @@ case class AddressRowUnsaved(
       Primary key for Address records. */
   addressid: Defaulted[AddressId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(addressidDefault: => AddressId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): AddressRow =
+  def toRow(addressidDefault: => AddressId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): AddressRow =
     AddressRow(
       addressline1 = addressline1,
       addressline2 = addressline2,

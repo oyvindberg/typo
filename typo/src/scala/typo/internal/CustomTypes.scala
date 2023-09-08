@@ -395,6 +395,26 @@ class CustomTypes(pkg: sc.QIdent) {
     })
   )
 
+  lazy val TypoUUID = CustomType(
+    comment = "UUID",
+    sqlType = "uuid",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoUUID")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.UUID, None)
+    ),
+    isNull = p => code"$p.getString == null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.UUID,
+      toTypo = (expr, target) => code"$target($expr)"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.UUID,
+      fromTypo = (expr, _) => code"$expr.value"
+    ),
+    objBody = Some(target => code"""|def apply(str: ${sc.Type.String}): $target = $target(${sc.Type.UUID}.fromString(str))
+             |def randomUUID: $target = $target(${sc.Type.UUID}.randomUUID())""".stripMargin)
+  )
+
   lazy val TypoXml = CustomType(
     comment = "XML",
     sqlType = "xml",
@@ -524,6 +544,7 @@ class CustomTypes(pkg: sc.QIdent) {
         TypoRegrole,
         TypoRegtype,
         TypoShort,
+        TypoUUID,
         TypoXid,
         TypoXml
       ).map(ct => (ct.typoType, ct))*

@@ -8,6 +8,7 @@ package pe
 package bea
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
@@ -16,7 +17,6 @@ import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
-import java.util.UUID
 
 case class BeaViewRow(
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.businessentityid]] */
@@ -28,21 +28,21 @@ case class BeaViewRow(
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.addresstypeid]] */
   addresstypeid: AddresstypeId,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object BeaViewRow {
-  implicit lazy val decoder: Decoder[BeaViewRow] = Decoder.forProduct6[BeaViewRow, BusinessentityId, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BeaViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[BeaViewRow] = Encoder.forProduct6[BeaViewRow, BusinessentityId, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[BeaViewRow] = Decoder.forProduct6[BeaViewRow, BusinessentityId, BusinessentityId, AddressId, AddresstypeId, TypoUUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BeaViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BeaViewRow] = Encoder.forProduct6[BeaViewRow, BusinessentityId, BusinessentityId, AddressId, AddresstypeId, TypoUUID, TypoLocalDateTime]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BeaViewRow] = new Read[BeaViewRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),
       (AddressId.get, Nullability.NoNulls),
       (AddresstypeId.get, Nullability.NoNulls),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BeaViewRow(
@@ -50,7 +50,7 @@ object BeaViewRow {
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
       addressid = AddressId.get.unsafeGetNonNullable(rs, i + 2),
       addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 3),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )

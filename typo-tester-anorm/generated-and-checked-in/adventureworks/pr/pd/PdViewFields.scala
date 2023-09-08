@@ -8,15 +8,15 @@ package pr
 package pd
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productdescription.ProductdescriptionId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 
 trait PdViewFields[Row] {
   val id: Field[ProductdescriptionId, Row]
   val productdescriptionid: Field[ProductdescriptionId, Row]
   val description: Field[/* max 400 chars */ String, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object PdViewFields extends PdViewStructure[PdViewRow](None, identity, (_, x) => x)

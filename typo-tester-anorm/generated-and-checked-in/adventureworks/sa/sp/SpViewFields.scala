@@ -8,9 +8,9 @@ package sa
 package sp
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -23,7 +23,7 @@ trait SpViewFields[Row] {
   val commissionpct: Field[BigDecimal, Row]
   val salesytd: Field[BigDecimal, Row]
   val saleslastyear: Field[BigDecimal, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SpViewFields extends SpViewStructure[SpViewRow](None, identity, (_, x) => x)

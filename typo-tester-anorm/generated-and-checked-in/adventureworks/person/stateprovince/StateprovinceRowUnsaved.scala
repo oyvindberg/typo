@@ -9,11 +9,11 @@ package stateprovince
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -42,11 +42,11 @@ case class StateprovinceRowUnsaved(
       0 = StateProvinceCode exists. 1 = StateProvinceCode unavailable, using CountryRegionCode. */
   isonlystateprovinceflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(stateprovinceidDefault: => StateprovinceId, isonlystateprovinceflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): StateprovinceRow =
+  def toRow(stateprovinceidDefault: => StateprovinceId, isonlystateprovinceflagDefault: => Flag, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): StateprovinceRow =
     StateprovinceRow(
       stateprovincecode = stateprovincecode,
       countryregioncode = countryregioncode,
@@ -80,7 +80,7 @@ object StateprovinceRowUnsaved {
           territoryid = json.\("territoryid").as(SalesterritoryId.reads),
           stateprovinceid = json.\("stateprovinceid").as(Defaulted.reads(StateprovinceId.reads)),
           isonlystateprovinceflag = json.\("isonlystateprovinceflag").as(Defaulted.reads(Flag.reads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -94,7 +94,7 @@ object StateprovinceRowUnsaved {
       "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
       "stateprovinceid" -> Defaulted.writes(StateprovinceId.writes).writes(o.stateprovinceid),
       "isonlystateprovinceflag" -> Defaulted.writes(Flag.writes).writes(o.isonlystateprovinceflag),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

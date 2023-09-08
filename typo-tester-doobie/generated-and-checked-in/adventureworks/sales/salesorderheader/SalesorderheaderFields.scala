@@ -9,6 +9,7 @@ package salesorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -19,7 +20,6 @@ import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import adventureworks.userdefined.CustomCreditcardId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -48,7 +48,7 @@ trait SalesorderheaderFields[Row] {
   val freight: Field[BigDecimal, Row]
   val totaldue: OptField[BigDecimal, Row]
   val comment: OptField[/* max 128 chars */ String, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SalesorderheaderFields extends SalesorderheaderStructure[SalesorderheaderRow](None, identity, (_, x) => x)

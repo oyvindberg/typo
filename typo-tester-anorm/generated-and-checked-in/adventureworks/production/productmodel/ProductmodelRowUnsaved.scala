@@ -9,9 +9,9 @@ package productmodel
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -33,11 +33,11 @@ case class ProductmodelRowUnsaved(
       Primary key for ProductModel records. */
   productmodelid: Defaulted[ProductmodelId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productmodelidDefault: => ProductmodelId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductmodelRow =
+  def toRow(productmodelidDefault: => ProductmodelId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): ProductmodelRow =
     ProductmodelRow(
       name = name,
       catalogdescription = catalogdescription,
@@ -64,7 +64,7 @@ object ProductmodelRowUnsaved {
           catalogdescription = json.\("catalogdescription").toOption.map(_.as(TypoXml.reads)),
           instructions = json.\("instructions").toOption.map(_.as(TypoXml.reads)),
           productmodelid = json.\("productmodelid").as(Defaulted.reads(ProductmodelId.reads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -76,7 +76,7 @@ object ProductmodelRowUnsaved {
       "catalogdescription" -> Writes.OptionWrites(TypoXml.writes).writes(o.catalogdescription),
       "instructions" -> Writes.OptionWrites(TypoXml.writes).writes(o.instructions),
       "productmodelid" -> Defaulted.writes(ProductmodelId.writes).writes(o.productmodelid),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

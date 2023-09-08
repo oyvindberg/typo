@@ -9,15 +9,14 @@ package specialofferproduct
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,11 +29,11 @@ case class SpecialofferproductRowUnsaved(
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SpecialofferproductRow =
+  def toRow(rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SpecialofferproductRow =
     SpecialofferproductRow(
       specialofferid = specialofferid,
       productid = productid,
@@ -54,7 +53,7 @@ object SpecialofferproductRowUnsaved {
         SpecialofferproductRowUnsaved(
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
           productid = json.\("productid").as(ProductId.reads),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -64,7 +63,7 @@ object SpecialofferproductRowUnsaved {
     new JsObject(ListMap[String, JsValue](
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
       "productid" -> ProductId.writes.writes(o.productid),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

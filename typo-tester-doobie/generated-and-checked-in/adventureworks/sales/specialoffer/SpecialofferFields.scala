@@ -8,7 +8,7 @@ package sales
 package specialoffer
 
 import adventureworks.customtypes.TypoLocalDateTime
-import java.util.UUID
+import adventureworks.customtypes.TypoUUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -23,7 +23,7 @@ trait SpecialofferFields[Row] {
   val enddate: Field[TypoLocalDateTime, Row]
   val minqty: Field[Int, Row]
   val maxqty: OptField[Int, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SpecialofferFields extends SpecialofferStructure[SpecialofferRow](None, identity, (_, x) => x)

@@ -8,17 +8,15 @@ package pe
 package be
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -28,7 +26,7 @@ case class BeViewRow(
   /** Points to [[person.businessentity.BusinessentityRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.businessentity.BusinessentityRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[person.businessentity.BusinessentityRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -39,7 +37,7 @@ object BeViewRow {
         BeViewRow(
           id = json.\("id").as(BusinessentityId.reads),
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -50,7 +48,7 @@ object BeViewRow {
       BeViewRow(
         id = row(idx + 0)(BusinessentityId.column),
         businessentityid = row(idx + 1)(BusinessentityId.column),
-        rowguid = row(idx + 2)(Column.columnToUUID),
+        rowguid = row(idx + 2)(TypoUUID.column),
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
@@ -59,7 +57,7 @@ object BeViewRow {
     new JsObject(ListMap[String, JsValue](
       "id" -> BusinessentityId.writes.writes(o.id),
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

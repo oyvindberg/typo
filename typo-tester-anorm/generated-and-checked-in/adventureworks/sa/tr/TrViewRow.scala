@@ -9,13 +9,13 @@ package tr
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -39,7 +39,7 @@ case class TrViewRow(
   /** Points to [[sales.salestaxrate.SalestaxrateRow.name]] */
   name: Name,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.salestaxrate.SalestaxrateRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -54,7 +54,7 @@ object TrViewRow {
           taxtype = json.\("taxtype").as(TypoShort.reads),
           taxrate = json.\("taxrate").as(Reads.bigDecReads),
           name = json.\("name").as(Name.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -69,7 +69,7 @@ object TrViewRow {
         taxtype = row(idx + 3)(TypoShort.column),
         taxrate = row(idx + 4)(Column.columnToScalaBigDecimal),
         name = row(idx + 5)(Name.column),
-        rowguid = row(idx + 6)(Column.columnToUUID),
+        rowguid = row(idx + 6)(TypoUUID.column),
         modifieddate = row(idx + 7)(TypoLocalDateTime.column)
       )
     )
@@ -82,7 +82,7 @@ object TrViewRow {
       "taxtype" -> TypoShort.writes.writes(o.taxtype),
       "taxrate" -> Writes.BigDecimalWrites.writes(o.taxrate),
       "name" -> Name.writes.writes(o.name),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

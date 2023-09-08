@@ -8,6 +8,7 @@ package person
 package stateprovince
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
@@ -15,7 +16,6 @@ import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -40,7 +40,7 @@ case class StateprovinceRow(
   /** ID of the territory in which the state or province is located. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
@@ -54,7 +54,7 @@ object StateprovinceRow {
           isonlystateprovinceflag = json.\("isonlystateprovinceflag").as(Flag.reads),
           name = json.\("name").as(Name.reads),
           territoryid = json.\("territoryid").as(SalesterritoryId.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -69,7 +69,7 @@ object StateprovinceRow {
         isonlystateprovinceflag = row(idx + 3)(Flag.column),
         name = row(idx + 4)(Name.column),
         territoryid = row(idx + 5)(SalesterritoryId.column),
-        rowguid = row(idx + 6)(Column.columnToUUID),
+        rowguid = row(idx + 6)(TypoUUID.column),
         modifieddate = row(idx + 7)(TypoLocalDateTime.column)
       )
     )
@@ -82,7 +82,7 @@ object StateprovinceRow {
       "isonlystateprovinceflag" -> Flag.writes.writes(o.isonlystateprovinceflag),
       "name" -> Name.writes.writes(o.name),
       "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

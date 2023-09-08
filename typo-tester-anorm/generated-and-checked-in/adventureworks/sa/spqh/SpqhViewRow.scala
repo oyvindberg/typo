@@ -8,11 +8,11 @@ package sa
 package spqh
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -32,7 +32,7 @@ case class SpqhViewRow(
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.salesquota]] */
   salesquota: BigDecimal,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -45,7 +45,7 @@ object SpqhViewRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           quotadate = json.\("quotadate").as(TypoLocalDateTime.reads),
           salesquota = json.\("salesquota").as(Reads.bigDecReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -58,7 +58,7 @@ object SpqhViewRow {
         businessentityid = row(idx + 1)(BusinessentityId.column),
         quotadate = row(idx + 2)(TypoLocalDateTime.column),
         salesquota = row(idx + 3)(Column.columnToScalaBigDecimal),
-        rowguid = row(idx + 4)(Column.columnToUUID),
+        rowguid = row(idx + 4)(TypoUUID.column),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
@@ -69,7 +69,7 @@ object SpqhViewRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "quotadate" -> TypoLocalDateTime.writes.writes(o.quotadate),
       "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

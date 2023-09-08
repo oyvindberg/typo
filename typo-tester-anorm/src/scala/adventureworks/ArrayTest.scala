@@ -7,7 +7,6 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.*
-import java.util.UUID
 
 class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
@@ -32,7 +31,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         time = TypoLocalTime.now,
         timez = TypoOffsetTime.now,
         date = TypoLocalDate.now,
-        uuid = UUID.randomUUID(),
+        uuid = TypoUUID.randomUUID,
         numeric = BigDecimal("3.14159"),
         boxes = Array(TypoBox(3.0, 4.0, 1.0, 2.0)),
         circlees = Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0)),
@@ -53,7 +52,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         times = Array(TypoLocalTime.now),
         timezs = Array(TypoOffsetTime.now),
         dates = Array(TypoLocalDate.now),
-        uuids = Array(UUID.randomUUID()),
+        uuids = Array(TypoUUID.randomUUID),
         numerics = Array(BigDecimal("3.14159"))
       )
       val after = PgtestRepoImpl.insert(before)
@@ -176,7 +175,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         time = Some(TypoLocalTime.now),
         timez = Some(TypoOffsetTime.now),
         date = Some(TypoLocalDate(LocalDate.now)),
-        uuid = Some(UUID.randomUUID()),
+        uuid = Some(TypoUUID.randomUUID),
         numeric = Some(BigDecimal("3.14159")),
         boxes = Some(Array(TypoBox(3.0, 4.0, 1.0, 2.0))),
         circlees = Some(Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0))),
@@ -197,7 +196,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         times = Some(Array(TypoLocalTime.now)),
         timezs = Some(Array(TypoOffsetTime.now)),
         dates = Some(Array(TypoLocalDate(LocalDate.now))),
-        uuids = Some(Array(UUID.randomUUID())),
+        uuids = Some(Array(TypoUUID.randomUUID)),
         numerics = Some(Array(BigDecimal("3.14159")))
       )
       val after = PgtestnullRepoImpl.insert(before)

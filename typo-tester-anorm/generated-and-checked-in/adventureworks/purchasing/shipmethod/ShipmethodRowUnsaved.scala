@@ -9,8 +9,8 @@ package shipmethod
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -34,11 +34,11 @@ case class ShipmethodRowUnsaved(
       Shipping charge per pound. */
   shiprate: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(shipmethodidDefault: => ShipmethodId, shipbaseDefault: => BigDecimal, shiprateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ShipmethodRow =
+  def toRow(shipmethodidDefault: => ShipmethodId, shipbaseDefault: => BigDecimal, shiprateDefault: => BigDecimal, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): ShipmethodRow =
     ShipmethodRow(
       name = name,
       shipmethodid = shipmethodid match {
@@ -71,7 +71,7 @@ object ShipmethodRowUnsaved {
           shipmethodid = json.\("shipmethodid").as(Defaulted.reads(ShipmethodId.reads)),
           shipbase = json.\("shipbase").as(Defaulted.reads(Reads.bigDecReads)),
           shiprate = json.\("shiprate").as(Defaulted.reads(Reads.bigDecReads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
@@ -83,7 +83,7 @@ object ShipmethodRowUnsaved {
       "shipmethodid" -> Defaulted.writes(ShipmethodId.writes).writes(o.shipmethodid),
       "shipbase" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.shipbase),
       "shiprate" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.shiprate),
-      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )

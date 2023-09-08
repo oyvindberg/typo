@@ -8,6 +8,7 @@ package sales
 package customer
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
@@ -15,7 +16,6 @@ import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
-import java.util.UUID
 
 case class CustomerRow(
   /** Primary key. */
@@ -29,20 +29,20 @@ case class CustomerRow(
   /** ID of the territory in which the customer is located. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 )
 
 object CustomerRow {
-  implicit lazy val decoder: Decoder[CustomerRow] = Decoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CustomerRow.apply)(CustomerId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[CustomerRow] = Encoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(CustomerId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[CustomerRow] = Decoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], TypoUUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CustomerRow.apply)(CustomerId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CustomerRow] = Encoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], TypoUUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(CustomerId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[CustomerRow] = new Read[CustomerRow](
     gets = List(
       (CustomerId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.Nullable),
       (BusinessentityId.get, Nullability.Nullable),
       (SalesterritoryId.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CustomerRow(
@@ -50,7 +50,7 @@ object CustomerRow {
       personid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
       storeid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
       territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 3),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )

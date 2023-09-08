@@ -9,9 +9,9 @@ package productinventory
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -26,7 +26,7 @@ class ProductinventoryStructure[Row](val prefix: Option[String], val extract: Ro
   override val shelf = new Field[/* max 10 chars */ String, Row](prefix, "shelf", None, None)(x => extract(x).shelf, (row, value) => merge(row, extract(row).copy(shelf = value)))
   override val bin = new Field[TypoShort, Row](prefix, "bin", None, Some("int2"))(x => extract(x).bin, (row, value) => merge(row, extract(row).copy(bin = value)))
   override val quantity = new Field[TypoShort, Row](prefix, "quantity", None, Some("int2"))(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

@@ -10,6 +10,7 @@ package product
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -20,7 +21,6 @@ import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import java.util.UUID
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.product` which has not been persisted yet */
@@ -79,11 +79,11 @@ case class ProductRowUnsaved(
       0 = Product is not a salable item. 1 = Product is salable. */
   finishedgoodsflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productidDefault: => ProductId, makeflagDefault: => Flag, finishedgoodsflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductRow =
+  def toRow(productidDefault: => ProductId, makeflagDefault: => Flag, finishedgoodsflagDefault: => Flag, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): ProductRow =
     ProductRow(
       name = name,
       productnumber = productnumber,
@@ -158,7 +158,7 @@ object ProductRowUnsaved {
         productid = orThrow(c.get("productid")(Defaulted.decoder(ProductId.decoder))),
         makeflag = orThrow(c.get("makeflag")(Defaulted.decoder(Flag.decoder))),
         finishedgoodsflag = orThrow(c.get("finishedgoodsflag")(Defaulted.decoder(Flag.decoder))),
-        rowguid = orThrow(c.get("rowguid")(Defaulted.decoder(Decoder.decodeUUID))),
+        rowguid = orThrow(c.get("rowguid")(Defaulted.decoder(TypoUUID.decoder))),
         modifieddate = orThrow(c.get("modifieddate")(Defaulted.decoder(TypoLocalDateTime.decoder)))
       )
     }
@@ -188,7 +188,7 @@ object ProductRowUnsaved {
       "productid" -> Defaulted.encoder(ProductId.encoder).apply(row.productid),
       "makeflag" -> Defaulted.encoder(Flag.encoder).apply(row.makeflag),
       "finishedgoodsflag" -> Defaulted.encoder(Flag.encoder).apply(row.finishedgoodsflag),
-      "rowguid" -> Defaulted.encoder(Encoder.encodeUUID).apply(row.rowguid),
+      "rowguid" -> Defaulted.encoder(TypoUUID.encoder).apply(row.rowguid),
       "modifieddate" -> Defaulted.encoder(TypoLocalDateTime.encoder).apply(row.modifieddate)
     )
   )

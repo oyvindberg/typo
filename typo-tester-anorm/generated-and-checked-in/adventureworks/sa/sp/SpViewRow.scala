@@ -8,12 +8,12 @@ package sa
 package sp
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -41,7 +41,7 @@ case class SpViewRow(
   /** Points to [[sales.salesperson.SalespersonRow.saleslastyear]] */
   saleslastyear: BigDecimal,
   /** Points to [[sales.salesperson.SalespersonRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.salesperson.SalespersonRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -58,7 +58,7 @@ object SpViewRow {
           commissionpct = json.\("commissionpct").as(Reads.bigDecReads),
           salesytd = json.\("salesytd").as(Reads.bigDecReads),
           saleslastyear = json.\("saleslastyear").as(Reads.bigDecReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -75,7 +75,7 @@ object SpViewRow {
         commissionpct = row(idx + 5)(Column.columnToScalaBigDecimal),
         salesytd = row(idx + 6)(Column.columnToScalaBigDecimal),
         saleslastyear = row(idx + 7)(Column.columnToScalaBigDecimal),
-        rowguid = row(idx + 8)(Column.columnToUUID),
+        rowguid = row(idx + 8)(TypoUUID.column),
         modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
@@ -90,7 +90,7 @@ object SpViewRow {
       "commissionpct" -> Writes.BigDecimalWrites.writes(o.commissionpct),
       "salesytd" -> Writes.BigDecimalWrites.writes(o.salesytd),
       "saleslastyear" -> Writes.BigDecimalWrites.writes(o.saleslastyear),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

@@ -8,7 +8,7 @@ package sales
 package specialoffer
 
 import adventureworks.customtypes.TypoLocalDateTime
-import java.util.UUID
+import adventureworks.customtypes.TypoUUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -28,7 +28,7 @@ class SpecialofferStructure[Row](val prefix: Option[String], val extract: Row =>
   override val enddate = new Field[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), Some("timestamp"))(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
   override val minqty = new Field[Int, Row](prefix, "minqty", None, Some("int4"))(x => extract(x).minqty, (row, value) => merge(row, extract(row).copy(minqty = value)))
   override val maxqty = new OptField[Int, Row](prefix, "maxqty", None, Some("int4"))(x => extract(x).maxqty, (row, value) => merge(row, extract(row).copy(maxqty = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

@@ -8,12 +8,12 @@ package sales
 package salesterritoryhistory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -36,7 +36,7 @@ case class SalesterritoryhistoryRow(
   /** Date the sales representative left work in the territory.
       Constraint CK_SalesTerritoryHistory_EndDate affecting columns "startdate", "enddate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesterritoryhistoryId = SalesterritoryhistoryId(businessentityid, startdate, territoryid)
@@ -50,7 +50,7 @@ object SalesterritoryhistoryRow {
           territoryid = json.\("territoryid").as(SalesterritoryId.reads),
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
           enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -63,7 +63,7 @@ object SalesterritoryhistoryRow {
         territoryid = row(idx + 1)(SalesterritoryId.column),
         startdate = row(idx + 2)(TypoLocalDateTime.column),
         enddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column)),
-        rowguid = row(idx + 4)(Column.columnToUUID),
+        rowguid = row(idx + 4)(TypoUUID.column),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
@@ -74,7 +74,7 @@ object SalesterritoryhistoryRow {
       "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
       "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

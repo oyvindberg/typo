@@ -9,11 +9,11 @@ package salesterritoryhistory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import io.circe.Decoder
 import io.circe.Encoder
-import java.util.UUID
 
 /** This class corresponds to a row in table `sales.salesterritoryhistory` which has not been persisted yet */
 case class SalesterritoryhistoryRowUnsaved(
@@ -28,11 +28,11 @@ case class SalesterritoryhistoryRowUnsaved(
   /** Date the sales representative left work in the territory. */
   enddate: Option[TypoLocalDateTime],
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesterritoryhistoryRow =
+  def toRow(rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): SalesterritoryhistoryRow =
     SalesterritoryhistoryRow(
       businessentityid = businessentityid,
       territoryid = territoryid,
@@ -49,6 +49,6 @@ case class SalesterritoryhistoryRowUnsaved(
     )
 }
 object SalesterritoryhistoryRowUnsaved {
-  implicit lazy val decoder: Decoder[SalesterritoryhistoryRowUnsaved] = Decoder.forProduct6[SalesterritoryhistoryRowUnsaved, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SalesterritoryhistoryRowUnsaved.apply)(BusinessentityId.decoder, SalesterritoryId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Defaulted.decoder(Decoder.decodeUUID), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit lazy val encoder: Encoder[SalesterritoryhistoryRowUnsaved] = Encoder.forProduct6[SalesterritoryhistoryRowUnsaved, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))(BusinessentityId.encoder, SalesterritoryId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Defaulted.encoder(Encoder.encodeUUID), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[SalesterritoryhistoryRowUnsaved] = Decoder.forProduct6[SalesterritoryhistoryRowUnsaved, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SalesterritoryhistoryRowUnsaved.apply)(BusinessentityId.decoder, SalesterritoryId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[SalesterritoryhistoryRowUnsaved] = Encoder.forProduct6[SalesterritoryhistoryRowUnsaved, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))(BusinessentityId.encoder, SalesterritoryId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

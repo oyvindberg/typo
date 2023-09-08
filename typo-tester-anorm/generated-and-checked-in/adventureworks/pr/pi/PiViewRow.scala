@@ -9,12 +9,12 @@ package pi
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -38,7 +38,7 @@ case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.quantity]] */
   quantity: TypoShort,
   /** Points to [[production.productinventory.ProductinventoryRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[production.productinventory.ProductinventoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -53,7 +53,7 @@ object PiViewRow {
           shelf = json.\("shelf").as(Reads.StringReads),
           bin = json.\("bin").as(TypoShort.reads),
           quantity = json.\("quantity").as(TypoShort.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -68,7 +68,7 @@ object PiViewRow {
         shelf = row(idx + 3)(Column.columnToString),
         bin = row(idx + 4)(TypoShort.column),
         quantity = row(idx + 5)(TypoShort.column),
-        rowguid = row(idx + 6)(Column.columnToUUID),
+        rowguid = row(idx + 6)(TypoUUID.column),
         modifieddate = row(idx + 7)(TypoLocalDateTime.column)
       )
     )
@@ -81,7 +81,7 @@ object PiViewRow {
       "shelf" -> Writes.StringWrites.writes(o.shelf),
       "bin" -> TypoShort.writes.writes(o.bin),
       "quantity" -> TypoShort.writes.writes(o.quantity),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

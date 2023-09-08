@@ -8,9 +8,9 @@ package production
 package vproductmodelinstructions
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -29,7 +29,7 @@ class VproductmodelinstructionsViewStructure[Row](val prefix: Option[String], va
   override val LaborHours = new OptField[BigDecimal, Row](prefix, "LaborHours", None, None)(x => extract(x).LaborHours, (row, value) => merge(row, extract(row).copy(LaborHours = value)))
   override val LotSize = new OptField[Int, Row](prefix, "LotSize", None, None)(x => extract(x).LotSize, (row, value) => merge(row, extract(row).copy(LotSize = value)))
   override val Step = new OptField[/* max 1024 chars */ String, Row](prefix, "Step", None, None)(x => extract(x).Step, (row, value) => merge(row, extract(row).copy(Step = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

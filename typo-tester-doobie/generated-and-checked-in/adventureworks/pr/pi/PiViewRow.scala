@@ -9,6 +9,7 @@ package pi
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
@@ -17,7 +18,6 @@ import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
-import java.util.UUID
 
 case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.productid]] */
@@ -33,14 +33,14 @@ case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.quantity]] */
   quantity: TypoShort,
   /** Points to [[production.productinventory.ProductinventoryRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[production.productinventory.ProductinventoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object PiViewRow {
-  implicit lazy val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, UUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(ProductId.decoder, ProductId.decoder, LocationId.decoder, Decoder.decodeString, TypoShort.decoder, TypoShort.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, UUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, ProductId.encoder, LocationId.encoder, Encoder.encodeString, TypoShort.encoder, TypoShort.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, TypoUUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(ProductId.decoder, ProductId.decoder, LocationId.decoder, Decoder.decodeString, TypoShort.decoder, TypoShort.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, TypoUUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, ProductId.encoder, LocationId.encoder, Encoder.encodeString, TypoShort.encoder, TypoShort.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PiViewRow] = new Read[PiViewRow](
     gets = List(
       (ProductId.get, Nullability.NoNulls),
@@ -49,7 +49,7 @@ object PiViewRow {
       (Meta.StringMeta.get, Nullability.NoNulls),
       (TypoShort.get, Nullability.NoNulls),
       (TypoShort.get, Nullability.NoNulls),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
@@ -59,7 +59,7 @@ object PiViewRow {
       shelf = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
       bin = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
       quantity = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 6),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 6),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
     )
   )

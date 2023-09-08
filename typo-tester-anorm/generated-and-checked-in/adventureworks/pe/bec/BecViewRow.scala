@@ -8,18 +8,16 @@ package pe
 package bec
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
-import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,7 +31,7 @@ case class BecViewRow(
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -46,7 +44,7 @@ object BecViewRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           personid = json.\("personid").as(BusinessentityId.reads),
           contacttypeid = json.\("contacttypeid").as(ContacttypeId.reads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -59,7 +57,7 @@ object BecViewRow {
         businessentityid = row(idx + 1)(BusinessentityId.column),
         personid = row(idx + 2)(BusinessentityId.column),
         contacttypeid = row(idx + 3)(ContacttypeId.column),
-        rowguid = row(idx + 4)(Column.columnToUUID),
+        rowguid = row(idx + 4)(TypoUUID.column),
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
@@ -70,7 +68,7 @@ object BecViewRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "personid" -> BusinessentityId.writes.writes(o.personid),
       "contacttypeid" -> ContacttypeId.writes.writes(o.contacttypeid),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

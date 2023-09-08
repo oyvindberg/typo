@@ -9,6 +9,7 @@ package soh
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -29,7 +30,6 @@ import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.util.UUID
 import scala.util.Try
 
 case class SohViewRow(
@@ -82,7 +82,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.comment]] */
   comment: Option[/* max 128 chars */ String],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -119,7 +119,7 @@ object SohViewRow {
         freight = orThrow(c.get("freight")(Decoder.decodeBigDecimal)),
         totaldue = orThrow(c.get("totaldue")(Decoder.decodeOption(Decoder.decodeBigDecimal))),
         comment = orThrow(c.get("comment")(Decoder.decodeOption(Decoder.decodeString))),
-        rowguid = orThrow(c.get("rowguid")(Decoder.decodeUUID)),
+        rowguid = orThrow(c.get("rowguid")(TypoUUID.decoder)),
         modifieddate = orThrow(c.get("modifieddate")(TypoLocalDateTime.decoder))
       )
     }
@@ -150,7 +150,7 @@ object SohViewRow {
       "freight" -> Encoder.encodeBigDecimal.apply(row.freight),
       "totaldue" -> Encoder.encodeOption(Encoder.encodeBigDecimal).apply(row.totaldue),
       "comment" -> Encoder.encodeOption(Encoder.encodeString).apply(row.comment),
-      "rowguid" -> Encoder.encodeUUID.apply(row.rowguid),
+      "rowguid" -> TypoUUID.encoder.apply(row.rowguid),
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
@@ -180,7 +180,7 @@ object SohViewRow {
       (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoUUID.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SohViewRow(
@@ -208,7 +208,7 @@ object SohViewRow {
       freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 21),
       totaldue = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 22),
       comment = Meta.StringMeta.get.unsafeGetNullable(rs, i + 23),
-      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 24),
+      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 24),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 25)
     )
   )

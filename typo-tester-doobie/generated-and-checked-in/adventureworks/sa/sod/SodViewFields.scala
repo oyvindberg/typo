@@ -9,10 +9,10 @@ package sod
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
@@ -26,7 +26,7 @@ trait SodViewFields[Row] {
   val specialofferid: Field[SpecialofferId, Row]
   val unitprice: Field[BigDecimal, Row]
   val unitpricediscount: Field[BigDecimal, Row]
-  val rowguid: Field[UUID, Row]
+  val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
 object SodViewFields extends SodViewStructure[SodViewRow](None, identity, (_, x) => x)

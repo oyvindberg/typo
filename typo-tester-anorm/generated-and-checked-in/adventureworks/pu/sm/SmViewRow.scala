@@ -8,12 +8,12 @@ package pu
 package sm
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -35,7 +35,7 @@ case class SmViewRow(
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shiprate]] */
   shiprate: BigDecimal,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[purchasing.shipmethod.ShipmethodRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -49,7 +49,7 @@ object SmViewRow {
           name = json.\("name").as(Name.reads),
           shipbase = json.\("shipbase").as(Reads.bigDecReads),
           shiprate = json.\("shiprate").as(Reads.bigDecReads),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -63,7 +63,7 @@ object SmViewRow {
         name = row(idx + 2)(Name.column),
         shipbase = row(idx + 3)(Column.columnToScalaBigDecimal),
         shiprate = row(idx + 4)(Column.columnToScalaBigDecimal),
-        rowguid = row(idx + 5)(Column.columnToUUID),
+        rowguid = row(idx + 5)(TypoUUID.column),
         modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
@@ -75,7 +75,7 @@ object SmViewRow {
       "name" -> Name.writes.writes(o.name),
       "shipbase" -> Writes.BigDecimalWrites.writes(o.shipbase),
       "shiprate" -> Writes.BigDecimalWrites.writes(o.shiprate),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

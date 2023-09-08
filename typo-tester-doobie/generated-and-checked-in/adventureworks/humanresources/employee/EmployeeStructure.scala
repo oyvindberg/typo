@@ -10,9 +10,9 @@ package employee
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -35,7 +35,7 @@ class EmployeeStructure[Row](val prefix: Option[String], val extract: Row => Emp
   override val vacationhours = new Field[TypoShort, Row](prefix, "vacationhours", None, Some("int2"))(x => extract(x).vacationhours, (row, value) => merge(row, extract(row).copy(vacationhours = value)))
   override val sickleavehours = new Field[TypoShort, Row](prefix, "sickleavehours", None, Some("int2"))(x => extract(x).sickleavehours, (row, value) => merge(row, extract(row).copy(sickleavehours = value)))
   override val currentflag = new Field[Flag, Row](prefix, "currentflag", None, Some("bool"))(x => extract(x).currentflag, (row, value) => merge(row, extract(row).copy(currentflag = value)))
-  override val rowguid = new Field[UUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+  override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
   override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
   override val organizationnode = new OptField[String, Row](prefix, "organizationnode", None, None)(x => extract(x).organizationnode, (row, value) => merge(row, extract(row).copy(organizationnode = value)))
 

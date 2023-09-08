@@ -8,11 +8,11 @@ package person
 package emailaddress
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -30,7 +30,7 @@ case class EmailaddressRow(
   emailaddressid: Int,
   /** E-mail address for the person. */
   emailaddress: Option[/* max 50 chars */ String],
-  rowguid: UUID,
+  rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmailaddressId = EmailaddressId(businessentityid, emailaddressid)
@@ -43,7 +43,7 @@ object EmailaddressRow {
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
           emailaddressid = json.\("emailaddressid").as(Reads.IntReads),
           emailaddress = json.\("emailaddress").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -55,7 +55,7 @@ object EmailaddressRow {
         businessentityid = row(idx + 0)(BusinessentityId.column),
         emailaddressid = row(idx + 1)(Column.columnToInt),
         emailaddress = row(idx + 2)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 3)(Column.columnToUUID),
+        rowguid = row(idx + 3)(TypoUUID.column),
         modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
@@ -65,7 +65,7 @@ object EmailaddressRow {
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "emailaddressid" -> Writes.IntWrites.writes(o.emailaddressid),
       "emailaddress" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailaddress),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )

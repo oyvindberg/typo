@@ -9,6 +9,7 @@ package soh
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -23,7 +24,6 @@ import adventureworks.userdefined.CustomCreditcardId
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
-import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
@@ -83,7 +83,7 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.comment]] */
   comment: Option[/* max 128 chars */ String],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.rowguid]] */
-  rowguid: UUID,
+  rowguid: TypoUUID,
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
@@ -116,7 +116,7 @@ object SohViewRow {
           freight = json.\("freight").as(Reads.bigDecReads),
           totaldue = json.\("totaldue").toOption.map(_.as(Reads.bigDecReads)),
           comment = json.\("comment").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          rowguid = json.\("rowguid").as(TypoUUID.reads),
           modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
@@ -149,7 +149,7 @@ object SohViewRow {
         freight = row(idx + 21)(Column.columnToScalaBigDecimal),
         totaldue = row(idx + 22)(Column.columnToOption(Column.columnToScalaBigDecimal)),
         comment = row(idx + 23)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 24)(Column.columnToUUID),
+        rowguid = row(idx + 24)(TypoUUID.column),
         modifieddate = row(idx + 25)(TypoLocalDateTime.column)
       )
     )
@@ -180,7 +180,7 @@ object SohViewRow {
       "freight" -> Writes.BigDecimalWrites.writes(o.freight),
       "totaldue" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.totaldue),
       "comment" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comment),
-      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
       "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
