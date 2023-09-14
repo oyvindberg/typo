@@ -24,7 +24,8 @@ case class SalesorderdetailRowUnsaved(
   salesorderid: SalesorderheaderId,
   /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[/* max 25 chars */ String],
-  /** Quantity ordered per product. */
+  /** Quantity ordered per product.
+      Constraint CK_SalesOrderDetail_OrderQty affecting columns "orderqty":  ((orderqty > 0)) */
   orderqty: TypoShort,
   /** Product sold to customer. Foreign key to Product.ProductID.
       Points to [[specialofferproduct.SpecialofferproductRow.productid]] */
@@ -32,13 +33,15 @@ case class SalesorderdetailRowUnsaved(
   /** Promotional code. Foreign key to SpecialOffer.SpecialOfferID.
       Points to [[specialofferproduct.SpecialofferproductRow.specialofferid]] */
   specialofferid: SpecialofferId,
-  /** Selling price of a single product. */
+  /** Selling price of a single product.
+      Constraint CK_SalesOrderDetail_UnitPrice affecting columns "unitprice":  ((unitprice >= 0.00)) */
   unitprice: BigDecimal,
   /** Default: nextval('sales.salesorderdetail_salesorderdetailid_seq'::regclass)
       Primary key. One incremental unique number per product sold. */
   salesorderdetailid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: 0.0
-      Discount amount. */
+      Discount amount.
+      Constraint CK_SalesOrderDetail_UnitPriceDiscount affecting columns "unitpricediscount":  ((unitpricediscount >= 0.00)) */
   unitpricediscount: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

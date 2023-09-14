@@ -30,7 +30,8 @@ case class ShoppingcartitemRowUnsaved(
       Primary key for ShoppingCartItem records. */
   shoppingcartitemid: Defaulted[ShoppingcartitemId] = Defaulted.UseDefault,
   /** Default: 1
-      Product quantity ordered. */
+      Product quantity ordered.
+      Constraint CK_ShoppingCartItem_Quantity affecting columns "quantity":  ((quantity >= 1)) */
   quantity: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Date the time the record was created. */

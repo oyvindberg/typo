@@ -28,22 +28,28 @@ case class EmployeeRowUnsaved(
   loginid: /* max 256 chars */ String,
   /** Work title such as Buyer or Sales Representative. */
   jobtitle: /* max 50 chars */ String,
-  /** Date of birth. */
+  /** Date of birth.
+      Constraint CK_Employee_BirthDate affecting columns "birthdate":  (((birthdate >= '1930-01-01'::date) AND (birthdate <= (now() - '18 years'::interval)))) */
   birthdate: TypoLocalDate,
-  /** M = Married, S = Single */
+  /** M = Married, S = Single
+      Constraint CK_Employee_MaritalStatus affecting columns "maritalstatus":  ((upper((maritalstatus)::text) = ANY (ARRAY['M'::text, 'S'::text]))) */
   maritalstatus: /* bpchar, max 1 chars */ String,
-  /** M = Male, F = Female */
+  /** M = Male, F = Female
+      Constraint CK_Employee_Gender affecting columns "gender":  ((upper((gender)::text) = ANY (ARRAY['M'::text, 'F'::text]))) */
   gender: /* bpchar, max 1 chars */ String,
-  /** Employee hired on this date. */
+  /** Employee hired on this date.
+      Constraint CK_Employee_HireDate affecting columns "hiredate":  (((hiredate >= '1996-07-01'::date) AND (hiredate <= (now() + '1 day'::interval)))) */
   hiredate: TypoLocalDate,
   /** Default: true
       Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
   salariedflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: 0
-      Number of available vacation hours. */
+      Number of available vacation hours.
+      Constraint CK_Employee_VacationHours affecting columns "vacationhours":  (((vacationhours >= '-40'::integer) AND (vacationhours <= 240))) */
   vacationhours: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: 0
-      Number of available sick leave hours. */
+      Number of available sick leave hours.
+      Constraint CK_Employee_SickLeaveHours affecting columns "sickleavehours":  (((sickleavehours >= 0) AND (sickleavehours <= 120))) */
   sickleavehours: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: true
       0 = Inactive, 1 = Active */

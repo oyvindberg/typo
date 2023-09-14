@@ -28,16 +28,20 @@ case class SalesterritoryRowUnsaved(
       Primary key for SalesTerritory records. */
   territoryid: Defaulted[SalesterritoryId] = Defaulted.UseDefault,
   /** Default: 0.00
-      Sales in the territory year to date. */
+      Sales in the territory year to date.
+      Constraint CK_SalesTerritory_SalesYTD affecting columns "salesytd":  ((salesytd >= 0.00)) */
   salesytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
-      Sales in the territory the previous year. */
+      Sales in the territory the previous year.
+      Constraint CK_SalesTerritory_SalesLastYear affecting columns "saleslastyear":  ((saleslastyear >= 0.00)) */
   saleslastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
-      Business costs in the territory year to date. */
+      Business costs in the territory year to date.
+      Constraint CK_SalesTerritory_CostYTD affecting columns "costytd":  ((costytd >= 0.00)) */
   costytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
-      Business costs in the territory the previous year. */
+      Business costs in the territory the previous year.
+      Constraint CK_SalesTerritory_CostLastYear affecting columns "costlastyear":  ((costlastyear >= 0.00)) */
   costlastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
