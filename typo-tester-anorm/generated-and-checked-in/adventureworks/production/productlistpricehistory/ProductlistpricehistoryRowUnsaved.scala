@@ -24,11 +24,14 @@ case class ProductlistpricehistoryRowUnsaved(
   /** Product identification number. Foreign key to Product.ProductID
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
-  /** List price start date. */
+  /** List price start date.
+      Constraint CK_ProductListPriceHistory_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
-  /** List price end date */
+  /** List price end date
+      Constraint CK_ProductListPriceHistory_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
-  /** Product list price. */
+  /** Product list price.
+      Constraint CK_ProductListPriceHistory_ListPrice affecting columns "listprice":  ((listprice > 0.00)) */
   listprice: BigDecimal,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault

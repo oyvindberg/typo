@@ -21,7 +21,8 @@ case class SalespersonquotahistoryRowUnsaved(
   businessentityid: BusinessentityId,
   /** Sales quota date. */
   quotadate: TypoLocalDateTime,
-  /** Sales quota amount. */
+  /** Sales quota amount.
+      Constraint CK_SalesPersonQuotaHistory_SalesQuota affecting columns "salesquota":  ((salesquota > 0.00)) */
   salesquota: BigDecimal,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

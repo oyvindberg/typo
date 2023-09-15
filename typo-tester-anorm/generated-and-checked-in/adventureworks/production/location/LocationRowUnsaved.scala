@@ -27,10 +27,12 @@ case class LocationRowUnsaved(
       Primary key for Location records. */
   locationid: Defaulted[LocationId] = Defaulted.UseDefault,
   /** Default: 0.00
-      Standard hourly cost of the manufacturing location. */
+      Standard hourly cost of the manufacturing location.
+      Constraint CK_Location_CostRate affecting columns "costrate":  ((costrate >= 0.00)) */
   costrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
-      Work capacity (in hours) of the manufacturing location. */
+      Work capacity (in hours) of the manufacturing location.
+      Constraint CK_Location_Availability affecting columns "availability":  ((availability >= 0.00)) */
   availability: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault

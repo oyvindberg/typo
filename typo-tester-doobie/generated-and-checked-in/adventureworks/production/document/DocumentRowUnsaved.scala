@@ -30,7 +30,8 @@ case class DocumentRowUnsaved(
   fileextension: Option[/* max 8 chars */ String],
   /** Revision number of the document. */
   revision: /* bpchar, max 5 chars */ String,
-  /** 1 = Pending approval, 2 = Approved, 3 = Obsolete */
+  /** 1 = Pending approval, 2 = Approved, 3 = Obsolete
+      Constraint CK_Document_Status affecting columns "status":  (((status >= 1) AND (status <= 3))) */
   status: TypoShort,
   /** Document abstract. */
   documentsummary: Option[String],

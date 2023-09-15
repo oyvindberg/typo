@@ -22,10 +22,12 @@ case class ShipmethodRowUnsaved(
       Primary key for ShipMethod records. */
   shipmethodid: Defaulted[ShipmethodId] = Defaulted.UseDefault,
   /** Default: 0.00
-      Minimum shipping charge. */
+      Minimum shipping charge.
+      Constraint CK_ShipMethod_ShipBase affecting columns "shipbase":  ((shipbase > 0.00)) */
   shipbase: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
-      Shipping charge per pound. */
+      Shipping charge per pound.
+      Constraint CK_ShipMethod_ShipRate affecting columns "shiprate":  ((shiprate > 0.00)) */
   shiprate: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
