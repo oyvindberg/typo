@@ -9,5 +9,5 @@ SELECT nc.oid                                        as table_oid,
 FROM pg_namespace nc,
      pg_class c
 WHERE c.relnamespace = nc.oid
-  AND c.relkind in ('m'::"char", 'v'::char)
+  AND c.relkind in ('m'::"char", 'v'::"char")
 order by 1, 2, 3
