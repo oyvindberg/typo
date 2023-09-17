@@ -16,6 +16,7 @@ const sidebars = {
             ],
         },
         {type: "doc", id: "setup"},
+        {type: "doc", id: "limitations"},
         {
             type: "category",
             label: "Type-safety",
@@ -49,8 +50,29 @@ const sidebars = {
                 {type: "doc", id: "other-features/constraints"},
             ],
         },
-        {type: "doc", id: "customization"},
-        {type: "doc", id: "patterns"}
+        {
+            type: "category",
+            label: "Patterns",
+            collapsible: true,
+            collapsed: false,
+            items: [
+                {type: "doc", id: "patterns/multi-repo"},
+                {type: "doc", id: "patterns/dynamic-queries"},
+            ],
+        },
+        {
+            type: "category",
+            label: "Customization",
+            collapsible: true,
+            collapsed: false,
+            items: [
+                {type: "doc", id: "customization/overview"},
+                {type: "doc", id: "customization/customize-sql-files"},
+                {type: "doc", id: "customization/customize-naming"},
+                {type: "doc", id: "customization/customize-nullability"},
+                {type: "doc", id: "customization/customize-types"},
+            ],
+        },
     ]
 };
 

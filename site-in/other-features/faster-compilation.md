@@ -2,7 +2,7 @@
 title: Focus on fast(er) compiles
 ---
 
-If you have a big database schema, typo can easily produce tens to hundreds of thousands of lines of code.
+If you have a big database schema, Typo can easily produce tens to hundreds of thousands of lines of code.
 And it's all full of implicit type class instances.
 
 The following measures have been taken to compile code fast

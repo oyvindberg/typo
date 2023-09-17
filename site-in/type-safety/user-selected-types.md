@@ -2,72 +2,23 @@
 title: User-selected types
 ---
 
-If you're integrating the generated code into an existing codebase it may be beneficial to reuse existing types, in particular ID types.
+This functionality is present in Typo in order to:
+- avoid generating [primary key types](type-safety/id-types.md) for what is typically strings and numbers if you already have such a type and you're integrating with an existing codebase.
+- to type up columns which should have had a more specific wrapper type, again typically strings or numbers
 
-You can [customize](../customization.md) typo to override types.
+It's strongly discouraged to use it for anything else. In particular, you should *not* use it to avoid [Typo types](type-safety/typo-types.md)!
+They are there to work around bugs.
 
-## Note
+## Usage
+You setup user-selected types by [Customizing column types](customization/customize-types.md).
+
 You need to implement a bunch of typeclass instances for the types you use.
 The compiler will guide you, but it's basically everything which is needed to use the type with your database and json library.
+The easiest approach is probably to copy/paste a generated primary key type and adapt it.
 
-You can likely copy/paste from the generated id types and adapt them. 
+## 💣 Note 💣
 
-### Choose column types from relations
+It is crucial that you implement these typeclass instances **correctly**, or things may obviously blow up at runtime.
+In particular, the generated Typo code makes use of `sqlType` to make explicit casts in generated SQL.
 
-```scala mdoc:silent
-import typo.{Options, TypeOverride}
 
-val rewriteColumnTypes = TypeOverride.relation {
-  case ("schema.table", "column") => "org.foo.ColumnId"
-}
-
-Options(
-  pkg = "org.foo",
-  dbLib = None,
-  typeOverride = rewriteColumnTypes
-)
-```
-
-### Explicit version
-
-The version above is "simplified", in that is takes a descriptive type and explodes it into strings. 
-You may prefer the version below which is more cumbersome but more structured:
-
-```scala mdoc:silent
-import typo.db.RelationName
-
-val rewriteMore = TypeOverride.of { 
-  case (RelationName(Some(schema), tableName), colName) if schema.contains("foo") && colName.value.startsWith("foo") => "org.foo.Bar" 
-}
-```
-
-### Composing multiple column overrides:
-
-```scala mdoc:silent
-rewriteColumnTypes.orElse(rewriteMore)
-```
-
-## Choose nullability and types for parameters and columns in sql files
-
-This is done inline in the SQL you write:
-
-```sql
--- foo is nullable, by default pg cannot infer nullability
-select 1 where :foo = 1;
--- foo is explicitly set to nullable
-select 1 where :"foo?" = 1;
--- foo is explicitly set to not nullable
-select 1 where :"foo!" = 1;
--- foo is explicitly set to not nullable and `Long`
-select 1 where :"foo:scala.Long!" = 1;
-```
-
-also works for columns, naturally:
-```sql
-select 1 as "foo:scala.Double?" -- rewrite `Int` to `Option[Double]`
-```
-
-and if you mention a parameter multiple times you only need to customize it at first mention
-```sql
-select 1 where :"foo!" = 1 and :foo != 2;
-```

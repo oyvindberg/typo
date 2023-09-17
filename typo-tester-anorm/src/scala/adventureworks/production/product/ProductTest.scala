@@ -1,6 +1,7 @@
 package adventureworks.production.product
 
 import adventureworks.customtypes.*
+import adventureworks.person_dynamic.PersonDynamicSqlRepoImpl
 import adventureworks.production.productcategory.*
 import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
@@ -17,6 +18,12 @@ import scala.util.Random
 class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
   // for scala 2.12
   implicit val `Ordering[LocalDateTime]` : Ordering[LocalDateTime] = (x: LocalDateTime, y: LocalDateTime) => x.compareTo(y)
+
+  test("flaf") {
+    withConnection { implicit c =>
+      PersonDynamicSqlRepoImpl(Some("A"))
+    }
+  }
 
   test("foo") {
     withConnection { implicit c =>

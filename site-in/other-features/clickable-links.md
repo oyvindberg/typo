@@ -2,7 +2,7 @@
 title: Clickable links
 ---
 
-typo discovers information about "dependencies" — flow of data through foreign keys or through column dependencies in views.
+Typo discovers information about "dependencies" — flow of data through foreign keys or through column dependencies in views.
 These are rendered in scaladoc in such a way that you can ctrl-click through them, and in that manner discover the schema of the database you're working with.
 
 Here's a short demo video:

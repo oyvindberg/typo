@@ -2,15 +2,15 @@
 title: String enums
 ---
 
-If you use string enums in postgres like this:
+If you use string enums in PostgreSQL like this:
 
 ```postgresql
 CREATE TYPE sector AS ENUM ('PUBLIC', 'PRIVATE', 'OTHER');
 ```
 
-typo will generate a type for it with the corresponding type class instances:
+Typo will generate a type for it with the corresponding type class instances:
 
-Note that like all generated code from typo it is in the scala 2/3 shared subset, so
+Note that like all generated code from Typo it is in the scala 2/3 shared subset, so
 it doesn't use `enum` for now.
 
 ```scala mdoc

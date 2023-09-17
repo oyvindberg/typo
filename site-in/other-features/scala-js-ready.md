@@ -6,7 +6,7 @@ If you want to move `Row` instances across the wire to a Scala.js app, you shoul
 
 _Note that this hasn't been tested yet, so report back with results._
 
-It's a rather manual process for now, where you can run typo twice:
+It's a rather manual process for now, where you can run Typo twice:
 - once to generate JVM code, where you specify both a database and json library, and output files to a JVM-only source folder
 - once to generate JS code, where you only specify a json library. You can write files to a JS-only source folder
 
