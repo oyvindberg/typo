@@ -11,6 +11,7 @@ package person
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -31,10 +32,11 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     delay {
-      if (map.contains(unsaved.id))
+      val _ = if (map.contains(unsaved.id))
         sys.error(s"id ${unsaved.id} already exists")
       else
         map.put(unsaved.id, unsaved)
+    
       unsaved
     }
   }
@@ -76,7 +78,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       map.get(row.id) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.id, row)
+          map.put(row.id, row): @nowarn
           true
         case None => false
       }
@@ -103,7 +105,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
             case (acc, PersonFieldValue.favoriteNumber(value)) => acc.copy(favoriteNumber = value)
           }
           if (updatedRow != oldRow) {
-            map.put(id, updatedRow)
+            map.put(id, updatedRow): @nowarn
             true
           } else {
             false
@@ -114,7 +116,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     delay {
-      map.put(unsaved.id, unsaved)
+      map.put(unsaved.id, unsaved): @nowarn
       unsaved
     }
   }

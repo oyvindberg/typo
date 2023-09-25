@@ -10,6 +10,7 @@ package businessentity
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   }
   override def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     delay {
-      if (map.contains(unsaved.businessentityid))
+      val _ = if (map.contains(unsaved.businessentityid))
         sys.error(s"id ${unsaved.businessentityid} already exists")
       else
         map.put(unsaved.businessentityid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
       map.get(row.businessentityid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.businessentityid, row)
+          map.put(row.businessentityid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   }
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     delay {
-      map.put(unsaved.businessentityid, unsaved)
+      map.put(unsaved.businessentityid, unsaved): @nowarn
       unsaved
     }
   }

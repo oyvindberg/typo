@@ -10,6 +10,7 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDate
+import scala.annotation.nowarn
 
 class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = EmployeeRepoImpl
@@ -64,16 +65,16 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
       // insert and round trip check
       val saved1 = repo.insert(unsaved)
       val saved2 = unsaved.toRow(???, ???, ???, ???, ???, ???, ???)
-      assert(saved1 === saved2)
+      assert(saved1 === saved2): @nowarn
 
       // check field values
-      repo.update(saved1.copy(gender = "M"))
+      repo.update(saved1.copy(gender = "M")): @nowarn
       val List(saved3) = repo.selectAll: @unchecked
       val List(`saved3`) = repo.selectByIds(Array(saved1.businessentityid, BusinessentityId(22))): @unchecked
-      assert(saved3.gender == "M")
+      assert(saved3.gender == "M"): @nowarn
 
       // delete
-      repo.delete(saved1.businessentityid)
+      repo.delete(saved1.businessentityid): @nowarn
 
       val List() = repo.selectAll: @unchecked
 

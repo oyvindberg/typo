@@ -8,6 +8,7 @@ package pg_catalog
 package pg_statistic_ext_data
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgStatisticExtDataRepoMock(map: scala.collection.mutable.Map[PgStatisticEx
     DeleteBuilderMock(DeleteParams.empty, PgStatisticExtDataFields, map)
   }
   override def insert(unsaved: PgStatisticExtDataRow)(implicit c: Connection): PgStatisticExtDataRow = {
-    if (map.contains(unsaved.stxoid))
+    val _ = if (map.contains(unsaved.stxoid))
       sys.error(s"id ${unsaved.stxoid} already exists")
     else
       map.put(unsaved.stxoid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
@@ -48,7 +50,7 @@ class PgStatisticExtDataRepoMock(map: scala.collection.mutable.Map[PgStatisticEx
     map.get(row.stxoid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.stxoid, row)
+        map.put(row.stxoid, row): @nowarn
         true
       case None => false
     }
@@ -57,7 +59,7 @@ class PgStatisticExtDataRepoMock(map: scala.collection.mutable.Map[PgStatisticEx
     UpdateBuilderMock(UpdateParams.empty, PgStatisticExtDataFields, map)
   }
   override def upsert(unsaved: PgStatisticExtDataRow)(implicit c: Connection): PgStatisticExtDataRow = {
-    map.put(unsaved.stxoid, unsaved)
+    map.put(unsaved.stxoid, unsaved): @nowarn
     unsaved
   }
 }

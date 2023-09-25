@@ -8,6 +8,7 @@ package production
 package culture
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     DeleteBuilderMock(DeleteParams.empty, CultureFields, map)
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
-    if (map.contains(unsaved.cultureid))
+    val _ = if (map.contains(unsaved.cultureid))
       sys.error(s"id ${unsaved.cultureid} already exists")
     else
       map.put(unsaved.cultureid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
@@ -52,7 +54,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     map.get(row.cultureid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.cultureid, row)
+        map.put(row.cultureid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     UpdateBuilderMock(UpdateParams.empty, CultureFields, map)
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
-    map.put(unsaved.cultureid, unsaved)
+    map.put(unsaved.cultureid, unsaved): @nowarn
     unsaved
   }
 }

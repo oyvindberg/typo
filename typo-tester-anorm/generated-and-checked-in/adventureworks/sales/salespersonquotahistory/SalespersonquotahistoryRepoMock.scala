@@ -8,6 +8,7 @@ package sales
 package salespersonquotahistory
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     DeleteBuilderMock(DeleteParams.empty, SalespersonquotahistoryFields, map)
   }
   override def insert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
-    if (map.contains(unsaved.compositeId))
+    val _ = if (map.contains(unsaved.compositeId))
       sys.error(s"id ${unsaved.compositeId} already exists")
     else
       map.put(unsaved.compositeId, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
@@ -49,7 +51,7 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     map.get(row.compositeId) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.compositeId, row)
+        map.put(row.compositeId, row): @nowarn
         true
       case None => false
     }
@@ -58,7 +60,7 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     UpdateBuilderMock(UpdateParams.empty, SalespersonquotahistoryFields, map)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
-    map.put(unsaved.compositeId, unsaved)
+    map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
 }

@@ -8,6 +8,7 @@ package production
 package productcosthistory
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
     DeleteBuilderMock(DeleteParams.empty, ProductcosthistoryFields, map)
   }
   override def insert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
-    if (map.contains(unsaved.compositeId))
+    val _ = if (map.contains(unsaved.compositeId))
       sys.error(s"id ${unsaved.compositeId} already exists")
     else
       map.put(unsaved.compositeId, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow = {
@@ -49,7 +51,7 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
     map.get(row.compositeId) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.compositeId, row)
+        map.put(row.compositeId, row): @nowarn
         true
       case None => false
     }
@@ -58,7 +60,7 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
     UpdateBuilderMock(UpdateParams.empty, ProductcosthistoryFields, map)
   }
   override def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
-    map.put(unsaved.compositeId, unsaved)
+    map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
 }

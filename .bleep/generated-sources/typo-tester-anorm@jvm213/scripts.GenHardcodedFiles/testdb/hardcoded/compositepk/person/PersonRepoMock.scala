@@ -9,6 +9,7 @@ package compositepk
 package person
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -28,10 +29,11 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     DeleteBuilderMock(DeleteParams.empty, PersonFields, map)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    if (map.contains(unsaved.compositeId))
+    val _ = if (map.contains(unsaved.compositeId))
       sys.error(s"id ${unsaved.compositeId} already exists")
     else
       map.put(unsaved.compositeId, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
@@ -57,7 +59,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     map.get(row.compositeId) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.compositeId, row)
+        map.put(row.compositeId, row): @nowarn
         true
       case None => false
     }
@@ -72,7 +74,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
           case (acc, PersonFieldValue.name(value)) => acc.copy(name = value)
         }
         if (updatedRow != oldRow) {
-          map.put(compositeId, updatedRow)
+          map.put(compositeId, updatedRow): @nowarn
           true
         } else {
           false
@@ -81,7 +83,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     }
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    map.put(unsaved.compositeId, unsaved)
+    map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
 }

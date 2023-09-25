@@ -8,6 +8,7 @@ package pg_catalog
 package pg_namespace
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
     DeleteBuilderMock(DeleteParams.empty, PgNamespaceFields, map)
   }
   override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgNamespaceFields, PgNamespaceRow] = {
@@ -51,7 +53,7 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
     UpdateBuilderMock(UpdateParams.empty, PgNamespaceFields, map)
   }
   override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

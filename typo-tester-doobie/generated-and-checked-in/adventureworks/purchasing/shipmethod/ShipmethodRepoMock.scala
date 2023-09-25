@@ -10,6 +10,7 @@ package shipmethod
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     delay {
-      if (map.contains(unsaved.shipmethodid))
+      val _ = if (map.contains(unsaved.shipmethodid))
         sys.error(s"id ${unsaved.shipmethodid} already exists")
       else
         map.put(unsaved.shipmethodid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
       map.get(row.shipmethodid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.shipmethodid, row)
+          map.put(row.shipmethodid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   }
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     delay {
-      map.put(unsaved.shipmethodid, unsaved)
+      map.put(unsaved.shipmethodid, unsaved): @nowarn
       unsaved
     }
   }

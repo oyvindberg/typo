@@ -10,6 +10,7 @@ package purchaseorderheader
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
   }
   override def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     delay {
-      if (map.contains(unsaved.purchaseorderid))
+      val _ = if (map.contains(unsaved.purchaseorderid))
         sys.error(s"id ${unsaved.purchaseorderid} already exists")
       else
         map.put(unsaved.purchaseorderid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
       map.get(row.purchaseorderid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.purchaseorderid, row)
+          map.put(row.purchaseorderid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     delay {
-      map.put(unsaved.purchaseorderid, unsaved)
+      map.put(unsaved.purchaseorderid, unsaved): @nowarn
       unsaved
     }
   }

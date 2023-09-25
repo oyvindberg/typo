@@ -8,6 +8,7 @@ package sales
 package shoppingcartitem
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields, map)
   }
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
-    if (map.contains(unsaved.shoppingcartitemid))
+    val _ = if (map.contains(unsaved.shoppingcartitemid))
       sys.error(s"id ${unsaved.shoppingcartitemid} already exists")
     else
       map.put(unsaved.shoppingcartitemid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
@@ -52,7 +54,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     map.get(row.shoppingcartitemid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.shoppingcartitemid, row)
+        map.put(row.shoppingcartitemid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields, map)
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
-    map.put(unsaved.shoppingcartitemid, unsaved)
+    map.put(unsaved.shoppingcartitemid, unsaved): @nowarn
     unsaved
   }
 }

@@ -10,6 +10,7 @@ package pg_sequence
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
   }
   override def insert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow] = {
     delay {
-      if (map.contains(unsaved.seqrelid))
+      val _ = if (map.contains(unsaved.seqrelid))
         sys.error(s"id ${unsaved.seqrelid} already exists")
       else
         map.put(unsaved.seqrelid, unsaved)
+    
       unsaved
     }
   }
@@ -53,7 +55,7 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
       map.get(row.seqrelid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.seqrelid, row)
+          map.put(row.seqrelid, row): @nowarn
           true
         case None => false
       }
@@ -64,7 +66,7 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
   }
   override def upsert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow] = {
     delay {
-      map.put(unsaved.seqrelid, unsaved)
+      map.put(unsaved.seqrelid, unsaved): @nowarn
       unsaved
     }
   }

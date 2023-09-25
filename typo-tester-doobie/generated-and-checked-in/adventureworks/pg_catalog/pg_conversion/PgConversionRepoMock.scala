@@ -10,6 +10,7 @@ package pg_conversion
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
   }
   override def insert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
     delay {
-      if (map.contains(unsaved.oid))
+      val _ = if (map.contains(unsaved.oid))
         sys.error(s"id ${unsaved.oid} already exists")
       else
         map.put(unsaved.oid, unsaved)
+    
       unsaved
     }
   }
@@ -59,7 +61,7 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
       map.get(row.oid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.oid, row)
+          map.put(row.oid, row): @nowarn
           true
         case None => false
       }
@@ -70,7 +72,7 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
   }
   override def upsert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
     delay {
-      map.put(unsaved.oid, unsaved)
+      map.put(unsaved.oid, unsaved): @nowarn
       unsaved
     }
   }

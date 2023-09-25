@@ -12,6 +12,7 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import scala.util.Random
 
 case class PersonWithAddresses(person: PersonRow, addresses: Map[Name, AddressRow])
@@ -32,7 +33,7 @@ class PersonWithAddressesRepo(
    */
   def syncAddresses(pa: PersonWithAddresses)(implicit c: Connection): List[BusinessentityaddressRow] = {
     // update person
-    personRepo.update(pa.person)
+    personRepo.update(pa.person): @nowarn
     // update stored addresses
     pa.addresses.toList.foreach { case (_, address) => addressRepo.update(address) }
 
@@ -105,7 +106,7 @@ class PersonWithAddressesTest extends AnyFunSuite with TypeCheckedTripleEquals {
         addressRepo = AddressRepoImpl
       )
 
-      repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1, Name("OFFICE") -> addressRow2)))
+      repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1, Name("OFFICE") -> addressRow2))): @nowarn
 
       def fetchBAs() = BusinessentityaddressRepoImpl.select.where(p => p.addressid in Array(addressRow1.addressid, addressRow2.addressid, addressRow3.addressid)).orderBy(_.addressid.asc).toList
 
@@ -115,7 +116,7 @@ class PersonWithAddressesTest extends AnyFunSuite with TypeCheckedTripleEquals {
       ) = fetchBAs(): @unchecked
 
       // check that it's idempotent
-      repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1, Name("OFFICE") -> addressRow2)))
+      repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1, Name("OFFICE") -> addressRow2))): @nowarn
 
       val List(
         BusinessentityaddressRow(personRow.businessentityid, addressRow1.addressid, `homeId`, _, _),
@@ -123,13 +124,13 @@ class PersonWithAddressesTest extends AnyFunSuite with TypeCheckedTripleEquals {
       ) = fetchBAs(): @unchecked
 
       // remove one
-      repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1)))
+      repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1))): @nowarn
       val List(
         BusinessentityaddressRow(personRow.businessentityid, addressRow1.addressid, `homeId`, _, _)
       ) = fetchBAs(): @unchecked
 
       // add one
-      repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1, Name("VACATION") -> addressRow3)))
+      repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1, Name("VACATION") -> addressRow3))): @nowarn
       val List(
         BusinessentityaddressRow(personRow.businessentityid, addressRow1.addressid, `homeId`, _, _),
         BusinessentityaddressRow(personRow.businessentityid, addressRow3.addressid, _, _, _)

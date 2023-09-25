@@ -10,6 +10,7 @@ package employeepayhistory
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   }
   override def insert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     delay {
-      if (map.contains(unsaved.compositeId))
+      val _ = if (map.contains(unsaved.compositeId))
         sys.error(s"id ${unsaved.compositeId} already exists")
       else
         map.put(unsaved.compositeId, unsaved)
+    
       unsaved
     }
   }
@@ -54,7 +56,7 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
       map.get(row.compositeId) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.compositeId, row)
+          map.put(row.compositeId, row): @nowarn
           true
         case None => false
       }
@@ -65,7 +67,7 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   }
   override def upsert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     delay {
-      map.put(unsaved.compositeId, unsaved)
+      map.put(unsaved.compositeId, unsaved): @nowarn
       unsaved
     }
   }

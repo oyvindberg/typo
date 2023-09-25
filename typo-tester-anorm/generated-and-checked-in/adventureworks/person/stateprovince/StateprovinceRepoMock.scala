@@ -8,6 +8,7 @@ package person
 package stateprovince
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     DeleteBuilderMock(DeleteParams.empty, StateprovinceFields, map)
   }
   override def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
-    if (map.contains(unsaved.stateprovinceid))
+    val _ = if (map.contains(unsaved.stateprovinceid))
       sys.error(s"id ${unsaved.stateprovinceid} already exists")
     else
       map.put(unsaved.stateprovinceid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
@@ -52,7 +54,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     map.get(row.stateprovinceid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.stateprovinceid, row)
+        map.put(row.stateprovinceid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     UpdateBuilderMock(UpdateParams.empty, StateprovinceFields, map)
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
-    map.put(unsaved.stateprovinceid, unsaved)
+    map.put(unsaved.stateprovinceid, unsaved): @nowarn
     unsaved
   }
 }

@@ -10,6 +10,7 @@ package stateprovince
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   }
   override def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     delay {
-      if (map.contains(unsaved.stateprovinceid))
+      val _ = if (map.contains(unsaved.stateprovinceid))
         sys.error(s"id ${unsaved.stateprovinceid} already exists")
       else
         map.put(unsaved.stateprovinceid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
       map.get(row.stateprovinceid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.stateprovinceid, row)
+          map.put(row.stateprovinceid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   }
   override def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     delay {
-      map.put(unsaved.stateprovinceid, unsaved)
+      map.put(unsaved.stateprovinceid, unsaved): @nowarn
       unsaved
     }
   }

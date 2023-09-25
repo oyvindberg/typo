@@ -8,6 +8,7 @@ package pg_catalog
 package pg_index
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
     DeleteBuilderMock(DeleteParams.empty, PgIndexFields, map)
   }
   override def insert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
-    if (map.contains(unsaved.indexrelid))
+    val _ = if (map.contains(unsaved.indexrelid))
       sys.error(s"id ${unsaved.indexrelid} already exists")
     else
       map.put(unsaved.indexrelid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgIndexFields, PgIndexRow] = {
@@ -48,7 +50,7 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
     map.get(row.indexrelid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.indexrelid, row)
+        map.put(row.indexrelid, row): @nowarn
         true
       case None => false
     }
@@ -57,7 +59,7 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
     UpdateBuilderMock(UpdateParams.empty, PgIndexFields, map)
   }
   override def upsert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
-    map.put(unsaved.indexrelid, unsaved)
+    map.put(unsaved.indexrelid, unsaved): @nowarn
     unsaved
   }
 }

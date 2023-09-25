@@ -10,6 +10,7 @@ package specialoffer
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   }
   override def insert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     delay {
-      if (map.contains(unsaved.specialofferid))
+      val _ = if (map.contains(unsaved.specialofferid))
         sys.error(s"id ${unsaved.specialofferid} already exists")
       else
         map.put(unsaved.specialofferid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
       map.get(row.specialofferid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.specialofferid, row)
+          map.put(row.specialofferid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   }
   override def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     delay {
-      map.put(unsaved.specialofferid, unsaved)
+      map.put(unsaved.specialofferid, unsaved): @nowarn
       unsaved
     }
   }

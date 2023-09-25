@@ -11,6 +11,7 @@ package marital_status
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   }
   override def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     delay {
-      if (map.contains(unsaved.id))
+      val _ = if (map.contains(unsaved.id))
         sys.error(s"id ${unsaved.id} already exists")
       else
         map.put(unsaved.id, unsaved)
+    
       unsaved
     }
   }
@@ -61,7 +63,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   }
   override def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     delay {
-      map.put(unsaved.id, unsaved)
+      map.put(unsaved.id, unsaved): @nowarn
       unsaved
     }
   }

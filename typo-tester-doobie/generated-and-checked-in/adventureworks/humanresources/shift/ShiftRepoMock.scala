@@ -10,6 +10,7 @@ package shift
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     delay {
-      if (map.contains(unsaved.shiftid))
+      val _ = if (map.contains(unsaved.shiftid))
         sys.error(s"id ${unsaved.shiftid} already exists")
       else
         map.put(unsaved.shiftid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       map.get(row.shiftid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.shiftid, row)
+          map.put(row.shiftid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     delay {
-      map.put(unsaved.shiftid, unsaved)
+      map.put(unsaved.shiftid, unsaved): @nowarn
       unsaved
     }
   }

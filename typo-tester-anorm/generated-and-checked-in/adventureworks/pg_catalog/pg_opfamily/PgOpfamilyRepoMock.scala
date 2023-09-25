@@ -8,6 +8,7 @@ package pg_catalog
 package pg_opfamily
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgOpfamilyRepoMock(map: scala.collection.mutable.Map[PgOpfamilyId, PgOpfam
     DeleteBuilderMock(DeleteParams.empty, PgOpfamilyFields, map)
   }
   override def insert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
@@ -51,7 +53,7 @@ class PgOpfamilyRepoMock(map: scala.collection.mutable.Map[PgOpfamilyId, PgOpfam
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgOpfamilyRepoMock(map: scala.collection.mutable.Map[PgOpfamilyId, PgOpfam
     UpdateBuilderMock(UpdateParams.empty, PgOpfamilyFields, map)
   }
   override def upsert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

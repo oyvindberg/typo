@@ -8,6 +8,7 @@ package production
 package productcategory
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class ProductcategoryRepoMock(toRow: Function1[ProductcategoryRowUnsaved, Produc
     DeleteBuilderMock(DeleteParams.empty, ProductcategoryFields, map)
   }
   override def insert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
-    if (map.contains(unsaved.productcategoryid))
+    val _ = if (map.contains(unsaved.productcategoryid))
       sys.error(s"id ${unsaved.productcategoryid} already exists")
     else
       map.put(unsaved.productcategoryid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: ProductcategoryRowUnsaved)(implicit c: Connection): ProductcategoryRow = {
@@ -52,7 +54,7 @@ class ProductcategoryRepoMock(toRow: Function1[ProductcategoryRowUnsaved, Produc
     map.get(row.productcategoryid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.productcategoryid, row)
+        map.put(row.productcategoryid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class ProductcategoryRepoMock(toRow: Function1[ProductcategoryRowUnsaved, Produc
     UpdateBuilderMock(UpdateParams.empty, ProductcategoryFields, map)
   }
   override def upsert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
-    map.put(unsaved.productcategoryid, unsaved)
+    map.put(unsaved.productcategoryid, unsaved): @nowarn
     unsaved
   }
 }

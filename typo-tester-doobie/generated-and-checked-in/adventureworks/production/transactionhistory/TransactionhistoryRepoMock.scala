@@ -10,6 +10,7 @@ package transactionhistory
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
   }
   override def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     delay {
-      if (map.contains(unsaved.transactionid))
+      val _ = if (map.contains(unsaved.transactionid))
         sys.error(s"id ${unsaved.transactionid} already exists")
       else
         map.put(unsaved.transactionid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
       map.get(row.transactionid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.transactionid, row)
+          map.put(row.transactionid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
   }
   override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     delay {
-      map.put(unsaved.transactionid, unsaved)
+      map.put(unsaved.transactionid, unsaved): @nowarn
       unsaved
     }
   }

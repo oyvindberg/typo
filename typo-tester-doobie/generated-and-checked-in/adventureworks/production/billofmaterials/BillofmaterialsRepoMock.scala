@@ -10,6 +10,7 @@ package billofmaterials
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     delay {
-      if (map.contains(unsaved.billofmaterialsid))
+      val _ = if (map.contains(unsaved.billofmaterialsid))
         sys.error(s"id ${unsaved.billofmaterialsid} already exists")
       else
         map.put(unsaved.billofmaterialsid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
       map.get(row.billofmaterialsid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.billofmaterialsid, row)
+          map.put(row.billofmaterialsid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   }
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     delay {
-      map.put(unsaved.billofmaterialsid, unsaved)
+      map.put(unsaved.billofmaterialsid, unsaved): @nowarn
       unsaved
     }
   }

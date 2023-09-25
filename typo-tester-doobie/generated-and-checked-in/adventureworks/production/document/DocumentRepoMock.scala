@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoUUID
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -31,10 +32,11 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     delay {
-      if (map.contains(unsaved.documentnode))
+      val _ = if (map.contains(unsaved.documentnode))
         sys.error(s"id ${unsaved.documentnode} already exists")
       else
         map.put(unsaved.documentnode, unsaved)
+    
       unsaved
     }
   }
@@ -61,7 +63,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
       map.get(row.documentnode) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.documentnode, row)
+          map.put(row.documentnode, row): @nowarn
           true
         case None => false
       }
@@ -72,7 +74,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     delay {
-      map.put(unsaved.documentnode, unsaved)
+      map.put(unsaved.documentnode, unsaved): @nowarn
       unsaved
     }
   }

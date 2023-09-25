@@ -460,7 +460,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |      ${cases.mkCode("\n")}
                |    }
                |    if (updatedRow != oldRow) {
-               |      map.put(${id.paramName}, updatedRow)
+               |      map.put(${id.paramName}, updatedRow): @${sc.Type.nowarn}
                |      true
                |    } else {
                |      false
@@ -473,18 +473,19 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"""map.get(${param.name}.${id.paramName}) match {
               |  case ${sc.Type.Some}(`${param.name}`) => false
               |  case ${sc.Type.Some}(_) =>
-              |    map.put(${param.name}.${id.paramName}, ${param.name})
+              |    map.put(${param.name}.${id.paramName}, ${param.name}): @${sc.Type.nowarn}
               |    true
               |  case ${sc.Type.None} => false
               |}""".stripMargin
       case RepoMethod.Insert(_, _, unsavedParam, _) =>
-        code"""|if (map.contains(${unsavedParam.name}.${id.paramName}))
+        code"""|val _ = if (map.contains(${unsavedParam.name}.${id.paramName}))
                |  sys.error(s"id $${${unsavedParam.name}.${id.paramName}} already exists")
                |else
                |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
+               |
                |${unsavedParam.name}"""
       case RepoMethod.Upsert(_, _, _, unsavedParam, _) =>
-        code"""|map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
+        code"""|map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${sc.Type.nowarn}
                |${unsavedParam.name}"""
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"

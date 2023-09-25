@@ -8,6 +8,7 @@ package production
 package workorder
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     DeleteBuilderMock(DeleteParams.empty, WorkorderFields, map)
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
-    if (map.contains(unsaved.workorderid))
+    val _ = if (map.contains(unsaved.workorderid))
       sys.error(s"id ${unsaved.workorderid} already exists")
     else
       map.put(unsaved.workorderid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
@@ -52,7 +54,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     map.get(row.workorderid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.workorderid, row)
+        map.put(row.workorderid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     UpdateBuilderMock(UpdateParams.empty, WorkorderFields, map)
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
-    map.put(unsaved.workorderid, unsaved)
+    map.put(unsaved.workorderid, unsaved): @nowarn
     unsaved
   }
 }

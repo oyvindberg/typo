@@ -10,6 +10,7 @@ package scrapreason
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     delay {
-      if (map.contains(unsaved.scrapreasonid))
+      val _ = if (map.contains(unsaved.scrapreasonid))
         sys.error(s"id ${unsaved.scrapreasonid} already exists")
       else
         map.put(unsaved.scrapreasonid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
       map.get(row.scrapreasonid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.scrapreasonid, row)
+          map.put(row.scrapreasonid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     delay {
-      map.put(unsaved.scrapreasonid, unsaved)
+      map.put(unsaved.scrapreasonid, unsaved): @nowarn
       unsaved
     }
   }

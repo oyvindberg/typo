@@ -10,6 +10,7 @@ package currency
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     delay {
-      if (map.contains(unsaved.currencycode))
+      val _ = if (map.contains(unsaved.currencycode))
         sys.error(s"id ${unsaved.currencycode} already exists")
       else
         map.put(unsaved.currencycode, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
       map.get(row.currencycode) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.currencycode, row)
+          map.put(row.currencycode, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   }
   override def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     delay {
-      map.put(unsaved.currencycode, unsaved)
+      map.put(unsaved.currencycode, unsaved): @nowarn
       unsaved
     }
   }

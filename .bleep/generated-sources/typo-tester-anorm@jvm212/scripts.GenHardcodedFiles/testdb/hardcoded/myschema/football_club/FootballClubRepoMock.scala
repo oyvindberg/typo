@@ -9,6 +9,7 @@ package myschema
 package football_club
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     DeleteBuilderMock(DeleteParams.empty, FootballClubFields, map)
   }
   override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
-    if (map.contains(unsaved.id))
+    val _ = if (map.contains(unsaved.id))
       sys.error(s"id ${unsaved.id} already exists")
     else
       map.put(unsaved.id, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
@@ -55,7 +57,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     map.get(row.id) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.id, row)
+        map.put(row.id, row): @nowarn
         true
       case None => false
     }
@@ -70,7 +72,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
           case (acc, FootballClubFieldValue.name(value)) => acc.copy(name = value)
         }
         if (updatedRow != oldRow) {
-          map.put(id, updatedRow)
+          map.put(id, updatedRow): @nowarn
           true
         } else {
           false
@@ -79,7 +81,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     }
   }
   override def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
-    map.put(unsaved.id, unsaved)
+    map.put(unsaved.id, unsaved): @nowarn
     unsaved
   }
 }

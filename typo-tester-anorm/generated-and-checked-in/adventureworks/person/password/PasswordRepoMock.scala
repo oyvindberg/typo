@@ -9,6 +9,7 @@ package password
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -28,10 +29,11 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     DeleteBuilderMock(DeleteParams.empty, PasswordFields, map)
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
-    if (map.contains(unsaved.businessentityid))
+    val _ = if (map.contains(unsaved.businessentityid))
       sys.error(s"id ${unsaved.businessentityid} already exists")
     else
       map.put(unsaved.businessentityid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
@@ -53,7 +55,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     map.get(row.businessentityid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.businessentityid, row)
+        map.put(row.businessentityid, row): @nowarn
         true
       case None => false
     }
@@ -62,7 +64,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     UpdateBuilderMock(UpdateParams.empty, PasswordFields, map)
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
-    map.put(unsaved.businessentityid, unsaved)
+    map.put(unsaved.businessentityid, unsaved): @nowarn
     unsaved
   }
 }

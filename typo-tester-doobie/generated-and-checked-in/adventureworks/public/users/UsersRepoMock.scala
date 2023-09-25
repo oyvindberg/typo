@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoUnknownCitext
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -31,10 +32,11 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   }
   override def insert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     delay {
-      if (map.contains(unsaved.userId))
+      val _ = if (map.contains(unsaved.userId))
         sys.error(s"id ${unsaved.userId} already exists")
       else
         map.put(unsaved.userId, unsaved)
+    
       unsaved
     }
   }
@@ -61,7 +63,7 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
       map.get(row.userId) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.userId, row)
+          map.put(row.userId, row): @nowarn
           true
         case None => false
       }
@@ -72,7 +74,7 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   }
   override def upsert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     delay {
-      map.put(unsaved.userId, unsaved)
+      map.put(unsaved.userId, unsaved): @nowarn
       unsaved
     }
   }

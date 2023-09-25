@@ -8,6 +8,7 @@ package production
 package location
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     DeleteBuilderMock(DeleteParams.empty, LocationFields, map)
   }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
-    if (map.contains(unsaved.locationid))
+    val _ = if (map.contains(unsaved.locationid))
       sys.error(s"id ${unsaved.locationid} already exists")
     else
       map.put(unsaved.locationid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
@@ -52,7 +54,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     map.get(row.locationid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.locationid, row)
+        map.put(row.locationid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     UpdateBuilderMock(UpdateParams.empty, LocationFields, map)
   }
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
-    map.put(unsaved.locationid, unsaved)
+    map.put(unsaved.locationid, unsaved): @nowarn
     unsaved
   }
 }

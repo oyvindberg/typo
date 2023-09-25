@@ -8,6 +8,7 @@ package sales
 package salesorderheader
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields, map)
   }
   override def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
-    if (map.contains(unsaved.salesorderid))
+    val _ = if (map.contains(unsaved.salesorderid))
       sys.error(s"id ${unsaved.salesorderid} already exists")
     else
       map.put(unsaved.salesorderid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
@@ -52,7 +54,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     map.get(row.salesorderid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.salesorderid, row)
+        map.put(row.salesorderid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields, map)
   }
   override def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
-    map.put(unsaved.salesorderid, unsaved)
+    map.put(unsaved.salesorderid, unsaved): @nowarn
     unsaved
   }
 }

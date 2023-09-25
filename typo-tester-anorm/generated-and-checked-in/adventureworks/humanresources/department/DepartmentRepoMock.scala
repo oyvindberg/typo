@@ -8,6 +8,7 @@ package humanresources
 package department
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     DeleteBuilderMock(DeleteParams.empty, DepartmentFields, map)
   }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
-    if (map.contains(unsaved.departmentid))
+    val _ = if (map.contains(unsaved.departmentid))
       sys.error(s"id ${unsaved.departmentid} already exists")
     else
       map.put(unsaved.departmentid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
@@ -52,7 +54,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     map.get(row.departmentid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.departmentid, row)
+        map.put(row.departmentid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     UpdateBuilderMock(UpdateParams.empty, DepartmentFields, map)
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
-    map.put(unsaved.departmentid, unsaved)
+    map.put(unsaved.departmentid, unsaved): @nowarn
     unsaved
   }
 }

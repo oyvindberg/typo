@@ -8,6 +8,7 @@ package pg_catalog
 package pg_sequence
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
     DeleteBuilderMock(DeleteParams.empty, PgSequenceFields, map)
   }
   override def insert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow = {
-    if (map.contains(unsaved.seqrelid))
+    val _ = if (map.contains(unsaved.seqrelid))
       sys.error(s"id ${unsaved.seqrelid} already exists")
     else
       map.put(unsaved.seqrelid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgSequenceFields, PgSequenceRow] = {
@@ -48,7 +50,7 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
     map.get(row.seqrelid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.seqrelid, row)
+        map.put(row.seqrelid, row): @nowarn
         true
       case None => false
     }
@@ -57,7 +59,7 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
     UpdateBuilderMock(UpdateParams.empty, PgSequenceFields, map)
   }
   override def upsert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow = {
-    map.put(unsaved.seqrelid, unsaved)
+    map.put(unsaved.seqrelid, unsaved): @nowarn
     unsaved
   }
 }

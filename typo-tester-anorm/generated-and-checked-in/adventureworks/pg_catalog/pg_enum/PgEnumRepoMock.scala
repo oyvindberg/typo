@@ -8,6 +8,7 @@ package pg_catalog
 package pg_enum
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = sc
     DeleteBuilderMock(DeleteParams.empty, PgEnumFields, map)
   }
   override def insert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgEnumFields, PgEnumRow] = {
@@ -54,7 +56,7 @@ class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = sc
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -63,7 +65,7 @@ class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = sc
     UpdateBuilderMock(UpdateParams.empty, PgEnumFields, map)
   }
   override def upsert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

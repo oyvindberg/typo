@@ -19,8 +19,9 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
   override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
     if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
-    else
-      map.put(unsaved.oid, unsaved)
+    else {
+      val _ = map.put(unsaved.oid, unsaved)
+    }
     unsaved
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
@@ -39,13 +40,13 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        val _ = map.put(row.oid, row)
         true
       case None => false
     }
   }
   override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    map.put(unsaved.oid, unsaved)
+    val _ = map.put(unsaved.oid, unsaved)
     unsaved
   }
 }

@@ -10,6 +10,7 @@ package pg_range
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
   }
   override def insert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow] = {
     delay {
-      if (map.contains(unsaved.rngtypid))
+      val _ = if (map.contains(unsaved.rngtypid))
         sys.error(s"id ${unsaved.rngtypid} already exists")
       else
         map.put(unsaved.rngtypid, unsaved)
+    
       unsaved
     }
   }
@@ -56,7 +58,7 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
       map.get(row.rngtypid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.rngtypid, row)
+          map.put(row.rngtypid, row): @nowarn
           true
         case None => false
       }
@@ -67,7 +69,7 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
   }
   override def upsert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow] = {
     delay {
-      map.put(unsaved.rngtypid, unsaved)
+      map.put(unsaved.rngtypid, unsaved): @nowarn
       unsaved
     }
   }

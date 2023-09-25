@@ -8,6 +8,7 @@ package pg_catalog
 package pg_statistic
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgStatisticRepoMock(map: scala.collection.mutable.Map[PgStatisticId, PgSta
     DeleteBuilderMock(DeleteParams.empty, PgStatisticFields, map)
   }
   override def insert(unsaved: PgStatisticRow)(implicit c: Connection): PgStatisticRow = {
-    if (map.contains(unsaved.compositeId))
+    val _ = if (map.contains(unsaved.compositeId))
       sys.error(s"id ${unsaved.compositeId} already exists")
     else
       map.put(unsaved.compositeId, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgStatisticFields, PgStatisticRow] = {
@@ -45,7 +47,7 @@ class PgStatisticRepoMock(map: scala.collection.mutable.Map[PgStatisticId, PgSta
     map.get(row.compositeId) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.compositeId, row)
+        map.put(row.compositeId, row): @nowarn
         true
       case None => false
     }
@@ -54,7 +56,7 @@ class PgStatisticRepoMock(map: scala.collection.mutable.Map[PgStatisticId, PgSta
     UpdateBuilderMock(UpdateParams.empty, PgStatisticFields, map)
   }
   override def upsert(unsaved: PgStatisticRow)(implicit c: Connection): PgStatisticRow = {
-    map.put(unsaved.compositeId, unsaved)
+    map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
 }

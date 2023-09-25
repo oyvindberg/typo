@@ -10,6 +10,7 @@ package pg_type
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgTypeRepoMock(map: scala.collection.mutable.Map[PgTypeId, PgTypeRow] = sc
   }
   override def insert(unsaved: PgTypeRow): ConnectionIO[PgTypeRow] = {
     delay {
-      if (map.contains(unsaved.oid))
+      val _ = if (map.contains(unsaved.oid))
         sys.error(s"id ${unsaved.oid} already exists")
       else
         map.put(unsaved.oid, unsaved)
+    
       unsaved
     }
   }
@@ -56,7 +58,7 @@ class PgTypeRepoMock(map: scala.collection.mutable.Map[PgTypeId, PgTypeRow] = sc
       map.get(row.oid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.oid, row)
+          map.put(row.oid, row): @nowarn
           true
         case None => false
       }
@@ -67,7 +69,7 @@ class PgTypeRepoMock(map: scala.collection.mutable.Map[PgTypeId, PgTypeRow] = sc
   }
   override def upsert(unsaved: PgTypeRow): ConnectionIO[PgTypeRow] = {
     delay {
-      map.put(unsaved.oid, unsaved)
+      map.put(unsaved.oid, unsaved): @nowarn
       unsaved
     }
   }

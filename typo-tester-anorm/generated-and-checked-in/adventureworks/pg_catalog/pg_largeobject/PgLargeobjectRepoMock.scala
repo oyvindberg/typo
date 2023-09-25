@@ -8,6 +8,7 @@ package pg_catalog
 package pg_largeobject
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, P
     DeleteBuilderMock(DeleteParams.empty, PgLargeobjectFields, map)
   }
   override def insert(unsaved: PgLargeobjectRow)(implicit c: Connection): PgLargeobjectRow = {
-    if (map.contains(unsaved.compositeId))
+    val _ = if (map.contains(unsaved.compositeId))
       sys.error(s"id ${unsaved.compositeId} already exists")
     else
       map.put(unsaved.compositeId, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
@@ -45,7 +47,7 @@ class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, P
     map.get(row.compositeId) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.compositeId, row)
+        map.put(row.compositeId, row): @nowarn
         true
       case None => false
     }
@@ -54,7 +56,7 @@ class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, P
     UpdateBuilderMock(UpdateParams.empty, PgLargeobjectFields, map)
   }
   override def upsert(unsaved: PgLargeobjectRow)(implicit c: Connection): PgLargeobjectRow = {
-    map.put(unsaved.compositeId, unsaved)
+    map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
 }

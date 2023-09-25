@@ -10,6 +10,7 @@ package pg_partitioned_table
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
   }
   override def insert(unsaved: PgPartitionedTableRow): ConnectionIO[PgPartitionedTableRow] = {
     delay {
-      if (map.contains(unsaved.partrelid))
+      val _ = if (map.contains(unsaved.partrelid))
         sys.error(s"id ${unsaved.partrelid} already exists")
       else
         map.put(unsaved.partrelid, unsaved)
+    
       unsaved
     }
   }
@@ -53,7 +55,7 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
       map.get(row.partrelid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.partrelid, row)
+          map.put(row.partrelid, row): @nowarn
           true
         case None => false
       }
@@ -64,7 +66,7 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
   }
   override def upsert(unsaved: PgPartitionedTableRow): ConnectionIO[PgPartitionedTableRow] = {
     delay {
-      map.put(unsaved.partrelid, unsaved)
+      map.put(unsaved.partrelid, unsaved): @nowarn
       unsaved
     }
   }

@@ -8,6 +8,7 @@ package pg_catalog
 package pg_ts_dict
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgTsDictRepoMock(map: scala.collection.mutable.Map[PgTsDictId, PgTsDictRow
     DeleteBuilderMock(DeleteParams.empty, PgTsDictFields, map)
   }
   override def insert(unsaved: PgTsDictRow)(implicit c: Connection): PgTsDictRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgTsDictFields, PgTsDictRow] = {
@@ -51,7 +53,7 @@ class PgTsDictRepoMock(map: scala.collection.mutable.Map[PgTsDictId, PgTsDictRow
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgTsDictRepoMock(map: scala.collection.mutable.Map[PgTsDictId, PgTsDictRow
     UpdateBuilderMock(UpdateParams.empty, PgTsDictFields, map)
   }
   override def upsert(unsaved: PgTsDictRow)(implicit c: Connection): PgTsDictRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

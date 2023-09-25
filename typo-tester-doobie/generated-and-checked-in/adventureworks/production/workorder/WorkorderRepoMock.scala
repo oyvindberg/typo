@@ -10,6 +10,7 @@ package workorder
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     delay {
-      if (map.contains(unsaved.workorderid))
+      val _ = if (map.contains(unsaved.workorderid))
         sys.error(s"id ${unsaved.workorderid} already exists")
       else
         map.put(unsaved.workorderid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
       map.get(row.workorderid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.workorderid, row)
+          map.put(row.workorderid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   }
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     delay {
-      map.put(unsaved.workorderid, unsaved)
+      map.put(unsaved.workorderid, unsaved): @nowarn
       unsaved
     }
   }

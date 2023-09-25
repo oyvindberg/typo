@@ -10,6 +10,7 @@ package location
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   }
   override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     delay {
-      if (map.contains(unsaved.locationid))
+      val _ = if (map.contains(unsaved.locationid))
         sys.error(s"id ${unsaved.locationid} already exists")
       else
         map.put(unsaved.locationid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
       map.get(row.locationid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.locationid, row)
+          map.put(row.locationid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     delay {
-      map.put(unsaved.locationid, unsaved)
+      map.put(unsaved.locationid, unsaved): @nowarn
       unsaved
     }
   }

@@ -10,6 +10,7 @@ package salesorderheader
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
   }
   override def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     delay {
-      if (map.contains(unsaved.salesorderid))
+      val _ = if (map.contains(unsaved.salesorderid))
         sys.error(s"id ${unsaved.salesorderid} already exists")
       else
         map.put(unsaved.salesorderid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
       map.get(row.salesorderid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.salesorderid, row)
+          map.put(row.salesorderid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
   }
   override def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     delay {
-      map.put(unsaved.salesorderid, unsaved)
+      map.put(unsaved.salesorderid, unsaved): @nowarn
       unsaved
     }
   }

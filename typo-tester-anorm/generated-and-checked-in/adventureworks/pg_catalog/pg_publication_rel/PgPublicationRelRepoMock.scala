@@ -8,6 +8,7 @@ package pg_catalog
 package pg_publication_rel
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRe
     DeleteBuilderMock(DeleteParams.empty, PgPublicationRelFields, map)
   }
   override def insert(unsaved: PgPublicationRelRow)(implicit c: Connection): PgPublicationRelRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
@@ -51,7 +53,7 @@ class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRe
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRe
     UpdateBuilderMock(UpdateParams.empty, PgPublicationRelFields, map)
   }
   override def upsert(unsaved: PgPublicationRelRow)(implicit c: Connection): PgPublicationRelRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

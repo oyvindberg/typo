@@ -8,6 +8,7 @@ package pg_catalog
 package pg_constraint
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgC
     DeleteBuilderMock(DeleteParams.empty, PgConstraintFields, map)
   }
   override def insert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgConstraintFields, PgConstraintRow] = {
@@ -51,7 +53,7 @@ class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgC
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgC
     UpdateBuilderMock(UpdateParams.empty, PgConstraintFields, map)
   }
   override def upsert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

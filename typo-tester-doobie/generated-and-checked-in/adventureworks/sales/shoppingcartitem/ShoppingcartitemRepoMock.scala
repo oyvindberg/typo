@@ -10,6 +10,7 @@ package shoppingcartitem
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
   }
   override def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     delay {
-      if (map.contains(unsaved.shoppingcartitemid))
+      val _ = if (map.contains(unsaved.shoppingcartitemid))
         sys.error(s"id ${unsaved.shoppingcartitemid} already exists")
       else
         map.put(unsaved.shoppingcartitemid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
       map.get(row.shoppingcartitemid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.shoppingcartitemid, row)
+          map.put(row.shoppingcartitemid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
   }
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     delay {
-      map.put(unsaved.shoppingcartitemid, unsaved)
+      map.put(unsaved.shoppingcartitemid, unsaved): @nowarn
       unsaved
     }
   }

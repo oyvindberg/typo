@@ -8,6 +8,7 @@ package pg_catalog
 package pg_authid
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgAuthidRepoMock(map: scala.collection.mutable.Map[PgAuthidId, PgAuthidRow
     DeleteBuilderMock(DeleteParams.empty, PgAuthidFields, map)
   }
   override def insert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgAuthidFields, PgAuthidRow] = {
@@ -51,7 +53,7 @@ class PgAuthidRepoMock(map: scala.collection.mutable.Map[PgAuthidId, PgAuthidRow
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgAuthidRepoMock(map: scala.collection.mutable.Map[PgAuthidId, PgAuthidRow
     UpdateBuilderMock(UpdateParams.empty, PgAuthidFields, map)
   }
   override def upsert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

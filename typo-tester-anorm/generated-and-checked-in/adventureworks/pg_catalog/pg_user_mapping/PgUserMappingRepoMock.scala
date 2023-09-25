@@ -8,6 +8,7 @@ package pg_catalog
 package pg_user_mapping
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, P
     DeleteBuilderMock(DeleteParams.empty, PgUserMappingFields, map)
   }
   override def insert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgUserMappingFields, PgUserMappingRow] = {
@@ -51,7 +53,7 @@ class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, P
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, P
     UpdateBuilderMock(UpdateParams.empty, PgUserMappingFields, map)
   }
   override def upsert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

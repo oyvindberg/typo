@@ -9,6 +9,7 @@ package users
 
 import adventureworks.customtypes.TypoUnknownCitext
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -28,10 +29,11 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
     DeleteBuilderMock(DeleteParams.empty, UsersFields, map)
   }
   override def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
-    if (map.contains(unsaved.userId))
+    val _ = if (map.contains(unsaved.userId))
       sys.error(s"id ${unsaved.userId} already exists")
     else
       map.put(unsaved.userId, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow = {
@@ -56,7 +58,7 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
     map.get(row.userId) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.userId, row)
+        map.put(row.userId, row): @nowarn
         true
       case None => false
     }
@@ -65,7 +67,7 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
     UpdateBuilderMock(UpdateParams.empty, UsersFields, map)
   }
   override def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
-    map.put(unsaved.userId, unsaved)
+    map.put(unsaved.userId, unsaved): @nowarn
     unsaved
   }
 }

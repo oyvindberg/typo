@@ -8,6 +8,7 @@ package pg_catalog
 package pg_largeobject_metadata
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgLargeobjectMetadataRepoMock(map: scala.collection.mutable.Map[PgLargeobj
     DeleteBuilderMock(DeleteParams.empty, PgLargeobjectMetadataFields, map)
   }
   override def insert(unsaved: PgLargeobjectMetadataRow)(implicit c: Connection): PgLargeobjectMetadataRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
@@ -48,7 +50,7 @@ class PgLargeobjectMetadataRepoMock(map: scala.collection.mutable.Map[PgLargeobj
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -57,7 +59,7 @@ class PgLargeobjectMetadataRepoMock(map: scala.collection.mutable.Map[PgLargeobj
     UpdateBuilderMock(UpdateParams.empty, PgLargeobjectMetadataFields, map)
   }
   override def upsert(unsaved: PgLargeobjectMetadataRow)(implicit c: Connection): PgLargeobjectMetadataRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

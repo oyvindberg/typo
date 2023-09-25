@@ -8,6 +8,7 @@ package sales
 package salesterritory
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields, map)
   }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
-    if (map.contains(unsaved.territoryid))
+    val _ = if (map.contains(unsaved.territoryid))
       sys.error(s"id ${unsaved.territoryid} already exists")
     else
       map.put(unsaved.territoryid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
@@ -52,7 +54,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     map.get(row.territoryid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.territoryid, row)
+        map.put(row.territoryid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields, map)
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
-    map.put(unsaved.territoryid, unsaved)
+    map.put(unsaved.territoryid, unsaved): @nowarn
     unsaved
   }
 }

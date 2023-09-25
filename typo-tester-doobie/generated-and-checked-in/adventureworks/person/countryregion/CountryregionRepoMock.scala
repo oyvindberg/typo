@@ -10,6 +10,7 @@ package countryregion
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     delay {
-      if (map.contains(unsaved.countryregioncode))
+      val _ = if (map.contains(unsaved.countryregioncode))
         sys.error(s"id ${unsaved.countryregioncode} already exists")
       else
         map.put(unsaved.countryregioncode, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
       map.get(row.countryregioncode) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.countryregioncode, row)
+          map.put(row.countryregioncode, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     delay {
-      map.put(unsaved.countryregioncode, unsaved)
+      map.put(unsaved.countryregioncode, unsaved): @nowarn
       unsaved
     }
   }

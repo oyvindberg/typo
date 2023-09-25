@@ -10,6 +10,7 @@ package addresstype
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     delay {
-      if (map.contains(unsaved.addresstypeid))
+      val _ = if (map.contains(unsaved.addresstypeid))
         sys.error(s"id ${unsaved.addresstypeid} already exists")
       else
         map.put(unsaved.addresstypeid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
       map.get(row.addresstypeid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.addresstypeid, row)
+          map.put(row.addresstypeid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     delay {
-      map.put(unsaved.addresstypeid, unsaved)
+      map.put(unsaved.addresstypeid, unsaved): @nowarn
       unsaved
     }
   }

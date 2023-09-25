@@ -10,6 +10,7 @@ package salestaxrate
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   }
   override def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     delay {
-      if (map.contains(unsaved.salestaxrateid))
+      val _ = if (map.contains(unsaved.salestaxrateid))
         sys.error(s"id ${unsaved.salestaxrateid} already exists")
       else
         map.put(unsaved.salestaxrateid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
       map.get(row.salestaxrateid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.salestaxrateid, row)
+          map.put(row.salestaxrateid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   }
   override def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     delay {
-      map.put(unsaved.salestaxrateid, unsaved)
+      map.put(unsaved.salestaxrateid, unsaved): @nowarn
       unsaved
     }
   }

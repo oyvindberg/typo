@@ -8,6 +8,7 @@ package pg_catalog
 package pg_range
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
     DeleteBuilderMock(DeleteParams.empty, PgRangeFields, map)
   }
   override def insert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow = {
-    if (map.contains(unsaved.rngtypid))
+    val _ = if (map.contains(unsaved.rngtypid))
       sys.error(s"id ${unsaved.rngtypid} already exists")
     else
       map.put(unsaved.rngtypid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgRangeFields, PgRangeRow] = {
@@ -51,7 +53,7 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
     map.get(row.rngtypid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.rngtypid, row)
+        map.put(row.rngtypid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
     UpdateBuilderMock(UpdateParams.empty, PgRangeFields, map)
   }
   override def upsert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow = {
-    map.put(unsaved.rngtypid, unsaved)
+    map.put(unsaved.rngtypid, unsaved): @nowarn
     unsaved
   }
 }

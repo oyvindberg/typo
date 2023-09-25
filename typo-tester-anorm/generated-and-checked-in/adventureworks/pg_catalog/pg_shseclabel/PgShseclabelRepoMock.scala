@@ -8,6 +8,7 @@ package pg_catalog
 package pg_shseclabel
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgS
     DeleteBuilderMock(DeleteParams.empty, PgShseclabelFields, map)
   }
   override def insert(unsaved: PgShseclabelRow)(implicit c: Connection): PgShseclabelRow = {
-    if (map.contains(unsaved.compositeId))
+    val _ = if (map.contains(unsaved.compositeId))
       sys.error(s"id ${unsaved.compositeId} already exists")
     else
       map.put(unsaved.compositeId, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgShseclabelFields, PgShseclabelRow] = {
@@ -45,7 +47,7 @@ class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgS
     map.get(row.compositeId) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.compositeId, row)
+        map.put(row.compositeId, row): @nowarn
         true
       case None => false
     }
@@ -54,7 +56,7 @@ class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgS
     UpdateBuilderMock(UpdateParams.empty, PgShseclabelFields, map)
   }
   override def upsert(unsaved: PgShseclabelRow)(implicit c: Connection): PgShseclabelRow = {
-    map.put(unsaved.compositeId, unsaved)
+    map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
 }

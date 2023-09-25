@@ -8,6 +8,7 @@ package person
 package contacttype
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     DeleteBuilderMock(DeleteParams.empty, ContacttypeFields, map)
   }
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
-    if (map.contains(unsaved.contacttypeid))
+    val _ = if (map.contains(unsaved.contacttypeid))
       sys.error(s"id ${unsaved.contacttypeid} already exists")
     else
       map.put(unsaved.contacttypeid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
@@ -52,7 +54,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     map.get(row.contacttypeid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.contacttypeid, row)
+        map.put(row.contacttypeid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     UpdateBuilderMock(UpdateParams.empty, ContacttypeFields, map)
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
-    map.put(unsaved.contacttypeid, unsaved)
+    map.put(unsaved.contacttypeid, unsaved): @nowarn
     unsaved
   }
 }

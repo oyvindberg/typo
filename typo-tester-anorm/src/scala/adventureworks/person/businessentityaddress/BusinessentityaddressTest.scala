@@ -12,6 +12,8 @@ import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.annotation.nowarn
+
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = BusinessentityaddressRepoImpl
 
@@ -72,16 +74,16 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
       // insert and round trip check
       val saved1 = repo.insert(unsaved1)
       val saved2 = unsaved1.toRow(???, ???)
-      assert(saved1 === saved2)
+      assert(saved1 === saved2): @nowarn
 
       // check field values
       val newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
-      repo.update(saved1.copy(modifieddate = newModifiedDate))
+      repo.update(saved1.copy(modifieddate = newModifiedDate)): @nowarn
       val List(saved3) = repo.selectAll: @unchecked
-      assert(saved3.modifieddate == newModifiedDate)
+      assert(saved3.modifieddate == newModifiedDate): @nowarn
 
       // delete
-      repo.delete(saved1.compositeId)
+      repo.delete(saved1.compositeId): @nowarn
 
       val List() = repo.selectAll: @unchecked
 

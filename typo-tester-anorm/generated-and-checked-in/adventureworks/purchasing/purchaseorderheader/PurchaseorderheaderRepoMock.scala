@@ -8,6 +8,7 @@ package purchasing
 package purchaseorderheader
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     DeleteBuilderMock(DeleteParams.empty, PurchaseorderheaderFields, map)
   }
   override def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
-    if (map.contains(unsaved.purchaseorderid))
+    val _ = if (map.contains(unsaved.purchaseorderid))
       sys.error(s"id ${unsaved.purchaseorderid} already exists")
     else
       map.put(unsaved.purchaseorderid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
@@ -52,7 +54,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     map.get(row.purchaseorderid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.purchaseorderid, row)
+        map.put(row.purchaseorderid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields, map)
   }
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
-    map.put(unsaved.purchaseorderid, unsaved)
+    map.put(unsaved.purchaseorderid, unsaved): @nowarn
     unsaved
   }
 }

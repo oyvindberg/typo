@@ -10,6 +10,7 @@ package unitmeasure
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   }
   override def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     delay {
-      if (map.contains(unsaved.unitmeasurecode))
+      val _ = if (map.contains(unsaved.unitmeasurecode))
         sys.error(s"id ${unsaved.unitmeasurecode} already exists")
       else
         map.put(unsaved.unitmeasurecode, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
       map.get(row.unitmeasurecode) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.unitmeasurecode, row)
+          map.put(row.unitmeasurecode, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   }
   override def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     delay {
-      map.put(unsaved.unitmeasurecode, unsaved)
+      map.put(unsaved.unitmeasurecode, unsaved): @nowarn
       unsaved
     }
   }

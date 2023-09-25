@@ -8,6 +8,7 @@ package pg_catalog
 package pg_subscription
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgSubscriptionRepoMock(map: scala.collection.mutable.Map[PgSubscriptionId,
     DeleteBuilderMock(DeleteParams.empty, PgSubscriptionFields, map)
   }
   override def insert(unsaved: PgSubscriptionRow)(implicit c: Connection): PgSubscriptionRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
@@ -51,7 +53,7 @@ class PgSubscriptionRepoMock(map: scala.collection.mutable.Map[PgSubscriptionId,
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgSubscriptionRepoMock(map: scala.collection.mutable.Map[PgSubscriptionId,
     UpdateBuilderMock(UpdateParams.empty, PgSubscriptionFields, map)
   }
   override def upsert(unsaved: PgSubscriptionRow)(implicit c: Connection): PgSubscriptionRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

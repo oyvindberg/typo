@@ -9,6 +9,7 @@ package pg_proc
 
 import adventureworks.customtypes.TypoOidVector
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class PgProcRepoMock(map: scala.collection.mutable.Map[PgProcId, PgProcRow] = sc
     DeleteBuilderMock(DeleteParams.empty, PgProcFields, map)
   }
   override def insert(unsaved: PgProcRow)(implicit c: Connection): PgProcRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgProcFields, PgProcRow] = {
@@ -52,7 +54,7 @@ class PgProcRepoMock(map: scala.collection.mutable.Map[PgProcId, PgProcRow] = sc
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class PgProcRepoMock(map: scala.collection.mutable.Map[PgProcId, PgProcRow] = sc
     UpdateBuilderMock(UpdateParams.empty, PgProcFields, map)
   }
   override def upsert(unsaved: PgProcRow)(implicit c: Connection): PgProcRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

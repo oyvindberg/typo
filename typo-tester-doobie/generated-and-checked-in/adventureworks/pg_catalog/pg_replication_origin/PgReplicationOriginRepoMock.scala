@@ -10,6 +10,7 @@ package pg_replication_origin
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgReplicationOriginRepoMock(map: scala.collection.mutable.Map[PgReplicatio
   }
   override def insert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     delay {
-      if (map.contains(unsaved.roident))
+      val _ = if (map.contains(unsaved.roident))
         sys.error(s"id ${unsaved.roident} already exists")
       else
         map.put(unsaved.roident, unsaved)
+    
       unsaved
     }
   }
@@ -56,7 +58,7 @@ class PgReplicationOriginRepoMock(map: scala.collection.mutable.Map[PgReplicatio
       map.get(row.roident) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.roident, row)
+          map.put(row.roident, row): @nowarn
           true
         case None => false
       }
@@ -67,7 +69,7 @@ class PgReplicationOriginRepoMock(map: scala.collection.mutable.Map[PgReplicatio
   }
   override def upsert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     delay {
-      map.put(unsaved.roident, unsaved)
+      map.put(unsaved.roident, unsaved): @nowarn
       unsaved
     }
   }

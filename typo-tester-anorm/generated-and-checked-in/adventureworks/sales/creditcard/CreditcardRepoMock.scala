@@ -10,6 +10,7 @@ package creditcard
 import adventureworks.userdefined.CustomCreditcardId
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
     DeleteBuilderMock(DeleteParams.empty, CreditcardFields, map)
   }
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
-    if (map.contains(unsaved.creditcardid))
+    val _ = if (map.contains(unsaved.creditcardid))
       sys.error(s"id ${unsaved.creditcardid} already exists")
     else
       map.put(unsaved.creditcardid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow = {
@@ -54,7 +56,7 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
     map.get(row.creditcardid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.creditcardid, row)
+        map.put(row.creditcardid, row): @nowarn
         true
       case None => false
     }
@@ -63,7 +65,7 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
     UpdateBuilderMock(UpdateParams.empty, CreditcardFields, map)
   }
   override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
-    map.put(unsaved.creditcardid, unsaved)
+    map.put(unsaved.creditcardid, unsaved): @nowarn
     unsaved
   }
 }

@@ -10,6 +10,7 @@ package contacttype
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     delay {
-      if (map.contains(unsaved.contacttypeid))
+      val _ = if (map.contains(unsaved.contacttypeid))
         sys.error(s"id ${unsaved.contacttypeid} already exists")
       else
         map.put(unsaved.contacttypeid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
       map.get(row.contacttypeid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.contacttypeid, row)
+          map.put(row.contacttypeid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     delay {
-      map.put(unsaved.contacttypeid, unsaved)
+      map.put(unsaved.contacttypeid, unsaved): @nowarn
       unsaved
     }
   }

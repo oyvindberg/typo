@@ -8,6 +8,7 @@ package sales
 package customer
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     DeleteBuilderMock(DeleteParams.empty, CustomerFields, map)
   }
   override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
-    if (map.contains(unsaved.customerid))
+    val _ = if (map.contains(unsaved.customerid))
       sys.error(s"id ${unsaved.customerid} already exists")
     else
       map.put(unsaved.customerid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
@@ -52,7 +54,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     map.get(row.customerid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.customerid, row)
+        map.put(row.customerid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     UpdateBuilderMock(UpdateParams.empty, CustomerFields, map)
   }
   override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
-    map.put(unsaved.customerid, unsaved)
+    map.put(unsaved.customerid, unsaved): @nowarn
     unsaved
   }
 }

@@ -8,6 +8,7 @@ package purchasing
 package shipmethod
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     DeleteBuilderMock(DeleteParams.empty, ShipmethodFields, map)
   }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
-    if (map.contains(unsaved.shipmethodid))
+    val _ = if (map.contains(unsaved.shipmethodid))
       sys.error(s"id ${unsaved.shipmethodid} already exists")
     else
       map.put(unsaved.shipmethodid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
@@ -52,7 +54,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     map.get(row.shipmethodid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.shipmethodid, row)
+        map.put(row.shipmethodid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     UpdateBuilderMock(UpdateParams.empty, ShipmethodFields, map)
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
-    map.put(unsaved.shipmethodid, unsaved)
+    map.put(unsaved.shipmethodid, unsaved): @nowarn
     unsaved
   }
 }

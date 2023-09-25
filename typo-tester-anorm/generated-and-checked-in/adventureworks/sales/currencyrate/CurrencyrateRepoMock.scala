@@ -8,6 +8,7 @@ package sales
 package currencyrate
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields, map)
   }
   override def insert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
-    if (map.contains(unsaved.currencyrateid))
+    val _ = if (map.contains(unsaved.currencyrateid))
       sys.error(s"id ${unsaved.currencyrateid} already exists")
     else
       map.put(unsaved.currencyrateid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
@@ -52,7 +54,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     map.get(row.currencyrateid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.currencyrateid, row)
+        map.put(row.currencyrateid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields, map)
   }
   override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
-    map.put(unsaved.currencyrateid, unsaved)
+    map.put(unsaved.currencyrateid, unsaved): @nowarn
     unsaved
   }
 }

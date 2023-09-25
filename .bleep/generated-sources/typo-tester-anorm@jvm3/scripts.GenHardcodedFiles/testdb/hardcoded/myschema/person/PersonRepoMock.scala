@@ -9,6 +9,7 @@ package myschema
 package person
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -28,10 +29,11 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     DeleteBuilderMock(DeleteParams.empty, PersonFields, map)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    if (map.contains(unsaved.id))
+    val _ = if (map.contains(unsaved.id))
       sys.error(s"id ${unsaved.id} already exists")
     else
       map.put(unsaved.id, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
@@ -69,7 +71,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     map.get(row.id) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.id, row)
+        map.put(row.id, row): @nowarn
         true
       case None => false
     }
@@ -94,7 +96,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
           case (acc, PersonFieldValue.favoriteNumber(value)) => acc.copy(favoriteNumber = value)
         }
         if (updatedRow != oldRow) {
-          map.put(id, updatedRow)
+          map.put(id, updatedRow): @nowarn
           true
         } else {
           false
@@ -103,7 +105,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     }
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    map.put(unsaved.id, unsaved)
+    map.put(unsaved.id, unsaved): @nowarn
     unsaved
   }
 }

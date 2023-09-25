@@ -8,6 +8,7 @@ package sales
 package salestaxrate
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
     DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields, map)
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
-    if (map.contains(unsaved.salestaxrateid))
+    val _ = if (map.contains(unsaved.salestaxrateid))
       sys.error(s"id ${unsaved.salestaxrateid} already exists")
     else
       map.put(unsaved.salestaxrateid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
@@ -52,7 +54,7 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
     map.get(row.salestaxrateid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.salestaxrateid, row)
+        map.put(row.salestaxrateid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
     UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields, map)
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
-    map.put(unsaved.salestaxrateid, unsaved)
+    map.put(unsaved.salestaxrateid, unsaved): @nowarn
     unsaved
   }
 }

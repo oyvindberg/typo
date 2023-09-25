@@ -166,6 +166,7 @@ object sc {
     val ChronoField = Qualified("java.time.temporal.ChronoField")
     val ChronoUnit = Qualified("java.time.temporal.ChronoUnit")
     val Numeric = Qualified("scala.math.Numeric")
+    val nowarn = Qualified("scala.annotation.nowarn")
 
     object dsl {
       val Bijection = Qualified("typo.dsl.Bijection")

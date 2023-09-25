@@ -10,6 +10,7 @@ package salesterritory
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
   }
   override def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     delay {
-      if (map.contains(unsaved.territoryid))
+      val _ = if (map.contains(unsaved.territoryid))
         sys.error(s"id ${unsaved.territoryid} already exists")
       else
         map.put(unsaved.territoryid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       map.get(row.territoryid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.territoryid, row)
+          map.put(row.territoryid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
   }
   override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     delay {
-      map.put(unsaved.territoryid, unsaved)
+      map.put(unsaved.territoryid, unsaved): @nowarn
       unsaved
     }
   }

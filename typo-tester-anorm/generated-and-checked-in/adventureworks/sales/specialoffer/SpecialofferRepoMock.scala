@@ -8,6 +8,7 @@ package sales
 package specialoffer
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
     DeleteBuilderMock(DeleteParams.empty, SpecialofferFields, map)
   }
   override def insert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
-    if (map.contains(unsaved.specialofferid))
+    val _ = if (map.contains(unsaved.specialofferid))
       sys.error(s"id ${unsaved.specialofferid} already exists")
     else
       map.put(unsaved.specialofferid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow = {
@@ -52,7 +54,7 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
     map.get(row.specialofferid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.specialofferid, row)
+        map.put(row.specialofferid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
     UpdateBuilderMock(UpdateParams.empty, SpecialofferFields, map)
   }
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
-    map.put(unsaved.specialofferid, unsaved)
+    map.put(unsaved.specialofferid, unsaved): @nowarn
     unsaved
   }
 }

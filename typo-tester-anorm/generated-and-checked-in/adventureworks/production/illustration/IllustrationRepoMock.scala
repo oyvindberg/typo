@@ -8,6 +8,7 @@ package production
 package illustration
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     DeleteBuilderMock(DeleteParams.empty, IllustrationFields, map)
   }
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
-    if (map.contains(unsaved.illustrationid))
+    val _ = if (map.contains(unsaved.illustrationid))
       sys.error(s"id ${unsaved.illustrationid} already exists")
     else
       map.put(unsaved.illustrationid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
@@ -52,7 +54,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     map.get(row.illustrationid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.illustrationid, row)
+        map.put(row.illustrationid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     UpdateBuilderMock(UpdateParams.empty, IllustrationFields, map)
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
-    map.put(unsaved.illustrationid, unsaved)
+    map.put(unsaved.illustrationid, unsaved): @nowarn
     unsaved
   }
 }

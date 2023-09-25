@@ -1,6 +1,8 @@
 package scripts
 
-import bleep._
+import bleep.*
+import bleep.commands.PublishLocal.{LocalIvy, Options}
+import bleep.packaging.ManifestCreator
 import bleep.plugin.dynver.DynVerPlugin
 
 object PublishLocal extends BleepScript("PublishLocal") {
@@ -9,11 +11,12 @@ object PublishLocal extends BleepScript("PublishLocal") {
     val projects = started.build.explodedProjects.keys.toArray.filter(projectsToPublish.include)
 
     commands.publishLocal(
-      bleep.commands.PublishLocal.Options(
+      Options(
         groupId = "com.olvind.typo",
         version = dynVer.version,
-        publishTarget = bleep.commands.PublishLocal.LocalIvy,
-        projects = projects
+        publishTarget = LocalIvy,
+        projects = projects,
+        manifestCreator = ManifestCreator.default
       )
     )
   }

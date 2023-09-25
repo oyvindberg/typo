@@ -8,6 +8,7 @@ package production
 package productmodel
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
     DeleteBuilderMock(DeleteParams.empty, ProductmodelFields, map)
   }
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
-    if (map.contains(unsaved.productmodelid))
+    val _ = if (map.contains(unsaved.productmodelid))
       sys.error(s"id ${unsaved.productmodelid} already exists")
     else
       map.put(unsaved.productmodelid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelRow = {
@@ -52,7 +54,7 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
     map.get(row.productmodelid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.productmodelid, row)
+        map.put(row.productmodelid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
     UpdateBuilderMock(UpdateParams.empty, ProductmodelFields, map)
   }
   override def upsert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
-    map.put(unsaved.productmodelid, unsaved)
+    map.put(unsaved.productmodelid, unsaved): @nowarn
     unsaved
   }
 }

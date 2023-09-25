@@ -8,6 +8,7 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.*
+import scala.annotation.nowarn
 
 class ArrayTest2 extends AnyFunSuite with TypeCheckedTripleEquals {
   def tableFor(dbType: String): Int =
@@ -70,48 +71,48 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         numerics = Array(BigDecimal("3.14159"))
       )
       PgtestRepoImpl.insert(before).map { after =>
-        assert(after.box === before.box)
-        assert(after.circle === before.circle)
-        assert(after.line === before.line)
-        assert(after.lseg === before.lseg)
-        assert(after.path === before.path)
-        assert(after.point === before.point)
-        assert(after.polygon === before.polygon)
-        assert(after.interval === before.interval)
-        assert(after.money === before.money)
-        assert(after.xml === before.xml)
-        assert(after.json === before.json)
-        assert(after.jsonb === before.jsonb)
-        assert(after.hstore === before.hstore)
-        assert(after.inet === before.inet)
-        assert(after.timestamp === before.timestamp)
-        assert(after.timestampz === before.timestampz)
-        assert(after.time === before.time)
-        assert(after.timez === before.timez)
-        assert(after.date === before.date)
-        assert(after.uuid === before.uuid)
-        assert(after.numeric === before.numeric)
-        assert(after.boxes === before.boxes)
-        assert(after.circlees === before.circlees)
-        assert(after.linees === before.linees)
-        assert(after.lseges === before.lseges)
-        assert(after.pathes === before.pathes)
-        assert(after.pointes === before.pointes)
-        assert(after.polygones === before.polygones)
-        assert(after.intervales === before.intervales)
-        assert(after.moneyes === before.moneyes)
-        assert(after.xmles === before.xmles)
-        assert(after.jsones === before.jsones)
-        assert(after.jsonbes === before.jsonbes)
-        assert(after.hstores === before.hstores)
-        assert(after.inets === before.inets)
-        assert(after.timestamps === before.timestamps)
-        assert(after.timestampzs === before.timestampzs)
-        assert(after.times === before.times)
-        assert(after.timezs === before.timezs)
-        assert(after.dates === before.dates)
-        assert(after.uuids === before.uuids)
-        assert(after.numerics === before.numerics)
+        assert(after.box === before.box): @nowarn
+        assert(after.circle === before.circle): @nowarn
+        assert(after.line === before.line): @nowarn
+        assert(after.lseg === before.lseg): @nowarn
+        assert(after.path === before.path): @nowarn
+        assert(after.point === before.point): @nowarn
+        assert(after.polygon === before.polygon): @nowarn
+        assert(after.interval === before.interval): @nowarn
+        assert(after.money === before.money): @nowarn
+        assert(after.xml === before.xml): @nowarn
+        assert(after.json === before.json): @nowarn
+        assert(after.jsonb === before.jsonb): @nowarn
+        assert(after.hstore === before.hstore): @nowarn
+        assert(after.inet === before.inet): @nowarn
+        assert(after.timestamp === before.timestamp): @nowarn
+        assert(after.timestampz === before.timestampz): @nowarn
+        assert(after.time === before.time): @nowarn
+        assert(after.timez === before.timez): @nowarn
+        assert(after.date === before.date): @nowarn
+        assert(after.uuid === before.uuid): @nowarn
+        assert(after.numeric === before.numeric): @nowarn
+        assert(after.boxes === before.boxes): @nowarn
+        assert(after.circlees === before.circlees): @nowarn
+        assert(after.linees === before.linees): @nowarn
+        assert(after.lseges === before.lseges): @nowarn
+        assert(after.pathes === before.pathes): @nowarn
+        assert(after.pointes === before.pointes): @nowarn
+        assert(after.polygones === before.polygones): @nowarn
+        assert(after.intervales === before.intervales): @nowarn
+        assert(after.moneyes === before.moneyes): @nowarn
+        assert(after.xmles === before.xmles): @nowarn
+        assert(after.jsones === before.jsones): @nowarn
+        assert(after.jsonbes === before.jsonbes): @nowarn
+        assert(after.hstores === before.hstores): @nowarn
+        assert(after.inets === before.inets): @nowarn
+        assert(after.timestamps === before.timestamps): @nowarn
+        assert(after.timestampzs === before.timestampzs): @nowarn
+        assert(after.times === before.times): @nowarn
+        assert(after.timezs === before.timezs): @nowarn
+        assert(after.dates === before.dates): @nowarn
+        assert(after.uuids === before.uuids): @nowarn
+        assert(after.numerics === before.numerics): @nowarn
       }
     }
   }
@@ -216,48 +217,48 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       )
 
       PgtestnullRepoImpl.insert(before).map { after =>
-        assert(after.box === before.box)
-        assert(after.circle === before.circle)
-        assert(after.line === before.line)
-        assert(after.lseg === before.lseg)
-        assert(after.path === before.path)
-        assert(after.point === before.point)
-        assert(after.polygon === before.polygon)
-        assert(after.interval === before.interval)
-        assert(after.money === before.money)
-        assert(after.xml === before.xml)
-        assert(after.json === before.json)
-        assert(after.jsonb === before.jsonb)
-        assert(after.hstore === before.hstore)
-        assert(after.inet === before.inet)
-        assert(after.timestamp === before.timestamp)
-        assert(after.timestampz === before.timestampz)
-        assert(after.time === before.time)
-        assert(after.timez === before.timez)
-        assert(after.date === before.date)
-        assert(after.uuid === before.uuid)
-        assert(after.numeric === before.numeric)
-        assert(after.boxes.map(_.toList) === before.boxes.map(_.toList))
-        assert(after.circlees.map(_.toList) === before.circlees.map(_.toList))
-        assert(after.linees.map(_.toList) === before.linees.map(_.toList))
-        assert(after.lseges.map(_.toList) === before.lseges.map(_.toList))
-        assert(after.pathes.map(_.toList) === before.pathes.map(_.toList))
-        assert(after.pointes.map(_.toList) === before.pointes.map(_.toList))
-        assert(after.polygones.map(_.toList) === before.polygones.map(_.toList))
-        assert(after.intervales.map(_.toList) === before.intervales.map(_.toList))
-        assert(after.moneyes.map(_.toList) === before.moneyes.map(_.toList))
-        assert(after.xmles.map(_.toList) === before.xmles.map(_.toList))
-        assert(after.jsones.map(_.toList) === before.jsones.map(_.toList))
-        assert(after.jsonbes.map(_.toList) === before.jsonbes.map(_.toList))
-        assert(after.hstores.map(_.toList) === before.hstores.map(_.toList))
-        assert(after.inets.map(_.toList) === before.inets.map(_.toList))
-        assert(after.timestamps.map(_.toList) === before.timestamps.map(_.toList))
-        assert(after.timestampzs.map(_.toList) === before.timestampzs.map(_.toList))
-        assert(after.times.map(_.toList) === before.times.map(_.toList))
-        assert(after.timezs.map(_.toList) === before.timezs.map(_.toList))
-        assert(after.dates.map(_.toList) === before.dates.map(_.toList))
-        assert(after.uuids.map(_.toList) === before.uuids.map(_.toList))
-        assert(after.numerics.map(_.toList) === before.numerics.map(_.toList))
+        assert(after.box === before.box): @nowarn
+        assert(after.circle === before.circle): @nowarn
+        assert(after.line === before.line): @nowarn
+        assert(after.lseg === before.lseg): @nowarn
+        assert(after.path === before.path): @nowarn
+        assert(after.point === before.point): @nowarn
+        assert(after.polygon === before.polygon): @nowarn
+        assert(after.interval === before.interval): @nowarn
+        assert(after.money === before.money): @nowarn
+        assert(after.xml === before.xml): @nowarn
+        assert(after.json === before.json): @nowarn
+        assert(after.jsonb === before.jsonb): @nowarn
+        assert(after.hstore === before.hstore): @nowarn
+        assert(after.inet === before.inet): @nowarn
+        assert(after.timestamp === before.timestamp): @nowarn
+        assert(after.timestampz === before.timestampz): @nowarn
+        assert(after.time === before.time): @nowarn
+        assert(after.timez === before.timez): @nowarn
+        assert(after.date === before.date): @nowarn
+        assert(after.uuid === before.uuid): @nowarn
+        assert(after.numeric === before.numeric): @nowarn
+        assert(after.boxes.map(_.toList) === before.boxes.map(_.toList)): @nowarn
+        assert(after.circlees.map(_.toList) === before.circlees.map(_.toList)): @nowarn
+        assert(after.linees.map(_.toList) === before.linees.map(_.toList)): @nowarn
+        assert(after.lseges.map(_.toList) === before.lseges.map(_.toList)): @nowarn
+        assert(after.pathes.map(_.toList) === before.pathes.map(_.toList)): @nowarn
+        assert(after.pointes.map(_.toList) === before.pointes.map(_.toList)): @nowarn
+        assert(after.polygones.map(_.toList) === before.polygones.map(_.toList)): @nowarn
+        assert(after.intervales.map(_.toList) === before.intervales.map(_.toList)): @nowarn
+        assert(after.moneyes.map(_.toList) === before.moneyes.map(_.toList)): @nowarn
+        assert(after.xmles.map(_.toList) === before.xmles.map(_.toList)): @nowarn
+        assert(after.jsones.map(_.toList) === before.jsones.map(_.toList)): @nowarn
+        assert(after.jsonbes.map(_.toList) === before.jsonbes.map(_.toList)): @nowarn
+        assert(after.hstores.map(_.toList) === before.hstores.map(_.toList)): @nowarn
+        assert(after.inets.map(_.toList) === before.inets.map(_.toList)): @nowarn
+        assert(after.timestamps.map(_.toList) === before.timestamps.map(_.toList)): @nowarn
+        assert(after.timestampzs.map(_.toList) === before.timestampzs.map(_.toList)): @nowarn
+        assert(after.times.map(_.toList) === before.times.map(_.toList)): @nowarn
+        assert(after.timezs.map(_.toList) === before.timezs.map(_.toList)): @nowarn
+        assert(after.dates.map(_.toList) === before.dates.map(_.toList)): @nowarn
+        assert(after.uuids.map(_.toList) === before.uuids.map(_.toList)): @nowarn
+        assert(after.numerics.map(_.toList) === before.numerics.map(_.toList)): @nowarn
       }
     }
   }

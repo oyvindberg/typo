@@ -13,6 +13,7 @@ import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
+import scala.annotation.nowarn
 import scala.util.Random
 
 class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
@@ -110,13 +111,13 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       // insert and round trip check
       val saved1 = productRepo.insert(unsaved1)
       val saved2 = unsaved1.toRow(saved1.productid, ???, ???, ???, ???)
-      assert(saved1 === saved2)
+      val _ = assert(saved1 === saved2)
 
       // check field values
       val newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
-      productRepo.update(saved1.copy(modifieddate = newModifiedDate))
+      productRepo.update(saved1.copy(modifieddate = newModifiedDate)): @nowarn
       val List(saved3) = productRepo.selectAll: @unchecked
-      assert(saved3.modifieddate == newModifiedDate)
+      assert(saved3.modifieddate == newModifiedDate): @nowarn
       val true = productRepo.update(saved3.copy(size = None)): @unchecked
 
       val query =
@@ -154,10 +155,10 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
       update.sql(returning = true).foreach(f => println(f.sql))
       val List(updated) = update.executeReturnChanged()
-      assert(updated.name === Name("MANf"))
-      assert(updated.listprice === BigDecimal(2))
-      assert(updated.reorderpoint === TypoShort(40))
-      assert(updated.sellstartdate === sellStartDate)
+      assert(updated.name === Name("MANf")): @nowarn
+      assert(updated.listprice === BigDecimal(2)): @nowarn
+      assert(updated.reorderpoint === TypoShort(40)): @nowarn
+      assert(updated.sellstartdate === sellStartDate): @nowarn
 
       val q = productRepo.select
         .where(p => !p.name.like("foo%"))
@@ -204,7 +205,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       }
 
       // delete
-      productRepo.delete.where(_.productid === saved1.productid).execute()
+      productRepo.delete.where(_.productid === saved1.productid).execute(): @nowarn
 
       val List() = productRepo.selectAll: @unchecked
 

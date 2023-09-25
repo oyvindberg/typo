@@ -24,7 +24,6 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
         all <- usersRepo.select.where(p => p.userId === unsaved.userId).toList
       } yield {
         assert(unsaved.toRow(???) === all.head)
-        succeed
       }
     }
   }

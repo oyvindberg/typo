@@ -8,6 +8,7 @@ package pg_catalog
 package pg_partitioned_table
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
     DeleteBuilderMock(DeleteParams.empty, PgPartitionedTableFields, map)
   }
   override def insert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
-    if (map.contains(unsaved.partrelid))
+    val _ = if (map.contains(unsaved.partrelid))
       sys.error(s"id ${unsaved.partrelid} already exists")
     else
       map.put(unsaved.partrelid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
@@ -48,7 +50,7 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
     map.get(row.partrelid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.partrelid, row)
+        map.put(row.partrelid, row): @nowarn
         true
       case None => false
     }
@@ -57,7 +59,7 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
     UpdateBuilderMock(UpdateParams.empty, PgPartitionedTableFields, map)
   }
   override def upsert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
-    map.put(unsaved.partrelid, unsaved)
+    map.put(unsaved.partrelid, unsaved): @nowarn
     unsaved
   }
 }

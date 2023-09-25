@@ -10,6 +10,7 @@ package productdescription
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class ProductdescriptionRepoMock(toRow: Function1[ProductdescriptionRowUnsaved, 
   }
   override def insert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     delay {
-      if (map.contains(unsaved.productdescriptionid))
+      val _ = if (map.contains(unsaved.productdescriptionid))
         sys.error(s"id ${unsaved.productdescriptionid} already exists")
       else
         map.put(unsaved.productdescriptionid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class ProductdescriptionRepoMock(toRow: Function1[ProductdescriptionRowUnsaved, 
       map.get(row.productdescriptionid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.productdescriptionid, row)
+          map.put(row.productdescriptionid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class ProductdescriptionRepoMock(toRow: Function1[ProductdescriptionRowUnsaved, 
   }
   override def upsert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     delay {
-      map.put(unsaved.productdescriptionid, unsaved)
+      map.put(unsaved.productdescriptionid, unsaved): @nowarn
       unsaved
     }
   }

@@ -8,6 +8,7 @@ package pg_catalog
 package pg_foreign_table
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgForeignTableRepoMock(map: scala.collection.mutable.Map[PgForeignTableId,
     DeleteBuilderMock(DeleteParams.empty, PgForeignTableFields, map)
   }
   override def insert(unsaved: PgForeignTableRow)(implicit c: Connection): PgForeignTableRow = {
-    if (map.contains(unsaved.ftrelid))
+    val _ = if (map.contains(unsaved.ftrelid))
       sys.error(s"id ${unsaved.ftrelid} already exists")
     else
       map.put(unsaved.ftrelid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgForeignTableFields, PgForeignTableRow] = {
@@ -48,7 +50,7 @@ class PgForeignTableRepoMock(map: scala.collection.mutable.Map[PgForeignTableId,
     map.get(row.ftrelid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.ftrelid, row)
+        map.put(row.ftrelid, row): @nowarn
         true
       case None => false
     }
@@ -57,7 +59,7 @@ class PgForeignTableRepoMock(map: scala.collection.mutable.Map[PgForeignTableId,
     UpdateBuilderMock(UpdateParams.empty, PgForeignTableFields, map)
   }
   override def upsert(unsaved: PgForeignTableRow)(implicit c: Connection): PgForeignTableRow = {
-    map.put(unsaved.ftrelid, unsaved)
+    map.put(unsaved.ftrelid, unsaved): @nowarn
     unsaved
   }
 }

@@ -8,6 +8,7 @@ package person
 package address
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     DeleteBuilderMock(DeleteParams.empty, AddressFields, map)
   }
   override def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
-    if (map.contains(unsaved.addressid))
+    val _ = if (map.contains(unsaved.addressid))
       sys.error(s"id ${unsaved.addressid} already exists")
     else
       map.put(unsaved.addressid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
@@ -52,7 +54,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     map.get(row.addressid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.addressid, row)
+        map.put(row.addressid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     UpdateBuilderMock(UpdateParams.empty, AddressFields, map)
   }
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
-    map.put(unsaved.addressid, unsaved)
+    map.put(unsaved.addressid, unsaved): @nowarn
     unsaved
   }
 }

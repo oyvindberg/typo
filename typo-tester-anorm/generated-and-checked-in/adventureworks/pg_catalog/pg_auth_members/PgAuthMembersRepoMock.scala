@@ -8,6 +8,7 @@ package pg_catalog
 package pg_auth_members
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgAuthMembersRepoMock(map: scala.collection.mutable.Map[PgAuthMembersId, P
     DeleteBuilderMock(DeleteParams.empty, PgAuthMembersFields, map)
   }
   override def insert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow = {
-    if (map.contains(unsaved.compositeId))
+    val _ = if (map.contains(unsaved.compositeId))
       sys.error(s"id ${unsaved.compositeId} already exists")
     else
       map.put(unsaved.compositeId, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
@@ -48,7 +50,7 @@ class PgAuthMembersRepoMock(map: scala.collection.mutable.Map[PgAuthMembersId, P
     map.get(row.compositeId) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.compositeId, row)
+        map.put(row.compositeId, row): @nowarn
         true
       case None => false
     }
@@ -57,7 +59,7 @@ class PgAuthMembersRepoMock(map: scala.collection.mutable.Map[PgAuthMembersId, P
     UpdateBuilderMock(UpdateParams.empty, PgAuthMembersFields, map)
   }
   override def upsert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow = {
-    map.put(unsaved.compositeId, unsaved)
+    map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
 }

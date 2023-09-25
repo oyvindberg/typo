@@ -9,6 +9,7 @@ package myschema
 package marital_status
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields, map)
   }
   override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
-    if (map.contains(unsaved.id))
+    val _ = if (map.contains(unsaved.id))
       sys.error(s"id ${unsaved.id} already exists")
     else
       map.put(unsaved.id, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
@@ -54,7 +56,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields, map)
   }
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
-    map.put(unsaved.id, unsaved)
+    map.put(unsaved.id, unsaved): @nowarn
     unsaved
   }
 }

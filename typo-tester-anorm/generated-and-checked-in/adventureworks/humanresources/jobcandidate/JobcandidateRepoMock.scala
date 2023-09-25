@@ -8,6 +8,7 @@ package humanresources
 package jobcandidate
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
     DeleteBuilderMock(DeleteParams.empty, JobcandidateFields, map)
   }
   override def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
-    if (map.contains(unsaved.jobcandidateid))
+    val _ = if (map.contains(unsaved.jobcandidateid))
       sys.error(s"id ${unsaved.jobcandidateid} already exists")
     else
       map.put(unsaved.jobcandidateid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
@@ -52,7 +54,7 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
     map.get(row.jobcandidateid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.jobcandidateid, row)
+        map.put(row.jobcandidateid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
     UpdateBuilderMock(UpdateParams.empty, JobcandidateFields, map)
   }
   override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
-    map.put(unsaved.jobcandidateid, unsaved)
+    map.put(unsaved.jobcandidateid, unsaved): @nowarn
     unsaved
   }
 }

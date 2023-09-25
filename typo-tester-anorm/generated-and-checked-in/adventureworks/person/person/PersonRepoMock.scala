@@ -9,6 +9,7 @@ package person
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -28,10 +29,11 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     DeleteBuilderMock(DeleteParams.empty, PersonFields, map)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    if (map.contains(unsaved.businessentityid))
+    val _ = if (map.contains(unsaved.businessentityid))
       sys.error(s"id ${unsaved.businessentityid} already exists")
     else
       map.put(unsaved.businessentityid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
@@ -53,7 +55,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     map.get(row.businessentityid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.businessentityid, row)
+        map.put(row.businessentityid, row): @nowarn
         true
       case None => false
     }
@@ -62,7 +64,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     UpdateBuilderMock(UpdateParams.empty, PersonFields, map)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    map.put(unsaved.businessentityid, unsaved)
+    map.put(unsaved.businessentityid, unsaved): @nowarn
     unsaved
   }
 }

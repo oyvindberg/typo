@@ -8,6 +8,7 @@ package person
 package countryregion
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     DeleteBuilderMock(DeleteParams.empty, CountryregionFields, map)
   }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
-    if (map.contains(unsaved.countryregioncode))
+    val _ = if (map.contains(unsaved.countryregioncode))
       sys.error(s"id ${unsaved.countryregioncode} already exists")
     else
       map.put(unsaved.countryregioncode, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
@@ -52,7 +54,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     map.get(row.countryregioncode) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.countryregioncode, row)
+        map.put(row.countryregioncode, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     UpdateBuilderMock(UpdateParams.empty, CountryregionFields, map)
   }
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
-    map.put(unsaved.countryregioncode, unsaved)
+    map.put(unsaved.countryregioncode, unsaved): @nowarn
     unsaved
   }
 }

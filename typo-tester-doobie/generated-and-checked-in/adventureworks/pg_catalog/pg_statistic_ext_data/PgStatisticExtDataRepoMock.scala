@@ -10,6 +10,7 @@ package pg_statistic_ext_data
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgStatisticExtDataRepoMock(map: scala.collection.mutable.Map[PgStatisticEx
   }
   override def insert(unsaved: PgStatisticExtDataRow): ConnectionIO[PgStatisticExtDataRow] = {
     delay {
-      if (map.contains(unsaved.stxoid))
+      val _ = if (map.contains(unsaved.stxoid))
         sys.error(s"id ${unsaved.stxoid} already exists")
       else
         map.put(unsaved.stxoid, unsaved)
+    
       unsaved
     }
   }
@@ -53,7 +55,7 @@ class PgStatisticExtDataRepoMock(map: scala.collection.mutable.Map[PgStatisticEx
       map.get(row.stxoid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.stxoid, row)
+          map.put(row.stxoid, row): @nowarn
           true
         case None => false
       }
@@ -64,7 +66,7 @@ class PgStatisticExtDataRepoMock(map: scala.collection.mutable.Map[PgStatisticEx
   }
   override def upsert(unsaved: PgStatisticExtDataRow): ConnectionIO[PgStatisticExtDataRow] = {
     delay {
-      map.put(unsaved.stxoid, unsaved)
+      map.put(unsaved.stxoid, unsaved): @nowarn
       unsaved
     }
   }

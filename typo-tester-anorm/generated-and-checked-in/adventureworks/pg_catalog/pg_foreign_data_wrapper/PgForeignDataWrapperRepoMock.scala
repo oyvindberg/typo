@@ -8,6 +8,7 @@ package pg_catalog
 package pg_foreign_data_wrapper
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgForeignDataWrapperRepoMock(map: scala.collection.mutable.Map[PgForeignDa
     DeleteBuilderMock(DeleteParams.empty, PgForeignDataWrapperFields, map)
   }
   override def insert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
@@ -51,7 +53,7 @@ class PgForeignDataWrapperRepoMock(map: scala.collection.mutable.Map[PgForeignDa
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgForeignDataWrapperRepoMock(map: scala.collection.mutable.Map[PgForeignDa
     UpdateBuilderMock(UpdateParams.empty, PgForeignDataWrapperFields, map)
   }
   override def upsert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

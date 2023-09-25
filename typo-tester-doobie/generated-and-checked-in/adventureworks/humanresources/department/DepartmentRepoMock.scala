@@ -10,6 +10,7 @@ package department
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   }
   override def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     delay {
-      if (map.contains(unsaved.departmentid))
+      val _ = if (map.contains(unsaved.departmentid))
         sys.error(s"id ${unsaved.departmentid} already exists")
       else
         map.put(unsaved.departmentid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
       map.get(row.departmentid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.departmentid, row)
+          map.put(row.departmentid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   }
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     delay {
-      map.put(unsaved.departmentid, unsaved)
+      map.put(unsaved.departmentid, unsaved): @nowarn
       unsaved
     }
   }

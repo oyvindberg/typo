@@ -181,9 +181,6 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         }
       } yield succeed
     }
-
-    succeed
-
   }
 
   test("in-memory") {

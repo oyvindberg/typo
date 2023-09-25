@@ -8,6 +8,7 @@ package pg_catalog
 package pg_extension
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgExtensionRepoMock(map: scala.collection.mutable.Map[PgExtensionId, PgExt
     DeleteBuilderMock(DeleteParams.empty, PgExtensionFields, map)
   }
   override def insert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgExtensionFields, PgExtensionRow] = {
@@ -51,7 +53,7 @@ class PgExtensionRepoMock(map: scala.collection.mutable.Map[PgExtensionId, PgExt
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgExtensionRepoMock(map: scala.collection.mutable.Map[PgExtensionId, PgExt
     UpdateBuilderMock(UpdateParams.empty, PgExtensionFields, map)
   }
   override def upsert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

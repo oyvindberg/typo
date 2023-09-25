@@ -8,6 +8,7 @@ package pg_catalog
 package pg_trigger
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgTriggerRepoMock(map: scala.collection.mutable.Map[PgTriggerId, PgTrigger
     DeleteBuilderMock(DeleteParams.empty, PgTriggerFields, map)
   }
   override def insert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgTriggerFields, PgTriggerRow] = {
@@ -51,7 +53,7 @@ class PgTriggerRepoMock(map: scala.collection.mutable.Map[PgTriggerId, PgTrigger
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgTriggerRepoMock(map: scala.collection.mutable.Map[PgTriggerId, PgTrigger
     UpdateBuilderMock(UpdateParams.empty, PgTriggerFields, map)
   }
   override def upsert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

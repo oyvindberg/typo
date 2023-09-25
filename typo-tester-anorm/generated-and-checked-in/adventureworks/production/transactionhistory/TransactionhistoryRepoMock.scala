@@ -8,6 +8,7 @@ package production
 package transactionhistory
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields, map)
   }
   override def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
-    if (map.contains(unsaved.transactionid))
+    val _ = if (map.contains(unsaved.transactionid))
       sys.error(s"id ${unsaved.transactionid} already exists")
     else
       map.put(unsaved.transactionid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow = {
@@ -52,7 +54,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     map.get(row.transactionid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.transactionid, row)
+        map.put(row.transactionid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields, map)
   }
   override def upsert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
-    map.put(unsaved.transactionid, unsaved)
+    map.put(unsaved.transactionid, unsaved): @nowarn
     unsaved
   }
 }

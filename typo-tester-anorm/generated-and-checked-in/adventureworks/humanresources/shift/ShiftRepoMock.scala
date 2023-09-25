@@ -8,6 +8,7 @@ package humanresources
 package shift
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     DeleteBuilderMock(DeleteParams.empty, ShiftFields, map)
   }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
-    if (map.contains(unsaved.shiftid))
+    val _ = if (map.contains(unsaved.shiftid))
       sys.error(s"id ${unsaved.shiftid} already exists")
     else
       map.put(unsaved.shiftid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
@@ -52,7 +54,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     map.get(row.shiftid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.shiftid, row)
+        map.put(row.shiftid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     UpdateBuilderMock(UpdateParams.empty, ShiftFields, map)
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
-    map.put(unsaved.shiftid, unsaved)
+    map.put(unsaved.shiftid, unsaved): @nowarn
     unsaved
   }
 }

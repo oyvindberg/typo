@@ -6,6 +6,7 @@ import doobie.implicits.toSqlInterpolator
 import doobie.util.fragment.Fragment
 
 import java.util.concurrent.atomic.AtomicInteger
+import scala.annotation.nowarn
 
 trait DeleteBuilder[Fields[_], Row] {
   protected def params: DeleteParams[Fields, Row]
@@ -67,7 +68,7 @@ object DeleteBuilder {
       var changed = 0
       map.foreach { case (id, row) =>
         if (params.where.forall(w => w(fields).eval(row))) {
-          map.remove(id)
+          map.remove(id): @nowarn
           changed += 1
         }
       }

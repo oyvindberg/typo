@@ -10,6 +10,7 @@ package pg_index
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
   }
   override def insert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow] = {
     delay {
-      if (map.contains(unsaved.indexrelid))
+      val _ = if (map.contains(unsaved.indexrelid))
         sys.error(s"id ${unsaved.indexrelid} already exists")
       else
         map.put(unsaved.indexrelid, unsaved)
+    
       unsaved
     }
   }
@@ -53,7 +55,7 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
       map.get(row.indexrelid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.indexrelid, row)
+          map.put(row.indexrelid, row): @nowarn
           true
         case None => false
       }
@@ -64,7 +66,7 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
   }
   override def upsert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow] = {
     delay {
-      map.put(unsaved.indexrelid, unsaved)
+      map.put(unsaved.indexrelid, unsaved): @nowarn
       unsaved
     }
   }

@@ -12,6 +12,7 @@ import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import doobie.util.Put
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -32,10 +33,11 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   }
   override def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     delay {
-      if (map.contains(unsaved.creditcardid))
+      val _ = if (map.contains(unsaved.creditcardid))
         sys.error(s"id ${unsaved.creditcardid} already exists")
       else
         map.put(unsaved.creditcardid, unsaved)
+    
       unsaved
     }
   }
@@ -59,7 +61,7 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
       map.get(row.creditcardid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.creditcardid, row)
+          map.put(row.creditcardid, row): @nowarn
           true
         case None => false
       }
@@ -70,7 +72,7 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   }
   override def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     delay {
-      map.put(unsaved.creditcardid, unsaved)
+      map.put(unsaved.creditcardid, unsaved): @nowarn
       unsaved
     }
   }

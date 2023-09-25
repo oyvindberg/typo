@@ -8,6 +8,7 @@ package pg_catalog
 package pg_rewrite
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -26,10 +27,11 @@ class PgRewriteRepoMock(map: scala.collection.mutable.Map[PgRewriteId, PgRewrite
     DeleteBuilderMock(DeleteParams.empty, PgRewriteFields, map)
   }
   override def insert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
     else
       map.put(unsaved.oid, unsaved)
+    
     unsaved
   }
   override def select: SelectBuilder[PgRewriteFields, PgRewriteRow] = {
@@ -51,7 +53,7 @@ class PgRewriteRepoMock(map: scala.collection.mutable.Map[PgRewriteId, PgRewrite
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
@@ -60,7 +62,7 @@ class PgRewriteRepoMock(map: scala.collection.mutable.Map[PgRewriteId, PgRewrite
     UpdateBuilderMock(UpdateParams.empty, PgRewriteFields, map)
   }
   override def upsert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow = {
-    map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

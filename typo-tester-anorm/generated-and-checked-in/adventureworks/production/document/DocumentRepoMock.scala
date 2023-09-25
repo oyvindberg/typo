@@ -9,6 +9,7 @@ package document
 
 import adventureworks.customtypes.TypoUUID
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -28,10 +29,11 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     DeleteBuilderMock(DeleteParams.empty, DocumentFields, map)
   }
   override def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
-    if (map.contains(unsaved.documentnode))
+    val _ = if (map.contains(unsaved.documentnode))
       sys.error(s"id ${unsaved.documentnode} already exists")
     else
       map.put(unsaved.documentnode, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
@@ -56,7 +58,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     map.get(row.documentnode) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.documentnode, row)
+        map.put(row.documentnode, row): @nowarn
         true
       case None => false
     }
@@ -65,7 +67,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     UpdateBuilderMock(UpdateParams.empty, DocumentFields, map)
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
-    map.put(unsaved.documentnode, unsaved)
+    map.put(unsaved.documentnode, unsaved): @nowarn
     unsaved
   }
 }

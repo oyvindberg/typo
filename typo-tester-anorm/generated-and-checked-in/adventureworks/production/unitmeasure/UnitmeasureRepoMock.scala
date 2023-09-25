@@ -8,6 +8,7 @@ package production
 package unitmeasure
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields, map)
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
-    if (map.contains(unsaved.unitmeasurecode))
+    val _ = if (map.contains(unsaved.unitmeasurecode))
       sys.error(s"id ${unsaved.unitmeasurecode} already exists")
     else
       map.put(unsaved.unitmeasurecode, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
@@ -52,7 +54,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     map.get(row.unitmeasurecode) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.unitmeasurecode, row)
+        map.put(row.unitmeasurecode, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields, map)
   }
   override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
-    map.put(unsaved.unitmeasurecode, unsaved)
+    map.put(unsaved.unitmeasurecode, unsaved): @nowarn
     unsaved
   }
 }

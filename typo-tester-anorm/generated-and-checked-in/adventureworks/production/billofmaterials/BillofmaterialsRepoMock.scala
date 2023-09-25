@@ -8,6 +8,7 @@ package production
 package billofmaterials
 
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -27,10 +28,11 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields, map)
   }
   override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
-    if (map.contains(unsaved.billofmaterialsid))
+    val _ = if (map.contains(unsaved.billofmaterialsid))
       sys.error(s"id ${unsaved.billofmaterialsid} already exists")
     else
       map.put(unsaved.billofmaterialsid, unsaved)
+    
     unsaved
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
@@ -52,7 +54,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     map.get(row.billofmaterialsid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.billofmaterialsid, row)
+        map.put(row.billofmaterialsid, row): @nowarn
         true
       case None => false
     }
@@ -61,7 +63,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields, map)
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
-    map.put(unsaved.billofmaterialsid, unsaved)
+    map.put(unsaved.billofmaterialsid, unsaved): @nowarn
     unsaved
   }
 }

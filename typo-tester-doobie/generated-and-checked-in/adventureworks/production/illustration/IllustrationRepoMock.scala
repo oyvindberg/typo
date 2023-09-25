@@ -10,6 +10,7 @@ package illustration
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -30,10 +31,11 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   }
   override def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     delay {
-      if (map.contains(unsaved.illustrationid))
+      val _ = if (map.contains(unsaved.illustrationid))
         sys.error(s"id ${unsaved.illustrationid} already exists")
       else
         map.put(unsaved.illustrationid, unsaved)
+    
       unsaved
     }
   }
@@ -57,7 +59,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
       map.get(row.illustrationid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.illustrationid, row)
+          map.put(row.illustrationid, row): @nowarn
           true
         case None => false
       }
@@ -68,7 +70,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   }
   override def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     delay {
-      map.put(unsaved.illustrationid, unsaved)
+      map.put(unsaved.illustrationid, unsaved): @nowarn
       unsaved
     }
   }

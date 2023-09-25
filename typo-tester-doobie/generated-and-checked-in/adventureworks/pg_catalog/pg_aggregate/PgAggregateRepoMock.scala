@@ -10,6 +10,7 @@ package pg_aggregate
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.DeleteBuilder.DeleteBuilderMock
 import typo.dsl.DeleteParams
@@ -29,10 +30,11 @@ class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAgg
   }
   override def insert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow] = {
     delay {
-      if (map.contains(unsaved.aggfnoid))
+      val _ = if (map.contains(unsaved.aggfnoid))
         sys.error(s"id ${unsaved.aggfnoid} already exists")
       else
         map.put(unsaved.aggfnoid, unsaved)
+    
       unsaved
     }
   }
@@ -53,7 +55,7 @@ class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAgg
       map.get(row.aggfnoid) match {
         case Some(`row`) => false
         case Some(_) =>
-          map.put(row.aggfnoid, row)
+          map.put(row.aggfnoid, row): @nowarn
           true
         case None => false
       }
@@ -64,7 +66,7 @@ class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAgg
   }
   override def upsert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow] = {
     delay {
-      map.put(unsaved.aggfnoid, unsaved)
+      map.put(unsaved.aggfnoid, unsaved): @nowarn
       unsaved
     }
   }

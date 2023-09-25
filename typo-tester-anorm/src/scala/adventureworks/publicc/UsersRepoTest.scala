@@ -19,7 +19,7 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
         verifiedOn = Some(TypoOffsetDateTime.now),
         createdAt = Defaulted.Provided(TypoOffsetDateTime.now)
       )
-      usersRepo.insert(unsaved)
+      val _ = usersRepo.insert(unsaved)
       val actual = usersRepo.select.where(p => p.userId === unsaved.userId).toList
       assert(unsaved.toRow(???) === actual.head)
     }
