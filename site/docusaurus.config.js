@@ -46,7 +46,7 @@ const config = {
       navbar: {
         title: "Typo",
         logo: {
-          alt: "My Site Logo",
+          alt: "Typo",
           src: "img/logo.svg",
         },
         items: [
@@ -65,6 +65,17 @@ const config = {
       },
       footer: {
         style: "dark",
+        links: [
+          {
+            title: "Links",
+            items: [
+              {
+                label: "Github",
+                to: "https://github.com/oyvindberg/typo",
+              },
+            ],
+          },
+        ],
         copyright: `Copyright © ${new Date().getFullYear()} Øyvind Raddum Berg`,
       },
       prism: {

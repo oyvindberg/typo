@@ -36,18 +36,26 @@ const sidebars = {
         },
         {
             type: "category",
+            label: "Testing",
+            collapsible: true,
+            collapsed: false,
+            items: [
+                {type: "doc", id: "other-features/testing-with-stubs"},
+                {type: "doc", id: "other-features/testing-with-random-values"},
+            ],
+        },
+        {
+            type: "category",
             label: "Other features",
             collapsible: true,
             collapsed: false,
             items: [
-                {type: "doc", id: "other-features/scala-js-ready"},
-                {type: "doc", id: "other-features/testing-with-stubs"},
-                {type: "doc", id: "other-features/testing-with-random-values"},
                 {type: "doc", id: "other-features/json"},
                 {type: "doc", id: "other-features/faster-compilation"},
                 {type: "doc", id: "other-features/flexible"},
                 {type: "doc", id: "other-features/clickable-links"},
                 {type: "doc", id: "other-features/constraints"},
+                {type: "doc", id: "other-features/scala-js-ready"},
             ],
         },
         {
