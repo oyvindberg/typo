@@ -24,7 +24,7 @@ class PgStatisticExtDataStructure[Row](val prefix: Option[String], val extract: 
   override val stxdndistinct = new OptField[TypoUnknownPgNdistinct, Row](prefix, "stxdndistinct", Some("text"), Some("pg_ndistinct"))(x => extract(x).stxdndistinct, (row, value) => merge(row, extract(row).copy(stxdndistinct = value)))
   override val stxddependencies = new OptField[TypoUnknownPgDependencies, Row](prefix, "stxddependencies", Some("text"), Some("pg_dependencies"))(x => extract(x).stxddependencies, (row, value) => merge(row, extract(row).copy(stxddependencies = value)))
   override val stxdmcv = new OptField[TypoUnknownPgMcvList, Row](prefix, "stxdmcv", Some("text"), Some("pg_mcv_list"))(x => extract(x).stxdmcv, (row, value) => merge(row, extract(row).copy(stxdmcv = value)))
-  override val stxdexpr = new OptField[TypoUnknownPgStatistic, Row](prefix, "stxdexpr", Some("text"), Some("_pg_statistic"))(x => extract(x).stxdexpr, (row, value) => merge(row, extract(row).copy(stxdexpr = value)))
+  override val stxdexpr = new OptField[Array[TypoUnknownPgStatistic], Row](prefix, "stxdexpr", Some("text[]"), Some("_pg_statistic"))(x => extract(x).stxdexpr, (row, value) => merge(row, extract(row).copy(stxdexpr = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)

@@ -28,7 +28,7 @@ case class PgStatisticExtDataRow(
   stxdndistinct: Option[TypoUnknownPgNdistinct],
   stxddependencies: Option[TypoUnknownPgDependencies],
   stxdmcv: Option[TypoUnknownPgMcvList],
-  stxdexpr: Option[TypoUnknownPgStatistic]
+  stxdexpr: Option[Array[TypoUnknownPgStatistic]]
 )
 
 object PgStatisticExtDataRow {
@@ -39,7 +39,7 @@ object PgStatisticExtDataRow {
           stxdndistinct = json.\("stxdndistinct").toOption.map(_.as(TypoUnknownPgNdistinct.reads)),
           stxddependencies = json.\("stxddependencies").toOption.map(_.as(TypoUnknownPgDependencies.reads)),
           stxdmcv = json.\("stxdmcv").toOption.map(_.as(TypoUnknownPgMcvList.reads)),
-          stxdexpr = json.\("stxdexpr").toOption.map(_.as(TypoUnknownPgStatistic.reads))
+          stxdexpr = json.\("stxdexpr").toOption.map(_.as(Reads.ArrayReads[TypoUnknownPgStatistic](TypoUnknownPgStatistic.reads, implicitly)))
         )
       )
     ),
@@ -51,7 +51,7 @@ object PgStatisticExtDataRow {
         stxdndistinct = row(idx + 1)(Column.columnToOption(TypoUnknownPgNdistinct.column)),
         stxddependencies = row(idx + 2)(Column.columnToOption(TypoUnknownPgDependencies.column)),
         stxdmcv = row(idx + 3)(Column.columnToOption(TypoUnknownPgMcvList.column)),
-        stxdexpr = row(idx + 4)(Column.columnToOption(TypoUnknownPgStatistic.column))
+        stxdexpr = row(idx + 4)(Column.columnToOption(TypoUnknownPgStatistic.arrayColumn))
       )
     )
   }
@@ -61,7 +61,7 @@ object PgStatisticExtDataRow {
       "stxdndistinct" -> Writes.OptionWrites(TypoUnknownPgNdistinct.writes).writes(o.stxdndistinct),
       "stxddependencies" -> Writes.OptionWrites(TypoUnknownPgDependencies.writes).writes(o.stxddependencies),
       "stxdmcv" -> Writes.OptionWrites(TypoUnknownPgMcvList.writes).writes(o.stxdmcv),
-      "stxdexpr" -> Writes.OptionWrites(TypoUnknownPgStatistic.writes).writes(o.stxdexpr)
+      "stxdexpr" -> Writes.OptionWrites(Writes.arrayWrites[TypoUnknownPgStatistic](implicitly, TypoUnknownPgStatistic.writes)).writes(o.stxdexpr)
     ))
   )
 }

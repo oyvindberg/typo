@@ -71,15 +71,9 @@ object MetaDb {
     val enums = Enums(input.pgEnums)
 
     val domains = input.domains.map { d =>
-      val tpe = TypeMapperDb(enums, Nil)
-        .dbTypeFrom(
-          d.`type`,
-          characterMaximumLength = None // todo: this can likely be set
-        )
-        .getOrElse {
-          logger.warn(s"Couldn't translate type from domain $d")
-          db.Type.Unknown(d.`type`)
-        }
+      val tpe = TypeMapperDb(enums, Nil).dbTypeFrom(d.`type`, characterMaximumLength = None /* todo: this can likely be set */ ) { () =>
+        logger.warn(s"Couldn't translate type from domain $d")
+      }
 
       db.Domain(
         name = db.RelationName(Some(d.schema), d.name),
@@ -136,9 +130,8 @@ object MetaDb {
                       else mdCol.isNullable.toNullability
                     }
 
-                  val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)).getOrElse {
+                  val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)) { () =>
                     logger.warn(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
-                    db.Type.Unknown(mdCol.columnTypeName)
                   }
 
                   val coord = (relationName, mdCol.name)
@@ -190,9 +183,8 @@ object MetaDb {
                   case None        => Nullability.NullableUnknown
                   case other       => throw new Exception(s"Unknown nullability: $other")
                 }
-              val tpe = typeMapperDb.col(c).getOrElse {
+              val tpe = typeMapperDb.col(c) { () =>
                 logger.warn(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${c.udtName}. Falling back to text")
-                db.Type.Unknown(c.udtName.get)
               }
               val coord = (relationName, colName)
               db.Col(

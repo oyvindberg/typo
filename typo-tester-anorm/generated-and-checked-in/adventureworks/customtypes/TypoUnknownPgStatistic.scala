@@ -31,7 +31,7 @@ object TypoUnknownPgStatistic {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayToStatement: ToStatement[Array[TypoUnknownPgStatistic]] = ToStatement[Array[TypoUnknownPgStatistic]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("_pg_statistic", v.map(v => v.value))))
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoUnknownPgStatistic]] = ToStatement[Array[TypoUnknownPgStatistic]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("pg_statistic", v.map(v => v.value))))
   implicit lazy val bijection: Bijection[TypoUnknownPgStatistic, String] = Bijection[TypoUnknownPgStatistic, String](_.value)(TypoUnknownPgStatistic.apply)
   implicit lazy val column: Column[TypoUnknownPgStatistic] = Column.nonNull[TypoUnknownPgStatistic]((v1: Any, _) =>
     v1 match {
@@ -41,7 +41,7 @@ object TypoUnknownPgStatistic {
   )
   implicit lazy val ordering: Ordering[TypoUnknownPgStatistic] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[TypoUnknownPgStatistic] = new ParameterMetaData[TypoUnknownPgStatistic] {
-    override def sqlType: String = "_pg_statistic"
+    override def sqlType: String = "pg_statistic"
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoUnknownPgStatistic] = Reads.StringReads.map(TypoUnknownPgStatistic.apply)

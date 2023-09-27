@@ -19,7 +19,7 @@ trait PgStatisticExtDataFields[Row] {
   val stxdndistinct: OptField[TypoUnknownPgNdistinct, Row]
   val stxddependencies: OptField[TypoUnknownPgDependencies, Row]
   val stxdmcv: OptField[TypoUnknownPgMcvList, Row]
-  val stxdexpr: OptField[TypoUnknownPgStatistic, Row]
+  val stxdexpr: OptField[Array[TypoUnknownPgStatistic], Row]
 }
 object PgStatisticExtDataFields extends PgStatisticExtDataStructure[PgStatisticExtDataRow](None, identity, (_, x) => x)
 

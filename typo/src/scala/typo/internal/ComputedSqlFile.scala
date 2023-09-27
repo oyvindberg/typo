@@ -34,9 +34,8 @@ case class ComputedSqlFile(
             else col.isNullable.toNullability
           }
 
-        val dbType = typeMapperDb.dbTypeFrom(col.columnTypeName, Some(col.precision)).getOrElse {
+        val dbType = typeMapperDb.dbTypeFrom(col.columnTypeName, Some(col.precision)) { () =>
           logger.warn(s"Couldn't translate type from file ${sqlFile.relPath} column ${col.name.value} with type ${col.columnTypeName}. Falling back to text")
-          db.Type.Unknown(col.columnTypeName)
         }
 
         // we let types flow through constraints down to this column, the point is to reuse id types downstream
@@ -86,9 +85,8 @@ case class ComputedSqlFile(
           case Some(parsedName) => naming.field(parsedName.name)
         }
 
-        val dbType = typeMapperDb.dbTypeFrom(jdbcParam.parameterTypeName, Some(jdbcParam.precision)).getOrElse {
+        val dbType = typeMapperDb.dbTypeFrom(jdbcParam.parameterTypeName, Some(jdbcParam.precision)) { () =>
           logger.warn(s"${sqlFile.relPath}: Couldn't translate type from param $maybeName with type ${jdbcParam.parameterTypeName}")
-          db.Type.Unknown(jdbcParam.parameterTypeName)
         }
 
         val tpe = scalaTypeMapper.sqlFile(
