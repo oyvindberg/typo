@@ -25,12 +25,12 @@ import scala.util.Try
 case class BillofmaterialsRowUnsaved(
   /** Parent product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]]
-      Constraint CK_BillOfMaterials_BOMLevel affecting columns "bomlevel", "productassemblyid", "perassemblyqty":  ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
-      Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns "productassemblyid", "componentid":  ((productassemblyid <> componentid)) */
+      Constraint CK_BillOfMaterials_BOMLevel affecting columns "bomlevel", "perassemblyqty", "productassemblyid":  ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
+      Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns "componentid", "productassemblyid":  ((productassemblyid <> componentid)) */
   productassemblyid: Option[ProductId],
   /** Component identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]]
-      Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns "productassemblyid", "componentid":  ((productassemblyid <> componentid)) */
+      Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns "componentid", "productassemblyid":  ((productassemblyid <> componentid)) */
   componentid: ProductId,
   /** Date the component stopped being used in the assembly item.
       Constraint CK_BillOfMaterials_EndDate affecting columns "enddate", "startdate":  (((enddate > startdate) OR (enddate IS NULL))) */
@@ -39,7 +39,7 @@ case class BillofmaterialsRowUnsaved(
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Indicates the depth the component is from its parent (AssemblyID).
-      Constraint CK_BillOfMaterials_BOMLevel affecting columns "bomlevel", "productassemblyid", "perassemblyqty":  ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1)))) */
+      Constraint CK_BillOfMaterials_BOMLevel affecting columns "bomlevel", "perassemblyqty", "productassemblyid":  ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1)))) */
   bomlevel: TypoShort,
   /** Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass)
       Primary key for BillOfMaterials records. */
@@ -50,7 +50,7 @@ case class BillofmaterialsRowUnsaved(
   startdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 1.00
       Quantity of the component needed to create the assembly.
-      Constraint CK_BillOfMaterials_BOMLevel affecting columns "bomlevel", "productassemblyid", "perassemblyqty":  ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
+      Constraint CK_BillOfMaterials_BOMLevel affecting columns "bomlevel", "perassemblyqty", "productassemblyid":  ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
       Constraint CK_BillOfMaterials_PerAssemblyQty affecting columns "perassemblyqty":  ((perassemblyqty >= 1.00)) */
   perassemblyqty: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */

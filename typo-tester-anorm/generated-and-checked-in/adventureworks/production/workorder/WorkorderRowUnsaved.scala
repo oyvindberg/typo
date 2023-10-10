@@ -33,10 +33,10 @@ case class WorkorderRowUnsaved(
       Constraint CK_WorkOrder_ScrappedQty affecting columns "scrappedqty":  ((scrappedqty >= 0)) */
   scrappedqty: TypoShort,
   /** Work order start date.
-      Constraint CK_WorkOrder_EndDate affecting columns "startdate", "enddate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_WorkOrder_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
   /** Work order end date.
-      Constraint CK_WorkOrder_EndDate affecting columns "startdate", "enddate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_WorkOrder_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
   /** Work order due date. */
   duedate: TypoLocalDateTime,

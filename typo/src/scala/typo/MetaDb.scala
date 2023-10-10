@@ -15,6 +15,7 @@ import typo.internal.metadb.{Enums, ForeignKeys, PrimaryKeys, UniqueKeys}
 import typo.internal.{DebugJson, TypeMapperDb}
 
 import java.sql.Connection
+import scala.collection.immutable.SortedSet
 
 case class MetaDb(
     relations: List[db.Relation],
@@ -87,7 +88,9 @@ object MetaDb {
     val constraints: Map[(db.RelationName, db.ColName), List[db.Constraint]] =
       input.constraints
         .collect { case ConstraintsSqlRow(tableSchema, Some(tableName), Some(columns), Some(constraintName), Some(checkClause)) =>
-          columns.map(column => (db.RelationName(tableSchema, tableName), db.ColName(column)) -> db.Constraint(constraintName, columns.map(db.ColName.apply).toList, checkClause))
+          columns.map(column =>
+            (db.RelationName(tableSchema, tableName), db.ColName(column)) -> db.Constraint(constraintName, SortedSet.empty[db.ColName] ++ columns.iterator.map(db.ColName.apply), checkClause)
+          )
         }
         .flatten
         .groupBy { case (k, _) => k }

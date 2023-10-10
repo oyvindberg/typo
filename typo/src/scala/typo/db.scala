@@ -3,6 +3,8 @@ package typo
 import typo.internal.DebugJson
 import typo.internal.analysis.{DecomposedSql, ParsedName}
 
+import scala.collection.immutable.SortedSet
+
 /** Describes what tables look like in postgres
   */
 object db {
@@ -69,8 +71,11 @@ object db {
   case class Domain(name: RelationName, tpe: Type, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])
   case class StringEnum(name: RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
+  object ColName {
+    implicit val ordering: Ordering[ColName] = Ordering.by(_.value)
+  }
 
-  case class Constraint(name: String, columns: List[ColName], checkClause: String)
+  case class Constraint(name: String, columns: SortedSet[ColName], checkClause: String)
 
   case class Col(
       parsedName: ParsedName,

@@ -34,10 +34,10 @@ case class WorkorderroutingRowUnsaved(
       Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns "scheduledenddate", "scheduledstartdate":  ((scheduledenddate >= scheduledstartdate)) */
   scheduledenddate: TypoLocalDateTime,
   /** Actual start date.
-      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns "actualstartdate", "actualenddate":  (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
+      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns "actualenddate", "actualstartdate":  (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
   actualstartdate: Option[TypoLocalDateTime],
   /** Actual end date.
-      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns "actualstartdate", "actualenddate":  (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
+      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns "actualenddate", "actualstartdate":  (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
   actualenddate: Option[TypoLocalDateTime],
   /** Number of manufacturing hours used.
       Constraint CK_WorkOrderRouting_ActualResourceHrs affecting columns "actualresourcehrs":  ((actualresourcehrs >= 0.0000)) */

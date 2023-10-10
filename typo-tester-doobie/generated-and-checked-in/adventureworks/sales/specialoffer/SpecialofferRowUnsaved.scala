@@ -22,10 +22,10 @@ case class SpecialofferRowUnsaved(
   /** Group the discount applies to such as Reseller or Customer. */
   category: /* max 50 chars */ String,
   /** Discount start date.
-      Constraint CK_SpecialOffer_EndDate affecting columns "startdate", "enddate":  ((enddate >= startdate)) */
+      Constraint CK_SpecialOffer_EndDate affecting columns "enddate", "startdate":  ((enddate >= startdate)) */
   startdate: TypoLocalDateTime,
   /** Discount end date.
-      Constraint CK_SpecialOffer_EndDate affecting columns "startdate", "enddate":  ((enddate >= startdate)) */
+      Constraint CK_SpecialOffer_EndDate affecting columns "enddate", "startdate":  ((enddate >= startdate)) */
   enddate: TypoLocalDateTime,
   /** Maximum discount percent allowed.
       Constraint CK_SpecialOffer_MaxQty affecting columns "maxqty":  ((maxqty >= 0)) */

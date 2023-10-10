@@ -38,11 +38,11 @@ case class SalesorderheaderRow(
   /** Incremental number to track changes to the sales order over time. */
   revisionnumber: TypoShort,
   /** Dates the sales order was created.
-      Constraint CK_SalesOrderHeader_DueDate affecting columns "orderdate", "duedate":  ((duedate >= orderdate))
+      Constraint CK_SalesOrderHeader_DueDate affecting columns "duedate", "orderdate":  ((duedate >= orderdate))
       Constraint CK_SalesOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   orderdate: TypoLocalDateTime,
   /** Date the order is due to the customer.
-      Constraint CK_SalesOrderHeader_DueDate affecting columns "orderdate", "duedate":  ((duedate >= orderdate)) */
+      Constraint CK_SalesOrderHeader_DueDate affecting columns "duedate", "orderdate":  ((duedate >= orderdate)) */
   duedate: TypoLocalDateTime,
   /** Date the order was shipped to the customer.
       Constraint CK_SalesOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
