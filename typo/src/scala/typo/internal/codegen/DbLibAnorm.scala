@@ -137,8 +137,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
           code"$targ.$arrayToStatementName"
         // fallback array case.
-        case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$ToStatement.arrayToParameter(${lookupParameterMetaDataFor(targ)})"
-        case other                                     => sc.Summon(ToStatement.of(other)).code
+        case sc.Type.TApply(sc.Type.Array, List(targ)) =>
+          // `ToStatement.arrayToParameter` does not work for arbitrary types. if it's a user-defined type, user needs to provide this too
+          if (sc.Type.containsUserDefined(tpe)) // should be `targ`, but this information is stripped in `sc.Type.base` above
+            code"$targ.arrayToStatement"
+          else code"$ToStatement.arrayToParameter(${lookupParameterMetaDataFor(targ)})"
+        case other => sc.Summon(ToStatement.of(other)).code
       }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
