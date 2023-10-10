@@ -48,7 +48,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         date = TypoLocalDate(LocalDate.now),
         uuid = TypoUUID.randomUUID,
         numeric = BigDecimal("3.14159"),
-        tstzrange = TypoUnknownTstzrange("[2000-09-25T22:00:00Z, 2023-09-26T21:59:59.999Z]"),
         boxes = Array(TypoBox(3.0, 4.0, 1.0, 2.0)),
         circlees = Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0)),
         linees = Array(TypoLine(3.0, 4.5, 5.5)),
@@ -69,8 +68,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         timezs = Array(TypoOffsetTime.now),
         dates = Array(TypoLocalDate(LocalDate.now)),
         uuids = Array(TypoUUID.randomUUID),
-        numerics = Array(BigDecimal("3.14159")),
-        tstzranges = Array(TypoUnknownTstzrange("[2000-09-25T22:00:00Z, 2023-09-26T21:59:59.999Z]"))
+        numerics = Array(BigDecimal("3.14159"))
       )
       PgtestRepoImpl.insert(before).map { after =>
         assert(after.box === before.box): @nowarn
@@ -143,7 +141,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         date = None,
         uuid = None,
         numeric = None,
-        tstzrange = None,
         boxes = None,
         circlees = None,
         linees = None,
@@ -164,8 +161,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         timezs = None,
         dates = None,
         uuids = None,
-        numerics = None,
-        tstzranges = None
+        numerics = None
       )
       PgtestnullRepoImpl.insert(before).map { after =>
         assert(after === before)
@@ -197,7 +193,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         date = Some(TypoLocalDate(LocalDate.now)),
         uuid = Some(TypoUUID.randomUUID),
         numeric = Some(BigDecimal("3.14159")),
-        tstzrange = Some(TypoUnknownTstzrange("[2000-09-25T22:00:00Z, 2023-09-26T21:59:59.999Z]")),
         boxes = Some(Array(TypoBox(3.0, 4.0, 1.0, 2.0))),
         circlees = Some(Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0))),
         linees = Some(Array(TypoLine(3.0, 4.5, 5.5))),
@@ -218,8 +213,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         timezs = Some(Array(TypoOffsetTime.now)),
         dates = Some(Array(TypoLocalDate(LocalDate.now))),
         uuids = Some(Array(TypoUUID.randomUUID)),
-        numerics = Some(Array(BigDecimal("3.14159"))),
-        tstzranges = Some(Array(TypoUnknownTstzrange("[2000-09-25T22:00:00Z, 2023-09-26T21:59:59.999Z]")))
+        numerics = Some(Array(BigDecimal("3.14159")))
       )
 
       PgtestnullRepoImpl.insert(before).map { after =>

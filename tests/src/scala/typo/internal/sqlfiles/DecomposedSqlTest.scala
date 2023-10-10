@@ -2,7 +2,7 @@ package typo.internal.sqlfiles
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-import typo.internal.analysis.{DecomposedSql, parseName}
+import typo.internal.analysis.{DecomposedSql, ParsedName}
 
 class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
@@ -13,11 +13,11 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
     val expected = DecomposedSql(
       List(
         DecomposedSql.SqlText("SELECT * FROM table WHERE afield = ':not me' AND bfield = "),
-        DecomposedSql.NamedParam(parseName("param1")),
+        DecomposedSql.NamedParam(ParsedName.of("param1")),
         DecomposedSql.SqlText(" AND cfield = "),
-        DecomposedSql.NamedParam(parseName("param2")),
+        DecomposedSql.NamedParam(ParsedName.of("param2")),
         DecomposedSql.SqlText(" and dfield = "),
-        DecomposedSql.NamedParam(parseName("param2"))
+        DecomposedSql.NamedParam(ParsedName.of("param2"))
       )
     )
     assert(actual === expected)
@@ -43,10 +43,10 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
                               |SELECT col1, col2 -- :named_parameters in comments should be ignored
                               |FROM table
                               |WHERE id = """.stripMargin),
-        DecomposedSql.NamedParam(parseName("named_parameter1")),
+        DecomposedSql.NamedParam(ParsedName.of("named_parameter1")),
         DecomposedSql.SqlText("""
                               |AND name = """.stripMargin),
-        DecomposedSql.NamedParam(parseName("named_parameter2"))
+        DecomposedSql.NamedParam(ParsedName.of("named_parameter2"))
       )
     )
     assert(actual === expected)
@@ -59,7 +59,7 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
     val expected = DecomposedSql(
       List(
         DecomposedSql.SqlText("SELECT '{1,2,3,4,5}'::int[] WHERE some_field = "),
-        DecomposedSql.NamedParam(parseName("some_field_value"))
+        DecomposedSql.NamedParam(ParsedName.of("some_field_value"))
       )
     )
 
@@ -71,7 +71,7 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
       "SELECT '{1,2,3,4,5}'::int[] WHERE f1 = :foo and f2 = ? and f3 = :foo and f4 = ?"
     )
     val expected = List(
-      DecomposedSql.NamedParam(parseName("foo")) -> List(0, 2),
+      DecomposedSql.NamedParam(ParsedName.of("foo")) -> List(0, 2),
       DecomposedSql.NotNamedParam -> List(1),
       DecomposedSql.NotNamedParam -> List(3)
     )
@@ -83,8 +83,8 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
       """SELECT '{1,2,3,4,5}'::int[] WHERE f1 = :"optional?" AND f2 = :"required!""""
     )
     val expected = List(
-      DecomposedSql.NamedParam(parseName("optional?")) -> List(0),
-      DecomposedSql.NamedParam(parseName("required!")) -> List(1)
+      DecomposedSql.NamedParam(ParsedName.of("optional?")) -> List(0),
+      DecomposedSql.NamedParam(ParsedName.of("required!")) -> List(1)
     )
     assert(actual.paramNamesWithIndices === expected)
   }
@@ -94,7 +94,7 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
       """SELECT 1 where WHERE foo.bar = ANY(:"flaff:org.foo.Id")""".stripMargin
     )
     val expected = List(
-      DecomposedSql.NamedParam(parseName("flaff:org.foo.Id")) -> List(0)
+      DecomposedSql.NamedParam(ParsedName.of("flaff:org.foo.Id")) -> List(0)
     )
     assert(actual.paramNamesWithIndices === expected)
     assert(actual.sqlWithNulls === "SELECT 1 where WHERE foo.bar = ANY(null)")
@@ -105,7 +105,7 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
       """select 1 where :"foo!" = 1 and :foo != 2""".stripMargin
     )
     val expected = List(
-      DecomposedSql.NamedParam(parseName("foo!")) -> List(0, 1)
+      DecomposedSql.NamedParam(ParsedName.of("foo!")) -> List(0, 1)
     )
     assert(actual.paramNamesWithIndices === expected)
   }
@@ -115,7 +115,7 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
       """select 1 where :foo = 1 and :"foo!" != 2""".stripMargin
     )
     val expected = List(
-      DecomposedSql.NamedParam(parseName("foo")) -> List(0, 1)
+      DecomposedSql.NamedParam(ParsedName.of("foo")) -> List(0, 1)
     )
     assert(actual.paramNamesWithIndices === expected)
   }

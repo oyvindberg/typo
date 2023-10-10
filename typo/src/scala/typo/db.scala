@@ -73,7 +73,7 @@ object db {
   case class Constraint(name: String, columns: List[ColName], checkClause: String)
 
   case class Col(
-      name: ColName,
+      parsedName: ParsedName,
       tpe: Type,
       udtName: Option[String],
       nullability: Nullability,
@@ -81,7 +81,9 @@ object db {
       comment: Option[String],
       constraints: List[Constraint],
       jsonDescription: DebugJson
-  )
+  ) {
+    def name = parsedName.name
+  }
   case class RelationName(schema: Option[String], name: String) {
     def value = s"${schema.map(_ + ".").getOrElse("")}$name"
   }

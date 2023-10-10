@@ -50,7 +50,7 @@ object JdbcMetadata {
               catalogName = nonEmpty(metadata.getCatalogName(n)),
               columnClassName = metadata.getColumnClassName(n),
               columnDisplaySize = metadata.getColumnDisplaySize(n),
-              parsedColumnName = parseName(metadata.getColumnLabel(n)),
+              parsedColumnName = ParsedName.of(metadata.getColumnLabel(n)),
               columnName = db.ColName(metadata.getColumnName(n)),
               columnType = JdbcType.fromInt(metadata.getColumnType(n)),
               columnTypeName = metadata.getColumnTypeName(n),

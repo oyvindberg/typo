@@ -1,5 +1,5 @@
 create extension hstore;
-
+drop table pgtest, pgtestnull;
 create table pgtest
 (
     box         box                        not null,

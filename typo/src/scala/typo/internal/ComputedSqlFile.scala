@@ -57,7 +57,7 @@ case class ComputedSqlFile(
           name = naming.field(col.name),
           tpe = tpe,
           dbCol = db.Col(
-            name = col.name,
+            parsedName = col.parsedColumnName,
             tpe = dbType,
             udtName = None,
             columnDefault = None,

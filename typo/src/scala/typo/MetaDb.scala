@@ -136,7 +136,7 @@ object MetaDb {
 
                   val coord = (relationName, mdCol.name)
                   val dbCol = db.Col(
-                    name = mdCol.name,
+                    parsedName = mdCol.parsedColumnName,
                     tpe = dbType,
                     udtName = None,
                     columnDefault = None,
@@ -175,7 +175,7 @@ object MetaDb {
             columns.map { c =>
               val jsonDescription = DebugJson(c)
 
-              val colName = db.ColName(c.columnName.get)
+              val parsedName = ParsedName.of(c.columnName.get)
               val nullability =
                 c.isNullable match {
                   case Some("YES") => Nullability.Nullable
@@ -184,18 +184,18 @@ object MetaDb {
                   case other       => throw new Exception(s"Unknown nullability: $other")
                 }
               val tpe = typeMapperDb.col(c) { () =>
-                logger.warn(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${c.udtName}. Falling back to text")
+                logger.warn(s"Couldn't translate type from relation ${relationName.value} column ${parsedName.name.value} with type ${c.udtName}. Falling back to text")
               }
-              val coord = (relationName, colName)
+              val coord = (relationName, parsedName.name)
               db.Col(
-                name = colName,
+                parsedName = parsedName,
                 columnDefault = c.columnDefault,
                 nullability = nullability,
                 tpe = tpe,
                 udtName = c.udtName,
                 comment = comments.get(coord),
                 jsonDescription = jsonDescription,
-                constraints = constraints.getOrElse(coord, Nil) ++ deps.get(colName).flatMap(otherCoord => constraints.get(otherCoord)).getOrElse(Nil)
+                constraints = constraints.getOrElse(coord, Nil) ++ deps.get(parsedName.name).flatMap(otherCoord => constraints.get(otherCoord)).getOrElse(Nil)
               )
             }
 

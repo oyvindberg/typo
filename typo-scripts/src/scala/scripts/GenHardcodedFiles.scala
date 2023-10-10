@@ -4,6 +4,7 @@ import bleep.*
 import bleep.logging.Logger
 import typo.*
 import typo.internal.FileSync.SoftWrite
+import typo.internal.analysis.ParsedName
 import typo.internal.{DebugJson, TypeMapperDb, generate}
 
 // this runs automatically at build time to instantly see results.
@@ -17,9 +18,9 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val person = db.Table(
     name = db.RelationName(Some("myschema"), "person"),
     cols = NonEmptyList(
-      db.Col(db.ColName("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
       db.Col(
-        db.ColName("favourite_football_club_id"),
+        ParsedName.of("favourite_football_club_id"),
         db.Type.VarChar(Some(50)),
         Some("varchar"),
         Nullability.NoNulls,
@@ -28,14 +29,14 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         Nil,
         DebugJson.Empty
       ),
-      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(db.ColName("nick_name"), db.Type.VarChar(Some(30)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(db.ColName("blog_url"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(db.ColName("email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(db.ColName("phone"), db.Type.VarChar(Some(8)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(db.ColName("likes_pizza"), db.Type.Boolean, Some("bool"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("nick_name"), db.Type.VarChar(Some(30)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("blog_url"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("phone"), db.Type.VarChar(Some(8)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("likes_pizza"), db.Type.Boolean, Some("bool"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
       db.Col(
-        db.ColName("marital_status_id"),
+        ParsedName.of("marital_status_id"),
         db.Type.VarChar(Some(50)),
         Some("varchar"),
         Nullability.NoNulls,
@@ -44,9 +45,9 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         Nil,
         DebugJson.Empty
       ),
-      db.Col(db.ColName("work_email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("work_email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
       db.Col(
-        db.ColName("sector"),
+        ParsedName.of("sector"),
         db.Type.EnumRef(db.RelationName(Some("myschema"), "sector")),
         Some("myschema.sector"),
         Nullability.NoNulls,
@@ -56,7 +57,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         DebugJson.Empty
       ),
       db.Col(
-        db.ColName("favorite_number"),
+        ParsedName.of("favorite_number"),
         db.Type.EnumRef(db.RelationName(Some("myschema"), "number")),
         Some("myschema.number"),
         Nullability.NoNulls,
@@ -86,8 +87,8 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val football_club = db.Table(
     name = db.RelationName(Some("myschema"), "football_club"),
     cols = NonEmptyList(
-      db.Col(db.ColName("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(db.ColName("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty)
+      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "football_club_pkey"))),
     Nil,
@@ -96,7 +97,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val marital_status = db.Table(
     name = db.RelationName(Some("myschema"), "marital_status"),
     cols = NonEmptyList(
-      db.Col(db.ColName("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty)
+      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "marital_status_pkey"))),
     Nil,
@@ -106,9 +107,9 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val cpk_person = db.Table(
     name = db.RelationName(Some("compositepk"), "person"), // name clash to ensure we handle it
     cols = NonEmptyList(
-      db.Col(db.ColName("one"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
-      db.Col(db.ColName("two"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
-      db.Col(db.ColName("name"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty)
+      db.Col(ParsedName.of("one"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("two"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("name"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("one"), db.ColName("two")), db.RelationName(Some("compositepk"), "person_pkey"))),
     Nil,

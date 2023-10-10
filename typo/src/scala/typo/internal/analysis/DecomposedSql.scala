@@ -134,7 +134,7 @@ object DecomposedSql {
           fragments += SqlText(buf.result())
           buf.clear()
           keepC = false
-          fragments += NamedParam(parseName(name))
+          fragments += NamedParam(ParsedName.of(name))
           c = '?'; // replace the parameter with a question mark
           i += name.length(); // skip past the end if the parameter
         } else if (c == ':' && i + 1 < length && query.charAt(i + 1) == '"') {
@@ -146,7 +146,7 @@ object DecomposedSql {
           fragments += SqlText(buf.result())
           buf.clear()
           keepC = false
-          fragments += NamedParam(parseName(name))
+          fragments += NamedParam(ParsedName.of(name))
           c = '?'; // replace the parameter with a question mark
           i = j; // skip past the end if the parameter
         }
