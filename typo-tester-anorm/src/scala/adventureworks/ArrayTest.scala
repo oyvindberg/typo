@@ -99,7 +99,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.timezs === before.timezs): @nowarn
       assert(after.dates === before.dates): @nowarn
       assert(after.uuids === before.uuids): @nowarn
-      assert(after.numerics === before.numerics): @nowarn
+      assert(after.numerics === before.numerics)
     }
   }
 
@@ -242,7 +242,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.timezs.map(_.toList) === before.timezs.map(_.toList)): @nowarn
       assert(after.dates.map(_.toList) === before.dates.map(_.toList)): @nowarn
       assert(after.uuids.map(_.toList) === before.uuids.map(_.toList)): @nowarn
-      assert(after.numerics.map(_.toList) === before.numerics.map(_.toList)): @nowarn
+      assert(after.numerics.map(_.toList) === before.numerics.map(_.toList))
     }
   }
 }
