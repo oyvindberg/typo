@@ -10,7 +10,6 @@ Here's a short demo video:
 <video
 width="100%"
 controls
-autoplay="autoplay"
 src="https://github.com/oyvindberg/typo/assets/247937/df5942d3-0b06-4df1-aee6-adb49c098997"
 />
 

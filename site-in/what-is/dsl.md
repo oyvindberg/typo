@@ -46,7 +46,6 @@ Some features
 <video
 width="100%"
 controls
-autoplay="autoplay"
 src="https://user-images.githubusercontent.com/247937/257662719-2a295f48-7cd2-4c49-b043-90bc8511de67.mp4"
 />
 
@@ -60,7 +59,6 @@ Column values can be computed from the original value in the column or from the 
 <video
 width="100%"
 controls
-autoplay="autoplay"
 src="https://user-images.githubusercontent.com/247937/257148737-7b32df2c-af54-4397-85d3-eab863179d78.mp4"
 />
 
