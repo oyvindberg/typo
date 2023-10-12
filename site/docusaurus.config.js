@@ -39,7 +39,9 @@ const config = {
       }),
     ],
   ],
-
+  clientModules: [
+    require.resolve('./tracker.js'),
+  ],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
