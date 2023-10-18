@@ -39,6 +39,8 @@ case class TypoCircle(center: TypoPoint, radius: Double)
 case class TypoHStore(value: Map[String, String])
 /** inet (via PGObject) */
 case class TypoInet(value: String)
+/** This is `java.time.TypoInstant`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
+case class TypoInstant(value: Instant)
 /** int2vector (via PGObject) */
 case class TypoInt2Vector(value: String)
 /** Interval type in PostgreSQL */
@@ -59,8 +61,6 @@ case class TypoLocalDateTime(value: LocalDateTime)
 case class TypoLocalTime(value: LocalTime)
 /** Money and cash types in PostgreSQL */
 case class TypoMoney(value: BigDecimal)
-/** This is `java.time.OffsetDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
-case class TypoOffsetDateTime(value: OffsetDateTime)
 /** This is `java.time.OffsetTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoOffsetTime(value: OffsetTime)
 /** oidvector (via PGObject) */
