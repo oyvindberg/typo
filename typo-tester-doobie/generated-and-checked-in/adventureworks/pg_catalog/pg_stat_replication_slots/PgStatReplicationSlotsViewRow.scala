@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_replication_slots
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -25,12 +25,12 @@ case class PgStatReplicationSlotsViewRow(
   streamBytes: /* nullability unknown */ Option[Long],
   totalTxns: /* nullability unknown */ Option[Long],
   totalBytes: /* nullability unknown */ Option[Long],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatReplicationSlotsViewRow {
-  implicit lazy val decoder: Decoder[PgStatReplicationSlotsViewRow] = Decoder.forProduct10[PgStatReplicationSlotsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoOffsetDateTime]]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(PgStatReplicationSlotsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[PgStatReplicationSlotsViewRow] = Encoder.forProduct10[PgStatReplicationSlotsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoOffsetDateTime]]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(x => (x.slotName, x.spillTxns, x.spillCount, x.spillBytes, x.streamTxns, x.streamCount, x.streamBytes, x.totalTxns, x.totalBytes, x.statsReset))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[PgStatReplicationSlotsViewRow] = Decoder.forProduct10[PgStatReplicationSlotsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoInstant]]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(PgStatReplicationSlotsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoInstant.decoder))
+  implicit lazy val encoder: Encoder[PgStatReplicationSlotsViewRow] = Encoder.forProduct10[PgStatReplicationSlotsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoInstant]]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(x => (x.slotName, x.spillTxns, x.spillCount, x.spillBytes, x.streamTxns, x.streamCount, x.streamBytes, x.totalTxns, x.totalBytes, x.statsReset))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoInstant.encoder))
   implicit lazy val read: Read[PgStatReplicationSlotsViewRow] = new Read[PgStatReplicationSlotsViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -42,7 +42,7 @@ object PgStatReplicationSlotsViewRow {
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (TypoInstant.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatReplicationSlotsViewRow(
       slotName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
@@ -54,7 +54,7 @@ object PgStatReplicationSlotsViewRow {
       streamBytes = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
       totalTxns = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
       totalBytes = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
-      statsReset = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 9)
+      statsReset = TypoInstant.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

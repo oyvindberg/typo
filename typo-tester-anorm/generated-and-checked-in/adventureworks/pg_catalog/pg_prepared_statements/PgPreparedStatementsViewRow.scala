@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_prepared_statements
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoRegtype
 import anorm.Column
 import anorm.RowParser
@@ -24,7 +24,7 @@ import scala.util.Try
 case class PgPreparedStatementsViewRow(
   name: /* nullability unknown */ Option[String],
   statement: /* nullability unknown */ Option[String],
-  prepareTime: /* nullability unknown */ Option[TypoOffsetDateTime],
+  prepareTime: /* nullability unknown */ Option[TypoInstant],
   parameterTypes: /* nullability unknown */ Option[Array[TypoRegtype]],
   fromSql: /* nullability unknown */ Option[Boolean],
   genericPlans: /* nullability unknown */ Option[Long],
@@ -37,7 +37,7 @@ object PgPreparedStatementsViewRow {
         PgPreparedStatementsViewRow(
           name = json.\("name").toOption.map(_.as(Reads.StringReads)),
           statement = json.\("statement").toOption.map(_.as(Reads.StringReads)),
-          prepareTime = json.\("prepare_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          prepareTime = json.\("prepare_time").toOption.map(_.as(TypoInstant.reads)),
           parameterTypes = json.\("parameter_types").toOption.map(_.as(Reads.ArrayReads[TypoRegtype](TypoRegtype.reads, implicitly))),
           fromSql = json.\("from_sql").toOption.map(_.as(Reads.BooleanReads)),
           genericPlans = json.\("generic_plans").toOption.map(_.as(Reads.LongReads)),
@@ -51,7 +51,7 @@ object PgPreparedStatementsViewRow {
       PgPreparedStatementsViewRow(
         name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
         statement = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        prepareTime = row(idx + 2)(Column.columnToOption(TypoOffsetDateTime.column)),
+        prepareTime = row(idx + 2)(Column.columnToOption(TypoInstant.column)),
         parameterTypes = row(idx + 3)(Column.columnToOption(TypoRegtype.arrayColumn)),
         fromSql = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
         genericPlans = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
@@ -63,7 +63,7 @@ object PgPreparedStatementsViewRow {
     new JsObject(ListMap[String, JsValue](
       "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
       "statement" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statement),
-      "prepare_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.prepareTime),
+      "prepare_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.prepareTime),
       "parameter_types" -> Writes.OptionWrites(Writes.arrayWrites[TypoRegtype](implicitly, TypoRegtype.writes)).writes(o.parameterTypes),
       "from_sql" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.fromSql),
       "generic_plans" -> Writes.OptionWrites(Writes.LongWrites).writes(o.genericPlans),

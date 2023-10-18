@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package triggers
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.OptField
 
 trait TriggersViewFields[Row] {
@@ -27,7 +27,7 @@ trait TriggersViewFields[Row] {
   val actionReferenceNewTable: OptField[String, Row]
   val actionReferenceOldRow: OptField[String, Row]
   val actionReferenceNewRow: OptField[String, Row]
-  val created: OptField[TypoOffsetDateTime, Row]
+  val created: OptField[TypoInstant, Row]
 }
 object TriggersViewFields extends TriggersViewStructure[TriggersViewRow](None, identity, (_, x) => x)
 

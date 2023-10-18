@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_archiver
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -18,11 +18,11 @@ class PgStatArchiverViewStructure[Row](val prefix: Option[String], val extract: 
 
   override val archivedCount = new OptField[Long, Row](prefix, "archived_count", None, None)(x => extract(x).archivedCount, (row, value) => merge(row, extract(row).copy(archivedCount = value)))
   override val lastArchivedWal = new OptField[String, Row](prefix, "last_archived_wal", None, None)(x => extract(x).lastArchivedWal, (row, value) => merge(row, extract(row).copy(lastArchivedWal = value)))
-  override val lastArchivedTime = new OptField[TypoOffsetDateTime, Row](prefix, "last_archived_time", Some("text"), None)(x => extract(x).lastArchivedTime, (row, value) => merge(row, extract(row).copy(lastArchivedTime = value)))
+  override val lastArchivedTime = new OptField[TypoInstant, Row](prefix, "last_archived_time", Some("text"), None)(x => extract(x).lastArchivedTime, (row, value) => merge(row, extract(row).copy(lastArchivedTime = value)))
   override val failedCount = new OptField[Long, Row](prefix, "failed_count", None, None)(x => extract(x).failedCount, (row, value) => merge(row, extract(row).copy(failedCount = value)))
   override val lastFailedWal = new OptField[String, Row](prefix, "last_failed_wal", None, None)(x => extract(x).lastFailedWal, (row, value) => merge(row, extract(row).copy(lastFailedWal = value)))
-  override val lastFailedTime = new OptField[TypoOffsetDateTime, Row](prefix, "last_failed_time", Some("text"), None)(x => extract(x).lastFailedTime, (row, value) => merge(row, extract(row).copy(lastFailedTime = value)))
-  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val lastFailedTime = new OptField[TypoInstant, Row](prefix, "last_failed_time", Some("text"), None)(x => extract(x).lastFailedTime, (row, value) => merge(row, extract(row).copy(lastFailedTime = value)))
+  override val statsReset = new OptField[TypoInstant, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](archivedCount, lastArchivedWal, lastArchivedTime, failedCount, lastFailedWal, lastFailedTime, statsReset)

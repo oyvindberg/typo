@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_roles
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
@@ -22,7 +22,7 @@ trait PgRolesViewFields[Row] {
   val rolreplication: Field[Boolean, Row]
   val rolconnlimit: Field[Int, Row]
   val rolpassword: OptField[String, Row]
-  val rolvaliduntil: OptField[TypoOffsetDateTime, Row]
+  val rolvaliduntil: OptField[TypoInstant, Row]
   val rolbypassrls: Field[Boolean, Row]
   val rolconfig: OptField[Array[String], Row]
   val oid: Field[PgAuthidId, Row]

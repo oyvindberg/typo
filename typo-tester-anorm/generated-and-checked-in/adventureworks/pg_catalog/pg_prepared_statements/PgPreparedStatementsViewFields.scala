@@ -7,14 +7,14 @@ package adventureworks
 package pg_catalog
 package pg_prepared_statements
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoRegtype
 import typo.dsl.SqlExpr.OptField
 
 trait PgPreparedStatementsViewFields[Row] {
   val name: OptField[String, Row]
   val statement: OptField[String, Row]
-  val prepareTime: OptField[TypoOffsetDateTime, Row]
+  val prepareTime: OptField[TypoInstant, Row]
   val parameterTypes: OptField[Array[TypoRegtype], Row]
   val fromSql: OptField[Boolean, Row]
   val genericPlans: OptField[Long, Row]

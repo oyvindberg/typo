@@ -7,7 +7,7 @@ package adventureworks
 package public
 package users
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -22,13 +22,13 @@ case class UsersRow(
   lastName: Option[String],
   email: TypoUnknownCitext,
   password: String,
-  createdAt: TypoOffsetDateTime,
-  verifiedOn: Option[TypoOffsetDateTime]
+  createdAt: TypoInstant,
+  verifiedOn: Option[TypoInstant]
 )
 
 object UsersRow {
-  implicit lazy val decoder: Decoder[UsersRow] = Decoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoOffsetDateTime, Option[TypoOffsetDateTime]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(UsersRow.apply)(UsersId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), TypoUnknownCitext.decoder, Decoder.decodeString, TypoOffsetDateTime.decoder, Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[UsersRow] = Encoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoOffsetDateTime, Option[TypoOffsetDateTime]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(x => (x.userId, x.name, x.lastName, x.email, x.password, x.createdAt, x.verifiedOn))(UsersId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), TypoUnknownCitext.encoder, Encoder.encodeString, TypoOffsetDateTime.encoder, Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[UsersRow] = Decoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoInstant, Option[TypoInstant]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(UsersRow.apply)(UsersId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), TypoUnknownCitext.decoder, Decoder.decodeString, TypoInstant.decoder, Decoder.decodeOption(TypoInstant.decoder))
+  implicit lazy val encoder: Encoder[UsersRow] = Encoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoInstant, Option[TypoInstant]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(x => (x.userId, x.name, x.lastName, x.email, x.password, x.createdAt, x.verifiedOn))(UsersId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), TypoUnknownCitext.encoder, Encoder.encodeString, TypoInstant.encoder, Encoder.encodeOption(TypoInstant.encoder))
   implicit lazy val read: Read[UsersRow] = new Read[UsersRow](
     gets = List(
       (UsersId.get, Nullability.NoNulls),
@@ -36,8 +36,8 @@ object UsersRow {
       (Meta.StringMeta.get, Nullability.Nullable),
       (TypoUnknownCitext.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoOffsetDateTime.get, Nullability.NoNulls),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (TypoInstant.get, Nullability.NoNulls),
+      (TypoInstant.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UsersRow(
       userId = UsersId.get.unsafeGetNonNullable(rs, i + 0),
@@ -45,8 +45,8 @@ object UsersRow {
       lastName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
       email = TypoUnknownCitext.get.unsafeGetNonNullable(rs, i + 3),
       password = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      createdAt = TypoOffsetDateTime.get.unsafeGetNonNullable(rs, i + 5),
-      verifiedOn = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 6)
+      createdAt = TypoInstant.get.unsafeGetNonNullable(rs, i + 5),
+      verifiedOn = TypoInstant.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

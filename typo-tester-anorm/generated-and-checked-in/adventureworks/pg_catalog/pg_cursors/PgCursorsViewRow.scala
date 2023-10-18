@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_cursors
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -26,7 +26,7 @@ case class PgCursorsViewRow(
   isHoldable: /* nullability unknown */ Option[Boolean],
   isBinary: /* nullability unknown */ Option[Boolean],
   isScrollable: /* nullability unknown */ Option[Boolean],
-  creationTime: /* nullability unknown */ Option[TypoOffsetDateTime]
+  creationTime: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgCursorsViewRow {
@@ -38,7 +38,7 @@ object PgCursorsViewRow {
           isHoldable = json.\("is_holdable").toOption.map(_.as(Reads.BooleanReads)),
           isBinary = json.\("is_binary").toOption.map(_.as(Reads.BooleanReads)),
           isScrollable = json.\("is_scrollable").toOption.map(_.as(Reads.BooleanReads)),
-          creationTime = json.\("creation_time").toOption.map(_.as(TypoOffsetDateTime.reads))
+          creationTime = json.\("creation_time").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -51,7 +51,7 @@ object PgCursorsViewRow {
         isHoldable = row(idx + 2)(Column.columnToOption(Column.columnToBoolean)),
         isBinary = row(idx + 3)(Column.columnToOption(Column.columnToBoolean)),
         isScrollable = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
-        creationTime = row(idx + 5)(Column.columnToOption(TypoOffsetDateTime.column))
+        creationTime = row(idx + 5)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -62,7 +62,7 @@ object PgCursorsViewRow {
       "is_holdable" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isHoldable),
       "is_binary" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isBinary),
       "is_scrollable" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isScrollable),
-      "creation_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.creationTime)
+      "creation_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.creationTime)
     ))
   )
 }

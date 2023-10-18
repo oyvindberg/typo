@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_user_tables
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_class.PgClassId
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -52,13 +52,13 @@ case class PgStatUserTablesViewRow(
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.nInsSinceVacuum]] */
   nInsSinceVacuum: Option[/* nullability unknown */ Long],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastVacuum]] */
-  lastVacuum: Option[/* nullability unknown */ TypoOffsetDateTime],
+  lastVacuum: Option[/* nullability unknown */ TypoInstant],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAutovacuum]] */
-  lastAutovacuum: Option[/* nullability unknown */ TypoOffsetDateTime],
+  lastAutovacuum: Option[/* nullability unknown */ TypoInstant],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAnalyze]] */
-  lastAnalyze: Option[/* nullability unknown */ TypoOffsetDateTime],
+  lastAnalyze: Option[/* nullability unknown */ TypoInstant],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAutoanalyze]] */
-  lastAutoanalyze: Option[/* nullability unknown */ TypoOffsetDateTime],
+  lastAutoanalyze: Option[/* nullability unknown */ TypoInstant],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.vacuumCount]] */
   vacuumCount: Option[/* nullability unknown */ Long],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.autovacuumCount]] */
@@ -92,10 +92,10 @@ object PgStatUserTablesViewRow {
         nDeadTup = orThrow(c.get("n_dead_tup")(Decoder.decodeOption(Decoder.decodeLong))),
         nModSinceAnalyze = orThrow(c.get("n_mod_since_analyze")(Decoder.decodeOption(Decoder.decodeLong))),
         nInsSinceVacuum = orThrow(c.get("n_ins_since_vacuum")(Decoder.decodeOption(Decoder.decodeLong))),
-        lastVacuum = orThrow(c.get("last_vacuum")(Decoder.decodeOption(TypoOffsetDateTime.decoder))),
-        lastAutovacuum = orThrow(c.get("last_autovacuum")(Decoder.decodeOption(TypoOffsetDateTime.decoder))),
-        lastAnalyze = orThrow(c.get("last_analyze")(Decoder.decodeOption(TypoOffsetDateTime.decoder))),
-        lastAutoanalyze = orThrow(c.get("last_autoanalyze")(Decoder.decodeOption(TypoOffsetDateTime.decoder))),
+        lastVacuum = orThrow(c.get("last_vacuum")(Decoder.decodeOption(TypoInstant.decoder))),
+        lastAutovacuum = orThrow(c.get("last_autovacuum")(Decoder.decodeOption(TypoInstant.decoder))),
+        lastAnalyze = orThrow(c.get("last_analyze")(Decoder.decodeOption(TypoInstant.decoder))),
+        lastAutoanalyze = orThrow(c.get("last_autoanalyze")(Decoder.decodeOption(TypoInstant.decoder))),
         vacuumCount = orThrow(c.get("vacuum_count")(Decoder.decodeOption(Decoder.decodeLong))),
         autovacuumCount = orThrow(c.get("autovacuum_count")(Decoder.decodeOption(Decoder.decodeLong))),
         analyzeCount = orThrow(c.get("analyze_count")(Decoder.decodeOption(Decoder.decodeLong))),
@@ -120,10 +120,10 @@ object PgStatUserTablesViewRow {
       "n_dead_tup" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.nDeadTup),
       "n_mod_since_analyze" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.nModSinceAnalyze),
       "n_ins_since_vacuum" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.nInsSinceVacuum),
-      "last_vacuum" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.lastVacuum),
-      "last_autovacuum" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.lastAutovacuum),
-      "last_analyze" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.lastAnalyze),
-      "last_autoanalyze" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.lastAutoanalyze),
+      "last_vacuum" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.lastVacuum),
+      "last_autovacuum" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.lastAutovacuum),
+      "last_analyze" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.lastAnalyze),
+      "last_autoanalyze" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.lastAutoanalyze),
       "vacuum_count" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.vacuumCount),
       "autovacuum_count" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.autovacuumCount),
       "analyze_count" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.analyzeCount),
@@ -147,10 +147,10 @@ object PgStatUserTablesViewRow {
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
-      (/* nullability unknown */ TypoOffsetDateTime.get, Nullability.Nullable),
-      (/* nullability unknown */ TypoOffsetDateTime.get, Nullability.Nullable),
-      (/* nullability unknown */ TypoOffsetDateTime.get, Nullability.Nullable),
-      (/* nullability unknown */ TypoOffsetDateTime.get, Nullability.Nullable),
+      (/* nullability unknown */ TypoInstant.get, Nullability.Nullable),
+      (/* nullability unknown */ TypoInstant.get, Nullability.Nullable),
+      (/* nullability unknown */ TypoInstant.get, Nullability.Nullable),
+      (/* nullability unknown */ TypoInstant.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
@@ -172,10 +172,10 @@ object PgStatUserTablesViewRow {
       nDeadTup = Meta.LongMeta.get.unsafeGetNullable(rs, i + 12),
       nModSinceAnalyze = Meta.LongMeta.get.unsafeGetNullable(rs, i + 13),
       nInsSinceVacuum = Meta.LongMeta.get.unsafeGetNullable(rs, i + 14),
-      lastVacuum = /* nullability unknown */ TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 15),
-      lastAutovacuum = /* nullability unknown */ TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 16),
-      lastAnalyze = /* nullability unknown */ TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 17),
-      lastAutoanalyze = /* nullability unknown */ TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 18),
+      lastVacuum = /* nullability unknown */ TypoInstant.get.unsafeGetNullable(rs, i + 15),
+      lastAutovacuum = /* nullability unknown */ TypoInstant.get.unsafeGetNullable(rs, i + 16),
+      lastAnalyze = /* nullability unknown */ TypoInstant.get.unsafeGetNullable(rs, i + 17),
+      lastAutoanalyze = /* nullability unknown */ TypoInstant.get.unsafeGetNullable(rs, i + 18),
       vacuumCount = Meta.LongMeta.get.unsafeGetNullable(rs, i + 19),
       autovacuumCount = Meta.LongMeta.get.unsafeGetNullable(rs, i + 20),
       analyzeCount = Meta.LongMeta.get.unsafeGetNullable(rs, i + 21),

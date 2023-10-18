@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_cursors
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -21,7 +21,7 @@ class PgCursorsViewStructure[Row](val prefix: Option[String], val extract: Row =
   override val isHoldable = new OptField[Boolean, Row](prefix, "is_holdable", None, None)(x => extract(x).isHoldable, (row, value) => merge(row, extract(row).copy(isHoldable = value)))
   override val isBinary = new OptField[Boolean, Row](prefix, "is_binary", None, None)(x => extract(x).isBinary, (row, value) => merge(row, extract(row).copy(isBinary = value)))
   override val isScrollable = new OptField[Boolean, Row](prefix, "is_scrollable", None, None)(x => extract(x).isScrollable, (row, value) => merge(row, extract(row).copy(isScrollable = value)))
-  override val creationTime = new OptField[TypoOffsetDateTime, Row](prefix, "creation_time", Some("text"), None)(x => extract(x).creationTime, (row, value) => merge(row, extract(row).copy(creationTime = value)))
+  override val creationTime = new OptField[TypoInstant, Row](prefix, "creation_time", Some("text"), None)(x => extract(x).creationTime, (row, value) => merge(row, extract(row).copy(creationTime = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](name, statement, isHoldable, isBinary, isScrollable, creationTime)

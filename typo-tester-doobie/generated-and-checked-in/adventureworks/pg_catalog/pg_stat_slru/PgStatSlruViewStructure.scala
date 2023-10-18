@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_slru
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -24,7 +24,7 @@ class PgStatSlruViewStructure[Row](val prefix: Option[String], val extract: Row 
   override val blksExists = new OptField[Long, Row](prefix, "blks_exists", None, None)(x => extract(x).blksExists, (row, value) => merge(row, extract(row).copy(blksExists = value)))
   override val flushes = new OptField[Long, Row](prefix, "flushes", None, None)(x => extract(x).flushes, (row, value) => merge(row, extract(row).copy(flushes = value)))
   override val truncates = new OptField[Long, Row](prefix, "truncates", None, None)(x => extract(x).truncates, (row, value) => merge(row, extract(row).copy(truncates = value)))
-  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val statsReset = new OptField[TypoInstant, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](name, blksZeroed, blksHit, blksRead, blksWritten, blksExists, flushes, truncates, statsReset)

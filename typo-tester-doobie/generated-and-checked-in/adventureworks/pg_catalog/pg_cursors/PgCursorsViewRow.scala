@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_cursors
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -21,12 +21,12 @@ case class PgCursorsViewRow(
   isHoldable: /* nullability unknown */ Option[Boolean],
   isBinary: /* nullability unknown */ Option[Boolean],
   isScrollable: /* nullability unknown */ Option[Boolean],
-  creationTime: /* nullability unknown */ Option[TypoOffsetDateTime]
+  creationTime: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgCursorsViewRow {
-  implicit lazy val decoder: Decoder[PgCursorsViewRow] = Decoder.forProduct6[PgCursorsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[TypoOffsetDateTime]]("name", "statement", "is_holdable", "is_binary", "is_scrollable", "creation_time")(PgCursorsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[PgCursorsViewRow] = Encoder.forProduct6[PgCursorsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[TypoOffsetDateTime]]("name", "statement", "is_holdable", "is_binary", "is_scrollable", "creation_time")(x => (x.name, x.statement, x.isHoldable, x.isBinary, x.isScrollable, x.creationTime))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[PgCursorsViewRow] = Decoder.forProduct6[PgCursorsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[TypoInstant]]("name", "statement", "is_holdable", "is_binary", "is_scrollable", "creation_time")(PgCursorsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(TypoInstant.decoder))
+  implicit lazy val encoder: Encoder[PgCursorsViewRow] = Encoder.forProduct6[PgCursorsViewRow, /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[Boolean], /* nullability unknown */ Option[TypoInstant]]("name", "statement", "is_holdable", "is_binary", "is_scrollable", "creation_time")(x => (x.name, x.statement, x.isHoldable, x.isBinary, x.isScrollable, x.creationTime))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(TypoInstant.encoder))
   implicit lazy val read: Read[PgCursorsViewRow] = new Read[PgCursorsViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -34,7 +34,7 @@ object PgCursorsViewRow {
       (Meta.BooleanMeta.get, Nullability.Nullable),
       (Meta.BooleanMeta.get, Nullability.Nullable),
       (Meta.BooleanMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (TypoInstant.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgCursorsViewRow(
       name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
@@ -42,7 +42,7 @@ object PgCursorsViewRow {
       isHoldable = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 2),
       isBinary = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 3),
       isScrollable = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 4),
-      creationTime = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 5)
+      creationTime = TypoInstant.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

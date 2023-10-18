@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoBox
 import adventureworks.customtypes.TypoCircle
 import adventureworks.customtypes.TypoHStore
 import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoInterval
 import adventureworks.customtypes.TypoJson
 import adventureworks.customtypes.TypoJsonb
@@ -20,7 +21,6 @@ import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.customtypes.TypoMoney
-import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
@@ -55,7 +55,7 @@ case class PgtestnullRow(
   hstore: Option[TypoHStore],
   inet: Option[TypoInet],
   timestamp: Option[TypoLocalDateTime],
-  timestampz: Option[TypoOffsetDateTime],
+  timestampz: Option[TypoInstant],
   time: Option[TypoLocalTime],
   timez: Option[TypoOffsetTime],
   date: Option[TypoLocalDate],
@@ -76,7 +76,7 @@ case class PgtestnullRow(
   hstores: Option[Array[TypoHStore]],
   inets: Option[Array[TypoInet]],
   timestamps: Option[Array[TypoLocalDateTime]],
-  timestampzs: Option[Array[TypoOffsetDateTime]],
+  timestampzs: Option[Array[TypoInstant]],
   times: Option[Array[TypoLocalTime]],
   timezs: Option[Array[TypoOffsetTime]],
   dates: Option[Array[TypoLocalDate]],
@@ -103,7 +103,7 @@ object PgtestnullRow {
           hstore = json.\("hstore").toOption.map(_.as(TypoHStore.reads)),
           inet = json.\("inet").toOption.map(_.as(TypoInet.reads)),
           timestamp = json.\("timestamp").toOption.map(_.as(TypoLocalDateTime.reads)),
-          timestampz = json.\("timestampz").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          timestampz = json.\("timestampz").toOption.map(_.as(TypoInstant.reads)),
           time = json.\("time").toOption.map(_.as(TypoLocalTime.reads)),
           timez = json.\("timez").toOption.map(_.as(TypoOffsetTime.reads)),
           date = json.\("date").toOption.map(_.as(TypoLocalDate.reads)),
@@ -124,7 +124,7 @@ object PgtestnullRow {
           hstores = json.\("hstores").toOption.map(_.as(Reads.ArrayReads[TypoHStore](TypoHStore.reads, implicitly))),
           inets = json.\("inets").toOption.map(_.as(Reads.ArrayReads[TypoInet](TypoInet.reads, implicitly))),
           timestamps = json.\("timestamps").toOption.map(_.as(Reads.ArrayReads[TypoLocalDateTime](TypoLocalDateTime.reads, implicitly))),
-          timestampzs = json.\("timestampzs").toOption.map(_.as(Reads.ArrayReads[TypoOffsetDateTime](TypoOffsetDateTime.reads, implicitly))),
+          timestampzs = json.\("timestampzs").toOption.map(_.as(Reads.ArrayReads[TypoInstant](TypoInstant.reads, implicitly))),
           times = json.\("times").toOption.map(_.as(Reads.ArrayReads[TypoLocalTime](TypoLocalTime.reads, implicitly))),
           timezs = json.\("timezs").toOption.map(_.as(Reads.ArrayReads[TypoOffsetTime](TypoOffsetTime.reads, implicitly))),
           dates = json.\("dates").toOption.map(_.as(Reads.ArrayReads[TypoLocalDate](TypoLocalDate.reads, implicitly))),
@@ -152,7 +152,7 @@ object PgtestnullRow {
         hstore = row(idx + 12)(Column.columnToOption(TypoHStore.column)),
         inet = row(idx + 13)(Column.columnToOption(TypoInet.column)),
         timestamp = row(idx + 14)(Column.columnToOption(TypoLocalDateTime.column)),
-        timestampz = row(idx + 15)(Column.columnToOption(TypoOffsetDateTime.column)),
+        timestampz = row(idx + 15)(Column.columnToOption(TypoInstant.column)),
         time = row(idx + 16)(Column.columnToOption(TypoLocalTime.column)),
         timez = row(idx + 17)(Column.columnToOption(TypoOffsetTime.column)),
         date = row(idx + 18)(Column.columnToOption(TypoLocalDate.column)),
@@ -173,7 +173,7 @@ object PgtestnullRow {
         hstores = row(idx + 33)(Column.columnToOption(TypoHStore.arrayColumn)),
         inets = row(idx + 34)(Column.columnToOption(TypoInet.arrayColumn)),
         timestamps = row(idx + 35)(Column.columnToOption(TypoLocalDateTime.arrayColumn)),
-        timestampzs = row(idx + 36)(Column.columnToOption(TypoOffsetDateTime.arrayColumn)),
+        timestampzs = row(idx + 36)(Column.columnToOption(TypoInstant.arrayColumn)),
         times = row(idx + 37)(Column.columnToOption(TypoLocalTime.arrayColumn)),
         timezs = row(idx + 38)(Column.columnToOption(TypoOffsetTime.arrayColumn)),
         dates = row(idx + 39)(Column.columnToOption(TypoLocalDate.arrayColumn)),
@@ -199,7 +199,7 @@ object PgtestnullRow {
       "hstore" -> Writes.OptionWrites(TypoHStore.writes).writes(o.hstore),
       "inet" -> Writes.OptionWrites(TypoInet.writes).writes(o.inet),
       "timestamp" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.timestamp),
-      "timestampz" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.timestampz),
+      "timestampz" -> Writes.OptionWrites(TypoInstant.writes).writes(o.timestampz),
       "time" -> Writes.OptionWrites(TypoLocalTime.writes).writes(o.time),
       "timez" -> Writes.OptionWrites(TypoOffsetTime.writes).writes(o.timez),
       "date" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.date),
@@ -220,7 +220,7 @@ object PgtestnullRow {
       "hstores" -> Writes.OptionWrites(Writes.arrayWrites[TypoHStore](implicitly, TypoHStore.writes)).writes(o.hstores),
       "inets" -> Writes.OptionWrites(Writes.arrayWrites[TypoInet](implicitly, TypoInet.writes)).writes(o.inets),
       "timestamps" -> Writes.OptionWrites(Writes.arrayWrites[TypoLocalDateTime](implicitly, TypoLocalDateTime.writes)).writes(o.timestamps),
-      "timestampzs" -> Writes.OptionWrites(Writes.arrayWrites[TypoOffsetDateTime](implicitly, TypoOffsetDateTime.writes)).writes(o.timestampzs),
+      "timestampzs" -> Writes.OptionWrites(Writes.arrayWrites[TypoInstant](implicitly, TypoInstant.writes)).writes(o.timestampzs),
       "times" -> Writes.OptionWrites(Writes.arrayWrites[TypoLocalTime](implicitly, TypoLocalTime.writes)).writes(o.times),
       "timezs" -> Writes.OptionWrites(Writes.arrayWrites[TypoOffsetTime](implicitly, TypoOffsetTime.writes)).writes(o.timezs),
       "dates" -> Writes.OptionWrites(Writes.arrayWrites[TypoLocalDate](implicitly, TypoLocalDate.writes)).writes(o.dates),

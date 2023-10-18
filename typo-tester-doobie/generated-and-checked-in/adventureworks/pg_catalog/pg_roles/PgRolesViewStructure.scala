@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_roles
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -27,7 +27,7 @@ class PgRolesViewStructure[Row](val prefix: Option[String], val extract: Row => 
   override val rolreplication = new Field[Boolean, Row](prefix, "rolreplication", None, None)(x => extract(x).rolreplication, (row, value) => merge(row, extract(row).copy(rolreplication = value)))
   override val rolconnlimit = new Field[Int, Row](prefix, "rolconnlimit", None, None)(x => extract(x).rolconnlimit, (row, value) => merge(row, extract(row).copy(rolconnlimit = value)))
   override val rolpassword = new OptField[String, Row](prefix, "rolpassword", None, None)(x => extract(x).rolpassword, (row, value) => merge(row, extract(row).copy(rolpassword = value)))
-  override val rolvaliduntil = new OptField[TypoOffsetDateTime, Row](prefix, "rolvaliduntil", Some("text"), None)(x => extract(x).rolvaliduntil, (row, value) => merge(row, extract(row).copy(rolvaliduntil = value)))
+  override val rolvaliduntil = new OptField[TypoInstant, Row](prefix, "rolvaliduntil", Some("text"), None)(x => extract(x).rolvaliduntil, (row, value) => merge(row, extract(row).copy(rolvaliduntil = value)))
   override val rolbypassrls = new Field[Boolean, Row](prefix, "rolbypassrls", None, None)(x => extract(x).rolbypassrls, (row, value) => merge(row, extract(row).copy(rolbypassrls = value)))
   override val rolconfig = new OptField[Array[String], Row](prefix, "rolconfig", None, None)(x => extract(x).rolconfig, (row, value) => merge(row, extract(row).copy(rolconfig = value)))
   override val oid = new Field[PgAuthidId, Row](prefix, "oid", None, None)(x => extract(x).oid, (row, value) => merge(row, extract(row).copy(oid = value)))

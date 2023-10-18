@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_user
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import typo.dsl.SqlExpr.OptField
 
@@ -19,7 +19,7 @@ trait PgUserViewFields[Row] {
   val userepl: OptField[Boolean, Row]
   val usebypassrls: OptField[Boolean, Row]
   val passwd: OptField[String, Row]
-  val valuntil: OptField[TypoOffsetDateTime, Row]
+  val valuntil: OptField[TypoInstant, Row]
   val useconfig: OptField[Array[String], Row]
 }
 object PgUserViewFields extends PgUserViewStructure[PgUserViewRow](None, identity, (_, x) => x)

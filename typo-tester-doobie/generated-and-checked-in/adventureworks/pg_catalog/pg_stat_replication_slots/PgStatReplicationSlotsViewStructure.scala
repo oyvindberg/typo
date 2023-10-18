@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_replication_slots
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -25,7 +25,7 @@ class PgStatReplicationSlotsViewStructure[Row](val prefix: Option[String], val e
   override val streamBytes = new OptField[Long, Row](prefix, "stream_bytes", None, None)(x => extract(x).streamBytes, (row, value) => merge(row, extract(row).copy(streamBytes = value)))
   override val totalTxns = new OptField[Long, Row](prefix, "total_txns", None, None)(x => extract(x).totalTxns, (row, value) => merge(row, extract(row).copy(totalTxns = value)))
   override val totalBytes = new OptField[Long, Row](prefix, "total_bytes", None, None)(x => extract(x).totalBytes, (row, value) => merge(row, extract(row).copy(totalBytes = value)))
-  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val statsReset = new OptField[TypoInstant, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](slotName, spillTxns, spillCount, spillBytes, streamTxns, streamCount, streamBytes, totalTxns, totalBytes, statsReset)

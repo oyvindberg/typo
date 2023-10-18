@@ -16,8 +16,8 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
         lastName = Some("last_name"),
         email = TypoUnknownCitext("email@asd.no"),
         password = "password",
-        verifiedOn = Some(TypoOffsetDateTime.now),
-        createdAt = Defaulted.Provided(TypoOffsetDateTime.now)
+        verifiedOn = Some(TypoInstant.now),
+        createdAt = Defaulted.Provided(TypoInstant.now)
       )
       for {
         _ <- usersRepo.insert(unsaved)
@@ -29,7 +29,7 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
   }
 
   test("in-memory") {
-    runTest(usersRepo = new UsersRepoMock(_.toRow(TypoOffsetDateTime.now)))
+    runTest(usersRepo = new UsersRepoMock(_.toRow(TypoInstant.now)))
   }
 
   test("pg") {

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_prepared_xacts
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -19,7 +19,7 @@ class PgPreparedXactsViewStructure[Row](val prefix: Option[String], val extract:
 
   override val transaction = new OptField[TypoXid, Row](prefix, "transaction", None, None)(x => extract(x).transaction, (row, value) => merge(row, extract(row).copy(transaction = value)))
   override val gid = new OptField[String, Row](prefix, "gid", None, None)(x => extract(x).gid, (row, value) => merge(row, extract(row).copy(gid = value)))
-  override val prepared = new OptField[TypoOffsetDateTime, Row](prefix, "prepared", Some("text"), None)(x => extract(x).prepared, (row, value) => merge(row, extract(row).copy(prepared = value)))
+  override val prepared = new OptField[TypoInstant, Row](prefix, "prepared", Some("text"), None)(x => extract(x).prepared, (row, value) => merge(row, extract(row).copy(prepared = value)))
   override val owner = new OptField[String, Row](prefix, "owner", None, None)(x => extract(x).owner, (row, value) => merge(row, extract(row).copy(owner = value)))
   override val database = new OptField[String, Row](prefix, "database", None, None)(x => extract(x).database, (row, value) => merge(row, extract(row).copy(database = value)))
 

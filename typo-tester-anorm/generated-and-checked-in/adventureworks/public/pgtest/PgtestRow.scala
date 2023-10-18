@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoBox
 import adventureworks.customtypes.TypoCircle
 import adventureworks.customtypes.TypoHStore
 import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoInterval
 import adventureworks.customtypes.TypoJson
 import adventureworks.customtypes.TypoJsonb
@@ -20,7 +21,6 @@ import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.customtypes.TypoMoney
-import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
@@ -55,7 +55,7 @@ case class PgtestRow(
   hstore: TypoHStore,
   inet: TypoInet,
   timestamp: TypoLocalDateTime,
-  timestampz: TypoOffsetDateTime,
+  timestampz: TypoInstant,
   time: TypoLocalTime,
   timez: TypoOffsetTime,
   date: TypoLocalDate,
@@ -76,7 +76,7 @@ case class PgtestRow(
   hstores: Array[TypoHStore],
   inets: Array[TypoInet],
   timestamps: Array[TypoLocalDateTime],
-  timestampzs: Array[TypoOffsetDateTime],
+  timestampzs: Array[TypoInstant],
   times: Array[TypoLocalTime],
   timezs: Array[TypoOffsetTime],
   dates: Array[TypoLocalDate],
@@ -103,7 +103,7 @@ object PgtestRow {
           hstore = json.\("hstore").as(TypoHStore.reads),
           inet = json.\("inet").as(TypoInet.reads),
           timestamp = json.\("timestamp").as(TypoLocalDateTime.reads),
-          timestampz = json.\("timestampz").as(TypoOffsetDateTime.reads),
+          timestampz = json.\("timestampz").as(TypoInstant.reads),
           time = json.\("time").as(TypoLocalTime.reads),
           timez = json.\("timez").as(TypoOffsetTime.reads),
           date = json.\("date").as(TypoLocalDate.reads),
@@ -124,7 +124,7 @@ object PgtestRow {
           hstores = json.\("hstores").as(Reads.ArrayReads[TypoHStore](TypoHStore.reads, implicitly)),
           inets = json.\("inets").as(Reads.ArrayReads[TypoInet](TypoInet.reads, implicitly)),
           timestamps = json.\("timestamps").as(Reads.ArrayReads[TypoLocalDateTime](TypoLocalDateTime.reads, implicitly)),
-          timestampzs = json.\("timestampzs").as(Reads.ArrayReads[TypoOffsetDateTime](TypoOffsetDateTime.reads, implicitly)),
+          timestampzs = json.\("timestampzs").as(Reads.ArrayReads[TypoInstant](TypoInstant.reads, implicitly)),
           times = json.\("times").as(Reads.ArrayReads[TypoLocalTime](TypoLocalTime.reads, implicitly)),
           timezs = json.\("timezs").as(Reads.ArrayReads[TypoOffsetTime](TypoOffsetTime.reads, implicitly)),
           dates = json.\("dates").as(Reads.ArrayReads[TypoLocalDate](TypoLocalDate.reads, implicitly)),
@@ -152,7 +152,7 @@ object PgtestRow {
         hstore = row(idx + 12)(TypoHStore.column),
         inet = row(idx + 13)(TypoInet.column),
         timestamp = row(idx + 14)(TypoLocalDateTime.column),
-        timestampz = row(idx + 15)(TypoOffsetDateTime.column),
+        timestampz = row(idx + 15)(TypoInstant.column),
         time = row(idx + 16)(TypoLocalTime.column),
         timez = row(idx + 17)(TypoOffsetTime.column),
         date = row(idx + 18)(TypoLocalDate.column),
@@ -173,7 +173,7 @@ object PgtestRow {
         hstores = row(idx + 33)(TypoHStore.arrayColumn),
         inets = row(idx + 34)(TypoInet.arrayColumn),
         timestamps = row(idx + 35)(TypoLocalDateTime.arrayColumn),
-        timestampzs = row(idx + 36)(TypoOffsetDateTime.arrayColumn),
+        timestampzs = row(idx + 36)(TypoInstant.arrayColumn),
         times = row(idx + 37)(TypoLocalTime.arrayColumn),
         timezs = row(idx + 38)(TypoOffsetTime.arrayColumn),
         dates = row(idx + 39)(TypoLocalDate.arrayColumn),
@@ -199,7 +199,7 @@ object PgtestRow {
       "hstore" -> TypoHStore.writes.writes(o.hstore),
       "inet" -> TypoInet.writes.writes(o.inet),
       "timestamp" -> TypoLocalDateTime.writes.writes(o.timestamp),
-      "timestampz" -> TypoOffsetDateTime.writes.writes(o.timestampz),
+      "timestampz" -> TypoInstant.writes.writes(o.timestampz),
       "time" -> TypoLocalTime.writes.writes(o.time),
       "timez" -> TypoOffsetTime.writes.writes(o.timez),
       "date" -> TypoLocalDate.writes.writes(o.date),
@@ -220,7 +220,7 @@ object PgtestRow {
       "hstores" -> Writes.arrayWrites[TypoHStore](implicitly, TypoHStore.writes).writes(o.hstores),
       "inets" -> Writes.arrayWrites[TypoInet](implicitly, TypoInet.writes).writes(o.inets),
       "timestamps" -> Writes.arrayWrites[TypoLocalDateTime](implicitly, TypoLocalDateTime.writes).writes(o.timestamps),
-      "timestampzs" -> Writes.arrayWrites[TypoOffsetDateTime](implicitly, TypoOffsetDateTime.writes).writes(o.timestampzs),
+      "timestampzs" -> Writes.arrayWrites[TypoInstant](implicitly, TypoInstant.writes).writes(o.timestampzs),
       "times" -> Writes.arrayWrites[TypoLocalTime](implicitly, TypoLocalTime.writes).writes(o.times),
       "timezs" -> Writes.arrayWrites[TypoOffsetTime](implicitly, TypoOffsetTime.writes).writes(o.timezs),
       "dates" -> Writes.arrayWrites[TypoLocalDate](implicitly, TypoLocalDate.writes).writes(o.dates),

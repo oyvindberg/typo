@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_locks
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -33,7 +33,7 @@ class PgLocksViewStructure[Row](val prefix: Option[String], val extract: Row => 
   override val mode = new OptField[String, Row](prefix, "mode", None, None)(x => extract(x).mode, (row, value) => merge(row, extract(row).copy(mode = value)))
   override val granted = new OptField[Boolean, Row](prefix, "granted", None, None)(x => extract(x).granted, (row, value) => merge(row, extract(row).copy(granted = value)))
   override val fastpath = new OptField[Boolean, Row](prefix, "fastpath", None, None)(x => extract(x).fastpath, (row, value) => merge(row, extract(row).copy(fastpath = value)))
-  override val waitstart = new OptField[TypoOffsetDateTime, Row](prefix, "waitstart", Some("text"), None)(x => extract(x).waitstart, (row, value) => merge(row, extract(row).copy(waitstart = value)))
+  override val waitstart = new OptField[TypoInstant, Row](prefix, "waitstart", Some("text"), None)(x => extract(x).waitstart, (row, value) => merge(row, extract(row).copy(waitstart = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](locktype, database, relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, mode, granted, fastpath, waitstart)

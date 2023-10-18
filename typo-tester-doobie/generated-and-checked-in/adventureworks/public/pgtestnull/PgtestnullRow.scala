@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoBox
 import adventureworks.customtypes.TypoCircle
 import adventureworks.customtypes.TypoHStore
 import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoInterval
 import adventureworks.customtypes.TypoJson
 import adventureworks.customtypes.TypoJsonb
@@ -20,7 +21,6 @@ import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.customtypes.TypoMoney
-import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
@@ -54,7 +54,7 @@ case class PgtestnullRow(
   hstore: Option[TypoHStore],
   inet: Option[TypoInet],
   timestamp: Option[TypoLocalDateTime],
-  timestampz: Option[TypoOffsetDateTime],
+  timestampz: Option[TypoInstant],
   time: Option[TypoLocalTime],
   timez: Option[TypoOffsetTime],
   date: Option[TypoLocalDate],
@@ -75,7 +75,7 @@ case class PgtestnullRow(
   hstores: Option[Array[TypoHStore]],
   inets: Option[Array[TypoInet]],
   timestamps: Option[Array[TypoLocalDateTime]],
-  timestampzs: Option[Array[TypoOffsetDateTime]],
+  timestampzs: Option[Array[TypoInstant]],
   times: Option[Array[TypoLocalTime]],
   timezs: Option[Array[TypoOffsetTime]],
   dates: Option[Array[TypoLocalDate]],
@@ -106,7 +106,7 @@ object PgtestnullRow {
         hstore = orThrow(c.get("hstore")(Decoder.decodeOption(TypoHStore.decoder))),
         inet = orThrow(c.get("inet")(Decoder.decodeOption(TypoInet.decoder))),
         timestamp = orThrow(c.get("timestamp")(Decoder.decodeOption(TypoLocalDateTime.decoder))),
-        timestampz = orThrow(c.get("timestampz")(Decoder.decodeOption(TypoOffsetDateTime.decoder))),
+        timestampz = orThrow(c.get("timestampz")(Decoder.decodeOption(TypoInstant.decoder))),
         time = orThrow(c.get("time")(Decoder.decodeOption(TypoLocalTime.decoder))),
         timez = orThrow(c.get("timez")(Decoder.decodeOption(TypoOffsetTime.decoder))),
         date = orThrow(c.get("date")(Decoder.decodeOption(TypoLocalDate.decoder))),
@@ -127,7 +127,7 @@ object PgtestnullRow {
         hstores = orThrow(c.get("hstores")(Decoder.decodeOption(Decoder.decodeArray[TypoHStore](TypoHStore.decoder, implicitly)))),
         inets = orThrow(c.get("inets")(Decoder.decodeOption(Decoder.decodeArray[TypoInet](TypoInet.decoder, implicitly)))),
         timestamps = orThrow(c.get("timestamps")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalDateTime](TypoLocalDateTime.decoder, implicitly)))),
-        timestampzs = orThrow(c.get("timestampzs")(Decoder.decodeOption(Decoder.decodeArray[TypoOffsetDateTime](TypoOffsetDateTime.decoder, implicitly)))),
+        timestampzs = orThrow(c.get("timestampzs")(Decoder.decodeOption(Decoder.decodeArray[TypoInstant](TypoInstant.decoder, implicitly)))),
         times = orThrow(c.get("times")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalTime](TypoLocalTime.decoder, implicitly)))),
         timezs = orThrow(c.get("timezs")(Decoder.decodeOption(Decoder.decodeArray[TypoOffsetTime](TypoOffsetTime.decoder, implicitly)))),
         dates = orThrow(c.get("dates")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalDate](TypoLocalDate.decoder, implicitly)))),
@@ -153,7 +153,7 @@ object PgtestnullRow {
       "hstore" -> Encoder.encodeOption(TypoHStore.encoder).apply(row.hstore),
       "inet" -> Encoder.encodeOption(TypoInet.encoder).apply(row.inet),
       "timestamp" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.timestamp),
-      "timestampz" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.timestampz),
+      "timestampz" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.timestampz),
       "time" -> Encoder.encodeOption(TypoLocalTime.encoder).apply(row.time),
       "timez" -> Encoder.encodeOption(TypoOffsetTime.encoder).apply(row.timez),
       "date" -> Encoder.encodeOption(TypoLocalDate.encoder).apply(row.date),
@@ -174,7 +174,7 @@ object PgtestnullRow {
       "hstores" -> Encoder.encodeOption(Encoder.encodeIterable[TypoHStore, Array](TypoHStore.encoder, implicitly)).apply(row.hstores),
       "inets" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInet, Array](TypoInet.encoder, implicitly)).apply(row.inets),
       "timestamps" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalDateTime, Array](TypoLocalDateTime.encoder, implicitly)).apply(row.timestamps),
-      "timestampzs" -> Encoder.encodeOption(Encoder.encodeIterable[TypoOffsetDateTime, Array](TypoOffsetDateTime.encoder, implicitly)).apply(row.timestampzs),
+      "timestampzs" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInstant, Array](TypoInstant.encoder, implicitly)).apply(row.timestampzs),
       "times" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalTime, Array](TypoLocalTime.encoder, implicitly)).apply(row.times),
       "timezs" -> Encoder.encodeOption(Encoder.encodeIterable[TypoOffsetTime, Array](TypoOffsetTime.encoder, implicitly)).apply(row.timezs),
       "dates" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalDate, Array](TypoLocalDate.encoder, implicitly)).apply(row.dates),
@@ -199,7 +199,7 @@ object PgtestnullRow {
       (TypoHStore.get, Nullability.Nullable),
       (TypoInet.get, Nullability.Nullable),
       (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoInstant.get, Nullability.Nullable),
       (TypoLocalTime.get, Nullability.Nullable),
       (TypoOffsetTime.get, Nullability.Nullable),
       (TypoLocalDate.get, Nullability.Nullable),
@@ -220,7 +220,7 @@ object PgtestnullRow {
       (TypoHStore.arrayGet, Nullability.Nullable),
       (TypoInet.arrayGet, Nullability.Nullable),
       (TypoLocalDateTime.arrayGet, Nullability.Nullable),
-      (TypoOffsetDateTime.arrayGet, Nullability.Nullable),
+      (TypoInstant.arrayGet, Nullability.Nullable),
       (TypoLocalTime.arrayGet, Nullability.Nullable),
       (TypoOffsetTime.arrayGet, Nullability.Nullable),
       (TypoLocalDate.arrayGet, Nullability.Nullable),
@@ -243,7 +243,7 @@ object PgtestnullRow {
       hstore = TypoHStore.get.unsafeGetNullable(rs, i + 12),
       inet = TypoInet.get.unsafeGetNullable(rs, i + 13),
       timestamp = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 14),
-      timestampz = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 15),
+      timestampz = TypoInstant.get.unsafeGetNullable(rs, i + 15),
       time = TypoLocalTime.get.unsafeGetNullable(rs, i + 16),
       timez = TypoOffsetTime.get.unsafeGetNullable(rs, i + 17),
       date = TypoLocalDate.get.unsafeGetNullable(rs, i + 18),
@@ -264,7 +264,7 @@ object PgtestnullRow {
       hstores = TypoHStore.arrayGet.unsafeGetNullable(rs, i + 33),
       inets = TypoInet.arrayGet.unsafeGetNullable(rs, i + 34),
       timestamps = TypoLocalDateTime.arrayGet.unsafeGetNullable(rs, i + 35),
-      timestampzs = TypoOffsetDateTime.arrayGet.unsafeGetNullable(rs, i + 36),
+      timestampzs = TypoInstant.arrayGet.unsafeGetNullable(rs, i + 36),
       times = TypoLocalTime.arrayGet.unsafeGetNullable(rs, i + 37),
       timezs = TypoOffsetTime.arrayGet.unsafeGetNullable(rs, i + 38),
       dates = TypoLocalDate.arrayGet.unsafeGetNullable(rs, i + 39),

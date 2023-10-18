@@ -8,7 +8,7 @@ package pg_catalog
 package pg_stat_activity
 
 import adventureworks.customtypes.TypoInet
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.OptField
 
@@ -23,10 +23,10 @@ trait PgStatActivityViewFields[Row] {
   val clientAddr: OptField[TypoInet, Row]
   val clientHostname: OptField[String, Row]
   val clientPort: OptField[Int, Row]
-  val backendStart: OptField[TypoOffsetDateTime, Row]
-  val xactStart: OptField[TypoOffsetDateTime, Row]
-  val queryStart: OptField[TypoOffsetDateTime, Row]
-  val stateChange: OptField[TypoOffsetDateTime, Row]
+  val backendStart: OptField[TypoInstant, Row]
+  val xactStart: OptField[TypoInstant, Row]
+  val queryStart: OptField[TypoInstant, Row]
+  val stateChange: OptField[TypoInstant, Row]
   val waitEventType: OptField[String, Row]
   val waitEvent: OptField[String, Row]
   val state: OptField[String, Row]

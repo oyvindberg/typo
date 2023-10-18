@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -24,12 +24,12 @@ case class PgStatWalViewRow(
   walSync: /* nullability unknown */ Option[Long],
   walWriteTime: /* nullability unknown */ Option[Double],
   walSyncTime: /* nullability unknown */ Option[Double],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatWalViewRow {
-  implicit lazy val decoder: Decoder[PgStatWalViewRow] = Decoder.forProduct9[PgStatWalViewRow, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[TypoOffsetDateTime]]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(PgStatWalViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[PgStatWalViewRow] = Encoder.forProduct9[PgStatWalViewRow, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[TypoOffsetDateTime]]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(x => (x.walRecords, x.walFpi, x.walBytes, x.walBuffersFull, x.walWrite, x.walSync, x.walWriteTime, x.walSyncTime, x.statsReset))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[PgStatWalViewRow] = Decoder.forProduct9[PgStatWalViewRow, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[TypoInstant]]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(PgStatWalViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(TypoInstant.decoder))
+  implicit lazy val encoder: Encoder[PgStatWalViewRow] = Encoder.forProduct9[PgStatWalViewRow, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[TypoInstant]]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(x => (x.walRecords, x.walFpi, x.walBytes, x.walBuffersFull, x.walWrite, x.walSync, x.walWriteTime, x.walSyncTime, x.statsReset))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(TypoInstant.encoder))
   implicit lazy val read: Read[PgStatWalViewRow] = new Read[PgStatWalViewRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.Nullable),
@@ -40,7 +40,7 @@ object PgStatWalViewRow {
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.DoubleMeta.get, Nullability.Nullable),
       (Meta.DoubleMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (TypoInstant.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatWalViewRow(
       walRecords = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
@@ -51,7 +51,7 @@ object PgStatWalViewRow {
       walSync = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
       walWriteTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 6),
       walSyncTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 7),
-      statsReset = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 8)
+      statsReset = TypoInstant.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

@@ -7,17 +7,17 @@ package adventureworks
 package pg_catalog
 package pg_stat_archiver
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatArchiverViewFields[Row] {
   val archivedCount: OptField[Long, Row]
   val lastArchivedWal: OptField[String, Row]
-  val lastArchivedTime: OptField[TypoOffsetDateTime, Row]
+  val lastArchivedTime: OptField[TypoInstant, Row]
   val failedCount: OptField[Long, Row]
   val lastFailedWal: OptField[String, Row]
-  val lastFailedTime: OptField[TypoOffsetDateTime, Row]
-  val statsReset: OptField[TypoOffsetDateTime, Row]
+  val lastFailedTime: OptField[TypoInstant, Row]
+  val statsReset: OptField[TypoInstant, Row]
 }
 object PgStatArchiverViewFields extends PgStatArchiverViewStructure[PgStatArchiverViewRow](None, identity, (_, x) => x)
 

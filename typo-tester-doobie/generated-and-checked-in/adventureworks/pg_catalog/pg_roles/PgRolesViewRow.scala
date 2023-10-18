@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_roles
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -35,7 +35,7 @@ case class PgRolesViewRow(
   rolconnlimit: Int,
   rolpassword: /* nullability unknown */ Option[String],
   /** Points to [[pg_authid.PgAuthidRow.rolvaliduntil]] */
-  rolvaliduntil: Option[TypoOffsetDateTime],
+  rolvaliduntil: Option[TypoInstant],
   /** Points to [[pg_authid.PgAuthidRow.rolbypassrls]] */
   rolbypassrls: Boolean,
   /** Points to [[pg_db_role_setting.PgDbRoleSettingRow.setconfig]] */
@@ -45,8 +45,8 @@ case class PgRolesViewRow(
 )
 
 object PgRolesViewRow {
-  implicit lazy val decoder: Decoder[PgRolesViewRow] = Decoder.forProduct13[PgRolesViewRow, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, /* nullability unknown */ Option[String], Option[TypoOffsetDateTime], Boolean, Option[Array[String]], PgAuthidId]("rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolconnlimit", "rolpassword", "rolvaliduntil", "rolbypassrls", "rolconfig", "oid")(PgRolesViewRow.apply)(Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeBoolean, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), PgAuthidId.decoder)
-  implicit lazy val encoder: Encoder[PgRolesViewRow] = Encoder.forProduct13[PgRolesViewRow, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, /* nullability unknown */ Option[String], Option[TypoOffsetDateTime], Boolean, Option[Array[String]], PgAuthidId]("rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolconnlimit", "rolpassword", "rolvaliduntil", "rolbypassrls", "rolconfig", "oid")(x => (x.rolname, x.rolsuper, x.rolinherit, x.rolcreaterole, x.rolcreatedb, x.rolcanlogin, x.rolreplication, x.rolconnlimit, x.rolpassword, x.rolvaliduntil, x.rolbypassrls, x.rolconfig, x.oid))(Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeBoolean, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), PgAuthidId.encoder)
+  implicit lazy val decoder: Decoder[PgRolesViewRow] = Decoder.forProduct13[PgRolesViewRow, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, /* nullability unknown */ Option[String], Option[TypoInstant], Boolean, Option[Array[String]], PgAuthidId]("rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolconnlimit", "rolpassword", "rolvaliduntil", "rolbypassrls", "rolconfig", "oid")(PgRolesViewRow.apply)(Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInstant.decoder), Decoder.decodeBoolean, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), PgAuthidId.decoder)
+  implicit lazy val encoder: Encoder[PgRolesViewRow] = Encoder.forProduct13[PgRolesViewRow, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, /* nullability unknown */ Option[String], Option[TypoInstant], Boolean, Option[Array[String]], PgAuthidId]("rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolconnlimit", "rolpassword", "rolvaliduntil", "rolbypassrls", "rolconfig", "oid")(x => (x.rolname, x.rolsuper, x.rolinherit, x.rolcreaterole, x.rolcreatedb, x.rolcanlogin, x.rolreplication, x.rolconnlimit, x.rolpassword, x.rolvaliduntil, x.rolbypassrls, x.rolconfig, x.oid))(Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInstant.encoder), Encoder.encodeBoolean, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), PgAuthidId.encoder)
   implicit lazy val read: Read[PgRolesViewRow] = new Read[PgRolesViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.NoNulls),
@@ -58,7 +58,7 @@ object PgRolesViewRow {
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoInstant.get, Nullability.Nullable),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (adventureworks.StringArrayMeta.get, Nullability.Nullable),
       (PgAuthidId.get, Nullability.NoNulls)
@@ -73,7 +73,7 @@ object PgRolesViewRow {
       rolreplication = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 6),
       rolconnlimit = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
       rolpassword = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      rolvaliduntil = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 9),
+      rolvaliduntil = TypoInstant.get.unsafeGetNullable(rs, i + 9),
       rolbypassrls = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 10),
       rolconfig = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 11),
       oid = PgAuthidId.get.unsafeGetNonNullable(rs, i + 12)

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -32,7 +32,7 @@ case class PgAuthidRow(
   rolbypassrls: Boolean,
   rolconnlimit: Int,
   rolpassword: Option[String],
-  rolvaliduntil: Option[TypoOffsetDateTime]
+  rolvaliduntil: Option[TypoInstant]
 )
 
 object PgAuthidRow {
@@ -50,7 +50,7 @@ object PgAuthidRow {
           rolbypassrls = json.\("rolbypassrls").as(Reads.BooleanReads),
           rolconnlimit = json.\("rolconnlimit").as(Reads.IntReads),
           rolpassword = json.\("rolpassword").toOption.map(_.as(Reads.StringReads)),
-          rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as(TypoOffsetDateTime.reads))
+          rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -69,7 +69,7 @@ object PgAuthidRow {
         rolbypassrls = row(idx + 8)(Column.columnToBoolean),
         rolconnlimit = row(idx + 9)(Column.columnToInt),
         rolpassword = row(idx + 10)(Column.columnToOption(Column.columnToString)),
-        rolvaliduntil = row(idx + 11)(Column.columnToOption(TypoOffsetDateTime.column))
+        rolvaliduntil = row(idx + 11)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -86,7 +86,7 @@ object PgAuthidRow {
       "rolbypassrls" -> Writes.BooleanWrites.writes(o.rolbypassrls),
       "rolconnlimit" -> Writes.IntWrites.writes(o.rolconnlimit),
       "rolpassword" -> Writes.OptionWrites(Writes.StringWrites).writes(o.rolpassword),
-      "rolvaliduntil" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.rolvaliduntil)
+      "rolvaliduntil" -> Writes.OptionWrites(TypoInstant.writes).writes(o.rolvaliduntil)
     ))
   )
 }

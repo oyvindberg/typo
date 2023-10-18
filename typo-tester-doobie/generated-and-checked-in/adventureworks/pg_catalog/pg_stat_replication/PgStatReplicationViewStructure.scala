@@ -8,8 +8,8 @@ package pg_catalog
 package pg_stat_replication
 
 import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoInterval
-import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -26,7 +26,7 @@ class PgStatReplicationViewStructure[Row](val prefix: Option[String], val extrac
   override val clientAddr = new OptField[TypoInet, Row](prefix, "client_addr", None, None)(x => extract(x).clientAddr, (row, value) => merge(row, extract(row).copy(clientAddr = value)))
   override val clientHostname = new OptField[String, Row](prefix, "client_hostname", None, None)(x => extract(x).clientHostname, (row, value) => merge(row, extract(row).copy(clientHostname = value)))
   override val clientPort = new OptField[Int, Row](prefix, "client_port", None, None)(x => extract(x).clientPort, (row, value) => merge(row, extract(row).copy(clientPort = value)))
-  override val backendStart = new OptField[TypoOffsetDateTime, Row](prefix, "backend_start", Some("text"), None)(x => extract(x).backendStart, (row, value) => merge(row, extract(row).copy(backendStart = value)))
+  override val backendStart = new OptField[TypoInstant, Row](prefix, "backend_start", Some("text"), None)(x => extract(x).backendStart, (row, value) => merge(row, extract(row).copy(backendStart = value)))
   override val backendXmin = new OptField[TypoXid, Row](prefix, "backend_xmin", None, None)(x => extract(x).backendXmin, (row, value) => merge(row, extract(row).copy(backendXmin = value)))
   override val state = new OptField[String, Row](prefix, "state", None, None)(x => extract(x).state, (row, value) => merge(row, extract(row).copy(state = value)))
   override val sentLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "sent_lsn", None, None)(x => extract(x).sentLsn, (row, value) => merge(row, extract(row).copy(sentLsn = value)))
@@ -38,7 +38,7 @@ class PgStatReplicationViewStructure[Row](val prefix: Option[String], val extrac
   override val replayLag = new OptField[TypoInterval, Row](prefix, "replay_lag", None, None)(x => extract(x).replayLag, (row, value) => merge(row, extract(row).copy(replayLag = value)))
   override val syncPriority = new OptField[Int, Row](prefix, "sync_priority", None, None)(x => extract(x).syncPriority, (row, value) => merge(row, extract(row).copy(syncPriority = value)))
   override val syncState = new OptField[String, Row](prefix, "sync_state", None, None)(x => extract(x).syncState, (row, value) => merge(row, extract(row).copy(syncState = value)))
-  override val replyTime = new OptField[TypoOffsetDateTime, Row](prefix, "reply_time", Some("text"), None)(x => extract(x).replyTime, (row, value) => merge(row, extract(row).copy(replyTime = value)))
+  override val replyTime = new OptField[TypoInstant, Row](prefix, "reply_time", Some("text"), None)(x => extract(x).replyTime, (row, value) => merge(row, extract(row).copy(replyTime = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](pid, usesysid, usename, applicationName, clientAddr, clientHostname, clientPort, backendStart, backendXmin, state, sentLsn, writeLsn, flushLsn, replayLsn, writeLag, flushLag, replayLag, syncPriority, syncState, replyTime)

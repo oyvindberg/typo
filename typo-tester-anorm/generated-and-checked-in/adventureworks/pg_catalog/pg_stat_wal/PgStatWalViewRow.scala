@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -29,7 +29,7 @@ case class PgStatWalViewRow(
   walSync: /* nullability unknown */ Option[Long],
   walWriteTime: /* nullability unknown */ Option[Double],
   walSyncTime: /* nullability unknown */ Option[Double],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatWalViewRow {
@@ -44,7 +44,7 @@ object PgStatWalViewRow {
           walSync = json.\("wal_sync").toOption.map(_.as(Reads.LongReads)),
           walWriteTime = json.\("wal_write_time").toOption.map(_.as(Reads.DoubleReads)),
           walSyncTime = json.\("wal_sync_time").toOption.map(_.as(Reads.DoubleReads)),
-          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -60,7 +60,7 @@ object PgStatWalViewRow {
         walSync = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
         walWriteTime = row(idx + 6)(Column.columnToOption(Column.columnToDouble)),
         walSyncTime = row(idx + 7)(Column.columnToOption(Column.columnToDouble)),
-        statsReset = row(idx + 8)(Column.columnToOption(TypoOffsetDateTime.column))
+        statsReset = row(idx + 8)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -74,7 +74,7 @@ object PgStatWalViewRow {
       "wal_sync" -> Writes.OptionWrites(Writes.LongWrites).writes(o.walSync),
       "wal_write_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.walWriteTime),
       "wal_sync_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.walSyncTime),
-      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
+      "stats_reset" -> Writes.OptionWrites(TypoInstant.writes).writes(o.statsReset)
     ))
   )
 }

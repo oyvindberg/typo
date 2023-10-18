@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_locks
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import anorm.Column
@@ -38,7 +38,7 @@ case class PgLocksViewRow(
   mode: /* nullability unknown */ Option[String],
   granted: /* nullability unknown */ Option[Boolean],
   fastpath: /* nullability unknown */ Option[Boolean],
-  waitstart: /* nullability unknown */ Option[TypoOffsetDateTime]
+  waitstart: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgLocksViewRow {
@@ -60,7 +60,7 @@ object PgLocksViewRow {
           mode = json.\("mode").toOption.map(_.as(Reads.StringReads)),
           granted = json.\("granted").toOption.map(_.as(Reads.BooleanReads)),
           fastpath = json.\("fastpath").toOption.map(_.as(Reads.BooleanReads)),
-          waitstart = json.\("waitstart").toOption.map(_.as(TypoOffsetDateTime.reads))
+          waitstart = json.\("waitstart").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -83,7 +83,7 @@ object PgLocksViewRow {
         mode = row(idx + 12)(Column.columnToOption(Column.columnToString)),
         granted = row(idx + 13)(Column.columnToOption(Column.columnToBoolean)),
         fastpath = row(idx + 14)(Column.columnToOption(Column.columnToBoolean)),
-        waitstart = row(idx + 15)(Column.columnToOption(TypoOffsetDateTime.column))
+        waitstart = row(idx + 15)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -104,7 +104,7 @@ object PgLocksViewRow {
       "mode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.mode),
       "granted" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.granted),
       "fastpath" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.fastpath),
-      "waitstart" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.waitstart)
+      "waitstart" -> Writes.OptionWrites(TypoInstant.writes).writes(o.waitstart)
     ))
   )
 }

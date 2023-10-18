@@ -8,7 +8,7 @@ package pg_catalog
 package pg_stat_activity
 
 import adventureworks.customtypes.TypoInet
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -28,10 +28,10 @@ class PgStatActivityViewStructure[Row](val prefix: Option[String], val extract: 
   override val clientAddr = new OptField[TypoInet, Row](prefix, "client_addr", None, None)(x => extract(x).clientAddr, (row, value) => merge(row, extract(row).copy(clientAddr = value)))
   override val clientHostname = new OptField[String, Row](prefix, "client_hostname", None, None)(x => extract(x).clientHostname, (row, value) => merge(row, extract(row).copy(clientHostname = value)))
   override val clientPort = new OptField[Int, Row](prefix, "client_port", None, None)(x => extract(x).clientPort, (row, value) => merge(row, extract(row).copy(clientPort = value)))
-  override val backendStart = new OptField[TypoOffsetDateTime, Row](prefix, "backend_start", Some("text"), None)(x => extract(x).backendStart, (row, value) => merge(row, extract(row).copy(backendStart = value)))
-  override val xactStart = new OptField[TypoOffsetDateTime, Row](prefix, "xact_start", Some("text"), None)(x => extract(x).xactStart, (row, value) => merge(row, extract(row).copy(xactStart = value)))
-  override val queryStart = new OptField[TypoOffsetDateTime, Row](prefix, "query_start", Some("text"), None)(x => extract(x).queryStart, (row, value) => merge(row, extract(row).copy(queryStart = value)))
-  override val stateChange = new OptField[TypoOffsetDateTime, Row](prefix, "state_change", Some("text"), None)(x => extract(x).stateChange, (row, value) => merge(row, extract(row).copy(stateChange = value)))
+  override val backendStart = new OptField[TypoInstant, Row](prefix, "backend_start", Some("text"), None)(x => extract(x).backendStart, (row, value) => merge(row, extract(row).copy(backendStart = value)))
+  override val xactStart = new OptField[TypoInstant, Row](prefix, "xact_start", Some("text"), None)(x => extract(x).xactStart, (row, value) => merge(row, extract(row).copy(xactStart = value)))
+  override val queryStart = new OptField[TypoInstant, Row](prefix, "query_start", Some("text"), None)(x => extract(x).queryStart, (row, value) => merge(row, extract(row).copy(queryStart = value)))
+  override val stateChange = new OptField[TypoInstant, Row](prefix, "state_change", Some("text"), None)(x => extract(x).stateChange, (row, value) => merge(row, extract(row).copy(stateChange = value)))
   override val waitEventType = new OptField[String, Row](prefix, "wait_event_type", None, None)(x => extract(x).waitEventType, (row, value) => merge(row, extract(row).copy(waitEventType = value)))
   override val waitEvent = new OptField[String, Row](prefix, "wait_event", None, None)(x => extract(x).waitEvent, (row, value) => merge(row, extract(row).copy(waitEvent = value)))
   override val state = new OptField[String, Row](prefix, "state", None, None)(x => extract(x).state, (row, value) => merge(row, extract(row).copy(state = value)))

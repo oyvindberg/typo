@@ -8,7 +8,7 @@ package public
 package users
 
 import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
@@ -26,11 +26,11 @@ case class UsersRowUnsaved(
   lastName: Option[String],
   email: TypoUnknownCitext,
   password: String,
-  verifiedOn: Option[TypoOffsetDateTime],
+  verifiedOn: Option[TypoInstant],
   /** Default: now() */
-  createdAt: Defaulted[TypoOffsetDateTime] = Defaulted.UseDefault
+  createdAt: Defaulted[TypoInstant] = Defaulted.UseDefault
 ) {
-  def toRow(createdAtDefault: => TypoOffsetDateTime): UsersRow =
+  def toRow(createdAtDefault: => TypoInstant): UsersRow =
     UsersRow(
       userId = userId,
       name = name,
@@ -53,8 +53,8 @@ object UsersRowUnsaved {
           lastName = json.\("last_name").toOption.map(_.as(Reads.StringReads)),
           email = json.\("email").as(TypoUnknownCitext.reads),
           password = json.\("password").as(Reads.StringReads),
-          verifiedOn = json.\("verified_on").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          createdAt = json.\("created_at").as(Defaulted.reads(TypoOffsetDateTime.reads))
+          verifiedOn = json.\("verified_on").toOption.map(_.as(TypoInstant.reads)),
+          createdAt = json.\("created_at").as(Defaulted.reads(TypoInstant.reads))
         )
       )
     ),
@@ -66,8 +66,8 @@ object UsersRowUnsaved {
       "last_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastName),
       "email" -> TypoUnknownCitext.writes.writes(o.email),
       "password" -> Writes.StringWrites.writes(o.password),
-      "verified_on" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.verifiedOn),
-      "created_at" -> Defaulted.writes(TypoOffsetDateTime.writes).writes(o.createdAt)
+      "verified_on" -> Writes.OptionWrites(TypoInstant.writes).writes(o.verifiedOn),
+      "created_at" -> Defaulted.writes(TypoInstant.writes).writes(o.createdAt)
     ))
   )
 }

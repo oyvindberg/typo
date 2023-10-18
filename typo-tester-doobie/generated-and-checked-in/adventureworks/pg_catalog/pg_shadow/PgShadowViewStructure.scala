@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_shadow
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -25,7 +25,7 @@ class PgShadowViewStructure[Row](val prefix: Option[String], val extract: Row =>
   override val userepl = new Field[Boolean, Row](prefix, "userepl", None, None)(x => extract(x).userepl, (row, value) => merge(row, extract(row).copy(userepl = value)))
   override val usebypassrls = new Field[Boolean, Row](prefix, "usebypassrls", None, None)(x => extract(x).usebypassrls, (row, value) => merge(row, extract(row).copy(usebypassrls = value)))
   override val passwd = new OptField[String, Row](prefix, "passwd", None, None)(x => extract(x).passwd, (row, value) => merge(row, extract(row).copy(passwd = value)))
-  override val valuntil = new OptField[TypoOffsetDateTime, Row](prefix, "valuntil", Some("text"), None)(x => extract(x).valuntil, (row, value) => merge(row, extract(row).copy(valuntil = value)))
+  override val valuntil = new OptField[TypoInstant, Row](prefix, "valuntil", Some("text"), None)(x => extract(x).valuntil, (row, value) => merge(row, extract(row).copy(valuntil = value)))
   override val useconfig = new OptField[Array[String], Row](prefix, "useconfig", None, None)(x => extract(x).useconfig, (row, value) => merge(row, extract(row).copy(useconfig = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =

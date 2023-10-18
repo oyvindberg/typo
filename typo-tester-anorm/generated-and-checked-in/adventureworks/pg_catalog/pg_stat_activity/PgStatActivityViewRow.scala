@@ -8,7 +8,7 @@ package pg_catalog
 package pg_stat_activity
 
 import adventureworks.customtypes.TypoInet
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoXid
 import anorm.Column
 import anorm.RowParser
@@ -35,10 +35,10 @@ case class PgStatActivityViewRow(
   clientAddr: /* nullability unknown */ Option[TypoInet],
   clientHostname: /* nullability unknown */ Option[String],
   clientPort: /* nullability unknown */ Option[Int],
-  backendStart: /* nullability unknown */ Option[TypoOffsetDateTime],
-  xactStart: /* nullability unknown */ Option[TypoOffsetDateTime],
-  queryStart: /* nullability unknown */ Option[TypoOffsetDateTime],
-  stateChange: /* nullability unknown */ Option[TypoOffsetDateTime],
+  backendStart: /* nullability unknown */ Option[TypoInstant],
+  xactStart: /* nullability unknown */ Option[TypoInstant],
+  queryStart: /* nullability unknown */ Option[TypoInstant],
+  stateChange: /* nullability unknown */ Option[TypoInstant],
   waitEventType: /* nullability unknown */ Option[String],
   waitEvent: /* nullability unknown */ Option[String],
   state: /* nullability unknown */ Option[String],
@@ -63,10 +63,10 @@ object PgStatActivityViewRow {
           clientAddr = json.\("client_addr").toOption.map(_.as(TypoInet.reads)),
           clientHostname = json.\("client_hostname").toOption.map(_.as(Reads.StringReads)),
           clientPort = json.\("client_port").toOption.map(_.as(Reads.IntReads)),
-          backendStart = json.\("backend_start").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          xactStart = json.\("xact_start").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          queryStart = json.\("query_start").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          stateChange = json.\("state_change").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          backendStart = json.\("backend_start").toOption.map(_.as(TypoInstant.reads)),
+          xactStart = json.\("xact_start").toOption.map(_.as(TypoInstant.reads)),
+          queryStart = json.\("query_start").toOption.map(_.as(TypoInstant.reads)),
+          stateChange = json.\("state_change").toOption.map(_.as(TypoInstant.reads)),
           waitEventType = json.\("wait_event_type").toOption.map(_.as(Reads.StringReads)),
           waitEvent = json.\("wait_event").toOption.map(_.as(Reads.StringReads)),
           state = json.\("state").toOption.map(_.as(Reads.StringReads)),
@@ -92,10 +92,10 @@ object PgStatActivityViewRow {
         clientAddr = row(idx + 7)(Column.columnToOption(TypoInet.column)),
         clientHostname = row(idx + 8)(Column.columnToOption(Column.columnToString)),
         clientPort = row(idx + 9)(Column.columnToOption(Column.columnToInt)),
-        backendStart = row(idx + 10)(Column.columnToOption(TypoOffsetDateTime.column)),
-        xactStart = row(idx + 11)(Column.columnToOption(TypoOffsetDateTime.column)),
-        queryStart = row(idx + 12)(Column.columnToOption(TypoOffsetDateTime.column)),
-        stateChange = row(idx + 13)(Column.columnToOption(TypoOffsetDateTime.column)),
+        backendStart = row(idx + 10)(Column.columnToOption(TypoInstant.column)),
+        xactStart = row(idx + 11)(Column.columnToOption(TypoInstant.column)),
+        queryStart = row(idx + 12)(Column.columnToOption(TypoInstant.column)),
+        stateChange = row(idx + 13)(Column.columnToOption(TypoInstant.column)),
         waitEventType = row(idx + 14)(Column.columnToOption(Column.columnToString)),
         waitEvent = row(idx + 15)(Column.columnToOption(Column.columnToString)),
         state = row(idx + 16)(Column.columnToOption(Column.columnToString)),
@@ -119,10 +119,10 @@ object PgStatActivityViewRow {
       "client_addr" -> Writes.OptionWrites(TypoInet.writes).writes(o.clientAddr),
       "client_hostname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.clientHostname),
       "client_port" -> Writes.OptionWrites(Writes.IntWrites).writes(o.clientPort),
-      "backend_start" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.backendStart),
-      "xact_start" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.xactStart),
-      "query_start" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.queryStart),
-      "state_change" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.stateChange),
+      "backend_start" -> Writes.OptionWrites(TypoInstant.writes).writes(o.backendStart),
+      "xact_start" -> Writes.OptionWrites(TypoInstant.writes).writes(o.xactStart),
+      "query_start" -> Writes.OptionWrites(TypoInstant.writes).writes(o.queryStart),
+      "state_change" -> Writes.OptionWrites(TypoInstant.writes).writes(o.stateChange),
       "wait_event_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.waitEventType),
       "wait_event" -> Writes.OptionWrites(Writes.StringWrites).writes(o.waitEvent),
       "state" -> Writes.OptionWrites(Writes.StringWrites).writes(o.state),

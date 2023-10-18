@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package routines
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -75,8 +75,8 @@ case class RoutinesViewRow(
   toSqlSpecificSchema: /* nullability unknown */ Option[String],
   toSqlSpecificName: /* nullability unknown */ Option[String],
   asLocator: /* nullability unknown */ Option[/* max 3 chars */ String],
-  created: /* nullability unknown */ Option[TypoOffsetDateTime],
-  lastAltered: /* nullability unknown */ Option[TypoOffsetDateTime],
+  created: /* nullability unknown */ Option[TypoInstant],
+  lastAltered: /* nullability unknown */ Option[TypoInstant],
   newSavepointLevel: /* nullability unknown */ Option[/* max 3 chars */ String],
   isUdtDependent: /* nullability unknown */ Option[/* max 3 chars */ String],
   resultCastFromDataType: /* nullability unknown */ Option[String],
@@ -163,8 +163,8 @@ object RoutinesViewRow {
           toSqlSpecificSchema = json.\("to_sql_specific_schema").toOption.map(_.as(Reads.StringReads)),
           toSqlSpecificName = json.\("to_sql_specific_name").toOption.map(_.as(Reads.StringReads)),
           asLocator = json.\("as_locator").toOption.map(_.as(Reads.StringReads)),
-          created = json.\("created").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          lastAltered = json.\("last_altered").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          created = json.\("created").toOption.map(_.as(TypoInstant.reads)),
+          lastAltered = json.\("last_altered").toOption.map(_.as(TypoInstant.reads)),
           newSavepointLevel = json.\("new_savepoint_level").toOption.map(_.as(Reads.StringReads)),
           isUdtDependent = json.\("is_udt_dependent").toOption.map(_.as(Reads.StringReads)),
           resultCastFromDataType = json.\("result_cast_from_data_type").toOption.map(_.as(Reads.StringReads)),
@@ -252,8 +252,8 @@ object RoutinesViewRow {
         toSqlSpecificSchema = row(idx + 51)(Column.columnToOption(Column.columnToString)),
         toSqlSpecificName = row(idx + 52)(Column.columnToOption(Column.columnToString)),
         asLocator = row(idx + 53)(Column.columnToOption(Column.columnToString)),
-        created = row(idx + 54)(Column.columnToOption(TypoOffsetDateTime.column)),
-        lastAltered = row(idx + 55)(Column.columnToOption(TypoOffsetDateTime.column)),
+        created = row(idx + 54)(Column.columnToOption(TypoInstant.column)),
+        lastAltered = row(idx + 55)(Column.columnToOption(TypoInstant.column)),
         newSavepointLevel = row(idx + 56)(Column.columnToOption(Column.columnToString)),
         isUdtDependent = row(idx + 57)(Column.columnToOption(Column.columnToString)),
         resultCastFromDataType = row(idx + 58)(Column.columnToOption(Column.columnToString)),
@@ -339,8 +339,8 @@ object RoutinesViewRow {
       "to_sql_specific_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.toSqlSpecificSchema),
       "to_sql_specific_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.toSqlSpecificName),
       "as_locator" -> Writes.OptionWrites(Writes.StringWrites).writes(o.asLocator),
-      "created" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.created),
-      "last_altered" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastAltered),
+      "created" -> Writes.OptionWrites(TypoInstant.writes).writes(o.created),
+      "last_altered" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastAltered),
       "new_savepoint_level" -> Writes.OptionWrites(Writes.StringWrites).writes(o.newSavepointLevel),
       "is_udt_dependent" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isUdtDependent),
       "result_cast_from_data_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.resultCastFromDataType),

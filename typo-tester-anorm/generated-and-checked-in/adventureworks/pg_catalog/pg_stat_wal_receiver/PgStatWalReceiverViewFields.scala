@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal_receiver
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatWalReceiverViewFields[Row] {
@@ -18,10 +18,10 @@ trait PgStatWalReceiverViewFields[Row] {
   val writtenLsn: OptField[/* pg_lsn */ Long, Row]
   val flushedLsn: OptField[/* pg_lsn */ Long, Row]
   val receivedTli: OptField[Int, Row]
-  val lastMsgSendTime: OptField[TypoOffsetDateTime, Row]
-  val lastMsgReceiptTime: OptField[TypoOffsetDateTime, Row]
+  val lastMsgSendTime: OptField[TypoInstant, Row]
+  val lastMsgReceiptTime: OptField[TypoInstant, Row]
   val latestEndLsn: OptField[/* pg_lsn */ Long, Row]
-  val latestEndTime: OptField[TypoOffsetDateTime, Row]
+  val latestEndTime: OptField[TypoInstant, Row]
   val slotName: OptField[String, Row]
   val senderHost: OptField[String, Row]
   val senderPort: OptField[Int, Row]

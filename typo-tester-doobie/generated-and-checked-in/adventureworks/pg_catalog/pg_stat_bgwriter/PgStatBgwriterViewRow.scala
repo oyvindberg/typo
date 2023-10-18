@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_bgwriter
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -26,12 +26,12 @@ case class PgStatBgwriterViewRow(
   buffersBackend: /* nullability unknown */ Option[Long],
   buffersBackendFsync: /* nullability unknown */ Option[Long],
   buffersAlloc: /* nullability unknown */ Option[Long],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatBgwriterViewRow {
-  implicit lazy val decoder: Decoder[PgStatBgwriterViewRow] = Decoder.forProduct11[PgStatBgwriterViewRow, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoOffsetDateTime]]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(PgStatBgwriterViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[PgStatBgwriterViewRow] = Encoder.forProduct11[PgStatBgwriterViewRow, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoOffsetDateTime]]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(x => (x.checkpointsTimed, x.checkpointsReq, x.checkpointWriteTime, x.checkpointSyncTime, x.buffersCheckpoint, x.buffersClean, x.maxwrittenClean, x.buffersBackend, x.buffersBackendFsync, x.buffersAlloc, x.statsReset))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[PgStatBgwriterViewRow] = Decoder.forProduct11[PgStatBgwriterViewRow, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoInstant]]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(PgStatBgwriterViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeDouble), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoInstant.decoder))
+  implicit lazy val encoder: Encoder[PgStatBgwriterViewRow] = Encoder.forProduct11[PgStatBgwriterViewRow, /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Double], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[Long], /* nullability unknown */ Option[TypoInstant]]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(x => (x.checkpointsTimed, x.checkpointsReq, x.checkpointWriteTime, x.checkpointSyncTime, x.buffersCheckpoint, x.buffersClean, x.maxwrittenClean, x.buffersBackend, x.buffersBackendFsync, x.buffersAlloc, x.statsReset))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeDouble), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoInstant.encoder))
   implicit lazy val read: Read[PgStatBgwriterViewRow] = new Read[PgStatBgwriterViewRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.Nullable),
@@ -44,7 +44,7 @@ object PgStatBgwriterViewRow {
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (TypoInstant.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatBgwriterViewRow(
       checkpointsTimed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
@@ -57,7 +57,7 @@ object PgStatBgwriterViewRow {
       buffersBackend = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
       buffersBackendFsync = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
       buffersAlloc = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
-      statsReset = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 10)
+      statsReset = TypoInstant.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }

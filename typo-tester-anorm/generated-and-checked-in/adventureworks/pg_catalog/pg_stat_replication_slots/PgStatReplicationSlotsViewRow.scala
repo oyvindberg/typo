@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_replication_slots
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -30,7 +30,7 @@ case class PgStatReplicationSlotsViewRow(
   streamBytes: /* nullability unknown */ Option[Long],
   totalTxns: /* nullability unknown */ Option[Long],
   totalBytes: /* nullability unknown */ Option[Long],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatReplicationSlotsViewRow {
@@ -46,7 +46,7 @@ object PgStatReplicationSlotsViewRow {
           streamBytes = json.\("stream_bytes").toOption.map(_.as(Reads.LongReads)),
           totalTxns = json.\("total_txns").toOption.map(_.as(Reads.LongReads)),
           totalBytes = json.\("total_bytes").toOption.map(_.as(Reads.LongReads)),
-          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -63,7 +63,7 @@ object PgStatReplicationSlotsViewRow {
         streamBytes = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
         totalTxns = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
         totalBytes = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
-        statsReset = row(idx + 9)(Column.columnToOption(TypoOffsetDateTime.column))
+        statsReset = row(idx + 9)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -78,7 +78,7 @@ object PgStatReplicationSlotsViewRow {
       "stream_bytes" -> Writes.OptionWrites(Writes.LongWrites).writes(o.streamBytes),
       "total_txns" -> Writes.OptionWrites(Writes.LongWrites).writes(o.totalTxns),
       "total_bytes" -> Writes.OptionWrites(Writes.LongWrites).writes(o.totalBytes),
-      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
+      "stats_reset" -> Writes.OptionWrites(TypoInstant.writes).writes(o.statsReset)
     ))
   )
 }

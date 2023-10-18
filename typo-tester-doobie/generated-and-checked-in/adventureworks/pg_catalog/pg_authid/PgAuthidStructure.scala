@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -29,7 +29,7 @@ class PgAuthidStructure[Row](val prefix: Option[String], val extract: Row => PgA
   override val rolbypassrls = new Field[Boolean, Row](prefix, "rolbypassrls", None, None)(x => extract(x).rolbypassrls, (row, value) => merge(row, extract(row).copy(rolbypassrls = value)))
   override val rolconnlimit = new Field[Int, Row](prefix, "rolconnlimit", None, Some("int4"))(x => extract(x).rolconnlimit, (row, value) => merge(row, extract(row).copy(rolconnlimit = value)))
   override val rolpassword = new OptField[String, Row](prefix, "rolpassword", None, None)(x => extract(x).rolpassword, (row, value) => merge(row, extract(row).copy(rolpassword = value)))
-  override val rolvaliduntil = new OptField[TypoOffsetDateTime, Row](prefix, "rolvaliduntil", Some("text"), Some("timestamptz"))(x => extract(x).rolvaliduntil, (row, value) => merge(row, extract(row).copy(rolvaliduntil = value)))
+  override val rolvaliduntil = new OptField[TypoInstant, Row](prefix, "rolvaliduntil", Some("text"), Some("timestamptz"))(x => extract(x).rolvaliduntil, (row, value) => merge(row, extract(row).copy(rolvaliduntil = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)

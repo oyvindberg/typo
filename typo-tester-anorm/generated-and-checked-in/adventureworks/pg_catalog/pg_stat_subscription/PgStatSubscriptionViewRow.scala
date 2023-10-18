@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_subscription
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_subscription.PgSubscriptionId
 import anorm.Column
 import anorm.RowParser
@@ -29,10 +29,10 @@ case class PgStatSubscriptionViewRow(
   pid: Option[Int],
   relid: Option[/* oid */ Long],
   receivedLsn: Option[/* pg_lsn */ Long],
-  lastMsgSendTime: Option[TypoOffsetDateTime],
-  lastMsgReceiptTime: Option[TypoOffsetDateTime],
+  lastMsgSendTime: Option[TypoInstant],
+  lastMsgReceiptTime: Option[TypoInstant],
   latestEndLsn: Option[/* pg_lsn */ Long],
-  latestEndTime: Option[TypoOffsetDateTime]
+  latestEndTime: Option[TypoInstant]
 )
 
 object PgStatSubscriptionViewRow {
@@ -44,10 +44,10 @@ object PgStatSubscriptionViewRow {
           pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
           relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
           receivedLsn = json.\("received_lsn").toOption.map(_.as(Reads.LongReads)),
-          lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as(TypoInstant.reads)),
+          lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as(TypoInstant.reads)),
           latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as(Reads.LongReads)),
-          latestEndTime = json.\("latest_end_time").toOption.map(_.as(TypoOffsetDateTime.reads))
+          latestEndTime = json.\("latest_end_time").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -60,10 +60,10 @@ object PgStatSubscriptionViewRow {
         pid = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
         relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
         receivedLsn = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
-        lastMsgSendTime = row(idx + 5)(Column.columnToOption(TypoOffsetDateTime.column)),
-        lastMsgReceiptTime = row(idx + 6)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastMsgSendTime = row(idx + 5)(Column.columnToOption(TypoInstant.column)),
+        lastMsgReceiptTime = row(idx + 6)(Column.columnToOption(TypoInstant.column)),
         latestEndLsn = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
-        latestEndTime = row(idx + 8)(Column.columnToOption(TypoOffsetDateTime.column))
+        latestEndTime = row(idx + 8)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -74,10 +74,10 @@ object PgStatSubscriptionViewRow {
       "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
       "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
       "received_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.receivedLsn),
-      "last_msg_send_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastMsgSendTime),
-      "last_msg_receipt_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastMsgReceiptTime),
+      "last_msg_send_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastMsgSendTime),
+      "last_msg_receipt_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastMsgReceiptTime),
       "latest_end_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.latestEndLsn),
-      "latest_end_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.latestEndTime)
+      "latest_end_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.latestEndTime)
     ))
   )
 }

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_bgwriter
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -31,7 +31,7 @@ case class PgStatBgwriterViewRow(
   buffersBackend: /* nullability unknown */ Option[Long],
   buffersBackendFsync: /* nullability unknown */ Option[Long],
   buffersAlloc: /* nullability unknown */ Option[Long],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatBgwriterViewRow {
@@ -48,7 +48,7 @@ object PgStatBgwriterViewRow {
           buffersBackend = json.\("buffers_backend").toOption.map(_.as(Reads.LongReads)),
           buffersBackendFsync = json.\("buffers_backend_fsync").toOption.map(_.as(Reads.LongReads)),
           buffersAlloc = json.\("buffers_alloc").toOption.map(_.as(Reads.LongReads)),
-          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -66,7 +66,7 @@ object PgStatBgwriterViewRow {
         buffersBackend = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
         buffersBackendFsync = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
         buffersAlloc = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
-        statsReset = row(idx + 10)(Column.columnToOption(TypoOffsetDateTime.column))
+        statsReset = row(idx + 10)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -82,7 +82,7 @@ object PgStatBgwriterViewRow {
       "buffers_backend" -> Writes.OptionWrites(Writes.LongWrites).writes(o.buffersBackend),
       "buffers_backend_fsync" -> Writes.OptionWrites(Writes.LongWrites).writes(o.buffersBackendFsync),
       "buffers_alloc" -> Writes.OptionWrites(Writes.LongWrites).writes(o.buffersAlloc),
-      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
+      "stats_reset" -> Writes.OptionWrites(TypoInstant.writes).writes(o.statsReset)
     ))
   )
 }

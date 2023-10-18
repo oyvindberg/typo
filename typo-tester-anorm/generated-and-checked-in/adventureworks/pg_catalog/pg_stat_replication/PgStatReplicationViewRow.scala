@@ -8,8 +8,8 @@ package pg_catalog
 package pg_stat_replication
 
 import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoInterval
-import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoXid
 import anorm.Column
 import anorm.RowParser
@@ -32,7 +32,7 @@ case class PgStatReplicationViewRow(
   clientAddr: /* nullability unknown */ Option[TypoInet],
   clientHostname: /* nullability unknown */ Option[String],
   clientPort: /* nullability unknown */ Option[Int],
-  backendStart: /* nullability unknown */ Option[TypoOffsetDateTime],
+  backendStart: /* nullability unknown */ Option[TypoInstant],
   backendXmin: /* nullability unknown */ Option[TypoXid],
   state: /* nullability unknown */ Option[String],
   sentLsn: /* nullability unknown */ Option[/* pg_lsn */ Long],
@@ -44,7 +44,7 @@ case class PgStatReplicationViewRow(
   replayLag: /* nullability unknown */ Option[TypoInterval],
   syncPriority: /* nullability unknown */ Option[Int],
   syncState: /* nullability unknown */ Option[String],
-  replyTime: /* nullability unknown */ Option[TypoOffsetDateTime]
+  replyTime: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatReplicationViewRow {
@@ -58,7 +58,7 @@ object PgStatReplicationViewRow {
           clientAddr = json.\("client_addr").toOption.map(_.as(TypoInet.reads)),
           clientHostname = json.\("client_hostname").toOption.map(_.as(Reads.StringReads)),
           clientPort = json.\("client_port").toOption.map(_.as(Reads.IntReads)),
-          backendStart = json.\("backend_start").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          backendStart = json.\("backend_start").toOption.map(_.as(TypoInstant.reads)),
           backendXmin = json.\("backend_xmin").toOption.map(_.as(TypoXid.reads)),
           state = json.\("state").toOption.map(_.as(Reads.StringReads)),
           sentLsn = json.\("sent_lsn").toOption.map(_.as(Reads.LongReads)),
@@ -70,7 +70,7 @@ object PgStatReplicationViewRow {
           replayLag = json.\("replay_lag").toOption.map(_.as(TypoInterval.reads)),
           syncPriority = json.\("sync_priority").toOption.map(_.as(Reads.IntReads)),
           syncState = json.\("sync_state").toOption.map(_.as(Reads.StringReads)),
-          replyTime = json.\("reply_time").toOption.map(_.as(TypoOffsetDateTime.reads))
+          replyTime = json.\("reply_time").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -85,7 +85,7 @@ object PgStatReplicationViewRow {
         clientAddr = row(idx + 4)(Column.columnToOption(TypoInet.column)),
         clientHostname = row(idx + 5)(Column.columnToOption(Column.columnToString)),
         clientPort = row(idx + 6)(Column.columnToOption(Column.columnToInt)),
-        backendStart = row(idx + 7)(Column.columnToOption(TypoOffsetDateTime.column)),
+        backendStart = row(idx + 7)(Column.columnToOption(TypoInstant.column)),
         backendXmin = row(idx + 8)(Column.columnToOption(TypoXid.column)),
         state = row(idx + 9)(Column.columnToOption(Column.columnToString)),
         sentLsn = row(idx + 10)(Column.columnToOption(Column.columnToLong)),
@@ -97,7 +97,7 @@ object PgStatReplicationViewRow {
         replayLag = row(idx + 16)(Column.columnToOption(TypoInterval.column)),
         syncPriority = row(idx + 17)(Column.columnToOption(Column.columnToInt)),
         syncState = row(idx + 18)(Column.columnToOption(Column.columnToString)),
-        replyTime = row(idx + 19)(Column.columnToOption(TypoOffsetDateTime.column))
+        replyTime = row(idx + 19)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -110,7 +110,7 @@ object PgStatReplicationViewRow {
       "client_addr" -> Writes.OptionWrites(TypoInet.writes).writes(o.clientAddr),
       "client_hostname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.clientHostname),
       "client_port" -> Writes.OptionWrites(Writes.IntWrites).writes(o.clientPort),
-      "backend_start" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.backendStart),
+      "backend_start" -> Writes.OptionWrites(TypoInstant.writes).writes(o.backendStart),
       "backend_xmin" -> Writes.OptionWrites(TypoXid.writes).writes(o.backendXmin),
       "state" -> Writes.OptionWrites(Writes.StringWrites).writes(o.state),
       "sent_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sentLsn),
@@ -122,7 +122,7 @@ object PgStatReplicationViewRow {
       "replay_lag" -> Writes.OptionWrites(TypoInterval.writes).writes(o.replayLag),
       "sync_priority" -> Writes.OptionWrites(Writes.IntWrites).writes(o.syncPriority),
       "sync_state" -> Writes.OptionWrites(Writes.StringWrites).writes(o.syncState),
-      "reply_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.replyTime)
+      "reply_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.replyTime)
     ))
   )
 }

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -24,7 +24,7 @@ class PgStatWalViewStructure[Row](val prefix: Option[String], val extract: Row =
   override val walSync = new OptField[Long, Row](prefix, "wal_sync", None, None)(x => extract(x).walSync, (row, value) => merge(row, extract(row).copy(walSync = value)))
   override val walWriteTime = new OptField[Double, Row](prefix, "wal_write_time", None, None)(x => extract(x).walWriteTime, (row, value) => merge(row, extract(row).copy(walWriteTime = value)))
   override val walSyncTime = new OptField[Double, Row](prefix, "wal_sync_time", None, None)(x => extract(x).walSyncTime, (row, value) => merge(row, extract(row).copy(walSyncTime = value)))
-  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val statsReset = new OptField[TypoInstant, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](walRecords, walFpi, walBytes, walBuffersFull, walWrite, walSync, walWriteTime, walSyncTime, statsReset)

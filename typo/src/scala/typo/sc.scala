@@ -110,6 +110,7 @@ object sc {
     val ResultSet = sc.Type.Qualified("java.sql.ResultSet")
     val JavaSqlTime = Qualified("java.sql.Time")
     val Types = Qualified("java.sql.Types")
+    val Instant = Qualified("java.time.Instant")
     val LocalDate = Qualified("java.time.LocalDate")
     val LocalDateTime = Qualified("java.time.LocalDateTime")
     val LocalTime = Qualified("java.time.LocalTime")

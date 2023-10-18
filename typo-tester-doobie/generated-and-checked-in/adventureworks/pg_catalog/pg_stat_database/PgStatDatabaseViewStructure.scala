@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_database
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -33,7 +33,7 @@ class PgStatDatabaseViewStructure[Row](val prefix: Option[String], val extract: 
   override val tempBytes = new OptField[Long, Row](prefix, "temp_bytes", None, None)(x => extract(x).tempBytes, (row, value) => merge(row, extract(row).copy(tempBytes = value)))
   override val deadlocks = new OptField[Long, Row](prefix, "deadlocks", None, None)(x => extract(x).deadlocks, (row, value) => merge(row, extract(row).copy(deadlocks = value)))
   override val checksumFailures = new OptField[Long, Row](prefix, "checksum_failures", None, None)(x => extract(x).checksumFailures, (row, value) => merge(row, extract(row).copy(checksumFailures = value)))
-  override val checksumLastFailure = new OptField[TypoOffsetDateTime, Row](prefix, "checksum_last_failure", Some("text"), None)(x => extract(x).checksumLastFailure, (row, value) => merge(row, extract(row).copy(checksumLastFailure = value)))
+  override val checksumLastFailure = new OptField[TypoInstant, Row](prefix, "checksum_last_failure", Some("text"), None)(x => extract(x).checksumLastFailure, (row, value) => merge(row, extract(row).copy(checksumLastFailure = value)))
   override val blkReadTime = new OptField[Double, Row](prefix, "blk_read_time", None, None)(x => extract(x).blkReadTime, (row, value) => merge(row, extract(row).copy(blkReadTime = value)))
   override val blkWriteTime = new OptField[Double, Row](prefix, "blk_write_time", None, None)(x => extract(x).blkWriteTime, (row, value) => merge(row, extract(row).copy(blkWriteTime = value)))
   override val sessionTime = new OptField[Double, Row](prefix, "session_time", None, None)(x => extract(x).sessionTime, (row, value) => merge(row, extract(row).copy(sessionTime = value)))
@@ -43,7 +43,7 @@ class PgStatDatabaseViewStructure[Row](val prefix: Option[String], val extract: 
   override val sessionsAbandoned = new OptField[Long, Row](prefix, "sessions_abandoned", None, None)(x => extract(x).sessionsAbandoned, (row, value) => merge(row, extract(row).copy(sessionsAbandoned = value)))
   override val sessionsFatal = new OptField[Long, Row](prefix, "sessions_fatal", None, None)(x => extract(x).sessionsFatal, (row, value) => merge(row, extract(row).copy(sessionsFatal = value)))
   override val sessionsKilled = new OptField[Long, Row](prefix, "sessions_killed", None, None)(x => extract(x).sessionsKilled, (row, value) => merge(row, extract(row).copy(sessionsKilled = value)))
-  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val statsReset = new OptField[TypoInstant, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](datid, datname, numbackends, xactCommit, xactRollback, blksRead, blksHit, tupReturned, tupFetched, tupInserted, tupUpdated, tupDeleted, conflicts, tempFiles, tempBytes, deadlocks, checksumFailures, checksumLastFailure, blkReadTime, blkWriteTime, sessionTime, activeTime, idleInTransactionTime, sessions, sessionsAbandoned, sessionsFatal, sessionsKilled, statsReset)

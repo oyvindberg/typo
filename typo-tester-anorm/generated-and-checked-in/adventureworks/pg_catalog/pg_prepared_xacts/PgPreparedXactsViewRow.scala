@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_prepared_xacts
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoXid
 import anorm.Column
 import anorm.RowParser
@@ -24,7 +24,7 @@ import scala.util.Try
 case class PgPreparedXactsViewRow(
   transaction: /* nullability unknown */ Option[TypoXid],
   gid: /* nullability unknown */ Option[String],
-  prepared: /* nullability unknown */ Option[TypoOffsetDateTime],
+  prepared: /* nullability unknown */ Option[TypoInstant],
   /** Points to [[pg_authid.PgAuthidRow.rolname]] */
   owner: Option[String],
   /** Points to [[pg_database.PgDatabaseRow.datname]] */
@@ -37,7 +37,7 @@ object PgPreparedXactsViewRow {
         PgPreparedXactsViewRow(
           transaction = json.\("transaction").toOption.map(_.as(TypoXid.reads)),
           gid = json.\("gid").toOption.map(_.as(Reads.StringReads)),
-          prepared = json.\("prepared").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          prepared = json.\("prepared").toOption.map(_.as(TypoInstant.reads)),
           owner = json.\("owner").toOption.map(_.as(Reads.StringReads)),
           database = json.\("database").toOption.map(_.as(Reads.StringReads))
         )
@@ -49,7 +49,7 @@ object PgPreparedXactsViewRow {
       PgPreparedXactsViewRow(
         transaction = row(idx + 0)(Column.columnToOption(TypoXid.column)),
         gid = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        prepared = row(idx + 2)(Column.columnToOption(TypoOffsetDateTime.column)),
+        prepared = row(idx + 2)(Column.columnToOption(TypoInstant.column)),
         owner = row(idx + 3)(Column.columnToOption(Column.columnToString)),
         database = row(idx + 4)(Column.columnToOption(Column.columnToString))
       )
@@ -59,7 +59,7 @@ object PgPreparedXactsViewRow {
     new JsObject(ListMap[String, JsValue](
       "transaction" -> Writes.OptionWrites(TypoXid.writes).writes(o.transaction),
       "gid" -> Writes.OptionWrites(Writes.StringWrites).writes(o.gid),
-      "prepared" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.prepared),
+      "prepared" -> Writes.OptionWrites(TypoInstant.writes).writes(o.prepared),
       "owner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.owner),
       "database" -> Writes.OptionWrites(Writes.StringWrites).writes(o.database)
     ))

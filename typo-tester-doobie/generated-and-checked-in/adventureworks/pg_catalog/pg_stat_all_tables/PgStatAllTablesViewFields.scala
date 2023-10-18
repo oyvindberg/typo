@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_all_tables
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_class.PgClassId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
@@ -28,10 +28,10 @@ trait PgStatAllTablesViewFields[Row] {
   val nDeadTup: OptField[Long, Row]
   val nModSinceAnalyze: OptField[Long, Row]
   val nInsSinceVacuum: OptField[Long, Row]
-  val lastVacuum: OptField[TypoOffsetDateTime, Row]
-  val lastAutovacuum: OptField[TypoOffsetDateTime, Row]
-  val lastAnalyze: OptField[TypoOffsetDateTime, Row]
-  val lastAutoanalyze: OptField[TypoOffsetDateTime, Row]
+  val lastVacuum: OptField[TypoInstant, Row]
+  val lastAutovacuum: OptField[TypoInstant, Row]
+  val lastAnalyze: OptField[TypoInstant, Row]
+  val lastAutoanalyze: OptField[TypoInstant, Row]
   val vacuumCount: OptField[Long, Row]
   val autovacuumCount: OptField[Long, Row]
   val analyzeCount: OptField[Long, Row]

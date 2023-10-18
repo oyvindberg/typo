@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_archiver
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -23,11 +23,11 @@ import scala.util.Try
 case class PgStatArchiverViewRow(
   archivedCount: /* nullability unknown */ Option[Long],
   lastArchivedWal: /* nullability unknown */ Option[String],
-  lastArchivedTime: /* nullability unknown */ Option[TypoOffsetDateTime],
+  lastArchivedTime: /* nullability unknown */ Option[TypoInstant],
   failedCount: /* nullability unknown */ Option[Long],
   lastFailedWal: /* nullability unknown */ Option[String],
-  lastFailedTime: /* nullability unknown */ Option[TypoOffsetDateTime],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  lastFailedTime: /* nullability unknown */ Option[TypoInstant],
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatArchiverViewRow {
@@ -36,11 +36,11 @@ object PgStatArchiverViewRow {
         PgStatArchiverViewRow(
           archivedCount = json.\("archived_count").toOption.map(_.as(Reads.LongReads)),
           lastArchivedWal = json.\("last_archived_wal").toOption.map(_.as(Reads.StringReads)),
-          lastArchivedTime = json.\("last_archived_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastArchivedTime = json.\("last_archived_time").toOption.map(_.as(TypoInstant.reads)),
           failedCount = json.\("failed_count").toOption.map(_.as(Reads.LongReads)),
           lastFailedWal = json.\("last_failed_wal").toOption.map(_.as(Reads.StringReads)),
-          lastFailedTime = json.\("last_failed_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
+          lastFailedTime = json.\("last_failed_time").toOption.map(_.as(TypoInstant.reads)),
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -50,11 +50,11 @@ object PgStatArchiverViewRow {
       PgStatArchiverViewRow(
         archivedCount = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
         lastArchivedWal = row(idx + 1)(Column.columnToOption(Column.columnToString)),
-        lastArchivedTime = row(idx + 2)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastArchivedTime = row(idx + 2)(Column.columnToOption(TypoInstant.column)),
         failedCount = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
         lastFailedWal = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        lastFailedTime = row(idx + 5)(Column.columnToOption(TypoOffsetDateTime.column)),
-        statsReset = row(idx + 6)(Column.columnToOption(TypoOffsetDateTime.column))
+        lastFailedTime = row(idx + 5)(Column.columnToOption(TypoInstant.column)),
+        statsReset = row(idx + 6)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -62,11 +62,11 @@ object PgStatArchiverViewRow {
     new JsObject(ListMap[String, JsValue](
       "archived_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.archivedCount),
       "last_archived_wal" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastArchivedWal),
-      "last_archived_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastArchivedTime),
+      "last_archived_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastArchivedTime),
       "failed_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.failedCount),
       "last_failed_wal" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastFailedWal),
-      "last_failed_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastFailedTime),
-      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
+      "last_failed_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastFailedTime),
+      "stats_reset" -> Writes.OptionWrites(TypoInstant.writes).writes(o.statsReset)
     ))
   )
 }

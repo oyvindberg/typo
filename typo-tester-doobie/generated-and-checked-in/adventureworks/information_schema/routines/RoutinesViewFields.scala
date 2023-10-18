@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package routines
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.OptField
 
 trait RoutinesViewFields[Row] {
@@ -65,8 +65,8 @@ trait RoutinesViewFields[Row] {
   val toSqlSpecificSchema: OptField[String, Row]
   val toSqlSpecificName: OptField[String, Row]
   val asLocator: OptField[/* max 3 chars */ String, Row]
-  val created: OptField[TypoOffsetDateTime, Row]
-  val lastAltered: OptField[TypoOffsetDateTime, Row]
+  val created: OptField[TypoInstant, Row]
+  val lastAltered: OptField[TypoInstant, Row]
   val newSavepointLevel: OptField[/* max 3 chars */ String, Row]
   val isUdtDependent: OptField[/* max 3 chars */ String, Row]
   val resultCastFromDataType: OptField[String, Row]

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_database
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatDatabaseViewFields[Row] {
@@ -28,7 +28,7 @@ trait PgStatDatabaseViewFields[Row] {
   val tempBytes: OptField[Long, Row]
   val deadlocks: OptField[Long, Row]
   val checksumFailures: OptField[Long, Row]
-  val checksumLastFailure: OptField[TypoOffsetDateTime, Row]
+  val checksumLastFailure: OptField[TypoInstant, Row]
   val blkReadTime: OptField[Double, Row]
   val blkWriteTime: OptField[Double, Row]
   val sessionTime: OptField[Double, Row]
@@ -38,7 +38,7 @@ trait PgStatDatabaseViewFields[Row] {
   val sessionsAbandoned: OptField[Long, Row]
   val sessionsFatal: OptField[Long, Row]
   val sessionsKilled: OptField[Long, Row]
-  val statsReset: OptField[TypoOffsetDateTime, Row]
+  val statsReset: OptField[TypoInstant, Row]
 }
 object PgStatDatabaseViewFields extends PgStatDatabaseViewStructure[PgStatDatabaseViewRow](None, identity, (_, x) => x)
 
