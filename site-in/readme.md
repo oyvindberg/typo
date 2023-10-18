@@ -36,6 +36,19 @@ Typo changes the game.
 It streamlines steps 2-7, liberates you from boilerplate, and lets you focus on what truly matters: 
 building robust and maintainable database applications.
 
+### Example video
+As an example of how typo frees you from these steps, consider this video where you write your SQL in an `.sql` file,
+and you see typo regenerating correct mapping code for it on save. 
+Much less testing is needed, because the name and type mapping will be correct, and the sql valid.
+
+<video
+width="100%"
+controls
+src="https://github.com/oyvindberg/typo/assets/247937/df7c4f2d-b118-4081-81c6-dd03dfe62ee2"
+/>
+
+Typo is also much more than this, keep reading to discover :)
+
 ### Types of Database Interactions
 
 Interactions with the database fall into four distinct categories, each with its unique challenges and requirements:
