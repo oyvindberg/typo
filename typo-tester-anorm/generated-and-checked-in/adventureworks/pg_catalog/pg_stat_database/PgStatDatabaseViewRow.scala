@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_database
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -38,7 +38,7 @@ case class PgStatDatabaseViewRow(
   tempBytes: /* nullability unknown */ Option[Long],
   deadlocks: /* nullability unknown */ Option[Long],
   checksumFailures: /* nullability unknown */ Option[Long],
-  checksumLastFailure: /* nullability unknown */ Option[TypoOffsetDateTime],
+  checksumLastFailure: /* nullability unknown */ Option[TypoInstant],
   blkReadTime: /* nullability unknown */ Option[Double],
   blkWriteTime: /* nullability unknown */ Option[Double],
   sessionTime: /* nullability unknown */ Option[Double],
@@ -48,7 +48,7 @@ case class PgStatDatabaseViewRow(
   sessionsAbandoned: /* nullability unknown */ Option[Long],
   sessionsFatal: /* nullability unknown */ Option[Long],
   sessionsKilled: /* nullability unknown */ Option[Long],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatDatabaseViewRow {
@@ -72,7 +72,7 @@ object PgStatDatabaseViewRow {
           tempBytes = json.\("temp_bytes").toOption.map(_.as(Reads.LongReads)),
           deadlocks = json.\("deadlocks").toOption.map(_.as(Reads.LongReads)),
           checksumFailures = json.\("checksum_failures").toOption.map(_.as(Reads.LongReads)),
-          checksumLastFailure = json.\("checksum_last_failure").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          checksumLastFailure = json.\("checksum_last_failure").toOption.map(_.as(TypoInstant.reads)),
           blkReadTime = json.\("blk_read_time").toOption.map(_.as(Reads.DoubleReads)),
           blkWriteTime = json.\("blk_write_time").toOption.map(_.as(Reads.DoubleReads)),
           sessionTime = json.\("session_time").toOption.map(_.as(Reads.DoubleReads)),
@@ -82,7 +82,7 @@ object PgStatDatabaseViewRow {
           sessionsAbandoned = json.\("sessions_abandoned").toOption.map(_.as(Reads.LongReads)),
           sessionsFatal = json.\("sessions_fatal").toOption.map(_.as(Reads.LongReads)),
           sessionsKilled = json.\("sessions_killed").toOption.map(_.as(Reads.LongReads)),
-          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -107,7 +107,7 @@ object PgStatDatabaseViewRow {
         tempBytes = row(idx + 14)(Column.columnToOption(Column.columnToLong)),
         deadlocks = row(idx + 15)(Column.columnToOption(Column.columnToLong)),
         checksumFailures = row(idx + 16)(Column.columnToOption(Column.columnToLong)),
-        checksumLastFailure = row(idx + 17)(Column.columnToOption(TypoOffsetDateTime.column)),
+        checksumLastFailure = row(idx + 17)(Column.columnToOption(TypoInstant.column)),
         blkReadTime = row(idx + 18)(Column.columnToOption(Column.columnToDouble)),
         blkWriteTime = row(idx + 19)(Column.columnToOption(Column.columnToDouble)),
         sessionTime = row(idx + 20)(Column.columnToOption(Column.columnToDouble)),
@@ -117,7 +117,7 @@ object PgStatDatabaseViewRow {
         sessionsAbandoned = row(idx + 24)(Column.columnToOption(Column.columnToLong)),
         sessionsFatal = row(idx + 25)(Column.columnToOption(Column.columnToLong)),
         sessionsKilled = row(idx + 26)(Column.columnToOption(Column.columnToLong)),
-        statsReset = row(idx + 27)(Column.columnToOption(TypoOffsetDateTime.column))
+        statsReset = row(idx + 27)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -140,7 +140,7 @@ object PgStatDatabaseViewRow {
       "temp_bytes" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tempBytes),
       "deadlocks" -> Writes.OptionWrites(Writes.LongWrites).writes(o.deadlocks),
       "checksum_failures" -> Writes.OptionWrites(Writes.LongWrites).writes(o.checksumFailures),
-      "checksum_last_failure" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.checksumLastFailure),
+      "checksum_last_failure" -> Writes.OptionWrites(TypoInstant.writes).writes(o.checksumLastFailure),
       "blk_read_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.blkReadTime),
       "blk_write_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.blkWriteTime),
       "session_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.sessionTime),
@@ -150,7 +150,7 @@ object PgStatDatabaseViewRow {
       "sessions_abandoned" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sessionsAbandoned),
       "sessions_fatal" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sessionsFatal),
       "sessions_killed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sessionsKilled),
-      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
+      "stats_reset" -> Writes.OptionWrites(TypoInstant.writes).writes(o.statsReset)
     ))
   )
 }

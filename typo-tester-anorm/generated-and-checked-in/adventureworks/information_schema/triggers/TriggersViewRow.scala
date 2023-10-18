@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package triggers
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -37,7 +37,7 @@ case class TriggersViewRow(
   actionReferenceNewTable: /* nullability unknown */ Option[String],
   actionReferenceOldRow: /* nullability unknown */ Option[String],
   actionReferenceNewRow: /* nullability unknown */ Option[String],
-  created: /* nullability unknown */ Option[TypoOffsetDateTime]
+  created: /* nullability unknown */ Option[TypoInstant]
 )
 
 object TriggersViewRow {
@@ -60,7 +60,7 @@ object TriggersViewRow {
           actionReferenceNewTable = json.\("action_reference_new_table").toOption.map(_.as(Reads.StringReads)),
           actionReferenceOldRow = json.\("action_reference_old_row").toOption.map(_.as(Reads.StringReads)),
           actionReferenceNewRow = json.\("action_reference_new_row").toOption.map(_.as(Reads.StringReads)),
-          created = json.\("created").toOption.map(_.as(TypoOffsetDateTime.reads))
+          created = json.\("created").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -84,7 +84,7 @@ object TriggersViewRow {
         actionReferenceNewTable = row(idx + 13)(Column.columnToOption(Column.columnToString)),
         actionReferenceOldRow = row(idx + 14)(Column.columnToOption(Column.columnToString)),
         actionReferenceNewRow = row(idx + 15)(Column.columnToOption(Column.columnToString)),
-        created = row(idx + 16)(Column.columnToOption(TypoOffsetDateTime.column))
+        created = row(idx + 16)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -106,7 +106,7 @@ object TriggersViewRow {
       "action_reference_new_table" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionReferenceNewTable),
       "action_reference_old_row" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionReferenceOldRow),
       "action_reference_new_row" -> Writes.OptionWrites(Writes.StringWrites).writes(o.actionReferenceNewRow),
-      "created" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.created)
+      "created" -> Writes.OptionWrites(TypoInstant.writes).writes(o.created)
     ))
   )
 }

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal_receiver
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -28,10 +28,10 @@ case class PgStatWalReceiverViewRow(
   writtenLsn: /* nullability unknown */ Option[/* pg_lsn */ Long],
   flushedLsn: /* nullability unknown */ Option[/* pg_lsn */ Long],
   receivedTli: /* nullability unknown */ Option[Int],
-  lastMsgSendTime: /* nullability unknown */ Option[TypoOffsetDateTime],
-  lastMsgReceiptTime: /* nullability unknown */ Option[TypoOffsetDateTime],
+  lastMsgSendTime: /* nullability unknown */ Option[TypoInstant],
+  lastMsgReceiptTime: /* nullability unknown */ Option[TypoInstant],
   latestEndLsn: /* nullability unknown */ Option[/* pg_lsn */ Long],
-  latestEndTime: /* nullability unknown */ Option[TypoOffsetDateTime],
+  latestEndTime: /* nullability unknown */ Option[TypoInstant],
   slotName: /* nullability unknown */ Option[String],
   senderHost: /* nullability unknown */ Option[String],
   senderPort: /* nullability unknown */ Option[Int],
@@ -49,10 +49,10 @@ object PgStatWalReceiverViewRow {
           writtenLsn = json.\("written_lsn").toOption.map(_.as(Reads.LongReads)),
           flushedLsn = json.\("flushed_lsn").toOption.map(_.as(Reads.LongReads)),
           receivedTli = json.\("received_tli").toOption.map(_.as(Reads.IntReads)),
-          lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as(TypoInstant.reads)),
+          lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as(TypoInstant.reads)),
           latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as(Reads.LongReads)),
-          latestEndTime = json.\("latest_end_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          latestEndTime = json.\("latest_end_time").toOption.map(_.as(TypoInstant.reads)),
           slotName = json.\("slot_name").toOption.map(_.as(Reads.StringReads)),
           senderHost = json.\("sender_host").toOption.map(_.as(Reads.StringReads)),
           senderPort = json.\("sender_port").toOption.map(_.as(Reads.IntReads)),
@@ -71,10 +71,10 @@ object PgStatWalReceiverViewRow {
         writtenLsn = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
         flushedLsn = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
         receivedTli = row(idx + 6)(Column.columnToOption(Column.columnToInt)),
-        lastMsgSendTime = row(idx + 7)(Column.columnToOption(TypoOffsetDateTime.column)),
-        lastMsgReceiptTime = row(idx + 8)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastMsgSendTime = row(idx + 7)(Column.columnToOption(TypoInstant.column)),
+        lastMsgReceiptTime = row(idx + 8)(Column.columnToOption(TypoInstant.column)),
         latestEndLsn = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
-        latestEndTime = row(idx + 10)(Column.columnToOption(TypoOffsetDateTime.column)),
+        latestEndTime = row(idx + 10)(Column.columnToOption(TypoInstant.column)),
         slotName = row(idx + 11)(Column.columnToOption(Column.columnToString)),
         senderHost = row(idx + 12)(Column.columnToOption(Column.columnToString)),
         senderPort = row(idx + 13)(Column.columnToOption(Column.columnToInt)),
@@ -91,10 +91,10 @@ object PgStatWalReceiverViewRow {
       "written_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.writtenLsn),
       "flushed_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.flushedLsn),
       "received_tli" -> Writes.OptionWrites(Writes.IntWrites).writes(o.receivedTli),
-      "last_msg_send_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastMsgSendTime),
-      "last_msg_receipt_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastMsgReceiptTime),
+      "last_msg_send_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastMsgSendTime),
+      "last_msg_receipt_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastMsgReceiptTime),
       "latest_end_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.latestEndLsn),
-      "latest_end_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.latestEndTime),
+      "latest_end_time" -> Writes.OptionWrites(TypoInstant.writes).writes(o.latestEndTime),
       "slot_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.slotName),
       "sender_host" -> Writes.OptionWrites(Writes.StringWrites).writes(o.senderHost),
       "sender_port" -> Writes.OptionWrites(Writes.IntWrites).writes(o.senderPort),

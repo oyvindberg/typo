@@ -8,7 +8,7 @@ package public
 package users
 
 import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import io.circe.Decoder
 import io.circe.Encoder
@@ -20,11 +20,11 @@ case class UsersRowUnsaved(
   lastName: Option[String],
   email: TypoUnknownCitext,
   password: String,
-  verifiedOn: Option[TypoOffsetDateTime],
+  verifiedOn: Option[TypoInstant],
   /** Default: now() */
-  createdAt: Defaulted[TypoOffsetDateTime] = Defaulted.UseDefault
+  createdAt: Defaulted[TypoInstant] = Defaulted.UseDefault
 ) {
-  def toRow(createdAtDefault: => TypoOffsetDateTime): UsersRow =
+  def toRow(createdAtDefault: => TypoInstant): UsersRow =
     UsersRow(
       userId = userId,
       name = name,
@@ -39,6 +39,6 @@ case class UsersRowUnsaved(
     )
 }
 object UsersRowUnsaved {
-  implicit lazy val decoder: Decoder[UsersRowUnsaved] = Decoder.forProduct7[UsersRowUnsaved, UsersId, String, Option[String], TypoUnknownCitext, String, Option[TypoOffsetDateTime], Defaulted[TypoOffsetDateTime]]("user_id", "name", "last_name", "email", "password", "verified_on", "created_at")(UsersRowUnsaved.apply)(UsersId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), TypoUnknownCitext.decoder, Decoder.decodeString, Decoder.decodeOption(TypoOffsetDateTime.decoder), Defaulted.decoder(TypoOffsetDateTime.decoder))
-  implicit lazy val encoder: Encoder[UsersRowUnsaved] = Encoder.forProduct7[UsersRowUnsaved, UsersId, String, Option[String], TypoUnknownCitext, String, Option[TypoOffsetDateTime], Defaulted[TypoOffsetDateTime]]("user_id", "name", "last_name", "email", "password", "verified_on", "created_at")(x => (x.userId, x.name, x.lastName, x.email, x.password, x.verifiedOn, x.createdAt))(UsersId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), TypoUnknownCitext.encoder, Encoder.encodeString, Encoder.encodeOption(TypoOffsetDateTime.encoder), Defaulted.encoder(TypoOffsetDateTime.encoder))
+  implicit lazy val decoder: Decoder[UsersRowUnsaved] = Decoder.forProduct7[UsersRowUnsaved, UsersId, String, Option[String], TypoUnknownCitext, String, Option[TypoInstant], Defaulted[TypoInstant]]("user_id", "name", "last_name", "email", "password", "verified_on", "created_at")(UsersRowUnsaved.apply)(UsersId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), TypoUnknownCitext.decoder, Decoder.decodeString, Decoder.decodeOption(TypoInstant.decoder), Defaulted.decoder(TypoInstant.decoder))
+  implicit lazy val encoder: Encoder[UsersRowUnsaved] = Encoder.forProduct7[UsersRowUnsaved, UsersId, String, Option[String], TypoUnknownCitext, String, Option[TypoInstant], Defaulted[TypoInstant]]("user_id", "name", "last_name", "email", "password", "verified_on", "created_at")(x => (x.userId, x.name, x.lastName, x.email, x.password, x.verifiedOn, x.createdAt))(UsersId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), TypoUnknownCitext.encoder, Encoder.encodeString, Encoder.encodeOption(TypoInstant.encoder), Defaulted.encoder(TypoInstant.encoder))
 }

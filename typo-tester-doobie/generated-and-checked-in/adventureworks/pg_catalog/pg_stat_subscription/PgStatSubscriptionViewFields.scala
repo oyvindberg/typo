@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_subscription
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_subscription.PgSubscriptionId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
@@ -18,10 +18,10 @@ trait PgStatSubscriptionViewFields[Row] {
   val pid: OptField[Int, Row]
   val relid: OptField[/* oid */ Long, Row]
   val receivedLsn: OptField[/* pg_lsn */ Long, Row]
-  val lastMsgSendTime: OptField[TypoOffsetDateTime, Row]
-  val lastMsgReceiptTime: OptField[TypoOffsetDateTime, Row]
+  val lastMsgSendTime: OptField[TypoInstant, Row]
+  val lastMsgReceiptTime: OptField[TypoInstant, Row]
   val latestEndLsn: OptField[/* pg_lsn */ Long, Row]
-  val latestEndTime: OptField[TypoOffsetDateTime, Row]
+  val latestEndTime: OptField[TypoInstant, Row]
 }
 object PgStatSubscriptionViewFields extends PgStatSubscriptionViewStructure[PgStatSubscriptionViewRow](None, identity, (_, x) => x)
 

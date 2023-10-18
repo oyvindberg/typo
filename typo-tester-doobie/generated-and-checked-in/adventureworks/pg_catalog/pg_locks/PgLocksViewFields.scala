@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_locks
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.OptField
@@ -28,7 +28,7 @@ trait PgLocksViewFields[Row] {
   val mode: OptField[String, Row]
   val granted: OptField[Boolean, Row]
   val fastpath: OptField[Boolean, Row]
-  val waitstart: OptField[TypoOffsetDateTime, Row]
+  val waitstart: OptField[TypoInstant, Row]
 }
 object PgLocksViewFields extends PgLocksViewStructure[PgLocksViewRow](None, identity, (_, x) => x)
 

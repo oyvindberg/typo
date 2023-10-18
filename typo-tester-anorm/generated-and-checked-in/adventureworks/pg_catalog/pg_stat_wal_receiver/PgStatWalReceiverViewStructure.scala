@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal_receiver
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -23,10 +23,10 @@ class PgStatWalReceiverViewStructure[Row](val prefix: Option[String], val extrac
   override val writtenLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "written_lsn", None, None)(x => extract(x).writtenLsn, (row, value) => merge(row, extract(row).copy(writtenLsn = value)))
   override val flushedLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "flushed_lsn", None, None)(x => extract(x).flushedLsn, (row, value) => merge(row, extract(row).copy(flushedLsn = value)))
   override val receivedTli = new OptField[Int, Row](prefix, "received_tli", None, None)(x => extract(x).receivedTli, (row, value) => merge(row, extract(row).copy(receivedTli = value)))
-  override val lastMsgSendTime = new OptField[TypoOffsetDateTime, Row](prefix, "last_msg_send_time", Some("text"), None)(x => extract(x).lastMsgSendTime, (row, value) => merge(row, extract(row).copy(lastMsgSendTime = value)))
-  override val lastMsgReceiptTime = new OptField[TypoOffsetDateTime, Row](prefix, "last_msg_receipt_time", Some("text"), None)(x => extract(x).lastMsgReceiptTime, (row, value) => merge(row, extract(row).copy(lastMsgReceiptTime = value)))
+  override val lastMsgSendTime = new OptField[TypoInstant, Row](prefix, "last_msg_send_time", Some("text"), None)(x => extract(x).lastMsgSendTime, (row, value) => merge(row, extract(row).copy(lastMsgSendTime = value)))
+  override val lastMsgReceiptTime = new OptField[TypoInstant, Row](prefix, "last_msg_receipt_time", Some("text"), None)(x => extract(x).lastMsgReceiptTime, (row, value) => merge(row, extract(row).copy(lastMsgReceiptTime = value)))
   override val latestEndLsn = new OptField[/* pg_lsn */ Long, Row](prefix, "latest_end_lsn", None, None)(x => extract(x).latestEndLsn, (row, value) => merge(row, extract(row).copy(latestEndLsn = value)))
-  override val latestEndTime = new OptField[TypoOffsetDateTime, Row](prefix, "latest_end_time", Some("text"), None)(x => extract(x).latestEndTime, (row, value) => merge(row, extract(row).copy(latestEndTime = value)))
+  override val latestEndTime = new OptField[TypoInstant, Row](prefix, "latest_end_time", Some("text"), None)(x => extract(x).latestEndTime, (row, value) => merge(row, extract(row).copy(latestEndTime = value)))
   override val slotName = new OptField[String, Row](prefix, "slot_name", None, None)(x => extract(x).slotName, (row, value) => merge(row, extract(row).copy(slotName = value)))
   override val senderHost = new OptField[String, Row](prefix, "sender_host", None, None)(x => extract(x).senderHost, (row, value) => merge(row, extract(row).copy(senderHost = value)))
   override val senderPort = new OptField[Int, Row](prefix, "sender_port", None, None)(x => extract(x).senderPort, (row, value) => merge(row, extract(row).copy(senderPort = value)))

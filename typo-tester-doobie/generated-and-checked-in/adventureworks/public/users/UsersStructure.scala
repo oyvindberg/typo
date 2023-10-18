@@ -7,7 +7,7 @@ package adventureworks
 package public
 package users
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -24,8 +24,8 @@ class UsersStructure[Row](val prefix: Option[String], val extract: Row => UsersR
   override val lastName = new OptField[String, Row](prefix, "last_name", None, None)(x => extract(x).lastName, (row, value) => merge(row, extract(row).copy(lastName = value)))
   override val email = new Field[TypoUnknownCitext, Row](prefix, "email", Some("text"), Some("citext"))(x => extract(x).email, (row, value) => merge(row, extract(row).copy(email = value)))
   override val password = new Field[String, Row](prefix, "password", None, None)(x => extract(x).password, (row, value) => merge(row, extract(row).copy(password = value)))
-  override val createdAt = new Field[TypoOffsetDateTime, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(x => extract(x).createdAt, (row, value) => merge(row, extract(row).copy(createdAt = value)))
-  override val verifiedOn = new OptField[TypoOffsetDateTime, Row](prefix, "verified_on", Some("text"), Some("timestamptz"))(x => extract(x).verifiedOn, (row, value) => merge(row, extract(row).copy(verifiedOn = value)))
+  override val createdAt = new Field[TypoInstant, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(x => extract(x).createdAt, (row, value) => merge(row, extract(row).copy(createdAt = value)))
+  override val verifiedOn = new OptField[TypoInstant, Row](prefix, "verified_on", Some("text"), Some("timestamptz"))(x => extract(x).verifiedOn, (row, value) => merge(row, extract(row).copy(verifiedOn = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](userId, name, lastName, email, password, createdAt, verifiedOn)

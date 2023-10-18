@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoBox
 import adventureworks.customtypes.TypoCircle
 import adventureworks.customtypes.TypoHStore
 import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoInterval
 import adventureworks.customtypes.TypoJson
 import adventureworks.customtypes.TypoJsonb
@@ -20,7 +21,6 @@ import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.customtypes.TypoMoney
-import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
@@ -50,7 +50,7 @@ class PgtestStructure[Row](val prefix: Option[String], val extract: Row => Pgtes
   override val hstore = new Field[TypoHStore, Row](prefix, "hstore", None, Some("hstore"))(x => extract(x).hstore, (row, value) => merge(row, extract(row).copy(hstore = value)))
   override val inet = new Field[TypoInet, Row](prefix, "inet", None, Some("inet"))(x => extract(x).inet, (row, value) => merge(row, extract(row).copy(inet = value)))
   override val timestamp = new Field[TypoLocalDateTime, Row](prefix, "timestamp", Some("text"), Some("timestamp"))(x => extract(x).timestamp, (row, value) => merge(row, extract(row).copy(timestamp = value)))
-  override val timestampz = new Field[TypoOffsetDateTime, Row](prefix, "timestampz", Some("text"), Some("timestamptz"))(x => extract(x).timestampz, (row, value) => merge(row, extract(row).copy(timestampz = value)))
+  override val timestampz = new Field[TypoInstant, Row](prefix, "timestampz", Some("text"), Some("timestamptz"))(x => extract(x).timestampz, (row, value) => merge(row, extract(row).copy(timestampz = value)))
   override val time = new Field[TypoLocalTime, Row](prefix, "time", Some("text"), Some("time"))(x => extract(x).time, (row, value) => merge(row, extract(row).copy(time = value)))
   override val timez = new Field[TypoOffsetTime, Row](prefix, "timez", Some("text"), Some("timetz"))(x => extract(x).timez, (row, value) => merge(row, extract(row).copy(timez = value)))
   override val date = new Field[TypoLocalDate, Row](prefix, "date", Some("text"), Some("date"))(x => extract(x).date, (row, value) => merge(row, extract(row).copy(date = value)))
@@ -71,7 +71,7 @@ class PgtestStructure[Row](val prefix: Option[String], val extract: Row => Pgtes
   override val hstores = new Field[Array[TypoHStore], Row](prefix, "hstores", None, Some("_hstore"))(x => extract(x).hstores, (row, value) => merge(row, extract(row).copy(hstores = value)))
   override val inets = new Field[Array[TypoInet], Row](prefix, "inets", None, Some("_inet"))(x => extract(x).inets, (row, value) => merge(row, extract(row).copy(inets = value)))
   override val timestamps = new Field[Array[TypoLocalDateTime], Row](prefix, "timestamps", Some("text[]"), Some("_timestamp"))(x => extract(x).timestamps, (row, value) => merge(row, extract(row).copy(timestamps = value)))
-  override val timestampzs = new Field[Array[TypoOffsetDateTime], Row](prefix, "timestampzs", Some("text[]"), Some("_timestamptz"))(x => extract(x).timestampzs, (row, value) => merge(row, extract(row).copy(timestampzs = value)))
+  override val timestampzs = new Field[Array[TypoInstant], Row](prefix, "timestampzs", Some("text[]"), Some("_timestamptz"))(x => extract(x).timestampzs, (row, value) => merge(row, extract(row).copy(timestampzs = value)))
   override val times = new Field[Array[TypoLocalTime], Row](prefix, "times", Some("text[]"), Some("_time"))(x => extract(x).times, (row, value) => merge(row, extract(row).copy(times = value)))
   override val timezs = new Field[Array[TypoOffsetTime], Row](prefix, "timezs", Some("text[]"), Some("_timetz"))(x => extract(x).timezs, (row, value) => merge(row, extract(row).copy(timezs = value)))
   override val dates = new Field[Array[TypoLocalDate], Row](prefix, "dates", Some("text[]"), Some("_date"))(x => extract(x).dates, (row, value) => merge(row, extract(row).copy(dates = value)))

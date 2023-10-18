@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_sys_tables
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_class.PgClassId
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -32,10 +32,10 @@ class PgStatSysTablesViewStructure[Row](val prefix: Option[String], val extract:
   override val nDeadTup = new OptField[/* nullability unknown */ Long, Row](prefix, "n_dead_tup", None, None)(x => extract(x).nDeadTup, (row, value) => merge(row, extract(row).copy(nDeadTup = value)))
   override val nModSinceAnalyze = new OptField[/* nullability unknown */ Long, Row](prefix, "n_mod_since_analyze", None, None)(x => extract(x).nModSinceAnalyze, (row, value) => merge(row, extract(row).copy(nModSinceAnalyze = value)))
   override val nInsSinceVacuum = new OptField[/* nullability unknown */ Long, Row](prefix, "n_ins_since_vacuum", None, None)(x => extract(x).nInsSinceVacuum, (row, value) => merge(row, extract(row).copy(nInsSinceVacuum = value)))
-  override val lastVacuum = new OptField[/* nullability unknown */ TypoOffsetDateTime, Row](prefix, "last_vacuum", Some("text"), None)(x => extract(x).lastVacuum, (row, value) => merge(row, extract(row).copy(lastVacuum = value)))
-  override val lastAutovacuum = new OptField[/* nullability unknown */ TypoOffsetDateTime, Row](prefix, "last_autovacuum", Some("text"), None)(x => extract(x).lastAutovacuum, (row, value) => merge(row, extract(row).copy(lastAutovacuum = value)))
-  override val lastAnalyze = new OptField[/* nullability unknown */ TypoOffsetDateTime, Row](prefix, "last_analyze", Some("text"), None)(x => extract(x).lastAnalyze, (row, value) => merge(row, extract(row).copy(lastAnalyze = value)))
-  override val lastAutoanalyze = new OptField[/* nullability unknown */ TypoOffsetDateTime, Row](prefix, "last_autoanalyze", Some("text"), None)(x => extract(x).lastAutoanalyze, (row, value) => merge(row, extract(row).copy(lastAutoanalyze = value)))
+  override val lastVacuum = new OptField[/* nullability unknown */ TypoInstant, Row](prefix, "last_vacuum", Some("text"), None)(x => extract(x).lastVacuum, (row, value) => merge(row, extract(row).copy(lastVacuum = value)))
+  override val lastAutovacuum = new OptField[/* nullability unknown */ TypoInstant, Row](prefix, "last_autovacuum", Some("text"), None)(x => extract(x).lastAutovacuum, (row, value) => merge(row, extract(row).copy(lastAutovacuum = value)))
+  override val lastAnalyze = new OptField[/* nullability unknown */ TypoInstant, Row](prefix, "last_analyze", Some("text"), None)(x => extract(x).lastAnalyze, (row, value) => merge(row, extract(row).copy(lastAnalyze = value)))
+  override val lastAutoanalyze = new OptField[/* nullability unknown */ TypoInstant, Row](prefix, "last_autoanalyze", Some("text"), None)(x => extract(x).lastAutoanalyze, (row, value) => merge(row, extract(row).copy(lastAutoanalyze = value)))
   override val vacuumCount = new OptField[/* nullability unknown */ Long, Row](prefix, "vacuum_count", None, None)(x => extract(x).vacuumCount, (row, value) => merge(row, extract(row).copy(vacuumCount = value)))
   override val autovacuumCount = new OptField[/* nullability unknown */ Long, Row](prefix, "autovacuum_count", None, None)(x => extract(x).autovacuumCount, (row, value) => merge(row, extract(row).copy(autovacuumCount = value)))
   override val analyzeCount = new OptField[/* nullability unknown */ Long, Row](prefix, "analyze_count", None, None)(x => extract(x).analyzeCount, (row, value) => merge(row, extract(row).copy(analyzeCount = value)))

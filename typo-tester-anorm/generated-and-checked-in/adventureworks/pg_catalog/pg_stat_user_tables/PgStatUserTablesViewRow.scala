@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_user_tables
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_class.PgClassId
 import anorm.Column
 import anorm.RowParser
@@ -53,13 +53,13 @@ case class PgStatUserTablesViewRow(
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.nInsSinceVacuum]] */
   nInsSinceVacuum: Option[/* nullability unknown */ Long],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastVacuum]] */
-  lastVacuum: Option[/* nullability unknown */ TypoOffsetDateTime],
+  lastVacuum: Option[/* nullability unknown */ TypoInstant],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAutovacuum]] */
-  lastAutovacuum: Option[/* nullability unknown */ TypoOffsetDateTime],
+  lastAutovacuum: Option[/* nullability unknown */ TypoInstant],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAnalyze]] */
-  lastAnalyze: Option[/* nullability unknown */ TypoOffsetDateTime],
+  lastAnalyze: Option[/* nullability unknown */ TypoInstant],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAutoanalyze]] */
-  lastAutoanalyze: Option[/* nullability unknown */ TypoOffsetDateTime],
+  lastAutoanalyze: Option[/* nullability unknown */ TypoInstant],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.vacuumCount]] */
   vacuumCount: Option[/* nullability unknown */ Long],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.autovacuumCount]] */
@@ -89,10 +89,10 @@ object PgStatUserTablesViewRow {
           nDeadTup = json.\("n_dead_tup").toOption.map(_.as(Reads.LongReads)),
           nModSinceAnalyze = json.\("n_mod_since_analyze").toOption.map(_.as(Reads.LongReads)),
           nInsSinceVacuum = json.\("n_ins_since_vacuum").toOption.map(_.as(Reads.LongReads)),
-          lastVacuum = json.\("last_vacuum").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          lastAutovacuum = json.\("last_autovacuum").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          lastAnalyze = json.\("last_analyze").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          lastAutoanalyze = json.\("last_autoanalyze").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastVacuum = json.\("last_vacuum").toOption.map(_.as(TypoInstant.reads)),
+          lastAutovacuum = json.\("last_autovacuum").toOption.map(_.as(TypoInstant.reads)),
+          lastAnalyze = json.\("last_analyze").toOption.map(_.as(TypoInstant.reads)),
+          lastAutoanalyze = json.\("last_autoanalyze").toOption.map(_.as(TypoInstant.reads)),
           vacuumCount = json.\("vacuum_count").toOption.map(_.as(Reads.LongReads)),
           autovacuumCount = json.\("autovacuum_count").toOption.map(_.as(Reads.LongReads)),
           analyzeCount = json.\("analyze_count").toOption.map(_.as(Reads.LongReads)),
@@ -119,10 +119,10 @@ object PgStatUserTablesViewRow {
         nDeadTup = row(idx + 12)(Column.columnToOption(Column.columnToLong)),
         nModSinceAnalyze = row(idx + 13)(Column.columnToOption(Column.columnToLong)),
         nInsSinceVacuum = row(idx + 14)(Column.columnToOption(Column.columnToLong)),
-        lastVacuum = row(idx + 15)(Column.columnToOption(TypoOffsetDateTime.column)),
-        lastAutovacuum = row(idx + 16)(Column.columnToOption(TypoOffsetDateTime.column)),
-        lastAnalyze = row(idx + 17)(Column.columnToOption(TypoOffsetDateTime.column)),
-        lastAutoanalyze = row(idx + 18)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastVacuum = row(idx + 15)(Column.columnToOption(TypoInstant.column)),
+        lastAutovacuum = row(idx + 16)(Column.columnToOption(TypoInstant.column)),
+        lastAnalyze = row(idx + 17)(Column.columnToOption(TypoInstant.column)),
+        lastAutoanalyze = row(idx + 18)(Column.columnToOption(TypoInstant.column)),
         vacuumCount = row(idx + 19)(Column.columnToOption(Column.columnToLong)),
         autovacuumCount = row(idx + 20)(Column.columnToOption(Column.columnToLong)),
         analyzeCount = row(idx + 21)(Column.columnToOption(Column.columnToLong)),
@@ -147,10 +147,10 @@ object PgStatUserTablesViewRow {
       "n_dead_tup" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nDeadTup),
       "n_mod_since_analyze" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nModSinceAnalyze),
       "n_ins_since_vacuum" -> Writes.OptionWrites(Writes.LongWrites).writes(o.nInsSinceVacuum),
-      "last_vacuum" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastVacuum),
-      "last_autovacuum" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastAutovacuum),
-      "last_analyze" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastAnalyze),
-      "last_autoanalyze" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastAutoanalyze),
+      "last_vacuum" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastVacuum),
+      "last_autovacuum" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastAutovacuum),
+      "last_analyze" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastAnalyze),
+      "last_autoanalyze" -> Writes.OptionWrites(TypoInstant.writes).writes(o.lastAutoanalyze),
       "vacuum_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.vacuumCount),
       "autovacuum_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.autovacuumCount),
       "analyze_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.analyzeCount),

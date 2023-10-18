@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_bgwriter
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatBgwriterViewFields[Row] {
@@ -21,7 +21,7 @@ trait PgStatBgwriterViewFields[Row] {
   val buffersBackend: OptField[Long, Row]
   val buffersBackendFsync: OptField[Long, Row]
   val buffersAlloc: OptField[Long, Row]
-  val statsReset: OptField[TypoOffsetDateTime, Row]
+  val statsReset: OptField[TypoInstant, Row]
 }
 object PgStatBgwriterViewFields extends PgStatBgwriterViewStructure[PgStatBgwriterViewRow](None, identity, (_, x) => x)
 

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_shadow
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import doobie.enumerated.Nullability
 import doobie.util.Read
@@ -32,14 +32,14 @@ case class PgShadowViewRow(
   /** Points to [[pg_authid.PgAuthidRow.rolpassword]] */
   passwd: Option[String],
   /** Points to [[pg_authid.PgAuthidRow.rolvaliduntil]] */
-  valuntil: Option[TypoOffsetDateTime],
+  valuntil: Option[TypoInstant],
   /** Points to [[pg_db_role_setting.PgDbRoleSettingRow.setconfig]] */
   useconfig: Option[Array[String]]
 )
 
 object PgShadowViewRow {
-  implicit lazy val decoder: Decoder[PgShadowViewRow] = Decoder.forProduct9[PgShadowViewRow, String, PgAuthidId, Boolean, Boolean, Boolean, Boolean, Option[String], Option[TypoOffsetDateTime], Option[Array[String]]]("usename", "usesysid", "usecreatedb", "usesuper", "userepl", "usebypassrls", "passwd", "valuntil", "useconfig")(PgShadowViewRow.apply)(Decoder.decodeString, PgAuthidId.decoder, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
-  implicit lazy val encoder: Encoder[PgShadowViewRow] = Encoder.forProduct9[PgShadowViewRow, String, PgAuthidId, Boolean, Boolean, Boolean, Boolean, Option[String], Option[TypoOffsetDateTime], Option[Array[String]]]("usename", "usesysid", "usecreatedb", "usesuper", "userepl", "usebypassrls", "passwd", "valuntil", "useconfig")(x => (x.usename, x.usesysid, x.usecreatedb, x.usesuper, x.userepl, x.usebypassrls, x.passwd, x.valuntil, x.useconfig))(Encoder.encodeString, PgAuthidId.encoder, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
+  implicit lazy val decoder: Decoder[PgShadowViewRow] = Decoder.forProduct9[PgShadowViewRow, String, PgAuthidId, Boolean, Boolean, Boolean, Boolean, Option[String], Option[TypoInstant], Option[Array[String]]]("usename", "usesysid", "usecreatedb", "usesuper", "userepl", "usebypassrls", "passwd", "valuntil", "useconfig")(PgShadowViewRow.apply)(Decoder.decodeString, PgAuthidId.decoder, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInstant.decoder), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgShadowViewRow] = Encoder.forProduct9[PgShadowViewRow, String, PgAuthidId, Boolean, Boolean, Boolean, Boolean, Option[String], Option[TypoInstant], Option[Array[String]]]("usename", "usesysid", "usecreatedb", "usesuper", "userepl", "usebypassrls", "passwd", "valuntil", "useconfig")(x => (x.usename, x.usesysid, x.usecreatedb, x.usesuper, x.userepl, x.usebypassrls, x.passwd, x.valuntil, x.useconfig))(Encoder.encodeString, PgAuthidId.encoder, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInstant.encoder), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit lazy val read: Read[PgShadowViewRow] = new Read[PgShadowViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.NoNulls),
@@ -49,7 +49,7 @@ object PgShadowViewRow {
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoInstant.get, Nullability.Nullable),
       (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgShadowViewRow(
@@ -60,7 +60,7 @@ object PgShadowViewRow {
       userepl = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 4),
       usebypassrls = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 5),
       passwd = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      valuntil = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 7),
+      valuntil = TypoInstant.get.unsafeGetNullable(rs, i + 7),
       useconfig = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 8)
     )
   )

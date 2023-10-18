@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_shadow
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import anorm.Column
 import anorm.RowParser
@@ -37,7 +37,7 @@ case class PgShadowViewRow(
   /** Points to [[pg_authid.PgAuthidRow.rolpassword]] */
   passwd: Option[String],
   /** Points to [[pg_authid.PgAuthidRow.rolvaliduntil]] */
-  valuntil: Option[TypoOffsetDateTime],
+  valuntil: Option[TypoInstant],
   /** Points to [[pg_db_role_setting.PgDbRoleSettingRow.setconfig]] */
   useconfig: Option[Array[String]]
 )
@@ -53,7 +53,7 @@ object PgShadowViewRow {
           userepl = json.\("userepl").as(Reads.BooleanReads),
           usebypassrls = json.\("usebypassrls").as(Reads.BooleanReads),
           passwd = json.\("passwd").toOption.map(_.as(Reads.StringReads)),
-          valuntil = json.\("valuntil").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          valuntil = json.\("valuntil").toOption.map(_.as(TypoInstant.reads)),
           useconfig = json.\("useconfig").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
@@ -69,7 +69,7 @@ object PgShadowViewRow {
         userepl = row(idx + 4)(Column.columnToBoolean),
         usebypassrls = row(idx + 5)(Column.columnToBoolean),
         passwd = row(idx + 6)(Column.columnToOption(Column.columnToString)),
-        valuntil = row(idx + 7)(Column.columnToOption(TypoOffsetDateTime.column)),
+        valuntil = row(idx + 7)(Column.columnToOption(TypoInstant.column)),
         useconfig = row(idx + 8)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
@@ -83,7 +83,7 @@ object PgShadowViewRow {
       "userepl" -> Writes.BooleanWrites.writes(o.userepl),
       "usebypassrls" -> Writes.BooleanWrites.writes(o.usebypassrls),
       "passwd" -> Writes.OptionWrites(Writes.StringWrites).writes(o.passwd),
-      "valuntil" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.valuntil),
+      "valuntil" -> Writes.OptionWrites(TypoInstant.writes).writes(o.valuntil),
       "useconfig" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.useconfig)
     ))
   )

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_replication_slots
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatReplicationSlotsViewFields[Row] {
@@ -20,7 +20,7 @@ trait PgStatReplicationSlotsViewFields[Row] {
   val streamBytes: OptField[Long, Row]
   val totalTxns: OptField[Long, Row]
   val totalBytes: OptField[Long, Row]
-  val statsReset: OptField[TypoOffsetDateTime, Row]
+  val statsReset: OptField[TypoInstant, Row]
 }
 object PgStatReplicationSlotsViewFields extends PgStatReplicationSlotsViewStructure[PgStatReplicationSlotsViewRow](None, identity, (_, x) => x)
 

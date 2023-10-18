@@ -8,8 +8,8 @@ package pg_catalog
 package pg_stat_replication
 
 import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoInterval
-import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.OptField
 
@@ -21,7 +21,7 @@ trait PgStatReplicationViewFields[Row] {
   val clientAddr: OptField[TypoInet, Row]
   val clientHostname: OptField[String, Row]
   val clientPort: OptField[Int, Row]
-  val backendStart: OptField[TypoOffsetDateTime, Row]
+  val backendStart: OptField[TypoInstant, Row]
   val backendXmin: OptField[TypoXid, Row]
   val state: OptField[String, Row]
   val sentLsn: OptField[/* pg_lsn */ Long, Row]
@@ -33,7 +33,7 @@ trait PgStatReplicationViewFields[Row] {
   val replayLag: OptField[TypoInterval, Row]
   val syncPriority: OptField[Int, Row]
   val syncState: OptField[String, Row]
-  val replyTime: OptField[TypoOffsetDateTime, Row]
+  val replyTime: OptField[TypoInstant, Row]
 }
 object PgStatReplicationViewFields extends PgStatReplicationViewStructure[PgStatReplicationViewRow](None, identity, (_, x) => x)
 

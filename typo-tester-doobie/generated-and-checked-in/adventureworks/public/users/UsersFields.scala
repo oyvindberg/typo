@@ -7,7 +7,7 @@ package adventureworks
 package public
 package users
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
@@ -19,8 +19,8 @@ trait UsersFields[Row] {
   val lastName: OptField[String, Row]
   val email: Field[TypoUnknownCitext, Row]
   val password: Field[String, Row]
-  val createdAt: Field[TypoOffsetDateTime, Row]
-  val verifiedOn: OptField[TypoOffsetDateTime, Row]
+  val createdAt: Field[TypoInstant, Row]
+  val verifiedOn: OptField[TypoInstant, Row]
 }
 object UsersFields extends UsersStructure[UsersRow](None, identity, (_, x) => x)
 

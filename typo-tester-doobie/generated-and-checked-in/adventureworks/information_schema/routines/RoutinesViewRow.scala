@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package routines
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -74,8 +74,8 @@ case class RoutinesViewRow(
   toSqlSpecificSchema: /* nullability unknown */ Option[String],
   toSqlSpecificName: /* nullability unknown */ Option[String],
   asLocator: /* nullability unknown */ Option[/* max 3 chars */ String],
-  created: /* nullability unknown */ Option[TypoOffsetDateTime],
-  lastAltered: /* nullability unknown */ Option[TypoOffsetDateTime],
+  created: /* nullability unknown */ Option[TypoInstant],
+  lastAltered: /* nullability unknown */ Option[TypoInstant],
   newSavepointLevel: /* nullability unknown */ Option[/* max 3 chars */ String],
   isUdtDependent: /* nullability unknown */ Option[/* max 3 chars */ String],
   resultCastFromDataType: /* nullability unknown */ Option[String],
@@ -166,8 +166,8 @@ object RoutinesViewRow {
         toSqlSpecificSchema = orThrow(c.get("to_sql_specific_schema")(Decoder.decodeOption(Decoder.decodeString))),
         toSqlSpecificName = orThrow(c.get("to_sql_specific_name")(Decoder.decodeOption(Decoder.decodeString))),
         asLocator = orThrow(c.get("as_locator")(Decoder.decodeOption(Decoder.decodeString))),
-        created = orThrow(c.get("created")(Decoder.decodeOption(TypoOffsetDateTime.decoder))),
-        lastAltered = orThrow(c.get("last_altered")(Decoder.decodeOption(TypoOffsetDateTime.decoder))),
+        created = orThrow(c.get("created")(Decoder.decodeOption(TypoInstant.decoder))),
+        lastAltered = orThrow(c.get("last_altered")(Decoder.decodeOption(TypoInstant.decoder))),
         newSavepointLevel = orThrow(c.get("new_savepoint_level")(Decoder.decodeOption(Decoder.decodeString))),
         isUdtDependent = orThrow(c.get("is_udt_dependent")(Decoder.decodeOption(Decoder.decodeString))),
         resultCastFromDataType = orThrow(c.get("result_cast_from_data_type")(Decoder.decodeOption(Decoder.decodeString))),
@@ -253,8 +253,8 @@ object RoutinesViewRow {
       "to_sql_specific_schema" -> Encoder.encodeOption(Encoder.encodeString).apply(row.toSqlSpecificSchema),
       "to_sql_specific_name" -> Encoder.encodeOption(Encoder.encodeString).apply(row.toSqlSpecificName),
       "as_locator" -> Encoder.encodeOption(Encoder.encodeString).apply(row.asLocator),
-      "created" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.created),
-      "last_altered" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.lastAltered),
+      "created" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.created),
+      "last_altered" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.lastAltered),
       "new_savepoint_level" -> Encoder.encodeOption(Encoder.encodeString).apply(row.newSavepointLevel),
       "is_udt_dependent" -> Encoder.encodeOption(Encoder.encodeString).apply(row.isUdtDependent),
       "result_cast_from_data_type" -> Encoder.encodeOption(Encoder.encodeString).apply(row.resultCastFromDataType),
@@ -339,8 +339,8 @@ object RoutinesViewRow {
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoInstant.get, Nullability.Nullable),
+      (TypoInstant.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),
@@ -423,8 +423,8 @@ object RoutinesViewRow {
       toSqlSpecificSchema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 51),
       toSqlSpecificName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 52),
       asLocator = Meta.StringMeta.get.unsafeGetNullable(rs, i + 53),
-      created = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 54),
-      lastAltered = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 55),
+      created = TypoInstant.get.unsafeGetNullable(rs, i + 54),
+      lastAltered = TypoInstant.get.unsafeGetNullable(rs, i + 55),
       newSavepointLevel = Meta.StringMeta.get.unsafeGetNullable(rs, i + 56),
       isUdtDependent = Meta.StringMeta.get.unsafeGetNullable(rs, i + 57),
       resultCastFromDataType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 58),

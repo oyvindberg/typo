@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -24,7 +24,7 @@ trait PgAuthidFields[Row] {
   val rolbypassrls: Field[Boolean, Row]
   val rolconnlimit: Field[Int, Row]
   val rolpassword: OptField[String, Row]
-  val rolvaliduntil: OptField[TypoOffsetDateTime, Row]
+  val rolvaliduntil: OptField[TypoInstant, Row]
 }
 object PgAuthidFields extends PgAuthidStructure[PgAuthidRow](None, identity, (_, x) => x)
 

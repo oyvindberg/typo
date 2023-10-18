@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_bgwriter
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -26,7 +26,7 @@ class PgStatBgwriterViewStructure[Row](val prefix: Option[String], val extract: 
   override val buffersBackend = new OptField[Long, Row](prefix, "buffers_backend", None, None)(x => extract(x).buffersBackend, (row, value) => merge(row, extract(row).copy(buffersBackend = value)))
   override val buffersBackendFsync = new OptField[Long, Row](prefix, "buffers_backend_fsync", None, None)(x => extract(x).buffersBackendFsync, (row, value) => merge(row, extract(row).copy(buffersBackendFsync = value)))
   override val buffersAlloc = new OptField[Long, Row](prefix, "buffers_alloc", None, None)(x => extract(x).buffersAlloc, (row, value) => merge(row, extract(row).copy(buffersAlloc = value)))
-  override val statsReset = new OptField[TypoOffsetDateTime, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
+  override val statsReset = new OptField[TypoInstant, Row](prefix, "stats_reset", Some("text"), None)(x => extract(x).statsReset, (row, value) => merge(row, extract(row).copy(statsReset = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](checkpointsTimed, checkpointsReq, checkpointWriteTime, checkpointSyncTime, buffersCheckpoint, buffersClean, maxwrittenClean, buffersBackend, buffersBackendFsync, buffersAlloc, statsReset)

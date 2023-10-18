@@ -7,14 +7,14 @@ package adventureworks
 package pg_catalog
 package pg_prepared_xacts
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoXid
 import typo.dsl.SqlExpr.OptField
 
 trait PgPreparedXactsViewFields[Row] {
   val transaction: OptField[TypoXid, Row]
   val gid: OptField[String, Row]
-  val prepared: OptField[TypoOffsetDateTime, Row]
+  val prepared: OptField[TypoInstant, Row]
   val owner: OptField[String, Row]
   val database: OptField[String, Row]
 }

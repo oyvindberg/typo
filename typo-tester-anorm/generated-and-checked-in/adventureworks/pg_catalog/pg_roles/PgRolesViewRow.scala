@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_roles
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.pg_catalog.pg_authid.PgAuthidId
 import anorm.Column
 import anorm.RowParser
@@ -40,7 +40,7 @@ case class PgRolesViewRow(
   rolconnlimit: Int,
   rolpassword: /* nullability unknown */ Option[String],
   /** Points to [[pg_authid.PgAuthidRow.rolvaliduntil]] */
-  rolvaliduntil: Option[TypoOffsetDateTime],
+  rolvaliduntil: Option[TypoInstant],
   /** Points to [[pg_authid.PgAuthidRow.rolbypassrls]] */
   rolbypassrls: Boolean,
   /** Points to [[pg_db_role_setting.PgDbRoleSettingRow.setconfig]] */
@@ -62,7 +62,7 @@ object PgRolesViewRow {
           rolreplication = json.\("rolreplication").as(Reads.BooleanReads),
           rolconnlimit = json.\("rolconnlimit").as(Reads.IntReads),
           rolpassword = json.\("rolpassword").toOption.map(_.as(Reads.StringReads)),
-          rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          rolvaliduntil = json.\("rolvaliduntil").toOption.map(_.as(TypoInstant.reads)),
           rolbypassrls = json.\("rolbypassrls").as(Reads.BooleanReads),
           rolconfig = json.\("rolconfig").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
           oid = json.\("oid").as(PgAuthidId.reads)
@@ -82,7 +82,7 @@ object PgRolesViewRow {
         rolreplication = row(idx + 6)(Column.columnToBoolean),
         rolconnlimit = row(idx + 7)(Column.columnToInt),
         rolpassword = row(idx + 8)(Column.columnToOption(Column.columnToString)),
-        rolvaliduntil = row(idx + 9)(Column.columnToOption(TypoOffsetDateTime.column)),
+        rolvaliduntil = row(idx + 9)(Column.columnToOption(TypoInstant.column)),
         rolbypassrls = row(idx + 10)(Column.columnToBoolean),
         rolconfig = row(idx + 11)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
         oid = row(idx + 12)(PgAuthidId.column)
@@ -100,7 +100,7 @@ object PgRolesViewRow {
       "rolreplication" -> Writes.BooleanWrites.writes(o.rolreplication),
       "rolconnlimit" -> Writes.IntWrites.writes(o.rolconnlimit),
       "rolpassword" -> Writes.OptionWrites(Writes.StringWrites).writes(o.rolpassword),
-      "rolvaliduntil" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.rolvaliduntil),
+      "rolvaliduntil" -> Writes.OptionWrites(TypoInstant.writes).writes(o.rolvaliduntil),
       "rolbypassrls" -> Writes.BooleanWrites.writes(o.rolbypassrls),
       "rolconfig" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.rolconfig),
       "oid" -> PgAuthidId.writes.writes(o.oid)

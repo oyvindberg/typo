@@ -16,8 +16,8 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
         lastName = Some("last_name"),
         email = TypoUnknownCitext("email@asd.no"),
         password = "password",
-        verifiedOn = Some(TypoOffsetDateTime.now),
-        createdAt = Defaulted.Provided(TypoOffsetDateTime.now)
+        verifiedOn = Some(TypoInstant.now),
+        createdAt = Defaulted.Provided(TypoInstant.now)
       )
       val _ = usersRepo.insert(unsaved)
       val actual = usersRepo.select.where(p => p.userId === unsaved.userId).toList

@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_prepared_statements
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoRegtype
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
@@ -19,7 +19,7 @@ class PgPreparedStatementsViewStructure[Row](val prefix: Option[String], val ext
 
   override val name = new OptField[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val statement = new OptField[String, Row](prefix, "statement", None, None)(x => extract(x).statement, (row, value) => merge(row, extract(row).copy(statement = value)))
-  override val prepareTime = new OptField[TypoOffsetDateTime, Row](prefix, "prepare_time", Some("text"), None)(x => extract(x).prepareTime, (row, value) => merge(row, extract(row).copy(prepareTime = value)))
+  override val prepareTime = new OptField[TypoInstant, Row](prefix, "prepare_time", Some("text"), None)(x => extract(x).prepareTime, (row, value) => merge(row, extract(row).copy(prepareTime = value)))
   override val parameterTypes = new OptField[Array[TypoRegtype], Row](prefix, "parameter_types", None, None)(x => extract(x).parameterTypes, (row, value) => merge(row, extract(row).copy(parameterTypes = value)))
   override val fromSql = new OptField[Boolean, Row](prefix, "from_sql", None, None)(x => extract(x).fromSql, (row, value) => merge(row, extract(row).copy(fromSql = value)))
   override val genericPlans = new OptField[Long, Row](prefix, "generic_plans", None, None)(x => extract(x).genericPlans, (row, value) => merge(row, extract(row).copy(genericPlans = value)))

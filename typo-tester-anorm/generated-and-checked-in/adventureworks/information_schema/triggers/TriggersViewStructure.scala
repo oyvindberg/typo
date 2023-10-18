@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package triggers
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -32,7 +32,7 @@ class TriggersViewStructure[Row](val prefix: Option[String], val extract: Row =>
   override val actionReferenceNewTable = new OptField[String, Row](prefix, "action_reference_new_table", None, None)(x => extract(x).actionReferenceNewTable, (row, value) => merge(row, extract(row).copy(actionReferenceNewTable = value)))
   override val actionReferenceOldRow = new OptField[String, Row](prefix, "action_reference_old_row", None, None)(x => extract(x).actionReferenceOldRow, (row, value) => merge(row, extract(row).copy(actionReferenceOldRow = value)))
   override val actionReferenceNewRow = new OptField[String, Row](prefix, "action_reference_new_row", None, None)(x => extract(x).actionReferenceNewRow, (row, value) => merge(row, extract(row).copy(actionReferenceNewRow = value)))
-  override val created = new OptField[TypoOffsetDateTime, Row](prefix, "created", Some("text"), None)(x => extract(x).created, (row, value) => merge(row, extract(row).copy(created = value)))
+  override val created = new OptField[TypoInstant, Row](prefix, "created", Some("text"), None)(x => extract(x).created, (row, value) => merge(row, extract(row).copy(created = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
     List[FieldLikeNoHkt[?, Row]](triggerCatalog, triggerSchema, triggerName, eventManipulation, eventObjectCatalog, eventObjectSchema, eventObjectTable, actionOrder, actionCondition, actionStatement, actionOrientation, actionTiming, actionReferenceOldTable, actionReferenceNewTable, actionReferenceOldRow, actionReferenceNewRow, created)

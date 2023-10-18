@@ -7,7 +7,7 @@ package adventureworks
 package information_schema
 package routines
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
@@ -70,8 +70,8 @@ class RoutinesViewStructure[Row](val prefix: Option[String], val extract: Row =>
   override val toSqlSpecificSchema = new OptField[String, Row](prefix, "to_sql_specific_schema", None, None)(x => extract(x).toSqlSpecificSchema, (row, value) => merge(row, extract(row).copy(toSqlSpecificSchema = value)))
   override val toSqlSpecificName = new OptField[String, Row](prefix, "to_sql_specific_name", None, None)(x => extract(x).toSqlSpecificName, (row, value) => merge(row, extract(row).copy(toSqlSpecificName = value)))
   override val asLocator = new OptField[/* max 3 chars */ String, Row](prefix, "as_locator", None, None)(x => extract(x).asLocator, (row, value) => merge(row, extract(row).copy(asLocator = value)))
-  override val created = new OptField[TypoOffsetDateTime, Row](prefix, "created", Some("text"), None)(x => extract(x).created, (row, value) => merge(row, extract(row).copy(created = value)))
-  override val lastAltered = new OptField[TypoOffsetDateTime, Row](prefix, "last_altered", Some("text"), None)(x => extract(x).lastAltered, (row, value) => merge(row, extract(row).copy(lastAltered = value)))
+  override val created = new OptField[TypoInstant, Row](prefix, "created", Some("text"), None)(x => extract(x).created, (row, value) => merge(row, extract(row).copy(created = value)))
+  override val lastAltered = new OptField[TypoInstant, Row](prefix, "last_altered", Some("text"), None)(x => extract(x).lastAltered, (row, value) => merge(row, extract(row).copy(lastAltered = value)))
   override val newSavepointLevel = new OptField[/* max 3 chars */ String, Row](prefix, "new_savepoint_level", None, None)(x => extract(x).newSavepointLevel, (row, value) => merge(row, extract(row).copy(newSavepointLevel = value)))
   override val isUdtDependent = new OptField[/* max 3 chars */ String, Row](prefix, "is_udt_dependent", None, None)(x => extract(x).isUdtDependent, (row, value) => merge(row, extract(row).copy(isUdtDependent = value)))
   override val resultCastFromDataType = new OptField[String, Row](prefix, "result_cast_from_data_type", None, None)(x => extract(x).resultCastFromDataType, (row, value) => merge(row, extract(row).copy(resultCastFromDataType = value)))

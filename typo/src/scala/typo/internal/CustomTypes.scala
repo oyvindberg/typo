@@ -114,17 +114,18 @@ class CustomTypes(pkg: sc.QIdent) {
              |""".stripMargin
     }
   )
-  lazy val TypoOffsetDateTime = CustomType(
-    comment = "This is `java.time.OffsetDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
+
+  lazy val TypoInstant = CustomType(
+    comment = "This is `java.time.TypoInstant`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
     sqlType = "timestamptz",
-    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoOffsetDateTime")),
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoInstant")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), sc.Type.OffsetDateTime, None)
+      sc.Param(sc.Ident("value"), sc.Type.Instant, None)
     ),
     isNull = p => code"$p != null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.String,
-      toTypo = (expr, target) => code"$target(${sc.Type.OffsetDateTime}.parse($expr, parser))"
+      toTypo = (expr, target) => code"$target($expr)"
     ),
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.String,
@@ -132,8 +133,9 @@ class CustomTypes(pkg: sc.QIdent) {
     ),
     objBody = Some { target =>
       code"""|val parser: ${sc.Type.DateTimeFormatter} = new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
-             |def apply(value: ${sc.Type.OffsetDateTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))  
-             |def now = $target(${sc.Type.OffsetDateTime}.now)
+             |def apply(value: ${sc.Type.Instant}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
+             |def apply(str: ${sc.Type.String}): $target = apply(${sc.Type.OffsetDateTime}.parse(str, parser).toInstant)
+             |def now = $target(${sc.Type.Instant}.now)
              |""".stripMargin
     }
   )
@@ -525,7 +527,7 @@ class CustomTypes(pkg: sc.QIdent) {
         TypoLocalDateTime,
         TypoLocalTime,
         TypoMoney,
-        TypoOffsetDateTime,
+        TypoInstant,
         TypoOffsetTime,
         TypoOidVector,
         TypoPath,

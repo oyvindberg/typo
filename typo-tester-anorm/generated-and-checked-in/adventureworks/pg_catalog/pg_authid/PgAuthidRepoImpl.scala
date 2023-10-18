@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
@@ -27,7 +27,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   }
   override def insert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow = {
     SQL"""insert into pg_catalog.pg_authid("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")
-          values (${ParameterValue(unsaved.oid, null, PgAuthidId.toStatement)}::oid, ${ParameterValue(unsaved.rolname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.rolsuper, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolinherit, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcreaterole, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcreatedb, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcanlogin, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolreplication, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolbypassrls, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolconnlimit, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.rolpassword, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.rolvaliduntil, null, ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata))}::timestamptz)
+          values (${ParameterValue(unsaved.oid, null, PgAuthidId.toStatement)}::oid, ${ParameterValue(unsaved.rolname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.rolsuper, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolinherit, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcreaterole, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcreatedb, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolcanlogin, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolreplication, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolbypassrls, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.rolconnlimit, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.rolpassword, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.rolvaliduntil, null, ToStatement.optionToStatement(TypoInstant.toStatement, TypoInstant.parameterMetadata))}::timestamptz)
           returning "oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil"::text
        """
       .executeInsert(PgAuthidRow.rowParser(1).single)
@@ -74,7 +74,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
               "rolbypassrls" = ${ParameterValue(row.rolbypassrls, null, ToStatement.booleanToStatement)},
               "rolconnlimit" = ${ParameterValue(row.rolconnlimit, null, ToStatement.intToStatement)}::int4,
               "rolpassword" = ${ParameterValue(row.rolpassword, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              "rolvaliduntil" = ${ParameterValue(row.rolvaliduntil, null, ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata))}::timestamptz
+              "rolvaliduntil" = ${ParameterValue(row.rolvaliduntil, null, ToStatement.optionToStatement(TypoInstant.toStatement, TypoInstant.parameterMetadata))}::timestamptz
           where "oid" = ${ParameterValue(oid, null, PgAuthidId.toStatement)}
        """.executeUpdate() > 0
   }
@@ -95,7 +95,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
             ${ParameterValue(unsaved.rolbypassrls, null, ToStatement.booleanToStatement)},
             ${ParameterValue(unsaved.rolconnlimit, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.rolpassword, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-            ${ParameterValue(unsaved.rolvaliduntil, null, ToStatement.optionToStatement(TypoOffsetDateTime.toStatement, TypoOffsetDateTime.parameterMetadata))}::timestamptz
+            ${ParameterValue(unsaved.rolvaliduntil, null, ToStatement.optionToStatement(TypoInstant.toStatement, TypoInstant.parameterMetadata))}::timestamptz
           )
           on conflict ("oid")
           do update set

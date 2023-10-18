@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoBox
 import adventureworks.customtypes.TypoCircle
 import adventureworks.customtypes.TypoHStore
 import adventureworks.customtypes.TypoInet
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoInterval
 import adventureworks.customtypes.TypoJson
 import adventureworks.customtypes.TypoJsonb
@@ -20,7 +21,6 @@ import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.customtypes.TypoMoney
-import adventureworks.customtypes.TypoOffsetDateTime
 import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
@@ -45,7 +45,7 @@ trait PgtestnullFields[Row] {
   val hstore: OptField[TypoHStore, Row]
   val inet: OptField[TypoInet, Row]
   val timestamp: OptField[TypoLocalDateTime, Row]
-  val timestampz: OptField[TypoOffsetDateTime, Row]
+  val timestampz: OptField[TypoInstant, Row]
   val time: OptField[TypoLocalTime, Row]
   val timez: OptField[TypoOffsetTime, Row]
   val date: OptField[TypoLocalDate, Row]
@@ -66,7 +66,7 @@ trait PgtestnullFields[Row] {
   val hstores: OptField[Array[TypoHStore], Row]
   val inets: OptField[Array[TypoInet], Row]
   val timestamps: OptField[Array[TypoLocalDateTime], Row]
-  val timestampzs: OptField[Array[TypoOffsetDateTime], Row]
+  val timestampzs: OptField[Array[TypoInstant], Row]
   val times: OptField[Array[TypoLocalTime], Row]
   val timezs: OptField[Array[TypoOffsetTime], Row]
   val dates: OptField[Array[TypoLocalDate], Row]

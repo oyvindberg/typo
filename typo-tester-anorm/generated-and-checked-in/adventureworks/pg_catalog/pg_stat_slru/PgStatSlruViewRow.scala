@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_slru
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -29,7 +29,7 @@ case class PgStatSlruViewRow(
   blksExists: /* nullability unknown */ Option[Long],
   flushes: /* nullability unknown */ Option[Long],
   truncates: /* nullability unknown */ Option[Long],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatSlruViewRow {
@@ -44,7 +44,7 @@ object PgStatSlruViewRow {
           blksExists = json.\("blks_exists").toOption.map(_.as(Reads.LongReads)),
           flushes = json.\("flushes").toOption.map(_.as(Reads.LongReads)),
           truncates = json.\("truncates").toOption.map(_.as(Reads.LongReads)),
-          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -60,7 +60,7 @@ object PgStatSlruViewRow {
         blksExists = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
         flushes = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
         truncates = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
-        statsReset = row(idx + 8)(Column.columnToOption(TypoOffsetDateTime.column))
+        statsReset = row(idx + 8)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -74,7 +74,7 @@ object PgStatSlruViewRow {
       "blks_exists" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksExists),
       "flushes" -> Writes.OptionWrites(Writes.LongWrites).writes(o.flushes),
       "truncates" -> Writes.OptionWrites(Writes.LongWrites).writes(o.truncates),
-      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
+      "stats_reset" -> Writes.OptionWrites(TypoInstant.writes).writes(o.statsReset)
     ))
   )
 }

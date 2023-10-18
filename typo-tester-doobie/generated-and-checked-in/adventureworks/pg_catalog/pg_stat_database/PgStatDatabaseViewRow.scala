@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_database
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
@@ -37,7 +37,7 @@ case class PgStatDatabaseViewRow(
   tempBytes: /* nullability unknown */ Option[Long],
   deadlocks: /* nullability unknown */ Option[Long],
   checksumFailures: /* nullability unknown */ Option[Long],
-  checksumLastFailure: /* nullability unknown */ Option[TypoOffsetDateTime],
+  checksumLastFailure: /* nullability unknown */ Option[TypoInstant],
   blkReadTime: /* nullability unknown */ Option[Double],
   blkWriteTime: /* nullability unknown */ Option[Double],
   sessionTime: /* nullability unknown */ Option[Double],
@@ -47,7 +47,7 @@ case class PgStatDatabaseViewRow(
   sessionsAbandoned: /* nullability unknown */ Option[Long],
   sessionsFatal: /* nullability unknown */ Option[Long],
   sessionsKilled: /* nullability unknown */ Option[Long],
-  statsReset: /* nullability unknown */ Option[TypoOffsetDateTime]
+  statsReset: /* nullability unknown */ Option[TypoInstant]
 )
 
 object PgStatDatabaseViewRow {
@@ -75,7 +75,7 @@ object PgStatDatabaseViewRow {
         tempBytes = orThrow(c.get("temp_bytes")(Decoder.decodeOption(Decoder.decodeLong))),
         deadlocks = orThrow(c.get("deadlocks")(Decoder.decodeOption(Decoder.decodeLong))),
         checksumFailures = orThrow(c.get("checksum_failures")(Decoder.decodeOption(Decoder.decodeLong))),
-        checksumLastFailure = orThrow(c.get("checksum_last_failure")(Decoder.decodeOption(TypoOffsetDateTime.decoder))),
+        checksumLastFailure = orThrow(c.get("checksum_last_failure")(Decoder.decodeOption(TypoInstant.decoder))),
         blkReadTime = orThrow(c.get("blk_read_time")(Decoder.decodeOption(Decoder.decodeDouble))),
         blkWriteTime = orThrow(c.get("blk_write_time")(Decoder.decodeOption(Decoder.decodeDouble))),
         sessionTime = orThrow(c.get("session_time")(Decoder.decodeOption(Decoder.decodeDouble))),
@@ -85,7 +85,7 @@ object PgStatDatabaseViewRow {
         sessionsAbandoned = orThrow(c.get("sessions_abandoned")(Decoder.decodeOption(Decoder.decodeLong))),
         sessionsFatal = orThrow(c.get("sessions_fatal")(Decoder.decodeOption(Decoder.decodeLong))),
         sessionsKilled = orThrow(c.get("sessions_killed")(Decoder.decodeOption(Decoder.decodeLong))),
-        statsReset = orThrow(c.get("stats_reset")(Decoder.decodeOption(TypoOffsetDateTime.decoder)))
+        statsReset = orThrow(c.get("stats_reset")(Decoder.decodeOption(TypoInstant.decoder)))
       )
     }
   )
@@ -108,7 +108,7 @@ object PgStatDatabaseViewRow {
       "temp_bytes" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.tempBytes),
       "deadlocks" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.deadlocks),
       "checksum_failures" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.checksumFailures),
-      "checksum_last_failure" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.checksumLastFailure),
+      "checksum_last_failure" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.checksumLastFailure),
       "blk_read_time" -> Encoder.encodeOption(Encoder.encodeDouble).apply(row.blkReadTime),
       "blk_write_time" -> Encoder.encodeOption(Encoder.encodeDouble).apply(row.blkWriteTime),
       "session_time" -> Encoder.encodeOption(Encoder.encodeDouble).apply(row.sessionTime),
@@ -118,7 +118,7 @@ object PgStatDatabaseViewRow {
       "sessions_abandoned" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.sessionsAbandoned),
       "sessions_fatal" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.sessionsFatal),
       "sessions_killed" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.sessionsKilled),
-      "stats_reset" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.statsReset)
+      "stats_reset" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.statsReset)
     )
   )
   implicit lazy val read: Read[PgStatDatabaseViewRow] = new Read[PgStatDatabaseViewRow](
@@ -140,7 +140,7 @@ object PgStatDatabaseViewRow {
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoInstant.get, Nullability.Nullable),
       (Meta.DoubleMeta.get, Nullability.Nullable),
       (Meta.DoubleMeta.get, Nullability.Nullable),
       (Meta.DoubleMeta.get, Nullability.Nullable),
@@ -150,7 +150,7 @@ object PgStatDatabaseViewRow {
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),
-      (TypoOffsetDateTime.get, Nullability.Nullable)
+      (TypoInstant.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatDatabaseViewRow(
       datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
@@ -170,7 +170,7 @@ object PgStatDatabaseViewRow {
       tempBytes = Meta.LongMeta.get.unsafeGetNullable(rs, i + 14),
       deadlocks = Meta.LongMeta.get.unsafeGetNullable(rs, i + 15),
       checksumFailures = Meta.LongMeta.get.unsafeGetNullable(rs, i + 16),
-      checksumLastFailure = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 17),
+      checksumLastFailure = TypoInstant.get.unsafeGetNullable(rs, i + 17),
       blkReadTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 18),
       blkWriteTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 19),
       sessionTime = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 20),
@@ -180,7 +180,7 @@ object PgStatDatabaseViewRow {
       sessionsAbandoned = Meta.LongMeta.get.unsafeGetNullable(rs, i + 24),
       sessionsFatal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 25),
       sessionsKilled = Meta.LongMeta.get.unsafeGetNullable(rs, i + 26),
-      statsReset = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 27)
+      statsReset = TypoInstant.get.unsafeGetNullable(rs, i + 27)
     )
   )
 }

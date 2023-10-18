@@ -7,7 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
@@ -28,7 +28,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   }
   override def insert(unsaved: PgAuthidRow): ConnectionIO[PgAuthidRow] = {
     sql"""insert into pg_catalog.pg_authid("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")
-          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAuthidId.put))}::oid, ${fromWrite(unsaved.rolname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.rolsuper)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolinherit)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcreaterole)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcreatedb)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcanlogin)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolreplication)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolbypassrls)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolconnlimit)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.rolpassword)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.rolvaliduntil)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAuthidId.put))}::oid, ${fromWrite(unsaved.rolname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.rolsuper)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolinherit)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcreaterole)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcreatedb)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcanlogin)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolreplication)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolbypassrls)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolconnlimit)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.rolpassword)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.rolvaliduntil)(Write.fromPutOption(TypoInstant.put))}::timestamptz)
           returning "oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil"::text
        """.query(PgAuthidRow.read).unique
   }
@@ -63,7 +63,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
               "rolbypassrls" = ${fromWrite(row.rolbypassrls)(Write.fromPut(Meta.BooleanMeta.put))},
               "rolconnlimit" = ${fromWrite(row.rolconnlimit)(Write.fromPut(Meta.IntMeta.put))}::int4,
               "rolpassword" = ${fromWrite(row.rolpassword)(Write.fromPutOption(Meta.StringMeta.put))},
-              "rolvaliduntil" = ${fromWrite(row.rolvaliduntil)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz
+              "rolvaliduntil" = ${fromWrite(row.rolvaliduntil)(Write.fromPutOption(TypoInstant.put))}::timestamptz
           where "oid" = ${fromWrite(oid)(Write.fromPut(PgAuthidId.put))}"""
       .update
       .run
@@ -86,7 +86,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
             ${fromWrite(unsaved.rolbypassrls)(Write.fromPut(Meta.BooleanMeta.put))},
             ${fromWrite(unsaved.rolconnlimit)(Write.fromPut(Meta.IntMeta.put))}::int4,
             ${fromWrite(unsaved.rolpassword)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.rolvaliduntil)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz
+            ${fromWrite(unsaved.rolvaliduntil)(Write.fromPutOption(TypoInstant.put))}::timestamptz
           )
           on conflict ("oid")
           do update set

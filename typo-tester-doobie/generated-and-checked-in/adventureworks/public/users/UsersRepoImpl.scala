@@ -8,7 +8,7 @@ package public
 package users
 
 import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -31,7 +31,7 @@ object UsersRepoImpl extends UsersRepo {
   }
   override def insert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
-          values (${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext, ${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.createdAt)(Write.fromPut(TypoOffsetDateTime.put))}::timestamptz, ${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz)
+          values (${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext, ${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.createdAt)(Write.fromPut(TypoInstant.put))}::timestamptz, ${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """.query(UsersRow.read).unique
   }
@@ -42,10 +42,10 @@ object UsersRepoImpl extends UsersRepo {
       Some((Fragment.const(s""""last_name""""), fr"${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}")),
       Some((Fragment.const(s""""email""""), fr"${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext")),
       Some((Fragment.const(s""""password""""), fr"${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""verified_on""""), fr"${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz")),
+      Some((Fragment.const(s""""verified_on""""), fr"${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz")),
       unsaved.createdAt match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""created_at""""), fr"${fromWrite(value: TypoOffsetDateTime)(Write.fromPut(TypoOffsetDateTime.put))}::timestamptz"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""created_at""""), fr"${fromWrite(value: TypoInstant)(Write.fromPut(TypoInstant.put))}::timestamptz"))
       }
     ).flatten
     
@@ -88,8 +88,8 @@ object UsersRepoImpl extends UsersRepo {
               "last_name" = ${fromWrite(row.lastName)(Write.fromPutOption(Meta.StringMeta.put))},
               "email" = ${fromWrite(row.email)(Write.fromPut(TypoUnknownCitext.put))}::citext,
               "password" = ${fromWrite(row.password)(Write.fromPut(Meta.StringMeta.put))},
-              "created_at" = ${fromWrite(row.createdAt)(Write.fromPut(TypoOffsetDateTime.put))}::timestamptz,
-              "verified_on" = ${fromWrite(row.verifiedOn)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz
+              "created_at" = ${fromWrite(row.createdAt)(Write.fromPut(TypoInstant.put))}::timestamptz,
+              "verified_on" = ${fromWrite(row.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz
           where "user_id" = ${fromWrite(userId)(Write.fromPut(UsersId.put))}"""
       .update
       .run
@@ -106,8 +106,8 @@ object UsersRepoImpl extends UsersRepo {
             ${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))},
             ${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext,
             ${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.createdAt)(Write.fromPut(TypoOffsetDateTime.put))}::timestamptz,
-            ${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz
+            ${fromWrite(unsaved.createdAt)(Write.fromPut(TypoInstant.put))}::timestamptz,
+            ${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz
           )
           on conflict ("user_id")
           do update set

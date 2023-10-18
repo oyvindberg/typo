@@ -7,7 +7,7 @@ package adventureworks
 package public
 package users
 
-import adventureworks.customtypes.TypoOffsetDateTime
+import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import anorm.Column
 import anorm.RowParser
@@ -27,8 +27,8 @@ case class UsersRow(
   lastName: Option[String],
   email: TypoUnknownCitext,
   password: String,
-  createdAt: TypoOffsetDateTime,
-  verifiedOn: Option[TypoOffsetDateTime]
+  createdAt: TypoInstant,
+  verifiedOn: Option[TypoInstant]
 )
 
 object UsersRow {
@@ -40,8 +40,8 @@ object UsersRow {
           lastName = json.\("last_name").toOption.map(_.as(Reads.StringReads)),
           email = json.\("email").as(TypoUnknownCitext.reads),
           password = json.\("password").as(Reads.StringReads),
-          createdAt = json.\("created_at").as(TypoOffsetDateTime.reads),
-          verifiedOn = json.\("verified_on").toOption.map(_.as(TypoOffsetDateTime.reads))
+          createdAt = json.\("created_at").as(TypoInstant.reads),
+          verifiedOn = json.\("verified_on").toOption.map(_.as(TypoInstant.reads))
         )
       )
     ),
@@ -54,8 +54,8 @@ object UsersRow {
         lastName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
         email = row(idx + 3)(TypoUnknownCitext.column),
         password = row(idx + 4)(Column.columnToString),
-        createdAt = row(idx + 5)(TypoOffsetDateTime.column),
-        verifiedOn = row(idx + 6)(Column.columnToOption(TypoOffsetDateTime.column))
+        createdAt = row(idx + 5)(TypoInstant.column),
+        verifiedOn = row(idx + 6)(Column.columnToOption(TypoInstant.column))
       )
     )
   }
@@ -66,8 +66,8 @@ object UsersRow {
       "last_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastName),
       "email" -> TypoUnknownCitext.writes.writes(o.email),
       "password" -> Writes.StringWrites.writes(o.password),
-      "created_at" -> TypoOffsetDateTime.writes.writes(o.createdAt),
-      "verified_on" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.verifiedOn)
+      "created_at" -> TypoInstant.writes.writes(o.createdAt),
+      "verified_on" -> Writes.OptionWrites(TypoInstant.writes).writes(o.verifiedOn)
     ))
   )
 }
