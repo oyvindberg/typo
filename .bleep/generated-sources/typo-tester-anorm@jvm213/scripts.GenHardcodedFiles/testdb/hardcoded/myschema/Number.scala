@@ -42,6 +42,7 @@ object Number {
   implicit lazy val arrayColumn: Column[Array[Number]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[Number]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
   implicit lazy val column: Column[Number] = Column.columnToString.mapResult(str => Number(str).left.map(SqlMappingError.apply))
+  implicit lazy val ordering: Ordering[Number] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Number] = new ParameterMetaData[Number] {
     override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
     override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType

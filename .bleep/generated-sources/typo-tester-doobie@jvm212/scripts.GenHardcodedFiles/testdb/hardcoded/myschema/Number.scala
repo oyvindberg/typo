@@ -42,6 +42,7 @@ object Number {
   implicit lazy val decoder: Decoder[Number] = Decoder.decodeString.emap(Number.apply)
   implicit lazy val encoder: Encoder[Number] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[Number] = Meta.StringMeta.get.temap(Number.apply)
+  implicit lazy val ordering: Ordering[Number] = Ordering.by(_.value)
   implicit lazy val put: Put[Number] = Meta.StringMeta.put.contramap(_.value)
   implicit lazy val read: Read[Number] = Read.fromGet(get)
   implicit lazy val write: Write[Number] = Write.fromPut(put)
