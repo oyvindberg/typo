@@ -75,7 +75,7 @@ object generate {
     val mostFiles: List[sc.File] =
       List(
         List(FileDefault(default, options.jsonLibs).file),
-        enums.map(enm => FileStringEnum(options, enm)),
+        enums.map(enm => FileStringEnum(options, enm, genOrdering)),
         domains.map(d => FileDomain(d, options, genOrdering)),
         customTypes.All.values.map(FileCustomType(options, genOrdering)),
         relationFilesByName.map { case (_, f) => f },

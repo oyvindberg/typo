@@ -42,6 +42,7 @@ object Sector {
   implicit lazy val arrayColumn: Column[Array[Sector]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[Sector]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
   implicit lazy val column: Column[Sector] = Column.columnToString.mapResult(str => Sector(str).left.map(SqlMappingError.apply))
+  implicit lazy val ordering: Ordering[Sector] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
     override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
     override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
