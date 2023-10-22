@@ -12,13 +12,13 @@ import typo.generated.information_schema.table_constraints.{TableConstraintsView
 import typo.generated.information_schema.tables.{TablesViewRepoImpl, TablesViewRow}
 import typo.internal.analysis.{DecomposedSql, JdbcMetadata, MaybeReturnsRows, NullabilityFromExplain, ParsedName}
 import typo.internal.metadb.{Enums, ForeignKeys, PrimaryKeys, UniqueKeys}
-import typo.internal.{DebugJson, TypeMapperDb}
+import typo.internal.{DebugJson, Lazy, TypeMapperDb}
 
 import java.sql.Connection
 import scala.collection.immutable.SortedSet
 
 case class MetaDb(
-    relations: List[db.Relation],
+    relations: Map[db.RelationName, Lazy[db.Relation]],
     enums: List[db.StringEnum],
     domains: List[db.Domain],
     typeMapperDb: TypeMapperDb
@@ -53,7 +53,7 @@ object MetaDb {
         keyColumnUsage = timed("keyColumnUsage")(KeyColumnUsageViewRepoImpl.selectAll),
         referentialConstraints = timed("referentialConstraints")(ReferentialConstraintsViewRepoImpl.selectAll),
         pgEnums = timed("pgEnums")(EnumsSqlRepoImpl()),
-        tables = timed("tables")(TablesViewRepoImpl.selectAll),
+        tables = timed("tables")(TablesViewRepoImpl.selectAll.filter(_.tableType.contains("BASE TABLE"))),
         columns = timed("columns")(ColumnsViewRepoImpl.selectAll),
         views = timed("views")(ViewFindAllSqlRepoImpl()),
         domains = timed("domains")(DomainsSqlRepoImpl()),
@@ -106,105 +106,103 @@ object MetaDb {
     val columnsByTable: Map[db.RelationName, List[ColumnsViewRow]] =
       input.columns.groupBy(c => db.RelationName(c.tableSchema, c.tableName.get))
 
-    val views: Map[db.RelationName, db.View] =
+    val views: Map[db.RelationName, Lazy[db.View]] =
       input.views.flatMap { viewRow =>
-        val relationName = db.RelationName(viewRow.tableSchema, viewRow.tableName.get)
-        logger.info(s"Analyzing view ${relationName.value}")
-
         viewRow.viewDefinition.map { sqlContent =>
-          val decomposedSql = DecomposedSql.parse(sqlContent)
-          val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked
-          val nullabilityInfo = NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
-          val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
-            jdbcMetadata.columns match {
-              case MaybeReturnsRows.Query(columns) =>
-                columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)).toMap
-              case MaybeReturnsRows.Update =>
-                Map.empty
-            }
+          val relationName = db.RelationName(viewRow.tableSchema, viewRow.tableName.get)
+          val lazyAnalysis = Lazy {
+            logger.info(s"Analyzing view ${relationName.value}")
+            val decomposedSql = DecomposedSql.parse(sqlContent)
+            val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked
+            val nullabilityInfo = NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
+            val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+              jdbcMetadata.columns match {
+                case MaybeReturnsRows.Query(columns) =>
+                  columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)).toMap
+                case MaybeReturnsRows.Update =>
+                  Map.empty
+              }
 
-          val cols: NonEmptyList[(db.Col, ParsedName)] =
-            jdbcMetadata.columns match {
-              case MaybeReturnsRows.Query(metadataCols) =>
-                metadataCols.zipWithIndex.map { case (mdCol, idx) =>
-                  val nullability: Nullability =
-                    mdCol.parsedColumnName.nullability.getOrElse {
-                      if (nullabilityInfo.exists(_.values(idx))) Nullability.Nullable
-                      else mdCol.isNullable.toNullability
+            val cols: NonEmptyList[(db.Col, ParsedName)] =
+              jdbcMetadata.columns match {
+                case MaybeReturnsRows.Query(metadataCols) =>
+                  metadataCols.zipWithIndex.map { case (mdCol, idx) =>
+                    val nullability: Nullability =
+                      mdCol.parsedColumnName.nullability.getOrElse {
+                        if (nullabilityInfo.exists(_.values(idx))) Nullability.Nullable
+                        else mdCol.isNullable.toNullability
+                      }
+
+                    val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)) { () =>
+                      logger.warn(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
                     }
 
-                  val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)) { () =>
-                    logger.warn(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
+                    val coord = (relationName, mdCol.name)
+                    val dbCol = db.Col(
+                      parsedName = mdCol.parsedColumnName,
+                      tpe = dbType,
+                      udtName = None,
+                      columnDefault = None,
+                      comment = comments.get(coord),
+                      jsonDescription = DebugJson(mdCol),
+                      nullability = nullability,
+                      constraints = constraints.getOrElse(coord, Nil)
+                    )
+                    (dbCol, mdCol.parsedColumnName)
                   }
 
-                  val coord = (relationName, mdCol.name)
-                  val dbCol = db.Col(
-                    parsedName = mdCol.parsedColumnName,
-                    tpe = dbType,
-                    udtName = None,
-                    columnDefault = None,
-                    comment = comments.get(coord),
-                    jsonDescription = DebugJson(mdCol),
-                    nullability = nullability,
-                    constraints = constraints.getOrElse(coord, Nil)
-                  )
-                  (dbCol, mdCol.parsedColumnName)
-                }
+                case MaybeReturnsRows.Update => ???
+              }
 
-              case MaybeReturnsRows.Update => ???
-            }
-
-          (relationName, db.View(relationName, decomposedSql, cols, deps, isMaterialized = viewRow.relkind == "m"))
+            db.View(relationName, decomposedSql, cols, deps, isMaterialized = viewRow.relkind == "m")
+          }
+          (relationName, lazyAnalysis)
         }
       }.toMap
 
-    val tables: List[db.Relation] =
+    val tables: Map[db.RelationName, Lazy[db.Table]] =
       input.tables.flatMap { relation =>
         val relationName = db.RelationName(schema = relation.tableSchema, name = relation.tableName.get)
 
-        if (views.contains(relationName)) None
-        else {
-          val columns = columnsByTable(relationName).sortBy(_.ordinalPosition)
-          val fks: List[db.ForeignKey] = foreignKeys.getOrElse(relationName, List.empty)
+        NonEmptyList.fromList(columnsByTable(relationName).sortBy(_.ordinalPosition)) map { columns =>
+          val lazyAnalysis = Lazy {
+            val fks: List[db.ForeignKey] = foreignKeys.getOrElse(relationName, List.empty)
 
-          val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
-            fks.flatMap { fk =>
-              val otherTable: db.RelationName = fk.otherTable
-              val value = fk.otherCols.map(cn => (otherTable, cn))
-              fk.cols.zip(value).toList
-            }.toMap
+            val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+              fks.flatMap { fk =>
+                val otherTable: db.RelationName = fk.otherTable
+                val value = fk.otherCols.map(cn => (otherTable, cn))
+                fk.cols.zip(value).toList
+              }.toMap
 
-          val mappedCols: List[db.Col] =
-            columns.map { c =>
-              val jsonDescription = DebugJson(c)
+            val mappedCols: NonEmptyList[db.Col] =
+              columns.map { c =>
+                val jsonDescription = DebugJson(c)
 
-              val parsedName = ParsedName.of(c.columnName.get)
-              val nullability =
-                c.isNullable match {
-                  case Some("YES") => Nullability.Nullable
-                  case Some("NO")  => Nullability.NoNulls
-                  case None        => Nullability.NullableUnknown
-                  case other       => throw new Exception(s"Unknown nullability: $other")
+                val parsedName = ParsedName.of(c.columnName.get)
+                val nullability =
+                  c.isNullable match {
+                    case Some("YES") => Nullability.Nullable
+                    case Some("NO")  => Nullability.NoNulls
+                    case None        => Nullability.NullableUnknown
+                    case other       => throw new Exception(s"Unknown nullability: $other")
+                  }
+                val tpe = typeMapperDb.col(c) { () =>
+                  logger.warn(s"Couldn't translate type from table ${relationName.value} column ${parsedName.name.value} with type ${c.udtName}. Falling back to text")
                 }
-              val tpe = typeMapperDb.col(c) { () =>
-                logger.warn(s"Couldn't translate type from relation ${relationName.value} column ${parsedName.name.value} with type ${c.udtName}. Falling back to text")
+                val coord = (relationName, parsedName.name)
+                db.Col(
+                  parsedName = parsedName,
+                  columnDefault = c.columnDefault,
+                  nullability = nullability,
+                  tpe = tpe,
+                  udtName = c.udtName,
+                  comment = comments.get(coord),
+                  jsonDescription = jsonDescription,
+                  constraints = constraints.getOrElse(coord, Nil) ++ deps.get(parsedName.name).flatMap(otherCoord => constraints.get(otherCoord)).getOrElse(Nil)
+                )
               }
-              val coord = (relationName, parsedName.name)
-              db.Col(
-                parsedName = parsedName,
-                columnDefault = c.columnDefault,
-                nullability = nullability,
-                tpe = tpe,
-                udtName = c.udtName,
-                comment = comments.get(coord),
-                jsonDescription = jsonDescription,
-                constraints = constraints.getOrElse(coord, Nil) ++ deps.get(parsedName.name).flatMap(otherCoord => constraints.get(otherCoord)).getOrElse(Nil)
-              )
-            }
 
-          for {
-            mappedCols <- NonEmptyList.fromList(mappedCols)
-          } yield {
             db.Table(
               name = relationName,
               cols = mappedCols,
@@ -213,9 +211,11 @@ object MetaDb {
               foreignKeys = fks
             )
           }
-        }
-      }
 
-    MetaDb(tables ++ views.values, enums, domains, typeMapperDb)
+          (relationName, lazyAnalysis)
+        }
+      }.toMap
+
+    MetaDb(tables ++ views, enums, domains, typeMapperDb)
   }
 }
