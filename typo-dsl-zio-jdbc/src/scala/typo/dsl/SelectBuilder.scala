@@ -1,4 +1,7 @@
-package dsl
+package typo.dsl
+
+import zio.{Chunk, ZIO}
+import zio.jdbc.*
 
 trait SelectBuilder[Fields[_], Row] {
 
@@ -42,10 +45,10 @@ trait SelectBuilder[Fields[_], Row] {
     withParams(params.limit(v))
 
   /** Execute the query and return the results as a list */
-  def toList: ConnectionIO[List[Row]]
+  def toChunk: ZIO[ZConnection, Throwable, Chunk[Row]]
 
   /** Return sql for debugging. [[None]] if backed by a mock repository */
-  def sql: Option[Fragment]
+  def sql: Option[SqlFragment]
 
   /** start constructing a join */
   final def join[F2[_], Row2](other: SelectBuilder[F2, Row2]): PartialJoin[F2, Row2] =

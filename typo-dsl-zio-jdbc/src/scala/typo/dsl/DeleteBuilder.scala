@@ -1,4 +1,7 @@
-package dsl
+package typo.dsl
+
+import zio.ZIO
+import zio.jdbc.*
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.annotation.nowarn
@@ -13,15 +16,15 @@ trait DeleteBuilder[Fields[_], Row] {
   final def whereStrict(v: Fields[Row] => SqlExpr[Boolean, Required, Row]): DeleteBuilder[Fields, Row] =
     withParams(params.where(v))
 
-  def sql: Option[Fragment]
-  def execute: ConnectionIO[Int]
+  def sql: Option[SqlFragment]
+  def execute: ZIO[ZConnection, Throwable, Long]
 }
 
 object DeleteBuilder {
   def apply[Fields[_], Row](name: String, structure: Structure.Relation[Fields, ?, Row]): DeleteBuilderSql[Fields, Row] =
     DeleteBuilderSql(name, structure, DeleteParams.empty)
 
-  case class DeleteBuilderSql[Fields[_], Row](
+  final case class DeleteBuilderSql[Fields[_], Row](
       name: String,
       structure: Structure.Relation[Fields, ?, Row],
       params: DeleteParams[Fields, Row]
@@ -29,26 +32,24 @@ object DeleteBuilder {
     override def withParams(params: DeleteParams[Fields, Row]): DeleteBuilder[Fields, Row] =
       copy(params = params)
 
-    def mkSql(counter: AtomicInteger): Fragment = {
-      List[Iterable[Fragment]](
-        Some(fr"delete from ${Fragment.const(name)}"),
+    def mkSql(counter: AtomicInteger): SqlFragment = {
+      List[Iterable[SqlFragment]](
+        Some(SqlFragment.deleteFrom(name)),
         params.where
           .map(w => w(structure.fields))
           .reduceLeftOption(_ and _)
-          .map { where => fr" where " ++ where.render(counter) }
+          .map { where => sql" where " ++ where.render(counter) }
       ).flatten.reduce(_ ++ _)
     }
 
-    override def sql: Option[Fragment] = {
+    override def sql: Option[SqlFragment] =
       Some(mkSql(new AtomicInteger(1)))
-    }
 
-    override def execute: ConnectionIO[Int] = {
-      mkSql(new AtomicInteger(0)).update.run
-    }
+    override def execute: ZIO[ZConnection, Throwable, Long] =
+      mkSql(new AtomicInteger(0)).update
   }
 
-  case class DeleteBuilderMock[Id, Fields[_], Row](
+  final case class DeleteBuilderMock[Id, Fields[_], Row](
       params: DeleteParams[Fields, Row],
       fields: Fields[Row],
       map: scala.collection.mutable.Map[Id, Row]
@@ -56,10 +57,9 @@ object DeleteBuilder {
     override def withParams(params: DeleteParams[Fields, Row]): DeleteBuilder[Fields, Row] =
       copy(params = params)
 
-    override def sql: Option[Fragment] =
-      None
+    override def sql: Option[SqlFragment] = None
 
-    override def execute: ConnectionIO[Int] = delay {
+    override def execute: ZIO[ZConnection, Throwable, Long] = ZIO.succeed {
       var changed = 0
       map.foreach { case (id, row) =>
         if (params.where.forall(w => w(fields).eval(row))) {
@@ -67,7 +67,7 @@ object DeleteBuilder {
           changed += 1
         }
       }
-      changed
+      changed.toLong
     }
   }
 }

@@ -1,14 +1,17 @@
-package dsl
+package typo.dsl
 
-case class SelectBuilderMock[Fields[_], Row](
+import zio.{Chunk, ZIO}
+import zio.jdbc.*
+
+final case class SelectBuilderMock[Fields[_], Row](
     structure: Structure[Fields, Row],
-    all: ConnectionIO[List[Row]],
+    all: ZIO[ZConnection, Throwable, Chunk[Row]],
     params: SelectParams[Fields, Row]
 ) extends SelectBuilder[Fields, Row] {
   override def withParams(sqlParams: SelectParams[Fields, Row]): SelectBuilder[Fields, Row] =
     copy(params = params)
 
-  override def toList: ConnectionIO[List[Row]] =
+  override def toChunk: ZIO[ZConnection, Throwable, Chunk[Row]] =
     all.map(all => SelectParams.applyParams(structure.fields, all, params))
 
   override def joinOn[Fields2[_], N[_]: Nullability, Row2](
@@ -21,10 +24,10 @@ case class SelectBuilderMock[Fields[_], Row](
 
     val newStructure = structure.join(otherMock.structure)
 
-    val newRows: ConnectionIO[List[(Row, Row2)]] =
+    val newRows: ZIO[ZConnection, Throwable, Chunk[(Row, Row2)]] =
       for {
-        lefts <- this.toList
-        rights <- otherMock.toList
+        lefts <- this.toChunk
+        rights <- otherMock.toChunk
       } yield for {
         left <- lefts
         right <- rights
@@ -42,10 +45,10 @@ case class SelectBuilderMock[Fields[_], Row](
       case _                                   => sys.error("you cannot mix mock and sql repos")
     }
 
-    val newRows: ConnectionIO[List[(Row, Option[Row2])]] = {
+    val newRows: ZIO[ZConnection, Throwable, Chunk[(Row, Option[Row2])]] = {
       for {
-        lefts <- this.toList
-        rights <- otherMock.toList
+        lefts <- this.toChunk
+        rights <- otherMock.toChunk
       } yield {
         lefts.map { left =>
           val maybeRight = rights.find { right =>
@@ -58,5 +61,5 @@ case class SelectBuilderMock[Fields[_], Row](
     SelectBuilderMock[LeftJoined[Fields, Fields2, *], (Row, Option[Row2])](structure.leftJoin(otherMock.structure), newRows, SelectParams.empty)
   }
 
-  override def sql: Option[Fragment] = None
+  override def sql: Option[SqlFragment] = None
 }

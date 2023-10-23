@@ -1,8 +1,12 @@
-package dsl
+package typo.dsl
+
+import zio.{Chunk, NonEmptyChunk}
+import zio.jdbc.*
+import zio.jdbc.extensions.*
 
 import java.util.concurrent.atomic.AtomicInteger
 
-case class SelectParams[Fields[_], Row](
+final case class SelectParams[Fields[_], Row](
     where: List[Fields[Row] => SqlExpr[Boolean, Option, Row]],
     orderBy: List[Fields[Row] => SortOrder[?, Row]],
     offset: Option[Int],
@@ -18,17 +22,17 @@ object SelectParams {
   def empty[Fields[_], Row]: SelectParams[Fields, Row] =
     SelectParams[Fields, Row](List.empty, List.empty, None, None)
 
-  def render[Row, Fields[_]](fields: Fields[Row], baseSql: Fragment, counter: AtomicInteger, params: SelectParams[Fields, Row]): Fragment = {
-    List[Option[Fragment]](
+  def render[Row, Fields[_]](fields: Fields[Row], baseSql: SqlFragment, counter: AtomicInteger, params: SelectParams[Fields, Row]): SqlFragment = {
+    List[Option[SqlFragment]](
       Some(baseSql),
-      NonEmptyList.fromFoldable(params.where.map(f => f(fields).render(counter))).map(fragments.whereAnd(_)),
-      NonEmptyList.fromFoldable(params.orderBy.map(f => f(fields).render(counter))).map(fragments.orderBy(_)),
-      params.offset.map(value => fr"offset $value"),
-      params.limit.map(value => fr"limit $value")
+      NonEmptyChunk.fromIterableOption(params.where.map(f => f(fields).render(counter))).map(SqlFragment.whereAnd(_)),
+      NonEmptyChunk.fromIterableOption(params.orderBy.map(f => f(fields).render(counter))).map(SqlFragment.orderBy(_)),
+      params.offset.map(value => sql"offset $value"),
+      params.limit.map(value => sql"limit $value")
     ).flatten.reduce(_ ++ _)
   }
 
-  def applyParams[Fields[_], Row](fields: Fields[Row], rows: List[Row], params: SelectParams[Fields, Row]): List[Row] = {
+  def applyParams[Fields[_], Row](fields: Fields[Row], rows: Chunk[Row], params: SelectParams[Fields, Row]): Chunk[Row] = {
     // precompute filters and order bys for this row structure
     val filters: List[SqlExpr[Boolean, Option, Row]] =
       params.where.map(f => f(fields))
