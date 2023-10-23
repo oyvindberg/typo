@@ -131,6 +131,8 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
       val (dbLib, jsonLib) =
         if (target.project.value.contains("doobie"))
           (DbLibName.Doobie, JsonLibName.Circe)
+        else if (target.project.value.contains("zio-jdbc"))
+          (DbLibName.ZioJdbc, JsonLibName.ZioJson)
         else (DbLibName.Anorm, JsonLibName.PlayJson)
       val domains = Nil
       val typeMapperDb = TypeMapperDb(enums, domains)
