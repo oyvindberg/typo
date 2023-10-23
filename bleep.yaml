@@ -86,6 +86,18 @@ projects:
       main: scripts.GenHardcodedFiles
       project: typo-scripts
     sources: ./generated-and-checked-in
+  typo-tester-zio-jdbc:
+    dependencies:
+      - dev.zio::zio-json:0.6.2
+      - org.postgresql:postgresql:42.6.0
+      - org.scalatest::scalatest:3.3.0-SNAP4
+    dependsOn: typo-dsl-zio-jdbc
+    extends: template-cross
+    isTestProject: true
+    sourcegen:
+      main: scripts.GenHardcodedFiles
+      project: typo-scripts
+    sources: ./generated-and-checked-in
 scripts:
   generate-adventureworks:
     main: scripts.GeneratedAdventureWorks
