@@ -13,8 +13,4 @@ object extensions {
     def intercalate(sep: SqlFragment): SqlFragment = SqlFragment.intersperse(sep, fragments)
   }
 
-  implicit final class RichListFragment(private val fragments: List[SqlFragment]) extends AnyVal {
-    def intercalate(sep: SqlFragment): SqlFragment = SqlFragment.intersperse(sep, fragments)
-  }
-
 }

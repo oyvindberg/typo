@@ -44,7 +44,7 @@ object UpdateBuilder {
       copy(params = params)
 
     def mkSql(counter: AtomicInteger, returning: Boolean): SqlFragment = {
-      List[Option[SqlFragment]](
+      Chunk[Option[SqlFragment]](
         Some(SqlFragment.update(name)),
         NonEmptyChunk.fromIterableOption(params.setters) match {
           case None =>
