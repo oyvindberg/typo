@@ -22,12 +22,14 @@ object generate {
     val options = InternalOptions(
       pkg = pkg,
       jsonLibs = publicOptions.jsonLibs.map {
-        case JsonLibName.Circe    => JsonLibCirce(pkg, default, publicOptions.inlineImplicits)
+        case JsonLibName.Circe => JsonLibCirce(pkg, default, publicOptions.inlineImplicits)
         case JsonLibName.PlayJson => JsonLibPlay(pkg, default, publicOptions.inlineImplicits)
+        case JsonLibName.ZioJson => JsonLibZioJson(pkg, default, publicOptions.inlineImplicits)
       },
       dbLib = publicOptions.dbLib.map {
         case DbLibName.Anorm  => new DbLibAnorm(pkg, publicOptions.inlineImplicits)
         case DbLibName.Doobie => new DbLibDoobie(pkg, publicOptions.inlineImplicits)
+        case DbLibName.ZioJdbc => new DbLibZioJdbc(pkg, publicOptions.inlineImplicits)
       },
       logger = publicOptions.logger,
       naming = naming,
