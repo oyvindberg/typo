@@ -60,14 +60,14 @@ object DeleteBuilder {
     override def sql: Option[SqlFragment] = None
 
     override def execute: ZIO[ZConnection, Throwable, Long] = ZIO.succeed {
-      var changed = 0
+      var changed: Long = 0L
       map.foreach { case (id, row) =>
         if (params.where.forall(w => w(fields).eval(row))) {
           map.remove(id): @nowarn
           changed += 1
         }
       }
-      changed.toLong
+      changed
     }
   }
 }
