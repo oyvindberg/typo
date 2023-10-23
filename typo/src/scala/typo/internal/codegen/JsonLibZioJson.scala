@@ -105,7 +105,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         name = decoderName,
         implicitParams = Nil,
         tpe = Decoder.of(wrapperType),
-        body = code"""${lookupDecoderFor(underlying)}.emap($wrapperType.apply)"""
+        body = code"""${lookupDecoderFor(underlying)}.mapOrFail($wrapperType.apply)"""
       ),
       sc.Given(
         tparams = Nil,
