@@ -8,3 +8,6 @@ target
 .vscode
 site/docs
 myproject/
+
+# TODO Jules: To remove
+typo-dsl-zio-jdbc
