@@ -37,6 +37,15 @@ projects:
     dependencies: org.tpolecat::doobie-postgres:1.0.0-RC4
     extends: template-cross
     sources: ../typo-dsl-shared
+  typo-dsl-zio-jdbc:
+    cross:
+      jvm212:
+        extends: template-kind-projector
+      jvm213:
+        extends: template-kind-projector
+    dependencies: dev.zio::zio-jdbc:0.1.0
+    extends: template-cross
+    sources: ../typo-dsl-shared
   # scripts for generating docs
   typo-scripts-doc:
     dependencies:
