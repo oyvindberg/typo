@@ -17,8 +17,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val Fragment = sc.Type.Qualified("zio.jdbc.SqlFragment")
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
 
-  private val SqlInterpolator = sc.Type.Qualified("zio.jdbc.SqlInterpolator")
-  private def SQL(content: sc.Code) = sc.StringInterpolate(SqlInterpolator, sc.Ident("sql"), content)
+  private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
+  private def SQL(content: sc.Code) = sc.StringInterpolate(sqlInterpolator, sc.Ident("sql"), content)
 
   private def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
