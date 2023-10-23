@@ -1,18 +1,36 @@
 package adventureworks
 
-import cats.effect.IO
-import cats.effect.unsafe.implicits.global
-import doobie.*
-import doobie.syntax.all.*
+import zio.jdbc.*
+import zio.{Unsafe, ZIO, ZLayer}
 
 object withConnection {
-  val xa = Transactor.fromDriverManager[IO](
-    "org.postgresql.Driver",
-    "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password",
-    logHandler = None
-  )
-  val testXa = Transactor.after.set(xa, HC.rollback)
+  val connectionPool: ZLayer[ZConnectionPoolConfig, Throwable, ZConnectionPool] =
+    ZLayer.succeed(ZConnectionPoolConfig.default) >>>
+      ZConnectionPool.postgres(
+        "localhost",
+        6432,
+        "Adventureworks",
+        Map(
+          "user" -> "postgres",
+          "password" -> "postgres"
+        )
+      )
 
-  def apply[T](f: ConnectionIO[T]): T =
-    f.transact(testXa).unsafeRunSync()
+  def apply[T](f: ZIO[ZConnection, Throwable, T]): T = {
+    Unsafe
+      .unsafe { implicit u =>
+        zio.Runtime.default.unsafe
+          .run {
+            (
+              for {
+                connection <- ZIO.service[ZConnection]
+                r <- f.provideLayer(ZLayer.succeed(connection))
+                _ <- connection.rollback
+              } yield r
+            ).provideLayer(connectionPool.flatMap(_.get.transaction))
+          }
+          .getOrThrow()
+      }
+
+  }
 }

@@ -3,7 +3,7 @@ package adventureworks
 import adventureworks.customtypes.*
 import adventureworks.public.pgtest.{PgtestRepoImpl, PgtestRow}
 import adventureworks.public.pgtestnull.{PgtestnullRepoImpl, PgtestnullRow}
-import doobie.implicits.toSqlInterpolator
+import zio.jdbc.*
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -20,7 +20,7 @@ class ArrayTest2 extends AnyFunSuite with TypeCheckedTripleEquals {
            |    many       $dbType[] not null,
            |    maybe_many $dbType[]
            |    );
-           |""".stripMargin.update.run
+           |""".update
     }
 }
 class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {

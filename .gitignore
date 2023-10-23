@@ -10,4 +10,7 @@ site/docs
 myproject/
 
 # TODO Jules: To remove
-typo-tester-zio-jdbc/**/*
+typo-tester-zio-jdbc/generated-and-checked-in/**/*
+.bleep/generated-sources/typo-tester-zio-jdbc@jvm3/**/*
+.bleep/generated-sources/typo-tester-zio-jdbc@jvm212/**/*
+.bleep/generated-sources/typo-tester-zio-jdbc@jvm213/**/*

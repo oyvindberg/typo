@@ -9,9 +9,10 @@ import adventureworks.person.stateprovince.{StateprovinceId, StateprovinceRepoIm
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.{SalesterritoryRepoImpl, SalesterritoryRowUnsaved}
 import adventureworks.withConnection
-import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
+import zio.ZIO
+import zio.json.{DecoderOps, EncoderOps}
 
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = BusinessentityaddressRepoImpl
@@ -25,8 +26,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
       postalcode = "postalcode",
       spatiallocation = None
     )
-    import io.circe.syntax.*
-    initial.asJson.as[AddressRowUnsaved] match {
+    initial.toJson.fromJson[AddressRowUnsaved] match {
       case Right(roundtripped) => assert(roundtripped === initial)
       case Left(error)         => fail(error)
     }
@@ -84,18 +84,18 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
         // insert and round trip check
         saved1 <- repo.insert(unsaved1)
         saved2 = unsaved1.toRow(???, ???)
-        _ <- delay(assert(saved1 === saved2))
+        _ <- ZIO.succeed(assert(saved1 === saved2))
         // check field values
         newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
         _ <- repo.update(saved1.copy(modifieddate = newModifiedDate))
-        saved3 <- repo.selectAll.compile.toList.map {
+        saved3 <- repo.selectAll.runCollect.map(_.toList).map {
           case List(x) => x
           case other   => throw new MatchError(other)
         }
-        _ <- delay(assert(saved3.modifieddate == newModifiedDate))
+        _ <- ZIO.succeed(assert(saved3.modifieddate == newModifiedDate))
         // delete
         _ <- repo.delete(saved1.compositeId)
-        _ <- repo.selectAll.compile.toList.map {
+        _ <- repo.selectAll.runCollect.map(_.toList).map {
           case Nil   => ()
           case other => throw new MatchError(other)
         }

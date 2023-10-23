@@ -3,9 +3,9 @@ package adventureworks.humanresources.department
 import adventureworks.customtypes.{Defaulted, TypoLocalDateTime}
 import adventureworks.public.Name
 import adventureworks.withConnection
-import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
+import zio.ZIO
 
 class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = DepartmentRepoImpl
@@ -22,14 +22,14 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
         // insert and round trip check
         saved1 <- repo.insert(unsaved)
         saved2 = unsaved.toRow(departmentidDefault = saved1.departmentid, modifieddateDefault = saved1.modifieddate)
-        _ <- delay(assert(saved1 === saved2))
+        _ <- ZIO.succeed(assert(saved1 === saved2))
         // check field values
         _ <- repo.update(saved1.copy(name = Name("baz")))
-        saved3 <- repo.selectAll.compile.lastOrError
-        _ <- delay(assert(saved3.name == Name("baz")))
+        saved3 <- repo.selectAll.runLast
+        _ <- ZIO.succeed(assert(saved3.map(_.name).contains(Name("baz"))))
         // delete
         _ <- repo.delete(saved1.departmentid)
-        _ <- repo.selectAll.compile.toList.map(x => assert(x === List()))
+        _ <- repo.selectAll.runCollect.map(x => assert(x.isEmpty))
       } yield succeed
     }
   }
@@ -47,7 +47,7 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
         saved1 <- repo.insert(unsaved)
         newName = Name("baz")
         saved2 <- repo.upsert(saved1.copy(name = newName))
-        _ <- delay(assert(saved2.name === newName))
+        _ <- ZIO.succeed(assert(saved2.name === newName))
       } yield succeed
     }
   }

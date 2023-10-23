@@ -147,9 +147,9 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
     val encoder =
       sc.Given(
         tparams = Nil,
-        name = decoderName,
+        name = encoderName,
         implicitParams = Nil,
-        tpe = Decoder.of(tpe),
+        tpe = Encoder.of(tpe),
         body = code"""$DeriveJsonEncoder.gen[$tpe]"""
       )
 

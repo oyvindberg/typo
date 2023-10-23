@@ -7,10 +7,10 @@ import adventureworks.production.productsubcategory.*
 import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
 import adventureworks.withConnection
-import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
+import zio.ZIO
 
 import java.time.LocalDateTime
 
@@ -82,16 +82,16 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         // insert and round trip check
         saved1 <- productRepo.insert(unsaved1)
         saved2 = unsaved1.toRow(saved1.productid, ???, ???, ???, ???)
-        _ <- delay(assert(saved1 === saved2))
+        _ <- ZIO.succeed(assert(saved1 === saved2))
 
         // check field values
         newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
         _ <- productRepo.update(saved1.copy(modifieddate = newModifiedDate))
-        saved3 <- productRepo.selectAll.compile.toList.map {
+        saved3 <- productRepo.selectAll.runCollect.map(_.toList).map {
           case List(x) => x
           case other   => throw new MatchError(other)
         }
-        _ <- delay(assert(saved3.modifieddate == newModifiedDate))
+        _ <- ZIO.succeed(assert(saved3.modifieddate == newModifiedDate))
         _ <- productRepo.update(saved3.copy(size = None)).map(res => assert(res))
         query = productRepo.select
           .where(_.`class` === "H ")
@@ -105,11 +105,11 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           .orderBy { case ((product, _), _) => product.productmodelid.asc }
           .orderBy { case ((_, _), productModel) => productModel(_.name).desc.withNullsFirst }
 
-        _ <- delay(query.sql.foreach(f => println(f)))
-        _ <- query.toList.map(println(_))
+        _ <- ZIO.succeed(query.sql.foreach(f => println(f)))
+        _ <- query.toChunk.map(println(_))
         leftJoined = productRepo.select.join(projectModelRepo.select).leftOn { case (p, pm) => p.productmodelid === pm.productmodelid }
-        _ <- delay(leftJoined.sql.foreach(println))
-        _ <- leftJoined.toList.map(println)
+        _ <- ZIO.succeed(leftJoined.sql.foreach(println))
+        _ <- leftJoined.toChunk.map(println)
 
         update = productRepo.update
           .setComputedValue(_.name)(p => (p.reverse.upper || Name("flaff")).substring(2, 4))
@@ -118,13 +118,13 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 //          .setComputedValue(_.sizeunitmeasurecode)(_ => Some(unitmeasure.unitmeasurecode))
           .where(_.productid === saved1.productid)
 
-        _ <- delay(update.sql(returning = true).foreach(println(_)))
+        _ <- ZIO.succeed(update.sql(returning = true).foreach(println(_)))
         foo <- update.executeReturnChanged
         List(updated) = foo
-        _ <- delay(assert(updated.name === Name("MANf")))
-        _ <- delay(assert(updated.listprice === BigDecimal(2)))
-        _ <- delay(assert(updated.reorderpoint === TypoShort(40)))
-        _ <- delay {
+        _ <- ZIO.succeed(assert(updated.name === Name("MANf")))
+        _ <- ZIO.succeed(assert(updated.listprice === BigDecimal(2)))
+        _ <- ZIO.succeed(assert(updated.reorderpoint === TypoShort(40)))
+        _ <- ZIO.succeed {
           val q = productRepo.select
             .where(p => !p.name.like("foo%"))
             .where(p => !(p.name.underlying || p.color).like("foo%"))
@@ -135,7 +135,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
             .where { case (_, pm) => !pm.instructions.isNull }
 
           q.sql.foreach(f => println(f))
-          q.toList.map(list => list.foreach(println))
+          q.toChunk.map(list => list.foreach(println))
 
         }
         _ <- {
@@ -165,7 +165,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
             .orderBy { case ((_, _), pm2) => pm2(_.rowguid).asc }
 
 //          q.sql.foreach(f => println(f.sql))
-          q.toList.map {
+          q.toChunk.map {
             _.map { case ((p, pm1), pm2) =>
               println(p)
               println(pm1)
@@ -175,7 +175,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         }
         // delete
         _ <- productRepo.delete(saved1.productid)
-        _ <- productRepo.selectAll.compile.toList.map {
+        _ <- productRepo.selectAll.runCollect.map(_.toList).map {
           case Nil   => ()
           case other => throw new MatchError(other)
         }
