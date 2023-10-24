@@ -95,6 +95,10 @@ projects:
     sources: ./generated-and-checked-in
   typo-tester-zio-jdbc:
     dependencies:
+      - dev.zio::zio-schema:0.4.14
+      - dev.zio::zio-schema-derivation:0.4.14
+      #- configuration: provided
+      #  module: org.scala-lang::scala-reflect:${SCALA_VERSION}
       - dev.zio::zio-json:0.6.2
       - org.postgresql:postgresql:42.6.0
       - org.scalatest::scalatest:3.3.0-SNAP4
