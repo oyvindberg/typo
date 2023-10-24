@@ -21,6 +21,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
   private val Schema = sc.Type.Qualified("zio.schema.Schema")
   private val DeriveSchema = sc.Type.Qualified("zio.schema.DeriveSchema")
+  private val JdbcDecoderError = sc.Type.Qualified("zio.jdbc.JdbcDecoderError")
 
   private def SQL(content: sc.Code) = sc.StringInterpolate(sqlInterpolator, sc.Ident("sql"), content)
 
@@ -416,7 +417,22 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = jdbcDecoderName,
         implicitParams = Nil,
         tpe = JdbcDecoder.of(wrapperType),
-        body = code"""${lookupJdbcDecoder(underlying)}.map($wrapperType.apply)"""
+        body =
+          code"""|${lookupJdbcDecoder(underlying)}.flatMap { s =>
+                 |  new ${JdbcDecoder.of(wrapperType)} {
+                 |    override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $wrapperType) = {
+                 |      def error(msg: ${sc.Type.String}): $JdbcDecoderError =
+                 |        $JdbcDecoderError(
+                 |          message = s"Error decoding '$wrapperType' from ResultSet",
+                 |          cause = new RuntimeException(msg),
+                 |          metadata = rs.getMetaData,
+                 |          row = rs.getRow
+                 |        )
+                 |
+                 |      $wrapperType.apply(s).fold(e => throw error(e), (columIndex, _))
+                 |    }
+                 |  }
+                 |}""".stripMargin
       ),
       sc.Given(
         tparams = Nil,
