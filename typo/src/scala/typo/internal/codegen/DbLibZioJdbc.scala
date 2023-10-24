@@ -19,6 +19,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
 
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
+
   private def SQL(content: sc.Code) = sc.StringInterpolate(sqlInterpolator, sc.Ident("sql"), content)
 
   private def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
@@ -34,17 +35,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     if (!inlineImplicits) JdbcDecoder.of(tpe)
     else
       sc.Type.base(tpe) match {
-        case sc.Type.BigDecimal                                => code"$JdbcDecoder.bigDecimalEncoderScala"
-        case sc.Type.Boolean                                   => code"$JdbcDecoder.booleanEncoder"
-        case sc.Type.Byte                                      => code"$JdbcDecoder.byteEncoder"
-        case sc.Type.Double                                    => code"$JdbcDecoder.doubleEncoder"
-        case sc.Type.Float                                     => code"$JdbcDecoder.floatEncoder"
-        case sc.Type.Int                                       => code"$JdbcDecoder.intEncoder"
-        case sc.Type.Long                                      => code"$JdbcDecoder.longEncoder"
-        case sc.Type.String                                    => code"$JdbcDecoder.stringEncoder"
-        case sc.Type.UUID                                      => code"$JdbcDecoder.uuidEncoder"
-        case sc.Type.Optional(targ)                            => code"$JdbcDecoder.optionEncoder(${lookupJdbcDecoder(targ)})"
-        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcDecoder.byteArrayEncoder"
+        case sc.Type.BigDecimal => code"$JdbcDecoder.bigDecimalDecoderScala"
+        case sc.Type.Boolean => code"$JdbcDecoder.booleanDecoder"
+        case sc.Type.Byte => code"$JdbcDecoder.byteDecoder"
+        case sc.Type.Double => code"$JdbcDecoder.doubleDecoder"
+        case sc.Type.Float => code"$JdbcDecoder.floatDecoder"
+        case sc.Type.Int => code"$JdbcDecoder.intDecoder"
+        case sc.Type.Long => code"$JdbcDecoder.longDecoder"
+        case sc.Type.String => code"$JdbcDecoder.stringDecoder"
+        case sc.Type.UUID => code"$JdbcDecoder.uuidDecoder"
+        case sc.Type.Optional(targ) => code"$JdbcDecoder.optionDecoder(${lookupJdbcDecoder(targ)})"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcDecoder.byteArrayDecoder"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"${JdbcDecoder.of(x)}" // TODO: Can we do better?
@@ -54,11 +55,39 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"${JdbcDecoder.of(other)}"
       }
 
+  /** Resolve known implicits at generation-time instead of at compile-time */
+  private def lookupJdbcEncoder(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) JdbcEncoder.of(tpe)
+    else
+      sc.Type.base(tpe) match {
+        case sc.Type.BigDecimal => code"$JdbcEncoder.bigDecimalEncoderScala"
+        case sc.Type.Boolean => code"$JdbcEncoder.booleanEncoder"
+        case sc.Type.Byte => code"$JdbcEncoder.byteEncoder"
+        case sc.Type.Double => code"$JdbcEncoder.doubleEncoder"
+        case sc.Type.Float => code"$JdbcEncoder.floatEncoder"
+        case sc.Type.Int => code"$JdbcEncoder.intEncoder"
+        case sc.Type.Long => code"$JdbcEncoder.longEncoder"
+        case sc.Type.String => code"$JdbcEncoder.stringEncoder"
+        case sc.Type.UUID => code"$JdbcEncoder.uuidEncoder"
+        case sc.Type.Optional(targ) => code"$JdbcEncoder.optionEncoder(${lookupJdbcDecoder(targ)})"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcEncoder.byteArrayEncoder"
+        // generated type
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
+          code"${JdbcEncoder.of(x)}" // TODO: Can we do better?
+        case x if missingInstancesByType.contains(JdbcDecoder.of(x)) =>
+          code"${missingInstancesByType(JdbcEncoder.of(x))}"
+        case other =>
+          code"${JdbcEncoder.of(other)}"
+      }
+
   @nowarn
-  private def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code =
-    if (inlineImplicits && !forbidInline)
-      code"???" // TODO Jules: What should I put here?
-    else code"$${$name}"
+  private def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code = {
+    // TODO Jules: Is this adapted to zio-jdbc?
+    //if (inlineImplicits && !forbidInline)
+    //  code"???" // TODO Jules: What should I put here?
+    // else code"$${$name}"
+    code"$${$name}"
+  }
 
   private def matchId(id: IdComputed): sc.Code =
     id match {
