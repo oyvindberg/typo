@@ -15,7 +15,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val `ZIO.succeed` = sc.Type.Qualified("zio.ZIO.succeed")
   private val JdbcEncoder = sc.Type.Qualified("zio.jdbc.JdbcEncoder")
   private val JdbcDecoder = sc.Type.Qualified("zio.jdbc.JdbcDecoder")
-  private val Fragment = sc.Type.Qualified("zio.jdbc.SqlFragment")
+  private val SqlFragment = sc.Type.Qualified("zio.jdbc.SqlFragment")
   private val UpdateResult = sc.Type.Qualified("zio.jdbc.UpdateResult")
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
@@ -189,10 +189,12 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"""${fieldValueOrIdsParam.name} match {
               |  case Nil      => selectAll
               |  case nonEmpty =>
-              |    val where = nonEmpty.map {
-              |      ${cases.mkCode("\n")}
-              |    }
-              |    ${SQL(code"""select ${dbNames(cols, isRead = true)} from $relName""")}.where(where.reduce(_ and _)).query(${lookupJdbcDecoder(rowType)}).selectStream
+              |    val wheres = $SqlFragment.empty.and(
+              |      nonEmpty.map {
+              |        ${cases.mkCode("\n")}
+              |      }
+              |    )
+              |    ${SQL(code"""select ${dbNames(cols, isRead = true)} from $relName""")}.where(wheres).query(${lookupJdbcDecoder(rowType)}).selectStream
               |}
               |""".stripMargin
 
@@ -239,13 +241,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
           val set = SQL(code"${runtimeInterpolateValue(code"${unsavedParam.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}")
-          code"""Some(($Fragment(${sc.s(col.dbName.value)}), $set))"""
+          code"""Some(($SqlFragment(${sc.s(col.dbName.value)}), $set))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, _), origType) =>
           val setValue = SQL(code"${runtimeInterpolateValue(code"value: $origType", origType)}${sqlCast.toPgCode(col)}")
           code"""|${unsavedParam.name}.$ident match {
                  |  case ${default.Defaulted}.${default.UseDefault} => None
-                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($Fragment(${sc.s(col.dbName.value)}), $setValue))
+                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($SqlFragment(${sc.s(col.dbName.value)}), $setValue))
                  |}"""
         }
 
@@ -286,16 +288,28 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           .filterNot(c => id.cols.exists(_.name == c.name))
           .map { c => code"${c.dbName.value} = EXCLUDED.${c.dbName.value}" }
 
-        val sql = SQL {
+        val base: sc.Code =
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |values (
                  |  ${values.mkCode(",\n")}
                  |)
-                 |on conflict (${dbNames(id.cols, isRead = false)})
-                 |do update set
-                 |  ${pickExcludedCols.mkCode(",\n")}
-                 |returning ${dbNames(cols, isRead = true)}
-                 |""".stripMargin
+                 |on conflict (${dbNames(id.cols, isRead = false)})""".stripMargin
+
+        val exclusion: Option[sc.Code] =
+          if (pickExcludedCols.isEmpty) None
+          else Some {
+            code"""|do update set
+                   |  ${pickExcludedCols.mkCode(",\n")}""".stripMargin
+         }
+
+        val returning: sc.Code = code"returning ${dbNames(cols, isRead = true)}"
+
+        val sql = SQL {
+          List(
+            Some(base),
+            exclusion,
+            Some(returning)
+          ).flatten.mkCode("\n")
         }
 
         code"$sql.insertReturning(${lookupJdbcDecoder(rowType)})"
