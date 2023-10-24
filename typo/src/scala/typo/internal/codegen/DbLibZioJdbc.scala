@@ -196,24 +196,31 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |}
               |""".stripMargin
 
-      case RepoMethod.UpdateFieldValues(relName, id, varargs, _, _, _) =>
-        // val cases: NonEmptyList[sc.Code] =
-        //  cases0.map { col =>
-        //    val fr = SQL(code"${col.dbName.value} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}${sqlCast.toPgCode(col)}")
-        //    code"case $fieldValue.${col.name}(value) => $fr"
-        //  }
-//
+      case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
+        val cases: NonEmptyList[sc.Code] =
+          cases0.map { col =>
+            val sql = SQL(code"${col.dbName.value} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}${sqlCast.toPgCode(col)}")
+            code"case $fieldValue.${col.name}(value) => $sql"
+          }
+
         val sql = SQL {
           code"""|update $relName
-                 |$$updates
-                 |where ${matchId(id)}""".stripMargin
+                 |set $$updates
+                 |where ${matchId(id)}
+                 |""".stripMargin
         }
 
-        // TODO Jules: What should I put here?
         code"""$NonEmptyChunk.fromIterableOption(${varargs.name}) match {
               |  case None           => ${`ZIO.succeed`}(false)
               |  case Some(nonEmpty) =>
-              |    val updates = ??? // TODO Jules: What should I put here?
+              |    import zio.prelude.ForEachOps
+              |    implicit val identity: zio.prelude.Identity[SqlFragment] = new zio.prelude.Identity[SqlFragment] {
+              |      override def identity: SqlFragment                                      = SqlFragment.empty
+              |      override def combine(l: => SqlFragment, r: => SqlFragment): SqlFragment = l ++ r
+              |    }
+              |    val updates = nonEmpty.map {
+              |      ${cases.mkCode("\n")}
+              |    }.intersperse(${SQL(code", ")})
               |    $sql.update.map(_ > 0)
               |}""".stripMargin
 
