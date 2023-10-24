@@ -91,8 +91,8 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         implicitParams = List(sc.Param(sc.Ident("T"), Encoder.of(T), None)),
         tpe = Encoder.of(d.Defaulted.of(T)),
         body = code"""|$Encoder.instance {
-                 |  case ${d.Provided}(value) => $Json.Obj.apply("provided" -> ${Encoder.of(T)}.apply(value))
-                 |  case ${d.UseDefault}      => $Json.fromString("defaulted")
+                 |  case ${d.Provided}(value) => $Json.Obj.apply("provided" -> ${Encoder.of(T)}.encodeJson(value))
+                 |  case ${d.UseDefault}      => $Json.Str.apply("defaulted")
                  |}""".stripMargin
       )
     )
