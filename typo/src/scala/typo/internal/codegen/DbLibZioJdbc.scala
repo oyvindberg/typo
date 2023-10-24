@@ -14,6 +14,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val ZIO = sc.Type.Qualified("zio.ZIO")
   private val `ZIO.succeed` = sc.Type.Qualified("zio.ZIO.succeed")
   private val JdbcEncoder = sc.Type.Qualified("zio.jdbc.JdbcEncoder")
+  private val JdbcDecoder = sc.Type.Qualified("zio.jdbc.JdbcDecoder")
   private val Fragment = sc.Type.Qualified("zio.jdbc.SqlFragment")
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
 
@@ -29,30 +30,28 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     missingInstances.collect { case x: sc.Given => (x.tpe, pkg / x.name) }.toMap
 
   /** Resolve known implicits at generation-time instead of at compile-time */
-  private def lookupJdbcEncoder(tpe: sc.Type): sc.Code =
-    if (!inlineImplicits) JdbcEncoder.of(tpe)
+  private def lookupJdbcDecoder(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) JdbcDecoder.of(tpe)
     else
       sc.Type.base(tpe) match {
-        case sc.Type.BigDecimal                                => code"$JdbcEncoder.bigDecimalEncoderScala"
-        case sc.Type.Boolean                                   => code"$JdbcEncoder.booleanEncoder"
-        case sc.Type.Byte                                      => code"$JdbcEncoder.byteEncoder"
-        case sc.Type.Double                                    => code"$JdbcEncoder.doubleEncoder"
-        case sc.Type.Float                                     => code"$JdbcEncoder.floatEncoder"
-        case sc.Type.Int                                       => code"$JdbcEncoder.intEncoder"
-        case sc.Type.Long                                      => code"$JdbcEncoder.longEncoder"
-        case sc.Type.String                                    => code"$JdbcEncoder.stringEncoder"
-        case sc.Type.UUID                                      => code"$JdbcEncoder.uuidEncoder"
-        case sc.Type.Optional(targ)                            => code"$JdbcEncoder.optionEncoder(${lookupJdbcEncoder(targ)})"
-        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcEncoder.byteArrayEncoder"
+        case sc.Type.BigDecimal                                => code"$JdbcDecoder.bigDecimalEncoderScala"
+        case sc.Type.Boolean                                   => code"$JdbcDecoder.booleanEncoder"
+        case sc.Type.Byte                                      => code"$JdbcDecoder.byteEncoder"
+        case sc.Type.Double                                    => code"$JdbcDecoder.doubleEncoder"
+        case sc.Type.Float                                     => code"$JdbcDecoder.floatEncoder"
+        case sc.Type.Int                                       => code"$JdbcDecoder.intEncoder"
+        case sc.Type.Long                                      => code"$JdbcDecoder.longEncoder"
+        case sc.Type.String                                    => code"$JdbcDecoder.stringEncoder"
+        case sc.Type.UUID                                      => code"$JdbcDecoder.uuidEncoder"
+        case sc.Type.Optional(targ)                            => code"$JdbcDecoder.optionEncoder(${lookupJdbcDecoder(targ)})"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcDecoder.byteArrayEncoder"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
-          code"???" // TODO Jules: What should I put here?
-        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
-          code"???" // TODO Jules: What should I put here?
-        case x if missingInstancesByType.contains(JdbcEncoder.of(x)) =>
-          code"${missingInstancesByType(JdbcEncoder.of(x))}"
+          code"${JdbcDecoder.of(x)}" // TODO: Can we do better?
+        case x if missingInstancesByType.contains(JdbcDecoder.of(x)) =>
+          code"${missingInstancesByType(JdbcDecoder.of(x))}"
         case other =>
-          code"${JdbcEncoder.of(other)}"
+          code"${JdbcDecoder.of(other)}"
       }
 
   @nowarn
@@ -79,7 +78,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
       unaryId match {
         case IdComputed.UnaryUserSpecified(_, tpe) =>
-          code"def selectByIds($idsParam)(implicit puts: ${JdbcEncoder.of(sc.Type.Array.of(tpe))}): ${ZStream.of(ZConnection, Throwable, rowType)}"
+          code"def selectByIds($idsParam)(implicit encoder: ${JdbcEncoder.of(sc.Type.Array.of(tpe))}): ${ZStream.of(ZConnection, Throwable, rowType)}"
         case _ =>
           code"def selectByIds($idsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
       }
@@ -117,17 +116,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectBuilder(relName, fieldsType, rowType) =>
-        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.read)"""
+        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType, ${lookupJdbcDecoder(rowType)})"""
 
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName""")
-        code"""$sql.query[$rowType].selectStream"""
+        code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectStream"""
 
       case RepoMethod.SelectById(relName, cols, id, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
-        code"""$sql.query[$rowType].selectOne"""
+        code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectOne"""
 
       case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
@@ -135,7 +134,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val sql = SQL(
           code"""select $joinedColNames from $relName where ${code"${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
         )
-        code"""$sql.query[$rowType].selectStream"""
+        code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectStream"""
       case RepoMethod.SelectByUnique(relName, cols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
@@ -143,7 +142,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |where ${cols.map(c => code"${c.dbName.code} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
-        code"""$sql.query[$rowType].selectOne"""
+        code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectOne"""
 
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases =
@@ -154,12 +153,12 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
         val sql = SQL(code"""select ${dbNames(cols, isRead = true)} from $relName $$where""")
         code"""${fieldValueOrIdsParam.name} match {
-              |  case Nil => $sql.query(${lookupJdbcEncoder(rowType)}).selectStream
+              |  case Nil => $sql.query(${lookupJdbcDecoder(rowType)}).selectStream
               |  case nonEmpty =>
               |    val where = nonEmpty.map {
               |      ${cases.mkCode("\n")}
               |    }
-              |    $sql.where(where).query(${lookupJdbcEncoder(rowType)}).selectStream
+              |    $sql.where(where).query(${lookupJdbcDecoder(rowType)}).selectStream
               |}
               |""".stripMargin
 
@@ -185,7 +184,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |}""".stripMargin
 
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
-        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.read)"
+        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType, ${lookupJdbcDecoder(rowType)})"
 
       case RepoMethod.Update(relName, _, id, param, colsNotId) =>
         val sql = SQL(
@@ -228,10 +227,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |val q = if (fs.isEmpty) {
                |  $sqlEmpty
                |} else {
-               |  import cats.syntax.foldable.toFoldableOps
                |  $sql
                |}
-               |q.query(${lookupJdbcEncoder(rowType)}).unique
+               |q.insertReturning(${lookupJdbcDecoder(rowType)})
                |"""
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -254,7 +252,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |""".stripMargin
         }
 
-        code"$sql.query(${lookupJdbcEncoder(rowType)}).unique"
+        code"$sql.insertReturning(${lookupJdbcDecoder(rowType)})"
 
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -267,13 +265,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |""".stripMargin
         }
 
-        code"$sql.query(${lookupJdbcEncoder(rowType)}).update.map(_ > 0)"
+        code"$sql.insertReturning(${lookupJdbcDecoder(rowType)})"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
-        code"$sql.update.map(_ > 0)"
+        code"$sql.delete.map(_ > 0)"
 
       case RepoMethod.SqlFile(sqlScript) =>
         val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.renderCode { (paramAtIndex: Int) =>
@@ -301,7 +299,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
           code"""|val sql =
                  |  ${SQL(renderedWithCasts)}
-                 |sql.query(${lookupJdbcEncoder(rowName)}).selectStream""".stripMargin
+                 |sql.query(${lookupJdbcDecoder(rowName)}).selectStream""".stripMargin
         }
         ret.getOrElse {
           code"${SQL(renderedScript)}.update"

@@ -163,7 +163,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         // todo: bleep should use something better than timestamps
         softWrite = SoftWrite.No
       )
-      cli("add to git", target.sources, List("git", "add", "-f", target.sources.toString), Logger.DevNull, cli.Out.Raw)
+      //cli("add to git", target.sources, List("git", "add", "-f", target.sources.toString), Logger.DevNull, cli.Out.Raw)
     }
   }
 }
