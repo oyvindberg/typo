@@ -17,7 +17,6 @@ class CustomTypes(pkg: sc.QIdent) {
       sc.Param(sc.Ident("x2"), sc.Type.Double, None),
       sc.Param(sc.Ident("y2"), sc.Type.Double, None)
     ),
-    isNull = p => code"$p.isNull",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PGbox,
       toTypo = (expr, target) => code"$target($expr.point(0).x, $expr.point(0).y, $expr.point(1).x, $expr.point(1).y)"
@@ -35,7 +34,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.Array.of(sc.Type.Byte), None)
     ),
-    isNull = p => code"$p != null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.Array.of(sc.Type.Byte),
       toTypo = (expr, target) => code"$target($expr)"
@@ -54,7 +52,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.LocalDate, None)
     ),
-    isNull = p => code"$p != null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.String,
       toTypo = (expr, target) => code"$target(${sc.Type.LocalDate}.parse($expr))"
@@ -75,7 +72,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.LocalTime, None)
     ),
-    isNull = p => code"$p != null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.String,
       toTypo = (expr, target) => code"$target(${sc.Type.LocalTime}.parse($expr))"
@@ -98,7 +94,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.LocalDateTime, None)
     ),
-    isNull = p => code"$p != null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.String,
       toTypo = (expr, target) => code"$target(${sc.Type.LocalDateTime}.parse($expr, parser))"
@@ -123,7 +118,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.Instant, None)
     ),
-    isNull = p => code"$p != null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.String,
       toTypo = (expr, target) => code"$target($expr)"
@@ -148,7 +142,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.OffsetTime, None)
     ),
-    isNull = p => code"$p != null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.String,
       toTypo = (expr, target) => code"$target(${sc.Type.OffsetTime}.parse($expr, parser))"
@@ -174,7 +167,6 @@ class CustomTypes(pkg: sc.QIdent) {
       sc.Param(sc.Ident("center"), TypoPoint.typoType, None),
       sc.Param(sc.Ident("radius"), sc.Type.Double, None)
     ),
-    isNull = p => code"$p.center == null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PGcircle,
       toTypo = (expr, target) => code"$target(TypoPoint($expr.center.x, $expr.center.y), $expr.radius)"
@@ -194,7 +186,6 @@ class CustomTypes(pkg: sc.QIdent) {
       sc.Param(sc.Ident("b"), sc.Type.Double, None),
       sc.Param(sc.Ident("c"), sc.Type.Double, None)
     ),
-    isNull = p => code"$p.isNull",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PGline,
       toTypo = (expr, target) => code"$target($expr.a, $expr.b, $expr.c)"
@@ -213,7 +204,6 @@ class CustomTypes(pkg: sc.QIdent) {
       sc.Param(sc.Ident("p1"), TypoPoint.typoType, None),
       sc.Param(sc.Ident("p2"), TypoPoint.typoType, None)
     ),
-    isNull = p => code"$p.point == null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PGlseg,
       toTypo = (expr, target) => code"$target(${TypoPoint.toTypo0(code"$expr.point(0)")}, ${TypoPoint.toTypo0(code"$expr.point(1)")})"
@@ -232,7 +222,6 @@ class CustomTypes(pkg: sc.QIdent) {
       sc.Param(sc.Ident("open"), sc.Type.Boolean, None),
       sc.Param(sc.Ident("points"), sc.Type.List.of(TypoPoint.typoType), None)
     ),
-    isNull = p => code"$p.points == null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PGpath,
       toTypo = (expr, target) => code"$target($expr.isOpen, $expr.points.map(p => ${TypoPoint.typoType}(p.x, p.y)).toList)"
@@ -251,7 +240,6 @@ class CustomTypes(pkg: sc.QIdent) {
       sc.Param(sc.Ident("x"), sc.Type.Double, None),
       sc.Param(sc.Ident("y"), sc.Type.Double, None)
     ),
-    isNull = p => code"$p.isNull",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PGpoint,
       toTypo = (expr, target) => code"$target($expr.x, $expr.y)"
@@ -269,7 +257,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("points"), sc.Type.List.of(TypoPoint.typoType), None)
     ),
-    isNull = p => code"$p.points == null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PGpolygon,
       toTypo = (expr, target) => code"$target($expr.points.map(p => ${TypoPoint.typoType}(p.x, p.y)).toList)"
@@ -292,7 +279,6 @@ class CustomTypes(pkg: sc.QIdent) {
       sc.Param(sc.Ident("minutes"), sc.Type.Int, None),
       sc.Param(sc.Ident("seconds"), sc.Type.Double, None)
     ),
-    isNull = p => code"$p.isNull",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PGInterval,
       toTypo = (expr, target) => code"$target($expr.getYears, $expr.getMonths, $expr.getDays, $expr.getHours, $expr.getMinutes, $expr.getSeconds)"
@@ -310,7 +296,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.Map.of(sc.Type.String, sc.Type.String), None)
     ),
-    isNull = p => code"$p == null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.JavaMap.of(sc.Type.Wildcard, sc.Type.Wildcard),
       toTypo = (expr, target) => {
@@ -341,7 +326,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.BigDecimal, None)
     ),
-    isNull = p => code"$p.isNull",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.JavaBigDecimal,
       toTypo = (expr, target) => code"$target(${sc.Type.BigDecimal}($expr))"
@@ -359,7 +343,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.Short, None)
     ),
-    isNull = p => code"$p != null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.JavaInteger,
       toTypo = (expr, target) => code"$target($expr.toShort)"
@@ -406,7 +389,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.UUID, None)
     ),
-    isNull = p => code"$p.getString == null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.UUID,
       toTypo = (expr, target) => code"$target($expr)"
@@ -426,7 +408,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.Array.of(sc.Type.Float), None)
     ),
-    isNull = p => code"$p.getString == null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PgArray,
       toTypo = (expr, target) => code"$target($expr.getArray.asInstanceOf[${sc.Type.Array.of(sc.Type.JavaFloat)}].map(Float2float))"
@@ -445,7 +426,6 @@ class CustomTypes(pkg: sc.QIdent) {
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.String, None)
     ),
-    isNull = p => code"$p.getString == null",
     toTypo = CustomType.ToTypo(
       jdbcType = sc.Type.PgSQLXML,
       toTypo = (expr, target) => code"$target($expr.getString)"
@@ -483,7 +463,6 @@ class CustomTypes(pkg: sc.QIdent) {
       params = NonEmptyList(
         sc.Param(sc.Ident("value"), sc.Type.String, None)
       ),
-      isNull = p => code"$p.getValue == null",
       toTypo = CustomType.ToTypo(
         jdbcType = sc.Type.PGobject,
         toTypo = (expr, target) => code"$target($expr.getValue)"
@@ -580,7 +559,6 @@ class CustomTypes(pkg: sc.QIdent) {
       sqlType = sqlType,
       typoType = sc.Type.Qualified(pkg / sc.Ident(s"TypoUnknown${Naming.titleCase(sqlType)}")),
       params = NonEmptyList(sc.Param(sc.Ident("value"), sc.Type.String, None)),
-      isNull = p => code"$p == null",
       toTypo = CustomType.ToTypo(
         jdbcType = sc.Type.String,
         toTypo = (expr, target) => code"$target($expr)"

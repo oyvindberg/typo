@@ -8,7 +8,6 @@ case class CustomType(
     sqlType: String,
     typoType: sc.Type.Qualified,
     params: NonEmptyList[sc.Param],
-    isNull: sc.Ident => sc.Code,
     toTypo: CustomType.ToTypo,
     fromTypo: CustomType.FromTypo,
     // some types is just very difficult to get right inside arrays using jdbc
