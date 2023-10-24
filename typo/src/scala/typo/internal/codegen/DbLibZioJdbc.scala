@@ -5,8 +5,6 @@ import typo.internal.analysis.MaybeReturnsRows
 import typo.sc.Type
 import typo.{NonEmptyList, sc}
 
-import scala.annotation.nowarn
-
 class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val ZConnection = sc.Type.Qualified("zio.jdbc.ZConnection")
   private val Throwable = sc.Type.Qualified("java.lang.Throwable")
@@ -16,6 +14,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val JdbcEncoder = sc.Type.Qualified("zio.jdbc.JdbcEncoder")
   private val JdbcDecoder = sc.Type.Qualified("zio.jdbc.JdbcDecoder")
   private val SqlFragment = sc.Type.Qualified("zio.jdbc.SqlFragment")
+  private val Segment = sc.Type.Qualified("zio.jdbc.SqlFragment.Segment")
+  private val Setter = sc.Type.Qualified("zio.jdbc.SqlFragment.Setter")
   private val UpdateResult = sc.Type.Qualified("zio.jdbc.UpdateResult")
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
@@ -27,6 +27,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val schemaName: sc.Ident = sc.Ident("schema")
   private val jdbcDecoderName: sc.Ident = sc.Ident("jdbcDecoder")
   private val jdbcEncoderName: sc.Ident = sc.Ident("jdbcEncoder")
+  private val jdbcSetterName: sc.Ident = sc.Ident("jdbcSetter")
 
   private def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
@@ -86,13 +87,35 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"${JdbcEncoder.of(other)}"
       }
 
-  @nowarn
+  /** Resolve known implicits at generation-time instead of at compile-time */
+  private def lookupSetter(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) Setter.of(tpe)
+    else
+      sc.Type.base(tpe) match {
+        case sc.Type.BigDecimal                                => code"$Setter.bigDecimalScalaSetter"
+        case sc.Type.Boolean                                   => code"$Setter.booleanSetter"
+        case sc.Type.Byte                                      => code"$Setter.byteSetter"
+        case sc.Type.Double                                    => code"$Setter.doubleSetter"
+        case sc.Type.Float                                     => code"$Setter.floatSetter"
+        case sc.Type.Int                                       => code"$Setter.intSetter"
+        case sc.Type.Long                                      => code"$Setter.longSetter"
+        case sc.Type.String                                    => code"$Setter.stringSetter"
+        case sc.Type.UUID                                      => code"$Setter.uuidParamSetter"
+        case sc.Type.Optional(targ)                            => code"$Setter.optionParamSetter(${lookupSetter(targ)})"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$Setter.byteArraySetter"
+        // generated type
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
+          code"${Setter.of(x)}" // TODO: Can we do better?
+        case x if missingInstancesByType.contains(Setter.of(x)) =>
+          code"${missingInstancesByType(Setter.of(x))}"
+        case other =>
+          code"${Setter.of(other)}"
+      }
+
   private def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code = {
-    // TODO Jules: Is this adapted to zio-jdbc?
-    // if (inlineImplicits && !forbidInline)
-    //  code"???" // TODO Jules: What should I put here?
-    // else code"$${$name}"
-    code"$${$name}"
+    if (inlineImplicits && !forbidInline)
+      code"$${$Segment.paramSegment($name)(${lookupSetter(tpe)})}"
+    else code"$name"
   }
 
   private def matchId(id: IdComputed): sc.Code =
@@ -297,10 +320,11 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
         val exclusion: Option[sc.Code] =
           if (pickExcludedCols.isEmpty) None
-          else Some {
-            code"""|do update set
+          else
+            Some {
+              code"""|do update set
                    |  ${pickExcludedCols.mkCode(",\n")}""".stripMargin
-         }
+            }
 
         val returning: sc.Code = code"returning ${dbNames(cols, isRead = true)}"
 
@@ -374,7 +398,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       x.name,
       x.params,
       Nil,
-      ZIO.of(ZConnection, Throwable, x.table.names.RowName),
+      ZIO.of(ZConnection, Throwable, UpdateResult.of(x.table.names.RowName)),
       code"${x.table.names.RepoImplName}.insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
     )
 
@@ -393,6 +417,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         implicitParams = Nil,
         tpe = JdbcDecoder.of(wrapperType),
         body = code"""${lookupJdbcDecoder(underlying)}.map($wrapperType.apply)"""
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = jdbcSetterName,
+        implicitParams = Nil,
+        tpe = Setter.of(wrapperType),
+        body = code"""${lookupSetter(underlying)}.contramap(_.value)"""
       )
     )
 
@@ -411,16 +442,29 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         implicitParams = Nil,
         tpe = JdbcDecoder.of(wrapperType),
         body = code"""${lookupJdbcDecoder(underlying)}.map($wrapperType.apply)"""
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = jdbcSetterName,
+        implicitParams = Nil,
+        tpe = Setter.of(wrapperType),
+        body = code"""${lookupSetter(underlying)}.contramap(_.value)"""
       )
     )
 
   override def missingInstances: List[sc.ClassMember] = List.empty // TODO Jules
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
-    val schema = sc.Given(tparams = Nil, name = schemaName, implicitParams = Nil, tpe = Schema.of(tpe), body = code"$DeriveSchema.deriveSchema[$tpe]")
+    val schema = sc.Given(tparams = Nil, name = schemaName, implicitParams = Nil, tpe = Schema.of(tpe), body = code"$DeriveSchema.gen[$tpe]")
     val decoder = sc.Given(tparams = Nil, name = jdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(tpe), body = code"JdbcDecoder.fromSchema")
     val encoder = sc.Given(tparams = Nil, name = jdbcEncoderName, implicitParams = Nil, tpe = JdbcEncoder.of(tpe), body = code"JdbcEncoder.fromSchema")
-    List(schema, decoder, encoder)
+    // TODO Jules: This `== 1` test doesn't test the correct thing
+    val maybeSetter =
+      if (cols.length == 1)
+        Some(sc.Given(tparams = Nil, name = jdbcSetterName, implicitParams = Nil, tpe = Setter.of(tpe), body = code"${lookupSetter(cols.head.tpe)}.contramap(_.${cols.head.name})"))
+      else None
+
+    List(Some(schema), Some(decoder), Some(encoder), maybeSetter).flatten
   }
 
   override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = List.empty // TODO Jules
