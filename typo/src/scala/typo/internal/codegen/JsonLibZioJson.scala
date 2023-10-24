@@ -62,7 +62,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         case sc.Type.OffsetTime                                            => code"$Encoder.offsetTime"
         case sc.Type.String                                                => code"$Encoder.string"
         case sc.Type.UUID                                                  => code"$Encoder.uuid"
-        case sc.Type.TApply(sc.Type.Array, List(targ))                     => code"$Encoder.array[$targ, ${sc.Type.Array}](${go(targ)}, implicitly)"
+        case sc.Type.TApply(sc.Type.Array, List(targ))                     => code"$Encoder.array[$targ](${go(targ)}, implicitly)"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$encoderName(${go(targ)})"
         case sc.Type.Optional(targ)                                        => code"$Encoder.option(${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$encoderName"
