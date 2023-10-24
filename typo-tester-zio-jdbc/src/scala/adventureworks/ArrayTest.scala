@@ -11,7 +11,7 @@ import java.time.*
 import scala.annotation.nowarn
 
 class ArrayTest2 extends AnyFunSuite with TypeCheckedTripleEquals {
-  def tableFor(dbType: String): Int =
+  def tableFor(dbType: String): Unit =
     withConnection {
       val tableName = s"test_type_${dbType.filter(_.isLetterOrDigit)}"
       sql"""create table if not exists $tableName (
@@ -20,7 +20,7 @@ class ArrayTest2 extends AnyFunSuite with TypeCheckedTripleEquals {
            |    many       $dbType[] not null,
            |    maybe_many $dbType[]
            |    );
-           |""".update
+           |""".execute
     }
 }
 class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
