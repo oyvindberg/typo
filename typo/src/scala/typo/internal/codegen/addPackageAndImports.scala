@@ -7,7 +7,6 @@ import scala.collection.mutable
 /** imports are automatically written based on the qualified idents found in the code
   */
 object addPackageAndImports {
-
   def apply(knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]], file: sc.File): sc.File = {
     val newImports = mutable.Map.empty[sc.Ident, sc.Type.Qualified]
 
