@@ -10,13 +10,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val Throwable = sc.Type.Qualified("java.lang.Throwable")
   private val ZStream = sc.Type.Qualified("zio.stream.ZStream")
   private val ZIO = sc.Type.Qualified("zio.ZIO")
-  private val `ZIO.succeed` = sc.Type.Qualified("zio.ZIO.succeed")
   private val JdbcEncoder = sc.Type.Qualified("zio.jdbc.JdbcEncoder")
   private val JdbcDecoder = sc.Type.Qualified("zio.jdbc.JdbcDecoder")
   private val SqlFragment = sc.Type.Qualified("zio.jdbc.SqlFragment")
   private val Segment = sc.Type.Qualified("zio.jdbc.SqlFragment.Segment")
   private val Setter = sc.Type.Qualified("zio.jdbc.SqlFragment.Setter")
   private val UpdateResult = sc.Type.Qualified("zio.jdbc.UpdateResult")
+  private val Chunk = sc.Type.Qualified("zio.Chunk")
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
   private val JdbcDecoderError = sc.Type.Qualified("zio.jdbc.JdbcDecoderError")
@@ -234,7 +234,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         }
 
         code"""$NonEmptyChunk.fromIterableOption(${varargs.name}) match {
-              |  case None           => ${`ZIO.succeed`}(false)
+              |  case None           => $ZIO.succeed(false)
               |  case Some(nonEmpty) =>
               |    import zio.prelude.ForEachOps
               |    implicit val identity: zio.prelude.Identity[SqlFragment] = new zio.prelude.Identity[SqlFragment] {
@@ -385,7 +385,86 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         }
     }
 
-  override def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code = code"???" // TODO Jules
+  override def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code =
+    repoMethod match {
+      case RepoMethod.SelectBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.SelectBuilderMock}($fieldsType, $ZIO.succeed($Chunk.fromIterable(map.values)), ${sc.Type.dsl.SelectParams}.empty)"
+      case RepoMethod.SelectAll(_, _, _) =>
+        code"$ZStream.fromIterable(map.values)"
+      case RepoMethod.SelectById(_, _, id, _) =>
+        code"$ZIO.succeed(map.get(${id.paramName}))"
+      case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
+        code"$ZStream.fromIterable(${idsParam.name}.flatMap(map.get))"
+      case RepoMethod.SelectByUnique(_, cols, _) =>
+        code"$ZIO.succeed(map.values.find(v => ${cols.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
+
+      case RepoMethod.SelectByFieldValues(_, cols, fieldValue, fieldValueOrIdsParam, _) =>
+        val cases = cols.map { col =>
+          code"case (acc, $fieldValue.${col.name}(value)) => acc.filter(_.${col.name} == value)"
+        }
+        code"""$ZStream.fromIterable {
+              |  ${fieldValueOrIdsParam.name}.foldLeft(map.values) {
+              |    ${cases.mkCode("\n")}
+              |  }
+              |}""".stripMargin
+      case RepoMethod.UpdateBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType, map)"
+      case RepoMethod.UpdateFieldValues(_, id, varargs, fieldValue, cases0, _) =>
+        val cases = cases0.map { col =>
+          code"case (acc, $fieldValue.${col.name}(value)) => acc.copy(${col.name} = value)"
+        }
+
+        code"""|$ZIO.succeed {
+               |  map.get(${id.paramName}) match {
+               |    case ${sc.Type.Some}(oldRow) =>
+               |      val updatedRow = ${varargs.name}.foldLeft(oldRow) {
+               |        ${cases.mkCode("\n")}
+               |      }
+               |      if (updatedRow != oldRow) {
+               |        map.put(${id.paramName}, updatedRow): @${sc.Type.nowarn}
+               |        true
+               |      } else {
+               |        false
+               |      }
+               |    case ${sc.Type.None} => false
+               |  }
+               |}""".stripMargin
+      case RepoMethod.Update(_, _, _, param, _) =>
+        code"""$ZIO.succeed {
+              |  map.get(${param.name}.${id.paramName}) match {
+              |    case ${sc.Type.Some}(`${param.name}`) => false
+              |    case ${sc.Type.Some}(_) =>
+              |      map.put(${param.name}.${id.paramName}, ${param.name}): @${sc.Type.nowarn}
+              |      true
+              |    case ${sc.Type.None} => false
+              |  }
+              |}""".stripMargin
+      case RepoMethod.Insert(_, _, unsavedParam, _) =>
+        code"""|$ZIO.succeed {
+               |  val _ =
+               |    if (map.contains(${unsavedParam.name}.${id.paramName}))
+               |      sys.error(s"id $${${unsavedParam.name}.${id.paramName}} already exists")
+               |    else
+               |      map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
+               |
+               |  $UpdateResult(1, $Chunk.single(${unsavedParam.name}))
+               |}"""
+      case RepoMethod.Upsert(_, _, _, unsavedParam, _) =>
+        code"""|$ZIO.succeed {
+               |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${sc.Type.nowarn}
+               |  $UpdateResult(1, $Chunk.single(${unsavedParam.name}))
+               |}""".stripMargin
+      case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
+        code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
+
+      case RepoMethod.DeleteBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType, map)"
+      case RepoMethod.Delete(_, id) =>
+        code"$ZIO.succeed(map.remove(${id.paramName}).isDefined)"
+      case RepoMethod.SqlFile(_) =>
+        // should not happen (tm)
+        code"???"
+    }
 
   override def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Value =
     sc.Value(
