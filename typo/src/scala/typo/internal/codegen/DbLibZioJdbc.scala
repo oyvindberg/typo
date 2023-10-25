@@ -693,7 +693,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                    |          v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                    |          (columIndex, ${ct.typoType}(b.result()))
                    |        } catch {
-                   |          case e: ClassCastException => throw new RuntimeException("Invalid TypoHStore decoder", e)
+                   |          case e: ClassCastException =>
+                   |            throw $JdbcDecoderError(
+                   |              message = s"Error decoding ${ct.typoType} from ResultSet",
+                   |              cause = e,
+                   |              metadata = rs.getMetaData,
+                   |              row = rs.getRow
+                   |            )
                    |        }
                    |  }
                    |}""".stripMargin
