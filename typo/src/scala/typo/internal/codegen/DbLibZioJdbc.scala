@@ -691,7 +691,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = jdbcDecoderName,
         implicitParams = Nil,
         tpe = JdbcDecoder.of(ct.typoType),
-        body = code"""${JdbcDecoder.of(ct.typoType)}((rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => ${ct.toTypo0(code"rs.getObject(i).asInstanceOf[${ct.fromTypo.jdbcType}]")}, ${sc.StrLit(ct.fromTypo.jdbcType.render.asString)})"""
+        body = {
+          val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
+          code"""${JdbcDecoder.of(ct.typoType)}((rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => ${ct.toTypo0(code"rs.getObject(i).asInstanceOf[${ct.fromTypo.jdbcType}]")}, $expectedType)"""
+        }
       ),
       sc.Given(
         tparams = Nil,
