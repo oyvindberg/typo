@@ -2,7 +2,7 @@ package adventureworks
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-import zio.Chunk
+import zio.{Chunk, ZIO}
 import zio.stream.ZStream
 
 class ReadPostgresTest extends AnyFunSuite with TypeCheckedTripleEquals {
@@ -217,8 +217,7 @@ class ReadPostgresTest extends AnyFunSuite with TypeCheckedTripleEquals {
           )
         )
         .flatMap(_.take(1))
-        .foreach(println)
-        .as(1) // for type inference
+        .foreach(v => ZIO.succeed(println(v)))
     )
   }
 }
