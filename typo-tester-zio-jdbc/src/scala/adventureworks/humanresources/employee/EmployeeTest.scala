@@ -127,7 +127,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           modifieddate = Defaulted.UseDefault,
           organizationnode = Defaulted.UseDefault
         )
-        _ <- repo.insert(employeeRowUnsaved).map {
+        _ <- repo.insert(employeeRowUnsaved).map(_.updatedKeys.head).map {
           case EmployeeRow(
                 personRow.businessentityid,
                 employeeRowUnsaved.nationalidnumber,
