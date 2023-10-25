@@ -8,7 +8,8 @@ import zio.stream.ZStream
 class ReadPostgresTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("don't fail while reading rows from postgres tables") {
     withConnection(
-      ZStream.fromChunk(
+      ZStream
+        .fromChunk(
           Chunk(
             adventureworks.information_schema.administrable_role_authorizations.AdministrableRoleAuthorizationsViewRepoImpl.selectAll,
             adventureworks.information_schema._pg_foreign_servers.PgForeignServersViewRepoImpl.selectAll,
@@ -217,6 +218,7 @@ class ReadPostgresTest extends AnyFunSuite with TypeCheckedTripleEquals {
         )
         .flatMap(_.take(1))
         .foreach(println)
+        .as(1)
     )
   }
 }
