@@ -46,9 +46,13 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
       )
       for {
         // insert and round trip check
-        saved1 <- repo.insert(unsaved)
+        inserted1 <- repo.insert(unsaved)
+        _ <- ZIO.succeed(assert(inserted1.rowsUpdated === 1L))
+        saved1 = inserted1.updatedKeys.head
         newName = Name("baz")
-        saved2 <- repo.upsert(saved1.copy(name = newName))
+        inserted2 <- repo.upsert(saved1.copy(name = newName))
+        _ <- ZIO.succeed(assert(inserted2.rowsUpdated === 1L))
+        saved2 = inserted2.updatedKeys.head
         _ <- ZIO.succeed(assert(saved2.name === newName))
       } yield succeed
     }
