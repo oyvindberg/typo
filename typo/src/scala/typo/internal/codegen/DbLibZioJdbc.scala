@@ -506,5 +506,46 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     List(decoder, encoder)
   }
 
-  override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = List.empty // TODO Jules
+  override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = {
+    val decoder =
+      sc.Given(
+        tparams = Nil,
+        name = jdbcDecoderName,
+        implicitParams = Nil,
+        tpe = JdbcDecoder.of(ct.typoType),
+        body = {
+          val namedParams = ct.params.zipWithIndex.map { case (c, idx) =>
+            code"${c.name} = ${lookupJdbcDecoder(c.tpe)}.unsafeDecode(columIndex + $idx, rs)._2"
+          }
+
+          code"""|new ${JdbcDecoder.of(ct.typoType)} {
+                 |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${ct.typoType}) =
+                 |    columIndex ->
+                 |      ${ct.typoType}(
+                 |        ${namedParams.mkCode(",\n")}
+                 |      )
+                 |}
+              """.stripMargin
+        }
+      )
+
+    /** Inspired by `JdbcEncoder.caseClassEncoder`
+     */
+    val encoder =
+      sc.Given(
+        tparams = Nil,
+        name = jdbcEncoderName,
+        implicitParams = Nil,
+        tpe = JdbcEncoder.of(ct.typoType),
+        body = {
+          code"""|new ${JdbcEncoder.of(ct.typoType)} {
+                 |  override def encode(value: ${ct.typoType}): $SqlFragment =
+                 |    ${ct.params.map(c => code"${lookupJdbcEncoder(c.tpe)}.encode(value.${c.name})").mkCode(code" ++ ${SQL(code", ")} ++\n")}
+                 |}
+                      """.stripMargin
+        }
+      )
+
+    List(decoder, encoder)
+  }
 }
