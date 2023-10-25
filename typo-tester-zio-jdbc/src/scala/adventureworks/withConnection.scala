@@ -6,7 +6,7 @@ import zio.{Unsafe, ZIO, ZLayer}
 import scala.annotation.nowarn
 
 object withConnection {
-  val connectionPool: ZLayer[ZConnectionPoolConfig, Throwable, ZConnectionPool] =
+  val connectionPool: ZLayer[Any, Throwable, ZConnectionPool] =
     ZLayer.succeed(ZConnectionPoolConfig.default) >>>
       ZConnectionPool.postgres(
         "localhost",
