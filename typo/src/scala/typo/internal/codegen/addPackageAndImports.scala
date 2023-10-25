@@ -7,6 +7,15 @@ import scala.collection.mutable
 /** imports are automatically written based on the qualified idents found in the code
   */
 object addPackageAndImports {
+
+  /**
+   * Imports that we don't need to write explicitly as they are already available in the Java "predef"
+   */
+  private val javaPredefImports: Set[sc.Type.Qualified] =
+    Set(
+      sc.Type.Qualified("java.lang.Throwable")
+    )
+
   def apply(knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]], file: sc.File): sc.File = {
     val newImports = mutable.Map.empty[sc.Ident, sc.Type.Qualified]
 
@@ -33,7 +42,7 @@ object addPackageAndImports {
     val withPrefix =
       code"""${NonEmptyList.fromList(file.pkg.idents).fold(sc.Code.Empty)(is => is.map(i => code"package $i").mkCode("\n"))}
             |
-            |${newImports.values.toList.sorted.map { i => code"import $i" }.mkCode("\n")}
+            |${newImports.values.toList.filterNot(javaPredefImports.contains).sorted.map { i => code"import $i" }.mkCode("\n")}
             |
             |$withShortenedNames""".stripMargin
 
