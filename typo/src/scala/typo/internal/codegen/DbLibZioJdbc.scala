@@ -590,8 +590,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
         ),
         tpe = Setter.of(sc.Type.Array.of(T)),
-        body =
-          code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
+        body = code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
                  |  (ps, i, v) => {
                  |    ps.setArray(i, ps.getConnection.createArrayOf(classTag.runtimeClass.getCanonicalName, v.asInstanceOf[Array[AnyRef]]))
                  |  },
@@ -600,7 +599,26 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       )
     }
 
-    List(primitiveArrayDecoder, primitiveArraySetter)
+    val primitiveArrayEncoder = {
+      // implicit def singleParamEncoder[A: SqlFragment.Setter]: JdbcEncoder[A] = value => sql"$value"
+      val T = sc.Type.Abstract(sc.Ident("T"))
+
+      sc.Given(
+        tparams = List(T),
+        name = sc.Ident("primitieArrayEncoder"),
+        implicitParams = List(
+          sc.Param(name = sc.Ident("setter"), tpe = Setter.of(T), default = None),
+          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
+        ),
+        tpe = JdbcEncoder.of(sc.Type.Array.of(T)),
+        body = code"""|value => {
+                 |  import $sqlInterpolator
+                 |  ${SQL(code"$$value")}
+                 |}""".stripMargin
+      )
+    }
+
+    List(primitiveArrayDecoder, primitiveArraySetter, primitiveArrayEncoder)
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
@@ -780,11 +798,11 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           implicitParams = Nil,
           tpe = Setter.of(ct.typoType),
           body = code"""|$Setter.forSqlType[${ct.typoType}](
-              |  (ps, i, v) => {
-              |    ${ct.params.zipWithIndex.map { case (c, i) => code"${lookupSetter(c.tpe)}.setValue(ps, i + $i, v.${c.name})" }.mkCode("\n")}
-              |  },
-              |  ${sc.Type.Types}.OTHER
-              |)""".stripMargin
+                   |  (ps, i, v) => {
+                   |    ${ct.params.zipWithIndex.map { case (c, i) => code"${lookupSetter(c.tpe)}.setValue(ps, i + $i, v.${c.name})" }.mkCode("\n")}
+                   |  },
+                   |  ${sc.Type.Types}.OTHER
+                   |)""".stripMargin
         )
 
       List(decoder, encoder, setter)
