@@ -12,17 +12,6 @@ import java.time.*
 import scala.annotation.nowarn
 
 class ArrayTest2 extends AnyFunSuite with TypeCheckedTripleEquals {
-
-  final case class Test(a: Int, b: String)
-  
-  new JdbcDecoder[Test] {
-    override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, Test) = ???
-  }
-  
-  new JdbcEncoder[Test] {
-    override def encode(value: Test): SqlFragment = ???
-  }
-
   def tableFor(dbType: String): Unit =
     withConnection {
       val tableName = s"test_type_${dbType.filter(_.isLetterOrDigit)}"
