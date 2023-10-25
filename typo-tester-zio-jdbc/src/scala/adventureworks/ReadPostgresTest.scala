@@ -218,7 +218,7 @@ class ReadPostgresTest extends AnyFunSuite with TypeCheckedTripleEquals {
         )
         .flatMap(_.take(1))
         .foreach(println)
-        .as(1)
+        .as(1) // for type inference
     )
   }
 }
