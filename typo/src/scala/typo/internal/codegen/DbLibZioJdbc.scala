@@ -496,8 +496,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         tpe = JdbcEncoder.of(tpe),
         body = {
           code"""|new ${JdbcEncoder.of(tpe)} {
+                 |  private final val comma = ${SQL(code", ")}
+                 |
                  |  override def encode(value: $tpe): $SqlFragment =
-                 |    ${cols.map(c => code"${lookupJdbcEncoder(c.tpe)}.encode(value.${c.name})").mkCode(code" ++ ${SQL(code", ")} ++\n")}
+                 |    ${cols.map(c => code"${lookupJdbcEncoder(c.tpe)}.encode(value.${c.name})").mkCode(code" ++ comma ++\n")}
                  |}
                   """.stripMargin
         }
@@ -507,45 +509,75 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   }
 
   override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = {
-    val decoder =
-      sc.Given(
-        tparams = Nil,
-        name = jdbcDecoderName,
-        implicitParams = Nil,
-        tpe = JdbcDecoder.of(ct.typoType),
-        body = {
-          val namedParams = ct.params.zipWithIndex.map { case (c, idx) =>
-            code"${c.name} = ${lookupJdbcDecoder(c.tpe)}.unsafeDecode(columIndex + $idx, rs)._2"
+    if (ct.params.length == 1) {
+      List(
+        sc.Given(
+          tparams = Nil,
+          name = jdbcEncoderName,
+          implicitParams = Nil,
+          tpe = JdbcEncoder.of(ct.typoType),
+          body = code"""${lookupJdbcEncoder(ct.params.head.tpe)}.contramap(_.value)"""
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = jdbcDecoderName,
+          implicitParams = Nil,
+          tpe = JdbcDecoder.of(ct.typoType),
+          body = code"""${lookupJdbcDecoder(ct.params.head.tpe)}.map(${ct.typoType}.apply)"""
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = jdbcSetterName,
+          implicitParams = Nil,
+          tpe = Setter.of(ct.typoType),
+          body = code"""${lookupSetter(ct.params.head.tpe)}.contramap(_.value)"""
+        )
+      )
+    } else {
+      val decoder =
+        sc.Given(
+          tparams = Nil,
+          name = jdbcDecoderName,
+          implicitParams = Nil,
+          tpe = JdbcDecoder.of(ct.typoType),
+          body = {
+            val namedParams = ct.params.zipWithIndex.map { case (c, idx) =>
+              code"${c.name} = ${lookupJdbcDecoder(c.tpe)}.unsafeDecode(columIndex + $idx, rs)._2"
+            }
+
+            code"""|new ${JdbcDecoder.of(ct.typoType)} {
+                   |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${ct.typoType}) =
+                   |    columIndex ->
+                   |      ${ct.typoType}(
+                   |        ${namedParams.mkCode(",\n")}
+                   |      )
+                   |}
+                """.stripMargin
           }
+        )
 
-          code"""|new ${JdbcDecoder.of(ct.typoType)} {
-                 |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${ct.typoType}) =
-                 |    columIndex ->
-                 |      ${ct.typoType}(
-                 |        ${namedParams.mkCode(",\n")}
-                 |      )
-                 |}
-              """.stripMargin
-        }
-      )
+      /** Inspired by `JdbcEncoder.caseClassEncoder`
+        */
+      val encoder =
+        sc.Given(
+          tparams = Nil,
+          name = jdbcEncoderName,
+          implicitParams = Nil,
+          tpe = JdbcEncoder.of(ct.typoType),
+          body = {
+            code"""|new ${JdbcEncoder.of(ct.typoType)} {
+                   |  private final val comma = ${SQL(code", ")}
+                   |
+                   |  override def encode(value: ${ct.typoType}): $SqlFragment = {
+                   |    ${ct.params.map(c => code"${lookupJdbcEncoder(c.tpe)}.encode(value.${c.name})").mkCode(code" ++ comma ++\n")}
+                   |  }
+                   |}
+                        """.stripMargin
+          }
+        )
 
-    /** Inspired by `JdbcEncoder.caseClassEncoder`
-     */
-    val encoder =
-      sc.Given(
-        tparams = Nil,
-        name = jdbcEncoderName,
-        implicitParams = Nil,
-        tpe = JdbcEncoder.of(ct.typoType),
-        body = {
-          code"""|new ${JdbcEncoder.of(ct.typoType)} {
-                 |  override def encode(value: ${ct.typoType}): $SqlFragment =
-                 |    ${ct.params.map(c => code"${lookupJdbcEncoder(c.tpe)}.encode(value.${c.name})").mkCode(code" ++ ${SQL(code", ")} ++\n")}
-                 |}
-                      """.stripMargin
-        }
-      )
+      List(decoder, encoder)
+    }
 
-    List(decoder, encoder)
   }
 }
