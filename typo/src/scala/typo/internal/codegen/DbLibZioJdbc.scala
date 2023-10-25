@@ -509,31 +509,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   }
 
   override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = {
-    if (ct.params.length == 1) {
-      List(
-        sc.Given(
-          tparams = Nil,
-          name = jdbcEncoderName,
-          implicitParams = Nil,
-          tpe = JdbcEncoder.of(ct.typoType),
-          body = code"""${lookupJdbcEncoder(ct.params.head.tpe)}.contramap(_.value)"""
-        ),
-        sc.Given(
-          tparams = Nil,
-          name = jdbcDecoderName,
-          implicitParams = Nil,
-          tpe = JdbcDecoder.of(ct.typoType),
-          body = code"""${lookupJdbcDecoder(ct.params.head.tpe)}.map(${ct.typoType}.apply)"""
-        ),
-        sc.Given(
-          tparams = Nil,
-          name = jdbcSetterName,
-          implicitParams = Nil,
-          tpe = Setter.of(ct.typoType),
-          body = code"""${lookupSetter(ct.params.head.tpe)}.contramap(_.value)"""
-        )
-      )
-    } else {
+    if (ct.params.length == 1) anyValInstances(ct.typoType, ct.params.head.tpe)
+    else {
       val decoder =
         sc.Given(
           tparams = Nil,
