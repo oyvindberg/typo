@@ -216,8 +216,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |      }
               |    )
               |    ${SQL(code"""select ${dbNames(cols, isRead = true)} from $relName""")}.where(wheres).query(${lookupJdbcDecoder(rowType)}).selectStream
-              |}
-              |""".stripMargin
+              |}""".stripMargin
 
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
@@ -560,8 +559,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |      $tpe(
                |        ${namedParams.mkCode(",\n")}
                |      )
-               |}
-          """.stripMargin
+               |}""".stripMargin
         }
       )
 
@@ -574,13 +572,19 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         implicitParams = Nil,
         tpe = JdbcEncoder.of(tpe),
         body = {
-          code"""|new ${JdbcEncoder.of(tpe)} {
+          if (cols.length == 1) {
+            code"""|new ${JdbcEncoder.of(tpe)} {
+                   |  override def encode(value: $tpe): $SqlFragment =
+                   |    ${lookupJdbcEncoder(cols.head.tpe)}.encode(value.${cols.head.name})
+                   |}""".stripMargin
+          } else {
+            code"""|new ${JdbcEncoder.of(tpe)} {
                  |  private final val comma = ${SQL(code", ")}
                  |
                  |  override def encode(value: $tpe): $SqlFragment =
                  |    ${cols.map(c => code"${lookupJdbcEncoder(c.tpe)}.encode(value.${c.name})").mkCode(code" ++ comma ++\n")}
-                 |}
-                  """.stripMargin
+                 |}""".stripMargin
+          }
         }
       )
 
@@ -607,8 +611,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                    |      ${ct.typoType}(
                    |        ${namedParams.mkCode(",\n")}
                    |      )
-                   |}
-                """.stripMargin
+                   |}""".stripMargin
           }
         )
 
@@ -627,8 +630,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                    |  override def encode(value: ${ct.typoType}): $SqlFragment = {
                    |    ${ct.params.map(c => code"${lookupJdbcEncoder(c.tpe)}.encode(value.${c.name})").mkCode(code" ++ comma ++\n")}
                    |  }
-                   |}
-                        """.stripMargin
+                   |}""".stripMargin
           }
         )
 
