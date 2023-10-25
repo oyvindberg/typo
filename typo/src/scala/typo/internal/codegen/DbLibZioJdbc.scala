@@ -700,7 +700,22 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           }
         )
 
-      List(decoder, encoder)
+      val setter =
+        sc.Given(
+          tparams = Nil,
+          name = jdbcSetterName,
+          implicitParams = Nil,
+          tpe = Setter.of(ct.typoType),
+          body =
+            code"""|$Setter.forSqlType[${ct.typoType}](
+              |  (ps, i, v) => {
+              |    ${ct.params.zipWithIndex.map { case (c, i) => code"${lookupSetter(c.tpe)}.setValue(ps, i + $i, v.${c.name})"}.mkCode("\n")}
+              |  },
+              |  ${sc.Type.Types}.OTHER
+              |)""".stripMargin
+        )
+
+      List(decoder, encoder, setter)
     }
   }
 }
