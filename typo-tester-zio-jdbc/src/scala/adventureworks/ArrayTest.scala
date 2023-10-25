@@ -7,7 +7,6 @@ import zio.jdbc.*
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
-import java.sql.ResultSet
 import java.time.*
 import scala.annotation.nowarn
 
