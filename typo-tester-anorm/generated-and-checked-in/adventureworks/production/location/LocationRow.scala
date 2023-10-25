@@ -7,6 +7,7 @@ package adventureworks
 package production
 package location
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.Column
@@ -58,6 +59,17 @@ object LocationRow {
         modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[LocationRow] = Text.instance[LocationRow]{ (row, sb) =>
+    LocationId.text.unsafeEncode(row.locationid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.costrate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.availability, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[LocationRow] = OWrites[LocationRow](o =>
     new JsObject(ListMap[String, JsValue](

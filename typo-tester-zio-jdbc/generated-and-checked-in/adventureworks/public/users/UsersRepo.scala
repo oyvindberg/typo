@@ -20,7 +20,10 @@ trait UsersRepo {
   def delete(userId: UsersId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[UsersFields, UsersRow]
   def insert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UsersRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: UsersRowUnsaved): ZIO[ZConnection, Throwable, UsersRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll: ZStream[ZConnection, Throwable, UsersRow]
   def selectById(userId: UsersId): ZIO[ZConnection, Throwable, Option[UsersRow]]

@@ -35,6 +35,9 @@ object LocationRepoImpl extends LocationRepo {
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
        """.query(LocationRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(LocationRow.text)
+  }
   override def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
     val fs = List(
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
@@ -69,6 +72,10 @@ object LocationRepoImpl extends LocationRepo {
     }
     q.query(LocationRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(LocationRowUnsaved.text)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
     SelectBuilderSql("production.location", LocationFields, LocationRow.read)

@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -33,4 +34,8 @@ object TypoHStore {
                                                                                                  v.value.foreach { case (k, v) => b.put(k, v)}
                                                                                                  b
                                                                                                })
+  implicit lazy val text: Text[TypoHStore] = new Text[TypoHStore] {
+    override def unsafeEncode(v: TypoHStore, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.map { case (k, v) => s"$k => $v" }.mkString(","), sb)
+    override def unsafeArrayEncode(v: TypoHStore, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.map { case (k, v) => s"$k => $v" }.mkString(","), sb)
+  }
 }

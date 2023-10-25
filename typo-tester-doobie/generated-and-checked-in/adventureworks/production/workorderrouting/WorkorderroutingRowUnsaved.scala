@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -73,4 +74,29 @@ case class WorkorderroutingRowUnsaved(
 object WorkorderroutingRowUnsaved {
   implicit lazy val decoder: Decoder[WorkorderroutingRowUnsaved] = Decoder.forProduct12[WorkorderroutingRowUnsaved, WorkorderId, Int, TypoShort, LocationId, TypoLocalDateTime, TypoLocalDateTime, Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], BigDecimal, Option[BigDecimal], Defaulted[TypoLocalDateTime]]("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(WorkorderroutingRowUnsaved.apply)(WorkorderId.decoder, Decoder.decodeInt, TypoShort.decoder, LocationId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeBigDecimal, Decoder.decodeOption(Decoder.decodeBigDecimal), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[WorkorderroutingRowUnsaved] = Encoder.forProduct12[WorkorderroutingRowUnsaved, WorkorderId, Int, TypoShort, LocationId, TypoLocalDateTime, TypoLocalDateTime, Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], BigDecimal, Option[BigDecimal], Defaulted[TypoLocalDateTime]]("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(x => (x.workorderid, x.productid, x.operationsequence, x.locationid, x.scheduledstartdate, x.scheduledenddate, x.actualstartdate, x.actualenddate, x.actualresourcehrs, x.plannedcost, x.actualcost, x.modifieddate))(WorkorderId.encoder, Encoder.encodeInt, TypoShort.encoder, LocationId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeBigDecimal, Encoder.encodeOption(Encoder.encodeBigDecimal), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[WorkorderroutingRowUnsaved] = Text.instance[WorkorderroutingRowUnsaved]{ (row, sb) =>
+    WorkorderId.text.unsafeEncode(row.workorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.operationsequence, sb)
+    sb.append(Text.DELIMETER)
+    LocationId.text.unsafeEncode(row.locationid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.scheduledstartdate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.scheduledenddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.actualstartdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.actualenddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.bigDecimalInstance).unsafeEncode(row.actualresourcehrs, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.plannedcost, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.bigDecimalInstance).unsafeEncode(row.actualcost, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

@@ -17,7 +17,10 @@ trait CurrencyrateRepo {
   def delete(currencyrateid: CurrencyrateId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow]
   def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow]
   def selectAll: Stream[ConnectionIO, CurrencyrateRow]
   def selectById(currencyrateid: CurrencyrateId): ConnectionIO[Option[CurrencyrateRow]]

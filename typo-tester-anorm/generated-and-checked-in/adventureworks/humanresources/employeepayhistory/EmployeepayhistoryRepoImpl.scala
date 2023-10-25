@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -39,6 +40,9 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
     
   }
+  override def insertStreaming(unsaved: Iterator[EmployeepayhistoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmployeepayhistoryRow.text, c)
+  }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
@@ -65,6 +69,10 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
         .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[EmployeepayhistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeepayhistoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     SelectBuilderSql("humanresources.employeepayhistory", EmployeepayhistoryFields, EmployeepayhistoryRow.rowParser)

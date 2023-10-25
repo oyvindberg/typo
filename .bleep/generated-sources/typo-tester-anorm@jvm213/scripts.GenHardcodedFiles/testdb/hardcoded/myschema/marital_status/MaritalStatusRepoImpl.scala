@@ -15,6 +15,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -34,6 +35,9 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY myschema.marital_status("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text, c)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
     SelectBuilderSql("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.rowParser)

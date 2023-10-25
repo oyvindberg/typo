@@ -13,6 +13,7 @@ import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
+import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -39,6 +40,9 @@ object PersonRepoImpl extends PersonRepo {
           values (${Segment.paramSegment(unsaved.id)(PersonId.setter)}::int8, ${Segment.paramSegment(unsaved.favouriteFootballClubId)(FootballClubId.setter)}, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.nickName)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.blogUrl)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.email)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.phone)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.likesPizza)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.maritalStatusId)(MaritalStatusId.setter)}, ${Segment.paramSegment(unsaved.workEmail)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sector)(Sector.setter)}::myschema.sector, ${Segment.paramSegment(unsaved.favoriteNumber)(Number.setter)}::myschema.number)
           returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
   }
   override def insert(unsaved: PersonRowUnsaved): ZIO[ZConnection, Throwable, PersonRow] = {
     val fs = List(
@@ -79,6 +83,10 @@ object PersonRepoImpl extends PersonRepo {
     }
     q.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY myschema.person("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("myschema.person", PersonFields, PersonRow.jdbcDecoder)

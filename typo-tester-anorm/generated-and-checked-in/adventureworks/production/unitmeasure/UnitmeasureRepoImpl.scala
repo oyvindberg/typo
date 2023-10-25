@@ -10,6 +10,7 @@ package unitmeasure
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       .executeInsert(UnitmeasureRow.rowParser(1).single)
     
   }
+  override def insertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(UnitmeasureRow.text, c)
+  }
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
     val namedParameters = List(
       Some((NamedParameter("unitmeasurecode", ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)), "::bpchar")),
@@ -61,6 +65,10 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
         .executeInsert(UnitmeasureRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[UnitmeasureRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UnitmeasureRowUnsaved.text, c)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
     SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.rowParser)

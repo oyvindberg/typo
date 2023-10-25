@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -38,4 +39,11 @@ case class PersoncreditcardRowUnsaved(
 object PersoncreditcardRowUnsaved {
   implicit lazy val decoder: Decoder[PersoncreditcardRowUnsaved] = Decoder.forProduct3[PersoncreditcardRowUnsaved, BusinessentityId, /* user-picked */ CustomCreditcardId, Defaulted[TypoLocalDateTime]]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRowUnsaved.apply)(BusinessentityId.decoder, CustomCreditcardId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[PersoncreditcardRowUnsaved] = Encoder.forProduct3[PersoncreditcardRowUnsaved, BusinessentityId, /* user-picked */ CustomCreditcardId, Defaulted[TypoLocalDateTime]]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, CustomCreditcardId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[PersoncreditcardRowUnsaved] = Text.instance[PersoncreditcardRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    /* user-picked */ CustomCreditcardId.text.unsafeEncode(row.creditcardid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

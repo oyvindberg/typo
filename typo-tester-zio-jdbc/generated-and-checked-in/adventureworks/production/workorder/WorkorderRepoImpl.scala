@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -37,6 +38,9 @@ object WorkorderRepoImpl extends WorkorderRepo {
           values (${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.orderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.scrappedqty)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """.insertReturning(WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text)
   }
   override def insert(unsaved: WorkorderRowUnsaved): ZIO[ZConnection, Throwable, WorkorderRow] = {
     val fs = List(
@@ -68,6 +72,10 @@ object WorkorderRepoImpl extends WorkorderRepo {
     }
     q.insertReturning(WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
     SelectBuilderSql("production.workorder", WorkorderFields, WorkorderRow.jdbcDecoder)

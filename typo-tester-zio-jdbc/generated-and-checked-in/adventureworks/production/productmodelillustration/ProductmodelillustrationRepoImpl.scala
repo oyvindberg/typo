@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           returning "productmodelid", "illustrationid", "modifieddate"::text
        """.insertReturning(ProductmodelillustrationRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelillustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelillustrationRow.text)
+  }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ZIO[ZConnection, Throwable, ProductmodelillustrationRow] = {
     val fs = List(
       Some((sql""""productmodelid"""", sql"${Segment.paramSegment(unsaved.productmodelid)(ProductmodelId.setter)}::int4")),
@@ -57,6 +61,10 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     }
     q.insertReturning(ProductmodelillustrationRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelillustrationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelillustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.jdbcDecoder)

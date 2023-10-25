@@ -10,6 +10,7 @@ package salesreason
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -36,6 +37,9 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[SalesreasonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesreasonRow.text, c)
   }
   override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow = {
     val namedParameters = List(
@@ -65,6 +69,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
         .executeInsert(SalesreasonRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SalesreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesreasonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
     SelectBuilderSql("sales.salesreason", SalesreasonFields, SalesreasonRow.rowParser)

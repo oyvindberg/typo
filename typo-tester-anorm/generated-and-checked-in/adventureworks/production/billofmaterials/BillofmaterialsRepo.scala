@@ -16,7 +16,10 @@ trait BillofmaterialsRepo {
   def delete(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow
+  def insertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[BillofmaterialsRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def selectAll(implicit c: Connection): List[BillofmaterialsRow]
   def selectById(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Option[BillofmaterialsRow]

@@ -16,7 +16,10 @@ trait CultureRepo {
   def delete(cultureid: CultureId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[CultureFields, CultureRow]
   def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow
+  def insertStreaming(unsaved: Iterator[CultureRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[CultureRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[CultureFields, CultureRow]
   def selectAll(implicit c: Connection): List[CultureRow]
   def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow]

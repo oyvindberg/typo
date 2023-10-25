@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import typo.dsl.Bijection
@@ -42,4 +43,8 @@ object TypoBytea {
     },
     "bytea"
   )
+  implicit lazy val text: Text[TypoBytea] = new Text[TypoBytea] {
+    override def unsafeEncode(v: TypoBytea, sb: StringBuilder) = Text.byteArrayInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoBytea, sb: StringBuilder) = Text.byteArrayInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

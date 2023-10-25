@@ -17,7 +17,10 @@ trait BusinessentityaddressRepo {
   def delete(compositeId: BusinessentityaddressId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def insert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def selectAll: Stream[ConnectionIO, BusinessentityaddressRow]
   def selectById(compositeId: BusinessentityaddressId): ConnectionIO[Option[BusinessentityaddressRow]]

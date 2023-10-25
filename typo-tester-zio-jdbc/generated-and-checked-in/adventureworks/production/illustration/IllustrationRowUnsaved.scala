@@ -7,6 +7,7 @@ package adventureworks
 package production
 package illustration
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
@@ -60,5 +61,12 @@ object IllustrationRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[IllustrationRowUnsaved] = Text.instance[IllustrationRowUnsaved]{ (row, sb) =>
+    Text.option(TypoXml.text).unsafeEncode(row.diagram, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(IllustrationId.text).unsafeEncode(row.illustrationid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

@@ -37,6 +37,9 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
        """.query(BillofmaterialsRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, BillofmaterialsRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(BillofmaterialsRow.text)
+  }
   override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
     val fs = List(
       Some((Fragment.const(s""""productassemblyid""""), fr"${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4")),
@@ -75,6 +78,10 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     }
     q.query(BillofmaterialsRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BillofmaterialsRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.billofmaterials("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BillofmaterialsRowUnsaved.text)
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     SelectBuilderSql("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.read)

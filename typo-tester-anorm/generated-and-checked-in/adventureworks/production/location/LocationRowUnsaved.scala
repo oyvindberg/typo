@@ -7,6 +7,7 @@ package adventureworks
 package production
 package location
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
@@ -71,6 +72,17 @@ object LocationRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[LocationRowUnsaved] = Text.instance[LocationRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(LocationId.text).unsafeEncode(row.locationid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.costrate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.availability, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[LocationRowUnsaved] = OWrites[LocationRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Name.writes.writes(o.name),

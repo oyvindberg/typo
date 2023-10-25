@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -40,6 +41,9 @@ object SalespersonRepoImpl extends SalespersonRepo {
        """
       .executeInsert(SalespersonRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[SalespersonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalespersonRow.text, c)
   }
   override def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
     val namedParameters = List(
@@ -86,6 +90,10 @@ object SalespersonRepoImpl extends SalespersonRepo {
         .executeInsert(SalespersonRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SalespersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalespersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
     SelectBuilderSql("sales.salesperson", SalespersonFields, SalespersonRow.rowParser)

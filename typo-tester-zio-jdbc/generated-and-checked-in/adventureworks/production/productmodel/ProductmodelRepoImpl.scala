@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -37,6 +38,9 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
           values (${Segment.paramSegment(unsaved.productmodelid)(ProductmodelId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.catalogdescription)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.instructions)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
        """.insertReturning(ProductmodelRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelRow.text)
   }
   override def insert(unsaved: ProductmodelRowUnsaved): ZIO[ZConnection, Throwable, ProductmodelRow] = {
     val fs = List(
@@ -68,6 +72,10 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     }
     q.insertReturning(ProductmodelRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
     SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.jdbcDecoder)

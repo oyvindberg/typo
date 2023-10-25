@@ -39,8 +39,30 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.shoppingcartitemid -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.shoppingcartitemid -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     SelectBuilderMock(ShoppingcartitemFields, delay(map.values.toList), SelectParams.empty)

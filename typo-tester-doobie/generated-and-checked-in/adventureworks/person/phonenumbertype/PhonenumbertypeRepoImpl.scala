@@ -34,6 +34,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
           returning "phonenumbertypeid", "name", "modifieddate"::text
        """.query(PhonenumbertypeRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PhonenumbertypeRow.text)
+  }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     val fs = List(
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
@@ -60,6 +63,10 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     }
     q.query(PhonenumbertypeRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PhonenumbertypeRowUnsaved.text)
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.read)

@@ -7,6 +7,7 @@ package adventureworks
 package production
 package scrapreason
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import java.sql.ResultSet
@@ -55,5 +56,12 @@ object ScrapreasonRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[ScrapreasonRow] = Text.instance[ScrapreasonRow]{ (row, sb) =>
+    ScrapreasonId.text.unsafeEncode(row.scrapreasonid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

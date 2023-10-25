@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -30,4 +31,8 @@ object TypoPolygon {
     .map(v => TypoPolygon(v.points.map(p => TypoPoint(p.x, p.y)).toList))
   implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPolygon] = Ordering.by(_.points)
   implicit lazy val put: Put[TypoPolygon] = Put.Advanced.other[PGpolygon](NonEmptyList.one("polygon")).contramap(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray))
+  implicit lazy val text: Text[TypoPolygon] = new Text[TypoPolygon] {
+    override def unsafeEncode(v: TypoPolygon, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"""(${v.points.map(p => s"${p.x}, ${p.y}").mkString(",")})""", sb)
+    override def unsafeArrayEncode(v: TypoPolygon, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"""(${v.points.map(p => s"${p.x}, ${p.y}").mkString(",")})""", sb)
+  }
 }

@@ -16,7 +16,10 @@ trait SpecialofferRepo {
   def delete(specialofferid: SpecialofferId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow]
   def insert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow
+  def insertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[SpecialofferRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[SpecialofferFields, SpecialofferRow]
   def selectAll(implicit c: Connection): List[SpecialofferRow]
   def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow]

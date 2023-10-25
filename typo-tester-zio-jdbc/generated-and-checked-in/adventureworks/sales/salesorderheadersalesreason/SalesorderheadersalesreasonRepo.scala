@@ -19,7 +19,10 @@ trait SalesorderheadersalesreasonRepo {
   def delete(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def insert(unsaved: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, SalesorderheadersalesreasonRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ZIO[ZConnection, Throwable, SalesorderheadersalesreasonRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def selectAll: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow]
   def selectById(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Option[SalesorderheadersalesreasonRow]]

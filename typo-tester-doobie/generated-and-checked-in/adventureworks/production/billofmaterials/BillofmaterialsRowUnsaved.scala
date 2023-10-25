@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -78,4 +79,23 @@ case class BillofmaterialsRowUnsaved(
 object BillofmaterialsRowUnsaved {
   implicit lazy val decoder: Decoder[BillofmaterialsRowUnsaved] = Decoder.forProduct9[BillofmaterialsRowUnsaved, Option[ProductId], ProductId, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, Defaulted[BillofmaterialsId], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate")(BillofmaterialsRowUnsaved.apply)(Decoder.decodeOption(ProductId.decoder), ProductId.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, TypoShort.decoder, Defaulted.decoder(BillofmaterialsId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[BillofmaterialsRowUnsaved] = Encoder.forProduct9[BillofmaterialsRowUnsaved, Option[ProductId], ProductId, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, Defaulted[BillofmaterialsId], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate")(x => (x.productassemblyid, x.componentid, x.enddate, x.unitmeasurecode, x.bomlevel, x.billofmaterialsid, x.startdate, x.perassemblyqty, x.modifieddate))(Encoder.encodeOption(ProductId.encoder), ProductId.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, TypoShort.encoder, Defaulted.encoder(BillofmaterialsId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[BillofmaterialsRowUnsaved] = Text.instance[BillofmaterialsRowUnsaved]{ (row, sb) =>
+    Text.option(ProductId.text).unsafeEncode(row.productassemblyid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.componentid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.bomlevel, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(BillofmaterialsId.text).unsafeEncode(row.billofmaterialsid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.perassemblyqty, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

@@ -36,6 +36,9 @@ object CustomerRepoImpl extends CustomerRepo {
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
        """.query(CustomerRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CustomerRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CustomerRow.text)
+  }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
     val fs = List(
       Some((Fragment.const(s""""personid""""), fr"${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
@@ -68,6 +71,10 @@ object CustomerRepoImpl extends CustomerRepo {
     }
     q.query(CustomerRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CustomerRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CustomerRowUnsaved.text)
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
     SelectBuilderSql("sales.customer", CustomerFields, CustomerRow.read)

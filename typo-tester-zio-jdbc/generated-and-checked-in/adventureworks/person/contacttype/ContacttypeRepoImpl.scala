@@ -10,6 +10,7 @@ package contacttype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           returning "contacttypeid", "name", "modifieddate"::text
        """.insertReturning(ContacttypeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text)
+  }
   override def insert(unsaved: ContacttypeRowUnsaved): ZIO[ZConnection, Throwable, ContacttypeRow] = {
     val fs = List(
       Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
@@ -59,6 +63,10 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     }
     q.insertReturning(ContacttypeRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ContacttypeRowUnsaved.text)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
     SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.jdbcDecoder)

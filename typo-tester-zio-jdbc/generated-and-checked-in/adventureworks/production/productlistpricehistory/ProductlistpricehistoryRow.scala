@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productlistpricehistory
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import java.sql.ResultSet
@@ -75,5 +76,16 @@ object ProductlistpricehistoryRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[ProductlistpricehistoryRow] = Text.instance[ProductlistpricehistoryRow]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.listprice, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

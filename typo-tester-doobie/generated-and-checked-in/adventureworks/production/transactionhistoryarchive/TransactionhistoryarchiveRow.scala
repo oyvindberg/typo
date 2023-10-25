@@ -9,6 +9,7 @@ package transactionhistoryarchive
 
 import adventureworks.customtypes.TypoLocalDateTime
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -63,4 +64,23 @@ object TransactionhistoryarchiveRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
+  implicit lazy val text: Text[TransactionhistoryarchiveRow] = Text.instance[TransactionhistoryarchiveRow]{ (row, sb) =>
+    TransactionhistoryarchiveId.text.unsafeEncode(row.transactionid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.referenceorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.referenceorderlineid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.transactiondate, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.transactiontype, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.quantity, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.actualcost, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

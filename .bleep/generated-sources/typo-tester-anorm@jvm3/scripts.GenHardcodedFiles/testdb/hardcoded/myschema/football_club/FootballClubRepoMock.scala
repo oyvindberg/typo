@@ -35,6 +35,12 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[FootballClubRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.id -> row)
+    }
+    unsaved.size.toLong
+  }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
     SelectBuilderMock(FootballClubFields, () => map.values.toList, SelectParams.empty)
   }

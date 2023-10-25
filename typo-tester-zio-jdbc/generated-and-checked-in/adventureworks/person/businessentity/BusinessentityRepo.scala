@@ -19,7 +19,10 @@ trait BusinessentityRepo {
   def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow]
   def insert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, BusinessentityRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: BusinessentityRowUnsaved): ZIO[ZConnection, Throwable, BusinessentityRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[BusinessentityFields, BusinessentityRow]
   def selectAll: ZStream[ZConnection, Throwable, BusinessentityRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[BusinessentityRow]]

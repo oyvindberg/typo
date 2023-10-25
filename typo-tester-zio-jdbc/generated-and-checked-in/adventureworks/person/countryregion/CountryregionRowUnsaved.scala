@@ -7,6 +7,7 @@ package adventureworks
 package person
 package countryregion
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
@@ -56,5 +57,12 @@ object CountryregionRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[CountryregionRowUnsaved] = Text.instance[CountryregionRowUnsaved]{ (row, sb) =>
+    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

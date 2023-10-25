@@ -7,6 +7,7 @@ package adventureworks
 package person
 package countryregion
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
@@ -48,6 +49,13 @@ object CountryregionRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[CountryregionRowUnsaved] = Text.instance[CountryregionRowUnsaved]{ (row, sb) =>
+    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[CountryregionRowUnsaved] = OWrites[CountryregionRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),

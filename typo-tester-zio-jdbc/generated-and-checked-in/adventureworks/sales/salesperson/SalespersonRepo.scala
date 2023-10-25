@@ -20,7 +20,10 @@ trait SalespersonRepo {
   def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[SalespersonFields, SalespersonRow]
   def insert(unsaved: SalespersonRow): ZIO[ZConnection, Throwable, SalespersonRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalespersonRowUnsaved): ZIO[ZConnection, Throwable, SalespersonRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SalespersonFields, SalespersonRow]
   def selectAll: ZStream[ZConnection, Throwable, SalespersonRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[SalespersonRow]]

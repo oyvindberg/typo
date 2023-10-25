@@ -7,6 +7,7 @@ package adventureworks
 package person
 package stateprovince
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
@@ -95,5 +96,22 @@ object StateprovinceRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[StateprovinceRow] = Text.instance[StateprovinceRow]{ (row, sb) =>
+    StateprovinceId.text.unsafeEncode(row.stateprovinceid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.stateprovincecode, sb)
+    sb.append(Text.DELIMETER)
+    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+    sb.append(Text.DELIMETER)
+    Flag.text.unsafeEncode(row.isonlystateprovinceflag, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    SalesterritoryId.text.unsafeEncode(row.territoryid, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

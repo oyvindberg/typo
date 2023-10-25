@@ -26,5 +26,8 @@ object UsersId {
   implicit lazy val get: Get[UsersId] = TypoUUID.get.map(UsersId.apply)
   implicit def ordering(implicit O0: Ordering[TypoUUID]): Ordering[UsersId] = Ordering.by(_.value)
   implicit lazy val put: Put[UsersId] = TypoUUID.put.contramap(_.value)
-  implicit val textEncoder: Text[UsersId] = Text.stringInstance.contramap(_.value.value.toString)
+  implicit lazy val text: Text[UsersId] = new Text[UsersId] {
+    override def unsafeEncode(v: UsersId, sb: StringBuilder) = TypoUUID.text.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: UsersId, sb: StringBuilder) = TypoUUID.text.unsafeArrayEncode(v.value, sb)
+  }
 }

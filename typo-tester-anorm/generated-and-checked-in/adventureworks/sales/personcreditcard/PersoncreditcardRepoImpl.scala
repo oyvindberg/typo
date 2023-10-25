@@ -10,6 +10,7 @@ package personcreditcard
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import adventureworks.userdefined.CustomCreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue
@@ -38,6 +39,9 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
       .executeInsert(PersoncreditcardRow.rowParser(1).single)
     
   }
+  override def insertStreaming(unsaved: Iterator[PersoncreditcardRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersoncreditcardRow.text, c)
+  }
   override def insert(unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
     val namedParameters = List(
       Some((NamedParameter("businessentityid", ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)), "::int4")),
@@ -62,6 +66,10 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
         .executeInsert(PersoncreditcardRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[PersoncreditcardRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersoncreditcardRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.rowParser)

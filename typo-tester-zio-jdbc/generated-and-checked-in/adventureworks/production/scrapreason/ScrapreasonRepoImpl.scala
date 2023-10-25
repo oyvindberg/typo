@@ -10,6 +10,7 @@ package scrapreason
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           returning "scrapreasonid", "name", "modifieddate"::text
        """.insertReturning(ScrapreasonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ScrapreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ScrapreasonRow.text)
+  }
   override def insert(unsaved: ScrapreasonRowUnsaved): ZIO[ZConnection, Throwable, ScrapreasonRow] = {
     val fs = List(
       Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
@@ -59,6 +63,10 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     }
     q.insertReturning(ScrapreasonRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ScrapreasonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ScrapreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
     SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.jdbcDecoder)

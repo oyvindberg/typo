@@ -7,6 +7,7 @@ package adventureworks
 package production
 package scrapreason
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
@@ -52,6 +53,13 @@ object ScrapreasonRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[ScrapreasonRowUnsaved] = Text.instance[ScrapreasonRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ScrapreasonId.text).unsafeEncode(row.scrapreasonid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[ScrapreasonRowUnsaved] = OWrites[ScrapreasonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Name.writes.writes(o.name),

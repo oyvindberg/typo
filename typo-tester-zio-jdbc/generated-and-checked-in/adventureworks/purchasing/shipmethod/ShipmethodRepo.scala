@@ -19,7 +19,10 @@ trait ShipmethodRepo {
   def delete(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
   def insert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, ShipmethodRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ShipmethodRowUnsaved): ZIO[ZConnection, Throwable, ShipmethodRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ShipmethodFields, ShipmethodRow]
   def selectAll: ZStream[ZConnection, Throwable, ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Option[ShipmethodRow]]

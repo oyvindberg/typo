@@ -16,6 +16,7 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -44,6 +45,9 @@ object ProductRepoImpl extends ProductRepo {
        """
       .executeInsert(ProductRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductRow.text, c)
   }
   override def insert(unsaved: ProductRowUnsaved)(implicit c: Connection): ProductRow = {
     val namedParameters = List(
@@ -103,6 +107,10 @@ object ProductRepoImpl extends ProductRepo {
         .executeInsert(ProductRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductFields, ProductRow] = {
     SelectBuilderSql("production.product", ProductFields, ProductRow.rowParser)

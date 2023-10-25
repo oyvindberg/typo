@@ -10,6 +10,7 @@ package users
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -49,4 +50,19 @@ object UsersRow {
       verifiedOn = TypoInstant.get.unsafeGetNullable(rs, i + 6)
     )
   )
+  implicit lazy val text: Text[UsersRow] = Text.instance[UsersRow]{ (row, sb) =>
+    UsersId.text.unsafeEncode(row.userId, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.lastName, sb)
+    sb.append(Text.DELIMETER)
+    TypoUnknownCitext.text.unsafeEncode(row.email, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.password, sb)
+    sb.append(Text.DELIMETER)
+    TypoInstant.text.unsafeEncode(row.createdAt, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
+  }
 }

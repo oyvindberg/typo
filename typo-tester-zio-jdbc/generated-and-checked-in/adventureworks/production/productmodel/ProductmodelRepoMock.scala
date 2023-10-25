@@ -42,8 +42,26 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
       unsaved
     }
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, row) =>
+      ZIO.succeed {
+        map += (row.productmodelid -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
   override def insert(unsaved: ProductmodelRowUnsaved): ZIO[ZConnection, Throwable, ProductmodelRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, unsavedRow) =>
+      ZIO.succeed {
+        val row = toRow(unsavedRow)
+        map += (row.productmodelid -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
     SelectBuilderMock(ProductmodelFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)

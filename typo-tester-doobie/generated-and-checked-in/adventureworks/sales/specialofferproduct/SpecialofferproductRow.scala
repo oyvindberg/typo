@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -47,4 +48,13 @@ object SpecialofferproductRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
+  implicit lazy val text: Text[SpecialofferproductRow] = Text.instance[SpecialofferproductRow]{ (row, sb) =>
+    SpecialofferId.text.unsafeEncode(row.specialofferid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

@@ -7,6 +7,7 @@ package adventureworks
 package production
 package transactionhistory
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
@@ -112,5 +113,24 @@ object TransactionhistoryRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[TransactionhistoryRowUnsaved] = Text.instance[TransactionhistoryRowUnsaved]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.referenceorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.transactiontype, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.quantity, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.actualcost, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TransactionhistoryId.text).unsafeEncode(row.transactionid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.referenceorderlineid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.transactiondate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

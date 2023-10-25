@@ -16,6 +16,7 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -41,6 +42,9 @@ object ProductRepoImpl extends ProductRepo {
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.productnumber)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.makeflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.finishedgoodsflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.color)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.safetystocklevel)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.reorderpoint)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.listprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.size)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar, ${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar, ${Segment.paramSegment(unsaved.weight)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.daystomanufacture)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productline)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.`class`)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.style)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(ProductsubcategoryId.setter))}::int4, ${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(ProductmodelId.setter))}::int4, ${Segment.paramSegment(unsaved.sellstartdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
        """.insertReturning(ProductRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductRow.text)
   }
   override def insert(unsaved: ProductRowUnsaved): ZIO[ZConnection, Throwable, ProductRow] = {
     val fs = List(
@@ -97,6 +101,10 @@ object ProductRepoImpl extends ProductRepo {
     }
     q.insertReturning(ProductRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductFields, ProductRow] = {
     SelectBuilderSql("production.product", ProductFields, ProductRow.jdbcDecoder)

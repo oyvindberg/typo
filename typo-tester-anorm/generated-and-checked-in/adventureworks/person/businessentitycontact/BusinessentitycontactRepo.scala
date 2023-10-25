@@ -16,7 +16,10 @@ trait BusinessentitycontactRepo {
   def delete(compositeId: BusinessentitycontactId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def insert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow
+  def insertStreaming(unsaved: Iterator[BusinessentitycontactRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: BusinessentitycontactRowUnsaved)(implicit c: Connection): BusinessentitycontactRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[BusinessentitycontactRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def selectAll(implicit c: Connection): List[BusinessentitycontactRow]
   def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow]

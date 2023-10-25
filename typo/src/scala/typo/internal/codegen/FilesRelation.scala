@@ -5,7 +5,7 @@ package codegen
 import play.api.libs.json.Json
 
 case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions) {
-  val RowFile: Option[sc.File] = maybeCols.map { cols =>
+  def RowFile(rowType: DbLib.RowType): Option[sc.File] = maybeCols.map { cols =>
     val compositeId = names.maybeId match {
       case Some(x: IdComputed.Composite) =>
         code"""|{
@@ -39,7 +39,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
     }
     val instances =
       options.jsonLibs.flatMap(_.instances(names.RowName, cols)) ++
-        options.dbLib.toList.flatMap(_.rowInstances(names.RowName, cols))
+        options.dbLib.toList.flatMap(_.rowInstances(names.RowName, cols, rowType = rowType))
 
     val str =
       code"""case class ${names.RowName.name}(
@@ -160,9 +160,12 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
     }
 
   def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
+    val renderedMethods = repoMethods.map { repoMethod =>
+      code"${repoMethod.comment.fold("")(c => c + "\n")}${dbLib.repoSig(repoMethod)}"
+    }
     val str =
       code"""trait ${names.RepoName.name} {
-            |  ${repoMethods.map(dbLib.repoSig).mkCode("\n")}
+            |  ${renderedMethods.mkCode("\n")}
             |}
             |""".stripMargin
 
@@ -171,7 +174,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
 
   def RepoImplFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val renderedMethods: NonEmptyList[sc.Code] = repoMethods.map { repoMethod =>
-      code"""|override ${dbLib.repoSig(repoMethod)} = {
+      code"""|${repoMethod.comment.fold("")(c => c + "\n")}override ${dbLib.repoSig(repoMethod)} = {
              |  ${dbLib.repoImpl(repoMethod)}
              |}""".stripMargin
     }
@@ -192,7 +195,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
 
     val methods: NonEmptyList[sc.Code] =
       repoMethods.map { repoMethod =>
-        code"""|override ${dbLib.repoSig(repoMethod)} = {
+        code"""|${repoMethod.comment.fold("")(c => c + "\n")}override ${dbLib.repoSig(repoMethod)} = {
                |  ${dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
                |}""".stripMargin
       }

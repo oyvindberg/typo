@@ -10,6 +10,7 @@ package department
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -42,4 +43,13 @@ case class DepartmentRowUnsaved(
 object DepartmentRowUnsaved {
   implicit lazy val decoder: Decoder[DepartmentRowUnsaved] = Decoder.forProduct4[DepartmentRowUnsaved, Name, Name, Defaulted[DepartmentId], Defaulted[TypoLocalDateTime]]("name", "groupname", "departmentid", "modifieddate")(DepartmentRowUnsaved.apply)(Name.decoder, Name.decoder, Defaulted.decoder(DepartmentId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[DepartmentRowUnsaved] = Encoder.forProduct4[DepartmentRowUnsaved, Name, Name, Defaulted[DepartmentId], Defaulted[TypoLocalDateTime]]("name", "groupname", "departmentid", "modifieddate")(x => (x.name, x.groupname, x.departmentid, x.modifieddate))(Name.encoder, Name.encoder, Defaulted.encoder(DepartmentId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[DepartmentRowUnsaved] = Text.instance[DepartmentRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.groupname, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(DepartmentId.text).unsafeEncode(row.departmentid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

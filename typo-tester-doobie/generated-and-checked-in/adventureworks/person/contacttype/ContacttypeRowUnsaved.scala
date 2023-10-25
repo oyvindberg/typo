@@ -10,6 +10,7 @@ package contacttype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -39,4 +40,11 @@ case class ContacttypeRowUnsaved(
 object ContacttypeRowUnsaved {
   implicit lazy val decoder: Decoder[ContacttypeRowUnsaved] = Decoder.forProduct3[ContacttypeRowUnsaved, Name, Defaulted[ContacttypeId], Defaulted[TypoLocalDateTime]]("name", "contacttypeid", "modifieddate")(ContacttypeRowUnsaved.apply)(Name.decoder, Defaulted.decoder(ContacttypeId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[ContacttypeRowUnsaved] = Encoder.forProduct3[ContacttypeRowUnsaved, Name, Defaulted[ContacttypeId], Defaulted[TypoLocalDateTime]]("name", "contacttypeid", "modifieddate")(x => (x.name, x.contacttypeid, x.modifieddate))(Name.encoder, Defaulted.encoder(ContacttypeId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[ContacttypeRowUnsaved] = Text.instance[ContacttypeRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ContacttypeId.text).unsafeEncode(row.contacttypeid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

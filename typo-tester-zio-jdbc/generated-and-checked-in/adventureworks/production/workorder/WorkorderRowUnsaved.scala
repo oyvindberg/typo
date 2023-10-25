@@ -7,6 +7,7 @@ package adventureworks
 package production
 package workorder
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
@@ -110,5 +111,24 @@ object WorkorderRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[WorkorderRowUnsaved] = Text.instance[WorkorderRowUnsaved]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.orderqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.scrappedqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.duedate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(ScrapreasonId.text).unsafeEncode(row.scrapreasonid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(WorkorderId.text).unsafeEncode(row.workorderid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

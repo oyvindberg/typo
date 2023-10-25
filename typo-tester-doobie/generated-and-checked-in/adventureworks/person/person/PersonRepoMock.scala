@@ -40,8 +40,30 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.businessentityid -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.businessentityid -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderMock(PersonFields, delay(map.values.toList), SelectParams.empty)

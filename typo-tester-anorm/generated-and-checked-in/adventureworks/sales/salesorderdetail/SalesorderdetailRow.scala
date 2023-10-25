@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesorderdetail
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
@@ -87,6 +88,27 @@ object SalesorderdetailRow {
         modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[SalesorderdetailRow] = Text.instance[SalesorderdetailRow]{ (row, sb) =>
+    SalesorderheaderId.text.unsafeEncode(row.salesorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.salesorderdetailid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.carriertrackingnumber, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.orderqty, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    SpecialofferId.text.unsafeEncode(row.specialofferid, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.unitprice, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.unitpricediscount, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[SalesorderdetailRow] = OWrites[SalesorderdetailRow](o =>
     new JsObject(ListMap[String, JsValue](

@@ -17,7 +17,10 @@ trait WorkorderroutingRepo {
   def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll: Stream[ConnectionIO, WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]]

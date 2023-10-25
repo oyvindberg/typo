@@ -35,8 +35,22 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[SalesorderheaderRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.salesorderid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SalesorderheaderRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.salesorderid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     SelectBuilderMock(SalesorderheaderFields, () => map.values.toList, SelectParams.empty)

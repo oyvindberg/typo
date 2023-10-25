@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -39,6 +40,9 @@ object DocumentRepoImpl extends DocumentRepo {
           values (${Segment.paramSegment(unsaved.title)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.owner)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.folderflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.filename)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.fileextension)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.revision)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.changenumber)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.documentsummary)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)})
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.insertReturning(DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(DocumentRow.text)
   }
   override def insert(unsaved: DocumentRowUnsaved): ZIO[ZConnection, Throwable, DocumentRow] = {
     val fs = List(
@@ -83,6 +87,10 @@ object DocumentRepoImpl extends DocumentRepo {
     }
     q.insertReturning(DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
     SelectBuilderSql("production.document", DocumentFields, DocumentRow.jdbcDecoder)

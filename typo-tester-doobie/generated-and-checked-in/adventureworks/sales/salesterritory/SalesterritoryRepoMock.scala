@@ -39,8 +39,30 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.territoryid -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.territoryid -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
     SelectBuilderMock(SalesterritoryFields, delay(map.values.toList), SelectParams.empty)

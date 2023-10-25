@@ -35,8 +35,22 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.territoryid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SalesterritoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.territoryid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
     SelectBuilderMock(SalesterritoryFields, () => map.values.toList, SelectParams.empty)

@@ -1,5 +1,6 @@
 package adventureworks.userdefined
 
+import adventureworks.Text
 import anorm.{Column, ParameterMetaData, ToStatement}
 import play.api.libs.json.{Reads, Writes}
 import typo.dsl.Bijection
@@ -16,6 +17,10 @@ object FirstName {
     override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[FirstName] = Reads.StringReads.map(FirstName.apply)
+  implicit lazy val text: Text[FirstName] = new Text[FirstName] {
+    override def unsafeEncode(v: FirstName, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: FirstName, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[FirstName] = ToStatement.stringToStatement.contramap(_.value)
   implicit lazy val writes: Writes[FirstName] = Writes.StringWrites.contramap(_.value)
 }

@@ -34,6 +34,9 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.query(TransactionhistoryarchiveRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryarchiveRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(TransactionhistoryarchiveRow.text)
+  }
   override def insert(unsaved: TransactionhistoryarchiveRowUnsaved): ConnectionIO[TransactionhistoryarchiveRow] = {
     val fs = List(
       Some((Fragment.const(s""""transactionid""""), fr"${fromWrite(unsaved.transactionid)(Write.fromPut(TransactionhistoryarchiveId.put))}::int4")),
@@ -69,6 +72,10 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     }
     q.query(TransactionhistoryarchiveRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryarchiveRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(TransactionhistoryarchiveRowUnsaved.text)
   }
   override def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     SelectBuilderSql("production.transactionhistoryarchive", TransactionhistoryarchiveFields, TransactionhistoryarchiveRow.read)

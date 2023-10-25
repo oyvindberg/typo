@@ -10,6 +10,7 @@ package culture
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -35,4 +36,11 @@ case class CultureRowUnsaved(
 object CultureRowUnsaved {
   implicit lazy val decoder: Decoder[CultureRowUnsaved] = Decoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(CultureRowUnsaved.apply)(CultureId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CultureRowUnsaved] = Encoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))(CultureId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[CultureRowUnsaved] = Text.instance[CultureRowUnsaved]{ (row, sb) =>
+    CultureId.text.unsafeEncode(row.cultureid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

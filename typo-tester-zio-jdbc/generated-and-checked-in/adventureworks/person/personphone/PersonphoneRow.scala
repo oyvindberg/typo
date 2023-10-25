@@ -7,6 +7,7 @@ package adventureworks
 package person
 package personphone
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
@@ -68,5 +69,14 @@ object PersonphoneRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[PersonphoneRow] = Text.instance[PersonphoneRow]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Phone.text.unsafeEncode(row.phonenumber, sb)
+    sb.append(Text.DELIMETER)
+    PhonenumbertypeId.text.unsafeEncode(row.phonenumbertypeid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

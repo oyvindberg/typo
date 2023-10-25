@@ -39,8 +39,30 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.compositeId -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductvendorRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.compositeId -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
     SelectBuilderMock(ProductvendorFields, delay(map.values.toList), SelectParams.empty)

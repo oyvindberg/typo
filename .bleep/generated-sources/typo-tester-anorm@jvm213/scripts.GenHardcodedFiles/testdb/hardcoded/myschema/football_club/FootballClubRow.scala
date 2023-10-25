@@ -19,6 +19,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
+import testdb.hardcoded.Text
 
 case class FootballClubRow(
   id: FootballClubId,
@@ -42,6 +43,11 @@ object FootballClubRow {
         name = row(idx + 1)(Column.columnToString)
       )
     )
+  }
+  implicit lazy val text: Text[FootballClubRow] = Text.instance[FootballClubRow]{ (row, sb) =>
+    FootballClubId.text.unsafeEncode(row.id, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
   }
   implicit lazy val writes: OWrites[FootballClubRow] = OWrites[FootballClubRow](o =>
     new JsObject(ListMap[String, JsValue](

@@ -20,6 +20,7 @@ import adventureworks.purchasing.shipmethod.ShipmethodId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.streamingInsert
 import adventureworks.userdefined.CustomCreditcardId
 import anorm.NamedParameter
 import anorm.ParameterMetaData
@@ -49,6 +50,9 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
        """
       .executeInsert(SalesorderheaderRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[SalesorderheaderRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderheaderRow.text, c)
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
     val namedParameters = List(
@@ -123,6 +127,10 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
         .executeInsert(SalesorderheaderRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SalesorderheaderRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesorderheader("duedate", "shipdate", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "totaldue", "comment", "salesorderid", "revisionnumber", "orderdate", "status", "onlineorderflag", "subtotal", "taxamt", "freight", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderheaderRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     SelectBuilderSql("sales.salesorderheader", SalesorderheaderFields, SalesorderheaderRow.rowParser)

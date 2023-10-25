@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
+import adventureworks.streamingInsert
 import adventureworks.userdefined.FirstName
 import anorm.NamedParameter
 import anorm.ParameterMetaData
@@ -43,6 +44,9 @@ object PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
@@ -87,6 +91,10 @@ object PersonRepoImpl extends PersonRepo {
         .executeInsert(PersonRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.person("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("person.person", PersonFields, PersonRow.rowParser)

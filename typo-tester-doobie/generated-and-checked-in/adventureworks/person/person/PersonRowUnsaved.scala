@@ -15,6 +15,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -84,4 +85,31 @@ case class PersonRowUnsaved(
 object PersonRowUnsaved {
   implicit lazy val decoder: Decoder[PersonRowUnsaved] = Decoder.forProduct13[PersonRowUnsaved, BusinessentityId, /* bpchar, max 2 chars */ String, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Option[TypoXml], Option[TypoXml], Defaulted[NameStyle], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate")(PersonRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), FirstName.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Defaulted.decoder(NameStyle.decoder), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[PersonRowUnsaved] = Encoder.forProduct13[PersonRowUnsaved, BusinessentityId, /* bpchar, max 2 chars */ String, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Option[TypoXml], Option[TypoXml], Defaulted[NameStyle], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate")(x => (x.businessentityid, x.persontype, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.additionalcontactinfo, x.demographics, x.namestyle, x.emailpromotion, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), FirstName.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Defaulted.encoder(NameStyle.encoder), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[PersonRowUnsaved] = Text.instance[PersonRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.persontype, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.title, sb)
+    sb.append(Text.DELIMETER)
+    /* user-picked */ FirstName.text.unsafeEncode(row.firstname, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Name.text).unsafeEncode(row.middlename, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.lastname, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.suffix, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.additionalcontactinfo, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.demographics, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(NameStyle.text).unsafeEncode(row.namestyle, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.emailpromotion, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

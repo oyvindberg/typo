@@ -35,6 +35,9 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
        """.query(CurrencyrateRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CurrencyrateRow.text)
+  }
   override def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow] = {
     val fs = List(
       Some((Fragment.const(s""""currencyratedate""""), fr"${fromWrite(unsaved.currencyratedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
@@ -65,6 +68,10 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     }
     q.query(CurrencyrateRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.currencyrate("currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "currencyrateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CurrencyrateRowUnsaved.text)
   }
   override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
     SelectBuilderSql("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.read)

@@ -42,6 +42,14 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
       unsaved
     }
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, row) =>
+      ZIO.succeed {
+        map += (row.id -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
     SelectBuilderMock(FootballClubFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }

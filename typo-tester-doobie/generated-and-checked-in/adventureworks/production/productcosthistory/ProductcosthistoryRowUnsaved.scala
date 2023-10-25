@@ -10,6 +10,7 @@ package productcosthistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -45,4 +46,15 @@ case class ProductcosthistoryRowUnsaved(
 object ProductcosthistoryRowUnsaved {
   implicit lazy val decoder: Decoder[ProductcosthistoryRowUnsaved] = Decoder.forProduct5[ProductcosthistoryRowUnsaved, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, Defaulted[TypoLocalDateTime]]("productid", "startdate", "enddate", "standardcost", "modifieddate")(ProductcosthistoryRowUnsaved.apply)(ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeBigDecimal, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[ProductcosthistoryRowUnsaved] = Encoder.forProduct5[ProductcosthistoryRowUnsaved, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, Defaulted[TypoLocalDateTime]]("productid", "startdate", "enddate", "standardcost", "modifieddate")(x => (x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate))(ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeBigDecimal, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[ProductcosthistoryRowUnsaved] = Text.instance[ProductcosthistoryRowUnsaved]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.standardcost, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

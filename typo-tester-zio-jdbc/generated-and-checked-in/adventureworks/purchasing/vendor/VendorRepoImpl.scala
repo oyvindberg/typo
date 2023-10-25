@@ -14,6 +14,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -39,6 +40,9 @@ object VendorRepoImpl extends VendorRepo {
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.accountnumber)(AccountNumber.setter)}::varchar, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.creditrating)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.preferredvendorstatus)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.activeflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.purchasingwebserviceurl)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
        """.insertReturning(VendorRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""", batchSize, unsaved)(VendorRow.text)
   }
   override def insert(unsaved: VendorRowUnsaved): ZIO[ZConnection, Throwable, VendorRow] = {
     val fs = List(
@@ -72,6 +76,10 @@ object VendorRepoImpl extends VendorRepo {
     }
     q.insertReturning(VendorRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(VendorRowUnsaved.text)
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
     SelectBuilderSql("purchasing.vendor", VendorFields, VendorRow.jdbcDecoder)

@@ -16,6 +16,7 @@ import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import testdb.hardcoded.Text
 
 /** Enum `myschema.sector`
   *  - PUBLIC
@@ -48,6 +49,10 @@ object Sector {
     override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[Sector] = Reads[Sector]{(value: JsValue) => value.validate(Reads.StringReads).flatMap(str => Sector(str).fold(JsError.apply, JsSuccess(_)))}
+  implicit lazy val text: Text[Sector] = new Text[Sector] {
+    override def unsafeEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[Sector] = ToStatement.stringToStatement.contramap(_.value)
   implicit lazy val writes: Writes[Sector] = Writes[Sector](value => Writes.StringWrites.writes(value.value))
 }

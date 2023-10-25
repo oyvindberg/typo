@@ -21,7 +21,10 @@ trait CreditcardRepo {
   def delete(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[CreditcardFields, CreditcardRow]
   def insert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, CreditcardRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CreditcardRowUnsaved): ZIO[ZConnection, Throwable, CreditcardRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CreditcardFields, CreditcardRow]
   def selectAll: ZStream[ZConnection, Throwable, CreditcardRow]
   def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Option[CreditcardRow]]

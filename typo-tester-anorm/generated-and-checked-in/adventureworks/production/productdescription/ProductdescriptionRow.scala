@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productdescription
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import anorm.Column
@@ -51,6 +52,15 @@ object ProductdescriptionRow {
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[ProductdescriptionRow] = Text.instance[ProductdescriptionRow]{ (row, sb) =>
+    ProductdescriptionId.text.unsafeEncode(row.productdescriptionid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.description, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[ProductdescriptionRow] = OWrites[ProductdescriptionRow](o =>
     new JsObject(ListMap[String, JsValue](

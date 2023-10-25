@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesreason
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import java.sql.ResultSet
@@ -62,5 +63,14 @@ object SalesreasonRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[SalesreasonRow] = Text.instance[SalesreasonRow]{ (row, sb) =>
+    SalesreasonId.text.unsafeEncode(row.salesreasonid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.reasontype, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

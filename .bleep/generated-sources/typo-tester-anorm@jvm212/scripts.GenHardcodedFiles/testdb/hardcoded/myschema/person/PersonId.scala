@@ -13,6 +13,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import testdb.hardcoded.Text
 import typo.dsl.Bijection
 
 /** Type for the primary key of table `myschema.person` */
@@ -28,6 +29,10 @@ object PersonId {
     override def jdbcType: Int = ParameterMetaData.LongParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[PersonId] = Reads.LongReads.map(PersonId.apply)
+  implicit lazy val text: Text[PersonId] = new Text[PersonId] {
+    override def unsafeEncode(v: PersonId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: PersonId, sb: StringBuilder) = Text.longInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[PersonId] = ToStatement.longToStatement.contramap(_.value)
   implicit lazy val writes: Writes[PersonId] = Writes.LongWrites.contramap(_.value)
 }

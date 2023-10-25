@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -48,6 +49,10 @@ object TypoUUID {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoUUID] = Reads.uuidReads.map(TypoUUID.apply)
+  implicit lazy val text: Text[TypoUUID] = new Text[TypoUUID] {
+    override def unsafeEncode(v: TypoUUID, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoUUID, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoUUID] = ToStatement[TypoUUID]((s, index, v) => s.setObject(index, v.value))
   implicit lazy val writes: Writes[TypoUUID] = Writes.UuidWrites.contramap(_.value)
 }

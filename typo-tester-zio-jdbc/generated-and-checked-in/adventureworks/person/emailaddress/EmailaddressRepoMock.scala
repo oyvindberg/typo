@@ -42,8 +42,26 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
       unsaved
     }
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, row) =>
+      ZIO.succeed {
+        map += (row.compositeId -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
   override def insert(unsaved: EmailaddressRowUnsaved): ZIO[ZConnection, Throwable, EmailaddressRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, unsavedRow) =>
+      ZIO.succeed {
+        val row = toRow(unsavedRow)
+        map += (row.compositeId -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
     SelectBuilderMock(EmailaddressFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)

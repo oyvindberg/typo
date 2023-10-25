@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package purchaseorderheader
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
@@ -95,6 +96,31 @@ object PurchaseorderheaderRow {
         modifieddate = row(idx + 11)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[PurchaseorderheaderRow] = Text.instance[PurchaseorderheaderRow]{ (row, sb) =>
+    PurchaseorderheaderId.text.unsafeEncode(row.purchaseorderid, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.revisionnumber, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.status, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.employeeid, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.vendorid, sb)
+    sb.append(Text.DELIMETER)
+    ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.orderdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.shipdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.subtotal, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.taxamt, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.freight, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[PurchaseorderheaderRow] = OWrites[PurchaseorderheaderRow](o =>
     new JsObject(ListMap[String, JsValue](

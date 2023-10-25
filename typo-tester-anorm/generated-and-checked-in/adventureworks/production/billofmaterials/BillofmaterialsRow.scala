@@ -7,6 +7,7 @@ package adventureworks
 package production
 package billofmaterials
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
@@ -85,6 +86,25 @@ object BillofmaterialsRow {
         modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[BillofmaterialsRow] = Text.instance[BillofmaterialsRow]{ (row, sb) =>
+    BillofmaterialsId.text.unsafeEncode(row.billofmaterialsid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(ProductId.text).unsafeEncode(row.productassemblyid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.componentid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.bomlevel, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.perassemblyqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[BillofmaterialsRow] = OWrites[BillofmaterialsRow](o =>
     new JsObject(ListMap[String, JsValue](

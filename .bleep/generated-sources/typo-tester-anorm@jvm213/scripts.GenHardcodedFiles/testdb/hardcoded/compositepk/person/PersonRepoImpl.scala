@@ -18,6 +18,7 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 import testdb.hardcoded.customtypes.Defaulted
+import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -37,6 +38,9 @@ object PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY compositepk.person("one", "two", "name") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
@@ -65,6 +69,10 @@ object PersonRepoImpl extends PersonRepo {
         .executeInsert(PersonRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("compositepk.person", PersonFields, PersonRow.rowParser)

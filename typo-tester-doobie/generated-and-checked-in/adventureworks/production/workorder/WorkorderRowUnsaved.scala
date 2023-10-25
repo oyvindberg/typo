@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -65,4 +66,23 @@ case class WorkorderRowUnsaved(
 object WorkorderRowUnsaved {
   implicit lazy val decoder: Decoder[WorkorderRowUnsaved] = Decoder.forProduct9[WorkorderRowUnsaved, ProductId, Int, TypoShort, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], Defaulted[WorkorderId], Defaulted[TypoLocalDateTime]]("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate")(WorkorderRowUnsaved.apply)(ProductId.decoder, Decoder.decodeInt, TypoShort.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), TypoLocalDateTime.decoder, Decoder.decodeOption(ScrapreasonId.decoder), Defaulted.decoder(WorkorderId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[WorkorderRowUnsaved] = Encoder.forProduct9[WorkorderRowUnsaved, ProductId, Int, TypoShort, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], Defaulted[WorkorderId], Defaulted[TypoLocalDateTime]]("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate")(x => (x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.workorderid, x.modifieddate))(ProductId.encoder, Encoder.encodeInt, TypoShort.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), TypoLocalDateTime.encoder, Encoder.encodeOption(ScrapreasonId.encoder), Defaulted.encoder(WorkorderId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[WorkorderRowUnsaved] = Text.instance[WorkorderRowUnsaved]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.orderqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.scrappedqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.duedate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(ScrapreasonId.text).unsafeEncode(row.scrapreasonid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(WorkorderId.text).unsafeEncode(row.workorderid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

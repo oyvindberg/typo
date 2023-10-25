@@ -35,6 +35,9 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
        """.query(JobcandidateRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(JobcandidateRow.text)
+  }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
     val fs = List(
       Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
@@ -62,6 +65,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     }
     q.query(JobcandidateRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, JobcandidateRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(JobcandidateRowUnsaved.text)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
     SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.read)

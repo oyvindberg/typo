@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
           values (${Segment.paramSegment(unsaved.productsubcategoryid)(ProductsubcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
        """.insertReturning(ProductsubcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductsubcategoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductsubcategoryRow.text)
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved): ZIO[ZConnection, Throwable, ProductsubcategoryRow] = {
     val fs = List(
@@ -66,6 +70,10 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     }
     q.insertReturning(ProductsubcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductsubcategoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductsubcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.jdbcDecoder)

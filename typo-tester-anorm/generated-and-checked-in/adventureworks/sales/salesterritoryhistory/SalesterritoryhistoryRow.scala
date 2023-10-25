@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesterritoryhistory
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
@@ -67,6 +68,19 @@ object SalesterritoryhistoryRow {
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[SalesterritoryhistoryRow] = Text.instance[SalesterritoryhistoryRow]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    SalesterritoryId.text.unsafeEncode(row.territoryid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[SalesterritoryhistoryRow] = OWrites[SalesterritoryhistoryRow](o =>
     new JsObject(ListMap[String, JsValue](

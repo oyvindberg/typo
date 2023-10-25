@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -38,6 +39,9 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
        """
       .executeInsert(ProductsubcategoryRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductsubcategoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductsubcategoryRow.text, c)
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryRow = {
     val namedParameters = List(
@@ -71,6 +75,10 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
         .executeInsert(ProductsubcategoryRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductsubcategoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductsubcategoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.rowParser)

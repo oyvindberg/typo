@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGpath
@@ -80,4 +81,8 @@ object TypoPath {
     },
     "path"
   )
+  implicit lazy val text: Text[TypoPath] = new Text[TypoPath] {
+    override def unsafeEncode(v: TypoPath, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"""${if (v.open) "[" else "("}${v.points.map(p => s"${p.x}, ${p.y}").mkString(",")}${if (v.open) "]" else ")"}""", sb)
+    override def unsafeArrayEncode(v: TypoPath, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"""${if (v.open) "[" else "("}${v.points.map(p => s"${p.x}, ${p.y}").mkString(",")}${if (v.open) "]" else ")"}""", sb)
+  }
 }

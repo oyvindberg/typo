@@ -10,6 +10,7 @@ package currency
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -35,4 +36,11 @@ case class CurrencyRowUnsaved(
 object CurrencyRowUnsaved {
   implicit lazy val decoder: Decoder[CurrencyRowUnsaved] = Decoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(CurrencyRowUnsaved.apply)(CurrencyId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CurrencyRowUnsaved] = Encoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(x => (x.currencycode, x.name, x.modifieddate))(CurrencyId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[CurrencyRowUnsaved] = Text.instance[CurrencyRowUnsaved]{ (row, sb) =>
+    CurrencyId.text.unsafeEncode(row.currencycode, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

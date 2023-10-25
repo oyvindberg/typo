@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.emailaddressid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.emailaddress)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
        """.insertReturning(EmailaddressRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmailaddressRow.text)
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ZIO[ZConnection, Throwable, EmailaddressRow] = {
     val fs = List(
@@ -66,6 +70,10 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     }
     q.insertReturning(EmailaddressRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmailaddressRowUnsaved.text)
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
     SelectBuilderSql("person.emailaddress", EmailaddressFields, EmailaddressRow.jdbcDecoder)

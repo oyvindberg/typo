@@ -34,6 +34,9 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text
        """.query(SalesreasonRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesreasonRow.text)
+  }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
     val fs = List(
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
@@ -61,6 +64,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     }
     q.query(SalesreasonRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
     SelectBuilderSql("sales.salesreason", SalesreasonFields, SalesreasonRow.read)

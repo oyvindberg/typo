@@ -24,7 +24,8 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.PGbox,
       fromTypo = (expr, target) => code"new $target($expr.x1, $expr.y1, $expr.x2, $expr.y2)"
-    )
+    ),
+    toText = CustomType.Text.string(expr => sc.s(code"(($${$expr.x1},$${$expr.y1}),($${$expr.x2},$${$expr.y2}))"))
   )
 
   lazy val TypoBytea = CustomType(
@@ -42,7 +43,8 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.Array.of(sc.Type.Byte),
       fromTypo = (expr, _) => code"$expr.value"
     ),
-    forbidArray = true
+    forbidArray = true,
+    toText = CustomType.Text(sc.Type.Array.of(sc.Type.Byte), expr => code"$expr.value")
   )
 
   lazy val TypoLocalDate = CustomType(
@@ -60,6 +62,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.String,
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
+    toText = CustomType.Text.string(expr => code"$expr.value.toString"),
     objBody = Some { target =>
       code"""|def now = $target(${sc.Type.LocalDate}.now)
              |def apply(str: ${sc.Type.String}): $target = $target(${sc.Type.LocalDate}.parse(str))""".stripMargin
@@ -80,6 +83,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.String,
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
+    toText = CustomType.Text.string(expr => code"$expr.value.toString"),
     objBody = Some { target =>
       code"""|def apply(value: ${sc.Type.LocalTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
              |def apply(str: ${sc.Type.String}): $target = apply(${sc.Type.LocalTime}.parse(str))
@@ -102,6 +106,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.String,
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
+    toText = CustomType.Text.string(expr => code"$expr.value.toString"),
     objBody = Some { target =>
       code"""|val parser: ${sc.Type.DateTimeFormatter} = new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).toFormatter
              |def apply(value: ${sc.Type.LocalDateTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
@@ -126,6 +131,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.String,
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
+    toText = CustomType.Text.string(expr => code"$expr.value.toString"),
     objBody = Some { target =>
       code"""|val parser: ${sc.Type.DateTimeFormatter} = new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
              |def apply(value: ${sc.Type.Instant}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
@@ -150,6 +156,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.String,
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
+    toText = CustomType.Text.string(expr => code"$expr.value.toString"),
     objBody = Some { target =>
       code"""|val parser: ${sc.Type.DateTimeFormatter} = new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
              |def apply(value: ${sc.Type.OffsetTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
@@ -174,7 +181,8 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.PGcircle,
       fromTypo = (expr, target) => code"new $target($expr.center.x, $expr.center.y, $expr.radius)"
-    )
+    ),
+    toText = CustomType.Text.string(expr => sc.s(code"<($${$expr.center.x},$${$expr.center.y}),$${$expr.radius}>"))
   )
 
   lazy val TypoLine = CustomType(
@@ -193,7 +201,8 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.PGline,
       fromTypo = (expr, target) => code"new $target($expr.a, $expr.b, $expr.c)"
-    )
+    ),
+    toText = CustomType.Text.string(expr => sc.s(code"{$${$expr.a},$${$expr.b},$${$expr.c}}"))
   )
 
   lazy val TypoLineSegment = CustomType(
@@ -211,7 +220,8 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.PGlseg,
       fromTypo = (expr, target) => code"new $target(${TypoPoint.fromTypo0(code"$expr.p1")}, ${TypoPoint.fromTypo0(code"$expr.p2")})"
-    )
+    ),
+    toText = CustomType.Text.string(expr => sc.s(code"(($${$expr.p1.x},$${$expr.p1.y}),($${$expr.p2.x},$${$expr.p2.y}))"))
   )
 
   lazy val TypoPath = CustomType(
@@ -229,7 +239,13 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.PGpath,
       fromTypo = (expr, target) => code"new $target($expr.points.map(p => new ${sc.Type.PGpoint}(p.x, p.y)).toArray, $expr.open)"
-    )
+    ),
+    toText = CustomType.Text.string { expr =>
+      val init = code"""$${if ($expr.open) "[" else "("}"""
+      val points = code"""$${$expr.points.map(p => s"$${p.x}, $${p.y}").mkString(",")}"""
+      val end = code"""$${if ($expr.open) "]" else ")"}"""
+      sc.s(init ++ points ++ end)
+    }
   )
 
   lazy val TypoPoint = CustomType(
@@ -247,7 +263,8 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.PGpoint,
       fromTypo = (expr, target) => code"new $target($expr.x, $expr.y)"
-    )
+    ),
+    toText = CustomType.Text.string(expr => sc.s(code"($${$expr.x},$${$expr.y})"))
   )
 
   lazy val TypoPolygon = CustomType(
@@ -264,7 +281,11 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.PGpolygon,
       fromTypo = (expr, target) => code"new $target($expr.points.map(p => new ${sc.Type.PGpoint}(p.x, p.y)).toArray)"
-    )
+    ),
+    toText = CustomType.Text.string { expr =>
+      val points = code"""$${$expr.points.map(p => s"$${p.x}, $${p.y}").mkString(",")}"""
+      sc.s(code"($points)")
+    }
   )
 
   lazy val TypoInterval = CustomType(
@@ -286,7 +307,10 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.PGInterval,
       fromTypo = (expr, target) => code"new $target($expr.years, $expr.months, $expr.days, $expr.hours, $expr.minutes, $expr.seconds)"
-    )
+    ),
+    toText = CustomType.Text.string { expr =>
+      sc.s(code"P$${$expr.years}Y$${$expr.months}M$${$expr.days}DT$${$expr.hours}H$${$expr.minutes}M$${$expr.seconds}S")
+    }
   )
 
   lazy val TypoHStore = CustomType(
@@ -316,7 +340,10 @@ class CustomTypes(pkg: sc.QIdent) {
                |}""".stripMargin
       }
     ),
-    forbidArray = true
+    forbidArray = true,
+    toText = CustomType.Text.string { expr =>
+      code"""$expr.value.map { case (k, v) => s"$$k => $$v" }.mkString(",")"""
+    }
   )
 
   lazy val TypoMoney = CustomType(
@@ -333,7 +360,8 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.JavaBigDecimal,
       fromTypo = (expr, _) => code"$expr.value.bigDecimal"
-    )
+    ),
+    toText = CustomType.Text(sc.Type.BigDecimal, expr => code"$expr.value")
   )
 
   lazy val TypoShort = CustomType(
@@ -351,6 +379,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.JavaInteger,
       fromTypo = (expr, _) => code"$expr.value.toInt"
     ),
+    toText = CustomType.Text(sc.Type.Short, expr => code"$expr.value"),
     toTypoInArray = Some(
       CustomType.ToTypo(
         jdbcType = sc.Type.JavaShort,
@@ -397,6 +426,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.UUID,
       fromTypo = (expr, _) => code"$expr.value"
     ),
+    toText = CustomType.Text.string(expr => code"$expr.value.toString"),
     objBody = Some(target => code"""|def apply(str: ${sc.Type.String}): $target = $target(${sc.Type.UUID}.fromString(str))
              |def randomUUID: $target = $target(${sc.Type.UUID}.randomUUID())""".stripMargin)
   )
@@ -416,7 +446,8 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.Array.of(sc.Type.JavaFloat),
       fromTypo = (expr, _) => code"$expr.value.map(x => x: ${sc.Type.JavaFloat})"
     ),
-    forbidArray = true
+    forbidArray = true,
+    toText = CustomType.Text.string(expr => code"""$expr.value.mkString("[", ",", "]")""")
   )
 
   lazy val TypoXml = CustomType(
@@ -434,6 +465,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = sc.Type.String,
       fromTypo = (expr, _) => code"$expr.value"
     ),
+    toText = CustomType.Text.string(expr => code"$expr.value.toString"),
     fromTypoInArray = Some(
       CustomType.FromTypo(
         jdbcType = sc.Type.PGobject,
@@ -476,6 +508,7 @@ class CustomTypes(pkg: sc.QIdent) {
                  |  obj
                  |}""".stripMargin
       ),
+      toText = CustomType.Text.string(expr => code"$expr.value"),
       toTypoInArray = Some(
         CustomType.ToTypo(
           jdbcType = sc.Type.String,
@@ -566,7 +599,8 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = CustomType.FromTypo(
         jdbcType = sc.Type.String,
         fromTypo = (expr, _) => code"$expr.value"
-      )
+      ),
+      toText = CustomType.Text.string(expr => code"$expr.value.toString")
     )
     All(ct.typoType) = ct
     ct

@@ -7,6 +7,7 @@ package adventureworks
 package production
 package workorder
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
@@ -80,6 +81,25 @@ object WorkorderRow {
         modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[WorkorderRow] = Text.instance[WorkorderRow]{ (row, sb) =>
+    WorkorderId.text.unsafeEncode(row.workorderid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.orderqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.scrappedqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.duedate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(ScrapreasonId.text).unsafeEncode(row.scrapreasonid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[WorkorderRow] = OWrites[WorkorderRow](o =>
     new JsObject(ListMap[String, JsValue](

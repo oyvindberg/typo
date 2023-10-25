@@ -17,7 +17,10 @@ trait ProductdescriptionRepo {
   def delete(productdescriptionid: ProductdescriptionId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow]
   def insert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductdescriptionRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductdescriptionRowUnsaved): ConnectionIO[ProductdescriptionRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductdescriptionRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductdescriptionFields, ProductdescriptionRow]
   def selectAll: Stream[ConnectionIO, ProductdescriptionRow]
   def selectById(productdescriptionid: ProductdescriptionId): ConnectionIO[Option[ProductdescriptionRow]]

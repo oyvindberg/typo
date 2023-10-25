@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package employee
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
@@ -149,5 +150,36 @@ object EmployeeRow {
       JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.organizationnode, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[EmployeeRow] = Text.instance[EmployeeRow]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.nationalidnumber, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.loginid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.jobtitle, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDate.text.unsafeEncode(row.birthdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.maritalstatus, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.gender, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDate.text.unsafeEncode(row.hiredate, sb)
+    sb.append(Text.DELIMETER)
+    Flag.text.unsafeEncode(row.salariedflag, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.vacationhours, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.sickleavehours, sb)
+    sb.append(Text.DELIMETER)
+    Flag.text.unsafeEncode(row.currentflag, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.organizationnode, sb)
   }
 }

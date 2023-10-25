@@ -13,6 +13,7 @@ import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -53,4 +54,15 @@ object BusinessentityaddressRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
+  implicit lazy val text: Text[BusinessentityaddressRow] = Text.instance[BusinessentityaddressRow]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    AddressId.text.unsafeEncode(row.addressid, sb)
+    sb.append(Text.DELIMETER)
+    AddresstypeId.text.unsafeEncode(row.addresstypeid, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

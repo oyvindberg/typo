@@ -17,7 +17,10 @@ trait ScrapreasonRepo {
   def delete(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow]
   def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow]
   def selectAll: Stream[ConnectionIO, ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]]

@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package productvendor
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
@@ -93,6 +94,29 @@ object ProductvendorRow {
         modifieddate = row(idx + 10)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[ProductvendorRow] = Text.instance[ProductvendorRow]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.averageleadtime, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.standardprice, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.bigDecimalInstance).unsafeEncode(row.lastreceiptcost, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.lastreceiptdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.minorderqty, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.maxorderqty, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.intInstance).unsafeEncode(row.onorderqty, sb)
+    sb.append(Text.DELIMETER)
+    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[ProductvendorRow] = OWrites[ProductvendorRow](o =>
     new JsObject(ListMap[String, JsValue](

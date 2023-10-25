@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package shift
 
+import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -27,4 +28,8 @@ object ShiftId {
   implicit lazy val ordering: Ordering[ShiftId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[ShiftId] = ParameterMetaData.instance[ShiftId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[ShiftId] = Setter.intSetter.contramap(_.value)
+  implicit lazy val text: Text[ShiftId] = new Text[ShiftId] {
+    override def unsafeEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

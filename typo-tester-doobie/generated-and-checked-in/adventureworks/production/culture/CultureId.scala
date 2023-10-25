@@ -7,6 +7,7 @@ package adventureworks
 package production
 package culture
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -25,4 +26,8 @@ object CultureId {
   implicit lazy val get: Get[CultureId] = Meta.StringMeta.get.map(CultureId.apply)
   implicit lazy val ordering: Ordering[CultureId] = Ordering.by(_.value)
   implicit lazy val put: Put[CultureId] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val text: Text[CultureId] = new Text[CultureId] {
+    override def unsafeEncode(v: CultureId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: CultureId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productcosthistory
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.Column
@@ -62,6 +63,17 @@ object ProductcosthistoryRow {
         modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[ProductcosthistoryRow] = Text.instance[ProductcosthistoryRow]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.standardcost, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[ProductcosthistoryRow] = OWrites[ProductcosthistoryRow](o =>
     new JsObject(ListMap[String, JsValue](

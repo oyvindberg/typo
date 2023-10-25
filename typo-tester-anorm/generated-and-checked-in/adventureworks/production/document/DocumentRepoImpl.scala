@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -42,6 +43,9 @@ object DocumentRepoImpl extends DocumentRepo {
        """
       .executeInsert(DocumentRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(DocumentRow.text, c)
   }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
     val namedParameters = List(
@@ -89,6 +93,10 @@ object DocumentRepoImpl extends DocumentRepo {
         .executeInsert(DocumentRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[DocumentRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DocumentRowUnsaved.text, c)
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
     SelectBuilderSql("production.document", DocumentFields, DocumentRow.rowParser)

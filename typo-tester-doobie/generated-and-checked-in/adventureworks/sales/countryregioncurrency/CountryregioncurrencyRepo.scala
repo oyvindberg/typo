@@ -17,7 +17,10 @@ trait CountryregioncurrencyRepo {
   def delete(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow]
   def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]]

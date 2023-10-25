@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package shoppingcartitem
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.Column
@@ -62,6 +63,19 @@ object ShoppingcartitemRow {
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[ShoppingcartitemRow] = Text.instance[ShoppingcartitemRow]{ (row, sb) =>
+    ShoppingcartitemId.text.unsafeEncode(row.shoppingcartitemid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.shoppingcartid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.quantity, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.datecreated, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[ShoppingcartitemRow] = OWrites[ShoppingcartitemRow](o =>
     new JsObject(ListMap[String, JsValue](

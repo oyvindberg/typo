@@ -35,6 +35,12 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.id -> row)
+    }
+    unsaved.size.toLong
+  }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
     SelectBuilderMock(MaritalStatusFields, () => map.values.toList, SelectParams.empty)
   }

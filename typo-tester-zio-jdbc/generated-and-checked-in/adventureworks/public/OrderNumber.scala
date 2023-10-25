@@ -6,6 +6,7 @@
 package adventureworks
 package public
 
+import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -28,4 +29,8 @@ object OrderNumber {
   implicit lazy val ordering: Ordering[OrderNumber] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[OrderNumber] = ParameterMetaData.instance[OrderNumber](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[OrderNumber] = Setter.stringSetter.contramap(_.value)
+  implicit lazy val text: Text[OrderNumber] = new Text[OrderNumber] {
+    override def unsafeEncode(v: OrderNumber, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: OrderNumber, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

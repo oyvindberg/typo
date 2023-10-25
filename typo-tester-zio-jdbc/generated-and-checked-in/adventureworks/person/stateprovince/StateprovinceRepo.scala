@@ -19,7 +19,10 @@ trait StateprovinceRepo {
   def delete(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow]
   def insert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, StateprovinceRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: StateprovinceRowUnsaved): ZIO[ZConnection, Throwable, StateprovinceRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[StateprovinceFields, StateprovinceRow]
   def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Option[StateprovinceRow]]

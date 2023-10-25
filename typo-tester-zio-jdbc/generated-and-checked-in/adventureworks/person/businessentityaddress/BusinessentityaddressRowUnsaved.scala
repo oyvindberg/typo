@@ -7,6 +7,7 @@ package adventureworks
 package person
 package businessentityaddress
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
@@ -79,5 +80,16 @@ object BusinessentityaddressRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[BusinessentityaddressRowUnsaved] = Text.instance[BusinessentityaddressRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    AddressId.text.unsafeEncode(row.addressid, sb)
+    sb.append(Text.DELIMETER)
+    AddresstypeId.text.unsafeEncode(row.addresstypeid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

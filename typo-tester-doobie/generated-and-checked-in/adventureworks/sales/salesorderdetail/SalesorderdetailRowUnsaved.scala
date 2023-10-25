@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -77,4 +78,25 @@ case class SalesorderdetailRowUnsaved(
 object SalesorderdetailRowUnsaved {
   implicit lazy val decoder: Decoder[SalesorderdetailRowUnsaved] = Decoder.forProduct10[SalesorderdetailRowUnsaved, SalesorderheaderId, Option[/* max 25 chars */ String], TypoShort, ProductId, SpecialofferId, BigDecimal, Defaulted[Int], Defaulted[BigDecimal], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate")(SalesorderdetailRowUnsaved.apply)(SalesorderheaderId.decoder, Decoder.decodeOption(Decoder.decodeString), TypoShort.decoder, ProductId.decoder, SpecialofferId.decoder, Decoder.decodeBigDecimal, Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[SalesorderdetailRowUnsaved] = Encoder.forProduct10[SalesorderdetailRowUnsaved, SalesorderheaderId, Option[/* max 25 chars */ String], TypoShort, ProductId, SpecialofferId, BigDecimal, Defaulted[Int], Defaulted[BigDecimal], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate")(x => (x.salesorderid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.salesorderdetailid, x.unitpricediscount, x.rowguid, x.modifieddate))(SalesorderheaderId.encoder, Encoder.encodeOption(Encoder.encodeString), TypoShort.encoder, ProductId.encoder, SpecialofferId.encoder, Encoder.encodeBigDecimal, Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[SalesorderdetailRowUnsaved] = Text.instance[SalesorderdetailRowUnsaved]{ (row, sb) =>
+    SalesorderheaderId.text.unsafeEncode(row.salesorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.carriertrackingnumber, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.orderqty, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    SpecialofferId.text.unsafeEncode(row.specialofferid, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.unitprice, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.salesorderdetailid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.unitpricediscount, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

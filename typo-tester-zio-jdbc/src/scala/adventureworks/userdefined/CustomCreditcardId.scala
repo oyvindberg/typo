@@ -4,6 +4,7 @@
   */
 package adventureworks.userdefined
 
+import adventureworks.Text
 import typo.dsl.Bijection
 import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.{JdbcDecoder, JdbcEncoder}
@@ -20,4 +21,5 @@ object CustomCreditcardId {
   implicit lazy val jdbcEncoder: JdbcEncoder[CustomCreditcardId] = JdbcEncoder.intEncoder.contramap(_.value)
   implicit lazy val ordering: Ordering[CustomCreditcardId] = Ordering.by(_.value)
   implicit lazy val setter: Setter[CustomCreditcardId] = Setter.intSetter.contramap(_.value)
+  implicit lazy val text: Text[CustomCreditcardId] = Text.intInstance.contramap(_.value)
 }

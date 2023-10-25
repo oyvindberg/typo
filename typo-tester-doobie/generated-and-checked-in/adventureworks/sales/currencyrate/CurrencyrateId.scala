@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package currencyrate
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -25,4 +26,8 @@ object CurrencyrateId {
   implicit lazy val get: Get[CurrencyrateId] = Meta.IntMeta.get.map(CurrencyrateId.apply)
   implicit lazy val ordering: Ordering[CurrencyrateId] = Ordering.by(_.value)
   implicit lazy val put: Put[CurrencyrateId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val text: Text[CurrencyrateId] = new Text[CurrencyrateId] {
+    override def unsafeEncode(v: CurrencyrateId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: CurrencyrateId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

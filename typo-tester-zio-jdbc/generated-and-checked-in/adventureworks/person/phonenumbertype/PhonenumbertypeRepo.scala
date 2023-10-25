@@ -19,7 +19,10 @@ trait PhonenumbertypeRepo {
   def delete(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def insert(unsaved: PhonenumbertypeRow): ZIO[ZConnection, Throwable, PhonenumbertypeRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PhonenumbertypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: PhonenumbertypeRowUnsaved): ZIO[ZConnection, Throwable, PhonenumbertypeRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PhonenumbertypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def selectAll: ZStream[ZConnection, Throwable, PhonenumbertypeRow]
   def selectById(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Option[PhonenumbertypeRow]]

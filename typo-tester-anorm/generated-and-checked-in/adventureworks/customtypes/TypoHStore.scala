@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -37,6 +38,10 @@ object TypoHStore {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoHStore] = implicitly[Reads[Map[String, String]]].map(TypoHStore.apply)
+  implicit lazy val text: Text[TypoHStore] = new Text[TypoHStore] {
+    override def unsafeEncode(v: TypoHStore, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.map { case (k, v) => s"$k => $v" }.mkString(","), sb)
+    override def unsafeArrayEncode(v: TypoHStore, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.map { case (k, v) => s"$k => $v" }.mkString(","), sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoHStore] = ToStatement[TypoHStore]((s, index, v) => s.setObject(index, {
                                                                 val b = new HashMap[String, String]
                                                                 v.value.foreach { case (k, v) => b.put(k, v)}

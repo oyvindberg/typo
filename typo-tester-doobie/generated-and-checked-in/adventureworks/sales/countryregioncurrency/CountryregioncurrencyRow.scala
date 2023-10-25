@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -43,4 +44,11 @@ object CountryregioncurrencyRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
+  implicit lazy val text: Text[CountryregioncurrencyRow] = Text.instance[CountryregioncurrencyRow]{ (row, sb) =>
+    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+    sb.append(Text.DELIMETER)
+    CurrencyId.text.unsafeEncode(row.currencycode, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

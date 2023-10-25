@@ -39,8 +39,30 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.countryregioncode -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.countryregioncode -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
     SelectBuilderMock(CountryregionFields, delay(map.values.toList), SelectParams.empty)

@@ -34,6 +34,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
           returning "illustrationid", "diagram", "modifieddate"::text
        """.query(IllustrationRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(IllustrationRow.text)
+  }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     val fs = List(
       Some((Fragment.const(s""""diagram""""), fr"${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml")),
@@ -60,6 +63,10 @@ object IllustrationRepoImpl extends IllustrationRepo {
     }
     q.query(IllustrationRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IllustrationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(IllustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
     SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.read)

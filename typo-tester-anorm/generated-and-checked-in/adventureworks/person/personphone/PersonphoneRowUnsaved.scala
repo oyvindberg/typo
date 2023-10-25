@@ -7,6 +7,7 @@ package adventureworks
 package person
 package personphone
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
@@ -56,6 +57,15 @@ object PersonphoneRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[PersonphoneRowUnsaved] = Text.instance[PersonphoneRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Phone.text.unsafeEncode(row.phonenumber, sb)
+    sb.append(Text.DELIMETER)
+    PhonenumbertypeId.text.unsafeEncode(row.phonenumbertypeid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[PersonphoneRowUnsaved] = OWrites[PersonphoneRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -37,6 +38,9 @@ object AddressRepoImpl extends AddressRepo {
           values (${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.addressline1)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.addressline2)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.city)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.postalcode)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.spatiallocation)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """.insertReturning(AddressRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, AddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddressRow.text)
   }
   override def insert(unsaved: AddressRowUnsaved): ZIO[ZConnection, Throwable, AddressRow] = {
     val fs = List(
@@ -71,6 +75,10 @@ object AddressRepoImpl extends AddressRepo {
     }
     q.insertReturning(AddressRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, AddressRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddressRowUnsaved.text)
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
     SelectBuilderSql("person.address", AddressFields, AddressRow.jdbcDecoder)

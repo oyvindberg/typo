@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
           values (${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productcategoryid", "name", "rowguid", "modifieddate"::text
        """.insertReturning(ProductcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcategoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productcategory("productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcategoryRow.text)
   }
   override def insert(unsaved: ProductcategoryRowUnsaved): ZIO[ZConnection, Throwable, ProductcategoryRow] = {
     val fs = List(
@@ -64,6 +68,10 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     }
     q.insertReturning(ProductcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcategoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productcategory("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow] = {
     SelectBuilderSql("production.productcategory", ProductcategoryFields, ProductcategoryRow.jdbcDecoder)

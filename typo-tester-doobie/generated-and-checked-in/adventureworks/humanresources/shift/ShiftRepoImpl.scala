@@ -35,6 +35,9 @@ object ShiftRepoImpl extends ShiftRepo {
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
        """.query(ShiftRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ShiftRow.text)
+  }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
@@ -63,6 +66,10 @@ object ShiftRepoImpl extends ShiftRepo {
     }
     q.query(ShiftRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ShiftRowUnsaved.text)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
     SelectBuilderSql("humanresources.shift", ShiftFields, ShiftRow.read)

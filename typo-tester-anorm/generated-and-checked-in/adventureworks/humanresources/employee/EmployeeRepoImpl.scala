@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -42,6 +43,9 @@ object EmployeeRepoImpl extends EmployeeRepo {
        """
       .executeInsert(EmployeeRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[EmployeeRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN""", batchSize, unsaved)(EmployeeRow.text, c)
   }
   override def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
     val namedParameters = List(
@@ -97,6 +101,10 @@ object EmployeeRepoImpl extends EmployeeRepo {
         .executeInsert(EmployeeRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[EmployeeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[EmployeeFields, EmployeeRow] = {
     SelectBuilderSql("humanresources.employee", EmployeeFields, EmployeeRow.rowParser)

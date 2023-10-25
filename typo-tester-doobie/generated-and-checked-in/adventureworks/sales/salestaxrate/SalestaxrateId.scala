@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salestaxrate
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -25,4 +26,8 @@ object SalestaxrateId {
   implicit lazy val get: Get[SalestaxrateId] = Meta.IntMeta.get.map(SalestaxrateId.apply)
   implicit lazy val ordering: Ordering[SalestaxrateId] = Ordering.by(_.value)
   implicit lazy val put: Put[SalestaxrateId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val text: Text[SalestaxrateId] = new Text[SalestaxrateId] {
+    override def unsafeEncode(v: SalestaxrateId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: SalestaxrateId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

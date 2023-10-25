@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package creditcard
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
@@ -77,5 +78,18 @@ object CreditcardRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[CreditcardRow] = Text.instance[CreditcardRow]{ (row, sb) =>
+    /* user-picked */ CustomCreditcardId.text.unsafeEncode(row.creditcardid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.cardtype, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.cardnumber, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.expmonth, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.expyear, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

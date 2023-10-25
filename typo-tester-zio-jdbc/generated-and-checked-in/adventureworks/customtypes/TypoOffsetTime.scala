@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import java.time.OffsetTime
@@ -71,4 +72,8 @@ object TypoOffsetTime {
     },
     "timetz"
   )
+  implicit lazy val text: Text[TypoOffsetTime] = new Text[TypoOffsetTime] {
+    override def unsafeEncode(v: TypoOffsetTime, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoOffsetTime, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
 }

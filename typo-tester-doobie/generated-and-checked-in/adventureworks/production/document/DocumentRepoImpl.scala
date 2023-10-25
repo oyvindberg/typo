@@ -39,6 +39,9 @@ object DocumentRepoImpl extends DocumentRepo {
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.query(DocumentRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(DocumentRow.text)
+  }
   override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
     val fs = List(
       Some((Fragment.const(s""""title""""), fr"${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}")),
@@ -84,6 +87,10 @@ object DocumentRepoImpl extends DocumentRepo {
     }
     q.query(DocumentRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DocumentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(DocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
     SelectBuilderSql("production.document", DocumentFields, DocumentRow.read)

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -37,6 +38,9 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
        """.insertReturning(PersonphoneRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonphoneRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonphoneRow.text)
+  }
   override def insert(unsaved: PersonphoneRowUnsaved): ZIO[ZConnection, Throwable, PersonphoneRow] = {
     val fs = List(
       Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
@@ -59,6 +63,10 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     }
     q.insertReturning(PersonphoneRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersonphoneRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonphoneRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
     SelectBuilderSql("person.personphone", PersonphoneFields, PersonphoneRow.jdbcDecoder)

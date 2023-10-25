@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package employeedepartmenthistory
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
@@ -70,6 +71,19 @@ object EmployeedepartmenthistoryRow {
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[EmployeedepartmenthistoryRow] = Text.instance[EmployeedepartmenthistoryRow]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    DepartmentId.text.unsafeEncode(row.departmentid, sb)
+    sb.append(Text.DELIMETER)
+    ShiftId.text.unsafeEncode(row.shiftid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDate.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDate.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[EmployeedepartmenthistoryRow] = OWrites[EmployeedepartmenthistoryRow](o =>
     new JsObject(ListMap[String, JsValue](

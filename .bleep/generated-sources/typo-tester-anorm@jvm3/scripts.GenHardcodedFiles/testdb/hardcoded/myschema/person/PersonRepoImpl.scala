@@ -22,6 +22,7 @@ import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
+import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -41,6 +42,9 @@ object PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
@@ -84,6 +88,10 @@ object PersonRepoImpl extends PersonRepo {
         .executeInsert(PersonRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY myschema.person("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("myschema.person", PersonFields, PersonRow.rowParser)

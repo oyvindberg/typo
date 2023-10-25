@@ -16,7 +16,10 @@ trait ShoppingcartitemRepo {
   def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow
+  def insertStreaming(unsaved: Iterator[ShoppingcartitemRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[ShoppingcartitemRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def selectAll(implicit c: Connection): List[ShoppingcartitemRow]
   def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow]

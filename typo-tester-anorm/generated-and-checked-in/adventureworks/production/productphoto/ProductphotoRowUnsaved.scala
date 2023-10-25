@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productphoto
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
@@ -65,6 +66,19 @@ object ProductphotoRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[ProductphotoRowUnsaved] = Text.instance[ProductphotoRowUnsaved]{ (row, sb) =>
+    Text.option(TypoBytea.text).unsafeEncode(row.thumbnailphoto, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.thumbnailphotofilename, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.largephoto, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.largephotofilename, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ProductphotoId.text).unsafeEncode(row.productphotoid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[ProductphotoRowUnsaved] = OWrites[ProductphotoRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "thumbnailphoto" -> Writes.OptionWrites(TypoBytea.writes).writes(o.thumbnailphoto),

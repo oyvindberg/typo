@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package jobcandidate
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
@@ -59,6 +60,15 @@ object JobcandidateRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[JobcandidateRowUnsaved] = Text.instance[JobcandidateRowUnsaved]{ (row, sb) =>
+    Text.option(BusinessentityId.text).unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.resume, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(JobcandidateId.text).unsafeEncode(row.jobcandidateid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[JobcandidateRowUnsaved] = OWrites[JobcandidateRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),

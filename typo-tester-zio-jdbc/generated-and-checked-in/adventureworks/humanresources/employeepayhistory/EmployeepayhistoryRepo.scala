@@ -19,7 +19,10 @@ trait EmployeepayhistoryRepo {
   def delete(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def insert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, EmployeepayhistoryRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeepayhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: EmployeepayhistoryRowUnsaved): ZIO[ZConnection, Throwable, EmployeepayhistoryRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeepayhistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, EmployeepayhistoryRow]
   def selectById(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Option[EmployeepayhistoryRow]]

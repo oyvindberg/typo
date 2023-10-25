@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 
 import java.sql.ResultSet
+import testdb.hardcoded.Text
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcDecoderError
@@ -62,4 +63,8 @@ object Sector {
   implicit lazy val ordering: Ordering[Sector] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Sector] = ParameterMetaData.instance[Sector](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[Sector] = Setter.stringSetter.contramap(_.value)
+  implicit lazy val text: Text[Sector] = new Text[Sector] {
+    override def unsafeEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

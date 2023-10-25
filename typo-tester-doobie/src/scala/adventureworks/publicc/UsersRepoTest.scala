@@ -3,14 +3,15 @@ package adventureworks.publicc
 import adventureworks.customtypes.*
 import adventureworks.public.users.*
 import adventureworks.withConnection
+import doobie.implicits.toSqlInterpolator
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  def runTest(usersRepo: UsersRepo): Assertion = {
+  def testRoundtrip(usersRepo: UsersRepo): Assertion = {
     withConnection {
-      val unsaved = UsersRowUnsaved(
+      val before = UsersRowUnsaved(
         userId = UsersId(TypoUUID.randomUUID),
         name = "name",
         lastName = Some("last_name"),
@@ -19,64 +20,59 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
         verifiedOn = Some(TypoInstant.now),
         createdAt = Defaulted.Provided(TypoInstant.now)
       )
+
       for {
-        _ <- usersRepo.insert(unsaved)
-        all <- usersRepo.select.where(p => p.userId === unsaved.userId).toList
+        _ <- usersRepo.insert(before)
+        after <- usersRepo.select.where(p => p.userId === before.userId).toList.map(_.head)
+      } yield assert(before.toRow(after.createdAt) === after)
+    }
+  }
+
+  def testInsertUnsavedStreaming(usersRepo: UsersRepo): Assertion = {
+    val before = List.tabulate(10)(idx =>
+      UsersRowUnsaved(
+        userId = UsersId(TypoUUID.randomUUID),
+        name = "name",
+        lastName = Some("last_name"),
+        email = TypoUnknownCitext(s"email-$idx@asd.no"),
+        password = "password",
+        verifiedOn = Some(TypoInstant.now),
+        createdAt = Defaulted.UseDefault
+      )
+    )
+
+    withConnection {
+      for {
+        _ <- usersRepo.insertUnsavedStreaming(fs2.Stream.emits(before), 2)
+        after <- usersRepo.selectByIds(before.map(_.userId).toArray).compile.toList
       } yield {
-        assert(unsaved.toRow(???) === all.head)
+        val beforeById = before.map(row => row.userId -> row).toMap
+        after.foreach { after =>
+          assert(after === beforeById(after.userId).toRow(after.createdAt))
+        }
+        succeed
       }
     }
   }
 
-  test("in-memory") {
-    runTest(usersRepo = new UsersRepoMock(_.toRow(TypoInstant.now)))
+  test("testRoundtrip in-memory") {
+    testRoundtrip(usersRepo = new UsersRepoMock(_.toRow(TypoInstant.now)))
   }
 
-  test("pg") {
-    runTest(usersRepo = UsersRepoImpl)
+  test("testRoundtrip pg") {
+    testRoundtrip(usersRepo = UsersRepoImpl)
   }
 
-  val unsavedManyDefaulted = List.tabulate(10)(idx =>
-    UsersRowUnsaved(
-      userId = UsersId(TypoUUID.randomUUID),
-      name = "name",
-      lastName = Some("last_name"),
-      email = TypoUnknownCitext(s"email-$idx@asd.no"),
-      password = "password",
-      verifiedOn = Some(TypoInstant.now),
-      createdAt = Defaulted.UseDefault
-    )
-  )
-
-  test("bulkInsert") {
-    val usersRepo = UsersRepoImpl
-    val unsaved = unsavedManyDefaulted.map(_.toRow(TypoInstant.now))
-    withConnection {
-      for {
-        _ <- usersRepo.bulkInsert(unsaved)
-        retrieved <- usersRepo.selectByIds(unsaved.map(_.userId).toArray).compile.toList
-      } yield {
-        assert(unsaved === retrieved)
-      }
-    }
+  test("testInsertUnsavedStreaming in-memory") {
+    testInsertUnsavedStreaming(usersRepo = new UsersRepoMock(_.toRow(TypoInstant.now)))
   }
 
-  test("bulkInsertUnsaved") {
-    val usersRepo = UsersRepoImpl
-    // Add a non-default element
-    val unsaved = unsavedManyDefaulted.updated(
-      2, unsavedManyDefaulted(2).copy(createdAt = Defaulted.Provided(TypoInstant.apply("2023-11-05 00:00:00.000000Z")))
-    )
-    withConnection {
-      for {
-        _ <- usersRepo.bulkInsertUnsaved(unsaved)
-        retrieved <- usersRepo.selectByIds(unsaved.map(_.userId).toArray).compile.toList
-      } yield {
-        assert(unsaved.length === retrieved.length && unsaved(2).toRow(???) === retrieved(2))
-        // TODO properly compare contents for defaulted elements. Perhaps this is better done on another table
-        // where we have a deterministic default in postgres to compare with instead of a timestamp
-        // with now() as default
-      }
+  test("testInsertUnsavedStreaming pg") {
+    val versionString = withConnection(sql"SELECT VERSION()".query[String].unique)
+    val version = versionString.split(' ')(1)
+    version.toDouble match {
+      case n if n >= 16 => testInsertUnsavedStreaming(usersRepo = UsersRepoImpl)
+      case _            => System.err.println(s"Skipping testInsertUnsavedStreaming pg because version $version < 16")
     }
   }
 }

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -49,4 +50,15 @@ case class BusinessentitycontactRowUnsaved(
 object BusinessentitycontactRowUnsaved {
   implicit lazy val decoder: Decoder[BusinessentitycontactRowUnsaved] = Decoder.forProduct5[BusinessentitycontactRowUnsaved, BusinessentityId, BusinessentityId, ContacttypeId, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BusinessentitycontactRowUnsaved.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[BusinessentitycontactRowUnsaved] = Encoder.forProduct5[BusinessentitycontactRowUnsaved, BusinessentityId, BusinessentityId, ContacttypeId, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[BusinessentitycontactRowUnsaved] = Text.instance[BusinessentitycontactRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.personid, sb)
+    sb.append(Text.DELIMETER)
+    ContacttypeId.text.unsafeEncode(row.contacttypeid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

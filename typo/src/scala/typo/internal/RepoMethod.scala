@@ -1,7 +1,9 @@
 package typo
 package internal
 
-sealed trait RepoMethod
+sealed trait RepoMethod {
+  val comment: Option[String] = None
+}
 
 object RepoMethod {
   sealed trait Mutator extends RepoMethod
@@ -95,6 +97,19 @@ object RepoMethod {
       rowType: sc.Type
   ) extends Mutator
 
+  case class InsertStreaming(
+      relName: db.RelationName,
+      cols: NonEmptyList[ComputedColumn],
+      rowType: sc.Type
+  ) extends Mutator
+
+  case class InsertUnsavedStreaming(
+      relName: db.RelationName,
+      unsaved: ComputedRowUnsaved
+  ) extends Mutator {
+    override val comment: Option[String] = Some("/* NOTE: this functionality requires PostgreSQL 16 or later! */")
+  }
+
   case class Delete(
       relName: db.RelationName,
       id: IdComputed
@@ -109,20 +124,22 @@ object RepoMethod {
   case class SqlFile(sqlFile: ComputedSqlFile) extends RepoMethod
 
   implicit val ordering: Ordering[RepoMethod] = Ordering.by {
-    case _: SelectBuilder       => "Select1"
-    case _: SelectAll           => "Select2"
-    case _: SelectById          => "Select3"
-    case _: SelectAllByIds      => "Select4"
-    case x: SelectByUnique      => s"SelectByUnique(${x.params.map(_.name.value).mkString(", ")})"
-    case _: SelectByFieldValues => "SelectByFieldValues"
-    case _: UpdateFieldValues   => "UpdateFieldValues"
-    case _: Update              => "Update1"
-    case _: UpdateBuilder       => "Update2"
-    case _: Upsert              => "Upsert"
-    case _: Insert              => "Insert1"
-    case _: InsertUnsaved       => "Insert2"
-    case _: Delete              => "Delete1"
-    case _: DeleteBuilder       => "Delete2"
-    case _: SqlFile             => "SqlFile"
+    case _: SelectBuilder          => "Select1"
+    case _: SelectAll              => "Select2"
+    case _: SelectById             => "Select3"
+    case _: SelectAllByIds         => "Select4"
+    case x: SelectByUnique         => s"SelectByUnique(${x.params.map(_.name.value).mkString(", ")})"
+    case _: SelectByFieldValues    => "SelectByFieldValues"
+    case _: UpdateFieldValues      => "UpdateFieldValues"
+    case _: Update                 => "Update1"
+    case _: UpdateBuilder          => "Update2"
+    case _: Upsert                 => "Upsert"
+    case _: Insert                 => "Insert1"
+    case _: InsertStreaming        => "Insert2"
+    case _: InsertUnsaved          => "Insert3"
+    case _: InsertUnsavedStreaming => "Insert4"
+    case _: Delete                 => "Delete1"
+    case _: DeleteBuilder          => "Delete2"
+    case _: SqlFile                => "SqlFile"
   }
 }

@@ -10,6 +10,7 @@ package phonenumbertype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -36,6 +37,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
        """
       .executeInsert(PhonenumbertypeRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(PhonenumbertypeRow.text, c)
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow = {
     val namedParameters = List(
@@ -64,6 +68,10 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
         .executeInsert(PhonenumbertypeRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[PhonenumbertypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PhonenumbertypeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.rowParser)

@@ -10,6 +10,7 @@ package location
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object LocationRepoImpl extends LocationRepo {
        """
       .executeInsert(LocationRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""", batchSize, unsaved)(LocationRow.text, c)
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
     val namedParameters = List(
@@ -73,6 +77,10 @@ object LocationRepoImpl extends LocationRepo {
         .executeInsert(LocationRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[LocationRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(LocationRowUnsaved.text, c)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
     SelectBuilderSql("production.location", LocationFields, LocationRow.rowParser)

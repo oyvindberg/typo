@@ -7,6 +7,7 @@ package testdb
 package hardcoded
 package myschema
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.Read
@@ -45,5 +46,9 @@ object Sector {
   implicit lazy val ordering: Ordering[Sector] = Ordering.by(_.value)
   implicit lazy val put: Put[Sector] = Meta.StringMeta.put.contramap(_.value)
   implicit lazy val read: Read[Sector] = Read.fromGet(get)
+  implicit lazy val text: Text[Sector] = new Text[Sector] {
+    override def unsafeEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val write: Write[Sector] = Write.fromPut(put)
 }

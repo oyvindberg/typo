@@ -16,7 +16,10 @@ trait ProductcosthistoryRepo {
   def delete(compositeId: ProductcosthistoryId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def insert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow
+  def insertStreaming(unsaved: Iterator[ProductcosthistoryRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[ProductcosthistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def selectAll(implicit c: Connection): List[ProductcosthistoryRow]
   def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow]

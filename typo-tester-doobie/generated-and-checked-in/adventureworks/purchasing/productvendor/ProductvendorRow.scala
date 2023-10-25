@@ -12,6 +12,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -84,4 +85,27 @@ object ProductvendorRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 10)
     )
   )
+  implicit lazy val text: Text[ProductvendorRow] = Text.instance[ProductvendorRow]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.averageleadtime, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.standardprice, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.bigDecimalInstance).unsafeEncode(row.lastreceiptcost, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.lastreceiptdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.minorderqty, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.maxorderqty, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.intInstance).unsafeEncode(row.onorderqty, sb)
+    sb.append(Text.DELIMETER)
+    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

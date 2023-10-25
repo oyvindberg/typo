@@ -9,6 +9,7 @@ package compositepk
 package person
 
 import testdb.hardcoded.customtypes.Defaulted
+import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object PersonRepoImpl extends PersonRepo {
           returning "one", "two", "name"
        """.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY compositepk.person("one", "two", "name") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
+  }
   override def insert(unsaved: PersonRowUnsaved): ZIO[ZConnection, Throwable, PersonRow] = {
     val fs = List(
       Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter.optionParamSetter(Setter.stringSetter))}")),
@@ -60,6 +64,10 @@ object PersonRepoImpl extends PersonRepo {
     }
     q.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("compositepk.person", PersonFields, PersonRow.jdbcDecoder)

@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package football_club
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -26,4 +27,8 @@ object FootballClubId {
   implicit lazy val get: Get[FootballClubId] = Meta.LongMeta.get.map(FootballClubId.apply)
   implicit lazy val ordering: Ordering[FootballClubId] = Ordering.by(_.value)
   implicit lazy val put: Put[FootballClubId] = Meta.LongMeta.put.contramap(_.value)
+  implicit lazy val text: Text[FootballClubId] = new Text[FootballClubId] {
+    override def unsafeEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package shipmethod
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
@@ -62,6 +63,19 @@ object ShipmethodRow {
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[ShipmethodRow] = Text.instance[ShipmethodRow]{ (row, sb) =>
+    ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.shipbase, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.shiprate, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[ShipmethodRow] = OWrites[ShipmethodRow](o =>
     new JsObject(ListMap[String, JsValue](

@@ -14,6 +14,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -64,4 +65,21 @@ case class VendorRowUnsaved(
 object VendorRowUnsaved {
   implicit lazy val decoder: Decoder[VendorRowUnsaved] = Decoder.forProduct8[VendorRowUnsaved, BusinessentityId, AccountNumber, Name, TypoShort, Option[/* max 1024 chars */ String], Defaulted[Flag], Defaulted[Flag], Defaulted[TypoLocalDateTime]]("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate")(VendorRowUnsaved.apply)(BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, TypoShort.decoder, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(Flag.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[VendorRowUnsaved] = Encoder.forProduct8[VendorRowUnsaved, BusinessentityId, AccountNumber, Name, TypoShort, Option[/* max 1024 chars */ String], Defaulted[Flag], Defaulted[Flag], Defaulted[TypoLocalDateTime]]("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.purchasingwebserviceurl, x.preferredvendorstatus, x.activeflag, x.modifieddate))(BusinessentityId.encoder, AccountNumber.encoder, Name.encoder, TypoShort.encoder, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(Flag.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[VendorRowUnsaved] = Text.instance[VendorRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    AccountNumber.text.unsafeEncode(row.accountnumber, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.creditrating, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.purchasingwebserviceurl, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.preferredvendorstatus, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.activeflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

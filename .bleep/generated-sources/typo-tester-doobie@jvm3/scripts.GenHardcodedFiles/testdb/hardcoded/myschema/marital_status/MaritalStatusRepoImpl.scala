@@ -32,6 +32,9 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           returning "id"
        """.query(MaritalStatusRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY myschema.marital_status("id") FROM STDIN""").copyIn(unsaved, batchSize)(MaritalStatusRow.text)
+  }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
     SelectBuilderSql("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.read)
   }

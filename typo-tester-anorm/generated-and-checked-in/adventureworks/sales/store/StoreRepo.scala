@@ -17,7 +17,10 @@ trait StoreRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[StoreFields, StoreRow]
   def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow
+  def insertStreaming(unsaved: Iterator[StoreRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[StoreRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[StoreFields, StoreRow]
   def selectAll(implicit c: Connection): List[StoreRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow]

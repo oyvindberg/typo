@@ -10,6 +10,7 @@ package productphoto
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -38,6 +39,9 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductphotoRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductphotoRow.text, c)
   }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
     val namedParameters = List(
@@ -69,6 +73,10 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
         .executeInsert(ProductphotoRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductphotoRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productphoto("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductphotoRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductphotoFields, ProductphotoRow] = {
     SelectBuilderSql("production.productphoto", ProductphotoFields, ProductphotoRow.rowParser)

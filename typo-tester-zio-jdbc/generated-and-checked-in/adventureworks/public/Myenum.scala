@@ -6,6 +6,7 @@
 package adventureworks
 package public
 
+import adventureworks.Text
 import java.sql.ResultSet
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -61,4 +62,8 @@ object Myenum {
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Myenum] = ParameterMetaData.instance[Myenum](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[Myenum] = Setter.stringSetter.contramap(_.value)
+  implicit lazy val text: Text[Myenum] = new Text[Myenum] {
+    override def unsafeEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

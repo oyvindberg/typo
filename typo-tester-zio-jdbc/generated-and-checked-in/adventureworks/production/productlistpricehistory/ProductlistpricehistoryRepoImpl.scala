@@ -10,6 +10,7 @@ package productlistpricehistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
           returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
        """.insertReturning(ProductlistpricehistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductlistpricehistoryRow.text)
+  }
   override def insert(unsaved: ProductlistpricehistoryRowUnsaved): ZIO[ZConnection, Throwable, ProductlistpricehistoryRow] = {
     val fs = List(
       Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
@@ -59,6 +63,10 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     }
     q.insertReturning(ProductlistpricehistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductlistpricehistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
     SelectBuilderSql("production.productlistpricehistory", ProductlistpricehistoryFields, ProductlistpricehistoryRow.jdbcDecoder)

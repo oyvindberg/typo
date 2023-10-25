@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object PasswordRepoImpl extends PasswordRepo {
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.passwordhash)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.passwordsalt)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """.insertReturning(PasswordRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PasswordRow.text)
   }
   override def insert(unsaved: PasswordRowUnsaved): ZIO[ZConnection, Throwable, PasswordRow] = {
     val fs = List(
@@ -63,6 +67,10 @@ object PasswordRepoImpl extends PasswordRepo {
     }
     q.insertReturning(PasswordRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PasswordRowUnsaved.text)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
     SelectBuilderSql("person.password", PasswordFields, PasswordRow.jdbcDecoder)

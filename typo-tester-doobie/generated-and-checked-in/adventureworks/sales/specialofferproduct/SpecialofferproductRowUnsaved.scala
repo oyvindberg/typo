@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -45,4 +46,13 @@ case class SpecialofferproductRowUnsaved(
 object SpecialofferproductRowUnsaved {
   implicit lazy val decoder: Decoder[SpecialofferproductRowUnsaved] = Decoder.forProduct4[SpecialofferproductRowUnsaved, SpecialofferId, ProductId, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("specialofferid", "productid", "rowguid", "modifieddate")(SpecialofferproductRowUnsaved.apply)(SpecialofferId.decoder, ProductId.decoder, Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[SpecialofferproductRowUnsaved] = Encoder.forProduct4[SpecialofferproductRowUnsaved, SpecialofferId, ProductId, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("specialofferid", "productid", "rowguid", "modifieddate")(x => (x.specialofferid, x.productid, x.rowguid, x.modifieddate))(SpecialofferId.encoder, ProductId.encoder, Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[SpecialofferproductRowUnsaved] = Text.instance[SpecialofferproductRowUnsaved]{ (row, sb) =>
+    SpecialofferId.text.unsafeEncode(row.specialofferid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

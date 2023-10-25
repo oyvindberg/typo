@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -71,4 +72,23 @@ object WorkorderRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
+  implicit lazy val text: Text[WorkorderRow] = Text.instance[WorkorderRow]{ (row, sb) =>
+    WorkorderId.text.unsafeEncode(row.workorderid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.orderqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.scrappedqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.duedate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(ScrapreasonId.text).unsafeEncode(row.scrapreasonid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

@@ -18,9 +18,10 @@ trait UsersRepo {
   def delete(userId: UsersId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[UsersFields, UsersRow]
   def insert(unsaved: UsersRow): ConnectionIO[UsersRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow]
-  def bulkInsert(unsaved: List[UsersRow]): ConnectionIO[Long]
-  def bulkInsertUnsaved(unsaved: List[UsersRowUnsaved]): ConnectionIO[Long]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll: Stream[ConnectionIO, UsersRow]
   def selectById(userId: UsersId): ConnectionIO[Option[UsersRow]]

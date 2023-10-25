@@ -19,7 +19,10 @@ trait ProductdocumentRepo {
   def delete(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow]
   def insert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, ProductdocumentRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ProductdocumentRowUnsaved): ZIO[ZConnection, Throwable, ProductdocumentRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow]
   def selectAll: ZStream[ZConnection, Throwable, ProductdocumentRow]
   def selectById(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Option[ProductdocumentRow]]

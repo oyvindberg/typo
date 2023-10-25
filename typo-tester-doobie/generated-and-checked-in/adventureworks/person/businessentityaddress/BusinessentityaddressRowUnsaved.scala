@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -50,4 +51,15 @@ case class BusinessentityaddressRowUnsaved(
 object BusinessentityaddressRowUnsaved {
   implicit lazy val decoder: Decoder[BusinessentityaddressRowUnsaved] = Decoder.forProduct5[BusinessentityaddressRowUnsaved, BusinessentityId, AddressId, AddresstypeId, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BusinessentityaddressRowUnsaved.apply)(BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[BusinessentityaddressRowUnsaved] = Encoder.forProduct5[BusinessentityaddressRowUnsaved, BusinessentityId, AddressId, AddresstypeId, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[BusinessentityaddressRowUnsaved] = Text.instance[BusinessentityaddressRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    AddressId.text.unsafeEncode(row.addressid, sb)
+    sb.append(Text.DELIMETER)
+    AddresstypeId.text.unsafeEncode(row.addresstypeid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

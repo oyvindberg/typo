@@ -10,6 +10,7 @@ package shoppingcartitem
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
        """
       .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ShoppingcartitemRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShoppingcartitemRow.text, c)
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
     val namedParameters = List(
@@ -74,6 +78,10 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
         .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ShoppingcartitemRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShoppingcartitemRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.rowParser)

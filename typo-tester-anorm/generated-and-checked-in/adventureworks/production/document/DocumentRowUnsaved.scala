@@ -7,6 +7,7 @@ package adventureworks
 package production
 package document
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
@@ -111,6 +112,33 @@ object DocumentRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[DocumentRowUnsaved] = Text.instance[DocumentRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.title, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.owner, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.filename, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.fileextension, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.revision, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.status, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.documentsummary, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.document, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.folderflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.changenumber, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(DocumentId.text).unsafeEncode(row.documentnode, sb)
+  }
   implicit lazy val writes: OWrites[DocumentRowUnsaved] = OWrites[DocumentRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "title" -> Writes.StringWrites.writes(o.title),

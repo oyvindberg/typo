@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -38,6 +39,9 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           values (${Segment.paramSegment(unsaved.salestaxrateid)(SalestaxrateId.setter)}::int4, ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.taxtype)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.taxrate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """.insertReturning(SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text)
   }
   override def insert(unsaved: SalestaxrateRowUnsaved): ZIO[ZConnection, Throwable, SalestaxrateRow] = {
     val fs = List(
@@ -73,6 +77,10 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     }
     q.insertReturning(SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalestaxrateRowUnsaved.text)
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
     SelectBuilderSql("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.jdbcDecoder)

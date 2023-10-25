@@ -16,6 +16,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
+import testdb.hardcoded.Text
 import testdb.hardcoded.customtypes.Defaulted
 
 /** This class corresponds to a row in table `compositepk.person` which has not been persisted yet */
@@ -50,6 +51,13 @@ object PersonRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[PersonRowUnsaved] = Text.instance[PersonRowUnsaved]{ (row, sb) =>
+    Text.option(Text.stringInstance).unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.longInstance).unsafeEncode(row.one, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.option(Text.stringInstance)).unsafeEncode(row.two, sb)
+  }
   implicit lazy val writes: OWrites[PersonRowUnsaved] = OWrites[PersonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),

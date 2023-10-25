@@ -19,7 +19,10 @@ trait BillofmaterialsRepo {
   def delete(billofmaterialsid: BillofmaterialsId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def insert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, BillofmaterialsRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: BillofmaterialsRowUnsaved): ZIO[ZConnection, Throwable, BillofmaterialsRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def selectAll: ZStream[ZConnection, Throwable, BillofmaterialsRow]
   def selectById(billofmaterialsid: BillofmaterialsId): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]]

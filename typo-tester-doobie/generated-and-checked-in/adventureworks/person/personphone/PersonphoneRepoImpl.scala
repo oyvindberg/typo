@@ -36,6 +36,9 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
        """.query(PersonphoneRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PersonphoneRow.text)
+  }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     val fs = List(
       Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
@@ -60,6 +63,10 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     }
     q.query(PersonphoneRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonphoneRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonphoneRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
     SelectBuilderSql("person.personphone", PersonphoneFields, PersonphoneRow.read)

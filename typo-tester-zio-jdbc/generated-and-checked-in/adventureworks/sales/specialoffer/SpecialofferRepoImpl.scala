@@ -10,6 +10,7 @@ package specialoffer
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           values (${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4, ${Segment.paramSegment(unsaved.description)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.discountpct)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.`type`)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.category)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.minqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.maxqty)(Setter.optionParamSetter(Setter.intSetter))}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
        """.insertReturning(SpecialofferRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferRow.text)
   }
   override def insert(unsaved: SpecialofferRowUnsaved): ZIO[ZConnection, Throwable, SpecialofferRow] = {
     val fs = List(
@@ -77,6 +81,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     }
     q.insertReturning(SpecialofferRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
     SelectBuilderSql("sales.specialoffer", SpecialofferFields, SpecialofferRow.jdbcDecoder)

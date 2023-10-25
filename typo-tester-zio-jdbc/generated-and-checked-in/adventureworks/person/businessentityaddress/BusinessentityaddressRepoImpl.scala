@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -37,6 +38,9 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.addresstypeid)(AddresstypeId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
        """.insertReturning(BusinessentityaddressRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityaddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentityaddressRow.text)
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved): ZIO[ZConnection, Throwable, BusinessentityaddressRow] = {
     val fs = List(
@@ -64,6 +68,10 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     }
     q.insertReturning(BusinessentityaddressRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityaddressRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityaddressRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     SelectBuilderSql("person.businessentityaddress", BusinessentityaddressFields, BusinessentityaddressRow.jdbcDecoder)

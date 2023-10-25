@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -40,6 +41,9 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
        """
       .executeInsert(ProductinventoryRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductinventoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductinventoryRow.text, c)
   }
   override def insert(unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
     val namedParameters = List(
@@ -75,6 +79,10 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
         .executeInsert(ProductinventoryRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductinventoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductinventoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
     SelectBuilderSql("production.productinventory", ProductinventoryFields, ProductinventoryRow.rowParser)

@@ -14,6 +14,7 @@ import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -39,6 +40,9 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           values (${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.stateprovincecode)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.isonlystateprovinceflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
        """.insertReturning(StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text)
   }
   override def insert(unsaved: StateprovinceRowUnsaved): ZIO[ZConnection, Throwable, StateprovinceRow] = {
     val fs = List(
@@ -75,6 +79,10 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     }
     q.insertReturning(StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text)
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
     SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.jdbcDecoder)

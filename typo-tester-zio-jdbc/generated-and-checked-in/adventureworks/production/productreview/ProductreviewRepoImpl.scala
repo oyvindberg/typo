@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           values (${Segment.paramSegment(unsaved.productreviewid)(ProductreviewId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.reviewername)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.reviewdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.emailaddress)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rating)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """.insertReturning(ProductreviewRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductreviewRow.text)
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ZIO[ZConnection, Throwable, ProductreviewRow] = {
     val fs = List(
@@ -69,6 +73,10 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     }
     q.insertReturning(ProductreviewRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductreviewRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
     SelectBuilderSql("production.productreview", ProductreviewFields, ProductreviewRow.jdbcDecoder)

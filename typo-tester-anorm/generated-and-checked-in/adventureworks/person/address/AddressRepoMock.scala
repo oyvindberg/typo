@@ -35,8 +35,22 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.addressid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[AddressRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.addressid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
     SelectBuilderMock(AddressFields, () => map.values.toList, SelectParams.empty)

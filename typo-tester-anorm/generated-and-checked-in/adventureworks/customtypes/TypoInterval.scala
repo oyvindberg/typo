@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -62,6 +63,10 @@ object TypoInterval {
       )
     ),
   )
+  implicit lazy val text: Text[TypoInterval] = new Text[TypoInterval] {
+    override def unsafeEncode(v: TypoInterval, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"P${v.years}Y${v.months}M${v.days}DT${v.hours}H${v.minutes}M${v.seconds}S", sb)
+    override def unsafeArrayEncode(v: TypoInterval, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"P${v.years}Y${v.months}M${v.days}DT${v.hours}H${v.minutes}M${v.seconds}S", sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoInterval] = ToStatement[TypoInterval]((s, index, v) => s.setObject(index, new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))
   implicit lazy val writes: OWrites[TypoInterval] = OWrites[TypoInterval](o =>
     new JsObject(ListMap[String, JsValue](

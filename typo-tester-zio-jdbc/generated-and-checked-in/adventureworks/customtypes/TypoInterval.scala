@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGInterval
@@ -95,4 +96,8 @@ object TypoInterval {
     },
     "interval"
   )
+  implicit lazy val text: Text[TypoInterval] = new Text[TypoInterval] {
+    override def unsafeEncode(v: TypoInterval, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"P${v.years}Y${v.months}M${v.days}DT${v.hours}H${v.minutes}M${v.seconds}S", sb)
+    override def unsafeArrayEncode(v: TypoInterval, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"P${v.years}Y${v.months}M${v.days}DT${v.hours}H${v.minutes}M${v.seconds}S", sb)
+  }
 }

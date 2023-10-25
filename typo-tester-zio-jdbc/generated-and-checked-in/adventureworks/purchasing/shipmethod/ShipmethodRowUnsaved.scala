@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package shipmethod
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
@@ -95,5 +96,18 @@ object ShipmethodRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[ShipmethodRowUnsaved] = Text.instance[ShipmethodRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ShipmethodId.text).unsafeEncode(row.shipmethodid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.shipbase, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.shiprate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

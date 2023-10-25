@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -38,6 +39,9 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
       .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
     
   }
+  override def insertStreaming(unsaved: Iterator[SalesorderheadersalesreasonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderheadersalesreasonRow.text, c)
+  }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     val namedParameters = List(
       Some((NamedParameter("salesorderid", ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)), "::int4")),
@@ -62,6 +66,10 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
         .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SalesorderheadersalesreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderheadersalesreasonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     SelectBuilderSql("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow.rowParser)

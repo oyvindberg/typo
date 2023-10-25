@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -44,4 +45,13 @@ object JobcandidateRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
+  implicit lazy val text: Text[JobcandidateRow] = Text.instance[JobcandidateRow]{ (row, sb) =>
+    JobcandidateId.text.unsafeEncode(row.jobcandidateid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(BusinessentityId.text).unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.resume, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

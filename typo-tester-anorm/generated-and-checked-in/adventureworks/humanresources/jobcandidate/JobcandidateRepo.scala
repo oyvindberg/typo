@@ -16,7 +16,10 @@ trait JobcandidateRepo {
   def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow]
   def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow
+  def insertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[JobcandidateRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[JobcandidateFields, JobcandidateRow]
   def selectAll(implicit c: Connection): List[JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId)(implicit c: Connection): Option[JobcandidateRow]

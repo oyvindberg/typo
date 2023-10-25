@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package vendor
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
@@ -83,6 +84,23 @@ object VendorRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[VendorRowUnsaved] = Text.instance[VendorRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    AccountNumber.text.unsafeEncode(row.accountnumber, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.creditrating, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.purchasingwebserviceurl, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.preferredvendorstatus, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.activeflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[VendorRowUnsaved] = OWrites[VendorRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),

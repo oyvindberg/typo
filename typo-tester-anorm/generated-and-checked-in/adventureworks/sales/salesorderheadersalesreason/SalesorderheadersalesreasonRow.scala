@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesorderheadersalesreason
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
@@ -51,6 +52,13 @@ object SalesorderheadersalesreasonRow {
         modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[SalesorderheadersalesreasonRow] = Text.instance[SalesorderheadersalesreasonRow]{ (row, sb) =>
+    SalesorderheaderId.text.unsafeEncode(row.salesorderid, sb)
+    sb.append(Text.DELIMETER)
+    SalesreasonId.text.unsafeEncode(row.salesreasonid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[SalesorderheadersalesreasonRow] = OWrites[SalesorderheadersalesreasonRow](o =>
     new JsObject(ListMap[String, JsValue](

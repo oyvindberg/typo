@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package personcreditcard
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
@@ -51,6 +52,13 @@ object PersoncreditcardRow {
         modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[PersoncreditcardRow] = Text.instance[PersoncreditcardRow]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    /* user-picked */ CustomCreditcardId.text.unsafeEncode(row.creditcardid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[PersoncreditcardRow] = OWrites[PersoncreditcardRow](o =>
     new JsObject(ListMap[String, JsValue](

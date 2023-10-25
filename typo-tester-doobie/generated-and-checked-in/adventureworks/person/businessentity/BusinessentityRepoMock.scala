@@ -39,8 +39,30 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.businessentityid -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: BusinessentityRowUnsaved): ConnectionIO[BusinessentityRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.businessentityid -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
     SelectBuilderMock(BusinessentityFields, delay(map.values.toList), SelectParams.empty)

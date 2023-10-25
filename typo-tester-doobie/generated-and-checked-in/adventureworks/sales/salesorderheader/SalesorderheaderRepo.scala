@@ -17,7 +17,10 @@ trait SalesorderheaderRepo {
   def delete(salesorderid: SalesorderheaderId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SalesorderheaderRowUnsaved): ConnectionIO[SalesorderheaderRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def selectAll: Stream[ConnectionIO, SalesorderheaderRow]
   def selectById(salesorderid: SalesorderheaderId): ConnectionIO[Option[SalesorderheaderRow]]

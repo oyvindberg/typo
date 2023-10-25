@@ -35,8 +35,22 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[StateprovinceRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.stateprovinceid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[StateprovinceRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.stateprovinceid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
     SelectBuilderMock(StateprovinceFields, () => map.values.toList, SelectParams.empty)

@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import scala.util.Success
 import scala.util.Try
 import zio.json.JsonDecoder
@@ -40,5 +41,11 @@ object Defaulted {
           out.write("}")
         case UseDefault => out.write("\"defaulted\"")
       }
+  }
+  implicit def text[T](implicit t: Text[T]): Text[Defaulted[T]] = Text.instance {
+    case (Defaulted.Provided(value), sb) => t.unsafeEncode(value, sb)
+    case (Defaulted.UseDefault, sb) =>
+      sb.append("__DEFAULT_VALUE__")
+      ()
   }
 }

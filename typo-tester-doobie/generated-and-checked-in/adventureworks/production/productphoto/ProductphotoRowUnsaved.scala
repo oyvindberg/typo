@@ -10,6 +10,7 @@ package productphoto
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -48,4 +49,17 @@ case class ProductphotoRowUnsaved(
 object ProductphotoRowUnsaved {
   implicit lazy val decoder: Decoder[ProductphotoRowUnsaved] = Decoder.forProduct6[ProductphotoRowUnsaved, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], Defaulted[ProductphotoId], Defaulted[TypoLocalDateTime]]("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate")(ProductphotoRowUnsaved.apply)(Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(ProductphotoId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[ProductphotoRowUnsaved] = Encoder.forProduct6[ProductphotoRowUnsaved, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], Defaulted[ProductphotoId], Defaulted[TypoLocalDateTime]]("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate")(x => (x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.productphotoid, x.modifieddate))(Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(ProductphotoId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[ProductphotoRowUnsaved] = Text.instance[ProductphotoRowUnsaved]{ (row, sb) =>
+    Text.option(TypoBytea.text).unsafeEncode(row.thumbnailphoto, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.thumbnailphotofilename, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.largephoto, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.largephotofilename, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ProductphotoId.text).unsafeEncode(row.productphotoid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

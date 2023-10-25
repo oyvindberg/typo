@@ -10,6 +10,7 @@ package contacttype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -36,6 +37,9 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
        """
       .executeInsert(ContacttypeRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text, c)
   }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
     val namedParameters = List(
@@ -64,6 +68,10 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
         .executeInsert(ContacttypeRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ContacttypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ContacttypeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
     SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.rowParser)

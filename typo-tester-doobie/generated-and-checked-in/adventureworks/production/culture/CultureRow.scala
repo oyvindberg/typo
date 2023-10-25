@@ -10,6 +10,7 @@ package culture
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -38,4 +39,11 @@ object CultureRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
+  implicit lazy val text: Text[CultureRow] = Text.instance[CultureRow]{ (row, sb) =>
+    CultureId.text.unsafeEncode(row.cultureid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

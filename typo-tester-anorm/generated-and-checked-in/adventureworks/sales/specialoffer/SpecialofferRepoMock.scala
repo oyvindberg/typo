@@ -35,8 +35,22 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.specialofferid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SpecialofferRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.specialofferid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
     SelectBuilderMock(SpecialofferFields, () => map.values.toList, SelectParams.empty)

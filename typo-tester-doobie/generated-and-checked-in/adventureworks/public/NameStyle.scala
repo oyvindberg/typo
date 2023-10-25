@@ -6,6 +6,7 @@
 package adventureworks
 package public
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -26,4 +27,8 @@ object NameStyle {
   implicit lazy val get: Get[NameStyle] = Meta.BooleanMeta.get.map(NameStyle.apply)
   implicit lazy val ordering: Ordering[NameStyle] = Ordering.by(_.value)
   implicit lazy val put: Put[NameStyle] = Meta.BooleanMeta.put.contramap(_.value)
+  implicit lazy val text: Text[NameStyle] = new Text[NameStyle] {
+    override def unsafeEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

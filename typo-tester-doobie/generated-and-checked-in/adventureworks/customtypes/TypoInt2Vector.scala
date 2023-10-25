@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -39,4 +40,8 @@ object TypoInt2Vector {
                                                                                 obj.setValue(v.value)
                                                                                 obj
                                                                               })
+  implicit lazy val text: Text[TypoInt2Vector] = new Text[TypoInt2Vector] {
+    override def unsafeEncode(v: TypoInt2Vector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoInt2Vector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

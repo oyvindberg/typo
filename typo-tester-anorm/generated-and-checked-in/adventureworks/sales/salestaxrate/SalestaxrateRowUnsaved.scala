@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salestaxrate
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
@@ -81,6 +82,21 @@ object SalestaxrateRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[SalestaxrateRowUnsaved] = Text.instance[SalestaxrateRowUnsaved]{ (row, sb) =>
+    StateprovinceId.text.unsafeEncode(row.stateprovinceid, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.taxtype, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(SalestaxrateId.text).unsafeEncode(row.salestaxrateid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.taxrate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[SalestaxrateRowUnsaved] = OWrites[SalestaxrateRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),

@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -37,6 +38,9 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
        """.insertReturning(JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""", batchSize, unsaved)(JobcandidateRow.text)
+  }
   override def insert(unsaved: JobcandidateRowUnsaved): ZIO[ZConnection, Throwable, JobcandidateRow] = {
     val fs = List(
       Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4")),
@@ -62,6 +66,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     }
     q.insertReturning(JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(JobcandidateRowUnsaved.text)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
     SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.jdbcDecoder)

@@ -10,6 +10,7 @@ package department
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -36,6 +37,9 @@ object DepartmentRepoImpl extends DepartmentRepo {
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""", batchSize, unsaved)(DepartmentRow.text, c)
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
     val namedParameters = List(
@@ -65,6 +69,10 @@ object DepartmentRepoImpl extends DepartmentRepo {
         .executeInsert(DepartmentRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[DepartmentRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DepartmentRowUnsaved.text, c)
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
     SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.rowParser)

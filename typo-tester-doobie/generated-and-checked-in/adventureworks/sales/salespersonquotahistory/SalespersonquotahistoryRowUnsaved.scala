@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -47,4 +48,15 @@ case class SalespersonquotahistoryRowUnsaved(
 object SalespersonquotahistoryRowUnsaved {
   implicit lazy val decoder: Decoder[SalespersonquotahistoryRowUnsaved] = Decoder.forProduct5[SalespersonquotahistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SalespersonquotahistoryRowUnsaved.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[SalespersonquotahistoryRowUnsaved] = Encoder.forProduct5[SalespersonquotahistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[SalespersonquotahistoryRowUnsaved] = Text.instance[SalespersonquotahistoryRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.quotadate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.salesquota, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

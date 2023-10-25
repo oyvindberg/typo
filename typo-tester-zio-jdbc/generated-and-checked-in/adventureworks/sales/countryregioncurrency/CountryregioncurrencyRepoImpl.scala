@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           returning "countryregioncode", "currencycode", "modifieddate"::text
        """.insertReturning(CountryregioncurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregioncurrencyRow.text)
+  }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved): ZIO[ZConnection, Throwable, CountryregioncurrencyRow] = {
     val fs = List(
       Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}")),
@@ -57,6 +61,10 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     }
     q.insertReturning(CountryregioncurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregioncurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.jdbcDecoder)

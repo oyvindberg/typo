@@ -3,14 +3,15 @@ package adventureworks.publicc
 import adventureworks.customtypes.*
 import adventureworks.public.users.*
 import adventureworks.withConnection
+import anorm.{SqlParser, SqlStringInterpolation}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  def runTest(usersRepo: UsersRepo): Assertion = {
+  def testRoundtrip(usersRepo: UsersRepo): Assertion = {
     withConnection { implicit c =>
-      val unsaved = UsersRowUnsaved(
+      val before = UsersRowUnsaved(
         userId = UsersId(TypoUUID.randomUUID),
         name = "name",
         lastName = Some("last_name"),
@@ -19,17 +20,53 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
         verifiedOn = Some(TypoInstant.now),
         createdAt = Defaulted.Provided(TypoInstant.now)
       )
-      val _ = usersRepo.insert(unsaved)
-      val actual = usersRepo.select.where(p => p.userId === unsaved.userId).toList
-      assert(unsaved.toRow(???) === actual.head)
+      val _ = usersRepo.insert(before)
+      val after = usersRepo.select.where(p => p.userId === before.userId).toList.head
+      assert(before.toRow(after.createdAt) === after)
     }
   }
 
-  test("in-memory") {
-    runTest(usersRepo = new UsersRepoMock(_.toRow(???)))
+  def testInsertUnsavedStreaming(usersRepo: UsersRepo): Assertion = {
+    val before = List.tabulate(10)(idx =>
+      UsersRowUnsaved(
+        userId = UsersId(TypoUUID.randomUUID),
+        name = "name",
+        lastName = Some("last_name"),
+        email = TypoUnknownCitext(s"email-$idx@asd.no"),
+        password = "password",
+        verifiedOn = Some(TypoInstant.now),
+        createdAt = Defaulted.UseDefault
+      )
+    )
+
+    withConnection { implicit c =>
+      val _ = usersRepo.insertUnsavedStreaming(before.iterator, 2)
+      val after = usersRepo.selectByIds(before.map(_.userId).toArray)
+      val beforeById = before.map(row => row.userId -> row).toMap
+      after.foreach { after =>
+        assert(after === beforeById(after.userId).toRow(after.createdAt))
+      }
+      succeed
+    }
   }
 
-  test("pg") {
-    runTest(usersRepo = UsersRepoImpl)
+  test("testRoundtrip in-memory") {
+    testRoundtrip(usersRepo = new UsersRepoMock(_.toRow(???)))
+  }
+  test("testRoundtrip pg") {
+    testRoundtrip(usersRepo = UsersRepoImpl)
+  }
+
+  test("testInsertUnsavedStreaming in-memory") {
+    testInsertUnsavedStreaming(usersRepo = new UsersRepoMock(_.toRow(TypoInstant.now)))
+  }
+
+  test("testInsertUnsavedStreaming pg") {
+    val versionString = withConnection(implicit c => SQL"SELECT VERSION()".as(SqlParser.get[String](1).single))
+    val version = versionString.split(' ')(1)
+    version.toDouble match {
+      case n if n >= 16 => testInsertUnsavedStreaming(usersRepo = UsersRepoImpl)
+      case _            => System.err.println(s"Skipping testInsertUnsavedStreaming pg because version $version < 16")
+    }
   }
 }

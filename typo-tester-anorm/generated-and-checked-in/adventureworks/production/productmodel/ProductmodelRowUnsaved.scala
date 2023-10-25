@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productmodel
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
@@ -70,6 +71,19 @@ object ProductmodelRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[ProductmodelRowUnsaved] = Text.instance[ProductmodelRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.catalogdescription, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.instructions, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ProductmodelId.text).unsafeEncode(row.productmodelid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[ProductmodelRowUnsaved] = OWrites[ProductmodelRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Name.writes.writes(o.name),

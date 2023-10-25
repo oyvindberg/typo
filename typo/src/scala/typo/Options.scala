@@ -14,6 +14,7 @@ case class Options(
     enableFieldValue: Selector = Selector.None,
     enableTestInserts: Selector = Selector.None,
     readonlyRepo: Selector = Selector.None,
+    enableStreamingInserts: Boolean = true,
     enableDsl: Boolean = false,
     debugTypes: Boolean = false,
     inlineImplicits: Boolean = true,

@@ -9,6 +9,7 @@ package transactionhistoryarchive
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -61,4 +62,23 @@ case class TransactionhistoryarchiveRowUnsaved(
 object TransactionhistoryarchiveRowUnsaved {
   implicit lazy val decoder: Decoder[TransactionhistoryarchiveRowUnsaved] = Decoder.forProduct9[TransactionhistoryarchiveRowUnsaved, TransactionhistoryarchiveId, Int, Int, /* bpchar, max 1 chars */ String, Int, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate")(TransactionhistoryarchiveRowUnsaved.apply)(TransactionhistoryarchiveId.decoder, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[TransactionhistoryarchiveRowUnsaved] = Encoder.forProduct9[TransactionhistoryarchiveRowUnsaved, TransactionhistoryarchiveId, Int, Int, /* bpchar, max 1 chars */ String, Int, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate")(x => (x.transactionid, x.productid, x.referenceorderid, x.transactiontype, x.quantity, x.actualcost, x.referenceorderlineid, x.transactiondate, x.modifieddate))(TransactionhistoryarchiveId.encoder, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[TransactionhistoryarchiveRowUnsaved] = Text.instance[TransactionhistoryarchiveRowUnsaved]{ (row, sb) =>
+    TransactionhistoryarchiveId.text.unsafeEncode(row.transactionid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.referenceorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.transactiontype, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.quantity, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.actualcost, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.referenceorderlineid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.transactiondate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

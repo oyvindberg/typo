@@ -16,7 +16,10 @@ trait SalesterritoryhistoryRepo {
   def delete(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def insert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow
+  def insertStreaming(unsaved: Iterator[SalesterritoryhistoryRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: SalesterritoryhistoryRowUnsaved)(implicit c: Connection): SalesterritoryhistoryRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[SalesterritoryhistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow]

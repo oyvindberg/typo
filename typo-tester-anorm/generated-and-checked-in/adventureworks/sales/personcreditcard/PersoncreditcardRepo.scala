@@ -16,7 +16,10 @@ trait PersoncreditcardRepo {
   def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow
+  def insertStreaming(unsaved: Iterator[PersoncreditcardRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[PersoncreditcardRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def selectAll(implicit c: Connection): List[PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow]

@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import typo.dsl.Bijection
@@ -62,4 +63,8 @@ object TypoUnknownCitext {
     },
     "citext"
   )
+  implicit lazy val text: Text[TypoUnknownCitext] = new Text[TypoUnknownCitext] {
+    override def unsafeEncode(v: TypoUnknownCitext, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoUnknownCitext, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
 }

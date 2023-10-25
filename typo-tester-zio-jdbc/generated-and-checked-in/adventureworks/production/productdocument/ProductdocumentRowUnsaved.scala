@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productdocument
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
@@ -63,5 +64,12 @@ object ProductdocumentRowUnsaved {
       Defaulted.jsonEncoder(DocumentId.jsonEncoder).unsafeEncode(a.documentnode, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[ProductdocumentRowUnsaved] = Text.instance[ProductdocumentRowUnsaved]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(DocumentId.text).unsafeEncode(row.documentnode, sb)
   }
 }

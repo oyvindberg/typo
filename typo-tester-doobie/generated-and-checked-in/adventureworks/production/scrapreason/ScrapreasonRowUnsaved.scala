@@ -10,6 +10,7 @@ package scrapreason
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -39,4 +40,11 @@ case class ScrapreasonRowUnsaved(
 object ScrapreasonRowUnsaved {
   implicit lazy val decoder: Decoder[ScrapreasonRowUnsaved] = Decoder.forProduct3[ScrapreasonRowUnsaved, Name, Defaulted[ScrapreasonId], Defaulted[TypoLocalDateTime]]("name", "scrapreasonid", "modifieddate")(ScrapreasonRowUnsaved.apply)(Name.decoder, Defaulted.decoder(ScrapreasonId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[ScrapreasonRowUnsaved] = Encoder.forProduct3[ScrapreasonRowUnsaved, Name, Defaulted[ScrapreasonId], Defaulted[TypoLocalDateTime]]("name", "scrapreasonid", "modifieddate")(x => (x.name, x.scrapreasonid, x.modifieddate))(Name.encoder, Defaulted.encoder(ScrapreasonId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[ScrapreasonRowUnsaved] = Text.instance[ScrapreasonRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ScrapreasonId.text).unsafeEncode(row.scrapreasonid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

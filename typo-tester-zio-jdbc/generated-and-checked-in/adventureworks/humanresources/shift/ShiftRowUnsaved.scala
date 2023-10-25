@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package shift
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
@@ -75,5 +76,16 @@ object ShiftRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[ShiftRowUnsaved] = Text.instance[ShiftRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalTime.text.unsafeEncode(row.starttime, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalTime.text.unsafeEncode(row.endtime, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ShiftId.text).unsafeEncode(row.shiftid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

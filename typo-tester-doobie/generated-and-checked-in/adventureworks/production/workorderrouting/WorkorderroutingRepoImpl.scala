@@ -37,6 +37,9 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
        """.query(WorkorderroutingRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(WorkorderroutingRow.text)
+  }
   override def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow] = {
     val fs = List(
       Some((Fragment.const(s""""workorderid""""), fr"${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4")),
@@ -69,6 +72,10 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     }
     q.query(WorkorderroutingRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderroutingRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     SelectBuilderSql("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.read)

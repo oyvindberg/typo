@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
+import adventureworks.streamingInsert
 import adventureworks.userdefined.FirstName
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -40,6 +41,9 @@ object PersonRepoImpl extends PersonRepo {
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.persontype)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.namestyle)(NameStyle.setter)}::bool, ${Segment.paramSegment(unsaved.title)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.firstname)(/* user-picked */ FirstName.setter)}::varchar, ${Segment.paramSegment(unsaved.middlename)(Setter.optionParamSetter(Name.setter))}::varchar, ${Segment.paramSegment(unsaved.lastname)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.suffix)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.emailpromotion)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.additionalcontactinfo)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
        """.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
   }
   override def insert(unsaved: PersonRowUnsaved): ZIO[ZConnection, Throwable, PersonRow] = {
     val fs = List(
@@ -81,6 +85,10 @@ object PersonRepoImpl extends PersonRepo {
     }
     q.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.person("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("person.person", PersonFields, PersonRow.jdbcDecoder)

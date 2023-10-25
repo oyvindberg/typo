@@ -37,6 +37,9 @@ object PersonRepoImpl extends PersonRepo {
           returning "one", "two", "name"
        """.query(PersonRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY compositepk.person("one", "two", "name") FROM STDIN""").copyIn(unsaved, batchSize)(PersonRow.text)
+  }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))}")),
@@ -63,6 +66,10 @@ object PersonRepoImpl extends PersonRepo {
     }
     q.query(PersonRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("compositepk.person", PersonFields, PersonRow.read)

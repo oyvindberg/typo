@@ -17,7 +17,10 @@ trait ShiftRepo {
   def delete(shiftid: ShiftId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[ShiftFields, ShiftRow]
   def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ShiftFields, ShiftRow]
   def selectAll: Stream[ConnectionIO, ShiftRow]
   def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]]

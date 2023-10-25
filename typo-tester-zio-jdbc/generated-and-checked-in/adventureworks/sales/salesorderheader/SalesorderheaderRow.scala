@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesorderheader
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
@@ -235,5 +236,56 @@ object SalesorderheaderRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[SalesorderheaderRow] = Text.instance[SalesorderheaderRow]{ (row, sb) =>
+    SalesorderheaderId.text.unsafeEncode(row.salesorderid, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.revisionnumber, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.orderdate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.duedate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.shipdate, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.status, sb)
+    sb.append(Text.DELIMETER)
+    Flag.text.unsafeEncode(row.onlineorderflag, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(OrderNumber.text).unsafeEncode(row.purchaseordernumber, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(AccountNumber.text).unsafeEncode(row.accountnumber, sb)
+    sb.append(Text.DELIMETER)
+    CustomerId.text.unsafeEncode(row.customerid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(BusinessentityId.text).unsafeEncode(row.salespersonid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(SalesterritoryId.text).unsafeEncode(row.territoryid, sb)
+    sb.append(Text.DELIMETER)
+    AddressId.text.unsafeEncode(row.billtoaddressid, sb)
+    sb.append(Text.DELIMETER)
+    AddressId.text.unsafeEncode(row.shiptoaddressid, sb)
+    sb.append(Text.DELIMETER)
+    ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(CustomCreditcardId.text).unsafeEncode(row.creditcardid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.creditcardapprovalcode, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(CurrencyrateId.text).unsafeEncode(row.currencyrateid, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.subtotal, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.taxamt, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.freight, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.bigDecimalInstance).unsafeEncode(row.totaldue, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.comment, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

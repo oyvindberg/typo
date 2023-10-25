@@ -9,6 +9,7 @@ package myschema
 package football_club
 
 import java.sql.ResultSet
+import testdb.hardcoded.Text
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder
@@ -46,5 +47,10 @@ object FootballClubRow {
       JsonEncoder.string.unsafeEncode(a.name, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[FootballClubRow] = Text.instance[FootballClubRow]{ (row, sb) =>
+    FootballClubId.text.unsafeEncode(row.id, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
   }
 }

@@ -35,8 +35,22 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.currencycode -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[CurrencyRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.currencycode -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
     SelectBuilderMock(CurrencyFields, () => map.values.toList, SelectParams.empty)

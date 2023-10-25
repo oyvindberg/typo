@@ -39,8 +39,30 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.phonenumbertypeid -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.phonenumbertypeid -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     SelectBuilderMock(PhonenumbertypeFields, delay(map.values.toList), SelectParams.empty)

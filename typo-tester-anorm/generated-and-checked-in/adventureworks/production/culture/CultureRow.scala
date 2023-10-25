@@ -7,6 +7,7 @@ package adventureworks
 package production
 package culture
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -46,6 +47,13 @@ object CultureRow {
         modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[CultureRow] = Text.instance[CultureRow]{ (row, sb) =>
+    CultureId.text.unsafeEncode(row.cultureid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[CultureRow] = OWrites[CultureRow](o =>
     new JsObject(ListMap[String, JsValue](

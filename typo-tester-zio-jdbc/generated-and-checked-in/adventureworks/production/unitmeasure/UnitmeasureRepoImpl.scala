@@ -10,6 +10,7 @@ package unitmeasure
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           returning "unitmeasurecode", "name", "modifieddate"::text
        """.insertReturning(UnitmeasureRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UnitmeasureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(UnitmeasureRow.text)
+  }
   override def insert(unsaved: UnitmeasureRowUnsaved): ZIO[ZConnection, Throwable, UnitmeasureRow] = {
     val fs = List(
       Some((sql""""unitmeasurecode"""", sql"${Segment.paramSegment(unsaved.unitmeasurecode)(UnitmeasureId.setter)}::bpchar")),
@@ -56,6 +60,10 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     }
     q.insertReturning(UnitmeasureRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UnitmeasureRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UnitmeasureRowUnsaved.text)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
     SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.jdbcDecoder)

@@ -10,6 +10,7 @@ package phonenumbertype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
           returning "phonenumbertypeid", "name", "modifieddate"::text
        """.insertReturning(PhonenumbertypeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PhonenumbertypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(PhonenumbertypeRow.text)
+  }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ZIO[ZConnection, Throwable, PhonenumbertypeRow] = {
     val fs = List(
       Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
@@ -59,6 +63,10 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     }
     q.insertReturning(PhonenumbertypeRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PhonenumbertypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PhonenumbertypeRowUnsaved.text)
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.jdbcDecoder)

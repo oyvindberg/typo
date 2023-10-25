@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGlseg
@@ -80,4 +81,8 @@ object TypoLineSegment {
     },
     "lseg"
   )
+  implicit lazy val text: Text[TypoLineSegment] = new Text[TypoLineSegment] {
+    override def unsafeEncode(v: TypoLineSegment, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"((${v.p1.x},${v.p1.y}),(${v.p2.x},${v.p2.y}))", sb)
+    override def unsafeArrayEncode(v: TypoLineSegment, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"((${v.p1.x},${v.p1.y}),(${v.p2.x},${v.p2.y}))", sb)
+  }
 }

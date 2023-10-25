@@ -7,6 +7,7 @@ package adventureworks
 package production
 package scrapreason
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -25,4 +26,8 @@ object ScrapreasonId {
   implicit lazy val get: Get[ScrapreasonId] = Meta.IntMeta.get.map(ScrapreasonId.apply)
   implicit lazy val ordering: Ordering[ScrapreasonId] = Ordering.by(_.value)
   implicit lazy val put: Put[ScrapreasonId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val text: Text[ScrapreasonId] = new Text[ScrapreasonId] {
+    override def unsafeEncode(v: ScrapreasonId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: ScrapreasonId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

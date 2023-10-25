@@ -17,7 +17,10 @@ trait ProductlistpricehistoryRepo {
   def delete(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductlistpricehistoryRowUnsaved): ConnectionIO[ProductlistpricehistoryRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow]
   def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]]

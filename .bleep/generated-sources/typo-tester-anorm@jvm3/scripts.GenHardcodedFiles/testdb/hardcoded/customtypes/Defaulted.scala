@@ -16,6 +16,7 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import testdb.hardcoded.Text
 
 
 /**
@@ -43,6 +44,12 @@ object Defaulted {
       Json.fromJson[T](providedJson).map(x => Defaulted.Provided(Some(x)))
     case _ =>
       JsError(s"Expected `Defaulted` json object structure")
+  }
+  implicit def text[T](implicit t: Text[T]): Text[Defaulted[T]] = Text.instance {
+    case (Defaulted.Provided(value), sb) => t.unsafeEncode(value, sb)
+    case (Defaulted.UseDefault, sb) =>
+      sb.append("__DEFAULT_VALUE__")
+      ()
   }
   implicit def writes[T](implicit T: Writes[T]): Writes[Defaulted[T]] = {
     case Defaulted.Provided(value) => Json.obj("provided" -> T.writes(value))

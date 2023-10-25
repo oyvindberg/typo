@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package shift
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -25,4 +26,8 @@ object ShiftId {
   implicit lazy val get: Get[ShiftId] = Meta.IntMeta.get.map(ShiftId.apply)
   implicit lazy val ordering: Ordering[ShiftId] = Ordering.by(_.value)
   implicit lazy val put: Put[ShiftId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val text: Text[ShiftId] = new Text[ShiftId] {
+    override def unsafeEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

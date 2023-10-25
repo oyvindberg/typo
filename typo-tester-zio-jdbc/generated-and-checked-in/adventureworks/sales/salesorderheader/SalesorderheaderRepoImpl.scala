@@ -20,6 +20,7 @@ import adventureworks.purchasing.shipmethod.ShipmethodId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.streamingInsert
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -46,6 +47,9 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           values (${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.revisionnumber)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.orderdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.onlineorderflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.purchaseordernumber)(Setter.optionParamSetter(OrderNumber.setter))}::varchar, ${Segment.paramSegment(unsaved.accountnumber)(Setter.optionParamSetter(AccountNumber.setter))}::varchar, ${Segment.paramSegment(unsaved.customerid)(CustomerId.setter)}::int4, ${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4, ${Segment.paramSegment(unsaved.billtoaddressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.shiptoaddressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4, ${Segment.paramSegment(unsaved.creditcardid)(Setter.optionParamSetter(CustomCreditcardId.setter))}::int4, ${Segment.paramSegment(unsaved.creditcardapprovalcode)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.currencyrateid)(Setter.optionParamSetter(CurrencyrateId.setter))}::int4, ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.totaldue)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.comment)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
        """.insertReturning(SalesorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheaderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderheaderRow.text)
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved): ZIO[ZConnection, Throwable, SalesorderheaderRow] = {
     val fs = List(
@@ -117,6 +121,10 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     }
     q.insertReturning(SalesorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheaderRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.salesorderheader("duedate", "shipdate", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "totaldue", "comment", "salesorderid", "revisionnumber", "orderdate", "status", "onlineorderflag", "subtotal", "taxamt", "freight", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderheaderRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     SelectBuilderSql("sales.salesorderheader", SalesorderheaderFields, SalesorderheaderRow.jdbcDecoder)

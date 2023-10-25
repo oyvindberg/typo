@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           values (${Segment.paramSegment(unsaved.addresstypeid)(AddresstypeId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text
        """.insertReturning(AddresstypeRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, AddresstypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddresstypeRow.text)
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ZIO[ZConnection, Throwable, AddresstypeRow] = {
     val fs = List(
@@ -64,6 +68,10 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     }
     q.insertReturning(AddresstypeRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, AddresstypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddresstypeRowUnsaved.text)
   }
   override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
     SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.jdbcDecoder)

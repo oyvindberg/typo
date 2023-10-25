@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -50,4 +51,15 @@ case class EmailaddressRowUnsaved(
 object EmailaddressRowUnsaved {
   implicit lazy val decoder: Decoder[EmailaddressRowUnsaved] = Decoder.forProduct5[EmailaddressRowUnsaved, BusinessentityId, Option[/* max 50 chars */ String], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate")(EmailaddressRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[EmailaddressRowUnsaved] = Encoder.forProduct5[EmailaddressRowUnsaved, BusinessentityId, Option[/* max 50 chars */ String], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate")(x => (x.businessentityid, x.emailaddress, x.emailaddressid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[EmailaddressRowUnsaved] = Text.instance[EmailaddressRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.emailaddress, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.emailaddressid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

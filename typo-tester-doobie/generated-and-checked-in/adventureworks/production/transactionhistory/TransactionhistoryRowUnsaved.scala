@@ -10,6 +10,7 @@ package transactionhistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -67,4 +68,23 @@ case class TransactionhistoryRowUnsaved(
 object TransactionhistoryRowUnsaved {
   implicit lazy val decoder: Decoder[TransactionhistoryRowUnsaved] = Decoder.forProduct9[TransactionhistoryRowUnsaved, ProductId, Int, /* bpchar, max 1 chars */ String, Int, BigDecimal, Defaulted[TransactionhistoryId], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate")(TransactionhistoryRowUnsaved.apply)(ProductId.decoder, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, Defaulted.decoder(TransactionhistoryId.decoder), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[TransactionhistoryRowUnsaved] = Encoder.forProduct9[TransactionhistoryRowUnsaved, ProductId, Int, /* bpchar, max 1 chars */ String, Int, BigDecimal, Defaulted[TransactionhistoryId], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate")(x => (x.productid, x.referenceorderid, x.transactiontype, x.quantity, x.actualcost, x.transactionid, x.referenceorderlineid, x.transactiondate, x.modifieddate))(ProductId.encoder, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, Defaulted.encoder(TransactionhistoryId.encoder), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[TransactionhistoryRowUnsaved] = Text.instance[TransactionhistoryRowUnsaved]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.referenceorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.transactiontype, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.quantity, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.actualcost, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TransactionhistoryId.text).unsafeEncode(row.transactionid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.referenceorderlineid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.transactiondate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

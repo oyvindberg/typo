@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGpoint
@@ -79,4 +80,8 @@ object TypoPoint {
     },
     "point"
   )
+  implicit lazy val text: Text[TypoPoint] = new Text[TypoPoint] {
+    override def unsafeEncode(v: TypoPoint, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"(${v.x},${v.y})", sb)
+    override def unsafeArrayEncode(v: TypoPoint, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"(${v.x},${v.y})", sb)
+  }
 }

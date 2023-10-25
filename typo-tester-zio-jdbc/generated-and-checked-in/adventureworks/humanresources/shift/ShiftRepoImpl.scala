@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object ShiftRepoImpl extends ShiftRepo {
           values (${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.starttime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.endtime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
        """.insertReturning(ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text)
   }
   override def insert(unsaved: ShiftRowUnsaved): ZIO[ZConnection, Throwable, ShiftRow] = {
     val fs = List(
@@ -62,6 +66,10 @@ object ShiftRepoImpl extends ShiftRepo {
     }
     q.insertReturning(ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShiftRowUnsaved.text)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
     SelectBuilderSql("humanresources.shift", ShiftFields, ShiftRow.jdbcDecoder)

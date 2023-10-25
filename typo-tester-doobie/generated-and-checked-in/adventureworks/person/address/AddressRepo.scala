@@ -17,7 +17,10 @@ trait AddressRepo {
   def delete(addressid: AddressId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[AddressFields, AddressRow]
   def insert(unsaved: AddressRow): ConnectionIO[AddressRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddressRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[AddressFields, AddressRow]
   def selectAll: Stream[ConnectionIO, AddressRow]
   def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]]

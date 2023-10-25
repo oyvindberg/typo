@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import typo.dsl.Bijection
@@ -62,4 +63,8 @@ object TypoMoney {
     },
     "money"
   )
+  implicit lazy val text: Text[TypoMoney] = new Text[TypoMoney] {
+    override def unsafeEncode(v: TypoMoney, sb: StringBuilder) = Text.bigDecimalInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoMoney, sb: StringBuilder) = Text.bigDecimalInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

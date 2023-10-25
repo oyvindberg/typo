@@ -35,8 +35,22 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[EmployeepayhistoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.compositeId -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[EmployeepayhistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.compositeId -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     SelectBuilderMock(EmployeepayhistoryFields, () => map.values.toList, SelectParams.empty)

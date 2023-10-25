@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package countryregioncurrency
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
@@ -51,6 +52,13 @@ object CountryregioncurrencyRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[CountryregioncurrencyRowUnsaved] = Text.instance[CountryregioncurrencyRowUnsaved]{ (row, sb) =>
+    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+    sb.append(Text.DELIMETER)
+    CurrencyId.text.unsafeEncode(row.currencycode, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[CountryregioncurrencyRowUnsaved] = OWrites[CountryregioncurrencyRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),

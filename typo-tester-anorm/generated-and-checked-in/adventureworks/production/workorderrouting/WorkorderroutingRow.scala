@@ -7,6 +7,7 @@ package adventureworks
 package production
 package workorderrouting
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
@@ -97,6 +98,31 @@ object WorkorderroutingRow {
         modifieddate = row(idx + 11)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[WorkorderroutingRow] = Text.instance[WorkorderroutingRow]{ (row, sb) =>
+    WorkorderId.text.unsafeEncode(row.workorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.operationsequence, sb)
+    sb.append(Text.DELIMETER)
+    LocationId.text.unsafeEncode(row.locationid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.scheduledstartdate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.scheduledenddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.actualstartdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.actualenddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.bigDecimalInstance).unsafeEncode(row.actualresourcehrs, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.plannedcost, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.bigDecimalInstance).unsafeEncode(row.actualcost, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[WorkorderroutingRow] = OWrites[WorkorderroutingRow](o =>
     new JsObject(ListMap[String, JsValue](

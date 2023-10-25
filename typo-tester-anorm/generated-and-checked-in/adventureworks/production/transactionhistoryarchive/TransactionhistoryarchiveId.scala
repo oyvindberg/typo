@@ -7,6 +7,7 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -27,6 +28,10 @@ object TransactionhistoryarchiveId {
     override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[TransactionhistoryarchiveId] = Reads.IntReads.map(TransactionhistoryarchiveId.apply)
+  implicit lazy val text: Text[TransactionhistoryarchiveId] = new Text[TransactionhistoryarchiveId] {
+    override def unsafeEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[TransactionhistoryarchiveId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[TransactionhistoryarchiveId] = Writes.IntWrites.contramap(_.value)
 }

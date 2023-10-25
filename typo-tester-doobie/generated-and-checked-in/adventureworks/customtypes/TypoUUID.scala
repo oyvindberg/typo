@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -31,4 +32,8 @@ object TypoUUID {
     .map(v => TypoUUID(v))
   implicit def ordering(implicit O0: Ordering[UUID]): Ordering[TypoUUID] = Ordering.by(_.value)
   implicit lazy val put: Put[TypoUUID] = Put.Advanced.other[UUID](NonEmptyList.one("uuid")).contramap(v => v.value)
+  implicit lazy val text: Text[TypoUUID] = new Text[TypoUUID] {
+    override def unsafeEncode(v: TypoUUID, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoUUID, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
 }

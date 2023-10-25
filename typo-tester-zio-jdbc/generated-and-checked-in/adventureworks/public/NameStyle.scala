@@ -6,6 +6,7 @@
 package adventureworks
 package public
 
+import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -28,4 +29,8 @@ object NameStyle {
   implicit lazy val ordering: Ordering[NameStyle] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[NameStyle] = ParameterMetaData.instance[NameStyle](ParameterMetaData.BooleanParameterMetaData.sqlType, ParameterMetaData.BooleanParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[NameStyle] = Setter.booleanSetter.contramap(_.value)
+  implicit lazy val text: Text[NameStyle] = new Text[NameStyle] {
+    override def unsafeEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

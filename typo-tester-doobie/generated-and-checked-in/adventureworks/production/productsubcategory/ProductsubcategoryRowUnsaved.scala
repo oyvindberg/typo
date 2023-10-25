@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -51,4 +52,15 @@ case class ProductsubcategoryRowUnsaved(
 object ProductsubcategoryRowUnsaved {
   implicit lazy val decoder: Decoder[ProductsubcategoryRowUnsaved] = Decoder.forProduct5[ProductsubcategoryRowUnsaved, ProductcategoryId, Name, Defaulted[ProductsubcategoryId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate")(ProductsubcategoryRowUnsaved.apply)(ProductcategoryId.decoder, Name.decoder, Defaulted.decoder(ProductsubcategoryId.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[ProductsubcategoryRowUnsaved] = Encoder.forProduct5[ProductsubcategoryRowUnsaved, ProductcategoryId, Name, Defaulted[ProductsubcategoryId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate")(x => (x.productcategoryid, x.name, x.productsubcategoryid, x.rowguid, x.modifieddate))(ProductcategoryId.encoder, Name.encoder, Defaulted.encoder(ProductsubcategoryId.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[ProductsubcategoryRowUnsaved] = Text.instance[ProductsubcategoryRowUnsaved]{ (row, sb) =>
+    ProductcategoryId.text.unsafeEncode(row.productcategoryid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ProductsubcategoryId.text).unsafeEncode(row.productsubcategoryid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

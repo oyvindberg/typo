@@ -19,7 +19,10 @@ trait SalespersonquotahistoryRepo {
   def delete(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def insert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, SalespersonquotahistoryRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalespersonquotahistoryRowUnsaved): ZIO[ZConnection, Throwable, SalespersonquotahistoryRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]]

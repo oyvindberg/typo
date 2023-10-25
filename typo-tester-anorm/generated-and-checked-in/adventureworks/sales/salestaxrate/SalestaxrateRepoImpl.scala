@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -40,6 +41,9 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text, c)
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
     val namedParameters = List(
@@ -78,6 +82,10 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
         .executeInsert(SalestaxrateRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SalestaxrateRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalestaxrateRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
     SelectBuilderSql("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.rowParser)

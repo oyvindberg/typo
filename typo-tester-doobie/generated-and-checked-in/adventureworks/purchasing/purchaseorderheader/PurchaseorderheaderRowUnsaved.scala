@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -101,4 +102,29 @@ case class PurchaseorderheaderRowUnsaved(
 object PurchaseorderheaderRowUnsaved {
   implicit lazy val decoder: Decoder[PurchaseorderheaderRowUnsaved] = Decoder.forProduct12[PurchaseorderheaderRowUnsaved, BusinessentityId, BusinessentityId, ShipmethodId, Option[TypoLocalDateTime], Defaulted[PurchaseorderheaderId], Defaulted[TypoShort], Defaulted[TypoShort], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate")(PurchaseorderheaderRowUnsaved.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ShipmethodId.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Defaulted.decoder(PurchaseorderheaderId.decoder), Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[PurchaseorderheaderRowUnsaved] = Encoder.forProduct12[PurchaseorderheaderRowUnsaved, BusinessentityId, BusinessentityId, ShipmethodId, Option[TypoLocalDateTime], Defaulted[PurchaseorderheaderId], Defaulted[TypoShort], Defaulted[TypoShort], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.employeeid, x.vendorid, x.shipmethodid, x.shipdate, x.purchaseorderid, x.revisionnumber, x.status, x.orderdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ShipmethodId.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Defaulted.encoder(PurchaseorderheaderId.encoder), Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[PurchaseorderheaderRowUnsaved] = Text.instance[PurchaseorderheaderRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.employeeid, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.vendorid, sb)
+    sb.append(Text.DELIMETER)
+    ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.shipdate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(PurchaseorderheaderId.text).unsafeEncode(row.purchaseorderid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoShort.text).unsafeEncode(row.revisionnumber, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoShort.text).unsafeEncode(row.status, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.orderdate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.subtotal, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.taxamt, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.freight, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

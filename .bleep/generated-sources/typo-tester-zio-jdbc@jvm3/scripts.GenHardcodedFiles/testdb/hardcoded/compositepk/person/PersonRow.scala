@@ -9,6 +9,7 @@ package compositepk
 package person
 
 import java.sql.ResultSet
+import testdb.hardcoded.Text
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder
@@ -54,5 +55,12 @@ object PersonRow {
       JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.name, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[PersonRow] = Text.instance[PersonRow]{ (row, sb) =>
+    Text.longInstance.unsafeEncode(row.one, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.two, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.name, sb)
   }
 }

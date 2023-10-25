@@ -10,6 +10,7 @@ package shoppingcartitem
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -58,4 +59,17 @@ case class ShoppingcartitemRowUnsaved(
 object ShoppingcartitemRowUnsaved {
   implicit lazy val decoder: Decoder[ShoppingcartitemRowUnsaved] = Decoder.forProduct6[ShoppingcartitemRowUnsaved, /* max 50 chars */ String, ProductId, Defaulted[ShoppingcartitemId], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate")(ShoppingcartitemRowUnsaved.apply)(Decoder.decodeString, ProductId.decoder, Defaulted.decoder(ShoppingcartitemId.decoder), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[ShoppingcartitemRowUnsaved] = Encoder.forProduct6[ShoppingcartitemRowUnsaved, /* max 50 chars */ String, ProductId, Defaulted[ShoppingcartitemId], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate")(x => (x.shoppingcartid, x.productid, x.shoppingcartitemid, x.quantity, x.datecreated, x.modifieddate))(Encoder.encodeString, ProductId.encoder, Defaulted.encoder(ShoppingcartitemId.encoder), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[ShoppingcartitemRowUnsaved] = Text.instance[ShoppingcartitemRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.shoppingcartid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ShoppingcartitemId.text).unsafeEncode(row.shoppingcartitemid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.quantity, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.datecreated, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

@@ -7,6 +7,7 @@ package adventureworks
 package person
 package person
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
@@ -95,6 +96,33 @@ object PersonRow {
         modifieddate = row(idx + 12)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[PersonRow] = Text.instance[PersonRow]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.persontype, sb)
+    sb.append(Text.DELIMETER)
+    NameStyle.text.unsafeEncode(row.namestyle, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.title, sb)
+    sb.append(Text.DELIMETER)
+    /* user-picked */ FirstName.text.unsafeEncode(row.firstname, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Name.text).unsafeEncode(row.middlename, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.lastname, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.suffix, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.emailpromotion, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.additionalcontactinfo, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.demographics, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[PersonRow] = OWrites[PersonRow](o =>
     new JsObject(ListMap[String, JsValue](

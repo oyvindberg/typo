@@ -35,8 +35,22 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[TransactionhistoryarchiveRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.transactionid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): TransactionhistoryarchiveRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[TransactionhistoryarchiveRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.transactionid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     SelectBuilderMock(TransactionhistoryarchiveFields, () => map.values.toList, SelectParams.empty)

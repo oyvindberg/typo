@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -47,6 +48,10 @@ object TypoPolygon {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoPolygon] = implicitly[Reads[List[TypoPoint]]].map(TypoPolygon.apply)
+  implicit lazy val text: Text[TypoPolygon] = new Text[TypoPolygon] {
+    override def unsafeEncode(v: TypoPolygon, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"""(${v.points.map(p => s"${p.x}, ${p.y}").mkString(",")})""", sb)
+    override def unsafeArrayEncode(v: TypoPolygon, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"""(${v.points.map(p => s"${p.x}, ${p.y}").mkString(",")})""", sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoPolygon] = ToStatement[TypoPolygon]((s, index, v) => s.setObject(index, new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
   implicit lazy val writes: Writes[TypoPolygon] = implicitly[Writes[List[TypoPoint]]].contramap(_.points)
 }

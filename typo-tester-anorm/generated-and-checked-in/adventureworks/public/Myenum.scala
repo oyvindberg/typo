@@ -6,6 +6,7 @@
 package adventureworks
 package public
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.SqlMappingError
@@ -47,6 +48,10 @@ object Myenum {
     override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[Myenum] = Reads[Myenum]{(value: JsValue) => value.validate(Reads.StringReads).flatMap(str => Myenum(str).fold(JsError.apply, JsSuccess(_)))}
+  implicit lazy val text: Text[Myenum] = new Text[Myenum] {
+    override def unsafeEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[Myenum] = ToStatement.stringToStatement.contramap(_.value)
   implicit lazy val writes: Writes[Myenum] = Writes[Myenum](value => Writes.StringWrites.writes(value.value))
 }

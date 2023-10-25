@@ -19,7 +19,10 @@ trait UnitmeasureRepo {
   def delete(unitmeasurecode: UnitmeasureId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow]
   def insert(unsaved: UnitmeasureRow): ZIO[ZConnection, Throwable, UnitmeasureRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UnitmeasureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: UnitmeasureRowUnsaved): ZIO[ZConnection, Throwable, UnitmeasureRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UnitmeasureRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow]
   def selectAll: ZStream[ZConnection, Throwable, UnitmeasureRow]
   def selectById(unitmeasurecode: UnitmeasureId): ZIO[ZConnection, Throwable, Option[UnitmeasureRow]]
