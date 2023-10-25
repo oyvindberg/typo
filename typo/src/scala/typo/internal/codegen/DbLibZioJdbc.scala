@@ -683,7 +683,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           implicitParams = Nil,
           tpe = JdbcDecoder.of(ct.typoType),
           body = code"""|new $JdbcDecoder[${ct.typoType}] {
-                   |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${ct.typoType}) = {
+                   |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${ct.typoType}) =
                    |    rs.getObject(columIndex) match {
                    |      case null => null
                    |      case a    =>
@@ -695,7 +695,6 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                    |        } catch {
                    |          case e: ClassCastException => throw new RuntimeException("Invalid TypoHStore decoder", e)
                    |        }
-                   |    }
                    |  }
                    |}""".stripMargin
         )
