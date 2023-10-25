@@ -5,6 +5,7 @@
 package adventureworks.userdefined
 
 import typo.dsl.Bijection
+import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.{JdbcDecoder, JdbcEncoder}
 import zio.json.*
 
@@ -16,5 +17,6 @@ object CustomCreditcardId {
   implicit lazy val jsonEncoder: JsonEncoder[CustomCreditcardId] = DeriveJsonEncoder.gen[CustomCreditcardId]
   implicit lazy val jdbcDecoder: JdbcDecoder[CustomCreditcardId] = JdbcDecoder.intDecoder.map(CustomCreditcardId.apply)
   implicit lazy val jdbcEncoder: JdbcEncoder[CustomCreditcardId] = JdbcEncoder.intEncoder.contramap(_.value)
+  implicit lazy val jdbcSetter: Setter[CustomCreditcardId] = Setter.intSetter.contramap(_.value)
   implicit lazy val ordering: Ordering[CustomCreditcardId] = Ordering.by(_.value)
 }
