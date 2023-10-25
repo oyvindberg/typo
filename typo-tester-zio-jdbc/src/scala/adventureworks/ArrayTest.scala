@@ -70,7 +70,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         uuids = Array(TypoUUID.randomUUID),
         numerics = Array(BigDecimal("3.14159"))
       )
-      PgtestRepoImpl.insert(before).map { after =>
+      PgtestRepoImpl.insert(before).map(_.updatedKeys.head).map { after =>
         assert(after.box === before.box): @nowarn
         assert(after.circle === before.circle): @nowarn
         assert(after.line === before.line): @nowarn
@@ -164,7 +164,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         numerics = None
       )
       PgtestnullRepoImpl.insert(before).map { after =>
-        assert(after === before)
+        assert(after.rowsUpdated === 1L)
+        assert(after.updatedKeys.head === before)
       }
     }
   }
@@ -216,7 +217,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         numerics = Some(Array(BigDecimal("3.14159")))
       )
 
-      PgtestnullRepoImpl.insert(before).map { after =>
+      PgtestnullRepoImpl.insert(before).map(_.updatedKeys.head).map { after =>
         assert(after.box === before.box): @nowarn
         assert(after.circle === before.circle): @nowarn
         assert(after.line === before.line): @nowarn
