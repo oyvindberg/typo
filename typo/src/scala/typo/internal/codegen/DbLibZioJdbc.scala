@@ -552,7 +552,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
       sc.Given(
         tparams = List(T),
-        name = sc.Ident("arrayDecoder"),
+        name = sc.Ident("primitiveArrayDecoder"),
         implicitParams = List(
           sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None),
         ),
@@ -582,7 +582,29 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       )
     }
 
-    List(primitiveArrayDecoder)
+    // TODO Jules: How to implement this?
+    val primitiveArrayEncoder = {
+      val T = sc.Type.Abstract(sc.Ident("T"))
+
+      sc.Given(
+        tparams = List(T),
+        name = sc.Ident("primitiveArrayEncoder"),
+        implicitParams = List(
+          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None),
+        ),
+        tpe = JdbcEncoder.of(sc.Type.Array.of(T)),
+        body =
+          code"""|new ${JdbcEncoder.of(sc.Type.Array.of(T))} {
+                 |  override def encode(value: ${sc.Type.Array.of(T)}): $SqlFragment =
+                 |    if (value.isEmpty) ???
+                 |    else {
+                 |      ???
+                 |    }
+                 |}""".stripMargin
+      )
+    }
+
+    List(primitiveArrayDecoder, primitiveArrayEncoder)
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
