@@ -706,7 +706,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                    |              row = rs.getRow
                    |            )
                    |        }
-                   |  }
+                   |    }
                    |}""".stripMargin
         )
 
