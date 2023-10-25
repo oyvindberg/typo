@@ -17,7 +17,10 @@ trait DepartmentRepo {
   def delete(departmentid: DepartmentId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[DepartmentFields, DepartmentRow]
   def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DepartmentRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[DepartmentFields, DepartmentRow]
   def selectAll: Stream[ConnectionIO, DepartmentRow]
   def selectById(departmentid: DepartmentId): ConnectionIO[Option[DepartmentRow]]

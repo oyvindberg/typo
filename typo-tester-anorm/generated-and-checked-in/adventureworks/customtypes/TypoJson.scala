@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -51,6 +52,10 @@ object TypoJson {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoJson] = Reads.StringReads.map(TypoJson.apply)
+  implicit lazy val text: Text[TypoJson] = new Text[TypoJson] {
+    override def unsafeEncode(v: TypoJson, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoJson, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoJson] = ToStatement[TypoJson]((s, index, v) => s.setObject(index, {
                                                               val obj = new PGobject
                                                               obj.setType("json")

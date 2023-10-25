@@ -10,6 +10,7 @@ package users
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -41,4 +42,19 @@ case class UsersRowUnsaved(
 object UsersRowUnsaved {
   implicit lazy val decoder: Decoder[UsersRowUnsaved] = Decoder.forProduct7[UsersRowUnsaved, UsersId, String, Option[String], TypoUnknownCitext, String, Option[TypoInstant], Defaulted[TypoInstant]]("user_id", "name", "last_name", "email", "password", "verified_on", "created_at")(UsersRowUnsaved.apply)(UsersId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), TypoUnknownCitext.decoder, Decoder.decodeString, Decoder.decodeOption(TypoInstant.decoder), Defaulted.decoder(TypoInstant.decoder))
   implicit lazy val encoder: Encoder[UsersRowUnsaved] = Encoder.forProduct7[UsersRowUnsaved, UsersId, String, Option[String], TypoUnknownCitext, String, Option[TypoInstant], Defaulted[TypoInstant]]("user_id", "name", "last_name", "email", "password", "verified_on", "created_at")(x => (x.userId, x.name, x.lastName, x.email, x.password, x.verifiedOn, x.createdAt))(UsersId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), TypoUnknownCitext.encoder, Encoder.encodeString, Encoder.encodeOption(TypoInstant.encoder), Defaulted.encoder(TypoInstant.encoder))
+  implicit lazy val text: Text[UsersRowUnsaved] = Text.instance[UsersRowUnsaved]{ (row, sb) =>
+    UsersId.text.unsafeEncode(row.userId, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.lastName, sb)
+    sb.append(Text.DELIMETER)
+    TypoUnknownCitext.text.unsafeEncode(row.email, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.password, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoInstant.text).unsafeEncode(row.createdAt, sb)
+  }
 }

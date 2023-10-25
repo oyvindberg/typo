@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -39,6 +40,9 @@ object WorkorderRepoImpl extends WorkorderRepo {
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text, c)
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
     val namedParameters = List(
@@ -73,6 +77,10 @@ object WorkorderRepoImpl extends WorkorderRepo {
         .executeInsert(WorkorderRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[WorkorderRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderRowUnsaved.text, c)
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
     SelectBuilderSql("production.workorder", WorkorderFields, WorkorderRow.rowParser)

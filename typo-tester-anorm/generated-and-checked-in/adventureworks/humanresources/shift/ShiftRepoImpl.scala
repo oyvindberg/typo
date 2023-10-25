@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object ShiftRepoImpl extends ShiftRepo {
        """
       .executeInsert(ShiftRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text, c)
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
     val namedParameters = List(
@@ -67,6 +71,10 @@ object ShiftRepoImpl extends ShiftRepo {
         .executeInsert(ShiftRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ShiftRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShiftRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
     SelectBuilderSql("humanresources.shift", ShiftFields, ShiftRow.rowParser)

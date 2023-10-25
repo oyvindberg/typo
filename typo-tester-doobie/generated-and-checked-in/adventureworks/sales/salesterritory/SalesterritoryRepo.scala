@@ -17,7 +17,10 @@ trait SalesterritoryRepo {
   def delete(territoryid: SalesterritoryId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow]
   def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow]
   def selectAll: Stream[ConnectionIO, SalesterritoryRow]
   def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]]

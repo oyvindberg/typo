@@ -7,6 +7,7 @@ package adventureworks
 package public
 package users
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import anorm.Column
@@ -58,6 +59,21 @@ object UsersRow {
         verifiedOn = row(idx + 6)(Column.columnToOption(TypoInstant.column))
       )
     )
+  }
+  implicit lazy val text: Text[UsersRow] = Text.instance[UsersRow]{ (row, sb) =>
+    UsersId.text.unsafeEncode(row.userId, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.lastName, sb)
+    sb.append(Text.DELIMETER)
+    TypoUnknownCitext.text.unsafeEncode(row.email, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.password, sb)
+    sb.append(Text.DELIMETER)
+    TypoInstant.text.unsafeEncode(row.createdAt, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
   }
   implicit lazy val writes: OWrites[UsersRow] = OWrites[UsersRow](o =>
     new JsObject(ListMap[String, JsValue](

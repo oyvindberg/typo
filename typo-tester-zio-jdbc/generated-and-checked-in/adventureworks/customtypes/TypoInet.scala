@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
@@ -73,4 +74,8 @@ object TypoInet {
     },
     "inet"
   )
+  implicit lazy val text: Text[TypoInet] = new Text[TypoInet] {
+    override def unsafeEncode(v: TypoInet, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoInet, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

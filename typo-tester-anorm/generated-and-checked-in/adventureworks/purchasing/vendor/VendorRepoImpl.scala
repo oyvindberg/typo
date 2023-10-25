@@ -14,6 +14,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -42,6 +43,9 @@ object VendorRepoImpl extends VendorRepo {
        """
       .executeInsert(VendorRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[VendorRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""", batchSize, unsaved)(VendorRow.text, c)
   }
   override def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
     val namedParameters = List(
@@ -78,6 +82,10 @@ object VendorRepoImpl extends VendorRepo {
         .executeInsert(VendorRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[VendorRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(VendorRowUnsaved.text, c)
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
     SelectBuilderSql("purchasing.vendor", VendorFields, VendorRow.rowParser)

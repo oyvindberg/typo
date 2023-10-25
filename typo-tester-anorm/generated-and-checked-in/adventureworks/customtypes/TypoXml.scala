@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -52,6 +53,10 @@ object TypoXml {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoXml] = Reads.StringReads.map(TypoXml.apply)
+  implicit lazy val text: Text[TypoXml] = new Text[TypoXml] {
+    override def unsafeEncode(v: TypoXml, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoXml, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoXml] = ToStatement[TypoXml]((s, index, v) => s.setObject(index, v.value))
   implicit lazy val writes: Writes[TypoXml] = Writes.StringWrites.contramap(_.value)
 }

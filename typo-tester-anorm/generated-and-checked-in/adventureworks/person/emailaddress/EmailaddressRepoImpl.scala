@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -39,6 +40,9 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
        """
       .executeInsert(EmailaddressRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[EmailaddressRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmailaddressRow.text, c)
   }
   override def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow = {
     val namedParameters = List(
@@ -72,6 +76,10 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
         .executeInsert(EmailaddressRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[EmailaddressRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmailaddressRowUnsaved.text, c)
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
     SelectBuilderSql("person.emailaddress", EmailaddressFields, EmailaddressRow.rowParser)

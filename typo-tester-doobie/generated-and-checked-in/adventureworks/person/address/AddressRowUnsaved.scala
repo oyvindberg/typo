@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -63,4 +64,23 @@ case class AddressRowUnsaved(
 object AddressRowUnsaved {
   implicit lazy val decoder: Decoder[AddressRowUnsaved] = Decoder.forProduct9[AddressRowUnsaved, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[TypoBytea], Defaulted[AddressId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate")(AddressRowUnsaved.apply)(Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, StateprovinceId.decoder, Decoder.decodeString, Decoder.decodeOption(TypoBytea.decoder), Defaulted.decoder(AddressId.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[AddressRowUnsaved] = Encoder.forProduct9[AddressRowUnsaved, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[TypoBytea], Defaulted[AddressId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate")(x => (x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.addressid, x.rowguid, x.modifieddate))(Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, StateprovinceId.encoder, Encoder.encodeString, Encoder.encodeOption(TypoBytea.encoder), Defaulted.encoder(AddressId.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[AddressRowUnsaved] = Text.instance[AddressRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.addressline1, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.addressline2, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.city, sb)
+    sb.append(Text.DELIMETER)
+    StateprovinceId.text.unsafeEncode(row.stateprovinceid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.postalcode, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.spatiallocation, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(AddressId.text).unsafeEncode(row.addressid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

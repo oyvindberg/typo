@@ -7,6 +7,7 @@ package adventureworks
 package person
 package password
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
@@ -61,6 +62,17 @@ object PasswordRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[PasswordRowUnsaved] = Text.instance[PasswordRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.passwordhash, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.passwordsalt, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[PasswordRowUnsaved] = OWrites[PasswordRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),

@@ -17,7 +17,10 @@ trait ProductinventoryRepo {
   def delete(compositeId: ProductinventoryId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow]
   def insert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductinventoryRowUnsaved): ConnectionIO[ProductinventoryRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow]
   def selectAll: Stream[ConnectionIO, ProductinventoryRow]
   def selectById(compositeId: ProductinventoryId): ConnectionIO[Option[ProductinventoryRow]]

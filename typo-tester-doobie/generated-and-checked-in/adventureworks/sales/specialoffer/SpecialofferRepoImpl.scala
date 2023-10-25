@@ -35,6 +35,9 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
        """.query(SpecialofferRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SpecialofferRow.text)
+  }
   override def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow] = {
     val fs = List(
       Some((Fragment.const(s""""description""""), fr"${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}")),
@@ -78,6 +81,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     }
     q.query(SpecialofferRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SpecialofferRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SpecialofferRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
     SelectBuilderSql("sales.specialoffer", SpecialofferFields, SpecialofferRow.read)

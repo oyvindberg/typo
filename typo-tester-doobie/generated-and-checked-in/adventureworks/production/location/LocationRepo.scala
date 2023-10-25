@@ -17,7 +17,10 @@ trait LocationRepo {
   def delete(locationid: LocationId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[LocationFields, LocationRow]
   def insert(unsaved: LocationRow): ConnectionIO[LocationRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll: Stream[ConnectionIO, LocationRow]
   def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]]

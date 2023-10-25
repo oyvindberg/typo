@@ -36,6 +36,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """.query(ProductreviewRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductreviewRow.text)
+  }
   override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
     val fs = List(
       Some((Fragment.const(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
@@ -70,6 +73,10 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     }
     q.query(ProductreviewRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductreviewRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductreviewRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
     SelectBuilderSql("production.productreview", ProductreviewFields, ProductreviewRow.read)

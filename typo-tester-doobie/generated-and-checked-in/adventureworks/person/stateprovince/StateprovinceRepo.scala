@@ -17,7 +17,10 @@ trait StateprovinceRepo {
   def delete(stateprovinceid: StateprovinceId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow]
   def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StateprovinceRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[StateprovinceFields, StateprovinceRow]
   def selectAll: Stream[ConnectionIO, StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId): ConnectionIO[Option[StateprovinceRow]]

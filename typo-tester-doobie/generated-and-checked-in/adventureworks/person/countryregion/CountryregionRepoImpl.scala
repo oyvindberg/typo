@@ -34,6 +34,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
           returning "countryregioncode", "name", "modifieddate"::text
        """.query(CountryregionRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CountryregionRow.text)
+  }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
       Some((Fragment.const(s""""countryregioncode""""), fr"${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}")),
@@ -57,6 +60,10 @@ object CountryregionRepoImpl extends CountryregionRepo {
     }
     q.query(CountryregionRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CountryregionRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
     SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.read)

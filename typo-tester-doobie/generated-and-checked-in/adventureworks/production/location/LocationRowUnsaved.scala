@@ -10,6 +10,7 @@ package location
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -55,4 +56,15 @@ case class LocationRowUnsaved(
 object LocationRowUnsaved {
   implicit lazy val decoder: Decoder[LocationRowUnsaved] = Decoder.forProduct5[LocationRowUnsaved, Name, Defaulted[LocationId], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("name", "locationid", "costrate", "availability", "modifieddate")(LocationRowUnsaved.apply)(Name.decoder, Defaulted.decoder(LocationId.decoder), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(Decoder.decodeBigDecimal), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[LocationRowUnsaved] = Encoder.forProduct5[LocationRowUnsaved, Name, Defaulted[LocationId], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("name", "locationid", "costrate", "availability", "modifieddate")(x => (x.name, x.locationid, x.costrate, x.availability, x.modifieddate))(Name.encoder, Defaulted.encoder(LocationId.encoder), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(Encoder.encodeBigDecimal), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[LocationRowUnsaved] = Text.instance[LocationRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(LocationId.text).unsafeEncode(row.locationid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.costrate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.availability, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

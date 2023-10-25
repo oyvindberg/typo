@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -35,4 +36,8 @@ object TypoXml {
     .map(v => TypoXml(v.getString))
   implicit lazy val ordering: Ordering[TypoXml] = Ordering.by(_.value)
   implicit lazy val put: Put[TypoXml] = Put.Advanced.other[String](NonEmptyList.one("xml")).contramap(v => v.value)
+  implicit lazy val text: Text[TypoXml] = new Text[TypoXml] {
+    override def unsafeEncode(v: TypoXml, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoXml, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
 }

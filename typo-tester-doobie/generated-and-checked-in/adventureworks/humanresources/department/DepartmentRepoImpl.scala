@@ -34,6 +34,9 @@ object DepartmentRepoImpl extends DepartmentRepo {
           returning "departmentid", "name", "groupname", "modifieddate"::text
        """.query(DepartmentRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(DepartmentRow.text)
+  }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
@@ -61,6 +64,10 @@ object DepartmentRepoImpl extends DepartmentRepo {
     }
     q.query(DepartmentRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DepartmentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(DepartmentRowUnsaved.text)
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
     SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.read)

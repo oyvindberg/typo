@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -28,4 +29,8 @@ object TypoLineSegment {
     .map(v => TypoLineSegment(TypoPoint(v.point(0).x, v.point(0).y), TypoPoint(v.point(1).x, v.point(1).y)))
   implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoLineSegment] = Ordering.by(x => (x.p1, x.p2))
   implicit lazy val put: Put[TypoLineSegment] = Put.Advanced.other[PGlseg](NonEmptyList.one("lseg")).contramap(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y)))
+  implicit lazy val text: Text[TypoLineSegment] = new Text[TypoLineSegment] {
+    override def unsafeEncode(v: TypoLineSegment, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"((${v.p1.x},${v.p1.y}),(${v.p2.x},${v.p2.y}))", sb)
+    override def unsafeArrayEncode(v: TypoLineSegment, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"((${v.p1.x},${v.p1.y}),(${v.p2.x},${v.p2.y}))", sb)
+  }
 }

@@ -39,6 +39,9 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """.query(SalesorderdetailRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesorderdetailRow.text)
+  }
   override def insert(unsaved: SalesorderdetailRowUnsaved): ConnectionIO[SalesorderdetailRow] = {
     val fs = List(
       Some((Fragment.const(s""""salesorderid""""), fr"${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4")),
@@ -78,6 +81,10 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     }
     q.query(SalesorderdetailRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesorderdetail("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderdetailRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.read)

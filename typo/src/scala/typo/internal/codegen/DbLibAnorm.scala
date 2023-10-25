@@ -4,7 +4,8 @@ package codegen
 
 import typo.internal.analysis.MaybeReturnsRows
 
-class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
+class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean) extends DbLib {
+
   val Column = sc.Type.Qualified("anorm.Column")
   val ToStatement = sc.Type.Qualified("anorm.ToStatement")
   val ToSql = sc.Type.Qualified("anorm.ToSql")
@@ -32,6 +33,18 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   val rowParserName: sc.Ident = sc.Ident("rowParser")
   val toStatementName: sc.Ident = sc.Ident("toStatement")
   val arrayParameterMetaDataName = sc.Ident("arrayParameterMetaData")
+  val textSupport: Option[DbLibTextSupport] =
+    if (enableStreamingInserts) Some(new DbLibTextSupport(pkg, inlineImplicits, None, default)) else None
+
+  override val additionalFiles: List[typo.sc.File] =
+    textSupport match {
+      case Some(textSupport) =>
+        List(
+          sc.File(textSupport.Text, DbLibTextImplementations.Text, Nil),
+          sc.File(textSupport.streamingInsert, DbLibTextImplementations.streamingInsertAnorm(textSupport.Text), Nil)
+        )
+      case None => Nil
+    }
 
   def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code =
     if (inlineImplicits && !forbidInline)
@@ -171,10 +184,14 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       code"def update($param)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): $rowType"
+    case RepoMethod.InsertStreaming(_, _, rowType) =>
+      code"def insertStreaming(unsaved: ${sc.Type.Iterator.of(rowType)}, batchSize: ${sc.Type.Int})(implicit c: ${sc.Type.Connection}): ${sc.Type.Long}"
     case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
       code"def upsert($unsavedParam)(implicit c: ${sc.Type.Connection}): $rowType"
     case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): $rowType"
+    case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
+      code"def insertUnsavedStreaming(unsaved: ${sc.Type.Iterator.of(unsaved.tpe)}, batchSize: ${sc.Type.Int})(implicit c: ${sc.Type.Connection}): ${sc.Type.Long}"
     case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
       code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
     case RepoMethod.Delete(_, id) =>
@@ -391,6 +408,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |    .executeInsert(${rowParserFor(rowType)}.single)
                |}
                |"""
+      case RepoMethod.InsertStreaming(relName, cols, rowType) =>
+        val sql = sc.s(code"COPY $relName(${dbNames(cols, isRead = false)}) FROM STDIN")
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)}, c)"
+      case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
+        val sql = sc.s(code"COPY $relName(${dbNames(unsaved.allCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(unsaved.tpe)}, c)"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
@@ -493,7 +516,17 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |${unsavedParam.name}"""
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
-
+      case RepoMethod.InsertStreaming(_, _, _) =>
+        code"""|unsaved.foreach { row =>
+               |  map += (row.${id.paramName} -> row)
+               |}
+               |unsaved.size.toLong""".stripMargin
+      case RepoMethod.InsertUnsavedStreaming(_, _) =>
+        code"""|unsaved.foreach { unsavedRow =>
+               |  val row = ${maybeToRow.get.name}(unsavedRow)
+               |  map += (row.${id.paramName} -> row)
+               |}
+               |unsaved.size.toLong""".stripMargin
       case RepoMethod.DeleteBuilder(_, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType, map)"
       case RepoMethod.Delete(_, id) =>
@@ -513,89 +546,115 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       code"${x.table.names.RepoImplName}.insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
     )
 
+  override val defaultedInstance: List[sc.Given] =
+    textSupport.map(_.defaultedInstance).toList
+
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
     List(
-      sc.Given(
-        tparams = Nil,
-        name = arrayColumnName,
-        implicitParams = Nil,
-        tpe = Column.of(sc.Type.Array.of(wrapperType)),
-        body = code"""$Column.columnToArray($columnName, implicitly)"""
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = arrayColumnName,
+          implicitParams = Nil,
+          tpe = Column.of(sc.Type.Array.of(wrapperType)),
+          body = code"""$Column.columnToArray($columnName, implicitly)"""
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = columnName,
-        implicitParams = Nil,
-        tpe = Column.of(wrapperType),
-        body = code"""${lookupColumnFor(underlying)}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))"""
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = columnName,
+          implicitParams = Nil,
+          tpe = Column.of(wrapperType),
+          body = code"""${lookupColumnFor(underlying)}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))"""
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = toStatementName,
-        implicitParams = Nil,
-        tpe = ToStatement.of(wrapperType),
-        body = code"${lookupToStatementFor(underlying)}.contramap(_.value)"
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = toStatementName,
+          implicitParams = Nil,
+          tpe = ToStatement.of(wrapperType),
+          body = code"${lookupToStatementFor(underlying)}.contramap(_.value)"
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = arrayToStatementName,
-        implicitParams = Nil,
-        tpe = ToStatement.of(sc.Type.Array.of(wrapperType)),
-        body = code"${lookupToStatementFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = arrayToStatementName,
+          implicitParams = Nil,
+          tpe = ToStatement.of(sc.Type.Array.of(wrapperType)),
+          body = code"${lookupToStatementFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = parameterMetadataName,
-        implicitParams = Nil,
-        tpe = ParameterMetaData.of(wrapperType),
-        body = code"""|new $ParameterMetaData[$wrapperType] {
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = parameterMetadataName,
+          implicitParams = Nil,
+          tpe = ParameterMetaData.of(wrapperType),
+          body = code"""|new $ParameterMetaData[$wrapperType] {
                  |  override def sqlType: ${sc.Type.String} = ${lookupParameterMetaDataFor(underlying)}.sqlType
                  |  override def jdbcType: ${sc.Type.Int} = ${lookupParameterMetaDataFor(underlying)}.jdbcType
                  |}""".stripMargin
-      )
-    )
+        )
+      ),
+      textSupport.map(_.anyValInstance(wrapperType, underlying))
+    ).flatten
 
   override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Given] =
     List(
-      sc.Given(
-        tparams = Nil,
-        name = toStatementName,
-        implicitParams = Nil,
-        tpe = ToStatement.of(wrapperType),
-        body = code"${lookupToStatementFor(underlying)}.contramap(_.value)"
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = toStatementName,
+          implicitParams = Nil,
+          tpe = ToStatement.of(wrapperType),
+          body = code"${lookupToStatementFor(underlying)}.contramap(_.value)"
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = arrayToStatementName,
-        implicitParams = Nil,
-        tpe = ToStatement.of(sc.Type.Array.of(wrapperType)),
-        body = code"${lookupToStatementFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = arrayToStatementName,
+          implicitParams = Nil,
+          tpe = ToStatement.of(sc.Type.Array.of(wrapperType)),
+          body = code"${lookupToStatementFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = arrayColumnName,
-        implicitParams = Nil,
-        tpe = Column.of(sc.Type.Array.of(wrapperType)),
-        body = code"$Column.columnToArray($columnName, implicitly)"
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = arrayColumnName,
+          implicitParams = Nil,
+          tpe = Column.of(sc.Type.Array.of(wrapperType)),
+          body = code"$Column.columnToArray($columnName, implicitly)"
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = columnName,
-        implicitParams = Nil,
-        tpe = Column.of(wrapperType),
-        body = code"${lookupColumnFor(underlying)}.map($wrapperType.apply)"
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = columnName,
+          implicitParams = Nil,
+          tpe = Column.of(wrapperType),
+          body = code"${lookupColumnFor(underlying)}.map($wrapperType.apply)"
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = parameterMetadataName,
-        implicitParams = Nil,
-        tpe = ParameterMetaData.of(wrapperType),
-        body = code"""|new ${ParameterMetaData.of(wrapperType)} {
+      Some(
+        sc.Given(
+          tparams = Nil,
+          name = parameterMetadataName,
+          implicitParams = Nil,
+          tpe = ParameterMetaData.of(wrapperType),
+          body = code"""|new ${ParameterMetaData.of(wrapperType)} {
                       |  override def sqlType: String = ${lookupParameterMetaDataFor(underlying)}.sqlType
                       |  override def jdbcType: Int = ${lookupParameterMetaDataFor(underlying)}.jdbcType
                       |}""".stripMargin
-      )
-    )
+        )
+      ),
+      textSupport.map(_.anyValInstance(wrapperType, underlying))
+    ).flatten
+
   override val missingInstances: List[sc.ClassMember] = {
     val arrayInstances = List[(sc.Type.Qualified, sc.StrLit)](
       (sc.Type.Float, sc.StrLit("float4")),
@@ -646,7 +705,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   val missingInstancesByType: Map[sc.Type, sc.QIdent] =
     missingInstances.collect { case x: sc.Given => (x.tpe, pkg / x.name) }.toMap
 
-  override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
+  override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn], rowType: DbLib.RowType): List[sc.ClassMember] = {
+    val text = textSupport.map(_.rowInstance(tpe, cols))
     val rowParser = {
       val mappedValues = cols.zipWithIndex.map { case (x, num) => code"${x.name} = row(idx + $num)(${lookupColumnFor(x.tpe)})" }
       sc.Value(
@@ -664,44 +724,54 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |}""".stripMargin
       )
     }
-
-    List(rowParser)
+    rowType match {
+      case DbLib.RowType.Writable      => text.toList
+      case DbLib.RowType.ReadWriteable => List(rowParser) ++ text
+      case DbLib.RowType.Readable      => List(rowParser)
+    }
   }
 
   override def customTypeInstances(ct: CustomType): List[sc.Given] = {
     val tpe = ct.typoType
     val v = sc.Ident("v")
     val normal = List(
-      sc.Given(
-        Nil,
-        toStatementName,
-        Nil,
-        ToStatement.of(tpe),
-        code"${ToStatement.of(tpe)}((s, index, v) => s.setObject(index, ${ct.fromTypo0(v)}))"
+      Some(
+        sc.Given(
+          Nil,
+          toStatementName,
+          Nil,
+          ToStatement.of(tpe),
+          code"${ToStatement.of(tpe)}((s, index, v) => s.setObject(index, ${ct.fromTypo0(v)}))"
+        )
       ),
-      sc.Given(
-        Nil,
-        parameterMetadataName,
-        Nil,
-        ParameterMetaData.of(tpe),
-        code"""|new ${ParameterMetaData.of(tpe)} {
+      Some(
+        sc.Given(
+          Nil,
+          parameterMetadataName,
+          Nil,
+          ParameterMetaData.of(tpe),
+          code"""|new ${ParameterMetaData.of(tpe)} {
                |  override def sqlType: ${sc.Type.String} = ${sc.StrLit(ct.sqlType)}
                |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
                |}""".stripMargin
+        )
       ),
-      sc.Given(
-        Nil,
-        columnName,
-        Nil,
-        Column.of(tpe),
-        code"""|$Column.nonNull[$tpe]((v1: ${sc.Type.Any}, _) =>
+      Some(
+        sc.Given(
+          Nil,
+          columnName,
+          Nil,
+          Column.of(tpe),
+          code"""|$Column.nonNull[$tpe]((v1: ${sc.Type.Any}, _) =>
                |  v1 match {
                |    case $v: ${ct.toTypo.jdbcType} => ${sc.Type.Right}(${ct.toTypo0(v)})
                |    case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of ${ct.toTypo.jdbcType.render.asString}, got $${other.getClass.getName}"))
                |  }
                |)""".stripMargin
-      )
-    )
+        )
+      ),
+      textSupport.map(_.customTypeInstance(ct))
+    ).flatten
 
     val array =
       if (ct.forbidArray) Nil

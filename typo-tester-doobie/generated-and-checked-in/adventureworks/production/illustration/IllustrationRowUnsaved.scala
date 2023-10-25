@@ -10,6 +10,7 @@ package illustration
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -39,4 +40,11 @@ case class IllustrationRowUnsaved(
 object IllustrationRowUnsaved {
   implicit lazy val decoder: Decoder[IllustrationRowUnsaved] = Decoder.forProduct3[IllustrationRowUnsaved, Option[TypoXml], Defaulted[IllustrationId], Defaulted[TypoLocalDateTime]]("diagram", "illustrationid", "modifieddate")(IllustrationRowUnsaved.apply)(Decoder.decodeOption(TypoXml.decoder), Defaulted.decoder(IllustrationId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[IllustrationRowUnsaved] = Encoder.forProduct3[IllustrationRowUnsaved, Option[TypoXml], Defaulted[IllustrationId], Defaulted[TypoLocalDateTime]]("diagram", "illustrationid", "modifieddate")(x => (x.diagram, x.illustrationid, x.modifieddate))(Encoder.encodeOption(TypoXml.encoder), Defaulted.encoder(IllustrationId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[IllustrationRowUnsaved] = Text.instance[IllustrationRowUnsaved]{ (row, sb) =>
+    Text.option(TypoXml.text).unsafeEncode(row.diagram, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(IllustrationId.text).unsafeEncode(row.illustrationid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

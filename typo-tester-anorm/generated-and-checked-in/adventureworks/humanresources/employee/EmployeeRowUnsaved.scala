@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package employee
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
@@ -131,6 +132,37 @@ object EmployeeRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[EmployeeRowUnsaved] = Text.instance[EmployeeRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.nationalidnumber, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.loginid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.jobtitle, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDate.text.unsafeEncode(row.birthdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.maritalstatus, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.gender, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDate.text.unsafeEncode(row.hiredate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.salariedflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoShort.text).unsafeEncode(row.vacationhours, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoShort.text).unsafeEncode(row.sickleavehours, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.currentflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.option(Text.stringInstance)).unsafeEncode(row.organizationnode, sb)
+  }
   implicit lazy val writes: OWrites[EmployeeRowUnsaved] = OWrites[EmployeeRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),

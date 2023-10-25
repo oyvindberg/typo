@@ -19,7 +19,10 @@ trait EmailaddressRepo {
   def delete(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
   def insert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, EmailaddressRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: EmailaddressRowUnsaved): ZIO[ZConnection, Throwable, EmailaddressRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll: ZStream[ZConnection, Throwable, EmailaddressRow]
   def selectById(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Option[EmailaddressRow]]

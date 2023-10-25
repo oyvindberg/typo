@@ -17,7 +17,10 @@ trait EmailaddressRepo {
   def delete(compositeId: EmailaddressId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
   def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, EmailaddressRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmailaddressRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll: Stream[ConnectionIO, EmailaddressRow]
   def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]]

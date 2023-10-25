@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -40,6 +41,9 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
        """
       .executeInsert(ProductvendorRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductvendorRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductvendorRow.text, c)
   }
   override def insert(unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
     val namedParameters = List(
@@ -73,6 +77,10 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
         .executeInsert(ProductvendorRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductvendorRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductvendorRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
     SelectBuilderSql("purchasing.productvendor", ProductvendorFields, ProductvendorRow.rowParser)

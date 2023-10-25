@@ -7,6 +7,7 @@ package adventureworks
 package production
 package location
 
+import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -27,4 +28,8 @@ object LocationId {
   implicit lazy val ordering: Ordering[LocationId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[LocationId] = ParameterMetaData.instance[LocationId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[LocationId] = Setter.intSetter.contramap(_.value)
+  implicit lazy val text: Text[LocationId] = new Text[LocationId] {
+    override def unsafeEncode(v: LocationId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: LocationId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

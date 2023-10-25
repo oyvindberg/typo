@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -105,4 +106,35 @@ case class EmployeeRowUnsaved(
 object EmployeeRowUnsaved {
   implicit lazy val decoder: Decoder[EmployeeRowUnsaved] = Decoder.forProduct15[EmployeeRowUnsaved, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Defaulted[Flag], Defaulted[TypoShort], Defaulted[TypoShort], Defaulted[Flag], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime], Defaulted[Option[String]]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRowUnsaved.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Defaulted.decoder(Flag.decoder), Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(TypoShort.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(Decoder.decodeOption(Decoder.decodeString)))
   implicit lazy val encoder: Encoder[EmployeeRowUnsaved] = Encoder.forProduct15[EmployeeRowUnsaved, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Defaulted[Flag], Defaulted[TypoShort], Defaulted[TypoShort], Defaulted[Flag], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime], Defaulted[Option[String]]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Defaulted.encoder(Flag.encoder), Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(TypoShort.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(Encoder.encodeOption(Encoder.encodeString)))
+  implicit lazy val text: Text[EmployeeRowUnsaved] = Text.instance[EmployeeRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.nationalidnumber, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.loginid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.jobtitle, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDate.text.unsafeEncode(row.birthdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.maritalstatus, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.gender, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDate.text.unsafeEncode(row.hiredate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.salariedflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoShort.text).unsafeEncode(row.vacationhours, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoShort.text).unsafeEncode(row.sickleavehours, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.currentflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.option(Text.stringInstance)).unsafeEncode(row.organizationnode, sb)
+  }
 }

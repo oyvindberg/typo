@@ -16,7 +16,10 @@ trait WorkorderRepo {
   def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[WorkorderFields, WorkorderRow]
   def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow
+  def insertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[WorkorderRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[WorkorderFields, WorkorderRow]
   def selectAll(implicit c: Connection): List[WorkorderRow]
   def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow]

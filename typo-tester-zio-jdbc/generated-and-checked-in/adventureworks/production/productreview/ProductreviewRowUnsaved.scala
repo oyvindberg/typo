@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productreview
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
@@ -102,5 +103,22 @@ object ProductreviewRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[ProductreviewRowUnsaved] = Text.instance[ProductreviewRowUnsaved]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.reviewername, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.emailaddress, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.rating, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.comments, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ProductreviewId.text).unsafeEncode(row.productreviewid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.reviewdate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productphoto
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import anorm.Column
@@ -60,6 +61,19 @@ object ProductphotoRow {
         modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[ProductphotoRow] = Text.instance[ProductphotoRow]{ (row, sb) =>
+    ProductphotoId.text.unsafeEncode(row.productphotoid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.thumbnailphoto, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.thumbnailphotofilename, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.largephoto, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.largephotofilename, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[ProductphotoRow] = OWrites[ProductphotoRow](o =>
     new JsObject(ListMap[String, JsValue](

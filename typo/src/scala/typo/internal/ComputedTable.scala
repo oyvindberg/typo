@@ -175,13 +175,18 @@ case class ComputedTable(
           id <- maybeId
           colsNotId <- colsNotId
         } yield RepoMethod.Update(dbTable.name, cols, id, sc.Param(sc.Ident("row"), names.RowName, None), colsNotId),
-        Some({
+        Some {
           val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
           RepoMethod.Insert(dbTable.name, cols, unsavedParam, names.RowName)
-        }),
+        },
+        if (options.enableStreamingInserts) Some(RepoMethod.InsertStreaming(dbTable.name, cols, names.RowName)) else None,
         maybeUnsavedRow.map { unsavedRow =>
           val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe, None)
           RepoMethod.InsertUnsaved(dbTable.name, cols, unsavedRow, unsavedParam, default, names.RowName)
+        },
+        maybeUnsavedRow.collect {
+          case unsavedRow if options.enableStreamingInserts =>
+            RepoMethod.InsertUnsavedStreaming(dbTable.name, unsavedRow)
         },
         maybeId.map(id => RepoMethod.Delete(dbTable.name, id))
       ).flatten,

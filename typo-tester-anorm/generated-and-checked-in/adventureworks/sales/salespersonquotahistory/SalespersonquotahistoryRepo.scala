@@ -16,7 +16,10 @@ trait SalespersonquotahistoryRepo {
   def delete(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def insert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow
+  def insertStreaming(unsaved: Iterator[SalespersonquotahistoryRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[SalespersonquotahistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow]

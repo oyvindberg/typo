@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package currencyrate
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
@@ -90,5 +91,20 @@ object CurrencyrateRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[CurrencyrateRowUnsaved] = Text.instance[CurrencyrateRowUnsaved]{ (row, sb) =>
+    TypoLocalDateTime.text.unsafeEncode(row.currencyratedate, sb)
+    sb.append(Text.DELIMETER)
+    CurrencyId.text.unsafeEncode(row.fromcurrencycode, sb)
+    sb.append(Text.DELIMETER)
+    CurrencyId.text.unsafeEncode(row.tocurrencycode, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.averagerate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.endofdayrate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(CurrencyrateId.text).unsafeEncode(row.currencyrateid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

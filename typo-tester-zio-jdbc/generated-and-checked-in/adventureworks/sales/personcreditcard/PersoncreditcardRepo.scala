@@ -19,7 +19,10 @@ trait PersoncreditcardRepo {
   def delete(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def insert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, PersoncreditcardRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersoncreditcardRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: PersoncreditcardRowUnsaved): ZIO[ZConnection, Throwable, PersoncreditcardRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersoncreditcardRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def selectAll: ZStream[ZConnection, Throwable, PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Option[PersoncreditcardRow]]

@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -87,4 +88,31 @@ case class DocumentRowUnsaved(
 object DocumentRowUnsaved {
   implicit lazy val decoder: Decoder[DocumentRowUnsaved] = Decoder.forProduct13[DocumentRowUnsaved, /* max 50 chars */ String, BusinessentityId, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, TypoShort, Option[String], Option[TypoBytea], Defaulted[Flag], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode")(DocumentRowUnsaved.apply)(Decoder.decodeString, BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, TypoShort.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(DocumentId.decoder))
   implicit lazy val encoder: Encoder[DocumentRowUnsaved] = Encoder.forProduct13[DocumentRowUnsaved, /* max 50 chars */ String, BusinessentityId, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, TypoShort, Option[String], Option[TypoBytea], Defaulted[Flag], Defaulted[Int], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.filename, x.fileextension, x.revision, x.status, x.documentsummary, x.document, x.folderflag, x.changenumber, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeString, BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, TypoShort.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(DocumentId.encoder))
+  implicit lazy val text: Text[DocumentRowUnsaved] = Text.instance[DocumentRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.title, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.owner, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.filename, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.fileextension, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.revision, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.status, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.documentsummary, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.document, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.folderflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.changenumber, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(DocumentId.text).unsafeEncode(row.documentnode, sb)
+  }
 }

@@ -35,8 +35,22 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.illustrationid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[IllustrationRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.illustrationid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
     SelectBuilderMock(IllustrationFields, () => map.values.toList, SelectParams.empty)

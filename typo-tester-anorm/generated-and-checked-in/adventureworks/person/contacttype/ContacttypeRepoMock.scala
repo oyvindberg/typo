@@ -35,8 +35,22 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.contacttypeid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ContacttypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.contacttypeid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
     SelectBuilderMock(ContacttypeFields, () => map.values.toList, SelectParams.empty)

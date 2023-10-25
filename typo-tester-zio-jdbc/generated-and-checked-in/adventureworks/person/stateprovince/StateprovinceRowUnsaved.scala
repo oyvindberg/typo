@@ -7,6 +7,7 @@ package adventureworks
 package person
 package stateprovince
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
@@ -108,5 +109,22 @@ object StateprovinceRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[StateprovinceRowUnsaved] = Text.instance[StateprovinceRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.stateprovincecode, sb)
+    sb.append(Text.DELIMETER)
+    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    SalesterritoryId.text.unsafeEncode(row.territoryid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(StateprovinceId.text).unsafeEncode(row.stateprovinceid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.isonlystateprovinceflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

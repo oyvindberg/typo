@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productmodelillustration
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
@@ -59,5 +60,12 @@ object ProductmodelillustrationRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[ProductmodelillustrationRowUnsaved] = Text.instance[ProductmodelillustrationRowUnsaved]{ (row, sb) =>
+    ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
+    sb.append(Text.DELIMETER)
+    IllustrationId.text.unsafeEncode(row.illustrationid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

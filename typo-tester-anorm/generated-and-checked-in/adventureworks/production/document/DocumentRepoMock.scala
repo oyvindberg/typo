@@ -36,8 +36,22 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.documentnode -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[DocumentRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.documentnode -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
     SelectBuilderMock(DocumentFields, () => map.values.toList, SelectParams.empty)

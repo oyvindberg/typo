@@ -19,7 +19,10 @@ trait CountryregionRepo {
   def delete(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[CountryregionFields, CountryregionRow]
   def insert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, CountryregionRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CountryregionRowUnsaved): ZIO[ZConnection, Throwable, CountryregionRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CountryregionFields, CountryregionRow]
   def selectAll: ZStream[ZConnection, Throwable, CountryregionRow]
   def selectById(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Option[CountryregionRow]]

@@ -19,7 +19,10 @@ trait SpecialofferRepo {
   def delete(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow]
   def insert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, SpecialofferRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SpecialofferRowUnsaved): ZIO[ZConnection, Throwable, SpecialofferRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SpecialofferFields, SpecialofferRow]
   def selectAll: ZStream[ZConnection, Throwable, SpecialofferRow]
   def selectById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Option[SpecialofferRow]]

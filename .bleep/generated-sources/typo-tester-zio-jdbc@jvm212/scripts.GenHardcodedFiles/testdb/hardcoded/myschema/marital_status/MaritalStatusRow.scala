@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package marital_status
 
+import testdb.hardcoded.Text
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder
@@ -33,5 +34,8 @@ object MaritalStatusRow {
       MaritalStatusId.jsonEncoder.unsafeEncode(a.id, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[MaritalStatusRow] = Text.instance[MaritalStatusRow]{ (row, sb) =>
+    MaritalStatusId.text.unsafeEncode(row.id, sb)
   }
 }

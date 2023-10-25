@@ -10,6 +10,7 @@ package businessentity
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -36,6 +37,9 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
        """
       .executeInsert(BusinessentityRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[BusinessentityRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentityRow.text, c)
   }
   override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = {
     val namedParameters = List(
@@ -67,6 +71,10 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
         .executeInsert(BusinessentityRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[BusinessentityRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityRowUnsaved.text, c)
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
     SelectBuilderSql("person.businessentity", BusinessentityFields, BusinessentityRow.rowParser)

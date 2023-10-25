@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package marital_status
 
+import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -32,6 +33,9 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           values (${Segment.paramSegment(unsaved.id)(MaritalStatusId.setter)}::int8)
           returning "id"
        """.insertReturning(MaritalStatusRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY myschema.marital_status("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
     SelectBuilderSql("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.jdbcDecoder)

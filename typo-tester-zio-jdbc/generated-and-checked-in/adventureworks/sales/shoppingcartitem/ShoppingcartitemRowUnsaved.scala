@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package shoppingcartitem
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
@@ -91,5 +92,18 @@ object ShoppingcartitemRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[ShoppingcartitemRowUnsaved] = Text.instance[ShoppingcartitemRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.shoppingcartid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ShoppingcartitemId.text).unsafeEncode(row.shoppingcartitemid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.quantity, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.datecreated, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

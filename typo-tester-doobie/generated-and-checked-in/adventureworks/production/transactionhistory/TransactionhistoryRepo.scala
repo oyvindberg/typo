@@ -17,7 +17,10 @@ trait TransactionhistoryRepo {
   def delete(transactionid: TransactionhistoryId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def selectAll: Stream[ConnectionIO, TransactionhistoryRow]
   def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]]

@@ -16,7 +16,10 @@ trait EmployeepayhistoryRepo {
   def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow
+  def insertStreaming(unsaved: Iterator[EmployeepayhistoryRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[EmployeepayhistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def selectAll(implicit c: Connection): List[EmployeepayhistoryRow]
   def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow]

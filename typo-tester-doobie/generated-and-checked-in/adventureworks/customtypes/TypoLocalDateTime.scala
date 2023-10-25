@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -37,4 +38,8 @@ object TypoLocalDateTime {
     .map(v => TypoLocalDateTime(LocalDateTime.parse(v, parser)))
   implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[TypoLocalDateTime] = Ordering.by(_.value)
   implicit lazy val put: Put[TypoLocalDateTime] = Put.Advanced.other[String](NonEmptyList.one("timestamp")).contramap(v => v.value.toString)
+  implicit lazy val text: Text[TypoLocalDateTime] = new Text[TypoLocalDateTime] {
+    override def unsafeEncode(v: TypoLocalDateTime, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoLocalDateTime, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
 }

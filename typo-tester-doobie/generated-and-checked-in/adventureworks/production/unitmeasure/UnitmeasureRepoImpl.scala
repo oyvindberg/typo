@@ -34,6 +34,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           returning "unitmeasurecode", "name", "modifieddate"::text
        """.query(UnitmeasureRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(UnitmeasureRow.text)
+  }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
       Some((Fragment.const(s""""unitmeasurecode""""), fr"${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar")),
@@ -57,6 +60,10 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     }
     q.query(UnitmeasureRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UnitmeasureRowUnsaved.text)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
     SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.read)

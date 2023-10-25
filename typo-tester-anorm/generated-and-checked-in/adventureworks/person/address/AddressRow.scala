@@ -7,6 +7,7 @@ package adventureworks
 package person
 package address
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
@@ -74,6 +75,25 @@ object AddressRow {
         modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[AddressRow] = Text.instance[AddressRow]{ (row, sb) =>
+    AddressId.text.unsafeEncode(row.addressid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.addressline1, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.addressline2, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.city, sb)
+    sb.append(Text.DELIMETER)
+    StateprovinceId.text.unsafeEncode(row.stateprovinceid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.postalcode, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.spatiallocation, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[AddressRow] = OWrites[AddressRow](o =>
     new JsObject(ListMap[String, JsValue](

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -56,4 +57,17 @@ case class CustomerRowUnsaved(
 object CustomerRowUnsaved {
   implicit lazy val decoder: Decoder[CustomerRowUnsaved] = Decoder.forProduct6[CustomerRowUnsaved, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Defaulted[CustomerId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate")(CustomerRowUnsaved.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Defaulted.decoder(CustomerId.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CustomerRowUnsaved] = Encoder.forProduct6[CustomerRowUnsaved, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Defaulted[CustomerId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate")(x => (x.personid, x.storeid, x.territoryid, x.customerid, x.rowguid, x.modifieddate))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Defaulted.encoder(CustomerId.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[CustomerRowUnsaved] = Text.instance[CustomerRowUnsaved]{ (row, sb) =>
+    Text.option(BusinessentityId.text).unsafeEncode(row.personid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(BusinessentityId.text).unsafeEncode(row.storeid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(SalesterritoryId.text).unsafeEncode(row.territoryid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(CustomerId.text).unsafeEncode(row.customerid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

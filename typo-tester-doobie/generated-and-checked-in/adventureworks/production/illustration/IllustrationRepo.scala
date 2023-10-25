@@ -17,7 +17,10 @@ trait IllustrationRepo {
   def delete(illustrationid: IllustrationId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[IllustrationFields, IllustrationRow]
   def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IllustrationRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[IllustrationFields, IllustrationRow]
   def selectAll: Stream[ConnectionIO, IllustrationRow]
   def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]]

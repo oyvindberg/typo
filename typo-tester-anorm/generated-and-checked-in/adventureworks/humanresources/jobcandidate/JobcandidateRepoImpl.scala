@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -38,6 +39,9 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
        """
       .executeInsert(JobcandidateRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""", batchSize, unsaved)(JobcandidateRow.text, c)
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
     val namedParameters = List(
@@ -67,6 +71,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         .executeInsert(JobcandidateRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[JobcandidateRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(JobcandidateRowUnsaved.text, c)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
     SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.rowParser)

@@ -6,9 +6,12 @@ import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
+import zio.Chunk
+import zio.jdbc.sqlInterpolator
+import zio.stream.ZStream
 
 class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  def runTest(usersRepo: UsersRepo): Assertion = {
+  def testRoundtrip(usersRepo: UsersRepo): Assertion = {
     withConnection {
       val unsaved = UsersRowUnsaved(
         userId = UsersId(TypoUUID.randomUUID),
@@ -28,11 +31,52 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
     }
   }
 
-  test("in-memory") {
-    runTest(usersRepo = new UsersRepoMock(_.toRow(TypoInstant.now)))
+  def testInsertUnsavedStreaming(usersRepo: UsersRepo): Assertion = {
+    val before = Chunk.tabulate(10)(idx =>
+      UsersRowUnsaved(
+        userId = UsersId(TypoUUID.randomUUID),
+        name = "name",
+        lastName = Some("last_name"),
+        email = TypoUnknownCitext(s"email-$idx@asd.no"),
+        password = "password",
+        verifiedOn = Some(TypoInstant.now),
+        createdAt = Defaulted.UseDefault
+      )
+    )
+
+    withConnection {
+      for {
+        _ <- usersRepo.insertUnsavedStreaming(ZStream.fromChunk(before), 2)
+        after <- usersRepo.selectByIds(before.map(_.userId).toArray).runCollect
+      } yield {
+        after.foreach { after =>
+          val beforeById = before.map(row => row.userId -> row).toMap
+          assert(after === beforeById(after.userId).toRow(after.createdAt))
+        }
+        succeed
+      }
+    }
   }
 
-  test("pg") {
-    runTest(usersRepo = UsersRepoImpl)
+  test("testRoundtrip in-memory") {
+    testRoundtrip(usersRepo = new UsersRepoMock(_.toRow(TypoInstant.now)))
   }
+
+  test("testRoundtrip pg") {
+    testRoundtrip(usersRepo = UsersRepoImpl)
+  }
+
+  test("testInsertUnsavedStreaming in-memory") {
+    testInsertUnsavedStreaming(usersRepo = new UsersRepoMock(_.toRow(TypoInstant.now)))
+  }
+
+  test("testInsertUnsavedStreaming pg") {
+    val versionString = withConnection(sql"SELECT VERSION()".query[String].selectOne.map(_.get))
+    val version = versionString.split(' ')(1)
+    version.toDouble match {
+      case n if n >= 16 => testInsertUnsavedStreaming(usersRepo = UsersRepoImpl)
+      case _            => System.err.println(s"Skipping testInsertUnsavedStreaming pg because version $version < 16")
+    }
+  }
+
 }

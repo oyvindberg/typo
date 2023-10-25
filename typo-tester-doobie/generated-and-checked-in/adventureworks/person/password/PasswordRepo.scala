@@ -18,7 +18,10 @@ trait PasswordRepo {
   def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[PasswordFields, PasswordRow]
   def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PasswordRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[PasswordFields, PasswordRow]
   def selectAll: Stream[ConnectionIO, PasswordRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]]

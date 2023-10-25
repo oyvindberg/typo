@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package currency
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -46,6 +47,13 @@ object CurrencyRow {
         modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[CurrencyRow] = Text.instance[CurrencyRow]{ (row, sb) =>
+    CurrencyId.text.unsafeEncode(row.currencycode, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[CurrencyRow] = OWrites[CurrencyRow](o =>
     new JsObject(ListMap[String, JsValue](

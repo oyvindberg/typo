@@ -17,7 +17,10 @@ trait VendorRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[VendorFields, VendorRow]
   def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow
+  def insertStreaming(unsaved: Iterator[VendorRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[VendorRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[VendorFields, VendorRow]
   def selectAll(implicit c: Connection): List[VendorRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow]

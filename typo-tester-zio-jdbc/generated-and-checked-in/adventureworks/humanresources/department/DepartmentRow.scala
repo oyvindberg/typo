@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package department
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import java.sql.ResultSet
@@ -62,5 +63,14 @@ object DepartmentRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[DepartmentRow] = Text.instance[DepartmentRow]{ (row, sb) =>
+    DepartmentId.text.unsafeEncode(row.departmentid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.groupname, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

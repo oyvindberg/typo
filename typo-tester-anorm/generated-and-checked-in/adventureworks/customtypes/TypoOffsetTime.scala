@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -54,6 +55,10 @@ object TypoOffsetTime {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoOffsetTime] = adventureworks.OffsetTimeReads.map(TypoOffsetTime.apply)
+  implicit lazy val text: Text[TypoOffsetTime] = new Text[TypoOffsetTime] {
+    override def unsafeEncode(v: TypoOffsetTime, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoOffsetTime, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoOffsetTime] = ToStatement[TypoOffsetTime]((s, index, v) => s.setObject(index, v.value.toString))
   implicit lazy val writes: Writes[TypoOffsetTime] = adventureworks.OffsetTimeWrites.contramap(_.value)
 }

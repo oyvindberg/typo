@@ -10,6 +10,7 @@ package scrapreason
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -36,6 +37,9 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ScrapreasonRow.text, c)
   }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     val namedParameters = List(
@@ -64,6 +68,10 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
         .executeInsert(ScrapreasonRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ScrapreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ScrapreasonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
     SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.rowParser)

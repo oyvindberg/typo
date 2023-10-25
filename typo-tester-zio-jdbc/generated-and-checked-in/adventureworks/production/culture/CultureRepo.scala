@@ -19,7 +19,10 @@ trait CultureRepo {
   def delete(cultureid: CultureId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[CultureFields, CultureRow]
   def insert(unsaved: CultureRow): ZIO[ZConnection, Throwable, CultureRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CultureRowUnsaved): ZIO[ZConnection, Throwable, CultureRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CultureFields, CultureRow]
   def selectAll: ZStream[ZConnection, Throwable, CultureRow]
   def selectById(cultureid: CultureId): ZIO[ZConnection, Throwable, Option[CultureRow]]

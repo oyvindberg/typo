@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -39,6 +40,9 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
        """
       .executeInsert(BillofmaterialsRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") FROM STDIN""", batchSize, unsaved)(BillofmaterialsRow.text, c)
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
     val namedParameters = List(
@@ -79,6 +83,10 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
         .executeInsert(BillofmaterialsRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[BillofmaterialsRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.billofmaterials("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BillofmaterialsRowUnsaved.text, c)
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     SelectBuilderSql("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.rowParser)

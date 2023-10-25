@@ -10,6 +10,7 @@ package users
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -39,6 +40,9 @@ object UsersRepoImpl extends UsersRepo {
       .executeInsert(UsersRow.rowParser(1).single)
     
   }
+  override def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text, c)
+  }
   override def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow = {
     val namedParameters = List(
       Some((NamedParameter("user_id", ParameterValue(unsaved.userId, null, UsersId.toStatement)), "::uuid")),
@@ -67,6 +71,10 @@ object UsersRepoImpl extends UsersRepo {
         .executeInsert(UsersRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UsersRowUnsaved.text, c)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
     SelectBuilderSql("public.users", UsersFields, UsersRow.rowParser)

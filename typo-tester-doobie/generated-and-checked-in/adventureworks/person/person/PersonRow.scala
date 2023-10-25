@@ -15,6 +15,7 @@ import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -86,4 +87,31 @@ object PersonRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 12)
     )
   )
+  implicit lazy val text: Text[PersonRow] = Text.instance[PersonRow]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.persontype, sb)
+    sb.append(Text.DELIMETER)
+    NameStyle.text.unsafeEncode(row.namestyle, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.title, sb)
+    sb.append(Text.DELIMETER)
+    /* user-picked */ FirstName.text.unsafeEncode(row.firstname, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Name.text).unsafeEncode(row.middlename, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.lastname, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.suffix, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.emailpromotion, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.additionalcontactinfo, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.demographics, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

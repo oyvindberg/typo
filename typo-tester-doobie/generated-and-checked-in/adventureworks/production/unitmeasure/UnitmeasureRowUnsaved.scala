@@ -10,6 +10,7 @@ package unitmeasure
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -35,4 +36,11 @@ case class UnitmeasureRowUnsaved(
 object UnitmeasureRowUnsaved {
   implicit lazy val decoder: Decoder[UnitmeasureRowUnsaved] = Decoder.forProduct3[UnitmeasureRowUnsaved, UnitmeasureId, Name, Defaulted[TypoLocalDateTime]]("unitmeasurecode", "name", "modifieddate")(UnitmeasureRowUnsaved.apply)(UnitmeasureId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[UnitmeasureRowUnsaved] = Encoder.forProduct3[UnitmeasureRowUnsaved, UnitmeasureId, Name, Defaulted[TypoLocalDateTime]]("unitmeasurecode", "name", "modifieddate")(x => (x.unitmeasurecode, x.name, x.modifieddate))(UnitmeasureId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[UnitmeasureRowUnsaved] = Text.instance[UnitmeasureRowUnsaved]{ (row, sb) =>
+    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

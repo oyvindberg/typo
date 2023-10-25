@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesorderheader
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -25,4 +26,8 @@ object SalesorderheaderId {
   implicit lazy val get: Get[SalesorderheaderId] = Meta.IntMeta.get.map(SalesorderheaderId.apply)
   implicit lazy val ordering: Ordering[SalesorderheaderId] = Ordering.by(_.value)
   implicit lazy val put: Put[SalesorderheaderId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val text: Text[SalesorderheaderId] = new Text[SalesorderheaderId] {
+    override def unsafeEncode(v: SalesorderheaderId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: SalesorderheaderId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

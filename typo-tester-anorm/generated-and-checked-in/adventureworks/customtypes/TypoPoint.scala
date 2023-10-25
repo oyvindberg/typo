@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -58,6 +59,10 @@ object TypoPoint {
       )
     ),
   )
+  implicit lazy val text: Text[TypoPoint] = new Text[TypoPoint] {
+    override def unsafeEncode(v: TypoPoint, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"(${v.x},${v.y})", sb)
+    override def unsafeArrayEncode(v: TypoPoint, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"(${v.x},${v.y})", sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoPoint] = ToStatement[TypoPoint]((s, index, v) => s.setObject(index, new PGpoint(v.x, v.y)))
   implicit lazy val writes: OWrites[TypoPoint] = OWrites[TypoPoint](o =>
     new JsObject(ListMap[String, JsValue](

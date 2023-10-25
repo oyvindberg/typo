@@ -16,7 +16,10 @@ trait ShiftRepo {
   def delete(shiftid: ShiftId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[ShiftFields, ShiftRow]
   def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow
+  def insertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[ShiftRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[ShiftFields, ShiftRow]
   def selectAll(implicit c: Connection): List[ShiftRow]
   def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow]

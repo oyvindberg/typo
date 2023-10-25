@@ -14,6 +14,7 @@ import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -67,4 +68,21 @@ case class StateprovinceRowUnsaved(
 object StateprovinceRowUnsaved {
   implicit lazy val decoder: Decoder[StateprovinceRowUnsaved] = Decoder.forProduct8[StateprovinceRowUnsaved, /* bpchar, max 3 chars */ String, CountryregionId, Name, SalesterritoryId, Defaulted[StateprovinceId], Defaulted[Flag], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate")(StateprovinceRowUnsaved.apply)(Decoder.decodeString, CountryregionId.decoder, Name.decoder, SalesterritoryId.decoder, Defaulted.decoder(StateprovinceId.decoder), Defaulted.decoder(Flag.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[StateprovinceRowUnsaved] = Encoder.forProduct8[StateprovinceRowUnsaved, /* bpchar, max 3 chars */ String, CountryregionId, Name, SalesterritoryId, Defaulted[StateprovinceId], Defaulted[Flag], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate")(x => (x.stateprovincecode, x.countryregioncode, x.name, x.territoryid, x.stateprovinceid, x.isonlystateprovinceflag, x.rowguid, x.modifieddate))(Encoder.encodeString, CountryregionId.encoder, Name.encoder, SalesterritoryId.encoder, Defaulted.encoder(StateprovinceId.encoder), Defaulted.encoder(Flag.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[StateprovinceRowUnsaved] = Text.instance[StateprovinceRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.stateprovincecode, sb)
+    sb.append(Text.DELIMETER)
+    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    SalesterritoryId.text.unsafeEncode(row.territoryid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(StateprovinceId.text).unsafeEncode(row.stateprovinceid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.isonlystateprovinceflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

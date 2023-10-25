@@ -16,6 +16,7 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.DecodingFailure
 import io.circe.Encoder
@@ -203,4 +204,55 @@ object ProductRowUnsaved {
       "modifieddate" -> Defaulted.encoder(TypoLocalDateTime.encoder).apply(row.modifieddate)
     )
   )
+  implicit lazy val text: Text[ProductRowUnsaved] = Text.instance[ProductRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.productnumber, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.color, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.safetystocklevel, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.reorderpoint, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.standardcost, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.listprice, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.size, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(UnitmeasureId.text).unsafeEncode(row.sizeunitmeasurecode, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(UnitmeasureId.text).unsafeEncode(row.weightunitmeasurecode, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.bigDecimalInstance).unsafeEncode(row.weight, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.daystomanufacture, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.productline, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.`class`, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.style, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(ProductsubcategoryId.text).unsafeEncode(row.productsubcategoryid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(ProductmodelId.text).unsafeEncode(row.productmodelid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.sellstartdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.sellenddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.discontinueddate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(ProductId.text).unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.makeflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Flag.text).unsafeEncode(row.finishedgoodsflag, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

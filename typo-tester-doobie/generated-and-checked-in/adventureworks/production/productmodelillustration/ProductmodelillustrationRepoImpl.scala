@@ -35,6 +35,9 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           returning "productmodelid", "illustrationid", "modifieddate"::text
        """.query(ProductmodelillustrationRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelillustrationRow.text)
+  }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow] = {
     val fs = List(
       Some((Fragment.const(s""""productmodelid""""), fr"${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4")),
@@ -58,6 +61,10 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     }
     q.query(ProductmodelillustrationRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelillustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.read)

@@ -1,5 +1,6 @@
 package adventureworks.userdefined
 
+import doobie.postgres.Text
 import doobie.util.meta.Meta
 import doobie.util.{Get, Put}
 import io.circe.{Decoder, Encoder}
@@ -15,4 +16,5 @@ object FirstName {
   implicit lazy val get: Get[FirstName] = Meta.StringMeta.get.map(FirstName.apply)
   implicit lazy val ordering: Ordering[FirstName] = Ordering.by(_.value)
   implicit lazy val put: Put[FirstName] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val text: Text[FirstName] = Text.stringInstance.contramap(_.value)
 }

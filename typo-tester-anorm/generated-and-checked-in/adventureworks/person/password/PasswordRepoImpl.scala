@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -38,6 +39,9 @@ object PasswordRepoImpl extends PasswordRepo {
        """
       .executeInsert(PasswordRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PasswordRow.text, c)
   }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
     val namedParameters = List(
@@ -68,6 +72,10 @@ object PasswordRepoImpl extends PasswordRepo {
         .executeInsert(PasswordRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[PasswordRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PasswordRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
     SelectBuilderSql("person.password", PasswordFields, PasswordRow.rowParser)

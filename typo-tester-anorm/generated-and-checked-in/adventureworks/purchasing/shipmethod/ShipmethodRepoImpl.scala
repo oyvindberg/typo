@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -38,6 +39,9 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ShipmethodRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShipmethodRow.text, c)
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
     val namedParameters = List(
@@ -78,6 +82,10 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
         .executeInsert(ShipmethodRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ShipmethodRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.shipmethod("name", "shipmethodid", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShipmethodRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
     SelectBuilderSql("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.rowParser)

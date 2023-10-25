@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package shift
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -27,6 +28,10 @@ object ShiftId {
     override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[ShiftId] = Reads.IntReads.map(ShiftId.apply)
+  implicit lazy val text: Text[ShiftId] = new Text[ShiftId] {
+    override def unsafeEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[ShiftId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[ShiftId] = Writes.IntWrites.contramap(_.value)
 }

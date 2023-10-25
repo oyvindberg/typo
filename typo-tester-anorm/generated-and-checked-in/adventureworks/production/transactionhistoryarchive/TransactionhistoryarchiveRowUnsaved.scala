@@ -7,6 +7,7 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import play.api.libs.json.JsObject
@@ -81,6 +82,25 @@ object TransactionhistoryarchiveRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[TransactionhistoryarchiveRowUnsaved] = Text.instance[TransactionhistoryarchiveRowUnsaved]{ (row, sb) =>
+    TransactionhistoryarchiveId.text.unsafeEncode(row.transactionid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.referenceorderid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.transactiontype, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.quantity, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.actualcost, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.referenceorderlineid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.transactiondate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[TransactionhistoryarchiveRowUnsaved] = OWrites[TransactionhistoryarchiveRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "transactionid" -> TransactionhistoryarchiveId.writes.writes(o.transactionid),

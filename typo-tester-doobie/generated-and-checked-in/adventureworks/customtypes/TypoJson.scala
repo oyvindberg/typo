@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -39,4 +40,8 @@ object TypoJson {
                                                                           obj.setValue(v.value)
                                                                           obj
                                                                         })
+  implicit lazy val text: Text[TypoJson] = new Text[TypoJson] {
+    override def unsafeEncode(v: TypoJson, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoJson, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

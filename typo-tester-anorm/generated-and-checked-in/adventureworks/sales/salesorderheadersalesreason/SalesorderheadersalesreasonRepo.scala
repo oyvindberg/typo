@@ -16,7 +16,10 @@ trait SalesorderheadersalesreasonRepo {
   def delete(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def insert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow
+  def insertStreaming(unsaved: Iterator[SalesorderheadersalesreasonRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): SalesorderheadersalesreasonRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[SalesorderheadersalesreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow]
   def selectById(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Option[SalesorderheadersalesreasonRow]

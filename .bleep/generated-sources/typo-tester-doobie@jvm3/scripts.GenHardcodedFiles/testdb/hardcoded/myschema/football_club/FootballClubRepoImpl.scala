@@ -35,6 +35,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
           returning "id", "name"
        """.query(FootballClubRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY myschema.football_club("id", "name") FROM STDIN""").copyIn(unsaved, batchSize)(FootballClubRow.text)
+  }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
     SelectBuilderSql("myschema.football_club", FootballClubFields, FootballClubRow.read)
   }

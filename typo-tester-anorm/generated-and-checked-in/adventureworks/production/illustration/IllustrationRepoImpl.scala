@@ -10,6 +10,7 @@ package illustration
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -38,6 +39,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
       .executeInsert(IllustrationRow.rowParser(1).single)
     
   }
+  override def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""", batchSize, unsaved)(IllustrationRow.text, c)
+  }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     val namedParameters = List(
       Some((NamedParameter("diagram", ParameterValue(unsaved.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))), "::xml")),
@@ -65,6 +69,10 @@ object IllustrationRepoImpl extends IllustrationRepo {
         .executeInsert(IllustrationRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[IllustrationRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IllustrationRowUnsaved.text, c)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
     SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.rowParser)

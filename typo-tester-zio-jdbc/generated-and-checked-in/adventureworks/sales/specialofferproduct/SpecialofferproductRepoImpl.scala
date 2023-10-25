@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           values (${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "specialofferid", "productid", "rowguid", "modifieddate"::text
        """.insertReturning(SpecialofferproductRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferproductRow.text)
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved): ZIO[ZConnection, Throwable, SpecialofferproductRow] = {
     val fs = List(
@@ -62,6 +66,10 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     }
     q.insertReturning(SpecialofferproductRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferproductRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.jdbcDecoder)

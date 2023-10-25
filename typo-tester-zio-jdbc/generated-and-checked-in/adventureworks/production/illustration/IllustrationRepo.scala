@@ -19,7 +19,10 @@ trait IllustrationRepo {
   def delete(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[IllustrationFields, IllustrationRow]
   def insert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, IllustrationRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: IllustrationRowUnsaved): ZIO[ZConnection, Throwable, IllustrationRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[IllustrationFields, IllustrationRow]
   def selectAll: ZStream[ZConnection, Throwable, IllustrationRow]
   def selectById(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Option[IllustrationRow]]

@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -50,6 +51,10 @@ object TypoLocalTime {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoLocalTime] = Reads.DefaultLocalTimeReads.map(TypoLocalTime.apply)
+  implicit lazy val text: Text[TypoLocalTime] = new Text[TypoLocalTime] {
+    override def unsafeEncode(v: TypoLocalTime, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoLocalTime, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoLocalTime] = ToStatement[TypoLocalTime]((s, index, v) => s.setObject(index, v.value.toString))
   implicit lazy val writes: Writes[TypoLocalTime] = Writes.DefaultLocalTimeWrites.contramap(_.value)
 }

@@ -19,7 +19,10 @@ trait ContacttypeRepo {
   def delete(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow]
   def insert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, ContacttypeRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ContacttypeRowUnsaved): ZIO[ZConnection, Throwable, ContacttypeRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ContacttypeFields, ContacttypeRow]
   def selectAll: ZStream[ZConnection, Throwable, ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Option[ContacttypeRow]]

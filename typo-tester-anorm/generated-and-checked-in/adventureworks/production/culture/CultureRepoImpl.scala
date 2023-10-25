@@ -10,6 +10,7 @@ package culture
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object CultureRepoImpl extends CultureRepo {
       .executeInsert(CultureRow.rowParser(1).single)
     
   }
+  override def insertStreaming(unsaved: Iterator[CultureRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CultureRow.text, c)
+  }
   override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
     val namedParameters = List(
       Some((NamedParameter("cultureid", ParameterValue(unsaved.cultureid, null, CultureId.toStatement)), "::bpchar")),
@@ -61,6 +65,10 @@ object CultureRepoImpl extends CultureRepo {
         .executeInsert(CultureRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[CultureRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CultureRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
     SelectBuilderSql("production.culture", CultureFields, CultureRow.rowParser)

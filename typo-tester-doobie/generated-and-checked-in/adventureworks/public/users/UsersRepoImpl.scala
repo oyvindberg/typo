@@ -11,7 +11,6 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import doobie.free.connection.ConnectionIO
-import doobie.postgres.syntax.fragment.toFragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -35,6 +34,9 @@ object UsersRepoImpl extends UsersRepo {
           values (${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext, ${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.createdAt)(Write.fromPut(TypoInstant.put))}::timestamptz, ${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """.query(UsersRow.read).unique
+  }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""").copyIn(unsaved, batchSize)(UsersRow.text)
   }
   override def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow] = {
     val fs = List(
@@ -62,17 +64,11 @@ object UsersRepoImpl extends UsersRepo {
          """
     }
     q.query(UsersRow.read).unique
-
+    
   }
-  override def bulkInsert(unsaved: List[UsersRow]): ConnectionIO[Long] = {
-    sql"""copy public.users ("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""".copyIn(unsaved)
-  }
-  override def bulkInsertUnsaved(unsaved: List[UsersRowUnsaved]): ConnectionIO[Long] = {
-    // TODO to make this bullet proof, we probably want to ensure that __DEFAULT_VALUE__ is not part of the encoded input anywhere
-    // It should also be defined in one place to ensure it's consistent.
-    // I'm just not sure how to best put that into the interpolator.
-    // See Defaulted.DEFAULT_VALUE
-    sql"""copy public.users ("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""".copyIn(unsaved)
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UsersRowUnsaved.text)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
     SelectBuilderSql("public.users", UsersFields, UsersRow.read)

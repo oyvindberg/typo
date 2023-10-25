@@ -6,6 +6,7 @@
 package adventureworks
 package public
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.Read
@@ -44,5 +45,9 @@ object Myenum {
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)
   implicit lazy val put: Put[Myenum] = Meta.StringMeta.put.contramap(_.value)
   implicit lazy val read: Read[Myenum] = Read.fromGet(get)
+  implicit lazy val text: Text[Myenum] = new Text[Myenum] {
+    override def unsafeEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val write: Write[Myenum] = Write.fromPut(put)
 }

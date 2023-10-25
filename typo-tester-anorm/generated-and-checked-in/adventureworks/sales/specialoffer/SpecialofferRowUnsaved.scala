@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package specialoffer
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
@@ -101,6 +102,29 @@ object SpecialofferRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[SpecialofferRowUnsaved] = Text.instance[SpecialofferRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.description, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.`type`, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.category, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.intInstance).unsafeEncode(row.maxqty, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(SpecialofferId.text).unsafeEncode(row.specialofferid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.discountpct, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.minqty, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[SpecialofferRowUnsaved] = OWrites[SpecialofferRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "description" -> Writes.StringWrites.writes(o.description),

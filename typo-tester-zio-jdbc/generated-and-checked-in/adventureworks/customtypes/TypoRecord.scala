@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
@@ -73,4 +74,8 @@ object TypoRecord {
     },
     "record"
   )
+  implicit lazy val text: Text[TypoRecord] = new Text[TypoRecord] {
+    override def unsafeEncode(v: TypoRecord, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoRecord, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

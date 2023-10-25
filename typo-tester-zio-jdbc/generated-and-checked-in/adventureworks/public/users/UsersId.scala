@@ -7,6 +7,7 @@ package adventureworks
 package public
 package users
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoUUID
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
@@ -28,4 +29,8 @@ object UsersId {
   implicit def ordering(implicit O0: Ordering[TypoUUID]): Ordering[UsersId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[UsersId] = ParameterMetaData.instance[UsersId](TypoUUID.parameterMetadata.sqlType, TypoUUID.parameterMetadata.jdbcType)
   implicit lazy val setter: Setter[UsersId] = TypoUUID.setter.contramap(_.value)
+  implicit lazy val text: Text[UsersId] = new Text[UsersId] {
+    override def unsafeEncode(v: UsersId, sb: StringBuilder) = TypoUUID.text.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: UsersId, sb: StringBuilder) = TypoUUID.text.unsafeArrayEncode(v.value, sb)
+  }
 }

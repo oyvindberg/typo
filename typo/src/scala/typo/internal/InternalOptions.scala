@@ -4,18 +4,19 @@ package internal
 import typo.internal.codegen.{DbLib, JsonLib}
 
 case class InternalOptions(
-    pkg: sc.QIdent,
-    jsonLibs: List[JsonLib],
     dbLib: Option[DbLib],
+    debugTypes: Boolean,
+    enableDsl: Boolean,
+    enableFieldValue: Selector,
+    enableStreamingInserts: Boolean,
+    enableTestInserts: Selector,
+    fileHeader: String,
+    generateMockRepos: Selector,
+    jsonLibs: List[JsonLib],
+    keepDependencies: Boolean,
     logger: TypoLogger,
     naming: Naming,
-    typeOverride: TypeOverride,
-    generateMockRepos: Selector,
-    fileHeader: String,
-    enableFieldValue: Selector,
-    enableDsl: Boolean,
-    enableTestInserts: Selector,
+    pkg: sc.QIdent,
     readonlyRepo: Selector,
-    keepDependencies: Boolean,
-    debugTypes: Boolean
+    typeOverride: TypeOverride
 )

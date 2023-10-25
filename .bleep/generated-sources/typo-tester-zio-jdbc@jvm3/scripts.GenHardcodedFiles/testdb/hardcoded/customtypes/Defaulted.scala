@@ -9,6 +9,7 @@ package customtypes
 
 import scala.util.Success
 import scala.util.Try
+import testdb.hardcoded.Text
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder
 import zio.json.JsonError
@@ -41,5 +42,11 @@ object Defaulted {
           out.write("}")
         case UseDefault => out.write("\"defaulted\"")
       }
+  }
+  implicit def text[T](implicit t: Text[T]): Text[Defaulted[T]] = Text.instance {
+    case (Defaulted.Provided(value), sb) => t.unsafeEncode(value, sb)
+    case (Defaulted.UseDefault, sb) =>
+      sb.append("__DEFAULT_VALUE__")
+      ()
   }
 }

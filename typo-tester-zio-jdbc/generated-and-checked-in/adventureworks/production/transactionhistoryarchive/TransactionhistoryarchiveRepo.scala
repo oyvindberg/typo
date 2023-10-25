@@ -19,7 +19,10 @@ trait TransactionhistoryarchiveRepo {
   def delete(transactionid: TransactionhistoryarchiveId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def insert(unsaved: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, TransactionhistoryarchiveRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: TransactionhistoryarchiveRowUnsaved): ZIO[ZConnection, Throwable, TransactionhistoryarchiveRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def selectAll: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow]
   def selectById(transactionid: TransactionhistoryarchiveId): ZIO[ZConnection, Throwable, Option[TransactionhistoryarchiveRow]]

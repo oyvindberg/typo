@@ -10,6 +10,7 @@ package specialoffer
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -38,6 +39,9 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
        """
       .executeInsert(SpecialofferRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferRow.text, c)
   }
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow = {
     val namedParameters = List(
@@ -83,6 +87,10 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
         .executeInsert(SpecialofferRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[SpecialofferRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
     SelectBuilderSql("sales.specialoffer", SpecialofferFields, SpecialofferRow.rowParser)

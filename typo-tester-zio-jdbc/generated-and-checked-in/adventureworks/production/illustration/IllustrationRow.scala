@@ -7,6 +7,7 @@ package adventureworks
 package production
 package illustration
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import java.sql.ResultSet
@@ -55,5 +56,12 @@ object IllustrationRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[IllustrationRow] = Text.instance[IllustrationRow]{ (row, sb) =>
+    IllustrationId.text.unsafeEncode(row.illustrationid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.diagram, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
 }

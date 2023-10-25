@@ -35,8 +35,22 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.scrapreasonid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ScrapreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.scrapreasonid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
     SelectBuilderMock(ScrapreasonFields, () => map.values.toList, SelectParams.empty)

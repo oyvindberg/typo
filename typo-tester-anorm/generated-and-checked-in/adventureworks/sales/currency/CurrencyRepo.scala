@@ -16,7 +16,10 @@ trait CurrencyRepo {
   def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[CurrencyFields, CurrencyRow]
   def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow
+  def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[CurrencyRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[CurrencyFields, CurrencyRow]
   def selectAll(implicit c: Connection): List[CurrencyRow]
   def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow]

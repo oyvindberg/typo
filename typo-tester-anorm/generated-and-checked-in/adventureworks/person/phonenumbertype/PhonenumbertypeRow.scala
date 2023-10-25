@@ -7,6 +7,7 @@ package adventureworks
 package person
 package phonenumbertype
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -46,6 +47,13 @@ object PhonenumbertypeRow {
         modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[PhonenumbertypeRow] = Text.instance[PhonenumbertypeRow]{ (row, sb) =>
+    PhonenumbertypeId.text.unsafeEncode(row.phonenumbertypeid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[PhonenumbertypeRow] = OWrites[PhonenumbertypeRow](o =>
     new JsObject(ListMap[String, JsValue](

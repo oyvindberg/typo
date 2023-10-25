@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -45,6 +46,10 @@ object TypoMoney {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoMoney] = Reads.bigDecReads.map(TypoMoney.apply)
+  implicit lazy val text: Text[TypoMoney] = new Text[TypoMoney] {
+    override def unsafeEncode(v: TypoMoney, sb: StringBuilder) = Text.bigDecimalInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoMoney, sb: StringBuilder) = Text.bigDecimalInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoMoney] = ToStatement[TypoMoney]((s, index, v) => s.setObject(index, v.value.bigDecimal))
   implicit lazy val writes: Writes[TypoMoney] = Writes.BigDecimalWrites.contramap(_.value)
 }

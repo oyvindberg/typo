@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -38,4 +39,11 @@ case class CountryregioncurrencyRowUnsaved(
 object CountryregioncurrencyRowUnsaved {
   implicit lazy val decoder: Decoder[CountryregioncurrencyRowUnsaved] = Decoder.forProduct3[CountryregioncurrencyRowUnsaved, CountryregionId, CurrencyId, Defaulted[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(CountryregioncurrencyRowUnsaved.apply)(CountryregionId.decoder, CurrencyId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CountryregioncurrencyRowUnsaved] = Encoder.forProduct3[CountryregioncurrencyRowUnsaved, CountryregionId, CurrencyId, Defaulted[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(CountryregionId.encoder, CurrencyId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[CountryregioncurrencyRowUnsaved] = Text.instance[CountryregioncurrencyRowUnsaved]{ (row, sb) =>
+    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+    sb.append(Text.DELIMETER)
+    CurrencyId.text.unsafeEncode(row.currencycode, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

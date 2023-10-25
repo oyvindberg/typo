@@ -20,7 +20,10 @@ trait StoreRepo {
   def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[StoreFields, StoreRow]
   def insert(unsaved: StoreRow): ZIO[ZConnection, Throwable, StoreRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StoreRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: StoreRowUnsaved): ZIO[ZConnection, Throwable, StoreRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, StoreRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[StoreFields, StoreRow]
   def selectAll: ZStream[ZConnection, Throwable, StoreRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[StoreRow]]

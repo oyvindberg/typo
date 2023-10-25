@@ -20,28 +20,29 @@ object generate {
     val naming = publicOptions.naming(pkg)
 
     val options = InternalOptions(
-      pkg = pkg,
+      dbLib = publicOptions.dbLib.map {
+        case DbLibName.Anorm   => new DbLibAnorm(pkg, publicOptions.inlineImplicits, default, publicOptions.enableStreamingInserts)
+        case DbLibName.Doobie  => new DbLibDoobie(pkg, publicOptions.inlineImplicits, default, publicOptions.enableStreamingInserts)
+        case DbLibName.ZioJdbc => new DbLibZioJdbc(pkg, publicOptions.inlineImplicits, dslEnabled = publicOptions.enableDsl, default, publicOptions.enableStreamingInserts)
+      },
+      debugTypes = publicOptions.debugTypes,
+      enableDsl = publicOptions.enableDsl,
+      enableFieldValue = publicOptions.enableFieldValue,
+      enableStreamingInserts = publicOptions.enableStreamingInserts,
+      enableTestInserts = publicOptions.enableTestInserts,
+      fileHeader = publicOptions.fileHeader,
+      generateMockRepos = publicOptions.generateMockRepos,
       jsonLibs = publicOptions.jsonLibs.map {
         case JsonLibName.Circe    => JsonLibCirce(pkg, default, publicOptions.inlineImplicits)
         case JsonLibName.PlayJson => JsonLibPlay(pkg, default, publicOptions.inlineImplicits)
         case JsonLibName.ZioJson  => JsonLibZioJson(pkg, default, publicOptions.inlineImplicits)
       },
-      dbLib = publicOptions.dbLib.map {
-        case DbLibName.Anorm   => new DbLibAnorm(pkg, publicOptions.inlineImplicits)
-        case DbLibName.Doobie  => new DbLibDoobie(pkg, publicOptions.inlineImplicits)
-        case DbLibName.ZioJdbc => new DbLibZioJdbc(pkg, publicOptions.inlineImplicits, dslEnabled = publicOptions.enableDsl)
-      },
+      keepDependencies = publicOptions.keepDependencies,
       logger = publicOptions.logger,
       naming = naming,
-      typeOverride = publicOptions.typeOverride,
-      generateMockRepos = publicOptions.generateMockRepos,
-      fileHeader = publicOptions.fileHeader,
-      enableFieldValue = publicOptions.enableFieldValue,
-      enableDsl = publicOptions.enableDsl,
+      pkg = pkg,
       readonlyRepo = publicOptions.readonlyRepo,
-      enableTestInserts = publicOptions.enableTestInserts,
-      keepDependencies = publicOptions.keepDependencies,
-      debugTypes = publicOptions.debugTypes
+      typeOverride = publicOptions.typeOverride
     )
     val customTypes = new CustomTypes(customTypesPackage)
     val genOrdering = new GenOrdering(customTypes, options.pkg)
@@ -77,7 +78,8 @@ object generate {
 
     val mostFiles: List[sc.File] =
       List(
-        List(FileDefault(default, options.jsonLibs).file),
+        options.dbLib.toList.flatMap(_.additionalFiles),
+        List(FileDefault(default, options.jsonLibs, options.dbLib).file),
         enums.map(enm => FileStringEnum(options, enm, genOrdering)),
         domains.map(d => FileDomain(d, options, genOrdering)),
         customTypes.All.values.map(FileCustomType(options, genOrdering)),

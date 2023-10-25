@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package department
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
@@ -56,6 +57,15 @@ object DepartmentRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[DepartmentRowUnsaved] = Text.instance[DepartmentRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.groupname, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(DepartmentId.text).unsafeEncode(row.departmentid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[DepartmentRowUnsaved] = OWrites[DepartmentRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Name.writes.writes(o.name),

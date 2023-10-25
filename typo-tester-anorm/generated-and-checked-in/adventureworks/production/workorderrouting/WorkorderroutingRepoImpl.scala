@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -40,6 +41,9 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
        """
       .executeInsert(WorkorderroutingRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderroutingRow.text, c)
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
     val namedParameters = List(
@@ -74,6 +78,10 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         .executeInsert(WorkorderroutingRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[WorkorderroutingRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderroutingRowUnsaved.text, c)
   }
   override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     SelectBuilderSql("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.rowParser)

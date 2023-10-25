@@ -34,6 +34,9 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           returning "contacttypeid", "name", "modifieddate"::text
        """.query(ContacttypeRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ContacttypeRow.text)
+  }
   override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
     val fs = List(
       Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
@@ -60,6 +63,10 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     }
     q.query(ContacttypeRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ContacttypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ContacttypeRowUnsaved.text)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
     SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.read)

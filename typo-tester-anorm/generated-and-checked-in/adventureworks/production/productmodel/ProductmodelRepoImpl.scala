@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -39,6 +40,9 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
        """
       .executeInsert(ProductmodelRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductmodelRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelRow.text, c)
   }
   override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelRow = {
     val namedParameters = List(
@@ -73,6 +77,10 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
         .executeInsert(ProductmodelRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductmodelRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
     SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.rowParser)

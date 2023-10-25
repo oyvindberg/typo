@@ -9,6 +9,7 @@ package compositepk
 package person
 
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -38,4 +39,11 @@ object PersonRow {
       name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2)
     )
   )
+  implicit lazy val text: Text[PersonRow] = Text.instance[PersonRow]{ (row, sb) =>
+    Text.longInstance.unsafeEncode(row.one, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.two, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.name, sb)
+  }
 }

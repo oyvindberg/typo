@@ -38,6 +38,9 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """.query(SalestaxrateRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalestaxrateRow.text)
+  }
   override def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow] = {
     val fs = List(
       Some((Fragment.const(s""""stateprovinceid""""), fr"${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4")),
@@ -74,6 +77,10 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     }
     q.query(SalestaxrateRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalestaxrateRowUnsaved.text)
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
     SelectBuilderSql("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.read)

@@ -7,6 +7,7 @@ package adventureworks
 package person
 package address
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
@@ -83,6 +84,25 @@ object AddressRowUnsaved {
       )
     ),
   )
+  implicit lazy val text: Text[AddressRowUnsaved] = Text.instance[AddressRowUnsaved]{ (row, sb) =>
+    Text.stringInstance.unsafeEncode(row.addressline1, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.addressline2, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.city, sb)
+    sb.append(Text.DELIMETER)
+    StateprovinceId.text.unsafeEncode(row.stateprovinceid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.postalcode, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoBytea.text).unsafeEncode(row.spatiallocation, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(AddressId.text).unsafeEncode(row.addressid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
   implicit lazy val writes: OWrites[AddressRowUnsaved] = OWrites[AddressRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "addressline1" -> Writes.StringWrites.writes(o.addressline1),

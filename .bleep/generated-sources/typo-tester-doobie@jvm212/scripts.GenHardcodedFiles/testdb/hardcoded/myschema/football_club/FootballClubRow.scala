@@ -9,6 +9,7 @@ package myschema
 package football_club
 
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -33,4 +34,9 @@ object FootballClubRow {
       name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1)
     )
   )
+  implicit lazy val text: Text[FootballClubRow] = Text.instance[FootballClubRow]{ (row, sb) =>
+    FootballClubId.text.unsafeEncode(row.id, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
+  }
 }

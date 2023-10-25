@@ -40,11 +40,31 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.userId -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow] = {
     insert(toRow(unsaved))
   }
-  override def bulkInsert(unsaved: List[UsersRow]): ConnectionIO[Long] = ???
-  override def bulkInsertUnsaved(unsaved: List[UsersRowUnsaved]): ConnectionIO[Long] = ???
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.userId -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
     SelectBuilderMock(UsersFields, delay(map.values.toList), SelectParams.empty)
   }

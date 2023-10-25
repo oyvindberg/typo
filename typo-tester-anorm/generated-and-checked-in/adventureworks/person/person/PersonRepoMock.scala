@@ -36,8 +36,22 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.businessentityid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.businessentityid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderMock(PersonFields, () => map.values.toList, SelectParams.empty)

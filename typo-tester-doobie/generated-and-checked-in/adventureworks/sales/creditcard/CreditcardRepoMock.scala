@@ -41,8 +41,30 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.creditcardid -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CreditcardRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.creditcardid -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
     SelectBuilderMock(CreditcardFields, delay(map.values.toList), SelectParams.empty)

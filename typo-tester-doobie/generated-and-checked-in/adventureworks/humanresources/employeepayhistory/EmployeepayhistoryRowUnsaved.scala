@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -45,4 +46,15 @@ case class EmployeepayhistoryRowUnsaved(
 object EmployeepayhistoryRowUnsaved {
   implicit lazy val decoder: Decoder[EmployeepayhistoryRowUnsaved] = Decoder.forProduct5[EmployeepayhistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoShort, Defaulted[TypoLocalDateTime]]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRowUnsaved.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, TypoShort.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[EmployeepayhistoryRowUnsaved] = Encoder.forProduct5[EmployeepayhistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoShort, Defaulted[TypoLocalDateTime]]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, TypoShort.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[EmployeepayhistoryRowUnsaved] = Text.instance[EmployeepayhistoryRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.ratechangedate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.rate, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.payfrequency, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

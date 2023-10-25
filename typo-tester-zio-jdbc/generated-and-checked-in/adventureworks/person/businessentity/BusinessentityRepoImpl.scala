@@ -10,6 +10,7 @@ package businessentity
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -34,6 +35,9 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "rowguid", "modifieddate"::text
        """.insertReturning(BusinessentityRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentityRow.text)
   }
   override def insert(unsaved: BusinessentityRowUnsaved): ZIO[ZConnection, Throwable, BusinessentityRow] = {
     val fs = List(
@@ -62,6 +66,10 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     }
     q.insertReturning(BusinessentityRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
     SelectBuilderSql("person.businessentity", BusinessentityFields, BusinessentityRow.jdbcDecoder)

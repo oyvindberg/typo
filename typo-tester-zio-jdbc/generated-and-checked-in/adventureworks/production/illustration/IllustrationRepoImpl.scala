@@ -10,6 +10,7 @@ package illustration
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
           returning "illustrationid", "diagram", "modifieddate"::text
        """.insertReturning(IllustrationRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""", batchSize, unsaved)(IllustrationRow.text)
+  }
   override def insert(unsaved: IllustrationRowUnsaved): ZIO[ZConnection, Throwable, IllustrationRow] = {
     val fs = List(
       Some((sql""""diagram"""", sql"${Segment.paramSegment(unsaved.diagram)(Setter.optionParamSetter(TypoXml.setter))}::xml")),
@@ -60,6 +64,10 @@ object IllustrationRepoImpl extends IllustrationRepo {
     }
     q.insertReturning(IllustrationRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IllustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
     SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.jdbcDecoder)

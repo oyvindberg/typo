@@ -8,6 +8,7 @@ package hardcoded
 package compositepk
 package person
 
+import testdb.hardcoded.Text
 import testdb.hardcoded.customtypes.Defaulted
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder
@@ -57,5 +58,12 @@ object PersonRowUnsaved {
       Defaulted.jsonEncoder(JsonEncoder.option(JsonEncoder.string)).unsafeEncode(a.two, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[PersonRowUnsaved] = Text.instance[PersonRowUnsaved]{ (row, sb) =>
+    Text.option(Text.stringInstance).unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.longInstance).unsafeEncode(row.one, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.option(Text.stringInstance)).unsafeEncode(row.two, sb)
   }
 }

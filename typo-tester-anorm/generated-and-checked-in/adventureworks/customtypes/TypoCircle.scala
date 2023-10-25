@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -58,6 +59,10 @@ object TypoCircle {
       )
     ),
   )
+  implicit lazy val text: Text[TypoCircle] = new Text[TypoCircle] {
+    override def unsafeEncode(v: TypoCircle, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"<(${v.center.x},${v.center.y}),${v.radius}>", sb)
+    override def unsafeArrayEncode(v: TypoCircle, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"<(${v.center.x},${v.center.y}),${v.radius}>", sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoCircle] = ToStatement[TypoCircle]((s, index, v) => s.setObject(index, new PGcircle(v.center.x, v.center.y, v.radius)))
   implicit lazy val writes: OWrites[TypoCircle] = OWrites[TypoCircle](o =>
     new JsObject(ListMap[String, JsValue](

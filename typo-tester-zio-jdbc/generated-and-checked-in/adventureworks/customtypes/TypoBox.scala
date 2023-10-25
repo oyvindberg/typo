@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGbox
@@ -87,4 +88,8 @@ object TypoBox {
     },
     "box"
   )
+  implicit lazy val text: Text[TypoBox] = new Text[TypoBox] {
+    override def unsafeEncode(v: TypoBox, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"((${v.x1},${v.y1}),(${v.x2},${v.y2}))", sb)
+    override def unsafeArrayEncode(v: TypoBox, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"((${v.x1},${v.y1}),(${v.x2},${v.y2}))", sb)
+  }
 }

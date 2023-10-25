@@ -42,6 +42,14 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
       unsaved
     }
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, row) =>
+      ZIO.succeed {
+        map += (row.id -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
     SelectBuilderMock(MaritalStatusFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }

@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
        """
       .executeInsert(AddresstypeRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddresstypeRow.text, c)
   }
   override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow = {
     val namedParameters = List(
@@ -69,6 +73,10 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
         .executeInsert(AddresstypeRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[AddresstypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddresstypeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
     SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.rowParser)

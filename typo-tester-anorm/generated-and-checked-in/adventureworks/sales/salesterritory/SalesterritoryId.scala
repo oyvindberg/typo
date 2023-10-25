@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesterritory
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -27,6 +28,10 @@ object SalesterritoryId {
     override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[SalesterritoryId] = Reads.IntReads.map(SalesterritoryId.apply)
+  implicit lazy val text: Text[SalesterritoryId] = new Text[SalesterritoryId] {
+    override def unsafeEncode(v: SalesterritoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: SalesterritoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[SalesterritoryId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[SalesterritoryId] = Writes.IntWrites.contramap(_.value)
 }

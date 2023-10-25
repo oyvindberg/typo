@@ -10,6 +10,7 @@ package productcosthistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.insertReturning(ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcosthistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcosthistoryRow.text)
+  }
   override def insert(unsaved: ProductcosthistoryRowUnsaved): ZIO[ZConnection, Throwable, ProductcosthistoryRow] = {
     val fs = List(
       Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
@@ -59,6 +63,10 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     }
     q.insertReturning(ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcosthistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcosthistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.jdbcDecoder)

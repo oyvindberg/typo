@@ -3,14 +3,16 @@ package internal
 package codegen
 
 import play.api.libs.json.Json
+import typo.internal.codegen.DbLib.RowType
 
 case class FilesTable(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
   val relation = FilesRelation(table.naming, table.names, Some(table.cols), options)
+  val RowFile = relation.RowFile(RowType.ReadWriteable)
 
   val UnsavedRowFile: Option[sc.File] =
     for {
       unsaved <- table.maybeUnsavedRow
-      rowFile <- relation.RowFile
+      rowFile <- RowFile
     } yield {
       val comments = scaladoc(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet")(Nil)
 
@@ -76,6 +78,10 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
         code"$comment${col.param.code}$default"
       }
 
+      val instances =
+        options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.allCols)) ++
+          options.dbLib.toList.flatMap(_.rowInstances(unsaved.tpe, unsaved.allCols, rowType = DbLib.RowType.Writable))
+
       sc.File(
         unsaved.tpe,
         code"""|$comments
@@ -84,7 +90,7 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
              |) {
              |  $toRow
              |}
-             |${genObject(unsaved.tpe.value, options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.allCols)))}
+             |${genObject(unsaved.tpe.value, instances)}
              |""".stripMargin,
         secondaryTypes = Nil
       )
@@ -153,7 +159,7 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
     } yield relation.RepoMockFile(dbLib, id, repoMethods)
 
   val all: List[sc.File] = List(
-    relation.RowFile,
+    RowFile,
     relation.FieldsFile,
     relation.StructureFile,
     UnsavedRowFile,

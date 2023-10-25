@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -27,4 +28,8 @@ object TypoCircle {
     .map(v => TypoCircle(TypoPoint(v.center.x, v.center.y), v.radius))
   implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoCircle] = Ordering.by(x => (x.center, x.radius))
   implicit lazy val put: Put[TypoCircle] = Put.Advanced.other[PGcircle](NonEmptyList.one("circle")).contramap(v => new PGcircle(v.center.x, v.center.y, v.radius))
+  implicit lazy val text: Text[TypoCircle] = new Text[TypoCircle] {
+    override def unsafeEncode(v: TypoCircle, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"<(${v.center.x},${v.center.y}),${v.radius}>", sb)
+    override def unsafeArrayEncode(v: TypoCircle, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"<(${v.center.x},${v.center.y}),${v.radius}>", sb)
+  }
 }

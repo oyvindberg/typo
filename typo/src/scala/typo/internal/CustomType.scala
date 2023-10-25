@@ -12,6 +12,7 @@ case class CustomType(
     fromTypo: CustomType.FromTypo,
     // some types is just very difficult to get right inside arrays using jdbc
     forbidArray: Boolean = false,
+    toText: CustomType.Text,
     toTypoInArray: Option[CustomType.ToTypo] = None,
     fromTypoInArray: Option[CustomType.FromTypo] = None,
     objBody: Option[sc.Type.Qualified => sc.Code] = None
@@ -23,6 +24,16 @@ case class CustomType(
 }
 
 object CustomType {
+  case class Text(
+      /* delegates to `Text` instance for this type */
+      textType: sc.Type,
+      toTextType: sc.Code => sc.Code
+  )
+  object Text {
+    def string(toTextType: sc.Code => sc.Code): Text =
+      Text(sc.Type.String, toTextType)
+  }
+
   case class ToTypo(
       jdbcType: sc.Type,
       toTypo: (sc.Code, sc.Type.Qualified) => sc.Code

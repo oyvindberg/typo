@@ -6,6 +6,7 @@
 package adventureworks
 package public
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -26,4 +27,8 @@ object AccountNumber {
   implicit lazy val get: Get[AccountNumber] = Meta.StringMeta.get.map(AccountNumber.apply)
   implicit lazy val ordering: Ordering[AccountNumber] = Ordering.by(_.value)
   implicit lazy val put: Put[AccountNumber] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val text: Text[AccountNumber] = new Text[AccountNumber] {
+    override def unsafeEncode(v: AccountNumber, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: AccountNumber, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

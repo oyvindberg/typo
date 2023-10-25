@@ -19,7 +19,10 @@ trait ProductlistpricehistoryRepo {
   def delete(compositeId: ProductlistpricehistoryId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def insert(unsaved: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, ProductlistpricehistoryRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ProductlistpricehistoryRowUnsaved): ZIO[ZConnection, Throwable, ProductlistpricehistoryRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, ProductlistpricehistoryRow]
   def selectById(compositeId: ProductlistpricehistoryId): ZIO[ZConnection, Throwable, Option[ProductlistpricehistoryRow]]

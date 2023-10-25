@@ -9,6 +9,7 @@ package myschema
 package marital_status
 
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -29,4 +30,7 @@ object MaritalStatusRow {
       id = MaritalStatusId.get.unsafeGetNonNullable(rs, i + 0)
     )
   )
+  implicit lazy val text: Text[MaritalStatusRow] = Text.instance[MaritalStatusRow]{ (row, sb) =>
+    MaritalStatusId.text.unsafeEncode(row.id, sb)
+  }
 }

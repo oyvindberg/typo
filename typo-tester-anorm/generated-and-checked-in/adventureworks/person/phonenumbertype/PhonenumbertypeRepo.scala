@@ -16,7 +16,10 @@ trait PhonenumbertypeRepo {
   def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
+  def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[PhonenumbertypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def selectAll(implicit c: Connection): List[PhonenumbertypeRow]
   def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow]

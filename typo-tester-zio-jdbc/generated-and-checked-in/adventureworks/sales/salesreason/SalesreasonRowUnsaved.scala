@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesreason
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
@@ -67,5 +68,14 @@ object SalesreasonRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[SalesreasonRowUnsaved] = Text.instance[SalesreasonRowUnsaved]{ (row, sb) =>
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.reasontype, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(SalesreasonId.text).unsafeEncode(row.salesreasonid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

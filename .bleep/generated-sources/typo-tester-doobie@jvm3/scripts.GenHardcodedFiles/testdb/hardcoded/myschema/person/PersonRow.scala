@@ -9,6 +9,7 @@ package myschema
 package person
 
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -69,4 +70,29 @@ object PersonRow {
       favoriteNumber = Number.get.unsafeGetNonNullable(rs, i + 11)
     )
   )
+  implicit lazy val text: Text[PersonRow] = Text.instance[PersonRow]{ (row, sb) =>
+    PersonId.text.unsafeEncode(row.id, sb)
+    sb.append(Text.DELIMETER)
+    FootballClubId.text.unsafeEncode(row.favouriteFootballClubId, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.nickName, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.blogUrl, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.email, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.phone, sb)
+    sb.append(Text.DELIMETER)
+    Text.booleanInstance.unsafeEncode(row.likesPizza, sb)
+    sb.append(Text.DELIMETER)
+    MaritalStatusId.text.unsafeEncode(row.maritalStatusId, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.workEmail, sb)
+    sb.append(Text.DELIMETER)
+    Sector.text.unsafeEncode(row.sector, sb)
+    sb.append(Text.DELIMETER)
+    Number.text.unsafeEncode(row.favoriteNumber, sb)
+  }
 }

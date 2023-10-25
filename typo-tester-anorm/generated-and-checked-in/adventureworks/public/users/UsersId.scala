@@ -7,6 +7,7 @@ package adventureworks
 package public
 package users
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoUUID
 import anorm.Column
 import anorm.ParameterMetaData
@@ -28,6 +29,10 @@ object UsersId {
     override def jdbcType: Int = TypoUUID.parameterMetadata.jdbcType
   }
   implicit lazy val reads: Reads[UsersId] = TypoUUID.reads.map(UsersId.apply)
+  implicit lazy val text: Text[UsersId] = new Text[UsersId] {
+    override def unsafeEncode(v: UsersId, sb: StringBuilder) = TypoUUID.text.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: UsersId, sb: StringBuilder) = TypoUUID.text.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[UsersId] = TypoUUID.toStatement.contramap(_.value)
   implicit lazy val writes: Writes[UsersId] = TypoUUID.writes.contramap(_.value)
 }

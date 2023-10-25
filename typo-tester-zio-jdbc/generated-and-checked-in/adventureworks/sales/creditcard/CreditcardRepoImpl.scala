@@ -10,6 +10,7 @@ package creditcard
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.streamingInsert
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -38,6 +39,9 @@ object CreditcardRepoImpl extends CreditcardRepo {
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """.insertReturning(CreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") FROM STDIN""", batchSize, unsaved)(CreditcardRow.text)
+  }
   override def insert(unsaved: CreditcardRowUnsaved): ZIO[ZConnection, Throwable, CreditcardRow] = {
     val fs = List(
       Some((sql""""cardtype"""", sql"${Segment.paramSegment(unsaved.cardtype)(Setter.stringSetter)}")),
@@ -65,6 +69,10 @@ object CreditcardRepoImpl extends CreditcardRepo {
     }
     q.insertReturning(CreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.creditcard("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CreditcardRowUnsaved.text)
   }
   override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
     SelectBuilderSql("sales.creditcard", CreditcardFields, CreditcardRow.jdbcDecoder)

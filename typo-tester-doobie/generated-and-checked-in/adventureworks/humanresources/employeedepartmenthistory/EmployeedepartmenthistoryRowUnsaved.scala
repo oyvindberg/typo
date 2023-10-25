@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -52,4 +53,17 @@ case class EmployeedepartmenthistoryRowUnsaved(
 object EmployeedepartmenthistoryRowUnsaved {
   implicit lazy val decoder: Decoder[EmployeedepartmenthistoryRowUnsaved] = Decoder.forProduct6[EmployeedepartmenthistoryRowUnsaved, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], Defaulted[TypoLocalDateTime]]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(EmployeedepartmenthistoryRowUnsaved.apply)(BusinessentityId.decoder, DepartmentId.decoder, ShiftId.decoder, TypoLocalDate.decoder, Decoder.decodeOption(TypoLocalDate.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[EmployeedepartmenthistoryRowUnsaved] = Encoder.forProduct6[EmployeedepartmenthistoryRowUnsaved, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], Defaulted[TypoLocalDateTime]]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(x => (x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate))(BusinessentityId.encoder, DepartmentId.encoder, ShiftId.encoder, TypoLocalDate.encoder, Encoder.encodeOption(TypoLocalDate.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[EmployeedepartmenthistoryRowUnsaved] = Text.instance[EmployeedepartmenthistoryRowUnsaved]{ (row, sb) =>
+    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+    sb.append(Text.DELIMETER)
+    DepartmentId.text.unsafeEncode(row.departmentid, sb)
+    sb.append(Text.DELIMETER)
+    ShiftId.text.unsafeEncode(row.shiftid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDate.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDate.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

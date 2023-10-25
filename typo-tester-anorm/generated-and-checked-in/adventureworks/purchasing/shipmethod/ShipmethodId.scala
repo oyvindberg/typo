@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package shipmethod
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -27,6 +28,10 @@ object ShipmethodId {
     override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[ShipmethodId] = Reads.IntReads.map(ShipmethodId.apply)
+  implicit lazy val text: Text[ShipmethodId] = new Text[ShipmethodId] {
+    override def unsafeEncode(v: ShipmethodId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: ShipmethodId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[ShipmethodId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[ShipmethodId] = Writes.IntWrites.contramap(_.value)
 }

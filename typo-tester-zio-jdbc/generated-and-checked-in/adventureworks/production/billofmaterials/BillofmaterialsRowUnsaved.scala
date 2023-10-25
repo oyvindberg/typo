@@ -7,6 +7,7 @@ package adventureworks
 package production
 package billofmaterials
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
@@ -123,5 +124,24 @@ object BillofmaterialsRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[BillofmaterialsRowUnsaved] = Text.instance[BillofmaterialsRowUnsaved]{ (row, sb) =>
+    Text.option(ProductId.text).unsafeEncode(row.productassemblyid, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.componentid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.bomlevel, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(BillofmaterialsId.text).unsafeEncode(row.billofmaterialsid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.bigDecimalInstance).unsafeEncode(row.perassemblyqty, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
 }

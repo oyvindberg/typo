@@ -39,8 +39,30 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       unsaved
     }
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0L
+      rows.foreach { row =>
+        map += (row.shiftid -> row)
+        num += 1
+      }
+      num
+    }
+  }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
+        map += (row.shiftid -> row)
+        num += 1
+      }
+      num
+    }
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
     SelectBuilderMock(ShiftFields, delay(map.values.toList), SelectParams.empty)

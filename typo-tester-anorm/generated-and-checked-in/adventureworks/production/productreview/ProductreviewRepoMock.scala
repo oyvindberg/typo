@@ -35,8 +35,22 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     
     unsaved
   }
+  override def insertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.productreviewid -> row)
+    }
+    unsaved.size.toLong
+  }
   override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
     insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductreviewRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.productreviewid -> row)
+    }
+    unsaved.size.toLong
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
     SelectBuilderMock(ProductreviewFields, () => map.values.toList, SelectParams.empty)

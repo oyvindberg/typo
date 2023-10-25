@@ -20,7 +20,10 @@ trait PasswordRepo {
   def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[PasswordFields, PasswordRow]
   def insert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, PasswordRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: PasswordRowUnsaved): ZIO[ZConnection, Throwable, PasswordRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[PasswordFields, PasswordRow]
   def selectAll: ZStream[ZConnection, Throwable, PasswordRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[PasswordRow]]

@@ -10,6 +10,7 @@ package productdescription
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
        """
       .executeInsert(ProductdescriptionRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductdescriptionRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductdescriptionRow.text, c)
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionRow = {
     val namedParameters = List(
@@ -69,6 +73,10 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
         .executeInsert(ProductdescriptionRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductdescriptionRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productdescription("description", "productdescriptionid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdescriptionRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
     SelectBuilderSql("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.rowParser)

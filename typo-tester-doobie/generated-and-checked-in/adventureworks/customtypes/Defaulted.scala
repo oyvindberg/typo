@@ -28,15 +28,10 @@ object Defaulted {
     case Provided(value) => Json.obj("provided" -> Encoder[T].apply(value))
     case UseDefault      => Json.fromString("defaulted")
   }
-  val DEFAULT_VALUE = "__DEFAULT_VALUE__"
-  implicit def textEncoder[T: Text]: Text[Defaulted[T]] =
-    Text.instance { (t, s) => {
-        val encoded = t match {
-          case Defaulted.Provided(value) => implicitly[Text[T]].encode(value)
-          case Defaulted.UseDefault      => DEFAULT_VALUE
-        }
-        s.append(encoded)
-        ()
-      }
-    }
+  implicit def text[T](implicit t: Text[T]): Text[Defaulted[T]] = Text.instance {
+    case (Defaulted.Provided(value), sb) => t.unsafeEncode(value, sb)
+    case (Defaulted.UseDefault, sb) =>
+      sb.append("__DEFAULT_VALUE__")
+      ()
+  }
 }

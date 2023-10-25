@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGline
@@ -83,4 +84,8 @@ object TypoLine {
     },
     "line"
   )
+  implicit lazy val text: Text[TypoLine] = new Text[TypoLine] {
+    override def unsafeEncode(v: TypoLine, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"{${v.a},${v.b},${v.c}}", sb)
+    override def unsafeArrayEncode(v: TypoLine, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"{${v.a},${v.b},${v.c}}", sb)
+  }
 }

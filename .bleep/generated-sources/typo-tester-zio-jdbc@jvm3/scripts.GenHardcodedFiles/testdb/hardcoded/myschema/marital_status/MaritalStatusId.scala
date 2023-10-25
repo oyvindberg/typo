@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package marital_status
 
+import testdb.hardcoded.Text
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -28,4 +29,8 @@ object MaritalStatusId {
   implicit lazy val ordering: Ordering[MaritalStatusId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[MaritalStatusId] = ParameterMetaData.instance[MaritalStatusId](ParameterMetaData.LongParameterMetaData.sqlType, ParameterMetaData.LongParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[MaritalStatusId] = Setter.longSetter.contramap(_.value)
+  implicit lazy val text: Text[MaritalStatusId] = new Text[MaritalStatusId] {
+    override def unsafeEncode(v: MaritalStatusId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: MaritalStatusId, sb: StringBuilder) = Text.longInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

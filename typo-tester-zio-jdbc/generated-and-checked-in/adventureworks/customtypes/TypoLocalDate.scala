@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import java.time.LocalDate
@@ -65,4 +66,8 @@ object TypoLocalDate {
     },
     "date"
   )
+  implicit lazy val text: Text[TypoLocalDate] = new Text[TypoLocalDate] {
+    override def unsafeEncode(v: TypoLocalDate, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoLocalDate, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
 }

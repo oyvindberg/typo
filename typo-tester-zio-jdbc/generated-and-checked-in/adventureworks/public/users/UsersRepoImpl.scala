@@ -10,6 +10,7 @@ package users
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -36,6 +37,9 @@ object UsersRepoImpl extends UsersRepo {
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """.insertReturning(UsersRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text)
+  }
   override def insert(unsaved: UsersRowUnsaved): ZIO[ZConnection, Throwable, UsersRow] = {
     val fs = List(
       Some((sql""""user_id"""", sql"${Segment.paramSegment(unsaved.userId)(UsersId.setter)}::uuid")),
@@ -61,6 +65,10 @@ object UsersRepoImpl extends UsersRepo {
     }
     q.insertReturning(UsersRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UsersRowUnsaved.text)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
     SelectBuilderSql("public.users", UsersFields, UsersRow.jdbcDecoder)

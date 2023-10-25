@@ -34,6 +34,9 @@ object CultureRepoImpl extends CultureRepo {
           returning "cultureid", "name", "modifieddate"::text
        """.query(CultureRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CultureRow.text)
+  }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
       Some((Fragment.const(s""""cultureid""""), fr"${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar")),
@@ -57,6 +60,10 @@ object CultureRepoImpl extends CultureRepo {
     }
     q.query(CultureRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CultureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CultureRowUnsaved.text)
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
     SelectBuilderSql("production.culture", CultureFields, CultureRow.read)

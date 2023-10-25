@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -65,4 +66,23 @@ case class PurchaseorderdetailRowUnsaved(
 object PurchaseorderdetailRowUnsaved {
   implicit lazy val decoder: Decoder[PurchaseorderdetailRowUnsaved] = Decoder.forProduct9[PurchaseorderdetailRowUnsaved, PurchaseorderheaderId, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime]]("purchaseorderid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "purchaseorderdetailid", "modifieddate")(PurchaseorderdetailRowUnsaved.apply)(PurchaseorderheaderId.decoder, TypoLocalDateTime.decoder, TypoShort.decoder, ProductId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Defaulted.decoder(Decoder.decodeInt), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[PurchaseorderdetailRowUnsaved] = Encoder.forProduct9[PurchaseorderdetailRowUnsaved, PurchaseorderheaderId, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime]]("purchaseorderid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "purchaseorderdetailid", "modifieddate")(x => (x.purchaseorderid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.purchaseorderdetailid, x.modifieddate))(PurchaseorderheaderId.encoder, TypoLocalDateTime.encoder, TypoShort.encoder, ProductId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Defaulted.encoder(Encoder.encodeInt), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[PurchaseorderdetailRowUnsaved] = Text.instance[PurchaseorderdetailRowUnsaved]{ (row, sb) =>
+    PurchaseorderheaderId.text.unsafeEncode(row.purchaseorderid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.duedate, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.orderqty, sb)
+    sb.append(Text.DELIMETER)
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.unitprice, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.receivedqty, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.rejectedqty, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.purchaseorderdetailid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

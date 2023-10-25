@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package department
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -50,6 +51,15 @@ object DepartmentRow {
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[DepartmentRow] = Text.instance[DepartmentRow]{ (row, sb) =>
+    DepartmentId.text.unsafeEncode(row.departmentid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.groupname, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[DepartmentRow] = OWrites[DepartmentRow](o =>
     new JsObject(ListMap[String, JsValue](

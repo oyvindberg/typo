@@ -19,7 +19,10 @@ trait PurchaseorderheaderRepo {
   def delete(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def insert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, PurchaseorderheaderRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PurchaseorderheaderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: PurchaseorderheaderRowUnsaved): ZIO[ZConnection, Throwable, PurchaseorderheaderRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PurchaseorderheaderRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def selectAll: ZStream[ZConnection, Throwable, PurchaseorderheaderRow]
   def selectById(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Option[PurchaseorderheaderRow]]

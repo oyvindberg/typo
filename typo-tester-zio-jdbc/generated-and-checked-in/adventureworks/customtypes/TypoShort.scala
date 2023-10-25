@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import scala.math.Numeric
@@ -76,4 +77,8 @@ object TypoShort {
     },
     "int2"
   )
+  implicit lazy val text: Text[TypoShort] = new Text[TypoShort] {
+    override def unsafeEncode(v: TypoShort, sb: StringBuilder) = Text[Short].unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoShort, sb: StringBuilder) = Text[Short].unsafeArrayEncode(v.value, sb)
+  }
 }

@@ -14,6 +14,7 @@ import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -41,6 +42,9 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[StateprovinceRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text, c)
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
     val namedParameters = List(
@@ -80,6 +84,10 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
         .executeInsert(StateprovinceRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[StateprovinceRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text, c)
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
     SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.rowParser)

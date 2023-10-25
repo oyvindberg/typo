@@ -17,7 +17,10 @@ trait UnitmeasureRepo {
   def delete(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow]
   def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow]
   def selectAll: Stream[ConnectionIO, UnitmeasureRow]
   def selectById(unitmeasurecode: UnitmeasureId): ConnectionIO[Option[UnitmeasureRow]]

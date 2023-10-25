@@ -19,6 +19,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
+import testdb.hardcoded.Text
 import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
@@ -78,6 +79,31 @@ object PersonRow {
         favoriteNumber = row(idx + 11)(Number.column)
       )
     )
+  }
+  implicit lazy val text: Text[PersonRow] = Text.instance[PersonRow]{ (row, sb) =>
+    PersonId.text.unsafeEncode(row.id, sb)
+    sb.append(Text.DELIMETER)
+    FootballClubId.text.unsafeEncode(row.favouriteFootballClubId, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.nickName, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.blogUrl, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.email, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.phone, sb)
+    sb.append(Text.DELIMETER)
+    Text.booleanInstance.unsafeEncode(row.likesPizza, sb)
+    sb.append(Text.DELIMETER)
+    MaritalStatusId.text.unsafeEncode(row.maritalStatusId, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.workEmail, sb)
+    sb.append(Text.DELIMETER)
+    Sector.text.unsafeEncode(row.sector, sb)
+    sb.append(Text.DELIMETER)
+    Number.text.unsafeEncode(row.favoriteNumber, sb)
   }
   implicit lazy val writes: OWrites[PersonRow] = OWrites[PersonRow](o =>
     new JsObject(ListMap[String, JsValue](

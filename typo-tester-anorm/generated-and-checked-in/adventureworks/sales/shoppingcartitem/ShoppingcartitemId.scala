@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package shoppingcartitem
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -27,6 +28,10 @@ object ShoppingcartitemId {
     override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[ShoppingcartitemId] = Reads.IntReads.map(ShoppingcartitemId.apply)
+  implicit lazy val text: Text[ShoppingcartitemId] = new Text[ShoppingcartitemId] {
+    override def unsafeEncode(v: ShoppingcartitemId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: ShoppingcartitemId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[ShoppingcartitemId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[ShoppingcartitemId] = Writes.IntWrites.contramap(_.value)
 }

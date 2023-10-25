@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -59,6 +60,10 @@ object TypoShort {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoShort] = implicitly[Reads[Short]].map(TypoShort.apply)
+  implicit lazy val text: Text[TypoShort] = new Text[TypoShort] {
+    override def unsafeEncode(v: TypoShort, sb: StringBuilder) = Text[Short].unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoShort, sb: StringBuilder) = Text[Short].unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoShort] = ToStatement[TypoShort]((s, index, v) => s.setObject(index, v.value.toInt))
   implicit lazy val writes: Writes[TypoShort] = implicitly[Writes[Short]].contramap(_.value)
 }

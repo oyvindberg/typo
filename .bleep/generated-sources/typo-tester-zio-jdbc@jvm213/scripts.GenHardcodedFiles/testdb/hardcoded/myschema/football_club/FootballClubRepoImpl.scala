@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package football_club
 
+import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -34,6 +35,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
           values (${Segment.paramSegment(unsaved.id)(FootballClubId.setter)}::int8, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)})
           returning "id", "name"
        """.insertReturning(FootballClubRow.jdbcDecoder).map(_.updatedKeys.head)
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY myschema.football_club("id", "name") FROM STDIN""", batchSize, unsaved)(FootballClubRow.text)
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
     SelectBuilderSql("myschema.football_club", FootballClubFields, FootballClubRow.jdbcDecoder)

@@ -105,6 +105,7 @@ object sc {
     val JavaShort = Qualified("java.lang.Short")
 
     val String = Qualified("java.lang.String")
+    val StringBuilder = Qualified("scala.collection.mutable.StringBuilder")
     val Connection = Qualified("java.sql.Connection")
     val PreparedStatement = Qualified("java.sql.PreparedStatement")
     val ResultSet = sc.Type.Qualified("java.sql.ResultSet")
@@ -145,6 +146,7 @@ object sc {
     val Float = Qualified("scala.Float")
     val Function1 = Qualified("scala.Function1")
     val Int = Qualified("scala.Int")
+    val Iterator = Qualified("scala.collection.Iterator")
     val Left = Qualified("scala.Left")
     val List = Qualified("scala.List")
     val Long = Qualified("scala.Long")
@@ -206,6 +208,7 @@ object sc {
         Float,
         Function1,
         Int,
+        Iterator,
         JavaCharacter,
         JavaInteger,
         Left,
@@ -219,6 +222,7 @@ object sc {
         Short,
         Some,
         String,
+        StringBuilder,
         StringContext,
         Unit,
         Throwable

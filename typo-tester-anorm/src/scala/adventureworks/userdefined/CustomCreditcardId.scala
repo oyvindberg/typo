@@ -4,6 +4,7 @@
   */
 package adventureworks.userdefined
 
+import adventureworks.Text
 import anorm.{Column, ParameterMetaData, ToStatement}
 import play.api.libs.json.{Reads, Writes}
 import typo.dsl.Bijection
@@ -21,6 +22,10 @@ object CustomCreditcardId {
     override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[CustomCreditcardId] = Reads.IntReads.map(CustomCreditcardId.apply)
+  implicit lazy val text: Text[CustomCreditcardId] = new Text[CustomCreditcardId] {
+    override def unsafeEncode(v: CustomCreditcardId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: CustomCreditcardId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[CustomCreditcardId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[CustomCreditcardId] = Writes.IntWrites.contramap(_.value)
 }

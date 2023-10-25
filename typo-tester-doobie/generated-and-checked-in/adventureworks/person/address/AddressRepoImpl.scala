@@ -37,6 +37,9 @@ object AddressRepoImpl extends AddressRepo {
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """.query(AddressRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(AddressRow.text)
+  }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     val fs = List(
       Some((Fragment.const(s""""addressline1""""), fr"${fromWrite(unsaved.addressline1)(Write.fromPut(Meta.StringMeta.put))}")),
@@ -72,6 +75,10 @@ object AddressRepoImpl extends AddressRepo {
     }
     q.query(AddressRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(AddressRowUnsaved.text)
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
     SelectBuilderSql("person.address", AddressFields, AddressRow.read)

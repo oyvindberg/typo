@@ -17,7 +17,10 @@ trait DocumentRepo {
   def delete(documentnode: DocumentId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[DocumentFields, DocumentRow]
   def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
+  def insertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[DocumentRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[DocumentFields, DocumentRow]
   def selectAll(implicit c: Connection): List[DocumentRow]
   def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow]

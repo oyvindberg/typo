@@ -19,7 +19,10 @@ trait SalestaxrateRepo {
   def delete(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow]
   def insert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, SalestaxrateRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalestaxrateRowUnsaved): ZIO[ZConnection, Throwable, SalestaxrateRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow]
   def selectAll: ZStream[ZConnection, Throwable, SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Option[SalestaxrateRow]]

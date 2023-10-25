@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package jobcandidate
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -25,4 +26,8 @@ object JobcandidateId {
   implicit lazy val get: Get[JobcandidateId] = Meta.IntMeta.get.map(JobcandidateId.apply)
   implicit lazy val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)
   implicit lazy val put: Put[JobcandidateId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val text: Text[JobcandidateId] = new Text[JobcandidateId] {
+    override def unsafeEncode(v: JobcandidateId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: JobcandidateId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

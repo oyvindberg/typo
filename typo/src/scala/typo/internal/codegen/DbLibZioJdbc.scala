@@ -5,7 +5,7 @@ import typo.internal.analysis.MaybeReturnsRows
 import typo.sc.Type
 import typo.{NonEmptyList, sc}
 
-class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean) extends DbLib {
+class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean) extends DbLib {
   private val ZConnection = sc.Type.Qualified("zio.jdbc.ZConnection")
   private val Throwable = sc.Type.Qualified("java.lang.Throwable")
   private val ZStream = sc.Type.Qualified("zio.stream.ZStream")
@@ -20,6 +20,19 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
   private val JdbcDecoderError = sc.Type.Qualified("zio.jdbc.JdbcDecoderError")
+
+  val textSupport: Option[DbLibTextSupport] =
+    if (enableStreamingInserts) Some(new DbLibTextSupport(pkg, inlineImplicits, None, default)) else None
+
+  override val additionalFiles: List[typo.sc.File] =
+    textSupport match {
+      case Some(textSupport) =>
+        List(
+          sc.File(textSupport.Text, DbLibTextImplementations.Text, Nil),
+          sc.File(textSupport.streamingInsert, DbLibTextImplementations.streamingInsertZio(textSupport.Text), Nil)
+        )
+      case None => Nil
+    }
 
   /** This type is basically a mapping from scala type to jdbc type name. zio-jdbc seems to use jdbc type number instead of the (potentially database-specific) type name. In the DSL we need to
     * generate some sql casts based on scala type, so it's unavoidable to have this mapping.
@@ -195,8 +208,16 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
       code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
+    case RepoMethod.InsertStreaming(_, _, rowType) =>
+      val in = ZStream.of(ZConnection, sc.Type.Throwable, rowType)
+      val out = ZIO.of(ZConnection, sc.Type.Throwable, sc.Type.Long)
+      code"def insertStreaming(unsaved: $in, batchSize: Int): $out"
     case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
       code"def upsert($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
+    case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
+      val in = ZStream.of(ZConnection, sc.Type.Throwable, unsaved.tpe)
+      val out = ZIO.of(ZConnection, sc.Type.Throwable, sc.Type.Long)
+      code"def insertUnsavedStreaming(unsaved: $in, batchSize: Int): $out"
     case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
       code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
     case RepoMethod.Delete(_, id) =>
@@ -374,6 +395,12 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         }
 
         code"$sql.insertReturning(${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)"
+      case RepoMethod.InsertStreaming(relName, cols, rowType) =>
+        val sql = sc.s(code"COPY $relName(${dbNames(cols, isRead = false)}) FROM STDIN")
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)})"
+      case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
+        val sql = sc.s(code"COPY $relName(${dbNames(unsaved.allCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(unsaved.tpe)})"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
@@ -490,6 +517,21 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType, map)"
       case RepoMethod.Delete(_, id) =>
         code"$ZIO.succeed(map.remove(${id.paramName}).isDefined)"
+      case RepoMethod.InsertStreaming(_, _, _) =>
+        code"""|unsaved.scanZIO(0L) { case (acc, row) =>
+               |  ZIO.succeed {
+               |    map += (row.${id.paramName} -> row)
+               |    acc + 1
+               |  }
+               |}.runLast.map(_.getOrElse(0L))""".stripMargin
+      case RepoMethod.InsertUnsavedStreaming(_, _) =>
+        code"""|unsaved.scanZIO(0L) { case (acc, unsavedRow) =>
+               |  ZIO.succeed {
+               |    val row = toRow(unsavedRow)
+               |    map += (row.${id.paramName} -> row)
+               |    acc + 1
+               |  }
+               |}.runLast.map(_.getOrElse(0L))""".stripMargin
       case RepoMethod.SqlFile(_) =>
         // should not happen (tm)
         code"???"
@@ -504,6 +546,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       ZIO.of(ZConnection, Throwable, x.table.names.RowName),
       code"${x.table.names.RepoImplName}.insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
     )
+
+  override val defaultedInstance: List[sc.Given] =
+    textSupport.map(_.defaultedInstance).toList
 
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.ClassMember] = {
     val arraySetter = sc.Given(
@@ -569,7 +614,18 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       sc.Given(tparams = Nil, name = parameterMetadataName, implicitParams = Nil, tpe = ParameterMetaData.of(wrapperType), body = body)
     }
 
-    List(Option(arraySetter), Option(arrayJdbcDecoder), Option(arrayJdbcEncoder), Option(jdbcEncoder), Option(jdbcDecoder), Option(setter), ifDsl(parameterMetadata)).flatten
+    val text = textSupport.map(_.anyValInstance(wrapperType, underlying))
+
+    List(
+      Option(arraySetter),
+      Option(arrayJdbcDecoder),
+      Option(arrayJdbcEncoder),
+      Option(jdbcEncoder),
+      Option(jdbcDecoder),
+      Option(setter),
+      ifDsl(parameterMetadata),
+      text
+    ).flatten
   }
 
   override def anyValInstances(wrapperType: Type.Qualified, underlying: sc.Type): List[sc.ClassMember] =
@@ -618,7 +674,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           tpe = ParameterMetaData.of(wrapperType),
           body = code"$ParameterMetaData.instance[$wrapperType](${lookupParameterMetaDataFor(underlying)}.sqlType, ${lookupParameterMetaDataFor(underlying)}.jdbcType)"
         )
-      )
+      ),
+      textSupport.map(_.anyValInstance(wrapperType, underlying))
     ).flatten
 
   override def missingInstances: List[sc.ClassMember] = {
@@ -719,7 +776,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       all(sc.Type.Boolean, "bool", array => code"$array.map(x => boolean2Boolean(x): ${sc.Type.AnyRef})")
   }
 
-  override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
+  override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn], rowType: DbLib.RowType): List[sc.ClassMember] = {
+    val text = textSupport.map(_.rowInstance(tpe, cols))
     val decoder = {
       val body =
         if (cols.length == 1)
@@ -739,8 +797,11 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         }
       sc.Given(tparams = Nil, name = jdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(tpe), body = body)
     }
-
-    List(decoder)
+    rowType match {
+      case DbLib.RowType.Writable      => text.toList
+      case DbLib.RowType.ReadWriteable => List(decoder) ++ text
+      case DbLib.RowType.Readable      => List(decoder)
+    }
   }
 
   override def customTypeInstances(ct: CustomType): List[sc.ClassMember] =
@@ -789,8 +850,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       val body = code"$ParameterMetaData.instance[${ct.typoType}](${sc.StrLit(ct.sqlType)}, ${sc.Type.Types}.OTHER)"
       sc.Given(Nil, parameterMetadataName, Nil, ParameterMetaData.of(ct.typoType), body)
     }
+    val text = textSupport.map(_.customTypeInstance(ct))
 
-    List(Option(jdbcEncoder), Option(jdbcDecoder), Option(setter), ifDsl(parameterMetadata)).flatten
+    List(Option(jdbcEncoder), Option(jdbcDecoder), Option(setter), ifDsl(parameterMetadata), text).flatten
   }
 
   def customTypeArray(ct: CustomType): List[sc.Given] = {

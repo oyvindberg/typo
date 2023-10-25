@@ -17,7 +17,10 @@ trait ProductreviewRepo {
   def delete(productreviewid: ProductreviewId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow]
   def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductreviewRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductreviewFields, ProductreviewRow]
   def selectAll: Stream[ConnectionIO, ProductreviewRow]
   def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]]

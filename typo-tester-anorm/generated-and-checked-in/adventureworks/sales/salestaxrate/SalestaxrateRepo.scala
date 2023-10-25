@@ -16,7 +16,10 @@ trait SalestaxrateRepo {
   def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow]
   def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow
+  def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[SalestaxrateRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow]
   def selectAll(implicit c: Connection): List[SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow]

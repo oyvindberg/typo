@@ -19,7 +19,10 @@ trait SalesterritoryhistoryRepo {
   def delete(compositeId: SalesterritoryhistoryId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def insert(unsaved: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, SalesterritoryhistoryRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalesterritoryhistoryRowUnsaved): ZIO[ZConnection, Throwable, SalesterritoryhistoryRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalesterritoryhistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId): ZIO[ZConnection, Throwable, Option[SalesterritoryhistoryRow]]

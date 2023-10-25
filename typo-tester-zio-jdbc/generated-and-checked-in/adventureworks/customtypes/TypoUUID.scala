@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import java.util.UUID
@@ -65,4 +66,8 @@ object TypoUUID {
     },
     "uuid"
   )
+  implicit lazy val text: Text[TypoUUID] = new Text[TypoUUID] {
+    override def unsafeEncode(v: TypoUUID, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)
+    override def unsafeArrayEncode(v: TypoUUID, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.toString, sb)
+  }
 }

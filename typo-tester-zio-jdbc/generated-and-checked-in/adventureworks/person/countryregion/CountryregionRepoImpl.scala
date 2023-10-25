@@ -10,6 +10,7 @@ package countryregion
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
           returning "countryregioncode", "name", "modifieddate"::text
        """.insertReturning(CountryregionRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregionRow.text)
+  }
   override def insert(unsaved: CountryregionRowUnsaved): ZIO[ZConnection, Throwable, CountryregionRow] = {
     val fs = List(
       Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}")),
@@ -56,6 +60,10 @@ object CountryregionRepoImpl extends CountryregionRepo {
     }
     q.insertReturning(CountryregionRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
     SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.jdbcDecoder)

@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -51,6 +52,10 @@ object TypoInt2Vector {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoInt2Vector] = Reads.StringReads.map(TypoInt2Vector.apply)
+  implicit lazy val text: Text[TypoInt2Vector] = new Text[TypoInt2Vector] {
+    override def unsafeEncode(v: TypoInt2Vector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoInt2Vector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoInt2Vector] = ToStatement[TypoInt2Vector]((s, index, v) => s.setObject(index, {
                                                                     val obj = new PGobject
                                                                     obj.setType("int2vector")

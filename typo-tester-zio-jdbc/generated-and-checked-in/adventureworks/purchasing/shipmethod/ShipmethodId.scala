@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package shipmethod
 
+import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -27,4 +28,8 @@ object ShipmethodId {
   implicit lazy val ordering: Ordering[ShipmethodId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[ShipmethodId] = ParameterMetaData.instance[ShipmethodId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[ShipmethodId] = Setter.intSetter.contramap(_.value)
+  implicit lazy val text: Text[ShipmethodId] = new Text[ShipmethodId] {
+    override def unsafeEncode(v: ShipmethodId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: ShipmethodId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

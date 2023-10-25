@@ -10,6 +10,7 @@ package currency
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -35,6 +36,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
           returning "currencycode", "name", "modifieddate"::text
        """.insertReturning(CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text)
+  }
   override def insert(unsaved: CurrencyRowUnsaved): ZIO[ZConnection, Throwable, CurrencyRow] = {
     val fs = List(
       Some((sql""""currencycode"""", sql"${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar")),
@@ -56,6 +60,10 @@ object CurrencyRepoImpl extends CurrencyRepo {
     }
     q.insertReturning(CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
     SelectBuilderSql("sales.currency", CurrencyFields, CurrencyRow.jdbcDecoder)

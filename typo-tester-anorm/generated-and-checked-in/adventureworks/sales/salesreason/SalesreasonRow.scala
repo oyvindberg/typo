@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesreason
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -50,6 +51,15 @@ object SalesreasonRow {
         modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[SalesreasonRow] = Text.instance[SalesreasonRow]{ (row, sb) =>
+    SalesreasonId.text.unsafeEncode(row.salesreasonid, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Name.text.unsafeEncode(row.reasontype, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[SalesreasonRow] = OWrites[SalesreasonRow](o =>
     new JsObject(ListMap[String, JsValue](

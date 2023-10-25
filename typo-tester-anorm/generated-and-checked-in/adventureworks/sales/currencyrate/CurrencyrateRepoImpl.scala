@@ -10,6 +10,7 @@ package currencyrate
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[CurrencyrateRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyrateRow.text, c)
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
     val namedParameters = List(
@@ -69,6 +73,10 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
         .executeInsert(CurrencyrateRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[CurrencyrateRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.currencyrate("currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "currencyrateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyrateRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
     SelectBuilderSql("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.rowParser)

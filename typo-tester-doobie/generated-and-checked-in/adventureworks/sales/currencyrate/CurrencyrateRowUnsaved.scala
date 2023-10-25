@@ -10,6 +10,7 @@ package currencyrate
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -53,4 +54,19 @@ case class CurrencyrateRowUnsaved(
 object CurrencyrateRowUnsaved {
   implicit lazy val decoder: Decoder[CurrencyrateRowUnsaved] = Decoder.forProduct7[CurrencyrateRowUnsaved, TypoLocalDateTime, CurrencyId, CurrencyId, BigDecimal, BigDecimal, Defaulted[CurrencyrateId], Defaulted[TypoLocalDateTime]]("currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "currencyrateid", "modifieddate")(CurrencyrateRowUnsaved.apply)(TypoLocalDateTime.decoder, CurrencyId.decoder, CurrencyId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Defaulted.decoder(CurrencyrateId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CurrencyrateRowUnsaved] = Encoder.forProduct7[CurrencyrateRowUnsaved, TypoLocalDateTime, CurrencyId, CurrencyId, BigDecimal, BigDecimal, Defaulted[CurrencyrateId], Defaulted[TypoLocalDateTime]]("currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "currencyrateid", "modifieddate")(x => (x.currencyratedate, x.fromcurrencycode, x.tocurrencycode, x.averagerate, x.endofdayrate, x.currencyrateid, x.modifieddate))(TypoLocalDateTime.encoder, CurrencyId.encoder, CurrencyId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Defaulted.encoder(CurrencyrateId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val text: Text[CurrencyrateRowUnsaved] = Text.instance[CurrencyrateRowUnsaved]{ (row, sb) =>
+    TypoLocalDateTime.text.unsafeEncode(row.currencyratedate, sb)
+    sb.append(Text.DELIMETER)
+    CurrencyId.text.unsafeEncode(row.fromcurrencycode, sb)
+    sb.append(Text.DELIMETER)
+    CurrencyId.text.unsafeEncode(row.tocurrencycode, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.averagerate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.endofdayrate, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(CurrencyrateId.text).unsafeEncode(row.currencyrateid, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  }
 }

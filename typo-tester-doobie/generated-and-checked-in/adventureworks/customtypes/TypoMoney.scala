@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -28,4 +29,8 @@ object TypoMoney {
     .map(v => TypoMoney(BigDecimal(v)))
   implicit lazy val ordering: Ordering[TypoMoney] = Ordering.by(_.value)
   implicit lazy val put: Put[TypoMoney] = Put.Advanced.other[java.math.BigDecimal](NonEmptyList.one("money")).contramap(v => v.value.bigDecimal)
+  implicit lazy val text: Text[TypoMoney] = new Text[TypoMoney] {
+    override def unsafeEncode(v: TypoMoney, sb: StringBuilder) = Text.bigDecimalInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoMoney, sb: StringBuilder) = Text.bigDecimalInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

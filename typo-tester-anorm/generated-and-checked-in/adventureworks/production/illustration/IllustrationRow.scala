@@ -7,6 +7,7 @@ package adventureworks
 package production
 package illustration
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import anorm.Column
@@ -48,6 +49,13 @@ object IllustrationRow {
         modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[IllustrationRow] = Text.instance[IllustrationRow]{ (row, sb) =>
+    IllustrationId.text.unsafeEncode(row.illustrationid, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoXml.text).unsafeEncode(row.diagram, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[IllustrationRow] = OWrites[IllustrationRow](o =>
     new JsObject(ListMap[String, JsValue](

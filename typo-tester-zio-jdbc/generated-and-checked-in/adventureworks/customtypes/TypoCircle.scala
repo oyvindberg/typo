@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGcircle
@@ -79,4 +80,8 @@ object TypoCircle {
     },
     "circle"
   )
+  implicit lazy val text: Text[TypoCircle] = new Text[TypoCircle] {
+    override def unsafeEncode(v: TypoCircle, sb: StringBuilder) = Text.stringInstance.unsafeEncode(s"<(${v.center.x},${v.center.y}),${v.radius}>", sb)
+    override def unsafeArrayEncode(v: TypoCircle, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(s"<(${v.center.x},${v.center.y}),${v.radius}>", sb)
+  }
 }

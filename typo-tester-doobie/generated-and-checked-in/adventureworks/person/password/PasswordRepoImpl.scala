@@ -36,6 +36,9 @@ object PasswordRepoImpl extends PasswordRepo {
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """.query(PasswordRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PasswordRow.text)
+  }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
     val fs = List(
       Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
@@ -64,6 +67,10 @@ object PasswordRepoImpl extends PasswordRepo {
     }
     q.query(PasswordRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PasswordRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PasswordRowUnsaved.text)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
     SelectBuilderSql("person.password", PasswordFields, PasswordRow.read)

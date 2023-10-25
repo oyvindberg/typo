@@ -18,7 +18,10 @@ trait EmployeeRepo {
   def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean]
   def delete: DeleteBuilder[EmployeeFields, EmployeeRow]
   def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, EmployeeRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeeRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[EmployeeFields, EmployeeRow]
   def selectAll: Stream[ConnectionIO, EmployeeRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[EmployeeRow]]

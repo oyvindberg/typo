@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -86,4 +87,29 @@ object PurchaseorderheaderRow {
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11)
     )
   )
+  implicit lazy val text: Text[PurchaseorderheaderRow] = Text.instance[PurchaseorderheaderRow]{ (row, sb) =>
+    PurchaseorderheaderId.text.unsafeEncode(row.purchaseorderid, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.revisionnumber, sb)
+    sb.append(Text.DELIMETER)
+    TypoShort.text.unsafeEncode(row.status, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.employeeid, sb)
+    sb.append(Text.DELIMETER)
+    BusinessentityId.text.unsafeEncode(row.vendorid, sb)
+    sb.append(Text.DELIMETER)
+    ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.orderdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoLocalDateTime.text).unsafeEncode(row.shipdate, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.subtotal, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.taxamt, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.freight, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  }
 }

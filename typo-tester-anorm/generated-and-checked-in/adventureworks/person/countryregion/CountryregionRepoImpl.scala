@@ -10,6 +10,7 @@ package countryregion
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
       .executeInsert(CountryregionRow.rowParser(1).single)
     
   }
+  override def insertStreaming(unsaved: Iterator[CountryregionRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregionRow.text, c)
+  }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
     val namedParameters = List(
       Some((NamedParameter("countryregioncode", ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)), "")),
@@ -61,6 +65,10 @@ object CountryregionRepoImpl extends CountryregionRepo {
         .executeInsert(CountryregionRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[CountryregionRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
     SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.rowParser)

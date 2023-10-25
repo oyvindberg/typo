@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -25,4 +26,8 @@ object TypoVector {
     .map(v => TypoVector(v.getArray.asInstanceOf[Array[java.lang.Float]].map(Float2float)))
   implicit def ordering(implicit O0: Ordering[Array[Float]]): Ordering[TypoVector] = Ordering.by(_.value)
   implicit lazy val put: Put[TypoVector] = Put.Advanced.other[Array[java.lang.Float]](NonEmptyList.one("vector")).contramap(v => v.value.map(x => x: java.lang.Float))
+  implicit lazy val text: Text[TypoVector] = new Text[TypoVector] {
+    override def unsafeEncode(v: TypoVector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.mkString("[", ",", "]"), sb)
+    override def unsafeArrayEncode(v: TypoVector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.mkString("[", ",", "]"), sb)
+  }
 }

@@ -7,6 +7,7 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import doobie.util.meta.Meta
@@ -25,4 +26,8 @@ object TransactionhistoryarchiveId {
   implicit lazy val get: Get[TransactionhistoryarchiveId] = Meta.IntMeta.get.map(TransactionhistoryarchiveId.apply)
   implicit lazy val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
   implicit lazy val put: Put[TransactionhistoryarchiveId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val text: Text[TransactionhistoryarchiveId] = new Text[TransactionhistoryarchiveId] {
+    override def unsafeEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

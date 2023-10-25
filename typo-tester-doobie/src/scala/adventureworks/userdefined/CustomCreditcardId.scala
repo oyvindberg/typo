@@ -4,6 +4,7 @@
   */
 package adventureworks.userdefined
 
+import doobie.postgres.Text
 import doobie.util.meta.Meta
 import doobie.util.{Get, Put}
 import io.circe.{Decoder, Encoder}
@@ -20,4 +21,6 @@ object CustomCreditcardId {
   implicit lazy val get: Get[CustomCreditcardId] = Meta.IntMeta.get.map(CustomCreditcardId.apply)
   implicit lazy val ordering: Ordering[CustomCreditcardId] = Ordering.by(_.value)
   implicit lazy val put: Put[CustomCreditcardId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val text: Text[CustomCreditcardId] = Text.intInstance.contramap(_.value)
+
 }

@@ -11,6 +11,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
+import doobie.postgres.Text
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -43,4 +44,11 @@ object ProductdocumentRow {
       documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
+  implicit lazy val text: Text[ProductdocumentRow] = Text.instance[ProductdocumentRow]{ (row, sb) =>
+    ProductId.text.unsafeEncode(row.productid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    sb.append(Text.DELIMETER)
+    DocumentId.text.unsafeEncode(row.documentnode, sb)
+  }
 }

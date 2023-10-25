@@ -7,6 +7,7 @@ package adventureworks
 package public
 package users
 
+import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
@@ -78,5 +79,20 @@ object UsersRowUnsaved {
       Defaulted.jsonEncoder(TypoInstant.jsonEncoder).unsafeEncode(a.createdAt, indent, out)
       out.write("}")
     }
+  }
+  implicit lazy val text: Text[UsersRowUnsaved] = Text.instance[UsersRowUnsaved]{ (row, sb) =>
+    UsersId.text.unsafeEncode(row.userId, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.stringInstance).unsafeEncode(row.lastName, sb)
+    sb.append(Text.DELIMETER)
+    TypoUnknownCitext.text.unsafeEncode(row.email, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.password, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
+    sb.append(Text.DELIMETER)
+    Defaulted.text(TypoInstant.text).unsafeEncode(row.createdAt, sb)
   }
 }

@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -37,6 +38,9 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
        """
       .executeInsert(ProductdocumentRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductdocumentRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(ProductdocumentRow.text, c)
   }
   override def insert(unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow = {
     val namedParameters = List(
@@ -65,6 +69,10 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
         .executeInsert(ProductdocumentRow.rowParser(1).single)
     }
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[ProductdocumentRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdocumentRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
     SelectBuilderSql("production.productdocument", ProductdocumentFields, ProductdocumentRow.rowParser)

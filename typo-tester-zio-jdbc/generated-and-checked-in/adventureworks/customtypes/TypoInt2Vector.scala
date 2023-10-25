@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
@@ -73,4 +74,8 @@ object TypoInt2Vector {
     },
     "int2vector"
   )
+  implicit lazy val text: Text[TypoInt2Vector] = new Text[TypoInt2Vector] {
+    override def unsafeEncode(v: TypoInt2Vector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoInt2Vector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

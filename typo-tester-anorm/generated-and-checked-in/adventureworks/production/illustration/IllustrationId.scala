@@ -7,6 +7,7 @@ package adventureworks
 package production
 package illustration
 
+import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
@@ -27,6 +28,10 @@ object IllustrationId {
     override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[IllustrationId] = Reads.IntReads.map(IllustrationId.apply)
+  implicit lazy val text: Text[IllustrationId] = new Text[IllustrationId] {
+    override def unsafeEncode(v: IllustrationId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: IllustrationId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[IllustrationId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[IllustrationId] = Writes.IntWrites.contramap(_.value)
 }

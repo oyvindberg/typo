@@ -34,6 +34,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
           returning "currencycode", "name", "modifieddate"::text
        """.query(CurrencyRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CurrencyRow.text)
+  }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
     val fs = List(
       Some((Fragment.const(s""""currencycode""""), fr"${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
@@ -57,6 +60,10 @@ object CurrencyRepoImpl extends CurrencyRepo {
     }
     q.query(CurrencyRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
     SelectBuilderSql("sales.currency", CurrencyFields, CurrencyRow.read)

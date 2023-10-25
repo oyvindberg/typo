@@ -17,6 +17,7 @@ trait MaritalStatusRepo {
   def delete(id: MaritalStatusId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow]
   def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow
+  def insertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow]
   def selectAll(implicit c: Connection): List[MaritalStatusRow]
   def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow]

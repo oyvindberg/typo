@@ -36,6 +36,9 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
        """.query(EmailaddressRow.read).unique
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, EmailaddressRow], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(EmailaddressRow.text)
+  }
   override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
     val fs = List(
       Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
@@ -67,6 +70,10 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     }
     q.query(EmailaddressRow.read).unique
     
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmailaddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.emailaddress("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(EmailaddressRowUnsaved.text)
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
     SelectBuilderSql("person.emailaddress", EmailaddressFields, EmailaddressRow.read)

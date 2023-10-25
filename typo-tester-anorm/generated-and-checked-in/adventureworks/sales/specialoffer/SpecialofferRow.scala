@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package specialoffer
 
+import adventureworks.Text
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import anorm.Column
@@ -84,6 +85,29 @@ object SpecialofferRow {
         modifieddate = row(idx + 10)(TypoLocalDateTime.column)
       )
     )
+  }
+  implicit lazy val text: Text[SpecialofferRow] = Text.instance[SpecialofferRow]{ (row, sb) =>
+    SpecialofferId.text.unsafeEncode(row.specialofferid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.description, sb)
+    sb.append(Text.DELIMETER)
+    Text.bigDecimalInstance.unsafeEncode(row.discountpct, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.`type`, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.category, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.enddate, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.minqty, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.intInstance).unsafeEncode(row.maxqty, sb)
+    sb.append(Text.DELIMETER)
+    TypoUUID.text.unsafeEncode(row.rowguid, sb)
+    sb.append(Text.DELIMETER)
+    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
   implicit lazy val writes: OWrites[SpecialofferRow] = OWrites[SpecialofferRow](o =>
     new JsObject(ListMap[String, JsValue](

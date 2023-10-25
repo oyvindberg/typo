@@ -7,6 +7,7 @@ package adventureworks
 package production
 package transactionhistory
 
+import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -27,4 +28,8 @@ object TransactionhistoryId {
   implicit lazy val ordering: Ordering[TransactionhistoryId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[TransactionhistoryId] = ParameterMetaData.instance[TransactionhistoryId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[TransactionhistoryId] = Setter.intSetter.contramap(_.value)
+  implicit lazy val text: Text[TransactionhistoryId] = new Text[TransactionhistoryId] {
+    override def unsafeEncode(v: TransactionhistoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TransactionhistoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }

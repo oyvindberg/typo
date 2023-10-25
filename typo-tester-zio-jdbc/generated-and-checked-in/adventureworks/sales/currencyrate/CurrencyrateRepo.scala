@@ -19,7 +19,10 @@ trait CurrencyrateRepo {
   def delete(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow]
   def insert(unsaved: CurrencyrateRow): ZIO[ZConnection, Throwable, CurrencyrateRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CurrencyrateRowUnsaved): ZIO[ZConnection, Throwable, CurrencyrateRow]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow]
   def selectAll: ZStream[ZConnection, Throwable, CurrencyrateRow]
   def selectById(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Option[CurrencyrateRow]]

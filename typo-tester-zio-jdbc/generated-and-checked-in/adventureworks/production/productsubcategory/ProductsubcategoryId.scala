@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productsubcategory
 
+import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -27,4 +28,8 @@ object ProductsubcategoryId {
   implicit lazy val ordering: Ordering[ProductsubcategoryId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[ProductsubcategoryId] = ParameterMetaData.instance[ProductsubcategoryId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[ProductsubcategoryId] = Setter.intSetter.contramap(_.value)
+  implicit lazy val text: Text[ProductsubcategoryId] = new Text[ProductsubcategoryId] {
+    override def unsafeEncode(v: ProductsubcategoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: ProductsubcategoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  }
 }
