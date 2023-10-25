@@ -20,7 +20,9 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
       )
       for {
         // insert and round trip check
-        saved1 <- repo.insert(unsaved)
+        inserted <- repo.insert(unsaved)
+        _ <- ZIO.succeed(assert(inserted.rowsUpdated === 1L))
+        saved1 = inserted.updatedKeys.head
         saved2 = unsaved.toRow(departmentidDefault = saved1.departmentid, modifieddateDefault = saved1.modifieddate)
         _ <- ZIO.succeed(assert(saved1 === saved2))
         // check field values
