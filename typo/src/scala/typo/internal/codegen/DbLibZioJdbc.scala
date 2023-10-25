@@ -20,6 +20,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
   private val JdbcDecoderError = sc.Type.Qualified("zio.jdbc.JdbcDecoderError")
+  private val ClassTag = sc.Type.Qualified("scala.reflect.ClassTag")
 
   private def SQL(content: sc.Code) = sc.StringInterpolate(sqlInterpolator, sc.Ident("sql"), content)
 
@@ -539,7 +540,50 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       )
     )
 
-  override def missingInstances: List[sc.ClassMember] = List.empty // TODO Jules
+  override def missingInstances: List[sc.ClassMember] = {
+    /**
+     * Adapted from Quill implementation
+     *
+     * Works for primitive types but not for more complex types
+     * TODO: Make it work for complex types
+     */
+    val primitiveArrayDecoder = {
+      val T = sc.Type.Abstract(sc.Ident("T"))
+
+      sc.Given(
+        tparams = List(T),
+        name = sc.Ident("arrayDecoder"),
+        implicitParams = List(
+          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None),
+        ),
+        tpe = JdbcDecoder.of(sc.Type.Array.of(T)),
+        body =
+          code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
+                 |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${sc.Type.Array.of(T)}) = {
+                 |    val arr = rs.getArray(columIndex)
+                 |    if (arr eq null) columIndex -> Array.empty(classTag)
+                 |    else {
+                 |      columIndex ->
+                 |        arr
+                 |          .getArray
+                 |          .asInstanceOf[Array[AnyRef]]
+                 |          .foldLeft(Array.newBuilder(classTag)) {
+                 |            case (b, x: T)                => b += x
+                 |            case (b, x: java.lang.Number) => b += x.asInstanceOf[T]
+                 |            case (_, x) =>
+                 |              throw new IllegalStateException(
+                 |                s"Retrieved $${x.getClass.getCanonicalName} type from JDBC array, but expected $$classTag. Re-check your decoder implementation"
+                 |              )
+                 |          }
+                 |          .result()
+                 |    }
+                 |  }
+                 |}""".stripMargin
+      )
+    }
+
+    List(primitiveArrayDecoder)
+  }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
     val decoder =
