@@ -719,7 +719,11 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           tpe = Setter.of(ct.typoType),
           body = code"""|$Setter
                    |  .other[${sc.Type.Map.of(sc.Type.String, sc.Type.String)}](
-                   |    (ps, i, v) => ps.setObject(i, v, ${sc.Type.Types}.OTHER),
+                   |    (ps, i, v) => {
+                   |      val javaMap = new java.util.HashMap[String, String](v.size)
+                   |      v.foreach { case (k, v) => javaMap.put(k, v) }
+                   |      ps.setObject(i, javaMap)
+                   |    },
                    |    "hstore"
                    |  )
                    |  .contramap(_.${ct.params.head.name})""".stripMargin
