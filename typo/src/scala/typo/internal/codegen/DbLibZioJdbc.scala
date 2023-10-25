@@ -555,6 +555,5 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
       List(decoder, encoder)
     }
-
   }
 }
