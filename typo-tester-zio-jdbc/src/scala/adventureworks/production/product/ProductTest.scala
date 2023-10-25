@@ -10,7 +10,7 @@ import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
-import zio.ZIO
+import zio.{Chunk, ZIO}
 
 import java.time.LocalDateTime
 
@@ -28,30 +28,38 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
     withConnection {
       for {
         // setup
-        unitmeasure <- unitmeasureRepo.insert(
+        unitmeasureInserted <- unitmeasureRepo.insert(
           UnitmeasureRowUnsaved(
             unitmeasurecode = UnitmeasureId("kgg"),
             name = Name("name")
           )
         )
-        productCategory <- productcategoryRepo.insert(
+        _ <- ZIO.succeed(assert(unitmeasureInserted.rowsUpdated == 1))
+        unitmeasure = unitmeasureInserted.updatedKeys.head
+        productCategoryInserted <- productcategoryRepo.insert(
           ProductcategoryRowUnsaved(
             name = Name("name")
           )
         )
-        productSubcategory <- productsubcategoryRepo.insert(
+        _ <- ZIO.succeed(assert(productCategoryInserted.rowsUpdated == 1))
+        productCategory = productCategoryInserted.updatedKeys.head
+        productSubcategoryInserted <- productsubcategoryRepo.insert(
           ProductsubcategoryRowUnsaved(
             productcategoryid = productCategory.productcategoryid,
             name = Name("name")
           )
         )
-        productmodel <- ProductmodelRepoImpl.insert(
+        _ <- ZIO.succeed(assert(productSubcategoryInserted.rowsUpdated == 1))
+        productSubcategory = productSubcategoryInserted.updatedKeys.head
+        productmodelInserted <- ProductmodelRepoImpl.insert(
           ProductmodelRowUnsaved(
             name = Name("name"),
             catalogdescription = Some(new TypoXml("<xml/>")),
             instructions = Some(new TypoXml("<instructions/>"))
           )
         )
+        _ <- ZIO.succeed(assert(productmodelInserted.rowsUpdated == 1))
+        productmodel = productmodelInserted.updatedKeys.head
         unsaved1 = ProductRowUnsaved(
           name = Name("name"),
           productnumber = "productnumber",
@@ -80,7 +88,9 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
         )
         // insert and round trip check
-        saved1 <- productRepo.insert(unsaved1)
+        inserted <- productRepo.insert(unsaved1)
+        _ <- ZIO.succeed(assert(inserted.rowsUpdated == 1L))
+        saved1 = inserted.updatedKeys.head
         saved2 = unsaved1.toRow(saved1.productid, ???, ???, ???, ???)
         _ <- ZIO.succeed(assert(saved1 === saved2))
 
@@ -120,7 +130,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
         _ <- ZIO.succeed(update.sql(returning = true).foreach(println(_)))
         foo <- update.executeReturnChanged
-        List(updated) = foo
+        Chunk(updated) = foo
         _ <- ZIO.succeed(assert(updated.name === Name("MANf")))
         _ <- ZIO.succeed(assert(updated.listprice === BigDecimal(2)))
         _ <- ZIO.succeed(assert(updated.reorderpoint === TypoShort(40)))
