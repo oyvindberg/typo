@@ -654,7 +654,61 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   }
 
   override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = {
-    if (ct.params.length == 1) {
+    val isTypoHStore = ct.typoType.name.value == "TypoHStore"
+    if (isTypoHStore) {
+      /** Copied from/inspired by Doobie code
+        */
+      val decoder =
+        sc.Given(
+          tparams = Nil,
+          name = jdbcDecoderName,
+          implicitParams = Nil,
+          tpe = JdbcDecoder.of(ct.typoType),
+          body = code"""|new $JdbcDecoder[${ct.typoType}] {
+                   |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${ct.typoType}) = {
+                   |    rs.getObject(columIndex) match {
+                   |      case null => null
+                   |      case a    =>
+                   |        try {
+                   |          val v = a.asInstanceOf[java.util.Map[?, ?]]
+                   |          val b = Map.newBuilder[String, String]
+                   |          v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
+                   |          (columIndex, ${ct.typoType}(b.result()))
+                   |        } catch {
+                   |          case e: ClassCastException => throw new RuntimeException("Invalid TypoHStore decoder", e)
+                   |        }
+                   |    }
+                   |  }
+                   |}""".stripMargin
+        )
+
+      val encoder =
+        sc.Given(
+          tparams = Nil,
+          name = jdbcEncoderName,
+          implicitParams = Nil,
+          tpe = JdbcEncoder.of(ct.typoType),
+          body = code"""$JdbcEncoder.singleParamEncoder[${ct.typoType}]"""
+        )
+
+      /** Copied from/inspired by Doobie code
+       */
+      val setter =
+        sc.Given(
+          tparams = Nil,
+          name = jdbcSetterName,
+          implicitParams = Nil,
+          tpe = Setter.of(ct.typoType),
+          body = code"""|$Setter
+                   |  .other[${sc.Type.Map.of(sc.Type.String, sc.Type.String)}](
+                   |    (ps, i, v) => ps.setObject(i, v, ${sc.Type.Types}.OTHER),
+                   |    "hstore"
+                   |  )
+                   |  .contramap(_.${ct.params.head.name})""".stripMargin
+        )
+
+      List(decoder, encoder, setter)
+    } else if (ct.params.length == 1) {
       List(
         sc.Given(
           tparams = Nil,
