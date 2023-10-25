@@ -21,7 +21,7 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
       )
       for {
         _ <- usersRepo.insert(unsaved)
-        all <- usersRepo.select.where(p => p.userId === unsaved.userId).toList
+        all <- usersRepo.select.where(p => p.userId === unsaved.userId).toChunk
       } yield {
         assert(unsaved.toRow(???) === all.head)
       }
