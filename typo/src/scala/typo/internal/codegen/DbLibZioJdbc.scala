@@ -40,7 +40,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     if (!inlineImplicits) JdbcDecoder.of(tpe)
     else
       sc.Type.base(tpe) match {
-        case sc.Type.BigDecimal                                => code"$JdbcDecoder.bigDecimalDecoder"
+        case sc.Type.BigDecimal                                => code"$JdbcDecoder.bigDecimalDecoderScala"
         case sc.Type.Boolean                                   => code"$JdbcDecoder.booleanDecoder"
         case sc.Type.Byte                                      => code"$JdbcDecoder.byteDecoder"
         case sc.Type.Double                                    => code"$JdbcDecoder.doubleDecoder"
