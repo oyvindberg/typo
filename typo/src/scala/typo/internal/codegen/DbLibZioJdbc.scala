@@ -580,28 +580,27 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       )
     }
 
-    // TODO Jules: How to implement this?
-    val primitiveArrayEncoder = {
+    val primitiveArraySetter = {
       val T = sc.Type.Abstract(sc.Ident("T"))
 
       sc.Given(
         tparams = List(T),
-        name = sc.Ident("primitiveArrayEncoder"),
+        name = sc.Ident("primitiveArraySetter"),
         implicitParams = List(
           sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
         ),
-        tpe = JdbcEncoder.of(sc.Type.Array.of(T)),
-        body = code"""|new ${JdbcEncoder.of(sc.Type.Array.of(T))} {
-                 |  override def encode(value: ${sc.Type.Array.of(T)}): $SqlFragment =
-                 |    if (value.isEmpty) ???
-                 |    else {
-                 |      ???
-                 |    }
-                 |}""".stripMargin
+        tpe = Setter.of(sc.Type.Array.of(T)),
+        body =
+          code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
+                 |  (ps, i, v) => {
+                 |    ps.setArray(i, ps.getConnection.createArrayOf(classTag.runtimeClass.getCanonicalName, v.asInstanceOf[Array[AnyRef]]))
+                 |  },
+                 |  ${sc.Type.Types}.ARRAY
+                 |)""".stripMargin
       )
     }
 
-    List(primitiveArrayDecoder, primitiveArrayEncoder)
+    List(primitiveArrayDecoder, primitiveArraySetter)
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
