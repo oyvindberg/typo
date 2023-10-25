@@ -541,12 +541,11 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     )
 
   override def missingInstances: List[sc.ClassMember] = {
-    /**
-     * Adapted from Quill implementation
-     *
-     * Works for primitive types but not for more complex types
-     * TODO: Make it work for complex types
-     */
+
+    /** Adapted from Quill implementation
+      *
+      * Works for primitive types but not for more complex types TODO: Make it work for complex types
+      */
     val primitiveArrayDecoder = {
       val T = sc.Type.Abstract(sc.Ident("T"))
 
@@ -554,11 +553,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         tparams = List(T),
         name = sc.Ident("primitiveArrayDecoder"),
         implicitParams = List(
-          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None),
+          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
         ),
         tpe = JdbcDecoder.of(sc.Type.Array.of(T)),
-        body =
-          code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
+        body = code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
                  |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${sc.Type.Array.of(T)}) = {
                  |    val arr = rs.getArray(columIndex)
                  |    if (arr eq null) columIndex -> Array.empty(classTag)
@@ -590,11 +588,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         tparams = List(T),
         name = sc.Ident("primitiveArrayEncoder"),
         implicitParams = List(
-          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None),
+          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
         ),
         tpe = JdbcEncoder.of(sc.Type.Array.of(T)),
-        body =
-          code"""|new ${JdbcEncoder.of(sc.Type.Array.of(T))} {
+        body = code"""|new ${JdbcEncoder.of(sc.Type.Array.of(T))} {
                  |  override def encode(value: ${sc.Type.Array.of(T)}): $SqlFragment =
                  |    if (value.isEmpty) ???
                  |    else {
@@ -658,8 +655,31 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   }
 
   override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = {
-    if (ct.params.length == 1) anyValInstances(ct.typoType, ct.params.head.tpe)
-    else {
+    if (ct.params.length == 1) {
+      List(
+        sc.Given(
+          tparams = Nil,
+          name = jdbcEncoderName,
+          implicitParams = Nil,
+          tpe = JdbcEncoder.of(ct.typoType),
+          body = code"""${lookupJdbcEncoder(ct.params.head.tpe)}.contramap(_.${ct.params.head.name})"""
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = jdbcDecoderName,
+          implicitParams = Nil,
+          tpe = JdbcDecoder.of(ct.typoType),
+          body = code"""${lookupJdbcDecoder(ct.params.head.tpe)}.map(${ct.typoType}.apply)"""
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = jdbcSetterName,
+          implicitParams = Nil,
+          tpe = Setter.of(ct.typoType),
+          body = code"""${lookupSetter(ct.params.head.tpe)}.contramap(_.${ct.params.head.name})"""
+        )
+      )
+    } else {
       val decoder =
         sc.Given(
           tparams = Nil,
@@ -706,10 +726,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           name = jdbcSetterName,
           implicitParams = Nil,
           tpe = Setter.of(ct.typoType),
-          body =
-            code"""|$Setter.forSqlType[${ct.typoType}](
+          body = code"""|$Setter.forSqlType[${ct.typoType}](
               |  (ps, i, v) => {
-              |    ${ct.params.zipWithIndex.map { case (c, i) => code"${lookupSetter(c.tpe)}.setValue(ps, i + $i, v.${c.name})"}.mkCode("\n")}
+              |    ${ct.params.zipWithIndex.map { case (c, i) => code"${lookupSetter(c.tpe)}.setValue(ps, i + $i, v.${c.name})" }.mkCode("\n")}
               |  },
               |  ${sc.Type.Types}.OTHER
               |)""".stripMargin
