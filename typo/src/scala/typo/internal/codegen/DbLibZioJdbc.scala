@@ -495,7 +495,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |    override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $wrapperType) = {
                  |      def error(msg: ${sc.Type.String}): $JdbcDecoderError =
                  |        $JdbcDecoderError(
-                 |          message = s"Error decoding '$wrapperType' from ResultSet",
+                 |          message = s"Error decoding $wrapperType from ResultSet",
                  |          cause = new RuntimeException(msg),
                  |          metadata = rs.getMetaData,
                  |          row = rs.getRow
