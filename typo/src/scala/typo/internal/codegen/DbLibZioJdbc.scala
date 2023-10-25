@@ -687,7 +687,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           name = jdbcDecoderName,
           implicitParams = Nil,
           tpe = JdbcDecoder.of(ct.typoType),
-          body = code"""|new $JdbcDecoder[${ct.typoType}] {
+          body = code"""|new ${JdbcDecoder.of(ct.typoType)} {
                    |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${ct.typoType}) =
                    |    rs.getObject(columIndex) match {
                    |      case null => null
