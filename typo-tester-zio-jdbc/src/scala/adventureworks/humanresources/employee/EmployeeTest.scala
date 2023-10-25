@@ -47,13 +47,15 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
     withConnection {
       for {
-        businessentityRow <- BusinessentityRepoImpl.insert(
+        businessentityRowInserted <- BusinessentityRepoImpl.insert(
           BusinessentityRowUnsaved(
             businessentityid = Defaulted.UseDefault,
             rowguid = Defaulted.UseDefault,
             modifieddate = Defaulted.UseDefault
           )
         )
+        _ <- ZIO.succeed(assert(businessentityRowInserted.rowsUpdated == 1L))
+        businessentityRow = businessentityRowInserted.updatedKeys.head
         personRowUnsaved = PersonRowUnsaved(
           businessentityid = businessentityRow.businessentityid,
           persontype = "SC",
@@ -69,7 +71,9 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           rowguid = Defaulted.UseDefault,
           modifieddate = Defaulted.UseDefault
         )
-        personRow <- PersonRepoImpl.insert(personRowUnsaved)
+        personRowInserted <- PersonRepoImpl.insert(personRowUnsaved)
+        _ <- ZIO.succeed(assert(personRowInserted.rowsUpdated == 1L))
+        personRow = personRowInserted.updatedKeys.head
         // setup
         unsaved = EmployeeRowUnsaved(
           businessentityid = personRow.businessentityid,
@@ -89,7 +93,9 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           organizationnode = Defaulted.Provided(Some("/"))
         )
         // insert and round trip check
-        saved1 <- repo.insert(unsaved)
+        inserted <- repo.insert(unsaved)
+        _ <- ZIO.succeed(assert(inserted.rowsUpdated == 1L))
+        saved1 = inserted.updatedKeys.head
         saved2 = unsaved.toRow(???, ???, ???, ???, ???, ???, ???)
         _ <- ZIO.succeed(assert(saved1 === saved2))
         // check field values
