@@ -164,8 +164,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         numerics = None
       )
       PgtestnullRepoImpl.insert(before).map { after =>
-        assert(after.rowsUpdated === 1L)
-        assert(after.updatedKeys.head === before)
+        assert(after.rowsUpdated === 1L && after.updatedKeys.head === before)
       }
     }
   }
