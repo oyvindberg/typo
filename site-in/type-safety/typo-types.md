@@ -92,7 +92,7 @@ case class TypoXml(value: String)
 You may also come across column types Typo doesn't know how to handle yet.
 You will see warnings in the log at generation-time like this:
 ```
-typo: Couldn't translate type from relation pg_catalog.pg_statistic_ext_data column stxdndistinct with type Some(pg_ndistinct). Falling back to text
+typo: Couldn't translate type from table pg_catalog.pg_statistic_ext_data column stxdndistinct with type Some(pg_ndistinct). Falling back to text
 ```
 
 And then you'll see corresponding classes like this:

@@ -5,8 +5,8 @@ import scala.util.control.NonFatal
 
 // guard against circular evaluation
 // may double-compute if not synchronized on the outside
-sealed trait Lazy[T] {
-  protected var state: Lazy.State[T] = Lazy.State.Initial
+sealed trait Lazy[+T] {
+  protected def state: Lazy.State[T]
 
   def get: Option[T]
 
@@ -29,6 +29,8 @@ sealed trait Lazy[T] {
 
 object Lazy {
   def apply[T](compute: => T): Lazy[T] = new Lazy[T] {
+    var state: Lazy.State[T] = Lazy.State.Initial
+
     override def get: Option[T] =
       state match {
         case State.Initial =>
@@ -49,6 +51,8 @@ object Lazy {
   }
 
   private final class Mapped[T, U](outer: Lazy[T], f: T => U) extends Lazy[U] {
+    var state: Lazy.State[U] = Lazy.State.Initial
+
     override def get: Option[U] =
       state match {
         case State.Initial =>
