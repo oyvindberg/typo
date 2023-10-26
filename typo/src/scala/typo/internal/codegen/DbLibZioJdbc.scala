@@ -604,21 +604,16 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     }
 
     val primitiveArrayEncoder = {
-      // implicit def singleParamEncoder[A: SqlFragment.Setter]: JdbcEncoder[A] = value => sql"$value"
       val T = sc.Type.Abstract(sc.Ident("T"))
 
       sc.Given(
         tparams = List(T),
-        name = sc.Ident("primitieArrayEncoder"),
+        name = sc.Ident("primitiveArrayEncoder"),
         implicitParams = List(
-          sc.Param(name = sc.Ident("setter"), tpe = Setter.of(T), default = None),
           sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
         ),
         tpe = JdbcEncoder.of(sc.Type.Array.of(T)),
-        body = code"""|value => {
-                 |  import $sqlInterpolator
-                 |  ${SQL(code"$$value")}
-                 |}""".stripMargin
+        body = code"""$JdbcEncoder.singleParamEncoder(${primitiveArraySetter.name}(classTag))"""
       )
     }
 
