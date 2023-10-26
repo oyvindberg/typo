@@ -286,7 +286,6 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |  $sqlEmpty
                |} else {
                |  import zio.prelude.ForEachOps
-               |  @scala.annotation.nowarn("msg=local val identitySqlFragment in value q is never used")
                |  val identitySqlFragment: zio.prelude.Identity[SqlFragment] = new zio.prelude.Identity[SqlFragment] {
                |    override def identity: SqlFragment                                      = SqlFragment.empty
                |    override def combine(l: => SqlFragment, r: => SqlFragment): SqlFragment = l ++ r
@@ -294,7 +293,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |  val names  = fs.map { case (n, _) => n }.intersperse(${SQL(code", ")})(zio.prelude.Invariant.ListForEach, identitySqlFragment)
                |  val values = fs.map { case (_, f) => f }.intersperse(${SQL(code", ")})(zio.prelude.Invariant.ListForEach, identitySqlFragment)
                |  ${SQL(code"insert into $relName($$names) values ($$values) returning ${dbNames(cols, isRead = true)}")}
-               |}: @scala.annotation.nowarn("msg=Unused import")
+               |}
                |q.insertReturning(${lookupJdbcDecoder(rowType)})
                |"""
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
