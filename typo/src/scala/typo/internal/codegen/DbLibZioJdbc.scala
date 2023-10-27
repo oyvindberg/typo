@@ -218,7 +218,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |        ${cases.mkCode("\n")}
               |      }
               |    )
-              |    ${SQL(code"""select ${dbNames(cols, isRead = true)} from $relName""")}.where(wheres).query(${lookupJdbcDecoder(rowType)}).selectStream
+              |    ${SQL(code"""select ${dbNames(cols, isRead = true)} from $relName where $$wheres""")}.query(${lookupJdbcDecoder(rowType)}).selectStream
               |}""".stripMargin
 
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
