@@ -106,17 +106,17 @@ object SelectBuilderSql {
           val rest = instance.parts.tail
 
           val prelude =
-            sql"""|select ${instance.columns.map(c => SqlFragment(c.value)).toChunk.intercalate(", ")}
-                 |from (
-                 |${first.sqlFrag}
-                 |) ${SqlFragment(first.alias)}
-                 |"""
+            sql"""select ${instance.columns.map(c => SqlFragment(c.value)).toChunk.intercalate(", ")}
+                 from (
+                 ${first.sqlFrag}
+                 ) ${SqlFragment(first.alias)}
+                 """
 
           val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag) =>
-            sql"""|join (
-                 |$sqlFrag
-                 |) ${SqlFragment(alias)} on $joinFrag
-                 |"""
+            sql"""join (
+                 $sqlFrag
+                 ) ${SqlFragment(alias)} on $joinFrag
+                 """
           }
 
           prelude ++ joins.reduce(_ ++ _)
@@ -164,17 +164,17 @@ object SelectBuilderSql {
           val rest = instance.parts.tail
 
           val prelude =
-            sql"""|select ${instance.columns.map(c => SqlFragment(c.value)).toChunk.intercalate(", ")}
-                  |from (
-                  |  ${first.sqlFrag}
-                  |) ${SqlFragment(first.alias)}
-                  |"""
+            sql"""select ${instance.columns.map(c => SqlFragment(c.value)).toChunk.intercalate(", ")}
+                  from (
+                    ${first.sqlFrag}
+                  ) ${SqlFragment(first.alias)}
+                  """
 
           val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag) =>
-            sql"""|left join (
-                  |${sqlFrag}
-                  |) ${SqlFragment(alias)} on $joinFrag
-                  |"""
+            sql"""left join (
+                  ${sqlFrag}
+                  ) ${SqlFragment(alias)} on $joinFrag
+                  """
           }
           prelude ++ joins.reduce(_ ++ _)
         }
