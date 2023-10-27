@@ -569,7 +569,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |            case (b, x: java.lang.Number) => b += x.asInstanceOf[T]
                  |            case (_, x) =>
                  |              throw $JdbcDecoderError(
-                 |                message = s"Error decoding ${sc.Type.Array.of(T)} from ResultSet",
+                 |                message = s"Error decoding ${sc.Type.Array}($$classTag) from ResultSet",
                  |                cause = new IllegalStateException(
                  |                  s"Retrieved $${x.getClass.getCanonicalName} type from JDBC array, but expected $$classTag. Re-check your decoder implementation"
                  |                ),
