@@ -637,7 +637,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           name = sc.Ident("ScalaBigDecimalArrayDecoder"),
           implicitParams = Nil,
           tpe = JdbcDecoder.of(sc.Type.Array.of(sc.Type.BigDecimal)),
-          body = code"""BigDecimalArrayDecoder.map(_.map(${sc.Type.BigDecimal}.apply))"""
+          body = code"""BigDecimalArrayDecoder.map(v => if (v eq null) null else v.map(${sc.Type.BigDecimal}.apply))"""
         ),
         sc.Given(
           tparams = Nil,
