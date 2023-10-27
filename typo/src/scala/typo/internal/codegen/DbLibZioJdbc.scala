@@ -571,7 +571,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         body = code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
                  |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${sc.Type.Array.of(T)}) = {
                  |    val arr = rs.getArray(columIndex)
-                 |    if (arr eq null) columIndex -> Array.empty[${T.value}]
+                 |    if (arr eq null) columIndex -> null
                  |    else {
                  |      columIndex ->
                  |        arr
@@ -605,7 +605,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         tpe = Setter.of(sc.Type.Array.of(T)),
         body = code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
                  |  (ps, i, v) => {
-                 |    ps.setArray(i, ps.getConnection.createArrayOf(${sc.StrLit(parseJdbcType(sqlType))}, v.asInstanceOf[Array[AnyRef]]))
+                 |    if (v.length == 0) ps.setNull(i, $sqlType)
+                 |    else ps.setArray(i, ps.getConnection.createArrayOf(${sc.StrLit(parseJdbcType(sqlType))}, v.asInstanceOf[Array[AnyRef]]))
                  |  },
                  |  ${sc.Type.Types}.ARRAY
                  |)""".stripMargin
