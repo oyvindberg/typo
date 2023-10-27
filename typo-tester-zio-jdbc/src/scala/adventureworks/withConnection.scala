@@ -30,8 +30,8 @@ object withConnection {
                 for {
                   connectionPool <- ZIO.service[ZConnectionPool]
                   c <- connectionPool.transaction.build
-                  _ <- c.get.access(_.setAutoCommit(false))
                   r <- f.provideEnvironment(c)
+                  _ <- c.get.access(_.setAutoCommit(false))
                   _ <- c.get.rollback
                 } yield r
               }
