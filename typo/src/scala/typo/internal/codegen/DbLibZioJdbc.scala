@@ -32,7 +32,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   private def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
-      .map(c => code"${c.dbName.value}" ++ (if (isRead) sqlCast.fromPgCode(c) else sc.Code.Empty))
+      .map(c => code"${c.dbName}" ++ (if (isRead) sqlCast.fromPgCode(c) else sc.Code.Empty))
       .mkCode(", ")
 
   private val missingInstancesByType: Map[sc.Type, sc.QIdent] =
