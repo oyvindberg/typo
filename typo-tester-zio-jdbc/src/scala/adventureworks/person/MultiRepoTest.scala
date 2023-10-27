@@ -54,9 +54,11 @@ case class PersonWithAddressesRepo(
         oldAttachedAddresses.find(x => x.addressid == address.addressid && x.addresstypeid == addresstypeId) match {
           case Some(bea) => ZIO.succeed(bea)
           case None =>
-            businessentityAddressRepo.insert(
-              BusinessentityaddressRowUnsaved(pa.person.businessentityid, address.addressid, addresstypeId)
-            ).map(_.updatedKeys.head)
+            businessentityAddressRepo
+              .insert(
+                BusinessentityaddressRowUnsaved(pa.person.businessentityid, address.addressid, addresstypeId)
+              )
+              .map(_.updatedKeys.head)
         }
       }
     } yield currentAttachedAddresses

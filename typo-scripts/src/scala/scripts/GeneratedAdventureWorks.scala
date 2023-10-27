@@ -65,13 +65,13 @@ object GeneratedAdventureWorks {
               .filter { case (_, synced) => synced != FileSync.Synced.Unchanged }
               .foreach { case (path, synced) => logger.withContext(path).warn(synced.toString) }
 
-            //cli(
-            //  "add files to git",
-            //  buildDir,
-            //  List("git", "add", "-f", targetSources.toString),
-            //  logger = logger,
-            //  cli.Out.Raw
-            //)
+          // cli(
+          //  "add files to git",
+          //  buildDir,
+          //  List("git", "add", "-f", targetSources.toString),
+          //  logger = logger,
+          //  cli.Out.Raw
+          // )
           }
         }
 
