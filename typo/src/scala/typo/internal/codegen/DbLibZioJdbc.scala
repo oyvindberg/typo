@@ -545,33 +545,29 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       *
       * Works for primitive types but not for more complex types TODO: Make it work for complex types
       */
-    val primitiveArrayDecoder = {
-      val T = sc.Type.Abstract(sc.Ident("T"))
-
+    def primitiveArrayDecoder(T: sc.Type.Qualified) = {
       sc.Given(
-        tparams = List(T),
-        name = sc.Ident("primitiveArrayDecoder"),
-        implicitParams = List(
-          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
-        ),
+        tparams = Nil,
+        name = sc.Ident(s"${T.name.value}ArrayDecoder"),
+        implicitParams = Nil,
         tpe = JdbcDecoder.of(sc.Type.Array.of(T)),
         body = code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
                  |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${sc.Type.Array.of(T)}) = {
                  |    val arr = rs.getArray(columIndex)
-                 |    if (arr eq null) columIndex -> Array.empty(classTag)
+                 |    if (arr eq null) columIndex -> Array.empty[${T.value}]
                  |    else {
                  |      columIndex ->
                  |        arr
                  |          .getArray
-                 |          .asInstanceOf[Array[AnyRef]]
-                 |          .foldLeft(Array.newBuilder(classTag)) {
-                 |            case (b, x: T)                => b += x
-                 |            case (b, x: java.lang.Number) => b += x.asInstanceOf[T]
+                 |          .asInstanceOf[Array[Any]]
+                 |          .foldLeft(Array.newBuilder[${T.value}]) {
+                 |            case (b, x: ${T.value}) => b += x
+                 |            case (b, x: java.lang.Number) => b += x.asInstanceOf[${T.value}]
                  |            case (_, x) =>
                  |              throw $JdbcDecoderError(
-                 |                message = s"Error decoding ${sc.Type.Array}($$classTag) from ResultSet",
+                 |                message = s"Error decoding ${sc.Type.Array}(${T.value}) from ResultSet",
                  |                cause = new IllegalStateException(
-                 |                  s"Retrieved $${x.getClass.getCanonicalName} type from JDBC array, but expected $$classTag. Re-check your decoder implementation"
+                 |                  s"Retrieved $${x.getClass.getCanonicalName} type from JDBC array, but expected (${T.value}). Re-check your decoder implementation"
                  |                ),
                  |                metadata = rs.getMetaData,
                  |                row = rs.getRow
@@ -584,40 +580,34 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       )
     }
 
-    val primitiveArraySetter = {
-      val T = sc.Type.Abstract(sc.Ident("T"))
-
+    def primitiveArraySetter(T: sc.Type.Qualified) = {
       sc.Given(
-        tparams = List(T),
-        name = sc.Ident("primitiveArraySetter"),
-        implicitParams = List(
-          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
-        ),
+        tparams = Nil,
+        name = sc.Ident(s"${T.name.value}ArraySetter"),
+        implicitParams = Nil,
         tpe = Setter.of(sc.Type.Array.of(T)),
         body = code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
                  |  (ps, i, v) => {
-                 |    ps.setArray(i, ps.getConnection.createArrayOf(classTag.runtimeClass.getCanonicalName, v.asInstanceOf[Array[AnyRef]]))
+                 |    ps.setArray(i, ps.getConnection.createArrayOf(classOf[${T.name}].getCanonicalName, v.asInstanceOf[Array[AnyRef]]))
                  |  },
                  |  ${sc.Type.Types}.ARRAY
                  |)""".stripMargin
       )
     }
 
-    val primitiveArrayEncoder = {
-      val T = sc.Type.Abstract(sc.Ident("T"))
-
+    def primitiveArrayEncoder(T: sc.Type.Qualified) = {
       sc.Given(
-        tparams = List(T),
-        name = sc.Ident("primitiveArrayEncoder"),
-        implicitParams = List(
-          sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(T), default = None)
-        ),
+        tparams = Nil,
+        name = sc.Ident(s"${T.name.value}ArrayEncoder"),
+        implicitParams = Nil,
         tpe = JdbcEncoder.of(sc.Type.Array.of(T)),
-        body = code"""$JdbcEncoder.singleParamEncoder(${primitiveArraySetter.name}(classTag))"""
+        body = code"""$JdbcEncoder.singleParamEncoder(${T.name.value}ArraySetter)"""
       )
     }
 
-    List(primitiveArrayDecoder, primitiveArraySetter, primitiveArrayEncoder)
+    def all(T: sc.Type.Qualified) = List(primitiveArrayDecoder(T), primitiveArraySetter(T), primitiveArrayEncoder(T))
+
+    all(sc.Type.String) ++ all(sc.Type.Long) ++ all(sc.Type.Float) ++ all(sc.Type.Double) ++ all(sc.Type.BigDecimal) ++ all(sc.Type.Boolean)
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
@@ -670,35 +660,114 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     List(decoder, encoder)
   }
 
-  override def customTypeInstances(ct: CustomType): List[sc.ClassMember] =
-    List(
-      sc.Given(
-        tparams = Nil,
-        name = jdbcEncoderName,
-        implicitParams = Nil,
-        tpe = JdbcEncoder.of(ct.typoType),
-        // JdbcEncoder for unary types defined in terms of `Setter`
-        body = code"""$JdbcEncoder.singleParamEncoder($jdbcSetterName)"""
-      ),
-      sc.Given(
-        tparams = Nil,
-        name = jdbcDecoderName,
-        implicitParams = Nil,
-        tpe = JdbcDecoder.of(ct.typoType),
-        body = {
-          val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
-          code"""${JdbcDecoder.of(ct.typoType)}((rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => ${ct.toTypo0(code"rs.getObject(i).asInstanceOf[${ct.toTypo.jdbcType}]")}, $expectedType)"""
-        }
-      ),
-      sc.Given(
-        tparams = Nil,
-        name = jdbcSetterName,
-        implicitParams = Nil,
-        tpe = Setter.of(ct.typoType),
-        body = {
-          val v = sc.Ident("v")
-          code"""$Setter.other((ps, i, $v) => ps.setObject(i, ${ct.fromTypo0(v)}), ${sc.StrLit(ct.sqlType)})"""
-        }
+  override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = {
+    val single =
+      List(
+        sc.Given(
+          tparams = Nil,
+          name = jdbcEncoderName,
+          implicitParams = Nil,
+          tpe = JdbcEncoder.of(ct.typoType),
+          // JdbcEncoder for unary types defined in terms of `Setter`
+          body = code"""$JdbcEncoder.singleParamEncoder($jdbcSetterName)"""
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = jdbcDecoderName,
+          implicitParams = Nil,
+          tpe = JdbcDecoder.of(ct.typoType),
+          body = {
+            val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
+            code"""${JdbcDecoder.of(ct.typoType)}((rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => ${ct.toTypo0(code"rs.getObject(i).asInstanceOf[${ct.toTypo.jdbcType}]")}, $expectedType)"""
+          }
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = jdbcSetterName,
+          implicitParams = Nil,
+          tpe = Setter.of(ct.typoType),
+          body = {
+            val v = sc.Ident("v")
+            code"""|$Setter.other(
+                   |  (ps, i, $v) => {
+                   |    ps.setObject(
+                   |      i,
+                   |      ${ct.fromTypo0(v)}
+                   |    )
+                   |  },
+                   |  ${sc.StrLit(ct.sqlType)}
+                   |)""".stripMargin
+          }
+        )
       )
-    )
+
+    val array = {
+      val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
+      val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
+      List(
+        sc.Given(
+          tparams = Nil,
+          name = sc.Ident("jdbcArrayEncoder"),
+          implicitParams = List(
+            sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
+          ),
+          tpe = JdbcEncoder.of(sc.Type.Array.of(ct.typoType)),
+          // JdbcEncoder for unary types defined in terms of `Setter`
+          body = code"""$JdbcEncoder.singleParamEncoder(${sc.Ident("jdbcArraySetter")}(classTag))"""
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = sc.Ident("jdbcArrayDecoder"),
+          implicitParams = List(
+            sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
+          ),
+          tpe = JdbcDecoder.of(sc.Type.Array.of(ct.typoType)),
+          body = {
+            val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
+            code"""|${JdbcDecoder.of(sc.Type.Array.of(ct.typoType))}(
+                   |  (rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => {
+                  |    val arr = rs.getArray(i)
+                  |    if (arr eq null) Array.empty(classTag)
+                  |    else
+                  |      arr
+                  |        .getArray
+                  |        .asInstanceOf[Array[AnyRef]]
+                  |        .foldLeft(Array.newBuilder(classTag)) {
+                  |          case (b, x) => b += ${toTypo.toTypo(code"x.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}
+                  |        }
+                  |        .result()
+                  |  },
+                  |  $expectedType
+                  |)""".stripMargin
+          }
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = sc.Ident("jdbcArraySetter"),
+          implicitParams = List(
+            sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
+          ),
+          tpe = Setter.of(sc.Type.Array.of(ct.typoType)),
+          body = {
+            val v = sc.Ident("v")
+            val vv = sc.Ident("vv")
+            code"""|$Setter.other((ps, i, $v) =>
+                  |  ps.setArray(
+                  |    i,
+                  |    ps.getConnection.createArrayOf(
+                  |      classTag.runtimeClass.getCanonicalName,
+                  |      $v.map { $vv =>
+                  |        ${fromTypo.fromTypo0(vv)}
+                  |      }
+                  |    )
+                  |  ),
+                  |  ${sc.StrLit(ct.sqlType)}
+                  |)""".stripMargin
+          }
+        )
+      )
+    }
+
+    single ++ array
+  }
 }
