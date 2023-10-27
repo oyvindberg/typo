@@ -35,11 +35,12 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
     // the xml structure doesn't have a stable equals method, so we need to use the json representation
     import zio.json.*
-    val initialJson = initial.toJson
-    initialJson.fromJson[PersonRowUnsaved] match {
+    val encoded = initial.toJson
+    val decoded = encoded.fromJson[PersonRowUnsaved]
+    decoded match {
       case Right(roundtripped) =>
         val roundtrippedAsJson = roundtripped.toJson
-        assert(roundtrippedAsJson === initialJson)
+        assert(roundtrippedAsJson === encoded)
       case Left(error) => fail(error)
     }
   }

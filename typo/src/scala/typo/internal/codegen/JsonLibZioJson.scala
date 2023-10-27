@@ -104,7 +104,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
                  |        out.write("\\"provided\\":")
                  |        ${sc.Ident("T")}.unsafeEncode(value, None, out)
                  |        out.write("}")
-                 |      case ${d.UseDefault} => out.write("defaulted")
+                 |      case ${d.UseDefault} => out.write("\\"defaulted\\"")
                  |    }
                  |}""".stripMargin
       )
