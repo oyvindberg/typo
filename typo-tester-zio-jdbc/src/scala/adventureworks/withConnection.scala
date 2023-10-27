@@ -12,7 +12,7 @@ object withConnection {
       ZConnectionPool.postgres(
         "localhost",
         6432,
-        "world",
+        "Adventureworks",
         Map(
           "user" -> "postgres",
           "password" -> "password"
