@@ -803,19 +803,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
             val v = sc.Ident("v")
             val vv = sc.Ident("vv")
             code"""|$Setter.forSqlType((ps, i, $v) =>
-                   |  if (v.isEmpty) ps.setNull(i, ${sc.Type.Types}.ARRAY)
-                   |  else
-                   |    ps.setArray(
-                   |      i,
-                   |      ps.getConnection.createArrayOf(
-                   |        ${sc.StrLit(ct.sqlType)},
-                   |        $v.map { $vv =>
-                   |          ${fromTypo.fromTypo0(vv)}
-                   |        }
-                   |      )
-                   |    ),
-                   |    ${sc.Type.Types}.ARRAY
-                   |  )""".stripMargin
+                   |  ps.setArray(
+                   |    i,
+                   |    ps.getConnection.createArrayOf(
+                   |      ${sc.StrLit(ct.sqlType)},
+                   |      $v.map { $vv =>
+                   |        ${fromTypo.fromTypo0(vv)}
+                   |      }
+                   |    )
+                   |  ),
+                   |  ${sc.Type.Types}.ARRAY
+                   |)""".stripMargin
           }
         )
       )
