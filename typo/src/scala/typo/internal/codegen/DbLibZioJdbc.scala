@@ -5,6 +5,8 @@ import typo.internal.analysis.MaybeReturnsRows
 import typo.sc.Type
 import typo.{NonEmptyList, sc}
 
+import java.sql.JDBCType
+
 class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val ZConnection = sc.Type.Qualified("zio.jdbc.ZConnection")
   private val Throwable = sc.Type.Qualified("java.lang.Throwable")
@@ -540,6 +542,21 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     )
 
   override def missingInstances: List[sc.ClassMember] = {
+    /**
+     * **Copied from Quill**
+     *
+     * Parses instances of java.sql.Types to string form so it can be used in
+     * creation of sql arrays. Some databases does not support each of generic
+     * types, hence it's welcome to override this method and provide alternatives
+     * to nonexistent types.
+     *
+     * @param intType
+     * one of java.sql.Types
+     * @return
+     * JDBC type in string form
+     */
+    def parseJdbcType(intType: Int): String = JDBCType.valueOf(intType).getName
+
 
     /** Adapted from Quill implementation
       *
@@ -580,7 +597,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       )
     }
 
-    def primitiveArraySetter(T: sc.Type.Qualified) = {
+    def primitiveArraySetter(T: sc.Type.Qualified, sqlType: Int) = {
       sc.Given(
         tparams = Nil,
         name = sc.Ident(s"${T.name.value}ArraySetter"),
@@ -588,7 +605,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         tpe = Setter.of(sc.Type.Array.of(T)),
         body = code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
                  |  (ps, i, v) => {
-                 |    ps.setArray(i, ps.getConnection.createArrayOf(classOf[${T.name}].getCanonicalName, v.asInstanceOf[Array[AnyRef]]))
+                 |    ps.setArray(i, ps.getConnection.createArrayOf(${sc.StrLit(parseJdbcType(sqlType))}, v.asInstanceOf[Array[AnyRef]]))
                  |  },
                  |  ${sc.Type.Types}.ARRAY
                  |)""".stripMargin
@@ -605,9 +622,40 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       )
     }
 
-    def all(T: sc.Type.Qualified) = List(primitiveArrayDecoder(T), primitiveArraySetter(T), primitiveArrayEncoder(T))
+    def ScalaBigDecimal =
+      List(
+        sc.Given(
+          tparams = Nil,
+          name = sc.Ident("ScalaBigDecimalArrayEncoder"),
+          implicitParams = Nil,
+          tpe = JdbcEncoder.of(sc.Type.Array.of(sc.Type.BigDecimal)),
+          body = code"""BigDecimalArrayEncoder.contramap(_.map(_.bigDecimal))"""
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = sc.Ident("ScalaBigDecimalArrayDecoder"),
+          implicitParams = Nil,
+          tpe = JdbcDecoder.of(sc.Type.Array.of(sc.Type.BigDecimal)),
+          body = code"""BigDecimalArrayDecoder.map(_.map(${sc.Type.BigDecimal}.apply))"""
+        ),
+        sc.Given(
+          tparams = Nil,
+          name = sc.Ident("ScalaBigDecimalArraySetter"),
+          implicitParams = Nil,
+          tpe = Setter.of(sc.Type.Array.of(sc.Type.BigDecimal)),
+          body = code"""BigDecimalArraySetter.contramap(_.map(_.bigDecimal))"""
+        )
+      )
 
-    all(sc.Type.String) ++ all(sc.Type.Long) ++ all(sc.Type.Float) ++ all(sc.Type.Double) ++ all(sc.Type.BigDecimal) ++ all(sc.Type.Boolean)
+    def all(T: sc.Type.Qualified, sqlType: Int) = List(primitiveArrayDecoder(T), primitiveArraySetter(T, sqlType), primitiveArrayEncoder(T))
+
+    all(sc.Type.String, java.sql.Types.VARCHAR)
+      ++ all(sc.Type.Long, java.sql.Types.BIGINT)
+      ++ all(sc.Type.Float, java.sql.Types.FLOAT)
+      ++ all(sc.Type.Double, java.sql.Types.DOUBLE)
+      ++ all(sc.Type.JavaBigDecimal, java.sql.Types.NUMERIC)
+      ++ ScalaBigDecimal
+      ++ all(sc.Type.Boolean, java.sql.Types.BOOLEAN)
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
@@ -708,12 +756,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         sc.Given(
           tparams = Nil,
           name = sc.Ident("jdbcArrayEncoder"),
-          implicitParams = List(
-            sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
-          ),
+          implicitParams = Nil,
           tpe = JdbcEncoder.of(sc.Type.Array.of(ct.typoType)),
           // JdbcEncoder for unary types defined in terms of `Setter`
-          body = code"""$JdbcEncoder.singleParamEncoder(${sc.Ident("jdbcArraySetter")}(classTag))"""
+          body = code"""$JdbcEncoder.singleParamEncoder(${sc.Ident("jdbcArraySetter")})"""
         ),
         sc.Given(
           tparams = Nil,
@@ -727,7 +773,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
             code"""|${JdbcDecoder.of(sc.Type.Array.of(ct.typoType))}(
                    |  (rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => {
                   |    val arr = rs.getArray(i)
-                  |    if (arr eq null) Array.empty(classTag)
+                  |    if (arr eq null) null
                   |    else
                   |      arr
                   |        .getArray
@@ -744,25 +790,25 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         sc.Given(
           tparams = Nil,
           name = sc.Ident("jdbcArraySetter"),
-          implicitParams = List(
-            sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
-          ),
+          implicitParams = Nil,
           tpe = Setter.of(sc.Type.Array.of(ct.typoType)),
           body = {
             val v = sc.Ident("v")
             val vv = sc.Ident("vv")
-            code"""|$Setter.other((ps, i, $v) =>
-                  |  ps.setArray(
-                  |    i,
-                  |    ps.getConnection.createArrayOf(
-                  |      classTag.runtimeClass.getCanonicalName,
-                  |      $v.map { $vv =>
-                  |        ${fromTypo.fromTypo0(vv)}
-                  |      }
-                  |    )
-                  |  ),
-                  |  ${sc.StrLit(ct.sqlType)}
-                  |)""".stripMargin
+            code"""|$Setter.forSqlType((ps, i, $v) =>
+                   |  if (v.isEmpty) ps.setNull(i, ${sc.Type.Types}.ARRAY)
+                   |  else
+                   |    ps.setArray(
+                   |      i,
+                   |      ps.getConnection.createArrayOf(
+                   |        ${sc.StrLit(ct.sqlType)},
+                   |        $v.map { $vv =>
+                   |          ${fromTypo.fromTypo0(vv)}
+                   |        }
+                   |      )
+                   |    ),
+                   |    ${sc.Type.Types}.ARRAY
+                   |  )""".stripMargin
           }
         )
       )
