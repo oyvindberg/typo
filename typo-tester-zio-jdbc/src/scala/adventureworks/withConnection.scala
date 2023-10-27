@@ -1,33 +1,40 @@
 package adventureworks
 
 import zio.jdbc.*
-import zio.{Unsafe, ZIO, ZLayer}
+import zio.{Schedule, Unsafe, ZIO, ZLayer, durationInt}
 
 object withConnection {
-  val connectionPool: ZLayer[Any, Throwable, ZConnectionPool] =
-    ZLayer.succeed(ZConnectionPoolConfig.default) >>>
+  lazy val connectionPool: ZLayer[Any, Throwable, ZConnectionPool] = {
+    ZLayer.succeed(
+      // See https://github.com/zio/zio-jdbc/pull/174/
+      ZConnectionPoolConfig.default.copy(retryPolicy = Schedule.recurs(10) && Schedule.exponential(15.millis))
+    ) >>>
       ZConnectionPool.postgres(
         "localhost",
         6432,
-        "Adventureworks",
+        "world",
         Map(
           "user" -> "postgres",
-          "password" -> "postgres"
+          "password" -> "password"
         )
       )
+  }
 
   def apply[T](f: ZIO[ZConnection, Throwable, T]): T = {
     Unsafe
       .unsafe { implicit u =>
         zio.Runtime.default.unsafe
           .run {
-            (
-              for {
-                connection <- ZIO.service[ZConnection]
-                r <- f.provideLayer(ZLayer.succeed(connection))
-                _ <- connection.rollback
-              } yield r
-            ).provideLayer(connectionPool.flatMap(_.get.transaction))
+            ZIO
+              .scoped[ZConnectionPool] {
+                for {
+                  connectionPool <- ZIO.service[ZConnectionPool]
+                  c <- connectionPool.transaction.build
+                  r <- f.provideEnvironment(c)
+                  _ <- c.get.rollback
+                } yield r
+              }
+              .provideLayer(connectionPool)
           }
           .getOrThrow()
       }
