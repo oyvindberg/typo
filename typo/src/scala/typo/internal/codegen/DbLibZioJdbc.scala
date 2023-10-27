@@ -568,9 +568,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         body = code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
                  |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${sc.Type.Array.of(T)}) = {
                  |    val arr = rs.getArray(columIndex)
-                 |    if (arr eq null) columIndex -> null
+                 |    if (arr eq null) 1 -> null
                  |    else {
-                 |      columIndex ->
+                 |      1 ->
                  |        arr
                  |          .getArray
                  |          .asInstanceOf[Array[Any]]
@@ -670,7 +670,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
           code"""|new ${JdbcDecoder.of(tpe)} {
                |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $tpe) =
-               |    columIndex ->
+               |    ${cols.length} ->
                |      $tpe(
                |        ${namedParams.mkCode(",\n")}
                |      )
