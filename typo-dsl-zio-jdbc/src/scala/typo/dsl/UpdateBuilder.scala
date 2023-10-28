@@ -31,6 +31,12 @@ trait UpdateBuilder[Fields[_], Row] {
 }
 
 object UpdateBuilder {
+  private implicit val identitySqlFragment: zio.prelude.Identity[SqlFragment] =
+    new zio.prelude.Identity[SqlFragment] {
+      override def identity: SqlFragment = SqlFragment.empty
+      override def combine(l: => SqlFragment, r: => SqlFragment): SqlFragment = l ++ r
+    }
+
   def apply[Fields[_], Row](name: String, structure: Structure.Relation[Fields, ?, Row], rowParser: JdbcDecoder[Row]): UpdateBuilderSql[Fields, Row] =
     UpdateBuilderSql(name, structure, rowParser, UpdateParams.empty)
 
@@ -55,7 +61,8 @@ object UpdateBuilder {
               val valueExpr = setter.value(structure.fields)
               sql"${fieldExpr.render(counter)} = ${valueExpr.render(counter)}${fieldExpr.sqlWriteCast.fold(SqlFragment.empty)(cast => SqlFragment(s"::$cast"))}"
             }
-            Some(SqlFragment(setFragments.toChunk.flatMap(_.segments)))
+            import zio.prelude.ForEachOps
+            Some(sql"SET " ++ setFragments.toChunk.intersperse(sql", "))
         },
         NonEmptyChunk.fromIterableOption(params.where).map { wheres =>
           SqlFragment.whereAnd(
