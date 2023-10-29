@@ -123,9 +123,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private def matchId(id: IdComputed): sc.Code =
     id match {
       case id: IdComputed.Unary =>
-        code"${id.col.dbName.value} = ${runtimeInterpolateValue(id.paramName, id.tpe)}"
+        code"${id.col.dbName} = ${runtimeInterpolateValue(id.paramName, id.tpe)}"
       case composite: IdComputed.Composite =>
-        code"${composite.cols.map(cc => code"${cc.dbName.value} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
+        code"${composite.cols.map(cc => code"${cc.dbName} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
@@ -192,14 +192,14 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val joinedColNames = dbNames(cols, isRead = true)
 
         val sql = SQL(
-          code"""select $joinedColNames from $relName where ${code"${unaryId.col.dbName.value} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"}"""
+          code"""select $joinedColNames from $relName where ${unaryId.col.dbName} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"""
         )
         code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectStream"""
       case RepoMethod.SelectByUnique(relName, cols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
-                 |where ${cols.map(c => code"${c.dbName.value} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
+                 |where ${cols.map(c => code"${c.dbName} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
         code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectOne"""
@@ -207,7 +207,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases =
           cols.map { col =>
-            val fr = SQL(code"${col.dbName.value} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}")
+            val fr = SQL(code"${col.dbName} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}")
             code"case $fieldValue.${col.name}(value) => $fr"
           }
 
@@ -225,7 +225,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
           cases0.map { col =>
-            val sql = SQL(code"${col.dbName.value} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}${sqlCast.toPgCode(col)}")
+            val sql = SQL(code"${col.dbName} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}${sqlCast.toPgCode(col)}")
             code"case $fieldValue.${col.name}(value) => $sql"
           }
 
@@ -249,7 +249,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.Update(relName, _, id, param, colsNotId) =>
         val sql = SQL(
           code"""update $relName
-                |set ${colsNotId.map { col => code"${col.dbName.value} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}" }.mkCode(",\n")}
+                |set ${colsNotId.map { col => code"${col.dbName} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}" }.mkCode(",\n")}
                 |where ${matchId(id)}""".stripMargin
         )
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
@@ -258,13 +258,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
           val set = SQL(code"${runtimeInterpolateValue(code"${unsavedParam.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}")
-          code"""Some(($SqlFragment(${sc.s(col.dbName.value)}), $set))"""
+          code"""Some(($SqlFragment(${col.dbName}), $set))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, _), origType) =>
           val setValue = SQL(code"${runtimeInterpolateValue(code"value: $origType", origType)}${sqlCast.toPgCode(col)}")
           code"""|${unsavedParam.name}.$ident match {
                  |  case ${default.Defaulted}.${default.UseDefault} => None
-                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($SqlFragment(${sc.s(col.dbName.value)}), $setValue))
+                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($SqlFragment(${col.dbName}), $setValue))
                  |}"""
         }
 
@@ -294,7 +294,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
         val pickExcludedCols = cols.toList
           .filterNot(c => id.cols.exists(_.name == c.name))
-          .map { c => code"${c.dbName.value} = EXCLUDED.${c.dbName.value}" }
+          .map { c => code"${c.dbName} = EXCLUDED.${c.dbName}" }
 
         val base: sc.Code =
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
