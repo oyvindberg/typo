@@ -238,14 +238,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"""$NonEmptyChunk.fromIterableOption(${varargs.name}) match {
               |  case None           => $ZIO.succeed(false)
               |  case Some(nonEmpty) =>
-              |    import zio.prelude.ForEachOps
-              |    implicit val identity: zio.prelude.Identity[SqlFragment] = new zio.prelude.Identity[SqlFragment] {
-              |      override def identity: SqlFragment                                      = SqlFragment.empty
-              |      override def combine(l: => SqlFragment, r: => SqlFragment): SqlFragment = l ++ r
-              |    }
-              |    val updates = nonEmpty.map {
-              |      ${cases.mkCode("\n")}
-              |    }.intersperse(${SQL(code", ")})
+              |    val updates = $SqlFragment.intersperse($SqlFragment(","), nonEmpty.map { ${cases.mkCode("\n")} })
               |    $sql.update.map(_ > 0)
               |}""".stripMargin
 
@@ -287,13 +280,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |val q = if (fs.isEmpty) {
                |  $sqlEmpty
                |} else {
-               |  import zio.prelude.ForEachOps
-               |  val identitySqlFragment: zio.prelude.Identity[SqlFragment] = new zio.prelude.Identity[SqlFragment] {
-               |    override def identity: SqlFragment                                      = SqlFragment.empty
-               |    override def combine(l: => SqlFragment, r: => SqlFragment): SqlFragment = l ++ r
-               |  }
-               |  val names  = fs.map { case (n, _) => n }.intersperse(${SQL(code", ")})(zio.prelude.Invariant.ListForEach, identitySqlFragment)
-               |  val values = fs.map { case (_, f) => f }.intersperse(${SQL(code", ")})(zio.prelude.Invariant.ListForEach, identitySqlFragment)
+               |  val names  = $SqlFragment.intersperse($SqlFragment(", "), fs.map { case (n, _) => n })
+               |  val values = $SqlFragment.intersperse($SqlFragment(", "), fs.map { case (_, f) => f })
                |  ${SQL(code"insert into $relName($$names) values ($$values) returning ${dbNames(cols, isRead = true)}")}
                |}
                |q.insertReturning(${lookupJdbcDecoder(rowType)})

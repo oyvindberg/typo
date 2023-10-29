@@ -1,7 +1,7 @@
 package typo.dsl
 
+import typo.dsl.extensions.*
 import zio.jdbc.*
-import zio.jdbc.extensions.*
 import zio.{Chunk, NonEmptyChunk, ZIO}
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -31,12 +31,6 @@ trait UpdateBuilder[Fields[_], Row] {
 }
 
 object UpdateBuilder {
-  private implicit val identitySqlFragment: zio.prelude.Identity[SqlFragment] =
-    new zio.prelude.Identity[SqlFragment] {
-      override def identity: SqlFragment = SqlFragment.empty
-      override def combine(l: => SqlFragment, r: => SqlFragment): SqlFragment = l ++ r
-    }
-
   def apply[Fields[_], Row](name: String, structure: Structure.Relation[Fields, ?, Row], rowParser: JdbcDecoder[Row]): UpdateBuilderSql[Fields, Row] =
     UpdateBuilderSql(name, structure, rowParser, UpdateParams.empty)
 
@@ -56,33 +50,27 @@ object UpdateBuilder {
           case None =>
             sys.error("you must specify a columns to set. use `set` method")
           case Some(setters) =>
-            val setFragments = setters.map { setter =>
-              val fieldExpr = setter.col(structure.fields)
-              val valueExpr = setter.value(structure.fields)
-              sql"${fieldExpr.render(counter)} = ${valueExpr.render(counter)}${fieldExpr.sqlWriteCast.fold(SqlFragment.empty)(cast => SqlFragment(s"::$cast"))}"
-            }
-            import zio.prelude.ForEachOps
-            Some(sql"SET " ++ setFragments.toChunk.intersperse(sql", "))
+            val setFragments = setters
+              .map { setter =>
+                val fieldExpr = setter.col(structure.fields)
+                val valueExpr = setter.value(structure.fields)
+                sql"${fieldExpr.render(counter)} = ${valueExpr.render(counter)}${fieldExpr.sqlWriteCast.fold(SqlFragment.empty)(cast => SqlFragment(s"::$cast"))}"
+              }
+              .mkFragment(", ")
+            Some(sql"SET $setFragments")
         },
         NonEmptyChunk.fromIterableOption(params.where).map { wheres =>
-          SqlFragment.whereAnd(
-            wheres.map { where =>
-              where(structure.fields).render(counter)
-            }
-          )
+          sql"WHERE ${wheres.toChunk.map { where => where(structure.fields).render(counter) }.mkFragment(" AND ")} "
         },
         if (returning) {
           val colFragments =
-            NonEmptyChunk
-              .fromIterableOption(structure.columns)
-              .get // unsafe
+            structure.columns
               .map { col => SqlFragment(col.sqlReadCast.foldLeft("\"" + col.value + "\"") { case (acc, cast) => s"$acc::$cast" }) }
-              .toChunk
-              .intercalate(", ")
+              .mkFragment(", ")
 
           Some(sql"returning $colFragments")
         } else None
-      ).flatten.intercalate(sql" ")
+      ).flatten.mkFragment(sql" ")
     }
 
     override def sql(returning: Boolean): Option[SqlFragment] = {

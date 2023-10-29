@@ -1,7 +1,7 @@
 package typo.dsl
 
 import zio.jdbc.*
-import zio.jdbc.extensions.*
+import extensions.*
 import zio.{Chunk, NonEmptyChunk, ZIO}
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -56,7 +56,8 @@ object SelectBuilderSql {
     private def sql(counter: AtomicInteger): SqlFragment = {
       val cols = structure.columns
         .map(x => SqlFragment(x.sqlReadCast.foldLeft("\"" + x.value + "\"") { case (acc, cast) => s"$acc::$cast" }))
-        .intercalate(SqlFragment(", "))
+        .mkFragment(", ")
+
       val baseSql = sql"select $cols from ${SqlFragment(name)}"
       SelectParams.render(structure.fields, baseSql, counter, params)
     }
@@ -106,7 +107,7 @@ object SelectBuilderSql {
           val rest = instance.parts.tail
 
           val prelude =
-            sql"""select ${instance.columns.map(c => SqlFragment(c.value)).toChunk.intercalate(", ")}
+            sql"""select ${instance.columns.map(c => SqlFragment(c.value)).mkFragment(", ")}
                  from (
                  ${first.sqlFrag}
                  ) ${SqlFragment(first.alias)}
@@ -164,7 +165,7 @@ object SelectBuilderSql {
           val rest = instance.parts.tail
 
           val prelude =
-            sql"""select ${instance.columns.map(c => SqlFragment(c.value)).toChunk.intercalate(", ")}
+            sql"""select ${instance.columns.map(c => SqlFragment(c.value)).mkFragment(", ")}
                   from (
                     ${first.sqlFrag}
                   ) ${SqlFragment(first.alias)}

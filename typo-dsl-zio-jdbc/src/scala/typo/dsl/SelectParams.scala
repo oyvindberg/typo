@@ -1,8 +1,8 @@
 package typo.dsl
 
-import zio.{Chunk, NonEmptyChunk}
+import typo.dsl.extensions.NonEmptyChunkOps
 import zio.jdbc.*
-import zio.jdbc.extensions.*
+import zio.{Chunk, NonEmptyChunk}
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -25,10 +25,10 @@ object SelectParams {
   def render[Row, Fields[_]](fields: Fields[Row], baseSql: SqlFragment, counter: AtomicInteger, params: SelectParams[Fields, Row]): SqlFragment = {
     List[Option[SqlFragment]](
       Some(baseSql),
-      NonEmptyChunk.fromIterableOption(params.where.map(f => f(fields).render(counter))).map(SqlFragment.whereAnd(_)),
-      NonEmptyChunk.fromIterableOption(params.orderBy.map(f => f(fields).render(counter))).map(SqlFragment.orderBy(_)),
-      params.offset.map(value => sql"offset $value"),
-      params.limit.map(value => sql"limit $value")
+      NonEmptyChunk.fromIterableOption(params.where.map(f => f(fields).render(counter))).map(fs => fs.mkFragment(" WHERE ", " AND ", "")),
+      NonEmptyChunk.fromIterableOption(params.orderBy.map(f => f(fields).render(counter))).map(fs => fs.mkFragment(" ORDER BY ", ", ", "")),
+      params.offset.map(value => sql" offset $value"),
+      params.limit.map(value => sql" limit $value")
     ).flatten.reduce(_ ++ _)
   }
 
