@@ -239,7 +239,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"""$NonEmptyChunk.fromIterableOption(${varargs.name}) match {
               |  case None           => $ZIO.succeed(false)
               |  case Some(nonEmpty) =>
-              |    val updates = $SqlFragment.intersperse($SqlFragment(","), nonEmpty.map { ${cases.mkCode("\n")} })
+              |    val updates = nonEmpty.map { ${cases.mkCode("\n")} }.mkFragment($SqlFragment(", "))
               |    $sql.update.map(_ > 0)
               |}""".stripMargin
 
@@ -258,13 +258,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
           val set = SQL(code"${runtimeInterpolateValue(code"${unsavedParam.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}")
-          code"""Some(($SqlFragment(${col.dbName}), $set))"""
+          code"""Some((${SQL(col.dbName)}, $set))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, _), origType) =>
           val setValue = SQL(code"${runtimeInterpolateValue(code"value: $origType", origType)}${sqlCast.toPgCode(col)}")
           code"""|${unsavedParam.name}.$ident match {
                  |  case ${default.Defaulted}.${default.UseDefault} => None
-                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($SqlFragment(${col.dbName}), $setValue))
+                 |  case ${default.Defaulted}.${default.Provided}(value) => Some((${SQL(col.dbName)}, $setValue))
                  |}"""
         }
 
@@ -281,8 +281,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |val q = if (fs.isEmpty) {
                |  $sqlEmpty
                |} else {
-               |  val names  = $SqlFragment.intersperse($SqlFragment(", "), fs.map { case (n, _) => n })
-               |  val values = $SqlFragment.intersperse($SqlFragment(", "), fs.map { case (_, f) => f })
+               |  val names  = fs.map { case (n, _) => n }.mkFragment($SqlFragment(", "))
+               |  val values = fs.map { case (_, f) => f }.mkFragment($SqlFragment(", "))
                |  ${SQL(code"insert into $relName($$names) values ($$values) returning ${dbNames(cols, isRead = true)}")}
                |}
                |q.insertReturning(${lookupJdbcDecoder(rowType)})
