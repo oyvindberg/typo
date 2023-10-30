@@ -650,18 +650,20 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = jdbcDecoderName,
         implicitParams = Nil,
         tpe = JdbcDecoder.of(tpe),
-        body = {
+        body = if (cols.length == 1) {
+          code"""${lookupJdbcDecoder(cols.head.tpe)}.map(v => $tpe(${cols.head.name} = v))""".stripMargin
+        } else {
           val namedParams = cols.zipWithIndex.map { case (c, idx) =>
             code"${c.name} = ${lookupJdbcDecoder(c.tpe)}.unsafeDecode(columIndex + $idx, rs)._2"
           }
 
           code"""|new ${JdbcDecoder.of(tpe)} {
-               |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $tpe) =
-               |    ${cols.length} ->
-               |      $tpe(
-               |        ${namedParams.mkCode(",\n")}
-               |      )
-               |}""".stripMargin
+                 |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $tpe) =
+                 |    ${cols.length} ->
+                 |      $tpe(
+                 |        ${namedParams.mkCode(",\n")}
+                 |      )
+                 |}""".stripMargin
         }
       )
 
