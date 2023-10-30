@@ -16,8 +16,8 @@ trait UpdateBuilder[Fields[_], Row] {
   final def where[N[_]: Nullability](v: Fields[Row] => SqlExpr[Boolean, N, Row]): UpdateBuilder[Fields, Row] =
     withParams(params.where(f => v(f).?.coalesce(false)))
 
-  final def setValue[N[_], T](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: N[T])(implicit P: JdbcEncoder[N[T]]): UpdateBuilder[Fields, Row] =
-    withParams(params.set(col, _ => SqlExpr.Const[T, N, Row](value, P)))
+  final def setValue[N[_], T](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: N[T])(implicit E: JdbcEncoder[N[T]], P: ParameterMetaData[T]): UpdateBuilder[Fields, Row] =
+    withParams(params.set(col, _ => SqlExpr.Const[T, N, Row](value, E, P)))
 
   final def setComputedValue[T, N[_]](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: SqlExpr.FieldLikeNotId[T, N, Row] => SqlExpr[T, N, Row]): UpdateBuilder[Fields, Row] =
     withParams(params.set(col, fields => value(col(fields))))

@@ -136,10 +136,10 @@ object SqlExpr {
       extends FieldLike[T, Option, R](prefix, name, sqlReadCast, sqlWriteCast)(get, set)
       with FieldLikeNotId[T, Option, R]
 
-  final case class Const[T, N[_], R](value: N[T], P: JdbcEncoder[N[T]]) extends SqlExpr[T, N, R] {
+  final case class Const[T, N[_], R](value: N[T], E: JdbcEncoder[N[T]], P: ParameterMetaData[T]) extends SqlExpr[T, N, R] {
     override def eval(row: R): N[T] = value
 
-    override def render(counter: AtomicInteger): SqlFragment = P.encode(value)
+    override def render(counter: AtomicInteger): SqlFragment = sql"${E.encode(value)}" ++ s"::${P.sqlType}"
   }
 
   final case class ArrayIndex[T, N1[_], N2[_], R](arr: SqlExpr[Array[T], N1, R], idx: SqlExpr[Int, N2, R], N: Nullability2[N1, N2, Option]) extends SqlExpr[T, Option, R] {
@@ -233,11 +233,11 @@ object SqlExpr {
   }
 
   // automatically put values in a constant expression
-  implicit def asConstOpt[T, R](t: Option[T])(implicit x: JdbcEncoder[Option[T]]): SqlExpr[T, Option, R] =
-    Const(t, x)
+  implicit def asConstOpt[T, R](t: Option[T])(implicit E: JdbcEncoder[Option[T]], P: ParameterMetaData[T]): SqlExpr[T, Option, R] =
+    Const(t, E, P)
 
-  implicit def asConstRequired[T: JdbcEncoder, R](t: T): SqlExpr[T, Required, R] =
-    Const[T, Required, R](t, implicitly)
+  implicit def asConstRequired[T: JdbcEncoder: ParameterMetaData, R](t: T): SqlExpr[T, Required, R] =
+    Const[T, Required, R](t, implicitly, implicitly)
 
   // some syntax to construct field sort order
   implicit class SqlExprSortSyntax[NT, R](private val expr: SqlExprNoHkt[NT, R]) extends AnyVal {

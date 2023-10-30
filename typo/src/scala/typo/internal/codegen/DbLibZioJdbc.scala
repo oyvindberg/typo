@@ -21,6 +21,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
   private val JdbcDecoderError = sc.Type.Qualified("zio.jdbc.JdbcDecoderError")
   private val ClassTag = sc.Type.Qualified("scala.reflect.ClassTag")
+  private val ParameterMetaData = sc.Type.Qualified("typo.dsl.ParameterMetaData")
 
   private def SQL(content: sc.Code) = sc.StringInterpolate(sqlInterpolator, sc.Ident("sql"), content)
 
@@ -28,6 +29,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val jdbcEncoderName: sc.Ident = sc.Ident("jdbcEncoder")
   private val setterName: sc.Ident = sc.Ident("setter")
   private val arraySetterName: sc.Ident = sc.Ident("arraySetter")
+  private val parameterMetadataName: sc.Ident = sc.Ident("parameterMetadata")
+  private val arrayParameterMetaDataName = sc.Ident("arrayParameterMetaData")
 
   private def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
@@ -112,6 +115,36 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"${missingInstancesByType(Setter.of(x))}"
         case other =>
           code"${Setter.of(other)}"
+      }
+
+  /** Resolve known implicits at generation-time instead of at compile-time */
+  def lookupParameterMetaDataFor(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) sc.Summon(ParameterMetaData.of(tpe)).code
+    else
+      sc.Type.base(tpe) match {
+        case sc.Type.BigDecimal => code"$ParameterMetaData.BigDecimalParameterMetaData"
+        case sc.Type.Boolean    => code"$ParameterMetaData.BooleanParameterMetaData"
+        case sc.Type.Byte       => code"$ParameterMetaData.ByteParameterMetaData"
+        case sc.Type.Double     => code"$ParameterMetaData.DoubleParameterMetaData"
+        case sc.Type.Float      => code"$ParameterMetaData.FloatParameterMetaData"
+        case sc.Type.Int        => code"$ParameterMetaData.IntParameterMetaData"
+        case sc.Type.Long       => code"$ParameterMetaData.LongParameterMetaData"
+        case sc.Type.String     => code"$ParameterMetaData.StringParameterMetaData"
+        case sc.Type.UUID       => code"$ParameterMetaData.UUIDParameterMetaData"
+        //        case sc.Type.Optional(targ) => lookupParameterMetaDataFor(targ)
+        // generated type
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
+          code"$tpe.$parameterMetadataName"
+        // customized type mapping
+        case x if missingInstancesByType.contains(ParameterMetaData.of(x)) =>
+          code"${missingInstancesByType(ParameterMetaData.of(x))}"
+        // generated array type
+        //        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+        //          code"$targ.$arrayColumnName"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$ParameterMetaData.ByteArrayParameterMetaData"
+        // fallback array case.
+        case sc.Type.TApply(sc.Type.Array, List(targ)) => code"${pkg / arrayParameterMetaDataName}(${lookupParameterMetaDataFor(targ)})"
+        case other                                     => sc.Summon(ParameterMetaData.of(other)).code
       }
 
   private def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code = {
@@ -502,6 +535,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         implicitParams = Nil,
         tpe = Setter.of(wrapperType),
         body = code"""${lookupSetter(underlying)}.contramap(_.value)"""
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = parameterMetadataName,
+        implicitParams = Nil,
+        tpe = ParameterMetaData.of(wrapperType),
+        body =
+          code"""|new $ParameterMetaData[$wrapperType] {
+                 |  override def sqlType: ${sc.Type.String} = ${lookupParameterMetaDataFor(underlying)}.sqlType
+                 |  override def jdbcType: ${sc.Type.Int} = ${lookupParameterMetaDataFor(underlying)}.jdbcType
+                 |}""".stripMargin
       )
     )
 
@@ -534,6 +578,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         implicitParams = Nil,
         tpe = Setter.of(sc.Type.Array.of(wrapperType)),
         body = code"""${lookupSetter(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = parameterMetadataName,
+        implicitParams = Nil,
+        tpe = ParameterMetaData.of(wrapperType),
+        body =
+          code"""|new ${ParameterMetaData.of(wrapperType)} {
+                 |  override def sqlType: String = ${lookupParameterMetaDataFor(underlying)}.sqlType
+                 |  override def jdbcType: Int = ${lookupParameterMetaDataFor(underlying)}.jdbcType
+                 |}""".stripMargin
       )
     )
 
@@ -629,6 +684,20 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         )
       )
 
+    val arrayParameterMetaData = {
+      val T = sc.Type.Abstract(sc.Ident("T"))
+      sc.Given(
+        List(T),
+        arrayParameterMetaDataName,
+        List(sc.Param(T.value, ParameterMetaData.of(T), None)),
+        ParameterMetaData.of(sc.Type.Array.of(T)),
+        code"""|new ${ParameterMetaData.of(sc.Type.Array.of(T))} {
+               |  override def sqlType: ${sc.Type.String} = ${sc.StrLit("_")} + $T.sqlType
+               |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
+               |}""".stripMargin
+      )
+    }
+
     def all(T: sc.Type.Qualified, sqlType: String, asAnyRef: sc.Code => sc.Code) = {
       List(primitiveArrayDecoder(T), primitiveArraySetter(T, sc.StrLit(sqlType), asAnyRef), primitiveArrayEncoder(T))
     }
@@ -641,6 +710,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       ++ all(sc.Type.JavaBigDecimal, "numeric", array => code"$array.map(x => x: ${sc.Type.AnyRef})")
       ++ ScalaBigDecimal
       ++ all(sc.Type.Boolean, "bool", array => code"$array.map(x => boolean2Boolean(x): ${sc.Type.AnyRef})")
+      :+ arrayParameterMetaData
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
@@ -736,7 +806,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                    |  ${sc.StrLit(ct.sqlType)}
                    |)""".stripMargin
           }
-        )
+        ),
+        sc.Given(
+          Nil,
+          parameterMetadataName,
+          Nil,
+          ParameterMetaData.of(ct.typoType),
+          code"""|new ${ParameterMetaData.of(ct.typoType)} {
+                 |  override def sqlType: ${sc.Type.String} = ${sc.StrLit(ct.sqlType)}
+                 |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
+                 |}""".stripMargin
+        ),
       )
 
     val array = {
