@@ -154,9 +154,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         name = decoderName,
         implicitParams = Nil,
         tpe = JsonDecoder.of(tpe),
-        body =
-          if (fields.length == 1) code"""${lookupDecoderFor(fields.head.tpe)}.map(v => $tpe(${fields.head.scalaName} = v))"""
-          else code"""$DeriveJsonDecoder.gen[$tpe]"""
+        body = code"""$DeriveJsonDecoder.gen[$tpe]"""
       )
 
     val encoder =
@@ -165,9 +163,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         name = encoderName,
         implicitParams = Nil,
         tpe = JsonEncoder.of(tpe),
-        body =
-          if (fields.length == 1) code"""${lookupEncoderFor(fields.head.tpe)}.contramap(_.${fields.head.scalaName})"""
-          else code"""$DeriveJsonEncoder.gen[$tpe]"""
+        body = code"""$DeriveJsonEncoder.gen[$tpe]"""
       )
 
     List(decoder, encoder)
