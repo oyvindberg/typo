@@ -677,10 +677,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         tpe = JdbcEncoder.of(tpe),
         body = {
           if (cols.length == 1) {
-            code"""|new ${JdbcEncoder.of(tpe)} {
-                   |  override def encode(value: $tpe): $SqlFragment =
-                   |    ${lookupJdbcEncoder(cols.head.tpe)}.encode(value.${cols.head.name})
-                   |}""".stripMargin
+            code"""|${lookupJdbcEncoder(cols.head.tpe)}.contramap(_.${cols.head.name})""".stripMargin
           } else {
             code"""|new ${JdbcEncoder.of(tpe)} {
                  |  private final val comma = ${SQL(code", ")}
