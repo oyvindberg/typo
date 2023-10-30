@@ -134,7 +134,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         _ <- ZIO.succeed(assert(updated.name === Name("MANf")))
         _ <- ZIO.succeed(assert(updated.listprice === BigDecimal(2)))
         _ <- ZIO.succeed(assert(updated.reorderpoint === TypoShort(40)))
-        _ <- ZIO.succeed {
+        _ <- {
           val q = productRepo.select
             .where(p => !p.name.like("foo%"))
             .where(p => !(p.name.underlying || p.color).like("foo%"))
@@ -146,7 +146,6 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
           q.sql.foreach(f => println(f))
           q.toChunk.map(list => list.foreach(println))
-
         }
         _ <- {
           val q = productRepo.select
