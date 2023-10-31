@@ -28,38 +28,30 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
     withConnection {
       for {
         // setup
-        unitmeasureInserted <- unitmeasureRepo.insert(
+        unitmeasure <- unitmeasureRepo.insert(
           UnitmeasureRowUnsaved(
             unitmeasurecode = UnitmeasureId("kgg"),
             name = Name("name")
           )
         )
-        _ <- ZIO.succeed(assert(unitmeasureInserted.rowsUpdated == 1))
-        unitmeasure = unitmeasureInserted.updatedKeys.head
-        productCategoryInserted <- productcategoryRepo.insert(
+        productCategory <- productcategoryRepo.insert(
           ProductcategoryRowUnsaved(
             name = Name("name")
           )
         )
-        _ <- ZIO.succeed(assert(productCategoryInserted.rowsUpdated == 1))
-        productCategory = productCategoryInserted.updatedKeys.head
-        productSubcategoryInserted <- productsubcategoryRepo.insert(
+        productSubcategory <- productsubcategoryRepo.insert(
           ProductsubcategoryRowUnsaved(
             productcategoryid = productCategory.productcategoryid,
             name = Name("name")
           )
         )
-        _ <- ZIO.succeed(assert(productSubcategoryInserted.rowsUpdated == 1))
-        productSubcategory = productSubcategoryInserted.updatedKeys.head
-        productmodelInserted <- ProductmodelRepoImpl.insert(
+        productmodel <- ProductmodelRepoImpl.insert(
           ProductmodelRowUnsaved(
             name = Name("name"),
             catalogdescription = Some(new TypoXml("<xml/>")),
             instructions = Some(new TypoXml("<instructions/>"))
           )
         )
-        _ <- ZIO.succeed(assert(productmodelInserted.rowsUpdated == 1))
-        productmodel = productmodelInserted.updatedKeys.head
         unsaved1 = ProductRowUnsaved(
           name = Name("name"),
           productnumber = "productnumber",
@@ -88,9 +80,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
         )
         // insert and round trip check
-        inserted <- productRepo.insert(unsaved1)
-        _ <- ZIO.succeed(assert(inserted.rowsUpdated == 1L))
-        saved1 = inserted.updatedKeys.head
+        saved1 <- productRepo.insert(unsaved1)
         saved2 = unsaved1.toRow(saved1.productid, ???, ???, ???, ???)
         _ <- ZIO.succeed(assert(saved1 === saved2))
 

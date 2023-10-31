@@ -48,15 +48,13 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
     withConnection {
       for {
-        businessentityRowInserted <- BusinessentityRepoImpl.insert(
+        businessentityRow <- BusinessentityRepoImpl.insert(
           BusinessentityRowUnsaved(
             businessentityid = Defaulted.UseDefault,
             rowguid = Defaulted.UseDefault,
             modifieddate = Defaulted.UseDefault
           )
         )
-        _ <- ZIO.succeed(assert(businessentityRowInserted.rowsUpdated == 1L))
-        businessentityRow = businessentityRowInserted.updatedKeys.head
         personRowUnsaved = PersonRowUnsaved(
           businessentityid = businessentityRow.businessentityid,
           persontype = "SC",
@@ -72,9 +70,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           rowguid = Defaulted.UseDefault,
           modifieddate = Defaulted.UseDefault
         )
-        personRowInserted <- PersonRepoImpl.insert(personRowUnsaved)
-        _ <- ZIO.succeed(assert(personRowInserted.rowsUpdated == 1L))
-        personRow = personRowInserted.updatedKeys.head
+        personRow <- PersonRepoImpl.insert(personRowUnsaved)
         // setup
         unsaved = EmployeeRowUnsaved(
           businessentityid = personRow.businessentityid,
@@ -94,9 +90,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           organizationnode = Defaulted.Provided(Some("/"))
         )
         // insert and round trip check
-        inserted <- repo.insert(unsaved)
-        _ <- ZIO.succeed(assert(inserted.rowsUpdated == 1L))
-        saved1 = inserted.updatedKeys.head
+        saved1 <- repo.insert(unsaved)
         saved2 = unsaved.toRow(???, ???, ???, ???, ???, ???, ???)
         _ <- ZIO.succeed(assert(saved1 === saved2))
         // check field values
@@ -128,7 +122,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           modifieddate = Defaulted.UseDefault,
           organizationnode = Defaulted.UseDefault
         )
-        _ <- repo.insert(employeeRowUnsaved).map(_.updatedKeys.head).map {
+        _ <- repo.insert(employeeRowUnsaved).map {
           case EmployeeRow(
                 personRow.businessentityid,
                 employeeRowUnsaved.nationalidnumber,

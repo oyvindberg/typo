@@ -37,7 +37,7 @@ case class PersonWithAddressesRepo(
       currentAddressesWithAddresstype <- Chunk.fromIterable(pa.addresses).forEach { case (addressTypeName, wanted) =>
         oldStoredAddressTypes.find(_.name == addressTypeName) match {
           case Some(found) => ZIO.succeed((found.addresstypeid, wanted))
-          case None        => addresstypeRepo.insert(AddresstypeRowUnsaved(name = addressTypeName)).map(row => (row.updatedKeys.head.addresstypeid, wanted))
+          case None        => addresstypeRepo.insert(AddresstypeRowUnsaved(name = addressTypeName)).map(row => (row.addresstypeid, wanted))
         }
       }
       currentAddressesByAddresstype = currentAddressesWithAddresstype.toMap
@@ -58,7 +58,6 @@ case class PersonWithAddressesRepo(
               .insert(
                 BusinessentityaddressRowUnsaved(pa.person.businessentityid, address.addressid, addresstypeId)
               )
-              .map(_.updatedKeys.head)
         }
       }
     } yield currentAttachedAddresses

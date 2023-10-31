@@ -186,9 +186,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     case RepoMethod.Update(_, _, _, param, _) =>
       code"def update($param): ${ZIO.of(ZConnection, Throwable, sc.Type.Boolean)}"
     case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
-      code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
+      code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
-      code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
+      code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
       code"def upsert($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
     case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
@@ -318,7 +318,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |  val values = fs.map { case (_, f) => f }.mkFragment($SqlFragment(", "))
                |  ${SQL(code"insert into $relName($$names) values ($$values) returning ${dbNames(cols, isRead = true)}")}
                |}
-               |q.insertReturning(${lookupJdbcDecoder(rowType)})
+               |q.insertReturning(${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)
                |"""
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -367,7 +367,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |""".stripMargin
         }
 
-        code"$sql.insertReturning(${lookupJdbcDecoder(rowType)})"
+        code"$sql.insertReturning(${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
@@ -470,7 +470,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |    else
                |      map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
                |
-               |  $UpdateResult(1, $Chunk.single(${unsavedParam.name}))
+               |  ${unsavedParam.name}
                |}"""
       case RepoMethod.Upsert(_, _, _, unsavedParam, _) =>
         code"""|$ZIO.succeed {
@@ -495,7 +495,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       x.name,
       x.params,
       Nil,
-      ZIO.of(ZConnection, Throwable, UpdateResult.of(x.table.names.RowName)),
+      ZIO.of(ZConnection, Throwable, x.table.names.RowName),
       code"${x.table.names.RepoImplName}.insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
     )
 

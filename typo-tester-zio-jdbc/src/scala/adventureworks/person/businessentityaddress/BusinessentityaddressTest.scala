@@ -36,18 +36,14 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
     withConnection {
       for {
         // setup
-        businessentityInserted <- BusinessentityRepoImpl.insert(BusinessentityRowUnsaved())
-        _ <- ZIO.succeed(assert(businessentityInserted.rowsUpdated == 1L))
-        businessentityRow = businessentityInserted.updatedKeys.head
-        countryregionInserted <- CountryregionRepoImpl.insert(
+        businessentityRow <- BusinessentityRepoImpl.insert(BusinessentityRowUnsaved())
+        countryregion <- CountryregionRepoImpl.insert(
           CountryregionRowUnsaved(
             countryregioncode = CountryregionId("max"),
             name = Name("max")
           )
         )
-        _ <- ZIO.succeed(assert(countryregionInserted.rowsUpdated == 1L))
-        countryregion = countryregionInserted.updatedKeys.head
-        salesTerritoryInserted <- SalesterritoryRepoImpl.insert(
+        salesTerritory <- SalesterritoryRepoImpl.insert(
           SalesterritoryRowUnsaved(
             name = Name("name"),
             countryregioncode = countryregion.countryregioncode,
@@ -55,9 +51,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
             salesytd = Defaulted.Provided(1)
           )
         )
-        _ <- ZIO.succeed(assert(salesTerritoryInserted.rowsUpdated == 1L))
-        salesTerritory = salesTerritoryInserted.updatedKeys.head
-        stateProvidenceInserted <- StateprovinceRepoImpl.insert(
+        stateProvidence <- StateprovinceRepoImpl.insert(
           StateprovinceRowUnsaved(
             stateprovincecode = "cde",
             countryregioncode = countryregion.countryregioncode,
@@ -65,9 +59,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
             territoryid = salesTerritory.territoryid
           )
         )
-        _ <- ZIO.succeed(assert(stateProvidenceInserted.rowsUpdated == 1L))
-        stateProvidence = stateProvidenceInserted.updatedKeys.head
-        addressInserted <- AddressRepoImpl.insert(
+        address <- AddressRepoImpl.insert(
           AddressRowUnsaved(
             addressline1 = "addressline1",
             addressline2 = Some("addressline2"),
@@ -77,15 +69,11 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
             spatiallocation = None
           )
         )
-        _ <- ZIO.succeed(assert(addressInserted.rowsUpdated == 1L))
-        address = addressInserted.updatedKeys.head
-        addressTypeInserted <- AddresstypeRepoImpl.insert(
+        addressType <- AddresstypeRepoImpl.insert(
           AddresstypeRowUnsaved(
             name = Name("name")
           )
         )
-        _ <- ZIO.succeed(assert(addressTypeInserted.rowsUpdated == 1L))
-        addressType = addressTypeInserted.updatedKeys.head
         unsaved1 = BusinessentityaddressRowUnsaved(
           businessentityid = businessentityRow.businessentityid,
           addressid = address.addressid,
@@ -94,9 +82,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
           modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
         )
         // insert and round trip check
-        inserted <- repo.insert(unsaved1)
-        _ <- ZIO.succeed(assert(inserted.rowsUpdated == 1L))
-        saved1 = inserted.updatedKeys.head
+        saved1 <- repo.insert(unsaved1)
         saved2 = unsaved1.toRow(???, ???)
         _ <- ZIO.succeed(assert(saved1 === saved2))
         // check field values
