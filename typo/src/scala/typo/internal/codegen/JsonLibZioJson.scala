@@ -7,12 +7,12 @@ import typo.{NonEmptyList, sc}
 final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits: Boolean) extends JsonLib {
   private val JsonDecoder = sc.Type.Qualified("zio.json.JsonDecoder")
   private val JsonEncoder = sc.Type.Qualified("zio.json.JsonEncoder")
-  private val DeriveJsonDecoder = sc.Type.Qualified("zio.json.DeriveJsonDecoder")
   private val DeriveJsonEncoder = sc.Type.Qualified("zio.json.DeriveJsonEncoder")
   private val Write = sc.Type.Qualified("zio.json.internal.Write")
   private val JsonError = sc.Type.Qualified("zio.json.JsonError")
   private val RetractReader = sc.Type.Qualified("zio.json.internal.RetractReader")
   private val Success = sc.Type.Qualified("scala.util.Success")
+  private val Json = sc.Type.Qualified("zio.json.ast.Json")
 
   private val encoderName = sc.Ident("jsonEncoder")
   private val decoderName = sc.Ident("jsonDecoder")
@@ -154,7 +154,25 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         name = decoderName,
         implicitParams = Nil,
         tpe = JsonDecoder.of(tpe),
-        body = code"""$DeriveJsonDecoder.gen[$tpe]"""
+        body = {
+          val params =
+            fields.map(f =>
+              f.tpe match {
+                case sc.Type.Optional(_) =>
+                  code"""${f.scalaName} <- jsonObj.get(${f.jsonName}).forEach(_.as[${f.tpe}]).map(_.flatten)"""
+                case _ =>
+                  code"""${f.scalaName} <- jsonObj.get(${f.jsonName}).forEach(_.as[${f.tpe}]).flatMap(_.toRight(\"\"\"Missing field ${f.jsonName}\"\"\"))"""
+              }
+            )
+
+          code"""|$JsonDecoder[$Json.Obj].mapOrFail { jsonObj =>
+                 |  import zio.prelude.ForEachOps
+                 |
+                 |  for {
+                 |    ${params.mkCode("\n")}
+                 |  } yield $tpe(${fields.map(v => code"${v.scalaName} = ${v.scalaName}").mkCode(", ")})
+                 |}""".stripMargin
+        }
       )
 
     val encoder =
