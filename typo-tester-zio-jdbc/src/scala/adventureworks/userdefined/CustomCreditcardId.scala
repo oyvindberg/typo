@@ -14,8 +14,8 @@ case class CustomCreditcardId(value: Int) extends AnyVal
 object CustomCreditcardId {
   implicit lazy val arraySetter: Setter[Array[CustomCreditcardId]] = adventureworks.IntArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[CustomCreditcardId, Int] = Bijection[CustomCreditcardId, Int](_.value)(CustomCreditcardId.apply)
-  implicit lazy val jsonDecoder: JsonDecoder[CustomCreditcardId] = DeriveJsonDecoder.gen[CustomCreditcardId]
-  implicit lazy val jsonEncoder: JsonEncoder[CustomCreditcardId] = DeriveJsonEncoder.gen[CustomCreditcardId]
+  implicit lazy val jsonDecoder: JsonDecoder[CustomCreditcardId] = JsonDecoder.int.map(CustomCreditcardId.apply)
+  implicit lazy val jsonEncoder: JsonEncoder[CustomCreditcardId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val jdbcDecoder: JdbcDecoder[CustomCreditcardId] = JdbcDecoder.intDecoder.map(CustomCreditcardId.apply)
   implicit lazy val jdbcEncoder: JdbcEncoder[CustomCreditcardId] = JdbcEncoder.intEncoder.contramap(_.value)
   implicit lazy val ordering: Ordering[CustomCreditcardId] = Ordering.by(_.value)
