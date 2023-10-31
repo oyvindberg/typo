@@ -7,7 +7,6 @@ import typo.{NonEmptyList, sc}
 final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits: Boolean) extends JsonLib {
   private val JsonDecoder = sc.Type.Qualified("zio.json.JsonDecoder")
   private val JsonEncoder = sc.Type.Qualified("zio.json.JsonEncoder")
-  private val DeriveJsonEncoder = sc.Type.Qualified("zio.json.DeriveJsonEncoder")
   private val Write = sc.Type.Qualified("zio.json.internal.Write")
   private val JsonError = sc.Type.Qualified("zio.json.JsonError")
   private val RetractReader = sc.Type.Qualified("zio.json.internal.RetractReader")
@@ -181,8 +180,21 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         name = encoderName,
         implicitParams = Nil,
         tpe = JsonEncoder.of(tpe),
-        body = code"""$DeriveJsonEncoder.gen[$tpe]"""
-      )
+        body = {
+          val params =
+            fields.map(f =>
+              code"""|out.write(\"\"\"${f.jsonName}:\"\"\")
+                     |JsonEncoder[${f.tpe}].unsafeEncode(a.${f.scalaName}, indent, out)""".stripMargin
+            )
+
+          code"""|new $JsonEncoder[$tpe] {
+                 |  override def unsafeEncode(a: $tpe, indent: Option[Int], out: $Write): Unit = {
+                 |    out.write("{")
+                 |    ${params.mkCode(code"\nout.write(\",\")\n")}
+                 |    out.write("}")
+                 |  }
+                 |}""".stripMargin
+        })
 
     List(decoder, encoder)
   }
