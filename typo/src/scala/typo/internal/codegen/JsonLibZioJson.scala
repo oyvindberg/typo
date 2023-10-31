@@ -157,16 +157,15 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
           val params =
             fields.map(f =>
               f.tpe match {
-                case sc.Type.Optional(_) =>
-                  code"""${f.scalaName} <- jsonObj.get(${f.jsonName}).forEach(_.as[${f.tpe}]).map(_.flatten)"""
+                case sc.Type.Optional(targ) =>
+                  val either = sc.Type.Either.of(sc.Type.String, sc.Type.Option.of(sc.Type.base(targ)))
+                  code"""${f.scalaName} <- jsonObj.get(${f.jsonName}).fold[$either](${sc.Type.Right}(${sc.Type.None}))(_.as(${lookupDecoderFor(f.tpe)}))"""
                 case _ =>
-                  code"""${f.scalaName} <- jsonObj.get(${f.jsonName}).forEach(_.as[${f.tpe}]).flatMap(_.toRight(\"\"\"Missing field ${f.jsonName}\"\"\"))"""
+                  code"""${f.scalaName} <- jsonObj.get(${f.jsonName}).toRight("Missing field '${f.jsonName.str}'").flatMap(_.as(${lookupDecoderFor(f.tpe)}))"""
               }
             )
 
           code"""|$JsonDecoder[$Json.Obj].mapOrFail { jsonObj =>
-                 |  import zio.prelude.ForEachOps
-                 |
                  |  for {
                  |    ${params.mkCode("\n")}
                  |  } yield $tpe(${fields.map(v => code"${v.scalaName} = ${v.scalaName}").mkCode(", ")})

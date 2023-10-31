@@ -58,7 +58,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcDecoder.byteArrayDecoder"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
-          code"${JdbcDecoder.of(x)}" // TODO: Can we do better?
+          code"$x.$jdbcDecoderName"
         case x if missingInstancesByType.contains(JdbcDecoder.of(x)) =>
           code"${missingInstancesByType(JdbcDecoder.of(x))}"
         case other =>
@@ -83,7 +83,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcEncoder.byteArrayEncoder"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
-          code"${JdbcEncoder.of(x)}" // TODO: Can we do better?
+          code"$x.$jdbcEncoderName"
         case x if missingInstancesByType.contains(JdbcDecoder.of(x)) =>
           code"${missingInstancesByType(JdbcEncoder.of(x))}"
         case other =>
