@@ -190,7 +190,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
           code"""|new $JsonEncoder[$tpe] {
                  |  override def unsafeEncode(a: $tpe, indent: Option[Int], out: $Write): Unit = {
                  |    out.write("{")
-                 |    ${params.mkCode(code"\nout.write(\",\")\n")}
+                 |    ${params.mkCode(code"""\nout.write(",")\n""")}
                  |    out.write("}")
                  |  }
                  |}""".stripMargin
