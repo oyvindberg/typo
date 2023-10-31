@@ -50,7 +50,7 @@ projects:
         extends: template-kind-projector
       jvm213:
         extends: template-kind-projector
-    dependencies: dev.zio::zio-jdbc:0.1.0+38-9fa45c18-SNAPSHOT
+    dependencies: dev.zio::zio-jdbc:0.1.0+40-fb415c23-SNAPSHOT
     extends: template-cross
     sources: ../typo-dsl-shared
   # scripts for generating docs
