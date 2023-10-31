@@ -4,6 +4,7 @@ import java.lang.{Boolean as JBool, Byte as JByte, Double as JDouble, Float as J
 import java.math.{BigInteger, BigDecimal as JBigDec}
 import java.net.{URI, URL}
 import java.sql.{Timestamp, Types}
+import java.time.OffsetDateTime
 import java.util.{Date, UUID as JUUID}
 
 /** ** Copied from anorm**
@@ -225,6 +226,12 @@ sealed trait JavaTimeParameterMetaData {
 
   /** Parameter metadata for Java8 zoned date/time */
   implicit object ZonedDateTimeParameterMetaData extends ParameterMetaData[ZonedDateTime] {
+    val sqlType = "TIMESTAMPZ"
+    val jdbcType = Types.TIMESTAMP_WITH_TIMEZONE
+  }
+
+  /** Parameter metadata for Java8 offset date/time */
+  implicit object OffsetDateTimeParameterMetaData extends ParameterMetaData[OffsetDateTime] {
     val sqlType = "TIMESTAMPZ"
     val jdbcType = Types.TIMESTAMP_WITH_TIMEZONE
   }
