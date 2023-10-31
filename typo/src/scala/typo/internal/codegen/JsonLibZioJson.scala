@@ -184,7 +184,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
           val params =
             fields.map(f =>
               code"""|out.write(\"\"\"${f.jsonName}:\"\"\")
-                     |JsonEncoder[${f.tpe}].unsafeEncode(a.${f.scalaName}, indent, out)""".stripMargin
+                     |${lookupEncoderFor(f.tpe)}.unsafeEncode(a.${f.scalaName}, indent, out)""".stripMargin
             )
 
           code"""|new $JsonEncoder[$tpe] {
