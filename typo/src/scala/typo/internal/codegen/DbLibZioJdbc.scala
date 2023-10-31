@@ -541,8 +541,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = parameterMetadataName,
         implicitParams = Nil,
         tpe = ParameterMetaData.of(wrapperType),
-        body =
-          code"""|new $ParameterMetaData[$wrapperType] {
+        body = code"""|new $ParameterMetaData[$wrapperType] {
                  |  override def sqlType: ${sc.Type.String} = ${lookupParameterMetaDataFor(underlying)}.sqlType
                  |  override def jdbcType: ${sc.Type.Int} = ${lookupParameterMetaDataFor(underlying)}.jdbcType
                  |}""".stripMargin
@@ -584,8 +583,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = parameterMetadataName,
         implicitParams = Nil,
         tpe = ParameterMetaData.of(wrapperType),
-        body =
-          code"""|new ${ParameterMetaData.of(wrapperType)} {
+        body = code"""|new ${ParameterMetaData.of(wrapperType)} {
                  |  override def sqlType: String = ${lookupParameterMetaDataFor(underlying)}.sqlType
                  |  override def jdbcType: Int = ${lookupParameterMetaDataFor(underlying)}.jdbcType
                  |}""".stripMargin
@@ -702,15 +700,15 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       List(primitiveArrayDecoder(T), primitiveArraySetter(T, sc.StrLit(sqlType), asAnyRef), primitiveArrayEncoder(T))
     }
 
-    all(sc.Type.String, "varchar", array => code"$array.map(x => x: ${sc.Type.AnyRef})")
-      ++ all(sc.Type.Int, "int4", array => code"$array.map(x => int2Integer(x): ${sc.Type.AnyRef})")
-      ++ all(sc.Type.Long, "int8", array => code"$array.map(x => long2Long(x): ${sc.Type.AnyRef})")
-      ++ all(sc.Type.Float, "float4", array => code"$array.map(x => float2Float(x): ${sc.Type.AnyRef})")
-      ++ all(sc.Type.Double, "float8", array => code"$array.map(x => double2Double(x): ${sc.Type.AnyRef})")
-      ++ all(sc.Type.JavaBigDecimal, "numeric", array => code"$array.map(x => x: ${sc.Type.AnyRef})")
-      ++ ScalaBigDecimal
-      ++ all(sc.Type.Boolean, "bool", array => code"$array.map(x => boolean2Boolean(x): ${sc.Type.AnyRef})")
-      :+ arrayParameterMetaData
+    all(sc.Type.String, "varchar", array => code"$array.map(x => x: ${sc.Type.AnyRef})") ++
+      all(sc.Type.Int, "int4", array => code"$array.map(x => int2Integer(x): ${sc.Type.AnyRef})") ++
+      all(sc.Type.Long, "int8", array => code"$array.map(x => long2Long(x): ${sc.Type.AnyRef})") ++
+      all(sc.Type.Float, "float4", array => code"$array.map(x => float2Float(x): ${sc.Type.AnyRef})") ++
+      all(sc.Type.Double, "float8", array => code"$array.map(x => double2Double(x): ${sc.Type.AnyRef})") ++
+      all(sc.Type.JavaBigDecimal, "numeric", array => code"$array.map(x => x: ${sc.Type.AnyRef})") ++
+      ScalaBigDecimal ++
+      all(sc.Type.Boolean, "bool", array => code"$array.map(x => boolean2Boolean(x): ${sc.Type.AnyRef})") :+
+      arrayParameterMetaData
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
@@ -816,7 +814,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |  override def sqlType: ${sc.Type.String} = ${sc.StrLit(ct.sqlType)}
                  |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
                  |}""".stripMargin
-        ),
+        )
       )
 
     val array = {
