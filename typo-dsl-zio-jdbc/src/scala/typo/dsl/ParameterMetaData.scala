@@ -207,28 +207,25 @@ sealed trait JavaTimeParameterMetaData {
 
   /** Parameter metadata for Java8 instant */
   implicit object InstantParameterMetaData extends ParameterMetaData[Instant] {
-    val sqlType = "TIMESTAMP"
-    val jdbcType = Types.TIMESTAMP
+    val sqlType = "TIMESTAMPZ"
+    val jdbcType = Types.TIMESTAMP_WITH_TIMEZONE
   }
 
   /** Parameter metadata for Java8 local date/time */
   implicit object LocalDateTimeParameterMetaData extends ParameterMetaData[LocalDateTime] {
-
     val sqlType = "TIMESTAMP"
     val jdbcType = Types.TIMESTAMP
   }
 
   /** Parameter metadata for Java8 local date */
   implicit object LocalDateParameterMetaData extends ParameterMetaData[LocalDate] {
-
     val sqlType = "TIMESTAMP"
     val jdbcType = Types.TIMESTAMP
   }
 
   /** Parameter metadata for Java8 zoned date/time */
   implicit object ZonedDateTimeParameterMetaData extends ParameterMetaData[ZonedDateTime] {
-
-    val sqlType = "TIMESTAMP"
-    val jdbcType = Types.TIMESTAMP
+    val sqlType = "TIMESTAMPZ"
+    val jdbcType = Types.TIMESTAMP_WITH_TIMEZONE
   }
 }
