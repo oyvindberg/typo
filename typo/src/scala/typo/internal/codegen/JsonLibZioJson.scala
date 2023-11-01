@@ -165,11 +165,13 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
               }
             )
 
+          // specify `Any` explicitly to save the compiler from LUBbing
+          val list = sc.Type.List.of(sc.Type.Either.of(sc.Type.String, sc.Type.Any))
           code"""|$JsonDecoder[$Json.Obj].mapOrFail { jsonObj =>
                  |  ${vals.mkCode("\n")}
                  |  if (${fields.map(f => code"${f.scalaName}.isRight").mkCode(" && ")})
                  |    ${sc.Type.Right}($tpe(${fields.map(v => code"${v.scalaName} = ${v.scalaName}.toOption.get").mkCode(", ")}))
-                 |  else ${sc.Type.Left}(${sc.Type.List.of(sc.Type.Either.of(sc.Type.String, sc.Type.Any))}(${fields.map(f => code"${f.scalaName}").mkCode(", ")}).flatMap(_.left.toOption).mkString(", "))
+                 |  else ${sc.Type.Left}($list(${fields.map(f => code"${f.scalaName}").mkCode(", ")}).flatMap(_.left.toOption).mkString(", "))
                  |}""".stripMargin
         }
       )
@@ -182,10 +184,8 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         tpe = JsonEncoder.of(tpe),
         body = {
           val params =
-            fields.map(f =>
-              code"""|out.write(\"\"\"${f.jsonName}:\"\"\")
-                     |${lookupEncoderFor(f.tpe)}.unsafeEncode(a.${f.scalaName}, indent, out)""".stripMargin
-            )
+            fields.map(f => code"""|out.write(\"\"\"${f.jsonName}:\"\"\")
+                     |${lookupEncoderFor(f.tpe)}.unsafeEncode(a.${f.scalaName}, indent, out)""".stripMargin)
 
           code"""|new $JsonEncoder[$tpe] {
                  |  override def unsafeEncode(a: $tpe, indent: Option[Int], out: $Write): Unit = {
@@ -194,7 +194,8 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
                  |    out.write("}")
                  |  }
                  |}""".stripMargin
-        })
+        }
+      )
 
     List(decoder, encoder)
   }
