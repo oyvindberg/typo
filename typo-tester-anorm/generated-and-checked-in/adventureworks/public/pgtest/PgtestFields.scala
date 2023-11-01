@@ -8,10 +8,12 @@ package public
 package pgtest
 
 import adventureworks.customtypes.TypoBox
+import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoCircle
 import adventureworks.customtypes.TypoHStore
 import adventureworks.customtypes.TypoInet
 import adventureworks.customtypes.TypoInstant
+import adventureworks.customtypes.TypoInt2Vector
 import adventureworks.customtypes.TypoInterval
 import adventureworks.customtypes.TypoJson
 import adventureworks.customtypes.TypoJsonb
@@ -25,53 +27,84 @@ import adventureworks.customtypes.TypoOffsetTime
 import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
 import adventureworks.customtypes.TypoPolygon
+import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
+import adventureworks.customtypes.TypoVector
 import adventureworks.customtypes.TypoXml
+import adventureworks.public.Mydomain
+import adventureworks.public.Myenum
 import typo.dsl.SqlExpr.Field
 
 trait PgtestFields[Row] {
+  val bool: Field[Boolean, Row]
   val box: Field[TypoBox, Row]
+  val bpchar: Field[/* bpchar, max 3 chars */ String, Row]
+  val bytea: Field[TypoBytea, Row]
+  val char: Field[/* bpchar, max 1 chars */ String, Row]
   val circle: Field[TypoCircle, Row]
+  val date: Field[TypoLocalDate, Row]
+  val float4: Field[Float, Row]
+  val float8: Field[Double, Row]
+  val hstore: Field[TypoHStore, Row]
+  val inet: Field[TypoInet, Row]
+  val int2: Field[TypoShort, Row]
+  val int2vector: Field[TypoInt2Vector, Row]
+  val int4: Field[Int, Row]
+  val int8: Field[Long, Row]
+  val interval: Field[TypoInterval, Row]
+  val json: Field[TypoJson, Row]
+  val jsonb: Field[TypoJsonb, Row]
   val line: Field[TypoLine, Row]
   val lseg: Field[TypoLineSegment, Row]
+  val money: Field[TypoMoney, Row]
+  val mydomain: Field[Mydomain, Row]
+  val myenum: Field[Myenum, Row]
+  val name: Field[String, Row]
+  val numeric: Field[BigDecimal, Row]
   val path: Field[TypoPath, Row]
   val point: Field[TypoPoint, Row]
   val polygon: Field[TypoPolygon, Row]
-  val interval: Field[TypoInterval, Row]
-  val money: Field[TypoMoney, Row]
-  val xml: Field[TypoXml, Row]
-  val json: Field[TypoJson, Row]
-  val jsonb: Field[TypoJsonb, Row]
-  val hstore: Field[TypoHStore, Row]
-  val inet: Field[TypoInet, Row]
+  val text: Field[String, Row]
+  val time: Field[TypoLocalTime, Row]
   val timestamp: Field[TypoLocalDateTime, Row]
   val timestampz: Field[TypoInstant, Row]
-  val time: Field[TypoLocalTime, Row]
   val timez: Field[TypoOffsetTime, Row]
-  val date: Field[TypoLocalDate, Row]
   val uuid: Field[TypoUUID, Row]
-  val numeric: Field[BigDecimal, Row]
+  val varchar: Field[String, Row]
+  val vector: Field[TypoVector, Row]
+  val xml: Field[TypoXml, Row]
   val boxes: Field[Array[TypoBox], Row]
+  val bpchares: Field[Array[/* bpchar */ String], Row]
+  val chares: Field[Array[/* bpchar */ String], Row]
   val circlees: Field[Array[TypoCircle], Row]
+  val datees: Field[Array[TypoLocalDate], Row]
+  val float4es: Field[Array[Float], Row]
+  val float8es: Field[Array[Double], Row]
+  val inetes: Field[Array[TypoInet], Row]
+  val int2es: Field[Array[TypoShort], Row]
+  val int2vectores: Field[Array[TypoInt2Vector], Row]
+  val int4es: Field[Array[Int], Row]
+  val int8es: Field[Array[Long], Row]
+  val intervales: Field[Array[TypoInterval], Row]
+  val jsones: Field[Array[TypoJson], Row]
+  val jsonbes: Field[Array[TypoJsonb], Row]
   val linees: Field[Array[TypoLine], Row]
   val lseges: Field[Array[TypoLineSegment], Row]
+  val moneyes: Field[Array[TypoMoney], Row]
+  val myenumes: Field[Array[Myenum], Row]
+  val namees: Field[Array[String], Row]
+  val numerices: Field[Array[BigDecimal], Row]
   val pathes: Field[Array[TypoPath], Row]
   val pointes: Field[Array[TypoPoint], Row]
   val polygones: Field[Array[TypoPolygon], Row]
-  val intervales: Field[Array[TypoInterval], Row]
-  val moneyes: Field[Array[TypoMoney], Row]
+  val textes: Field[Array[String], Row]
+  val timees: Field[Array[TypoLocalTime], Row]
+  val timestampes: Field[Array[TypoLocalDateTime], Row]
+  val timestampzes: Field[Array[TypoInstant], Row]
+  val timezes: Field[Array[TypoOffsetTime], Row]
+  val uuides: Field[Array[TypoUUID], Row]
+  val varchares: Field[Array[String], Row]
   val xmles: Field[Array[TypoXml], Row]
-  val jsones: Field[Array[TypoJson], Row]
-  val jsonbes: Field[Array[TypoJsonb], Row]
-  val hstores: Field[Array[TypoHStore], Row]
-  val inets: Field[Array[TypoInet], Row]
-  val timestamps: Field[Array[TypoLocalDateTime], Row]
-  val timestampzs: Field[Array[TypoInstant], Row]
-  val times: Field[Array[TypoLocalTime], Row]
-  val timezs: Field[Array[TypoOffsetTime], Row]
-  val dates: Field[Array[TypoLocalDate], Row]
-  val uuids: Field[Array[TypoUUID], Row]
-  val numerics: Field[Array[BigDecimal], Row]
 }
 object PgtestFields extends PgtestStructure[PgtestRow](None, identity, (_, x) => x)
 

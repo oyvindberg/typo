@@ -43,7 +43,8 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.Array.of(sc.Type.Byte),
       fromTypo = (expr, _) => code"$expr.value"
-    )
+    ),
+    forbidArray = true
   )
 
   lazy val TypoLocalDate = CustomType(
@@ -329,7 +330,8 @@ class CustomTypes(pkg: sc.QIdent) {
                |  b
                |}""".stripMargin
       }
-    )
+    ),
+    forbidArray = true
   )
 
   lazy val TypoMoney = CustomType(
@@ -417,6 +419,25 @@ class CustomTypes(pkg: sc.QIdent) {
              |def randomUUID: $target = $target(${sc.Type.UUID}.randomUUID())""".stripMargin)
   )
 
+  lazy val TypoVector = CustomType(
+    comment = "extension: https://github.com/pgvector/pgvector",
+    sqlType = "vector",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoVector")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.Array.of(sc.Type.Float), None)
+    ),
+    isNull = p => code"$p.getString == null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.PgArray,
+      toTypo = (expr, target) => code"$target($expr.getArray.asInstanceOf[${sc.Type.Array.of(sc.Type.JavaFloat)}].map(Float2float))"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.Array.of(sc.Type.JavaFloat),
+      fromTypo = (expr, _) => code"$expr.value.map(x => x: ${sc.Type.JavaFloat})"
+    ),
+    forbidArray = true
+  )
+
   lazy val TypoXml = CustomType(
     comment = "XML",
     sqlType = "xml",
@@ -488,7 +509,7 @@ class CustomTypes(pkg: sc.QIdent) {
   lazy val TypoInet = obj("inet", "TypoInet").copy(toTypoInArray = None)
   lazy val TypoAclItem = obj("aclitem", "TypoAclItem").copy(toTypoInArray = None)
   lazy val TypoAnyArray = obj("anyarray", "TypoAnyArray")
-  lazy val TypoInt2Vector = obj("int2vector", "TypoInt2Vector")
+  lazy val TypoInt2Vector = obj("int2vector", "TypoInt2Vector").copy(toTypoInArray = None).withComment(""". Valid syntax: `TypoInt2Vector("1 2 3")""")
   lazy val TypoOidVector = obj("oidvector", "TypoOidVector")
   lazy val TypoPgNodeTree = obj("pg_node_tree", "TypoPgNodeTree")
   lazy val TypoRecord = obj("record", "TypoRecord").copy(toTypoInArray = None)
@@ -547,6 +568,7 @@ class CustomTypes(pkg: sc.QIdent) {
         TypoRegtype,
         TypoShort,
         TypoUUID,
+        TypoVector,
         TypoXid,
         TypoXml
       ).map(ct => (ct.typoType, ct))*

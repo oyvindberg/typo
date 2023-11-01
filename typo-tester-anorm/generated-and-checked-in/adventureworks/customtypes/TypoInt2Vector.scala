@@ -17,7 +17,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import typo.dsl.Bijection
 
-/** int2vector (via PGObject) */
+/** int2vector (via PGObject). Valid syntax: `TypoInt2Vector("1 2 3") */
 case class TypoInt2Vector(value: String)
 
 object TypoInt2Vector {
@@ -26,7 +26,7 @@ object TypoInt2Vector {
         case v: PgArray =>
          v.getArray match {
            case v: Array[?] =>
-             Right(v.map(v => TypoInt2Vector(v.asInstanceOf[String])))
+             Right(v.map(v => TypoInt2Vector(v.asInstanceOf[PGobject].getValue)))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoInt2Vector, got ${other.getClass.getName}"))
          }
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))

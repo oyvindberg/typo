@@ -5,7 +5,7 @@ import bleep.logging.Logger
 import typo.*
 import typo.internal.FileSync.SoftWrite
 import typo.internal.analysis.ParsedName
-import typo.internal.{DebugJson, TypeMapperDb, generate}
+import typo.internal.{DebugJson, Lazy, TypeMapperDb, generate}
 
 // this runs automatically at build time to instantly see results.
 // it does not need a running database
@@ -135,8 +135,14 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
           (DbLibName.ZioJdbc, JsonLibName.ZioJson)
         else (DbLibName.Anorm, JsonLibName.PlayJson)
       val domains = Nil
-      val typeMapperDb = TypeMapperDb(enums, domains)
-      val metaDb = MetaDb(relations = all, enums = enums, domains = domains, typeMapperDb)
+
+      val metaDb = MetaDb(
+        relations = all.map(t => t.name -> Lazy(t)).toMap,
+        enums = enums,
+        domains = domains,
+        TypeMapperDb(enums, domains)
+      )
+
       val generated: Generated =
         generate(
           Options(

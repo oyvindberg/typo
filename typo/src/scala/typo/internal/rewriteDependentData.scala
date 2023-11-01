@@ -15,9 +15,9 @@ object rewriteDependentData {
     def apply(key: K): Option[Lazy[V]]
   }
 
-  def apply[K, V](in: Map[K, V]) = new Api(in)
+  def apply[K, V](in: Map[K, Lazy[V]]) = new Api(in)
 
-  final class Api[K, V](in: Map[K, V]) {
+  final class Api[K, V](in: Map[K, Lazy[V]]) {
     def eager[VV](f: (K, V, Eval[K, VV]) => VV)(implicit O: Ordering[K]): SortedMap[K, VV] =
       apply(f).map { case (k, v) => (k, v.forceGet) }
 
@@ -33,12 +33,12 @@ object rewriteDependentData {
 
     def apply[VV](f: (K, V, Eval[K, VV]) => VV)(implicit O: Ordering[K]): SortedMap[K, Lazy[VV]] = {
       // sorted to ensure consistency
-      val sortedIn = SortedMap.empty[K, V] ++ in
+      val sortedIn = SortedMap.empty[K, Lazy[V]] ++ in
 
       lazy val eval: Eval[K, VV] = rewritten.apply
 
       lazy val rewritten: SortedMap[K, Lazy[VV]] =
-        sortedIn.map { case (k, v) => k -> Lazy(f(k, v, eval)) }
+        sortedIn.map { case (k, lazyV) => k -> lazyV.map(v => f(k, v, eval)) }
 
       rewritten
     }

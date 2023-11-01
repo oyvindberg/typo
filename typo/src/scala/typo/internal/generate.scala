@@ -49,7 +49,7 @@ object generate {
     val domains = metaDb.domains.map(ComputedDomain(naming, scalaTypeMapper))
 
     val computeds: SortedMap[db.RelationName, Lazy[HasSource]] =
-      rewriteDependentData(metaDb.relations.map(rel => rel.name -> rel).toMap).apply[HasSource] {
+      rewriteDependentData(metaDb.relations).apply[HasSource] {
         case (_, dbTable: db.Table, eval) =>
           ComputedTable(options, default, dbTable, naming, scalaTypeMapper, eval)
         case (_, dbView: db.View, eval) =>

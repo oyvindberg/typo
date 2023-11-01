@@ -11,10 +11,13 @@ case class CustomType(
     isNull: sc.Ident => sc.Code,
     toTypo: CustomType.ToTypo,
     fromTypo: CustomType.FromTypo,
+    // some types is just very difficult to get right inside arrays using jdbc
+    forbidArray: Boolean = false,
     toTypoInArray: Option[CustomType.ToTypo] = None,
     fromTypoInArray: Option[CustomType.FromTypo] = None,
     objBody: Option[sc.Type.Qualified => sc.Code] = None
 ) {
+  def withComment(newComment: String): CustomType = copy(comment = comment + newComment)
   def objBody0 = objBody.map(f => f(typoType))
   def toTypo0(expr: sc.Code): sc.Code = toTypo.toTypo(expr, typoType)
   def fromTypo0(expr: sc.Code): sc.Code = fromTypo.fromTypo0(expr)

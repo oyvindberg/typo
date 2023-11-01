@@ -17,10 +17,6 @@ import typo.dsl.Bijection
 case class TypoBytea(value: Array[Byte])
 
 object TypoBytea {
-  implicit lazy val arrayGet: Get[Array[TypoBytea]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_bytea"))
-    .map(_.map(v => TypoBytea(v.asInstanceOf[Array[Byte]])))
-  implicit lazy val arrayPut: Put[Array[TypoBytea]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_bytea"), "bytea")
-    .contramap(_.map(v => v.value))
   implicit lazy val bijection: Bijection[TypoBytea, Array[Byte]] = Bijection[TypoBytea, Array[Byte]](_.value)(TypoBytea.apply)
   implicit lazy val decoder: Decoder[TypoBytea] = Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly).map(TypoBytea.apply)
   implicit lazy val encoder: Encoder[TypoBytea] = Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly).contramap(_.value)
