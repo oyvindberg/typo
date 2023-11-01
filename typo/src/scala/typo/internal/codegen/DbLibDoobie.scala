@@ -595,30 +595,32 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         )
       )
     }
-    val array = {
-      val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
-      val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
-      val sqlArrayTypeLit = sc.StrLit("_" + ct.sqlType)
-      val arrayType = sc.Type.Array.of(ct.typoType)
-      List(
-        sc.Given(
-          tparams = Nil,
-          name = arrayGetName,
-          implicitParams = Nil,
-          tpe = Get.of(arrayType),
-          body = code"""|$Get.Advanced.array[${sc.Type.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit))
+    val array =
+      if (ct.forbidArray) Nil
+      else {
+        val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
+        val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
+        val sqlArrayTypeLit = sc.StrLit("_" + ct.sqlType)
+        val arrayType = sc.Type.Array.of(ct.typoType)
+        List(
+          sc.Given(
+            tparams = Nil,
+            name = arrayGetName,
+            implicitParams = Nil,
+            tpe = Get.of(arrayType),
+            body = code"""|$Get.Advanced.array[${sc.Type.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit))
                         |  .map(_.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))""".stripMargin
-        ),
-        sc.Given(
-          tparams = Nil,
-          name = arrayPutName,
-          implicitParams = Nil,
-          tpe = Put.of(arrayType),
-          body = code"""|$Put.Advanced.array[${sc.Type.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit)
+          ),
+          sc.Given(
+            tparams = Nil,
+            name = arrayPutName,
+            implicitParams = Nil,
+            tpe = Put.of(arrayType),
+            body = code"""|$Put.Advanced.array[${sc.Type.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit)
                         |  .contramap(_.map($v => ${fromTypo.fromTypo0(v)}))""".stripMargin
+          )
         )
-      )
-    }
+      }
 
     single ++ array
   }

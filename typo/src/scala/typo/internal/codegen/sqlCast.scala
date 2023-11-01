@@ -38,6 +38,8 @@ object sqlCast {
         Some("text")
       case db.Type.PGmoney =>
         Some("numeric")
+      case db.Type.Vector =>
+        Some("float4[]")
       case db.Type.Array(db.Type.PGmoney) =>
         Some("numeric[]")
       case db.Type.TimestampTz | db.Type.Timestamp | db.Type.TimeTz | db.Type.Time | db.Type.Date =>

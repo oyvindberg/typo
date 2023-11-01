@@ -76,6 +76,7 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
       case "regrole"                           => db.Type.regrole
       case "regtype"                           => db.Type.regtype
       case "xid"                               => db.Type.xid
+      case "vector"                            => db.Type.Vector
       case ArrayName(underlying) =>
         db.Type.Array(dbTypeFrom(underlying, characterMaximumLength)(logWarning))
       case typeName =>

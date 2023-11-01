@@ -703,24 +703,26 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       )
     )
 
-    val array = {
-      val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
-      val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
+    val array =
+      if (ct.forbidArray) Nil
+      else {
+        val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
+        val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
 
-      List(
-        sc.Given(
-          Nil,
-          arrayToStatementName,
-          Nil,
-          ToStatement.of(sc.Type.Array.of(tpe)),
-          code"${ToStatement.of(sc.Type.Array.of(tpe))}((s, index, v) => s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(ct.sqlType)}, $v.map(v => ${fromTypo.fromTypo0(v)}))))"
-        ),
-        sc.Given(
-          Nil,
-          arrayColumnName,
-          Nil,
-          Column.of(sc.Type.Array.of(tpe)),
-          code"""|$Column.nonNull[${sc.Type.Array.of(tpe)}]((v1: ${sc.Type.Any}, _) =>
+        List(
+          sc.Given(
+            Nil,
+            arrayToStatementName,
+            Nil,
+            ToStatement.of(sc.Type.Array.of(tpe)),
+            code"${ToStatement.of(sc.Type.Array.of(tpe))}((s, index, v) => s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(ct.sqlType)}, $v.map(v => ${fromTypo.fromTypo0(v)}))))"
+          ),
+          sc.Given(
+            Nil,
+            arrayColumnName,
+            Nil,
+            Column.of(sc.Type.Array.of(tpe)),
+            code"""|$Column.nonNull[${sc.Type.Array.of(tpe)}]((v1: ${sc.Type.Any}, _) =>
                  |  v1 match {
                  |      case $v: ${sc.Type.PgArray} =>
                  |       $v.getArray match {
@@ -731,9 +733,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |    case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of ${sc.Type.PgArray.render.asString}, got $${other.getClass.getName}"))
                  |  }
                  |)""".stripMargin
+          )
         )
-      )
-    }
+      }
     normal ++ array
   }
 }

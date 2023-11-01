@@ -1,4 +1,6 @@
 create extension hstore;
+create extension vector;
+
 drop table pgtest, pgtestnull;
 create table pgtest
 (
@@ -23,6 +25,7 @@ create table pgtest
     date        date                       not null,
     uuid        uuid                       not null,
     numeric     numeric                    not null,
+    vector      vector                     not null,
     boxes       box[]                      not null,
     circlees    circle[]                   not null,
     linees      line[]                     not null,
@@ -35,7 +38,6 @@ create table pgtest
     xmles       xml[]                      not null,
     jsones      json[]                     not null,
     jsonbes     jsonb[]                    not null,
-    hstores     hstore[]                   not null,
     inets       inet[]                     not null,
     timestamps  timestamp[]                not null,
     timestampzs timestamp with time zone[] not null,
@@ -69,6 +71,7 @@ create table pgtestnull
     date        date,
     uuid        uuid,
     numeric     numeric,
+    vector      vector,
     boxes       box[],
     circlees    circle[],
     linees      line[],
@@ -81,7 +84,6 @@ create table pgtestnull
     xmles       xml[],
     jsones      json[],
     jsonbes     jsonb[],
-    hstores     hstore[],
     inets       inet[],
     timestamps  timestamp[],
     timestampzs timestamp with time zone[],
