@@ -43,7 +43,8 @@ class CustomTypes(pkg: sc.QIdent) {
     fromTypo = CustomType.FromTypo(
       jdbcType = sc.Type.Array.of(sc.Type.Byte),
       fromTypo = (expr, _) => code"$expr.value"
-    )
+    ),
+    forbidArray = true
   )
 
   lazy val TypoLocalDate = CustomType(
@@ -508,7 +509,7 @@ class CustomTypes(pkg: sc.QIdent) {
   lazy val TypoInet = obj("inet", "TypoInet").copy(toTypoInArray = None)
   lazy val TypoAclItem = obj("aclitem", "TypoAclItem").copy(toTypoInArray = None)
   lazy val TypoAnyArray = obj("anyarray", "TypoAnyArray")
-  lazy val TypoInt2Vector = obj("int2vector", "TypoInt2Vector")
+  lazy val TypoInt2Vector = obj("int2vector", "TypoInt2Vector").copy(toTypoInArray = None).withComment(""". Valid syntax: `TypoInt2Vector("1 2 3")""")
   lazy val TypoOidVector = obj("oidvector", "TypoOidVector")
   lazy val TypoPgNodeTree = obj("pg_node_tree", "TypoPgNodeTree")
   lazy val TypoRecord = obj("record", "TypoRecord").copy(toTypoInArray = None)
