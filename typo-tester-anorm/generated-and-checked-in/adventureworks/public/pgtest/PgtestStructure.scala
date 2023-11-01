@@ -26,6 +26,7 @@ import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
 import adventureworks.customtypes.TypoPolygon
 import adventureworks.customtypes.TypoUUID
+import adventureworks.customtypes.TypoVector
 import adventureworks.customtypes.TypoXml
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -56,6 +57,7 @@ class PgtestStructure[Row](val prefix: Option[String], val extract: Row => Pgtes
   override val date = new Field[TypoLocalDate, Row](prefix, "date", Some("text"), Some("date"))(x => extract(x).date, (row, value) => merge(row, extract(row).copy(date = value)))
   override val uuid = new Field[TypoUUID, Row](prefix, "uuid", None, Some("uuid"))(x => extract(x).uuid, (row, value) => merge(row, extract(row).copy(uuid = value)))
   override val numeric = new Field[BigDecimal, Row](prefix, "numeric", None, Some("numeric"))(x => extract(x).numeric, (row, value) => merge(row, extract(row).copy(numeric = value)))
+  override val vector = new Field[TypoVector, Row](prefix, "vector", Some("float4[]"), Some("vector"))(x => extract(x).vector, (row, value) => merge(row, extract(row).copy(vector = value)))
   override val boxes = new Field[Array[TypoBox], Row](prefix, "boxes", None, Some("_box"))(x => extract(x).boxes, (row, value) => merge(row, extract(row).copy(boxes = value)))
   override val circlees = new Field[Array[TypoCircle], Row](prefix, "circlees", None, Some("_circle"))(x => extract(x).circlees, (row, value) => merge(row, extract(row).copy(circlees = value)))
   override val linees = new Field[Array[TypoLine], Row](prefix, "linees", None, Some("_line"))(x => extract(x).linees, (row, value) => merge(row, extract(row).copy(linees = value)))
@@ -68,7 +70,6 @@ class PgtestStructure[Row](val prefix: Option[String], val extract: Row => Pgtes
   override val xmles = new Field[Array[TypoXml], Row](prefix, "xmles", None, Some("_xml"))(x => extract(x).xmles, (row, value) => merge(row, extract(row).copy(xmles = value)))
   override val jsones = new Field[Array[TypoJson], Row](prefix, "jsones", None, Some("_json"))(x => extract(x).jsones, (row, value) => merge(row, extract(row).copy(jsones = value)))
   override val jsonbes = new Field[Array[TypoJsonb], Row](prefix, "jsonbes", None, Some("_jsonb"))(x => extract(x).jsonbes, (row, value) => merge(row, extract(row).copy(jsonbes = value)))
-  override val hstores = new Field[Array[TypoHStore], Row](prefix, "hstores", None, Some("_hstore"))(x => extract(x).hstores, (row, value) => merge(row, extract(row).copy(hstores = value)))
   override val inets = new Field[Array[TypoInet], Row](prefix, "inets", None, Some("_inet"))(x => extract(x).inets, (row, value) => merge(row, extract(row).copy(inets = value)))
   override val timestamps = new Field[Array[TypoLocalDateTime], Row](prefix, "timestamps", Some("text[]"), Some("_timestamp"))(x => extract(x).timestamps, (row, value) => merge(row, extract(row).copy(timestamps = value)))
   override val timestampzs = new Field[Array[TypoInstant], Row](prefix, "timestampzs", Some("text[]"), Some("_timestamptz"))(x => extract(x).timestampzs, (row, value) => merge(row, extract(row).copy(timestampzs = value)))
@@ -79,7 +80,7 @@ class PgtestStructure[Row](val prefix: Option[String], val extract: Row => Pgtes
   override val numerics = new Field[Array[BigDecimal], Row](prefix, "numerics", None, Some("_numeric"))(x => extract(x).numerics, (row, value) => merge(row, extract(row).copy(numerics = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
-    List[FieldLikeNoHkt[?, Row]](box, circle, line, lseg, path, point, polygon, interval, money, xml, json, jsonb, hstore, inet, timestamp, timestampz, time, timez, date, uuid, numeric, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets, timestamps, timestampzs, times, timezs, dates, uuids, numerics)
+    List[FieldLikeNoHkt[?, Row]](box, circle, line, lseg, path, point, polygon, interval, money, xml, json, jsonb, hstore, inet, timestamp, timestampz, time, timez, date, uuid, numeric, vector, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, inets, timestamps, timestampzs, times, timezs, dates, uuids, numerics)
 
   override def copy[NewRow](prefix: Option[String], extract: NewRow => PgtestRow, merge: (NewRow, PgtestRow) => NewRow): PgtestStructure[NewRow] =
     new PgtestStructure(prefix, extract, merge)

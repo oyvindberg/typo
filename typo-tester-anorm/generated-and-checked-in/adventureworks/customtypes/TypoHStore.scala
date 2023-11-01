@@ -12,7 +12,6 @@ import anorm.ToStatement
 import anorm.TypeDoesNotMatch
 import java.sql.Types
 import java.util.HashMap
-import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import typo.dsl.Bijection
@@ -21,26 +20,6 @@ import typo.dsl.Bijection
 case class TypoHStore(value: Map[String, String])
 
 object TypoHStore {
-  implicit lazy val arrayColumn: Column[Array[TypoHStore]] = Column.nonNull[Array[TypoHStore]]((v1: Any, _) =>
-    v1 match {
-        case v: PgArray =>
-         v.getArray match {
-           case v: Array[?] =>
-             Right(v.map(v => {
-                                val b = Map.newBuilder[String, String]
-                                v.asInstanceOf[java.util.Map[?, ?]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
-                                TypoHStore(b.result())
-                              }))
-           case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoHStore, got ${other.getClass.getName}"))
-         }
-      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
-    }
-  )
-  implicit lazy val arrayToStatement: ToStatement[Array[TypoHStore]] = ToStatement[Array[TypoHStore]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("hstore", v.map(v => {
-                                                                                                                         val b = new HashMap[String, String]
-                                                                                                                         v.value.foreach { case (k, v) => b.put(k, v)}
-                                                                                                                         b
-                                                                                                                       }))))
   implicit lazy val bijection: Bijection[TypoHStore, Map[String, String]] = Bijection[TypoHStore, Map[String, String]](_.value)(TypoHStore.apply)
   implicit lazy val column: Column[TypoHStore] = Column.nonNull[TypoHStore]((v1: Any, _) =>
     v1 match {

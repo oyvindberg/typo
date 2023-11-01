@@ -3,7 +3,7 @@ version: '3.1'
 
 services:
   db:
-    image: postgis/postgis:14-3.3 # postgres with postgis
+    image: ghcr.io/oyvindberg/typo/integration-test:main
     restart: always
     environment:
       POSTGRES_USER: postgres

@@ -26,6 +26,7 @@ import adventureworks.customtypes.TypoPath
 import adventureworks.customtypes.TypoPoint
 import adventureworks.customtypes.TypoPolygon
 import adventureworks.customtypes.TypoUUID
+import adventureworks.customtypes.TypoVector
 import adventureworks.customtypes.TypoXml
 import typo.dsl.SqlExpr.OptField
 
@@ -51,6 +52,7 @@ trait PgtestnullFields[Row] {
   val date: OptField[TypoLocalDate, Row]
   val uuid: OptField[TypoUUID, Row]
   val numeric: OptField[BigDecimal, Row]
+  val vector: OptField[TypoVector, Row]
   val boxes: OptField[Array[TypoBox], Row]
   val circlees: OptField[Array[TypoCircle], Row]
   val linees: OptField[Array[TypoLine], Row]
@@ -63,7 +65,6 @@ trait PgtestnullFields[Row] {
   val xmles: OptField[Array[TypoXml], Row]
   val jsones: OptField[Array[TypoJson], Row]
   val jsonbes: OptField[Array[TypoJsonb], Row]
-  val hstores: OptField[Array[TypoHStore], Row]
   val inets: OptField[Array[TypoInet], Row]
   val timestamps: OptField[Array[TypoLocalDateTime], Row]
   val timestampzs: OptField[Array[TypoInstant], Row]

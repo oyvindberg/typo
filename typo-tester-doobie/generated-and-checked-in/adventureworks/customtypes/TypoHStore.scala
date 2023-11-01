@@ -18,18 +18,6 @@ import typo.dsl.Bijection
 case class TypoHStore(value: Map[String, String])
 
 object TypoHStore {
-  implicit lazy val arrayGet: Get[Array[TypoHStore]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_hstore"))
-    .map(_.map(v => {
-                      val b = Map.newBuilder[String, String]
-                      v.asInstanceOf[java.util.Map[?, ?]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
-                      TypoHStore(b.result())
-                    }))
-  implicit lazy val arrayPut: Put[Array[TypoHStore]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_hstore"), "hstore")
-    .contramap(_.map(v => {
-                            val b = new HashMap[String, String]
-                            v.value.foreach { case (k, v) => b.put(k, v)}
-                            b
-                          }))
   implicit lazy val bijection: Bijection[TypoHStore, Map[String, String]] = Bijection[TypoHStore, Map[String, String]](_.value)(TypoHStore.apply)
   implicit lazy val decoder: Decoder[TypoHStore] = Decoder[Map[String, String]].map(TypoHStore.apply)
   implicit lazy val encoder: Encoder[TypoHStore] = Encoder[Map[String, String]].contramap(_.value)

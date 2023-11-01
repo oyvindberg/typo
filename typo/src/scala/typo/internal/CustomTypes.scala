@@ -329,7 +329,8 @@ class CustomTypes(pkg: sc.QIdent) {
                |  b
                |}""".stripMargin
       }
-    )
+    ),
+    forbidArray = true
   )
 
   lazy val TypoMoney = CustomType(
@@ -415,6 +416,25 @@ class CustomTypes(pkg: sc.QIdent) {
     ),
     objBody = Some(target => code"""|def apply(str: ${sc.Type.String}): $target = $target(${sc.Type.UUID}.fromString(str))
              |def randomUUID: $target = $target(${sc.Type.UUID}.randomUUID())""".stripMargin)
+  )
+
+  lazy val TypoVector = CustomType(
+    comment = "extension: https://github.com/pgvector/pgvector",
+    sqlType = "vector",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoVector")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.Array.of(sc.Type.Float), None)
+    ),
+    isNull = p => code"$p.getString == null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.PgArray,
+      toTypo = (expr, target) => code"$target($expr.getArray.asInstanceOf[${sc.Type.Array.of(sc.Type.JavaFloat)}].map(Float2float))"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.Array.of(sc.Type.JavaFloat),
+      fromTypo = (expr, _) => code"$expr.value.map(x => x: ${sc.Type.JavaFloat})"
+    ),
+    forbidArray = true
   )
 
   lazy val TypoXml = CustomType(
@@ -547,6 +567,7 @@ class CustomTypes(pkg: sc.QIdent) {
         TypoRegtype,
         TypoShort,
         TypoUUID,
+        TypoVector,
         TypoXid,
         TypoXml
       ).map(ct => (ct.typoType, ct))*
