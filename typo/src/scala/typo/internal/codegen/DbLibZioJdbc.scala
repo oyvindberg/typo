@@ -25,10 +25,12 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   private def SQL(content: sc.Code) = sc.StringInterpolate(sqlInterpolator, sc.Ident("sql"), content)
 
+  private val arraySetterName: sc.Ident = sc.Ident("arraySetter")
+  private val arrayJdbcDecoderName: sc.Ident = sc.Ident("arrayJdbcDecoder")
+  private val arrayJdbcEncoderName: sc.Ident = sc.Ident("arrayJdbcEncoder")
   private val jdbcDecoderName: sc.Ident = sc.Ident("jdbcDecoder")
   private val jdbcEncoderName: sc.Ident = sc.Ident("jdbcEncoder")
   private val setterName: sc.Ident = sc.Ident("setter")
-  private val arraySetterName: sc.Ident = sc.Ident("arraySetter")
   private val parameterMetadataName: sc.Ident = sc.Ident("parameterMetadata")
   private val arrayParameterMetaDataName = sc.Ident("arrayParameterMetaData")
 
@@ -138,9 +140,6 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         // customized type mapping
         case x if missingInstancesByType.contains(ParameterMetaData.of(x)) =>
           code"${missingInstancesByType(ParameterMetaData.of(x))}"
-        // generated array type
-        //        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
-        //          code"$targ.$arrayColumnName"
         case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$ParameterMetaData.ByteArrayParameterMetaData"
         // fallback array case.
         case sc.Type.TApply(sc.Type.Array, List(targ)) => code"${pkg / arrayParameterMetaDataName}(${lookupParameterMetaDataFor(targ)})"
@@ -503,6 +502,28 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     List(
       sc.Given(
         tparams = Nil,
+        name = arraySetterName,
+        implicitParams = Nil,
+        tpe = Setter.of(sc.Type.Array.of(wrapperType)),
+        body = code"""${lookupSetter(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = arrayJdbcDecoderName,
+        implicitParams = Nil,
+        tpe = JdbcDecoder.of(sc.Type.Array.of(wrapperType)),
+        body = code"""${lookupJdbcDecoder(sc.Type.Array.of(underlying))}.map(a => if (a == null) null else a.map(force))"""
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = arrayJdbcEncoderName,
+        implicitParams = Nil,
+        tpe = JdbcEncoder.of(sc.Type.Array.of(wrapperType)),
+        // JdbcEncoder for unary types defined in terms of `Setter`
+        body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
+      ),
+      sc.Given(
+        tparams = Nil,
         name = jdbcEncoderName,
         implicitParams = Nil,
         tpe = JdbcEncoder.of(wrapperType),
@@ -803,7 +824,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         List(
           sc.Given(
             tparams = Nil,
-            name = sc.Ident("jdbcArrayEncoder"),
+            name = arrayJdbcEncoderName,
             implicitParams = Nil,
             tpe = JdbcEncoder.of(sc.Type.Array.of(ct.typoType)),
             // JdbcEncoder for unary types defined in terms of `Setter`
@@ -811,7 +832,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           ),
           sc.Given(
             tparams = Nil,
-            name = sc.Ident("jdbcArrayDecoder"),
+            name = arrayJdbcDecoderName,
             implicitParams = List(
               sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
             ),
