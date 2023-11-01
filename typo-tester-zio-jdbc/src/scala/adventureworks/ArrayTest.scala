@@ -48,6 +48,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         date = TypoLocalDate(LocalDate.now),
         uuid = TypoUUID.randomUUID,
         numeric = BigDecimal("3.14159"),
+        vector = TypoVector(Array(1.0f, 2.2f, 3.3f)),
         boxes = Array(TypoBox(3.0, 4.0, 1.0, 2.0)),
         circlees = Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0)),
         linees = Array(TypoLine(3.0, 4.5, 5.5)),
@@ -60,7 +61,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         xmles = Array(TypoXml("<xml/>")),
         jsones = Array(TypoJson("""{"a": 1}""")),
         jsonbes = Array(TypoJsonb("""{"a": 2}""")),
-        hstores = Array(), // todo
         inets = Array(TypoInet("::10.2.3.4")),
         timestamps = Array(TypoLocalDateTime.now),
         timestampzs = Array(TypoInstant.now),
@@ -92,6 +92,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         assert(after.date === before.date): @nowarn
         assert(after.uuid === before.uuid): @nowarn
         assert(after.numeric === before.numeric): @nowarn
+        assert(after.vector === before.vector): @nowarn
         assert(after.boxes === before.boxes): @nowarn
         assert(after.circlees === before.circlees): @nowarn
         assert(after.linees === before.linees): @nowarn
@@ -104,7 +105,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         assert(after.xmles === before.xmles): @nowarn
         assert(after.jsones === before.jsones): @nowarn
         assert(after.jsonbes === before.jsonbes): @nowarn
-        assert(after.hstores === before.hstores): @nowarn
         assert(after.inets === before.inets): @nowarn
         assert(after.timestamps === before.timestamps): @nowarn
         assert(after.timestampzs === before.timestampzs): @nowarn
@@ -141,6 +141,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         date = None,
         uuid = None,
         numeric = None,
+        vector = None,
         boxes = None,
         circlees = None,
         linees = None,
@@ -153,7 +154,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         xmles = None,
         jsones = None,
         jsonbes = None,
-        hstores = None,
         inets = None,
         timestamps = None,
         timestampzs = None,
@@ -193,6 +193,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         date = Some(TypoLocalDate(LocalDate.now)),
         uuid = Some(TypoUUID.randomUUID),
         numeric = Some(BigDecimal("3.14159")),
+        vector = Some(TypoVector(Array(1.0f, 2.2f, 3.3f))),
         boxes = Some(Array(TypoBox(3.0, 4.0, 1.0, 2.0))),
         circlees = Some(Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0))),
         linees = Some(Array(TypoLine(3.0, 4.5, 5.5))),
@@ -205,7 +206,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         xmles = Some(Array(TypoXml("<xml/>"))),
         jsones = Some(Array(TypoJson("""{"a": 1}"""))),
         jsonbes = Some(Array(TypoJsonb("""{"a": 2}"""))),
-        hstores = Some(Array()),
         inets = Some(Array(TypoInet("::10.2.3.4"))),
         timestamps = Some(Array(TypoLocalDateTime.now)),
         timestampzs = Some(Array(TypoInstant.now)),
@@ -238,6 +238,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         assert(after.date === before.date): @nowarn
         assert(after.uuid === before.uuid): @nowarn
         assert(after.numeric === before.numeric): @nowarn
+        assert(after.vector === before.vector): @nowarn
         assert(after.boxes.map(_.toList) === before.boxes.map(_.toList)): @nowarn
         assert(after.circlees.map(_.toList) === before.circlees.map(_.toList)): @nowarn
         assert(after.linees.map(_.toList) === before.linees.map(_.toList)): @nowarn
@@ -250,7 +251,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         assert(after.xmles.map(_.toList) === before.xmles.map(_.toList)): @nowarn
         assert(after.jsones.map(_.toList) === before.jsones.map(_.toList)): @nowarn
         assert(after.jsonbes.map(_.toList) === before.jsonbes.map(_.toList)): @nowarn
-        assert(after.hstores.map(_.toList) === before.hstores.map(_.toList)): @nowarn
         assert(after.inets.map(_.toList) === before.inets.map(_.toList)): @nowarn
         assert(after.timestamps.map(_.toList) === before.timestamps.map(_.toList)): @nowarn
         assert(after.timestampzs.map(_.toList) === before.timestampzs.map(_.toList)): @nowarn

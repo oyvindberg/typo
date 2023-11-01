@@ -795,28 +795,30 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         )
       )
 
-    val array = {
-      val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
-      val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
-      List(
-        sc.Given(
-          tparams = Nil,
-          name = sc.Ident("jdbcArrayEncoder"),
-          implicitParams = Nil,
-          tpe = JdbcEncoder.of(sc.Type.Array.of(ct.typoType)),
-          // JdbcEncoder for unary types defined in terms of `Setter`
-          body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
-        ),
-        sc.Given(
-          tparams = Nil,
-          name = sc.Ident("jdbcArrayDecoder"),
-          implicitParams = List(
-            sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
+    val array =
+      if (ct.forbidArray) Nil
+      else {
+        val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
+        val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
+        List(
+          sc.Given(
+            tparams = Nil,
+            name = sc.Ident("jdbcArrayEncoder"),
+            implicitParams = Nil,
+            tpe = JdbcEncoder.of(sc.Type.Array.of(ct.typoType)),
+            // JdbcEncoder for unary types defined in terms of `Setter`
+            body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
           ),
-          tpe = JdbcDecoder.of(sc.Type.Array.of(ct.typoType)),
-          body = {
-            val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
-            code"""|${JdbcDecoder.of(sc.Type.Array.of(ct.typoType))}(
+          sc.Given(
+            tparams = Nil,
+            name = sc.Ident("jdbcArrayDecoder"),
+            implicitParams = List(
+              sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
+            ),
+            tpe = JdbcDecoder.of(sc.Type.Array.of(ct.typoType)),
+            body = {
+              val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
+              code"""|${JdbcDecoder.of(sc.Type.Array.of(ct.typoType))}(
                    |  (rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => {
                   |    val arr = rs.getArray(i)
                   |    if (arr eq null) null
@@ -831,17 +833,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                   |  },
                   |  $expectedType
                   |)""".stripMargin
-          }
-        ),
-        sc.Given(
-          tparams = Nil,
-          name = arraySetterName,
-          implicitParams = Nil,
-          tpe = Setter.of(sc.Type.Array.of(ct.typoType)),
-          body = {
-            val v = sc.Ident("v")
-            val vv = sc.Ident("vv")
-            code"""|$Setter.forSqlType((ps, i, $v) =>
+            }
+          ),
+          sc.Given(
+            tparams = Nil,
+            name = arraySetterName,
+            implicitParams = Nil,
+            tpe = Setter.of(sc.Type.Array.of(ct.typoType)),
+            body = {
+              val v = sc.Ident("v")
+              val vv = sc.Ident("vv")
+              code"""|$Setter.forSqlType((ps, i, $v) =>
                    |  ps.setArray(
                    |    i,
                    |    ps.getConnection.createArrayOf(
@@ -853,10 +855,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                    |  ),
                    |  ${sc.Type.Types}.ARRAY
                    |)""".stripMargin
-          }
+            }
+          )
         )
-      )
-    }
+      }
 
     single ++ array
   }
