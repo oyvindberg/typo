@@ -14,12 +14,12 @@ import io.circe.Encoder
 import org.postgresql.util.PGobject
 import typo.dsl.Bijection
 
-/** int2vector (via PGObject) */
+/** int2vector (via PGObject). Valid syntax: `TypoInt2Vector("1 2 3") */
 case class TypoInt2Vector(value: String)
 
 object TypoInt2Vector {
   implicit lazy val arrayGet: Get[Array[TypoInt2Vector]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_int2vector"))
-    .map(_.map(v => TypoInt2Vector(v.asInstanceOf[String])))
+    .map(_.map(v => TypoInt2Vector(v.asInstanceOf[PGobject].getValue)))
   implicit lazy val arrayPut: Put[Array[TypoInt2Vector]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_int2vector"), "int2vector")
     .contramap(_.map(v => {
                             val obj = new PGobject

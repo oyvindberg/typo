@@ -11,7 +11,6 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
 import java.sql.Types
-import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import typo.dsl.Bijection
@@ -20,18 +19,6 @@ import typo.dsl.Bijection
 case class TypoBytea(value: Array[Byte])
 
 object TypoBytea {
-  implicit lazy val arrayColumn: Column[Array[TypoBytea]] = Column.nonNull[Array[TypoBytea]]((v1: Any, _) =>
-    v1 match {
-        case v: PgArray =>
-         v.getArray match {
-           case v: Array[?] =>
-             Right(v.map(v => TypoBytea(v.asInstanceOf[Array[Byte]])))
-           case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoBytea, got ${other.getClass.getName}"))
-         }
-      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
-    }
-  )
-  implicit lazy val arrayToStatement: ToStatement[Array[TypoBytea]] = ToStatement[Array[TypoBytea]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("bytea", v.map(v => v.value))))
   implicit lazy val bijection: Bijection[TypoBytea, Array[Byte]] = Bijection[TypoBytea, Array[Byte]](_.value)(TypoBytea.apply)
   implicit lazy val column: Column[TypoBytea] = Column.nonNull[TypoBytea]((v1: Any, _) =>
     v1 match {
