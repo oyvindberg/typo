@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoAnyArray(value: String)
 
 object TypoAnyArray {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoAnyArray]): JdbcDecoder[Array[TypoAnyArray]] = JdbcDecoder[Array[TypoAnyArray]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoAnyArray(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoAnyArray]] = JdbcDecoder[Array[TypoAnyArray]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoAnyArray(x.asInstanceOf[String]))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoAnyArray]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoAnyArray]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoAnyArray {
   implicit lazy val jsonDecoder: JsonDecoder[TypoAnyArray] = JsonDecoder.string.map(TypoAnyArray.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoAnyArray] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoAnyArray] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoAnyArray] = new ParameterMetaData[TypoAnyArray] {
-    override def sqlType: String = "anyarray"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoAnyArray] = ParameterMetaData.instance[TypoAnyArray]("anyarray", Types.OTHER)
   implicit lazy val setter: Setter[TypoAnyArray] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

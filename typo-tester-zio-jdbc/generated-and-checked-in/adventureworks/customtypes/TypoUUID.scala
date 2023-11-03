@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import java.util.UUID
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -24,20 +23,12 @@ case class TypoUUID(value: UUID)
 object TypoUUID {
   def apply(str: String): TypoUUID = TypoUUID(UUID.fromString(str))
   def randomUUID: TypoUUID = TypoUUID(UUID.randomUUID())
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoUUID]): JdbcDecoder[Array[TypoUUID]] = JdbcDecoder[Array[TypoUUID]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoUUID(x.asInstanceOf[UUID])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoUUID]] = JdbcDecoder[Array[TypoUUID]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoUUID(x.asInstanceOf[UUID]))
     },
-    "java.util.UUID"
+    "scala.Array[java.util.UUID]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUUID]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoUUID]] = Setter.forSqlType((ps, i, v) =>
@@ -64,10 +55,7 @@ object TypoUUID {
   implicit lazy val jsonDecoder: JsonDecoder[TypoUUID] = JsonDecoder.uuid.map(TypoUUID.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoUUID] = JsonEncoder.uuid.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[UUID]): Ordering[TypoUUID] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoUUID] = new ParameterMetaData[TypoUUID] {
-    override def sqlType: String = "uuid"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoUUID] = ParameterMetaData.instance[TypoUUID]("uuid", Types.OTHER)
   implicit lazy val setter: Setter[TypoUUID] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

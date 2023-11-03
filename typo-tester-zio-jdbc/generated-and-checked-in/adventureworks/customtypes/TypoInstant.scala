@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -31,20 +30,12 @@ object TypoInstant {
   def apply(value: Instant): TypoInstant = new TypoInstant(value.truncatedTo(ChronoUnit.MICROS))
   def apply(str: String): TypoInstant = apply(OffsetDateTime.parse(str, parser).toInstant)
   def now = TypoInstant(Instant.now)
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoInstant]): JdbcDecoder[Array[TypoInstant]] = JdbcDecoder[Array[TypoInstant]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoInstant(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoInstant]] = JdbcDecoder[Array[TypoInstant]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoInstant(x.asInstanceOf[String]))
     },
-    "java.lang.String"
+    "scala.Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInstant]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInstant]] = Setter.forSqlType((ps, i, v) =>
@@ -71,10 +62,7 @@ object TypoInstant {
   implicit lazy val jsonDecoder: JsonDecoder[TypoInstant] = JsonDecoder.instant.map(TypoInstant.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoInstant] = JsonEncoder.instant.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[Instant]): Ordering[TypoInstant] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoInstant] = new ParameterMetaData[TypoInstant] {
-    override def sqlType: String = "timestamptz"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoInstant] = ParameterMetaData.instance[TypoInstant]("timestamptz", Types.OTHER)
   implicit lazy val setter: Setter[TypoInstant] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

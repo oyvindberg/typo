@@ -28,6 +28,10 @@ trait ParameterMetaData[T] {
 /** ParameterMetaData companion, providing defaults based on SQL92.
   */
 object ParameterMetaData extends JavaTimeParameterMetaData {
+  def instance[T](_sqlType: String, _jdbcType: Int): ParameterMetaData[T] = new ParameterMetaData[T] {
+    val sqlType = _sqlType
+    val jdbcType = _jdbcType
+  }
 
   /** Binary meta data */
   implicit object BlobParameterMetaData extends ParameterMetaData[java.sql.Blob] {
@@ -234,5 +238,11 @@ sealed trait JavaTimeParameterMetaData {
   implicit object OffsetDateTimeParameterMetaData extends ParameterMetaData[OffsetDateTime] {
     val sqlType = "TIMESTAMPZ"
     val jdbcType = Types.TIMESTAMP_WITH_TIMEZONE
+  }
+
+  // added in typo. this is postgres-specific
+  implicit def arrayParameterMetaData[T](implicit T: ParameterMetaData[T]): ParameterMetaData[Array[T]] = new ParameterMetaData[Array[T]] {
+    override def sqlType: java.lang.String = "_" + T.sqlType
+    override def jdbcType: scala.Int = java.sql.Types.ARRAY
   }
 }

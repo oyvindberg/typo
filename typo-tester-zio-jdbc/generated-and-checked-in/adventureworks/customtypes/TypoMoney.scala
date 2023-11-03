@@ -8,7 +8,6 @@ package customtypes
 
 import java.sql.ResultSet
 import java.sql.Types
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -21,20 +20,12 @@ import zio.json.JsonEncoder
 case class TypoMoney(value: BigDecimal)
 
 object TypoMoney {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoMoney]): JdbcDecoder[Array[TypoMoney]] = JdbcDecoder[Array[TypoMoney]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoMoney(BigDecimal(x.asInstanceOf[java.math.BigDecimal]))
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoMoney]] = JdbcDecoder[Array[TypoMoney]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoMoney(BigDecimal(x.asInstanceOf[java.math.BigDecimal])))
     },
-    "java.math.BigDecimal"
+    "scala.Array[java.math.BigDecimal]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoMoney]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoMoney]] = Setter.forSqlType((ps, i, v) =>
@@ -61,10 +52,7 @@ object TypoMoney {
   implicit lazy val jsonDecoder: JsonDecoder[TypoMoney] = JsonDecoder.scalaBigDecimal.map(TypoMoney.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoMoney] = JsonEncoder.scalaBigDecimal.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoMoney] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoMoney] = new ParameterMetaData[TypoMoney] {
-    override def sqlType: String = "money"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoMoney] = ParameterMetaData.instance[TypoMoney]("money", Types.OTHER)
   implicit lazy val setter: Setter[TypoMoney] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

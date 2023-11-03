@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGpoint
-import scala.reflect.ClassTag
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
@@ -23,20 +22,12 @@ import zio.json.internal.Write
 case class TypoPoint(x: Double, y: Double)
 
 object TypoPoint {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoPoint]): JdbcDecoder[Array[TypoPoint]] = JdbcDecoder[Array[TypoPoint]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoPoint(x.asInstanceOf[PGpoint].x, x.asInstanceOf[PGpoint].y)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoPoint]] = JdbcDecoder[Array[TypoPoint]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoPoint(x.asInstanceOf[PGpoint].x, x.asInstanceOf[PGpoint].y))
     },
-    "org.postgresql.geometric.PGpoint"
+    "scala.Array[org.postgresql.geometric.PGpoint]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPoint]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoPoint]] = Setter.forSqlType((ps, i, v) =>
@@ -78,10 +69,7 @@ object TypoPoint {
     }
   }
   implicit lazy val ordering: Ordering[TypoPoint] = Ordering.by(x => (x.x, x.y))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoPoint] = new ParameterMetaData[TypoPoint] {
-    override def sqlType: String = "point"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoPoint] = ParameterMetaData.instance[TypoPoint]("point", Types.OTHER)
   implicit lazy val setter: Setter[TypoPoint] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

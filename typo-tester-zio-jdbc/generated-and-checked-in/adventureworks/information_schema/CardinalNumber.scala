@@ -26,9 +26,6 @@ object CardinalNumber {
   implicit lazy val jsonDecoder: JsonDecoder[CardinalNumber] = JsonDecoder.int.map(CardinalNumber.apply)
   implicit lazy val jsonEncoder: JsonEncoder[CardinalNumber] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[CardinalNumber] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[CardinalNumber] = new ParameterMetaData[CardinalNumber] {
-    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[CardinalNumber] = ParameterMetaData.instance[CardinalNumber](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[CardinalNumber] = Setter.intSetter.contramap(_.value)
 }

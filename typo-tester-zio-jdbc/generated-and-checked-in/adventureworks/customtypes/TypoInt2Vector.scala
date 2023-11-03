@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoInt2Vector(value: String)
 
 object TypoInt2Vector {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoInt2Vector]): JdbcDecoder[Array[TypoInt2Vector]] = JdbcDecoder[Array[TypoInt2Vector]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoInt2Vector(x.asInstanceOf[PGobject].getValue)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoInt2Vector]] = JdbcDecoder[Array[TypoInt2Vector]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoInt2Vector(x.asInstanceOf[PGobject].getValue))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInt2Vector]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInt2Vector]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoInt2Vector {
   implicit lazy val jsonDecoder: JsonDecoder[TypoInt2Vector] = JsonDecoder.string.map(TypoInt2Vector.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoInt2Vector] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoInt2Vector] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoInt2Vector] = new ParameterMetaData[TypoInt2Vector] {
-    override def sqlType: String = "int2vector"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoInt2Vector] = ParameterMetaData.instance[TypoInt2Vector]("int2vector", Types.OTHER)
   implicit lazy val setter: Setter[TypoInt2Vector] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

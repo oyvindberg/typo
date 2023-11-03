@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoJsonb(value: String)
 
 object TypoJsonb {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoJsonb]): JdbcDecoder[Array[TypoJsonb]] = JdbcDecoder[Array[TypoJsonb]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoJsonb(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoJsonb]] = JdbcDecoder[Array[TypoJsonb]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoJsonb(x.asInstanceOf[String]))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoJsonb]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoJsonb]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoJsonb {
   implicit lazy val jsonDecoder: JsonDecoder[TypoJsonb] = JsonDecoder.string.map(TypoJsonb.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoJsonb] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoJsonb] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoJsonb] = new ParameterMetaData[TypoJsonb] {
-    override def sqlType: String = "jsonb"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoJsonb] = ParameterMetaData.instance[TypoJsonb]("jsonb", Types.OTHER)
   implicit lazy val setter: Setter[TypoJsonb] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

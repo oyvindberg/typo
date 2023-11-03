@@ -25,9 +25,6 @@ object ScrapreasonId {
   implicit lazy val jsonDecoder: JsonDecoder[ScrapreasonId] = JsonDecoder.int.map(ScrapreasonId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[ScrapreasonId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[ScrapreasonId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[ScrapreasonId] = new ParameterMetaData[ScrapreasonId] {
-    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[ScrapreasonId] = ParameterMetaData.instance[ScrapreasonId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[ScrapreasonId] = Setter.intSetter.contramap(_.value)
 }

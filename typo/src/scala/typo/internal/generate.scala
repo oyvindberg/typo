@@ -29,7 +29,7 @@ object generate {
       dbLib = publicOptions.dbLib.map {
         case DbLibName.Anorm   => new DbLibAnorm(pkg, publicOptions.inlineImplicits)
         case DbLibName.Doobie  => new DbLibDoobie(pkg, publicOptions.inlineImplicits)
-        case DbLibName.ZioJdbc => new DbLibZioJdbc(pkg, publicOptions.inlineImplicits)
+        case DbLibName.ZioJdbc => new DbLibZioJdbc(pkg, publicOptions.inlineImplicits, dslEnabled = publicOptions.enableDsl)
       },
       logger = publicOptions.logger,
       naming = naming,

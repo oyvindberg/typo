@@ -10,7 +10,6 @@ import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGpath
 import org.postgresql.geometric.PGpoint
-import scala.reflect.ClassTag
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
@@ -24,20 +23,12 @@ import zio.json.internal.Write
 case class TypoPath(open: Boolean, points: List[TypoPoint])
 
 object TypoPath {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoPath]): JdbcDecoder[Array[TypoPath]] = JdbcDecoder[Array[TypoPath]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoPath(x.asInstanceOf[PGpath].isOpen, x.asInstanceOf[PGpath].points.map(p => TypoPoint(p.x, p.y)).toList)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoPath]] = JdbcDecoder[Array[TypoPath]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoPath(x.asInstanceOf[PGpath].isOpen, x.asInstanceOf[PGpath].points.map(p => TypoPoint(p.x, p.y)).toList))
     },
-    "org.postgresql.geometric.PGpath"
+    "scala.Array[org.postgresql.geometric.PGpath]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPath]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoPath]] = Setter.forSqlType((ps, i, v) =>
@@ -79,10 +70,7 @@ object TypoPath {
     }
   }
   implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPath] = Ordering.by(x => (x.open, x.points))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoPath] = new ParameterMetaData[TypoPath] {
-    override def sqlType: String = "path"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoPath] = ParameterMetaData.instance[TypoPath]("path", Types.OTHER)
   implicit lazy val setter: Setter[TypoPath] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

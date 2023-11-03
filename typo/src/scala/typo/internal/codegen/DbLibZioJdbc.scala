@@ -5,7 +5,7 @@ import typo.internal.analysis.MaybeReturnsRows
 import typo.sc.Type
 import typo.{NonEmptyList, sc}
 
-class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
+class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean) extends DbLib {
   private val ZConnection = sc.Type.Qualified("zio.jdbc.ZConnection")
   private val Throwable = sc.Type.Qualified("java.lang.Throwable")
   private val ZStream = sc.Type.Qualified("zio.stream.ZStream")
@@ -20,8 +20,16 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val NonEmptyChunk = sc.Type.Qualified("zio.NonEmptyChunk")
   private val sqlInterpolator = sc.Type.Qualified("zio.jdbc.sqlInterpolator")
   private val JdbcDecoderError = sc.Type.Qualified("zio.jdbc.JdbcDecoderError")
-  private val ClassTag = sc.Type.Qualified("scala.reflect.ClassTag")
+
+  /** This type is basically a mapping from scala type to jdbc type name. zio-jdbc seems to use jdbc type number instead of the (potentially database-specific) type name. In the DSL we need to
+    * generate some sql casts based on scala type, so it's unavoidable to have this mapping.
+    *
+    * A bit unfortunate maybe, but it's not the end of the world to provide it ourselves.
+    */
   private val ParameterMetaData = sc.Type.Qualified("typo.dsl.ParameterMetaData")
+
+  def ifDsl(g: sc.Given): Option[sc.Given] =
+    if (dslEnabled) Some(g) else None
 
   private def SQL(content: sc.Code) = sc.StringInterpolate(sqlInterpolator, sc.Ident("sql"), content)
 
@@ -32,7 +40,6 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   private val jdbcEncoderName: sc.Ident = sc.Ident("jdbcEncoder")
   private val setterName: sc.Ident = sc.Ident("setter")
   private val parameterMetadataName: sc.Ident = sc.Ident("parameterMetadata")
-  private val arrayParameterMetaDataName = sc.Ident("arrayParameterMetaData")
 
   private def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
@@ -142,7 +149,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"${missingInstancesByType(ParameterMetaData.of(x))}"
         case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$ParameterMetaData.ByteArrayParameterMetaData"
         // fallback array case.
-        case sc.Type.TApply(sc.Type.Array, List(targ)) => code"${pkg / arrayParameterMetaDataName}(${lookupParameterMetaDataFor(targ)})"
+        case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$ParameterMetaData.arrayParameterMetaData(${lookupParameterMetaDataFor(targ)})"
         case other                                     => sc.Summon(ParameterMetaData.of(other)).code
       }
 
@@ -498,118 +505,121 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       code"${x.table.names.RepoImplName}.insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
     )
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.ClassMember] =
-    List(
-      sc.Given(
-        tparams = Nil,
-        name = arraySetterName,
-        implicitParams = Nil,
-        tpe = Setter.of(sc.Type.Array.of(wrapperType)),
-        body = code"""${lookupSetter(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
-      ),
-      sc.Given(
-        tparams = Nil,
-        name = arrayJdbcDecoderName,
-        implicitParams = Nil,
-        tpe = JdbcDecoder.of(sc.Type.Array.of(wrapperType)),
-        body = code"""${lookupJdbcDecoder(sc.Type.Array.of(underlying))}.map(a => if (a == null) null else a.map(force))"""
-      ),
-      sc.Given(
-        tparams = Nil,
-        name = arrayJdbcEncoderName,
-        implicitParams = Nil,
-        tpe = JdbcEncoder.of(sc.Type.Array.of(wrapperType)),
-        // JdbcEncoder for unary types defined in terms of `Setter`
-        body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
-      ),
-      sc.Given(
-        tparams = Nil,
-        name = jdbcEncoderName,
-        implicitParams = Nil,
-        tpe = JdbcEncoder.of(wrapperType),
-        body = code"""${lookupJdbcEncoder(underlying)}.contramap(_.value)"""
-      ),
-      sc.Given(
-        tparams = Nil,
-        name = jdbcDecoderName,
-        implicitParams = Nil,
-        tpe = JdbcDecoder.of(wrapperType),
-        body = code"""|${lookupJdbcDecoder(underlying)}.flatMap { s =>
-                 |  new ${JdbcDecoder.of(wrapperType)} {
-                 |    override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $wrapperType) = {
-                 |      def error(msg: ${sc.Type.String}): $JdbcDecoderError =
-                 |        $JdbcDecoderError(
-                 |          message = s"Error decoding $wrapperType from ResultSet",
-                 |          cause = new RuntimeException(msg),
-                 |          metadata = rs.getMetaData,
-                 |          row = rs.getRow
-                 |        )
-                 |
-                 |      $wrapperType.apply(s).fold(e => throw error(e), (columIndex, _))
-                 |    }
-                 |  }
-                 |}""".stripMargin
-      ),
-      sc.Given(
-        tparams = Nil,
-        name = setterName,
-        implicitParams = Nil,
-        tpe = Setter.of(wrapperType),
-        body = code"""${lookupSetter(underlying)}.contramap(_.value)"""
-      ),
-      sc.Given(
-        tparams = Nil,
-        name = parameterMetadataName,
-        implicitParams = Nil,
-        tpe = ParameterMetaData.of(wrapperType),
-        body = code"""|new $ParameterMetaData[$wrapperType] {
-                 |  override def sqlType: ${sc.Type.String} = ${lookupParameterMetaDataFor(underlying)}.sqlType
-                 |  override def jdbcType: ${sc.Type.Int} = ${lookupParameterMetaDataFor(underlying)}.jdbcType
-                 |}""".stripMargin
-      )
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.ClassMember] = {
+    val arraySetter = sc.Given(
+      tparams = Nil,
+      name = arraySetterName,
+      implicitParams = Nil,
+      tpe = Setter.of(sc.Type.Array.of(wrapperType)),
+      body = code"""${lookupSetter(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
     )
+    val arrayJdbcDecoder = sc.Given(
+      tparams = Nil,
+      name = arrayJdbcDecoderName,
+      implicitParams = Nil,
+      tpe = JdbcDecoder.of(sc.Type.Array.of(wrapperType)),
+      body = code"""${lookupJdbcDecoder(sc.Type.Array.of(underlying))}.map(a => if (a == null) null else a.map(force))"""
+    )
+    val arrayJdbcEncoder = sc.Given(
+      tparams = Nil,
+      name = arrayJdbcEncoderName,
+      implicitParams = Nil,
+      tpe = JdbcEncoder.of(sc.Type.Array.of(wrapperType)),
+      // JdbcEncoder for unary types defined in terms of `Setter`
+      body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
+    )
+    val jdbcEncoder = sc.Given(
+      tparams = Nil,
+      name = jdbcEncoderName,
+      implicitParams = Nil,
+      tpe = JdbcEncoder.of(wrapperType),
+      body = code"""${lookupJdbcEncoder(underlying)}.contramap(_.value)"""
+    )
+    val jdbcDecoder = {
+      val body =
+        code"""|${lookupJdbcDecoder(underlying)}.flatMap { s =>
+               |  new ${JdbcDecoder.of(wrapperType)} {
+               |    override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $wrapperType) = {
+               |      def error(msg: ${sc.Type.String}): $JdbcDecoderError =
+               |        $JdbcDecoderError(
+               |          message = s"Error decoding $wrapperType from ResultSet",
+               |          cause = new RuntimeException(msg),
+               |          metadata = rs.getMetaData,
+               |          row = rs.getRow
+               |        )
+               |
+               |      $wrapperType.apply(s).fold(e => throw error(e), (columIndex, _))
+               |    }
+               |  }
+               |}""".stripMargin
+      sc.Given(tparams = Nil, name = jdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(wrapperType), body = body)
+    }
+
+    val setter = sc.Given(
+      tparams = Nil,
+      name = setterName,
+      implicitParams = Nil,
+      tpe = Setter.of(wrapperType),
+      body = code"""${lookupSetter(underlying)}.contramap(_.value)"""
+    )
+
+    val parameterMetadata = {
+      val body =
+        code"$ParameterMetaData.instance[$wrapperType](${lookupParameterMetaDataFor(underlying)}.sqlType, ${lookupParameterMetaDataFor(underlying)}.jdbcType)"
+      sc.Given(tparams = Nil, name = parameterMetadataName, implicitParams = Nil, tpe = ParameterMetaData.of(wrapperType), body = body)
+    }
+
+    List(Option(arraySetter), Option(arrayJdbcDecoder), Option(arrayJdbcEncoder), Option(jdbcEncoder), Option(jdbcDecoder), Option(setter), ifDsl(parameterMetadata)).flatten
+  }
 
   override def anyValInstances(wrapperType: Type.Qualified, underlying: sc.Type): List[sc.ClassMember] =
     List(
-      sc.Given(
-        tparams = Nil,
-        name = jdbcEncoderName,
-        implicitParams = Nil,
-        tpe = JdbcEncoder.of(wrapperType),
-        body = code"""${lookupJdbcEncoder(underlying)}.contramap(_.value)"""
+      Option(
+        sc.Given(
+          tparams = Nil,
+          name = jdbcEncoderName,
+          implicitParams = Nil,
+          tpe = JdbcEncoder.of(wrapperType),
+          body = code"""${lookupJdbcEncoder(underlying)}.contramap(_.value)"""
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = jdbcDecoderName,
-        implicitParams = Nil,
-        tpe = JdbcDecoder.of(wrapperType),
-        body = code"""${lookupJdbcDecoder(underlying)}.map($wrapperType.apply)"""
+      Option(
+        sc.Given(
+          tparams = Nil,
+          name = jdbcDecoderName,
+          implicitParams = Nil,
+          tpe = JdbcDecoder.of(wrapperType),
+          body = code"""${lookupJdbcDecoder(underlying)}.map($wrapperType.apply)"""
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = setterName,
-        implicitParams = Nil,
-        tpe = Setter.of(wrapperType),
-        body = code"""${lookupSetter(underlying)}.contramap(_.value)"""
+      Option(
+        sc.Given(
+          tparams = Nil,
+          name = setterName,
+          implicitParams = Nil,
+          tpe = Setter.of(wrapperType),
+          body = code"""${lookupSetter(underlying)}.contramap(_.value)"""
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = arraySetterName,
-        implicitParams = Nil,
-        tpe = Setter.of(sc.Type.Array.of(wrapperType)),
-        body = code"""${lookupSetter(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
+      Option(
+        sc.Given(
+          tparams = Nil,
+          name = arraySetterName,
+          implicitParams = Nil,
+          tpe = Setter.of(sc.Type.Array.of(wrapperType)),
+          body = code"""${lookupSetter(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
+        )
       ),
-      sc.Given(
-        tparams = Nil,
-        name = parameterMetadataName,
-        implicitParams = Nil,
-        tpe = ParameterMetaData.of(wrapperType),
-        body = code"""|new ${ParameterMetaData.of(wrapperType)} {
-                 |  override def sqlType: String = ${lookupParameterMetaDataFor(underlying)}.sqlType
-                 |  override def jdbcType: Int = ${lookupParameterMetaDataFor(underlying)}.jdbcType
-                 |}""".stripMargin
+      ifDsl(
+        sc.Given(
+          tparams = Nil,
+          name = parameterMetadataName,
+          implicitParams = Nil,
+          tpe = ParameterMetaData.of(wrapperType),
+          body = code"$ParameterMetaData.instance[$wrapperType](${lookupParameterMetaDataFor(underlying)}.sqlType, ${lookupParameterMetaDataFor(underlying)}.jdbcType)"
+        )
       )
-    )
+    ).flatten
 
   override def missingInstances: List[sc.ClassMember] = {
 
@@ -618,54 +628,46 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       * Works for primitive types but not for more complex types TODO: Make it work for complex types
       */
     def primitiveArrayDecoder(T: sc.Type.Qualified) = {
-      sc.Given(
-        tparams = Nil,
-        name = sc.Ident(s"${T.name.value}ArrayDecoder"),
-        implicitParams = Nil,
-        tpe = JdbcDecoder.of(sc.Type.Array.of(T)),
-        body = code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
-                 |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${sc.Type.Array.of(T)}) = {
-                 |    val arr = rs.getArray(columIndex)
-                 |    if (arr eq null) columIndex -> null
-                 |    else {
-                 |      columIndex ->
-                 |        arr
-                 |          .getArray
-                 |          .asInstanceOf[Array[Any]]
-                 |          .foldLeft(Array.newBuilder[${T.value}]) {
-                 |            case (b, x: ${T.value}) => b += x
-                 |            case (b, x: java.lang.Number) => b += x.asInstanceOf[${T.value}]
-                 |            case (_, x) =>
-                 |              throw $JdbcDecoderError(
-                 |                message = s"Error decoding ${sc.Type.Array}(${T.value}) from ResultSet",
-                 |                cause = new IllegalStateException(
-                 |                  s"Retrieved $${x.getClass.getCanonicalName} type from JDBC array, but expected (${T.value}). Re-check your decoder implementation"
-                 |                ),
-                 |                metadata = rs.getMetaData,
-                 |                row = rs.getRow
-                 |              )
-                 |          }
-                 |          .result()
-                 |    }
-                 |  }
-                 |}""".stripMargin
-      )
+      val body =
+        code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
+               |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${sc.Type.Array.of(T)}) = {
+               |    val arr = rs.getArray(columIndex)
+               |    if (arr eq null) columIndex -> null
+               |    else {
+               |      columIndex ->
+               |        arr
+               |          .getArray
+               |          .asInstanceOf[Array[Any]]
+               |          .foldLeft(Array.newBuilder[${T.value}]) {
+               |            case (b, x: ${T.value}) => b += x
+               |            case (b, x: java.lang.Number) => b += x.asInstanceOf[${T.value}]
+               |            case (_, x) =>
+               |              throw $JdbcDecoderError(
+               |                message = s"Error decoding ${sc.Type.Array}(${T.value}) from ResultSet",
+               |                cause = new IllegalStateException(
+               |                  s"Retrieved $${x.getClass.getCanonicalName} type from JDBC array, but expected (${T.value}). Re-check your decoder implementation"
+               |                ),
+               |                metadata = rs.getMetaData,
+               |                row = rs.getRow
+               |              )
+               |          }
+               |          .result()
+               |    }
+               |  }
+               |}""".stripMargin
+      sc.Given(tparams = Nil, name = sc.Ident(s"${T.name.value}ArrayDecoder"), implicitParams = Nil, tpe = JdbcDecoder.of(sc.Type.Array.of(T)), body = body)
     }
 
     def primitiveArraySetter(T: sc.Type.Qualified, sqlType: sc.StrLit, asAnyRef: sc.Code => sc.Code) = {
       val v = sc.Ident("v")
-      sc.Given(
-        tparams = Nil,
-        name = sc.Ident(s"${T.name.value}ArraySetter"),
-        implicitParams = Nil,
-        tpe = Setter.of(sc.Type.Array.of(T)),
-        body = code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
-                 |  (ps, i, $v) => {
-                 |    ps.setArray(i, ps.getConnection.createArrayOf($sqlType, ${asAnyRef(v)}))
-                 |  },
-                 |  ${sc.Type.Types}.ARRAY
-                 |)""".stripMargin
-      )
+      val body =
+        code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
+               |  (ps, i, $v) => {
+               |    ps.setArray(i, ps.getConnection.createArrayOf($sqlType, ${asAnyRef(v)}))
+               |  },
+               |  ${sc.Type.Types}.ARRAY
+               |)""".stripMargin
+      sc.Given(tparams = Nil, name = sc.Ident(s"${T.name.value}ArraySetter"), implicitParams = Nil, tpe = Setter.of(sc.Type.Array.of(T)), body = body)
     }
 
     def primitiveArrayEncoder(T: sc.Type.Qualified) = {
@@ -703,20 +705,6 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         )
       )
 
-    val arrayParameterMetaData = {
-      val T = sc.Type.Abstract(sc.Ident("T"))
-      sc.Given(
-        List(T),
-        arrayParameterMetaDataName,
-        List(sc.Param(T.value, ParameterMetaData.of(T), None)),
-        ParameterMetaData.of(sc.Type.Array.of(T)),
-        code"""|new ${ParameterMetaData.of(sc.Type.Array.of(T))} {
-               |  override def sqlType: ${sc.Type.String} = ${sc.StrLit("_")} + $T.sqlType
-               |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
-               |}""".stripMargin
-      )
-    }
-
     def all(T: sc.Type.Qualified, sqlType: String, asAnyRef: sc.Code => sc.Code) = {
       List(primitiveArrayDecoder(T), primitiveArraySetter(T, sc.StrLit(sqlType), asAnyRef), primitiveArrayEncoder(T))
     }
@@ -728,20 +716,15 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       all(sc.Type.Double, "float8", array => code"$array.map(x => double2Double(x): ${sc.Type.AnyRef})") ++
       all(sc.Type.JavaBigDecimal, "numeric", array => code"$array.map(x => x: ${sc.Type.AnyRef})") ++
       ScalaBigDecimal ++
-      all(sc.Type.Boolean, "bool", array => code"$array.map(x => boolean2Boolean(x): ${sc.Type.AnyRef})") :+
-      arrayParameterMetaData
+      all(sc.Type.Boolean, "bool", array => code"$array.map(x => boolean2Boolean(x): ${sc.Type.AnyRef})")
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
-    val decoder =
-      sc.Given(
-        tparams = Nil,
-        name = jdbcDecoderName,
-        implicitParams = Nil,
-        tpe = JdbcDecoder.of(tpe),
-        body = if (cols.length == 1) {
+    val decoder = {
+      val body =
+        if (cols.length == 1)
           code"""${lookupJdbcDecoder(cols.head.tpe)}.map(v => $tpe(${cols.head.name} = v))""".stripMargin
-        } else {
+        else {
           val namedParams = cols.zipWithIndex.map { case (c, idx) =>
             code"${c.name} = ${lookupJdbcDecoder(c.tpe)}.unsafeDecode(columIndex + $idx, rs)._2"
           }
@@ -754,133 +737,107 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |      )
                  |}""".stripMargin
         }
-      )
+      sc.Given(tparams = Nil, name = jdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(tpe), body = body)
+    }
 
     List(decoder)
   }
 
-  override def customTypeInstances(ct: CustomType): List[sc.ClassMember] = {
-    val single =
-      List(
-        sc.Given(
-          tparams = Nil,
-          name = jdbcEncoderName,
-          implicitParams = Nil,
-          tpe = JdbcEncoder.of(ct.typoType),
-          // JdbcEncoder for unary types defined in terms of `Setter`
-          body = code"""$JdbcEncoder.singleParamEncoder($setterName)"""
-        ),
-        sc.Given(
-          tparams = Nil,
-          name = jdbcDecoderName,
-          implicitParams = Nil,
-          tpe = JdbcDecoder.of(ct.typoType),
-          body = {
-            val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
-            code"""|${JdbcDecoder.of(ct.typoType)}(
-                   |  (rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => {
-                   |    val v = rs.getObject(i)
-                   |    if (v eq null) null else ${ct.toTypo0(code"v.asInstanceOf[${ct.toTypo.jdbcType}]")}
-                   |  },
-                   |  $expectedType
-                   |)""".stripMargin
-          }
-        ),
-        sc.Given(
-          tparams = Nil,
-          name = setterName,
-          implicitParams = Nil,
-          tpe = Setter.of(ct.typoType),
-          body = {
-            val v = sc.Ident("v")
-            code"""|$Setter.other(
-                   |  (ps, i, $v) => {
-                   |    ps.setObject(
-                   |      i,
-                   |      ${ct.fromTypo0(v)}
-                   |    )
-                   |  },
-                   |  ${sc.StrLit(ct.sqlType)}
-                   |)""".stripMargin
-          }
-        ),
-        sc.Given(
-          Nil,
-          parameterMetadataName,
-          Nil,
-          ParameterMetaData.of(ct.typoType),
-          code"""|new ${ParameterMetaData.of(ct.typoType)} {
-                 |  override def sqlType: ${sc.Type.String} = ${sc.StrLit(ct.sqlType)}
-                 |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.OTHER
-                 |}""".stripMargin
-        )
-      )
+  override def customTypeInstances(ct: CustomType): List[sc.ClassMember] =
+    customTypeOne(ct) ++ (if (ct.forbidArray) Nil else customTypeArray(ct))
 
-    val array =
-      if (ct.forbidArray) Nil
-      else {
-        val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
-        val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
-        List(
-          sc.Given(
-            tparams = Nil,
-            name = arrayJdbcEncoderName,
-            implicitParams = Nil,
-            tpe = JdbcEncoder.of(sc.Type.Array.of(ct.typoType)),
-            // JdbcEncoder for unary types defined in terms of `Setter`
-            body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
-          ),
-          sc.Given(
-            tparams = Nil,
-            name = arrayJdbcDecoderName,
-            implicitParams = List(
-              sc.Param(name = sc.Ident("classTag"), tpe = ClassTag.of(ct.typoType), default = None)
-            ),
-            tpe = JdbcDecoder.of(sc.Type.Array.of(ct.typoType)),
-            body = {
-              val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
-              code"""|${JdbcDecoder.of(sc.Type.Array.of(ct.typoType))}(
-                   |  (rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => {
-                  |    val arr = rs.getArray(i)
-                  |    if (arr eq null) null
-                  |    else
-                  |      arr
-                  |        .getArray
-                  |        .asInstanceOf[Array[AnyRef]]
-                  |        .foldLeft(Array.newBuilder(classTag)) {
-                  |          case (b, x) => b += ${toTypo.toTypo(code"x.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}
-                  |        }
-                  |        .result()
-                  |  },
-                  |  $expectedType
-                  |)""".stripMargin
-            }
-          ),
-          sc.Given(
-            tparams = Nil,
-            name = arraySetterName,
-            implicitParams = Nil,
-            tpe = Setter.of(sc.Type.Array.of(ct.typoType)),
-            body = {
-              val v = sc.Ident("v")
-              val vv = sc.Ident("vv")
-              code"""|$Setter.forSqlType((ps, i, $v) =>
-                   |  ps.setArray(
-                   |    i,
-                   |    ps.getConnection.createArrayOf(
-                   |      ${sc.StrLit(ct.sqlType)},
-                   |      $v.map { $vv =>
-                   |        ${fromTypo.fromTypo0(vv)}
-                   |      }
-                   |    )
-                   |  ),
-                   |  ${sc.Type.Types}.ARRAY
-                   |)""".stripMargin
-            }
-          )
-        )
-      }
+  def customTypeOne(ct: CustomType): List[sc.Given] = {
 
-    single ++ array
+    val jdbcEncoder = sc.Given(
+      tparams = Nil,
+      name = jdbcEncoderName,
+      implicitParams = Nil,
+      tpe = JdbcEncoder.of(ct.typoType),
+      // JdbcEncoder for unary types defined in terms of `Setter`
+      body = code"""$JdbcEncoder.singleParamEncoder($setterName)"""
+    )
+
+    val jdbcDecoder = {
+      val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
+      val body =
+        code"""|${JdbcDecoder.of(ct.typoType)}(
+               |  (rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => {
+               |    val v = rs.getObject(i)
+               |    if (v eq null) null else ${ct.toTypo0(code"v.asInstanceOf[${ct.toTypo.jdbcType}]")}
+               |  },
+               |  $expectedType
+               |)""".stripMargin
+      sc.Given(tparams = Nil, name = jdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(ct.typoType), body = body)
+    }
+
+    val setter = {
+      val v = sc.Ident("v")
+      val body =
+        code"""|$Setter.other(
+               |  (ps, i, $v) => {
+               |    ps.setObject(
+               |      i,
+               |      ${ct.fromTypo0(v)}
+               |    )
+               |  },
+               |  ${sc.StrLit(ct.sqlType)}
+               |)""".stripMargin
+      sc.Given(tparams = Nil, name = setterName, implicitParams = Nil, tpe = Setter.of(ct.typoType), body = body)
+    }
+
+    val parameterMetadata = {
+      val body = code"$ParameterMetaData.instance[${ct.typoType}](${sc.StrLit(ct.sqlType)}, ${sc.Type.Types}.OTHER)"
+      sc.Given(Nil, parameterMetadataName, Nil, ParameterMetaData.of(ct.typoType), body)
+    }
+
+    List(Option(jdbcEncoder), Option(jdbcDecoder), Option(setter), ifDsl(parameterMetadata)).flatten
+  }
+
+  def customTypeArray(ct: CustomType): List[sc.Given] = {
+    val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
+    val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
+    val jdbcEncoder = sc.Given(
+      tparams = Nil,
+      name = arrayJdbcEncoderName,
+      implicitParams = Nil,
+      tpe = JdbcEncoder.of(sc.Type.Array.of(ct.typoType)),
+      // JdbcEncoder for unary types defined in terms of `Setter`
+      body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
+    )
+
+    val jdbcDecoder = {
+      val expectedType = sc.StrLit(sc.Type.Array.of(ct.fromTypo.jdbcType).render.asString)
+      val body =
+        code"""|${JdbcDecoder.of(sc.Type.Array.of(ct.typoType))}((rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) =>
+               |  rs.getArray(i) match {
+               |    case null => null
+               |    case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => ${toTypo.toTypo(code"x.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)})
+               |  },
+               |  $expectedType
+               |)""".stripMargin
+      sc.Given(tparams = Nil, name = arrayJdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(sc.Type.Array.of(ct.typoType)), body = body)
+    }
+
+    val setter = {
+      val v = sc.Ident("v")
+      val vv = sc.Ident("vv")
+      val body =
+        code"""|$Setter.forSqlType((ps, i, $v) =>
+               |  ps.setArray(
+               |    i,
+               |    ps.getConnection.createArrayOf(
+               |      ${sc.StrLit(ct.sqlType)},
+               |      $v.map { $vv =>
+               |        ${fromTypo.fromTypo0(vv)}
+               |      }
+               |    )
+               |  ),
+               |  ${sc.Type.Types}.ARRAY
+               |)""".stripMargin
+
+      sc.Given(tparams = Nil, name = arraySetterName, implicitParams = Nil, tpe = Setter.of(sc.Type.Array.of(ct.typoType)), body = body)
+    }
+
+    List(jdbcEncoder, jdbcDecoder, setter)
   }
 }

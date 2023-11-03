@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoXid(value: String)
 
 object TypoXid {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoXid]): JdbcDecoder[Array[TypoXid]] = JdbcDecoder[Array[TypoXid]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoXid(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoXid]] = JdbcDecoder[Array[TypoXid]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoXid(x.asInstanceOf[String]))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoXid]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoXid]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoXid {
   implicit lazy val jsonDecoder: JsonDecoder[TypoXid] = JsonDecoder.string.map(TypoXid.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoXid] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoXid] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoXid] = new ParameterMetaData[TypoXid] {
-    override def sqlType: String = "xid"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoXid] = ParameterMetaData.instance[TypoXid]("xid", Types.OTHER)
   implicit lazy val setter: Setter[TypoXid] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

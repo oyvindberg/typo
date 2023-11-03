@@ -26,9 +26,6 @@ object MaritalStatusId {
   implicit lazy val jsonDecoder: JsonDecoder[MaritalStatusId] = JsonDecoder.long.map(MaritalStatusId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[MaritalStatusId] = JsonEncoder.long.contramap(_.value)
   implicit lazy val ordering: Ordering[MaritalStatusId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[MaritalStatusId] = new ParameterMetaData[MaritalStatusId] {
-    override def sqlType: String = ParameterMetaData.LongParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.LongParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[MaritalStatusId] = ParameterMetaData.instance[MaritalStatusId](ParameterMetaData.LongParameterMetaData.sqlType, ParameterMetaData.LongParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[MaritalStatusId] = Setter.longSetter.contramap(_.value)
 }

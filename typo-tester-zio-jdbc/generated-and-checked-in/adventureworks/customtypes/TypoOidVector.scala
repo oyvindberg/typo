@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoOidVector(value: String)
 
 object TypoOidVector {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoOidVector]): JdbcDecoder[Array[TypoOidVector]] = JdbcDecoder[Array[TypoOidVector]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoOidVector(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoOidVector]] = JdbcDecoder[Array[TypoOidVector]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoOidVector(x.asInstanceOf[String]))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoOidVector]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoOidVector]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoOidVector {
   implicit lazy val jsonDecoder: JsonDecoder[TypoOidVector] = JsonDecoder.string.map(TypoOidVector.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoOidVector] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoOidVector] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoOidVector] = new ParameterMetaData[TypoOidVector] {
-    override def sqlType: String = "oidvector"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoOidVector] = ParameterMetaData.instance[TypoOidVector]("oidvector", Types.OTHER)
   implicit lazy val setter: Setter[TypoOidVector] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

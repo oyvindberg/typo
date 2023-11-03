@@ -240,8 +240,4 @@ package object hardcoded {
     },
     java.sql.Types.ARRAY
   )
-  implicit def arrayParameterMetaData[T](implicit T: typo.dsl.ParameterMetaData[T]): typo.dsl.ParameterMetaData[scala.Array[T]] = new typo.dsl.ParameterMetaData[scala.Array[T]] {
-    override def sqlType: java.lang.String = "_" + T.sqlType
-    override def jdbcType: scala.Int = java.sql.Types.ARRAY
-  }
 }

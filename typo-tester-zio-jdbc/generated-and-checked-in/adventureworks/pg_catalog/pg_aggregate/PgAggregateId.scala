@@ -26,9 +26,6 @@ object PgAggregateId {
   implicit lazy val jsonDecoder: JsonDecoder[PgAggregateId] = TypoRegproc.jsonDecoder.map(PgAggregateId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[PgAggregateId] = TypoRegproc.jsonEncoder.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[TypoRegproc]): Ordering[PgAggregateId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[PgAggregateId] = new ParameterMetaData[PgAggregateId] {
-    override def sqlType: String = TypoRegproc.parameterMetadata.sqlType
-    override def jdbcType: Int = TypoRegproc.parameterMetadata.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[PgAggregateId] = ParameterMetaData.instance[PgAggregateId](TypoRegproc.parameterMetadata.sqlType, TypoRegproc.parameterMetadata.jdbcType)
   implicit lazy val setter: Setter[PgAggregateId] = Setter[TypoRegproc].contramap(_.value)
 }

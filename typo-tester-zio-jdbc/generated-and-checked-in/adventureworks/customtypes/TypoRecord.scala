@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoRecord(value: String)
 
 object TypoRecord {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoRecord]): JdbcDecoder[Array[TypoRecord]] = JdbcDecoder[Array[TypoRecord]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoRecord(x.asInstanceOf[PGobject].getValue)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoRecord]] = JdbcDecoder[Array[TypoRecord]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoRecord(x.asInstanceOf[PGobject].getValue))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoRecord]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoRecord]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoRecord {
   implicit lazy val jsonDecoder: JsonDecoder[TypoRecord] = JsonDecoder.string.map(TypoRecord.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoRecord] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoRecord] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoRecord] = new ParameterMetaData[TypoRecord] {
-    override def sqlType: String = "record"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoRecord] = ParameterMetaData.instance[TypoRecord]("record", Types.OTHER)
   implicit lazy val setter: Setter[TypoRecord] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

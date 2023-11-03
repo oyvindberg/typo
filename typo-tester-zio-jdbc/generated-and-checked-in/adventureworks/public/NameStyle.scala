@@ -26,9 +26,6 @@ object NameStyle {
   implicit lazy val jsonDecoder: JsonDecoder[NameStyle] = JsonDecoder.boolean.map(NameStyle.apply)
   implicit lazy val jsonEncoder: JsonEncoder[NameStyle] = JsonEncoder.boolean.contramap(_.value)
   implicit lazy val ordering: Ordering[NameStyle] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[NameStyle] = new ParameterMetaData[NameStyle] {
-    override def sqlType: String = ParameterMetaData.BooleanParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.BooleanParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[NameStyle] = ParameterMetaData.instance[NameStyle](ParameterMetaData.BooleanParameterMetaData.sqlType, ParameterMetaData.BooleanParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[NameStyle] = Setter.booleanSetter.contramap(_.value)
 }

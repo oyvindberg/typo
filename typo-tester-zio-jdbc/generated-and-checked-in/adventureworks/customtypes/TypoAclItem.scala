@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoAclItem(value: String)
 
 object TypoAclItem {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoAclItem]): JdbcDecoder[Array[TypoAclItem]] = JdbcDecoder[Array[TypoAclItem]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoAclItem(x.asInstanceOf[PGobject].getValue)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoAclItem]] = JdbcDecoder[Array[TypoAclItem]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoAclItem(x.asInstanceOf[PGobject].getValue))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoAclItem]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoAclItem]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoAclItem {
   implicit lazy val jsonDecoder: JsonDecoder[TypoAclItem] = JsonDecoder.string.map(TypoAclItem.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoAclItem] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoAclItem] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoAclItem] = new ParameterMetaData[TypoAclItem] {
-    override def sqlType: String = "aclitem"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoAclItem] = ParameterMetaData.instance[TypoAclItem]("aclitem", Types.OTHER)
   implicit lazy val setter: Setter[TypoAclItem] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

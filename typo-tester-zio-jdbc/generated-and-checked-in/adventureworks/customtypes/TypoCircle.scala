@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGcircle
-import scala.reflect.ClassTag
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
@@ -23,20 +22,12 @@ import zio.json.internal.Write
 case class TypoCircle(center: TypoPoint, radius: Double)
 
 object TypoCircle {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoCircle]): JdbcDecoder[Array[TypoCircle]] = JdbcDecoder[Array[TypoCircle]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoCircle(TypoPoint(x.asInstanceOf[PGcircle].center.x, x.asInstanceOf[PGcircle].center.y), x.asInstanceOf[PGcircle].radius)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoCircle]] = JdbcDecoder[Array[TypoCircle]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoCircle(TypoPoint(x.asInstanceOf[PGcircle].center.x, x.asInstanceOf[PGcircle].center.y), x.asInstanceOf[PGcircle].radius))
     },
-    "org.postgresql.geometric.PGcircle"
+    "scala.Array[org.postgresql.geometric.PGcircle]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoCircle]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoCircle]] = Setter.forSqlType((ps, i, v) =>
@@ -78,10 +69,7 @@ object TypoCircle {
     }
   }
   implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoCircle] = Ordering.by(x => (x.center, x.radius))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoCircle] = new ParameterMetaData[TypoCircle] {
-    override def sqlType: String = "circle"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoCircle] = ParameterMetaData.instance[TypoCircle]("circle", Types.OTHER)
   implicit lazy val setter: Setter[TypoCircle] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

@@ -25,9 +25,6 @@ object CultureId {
   implicit lazy val jsonDecoder: JsonDecoder[CultureId] = JsonDecoder.string.map(CultureId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[CultureId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[CultureId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[CultureId] = new ParameterMetaData[CultureId] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[CultureId] = ParameterMetaData.instance[CultureId](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[CultureId] = Setter.stringSetter.contramap(_.value)
 }

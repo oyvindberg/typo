@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoPgNodeTree(value: String)
 
 object TypoPgNodeTree {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoPgNodeTree]): JdbcDecoder[Array[TypoPgNodeTree]] = JdbcDecoder[Array[TypoPgNodeTree]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoPgNodeTree(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoPgNodeTree]] = JdbcDecoder[Array[TypoPgNodeTree]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoPgNodeTree(x.asInstanceOf[String]))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPgNodeTree]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoPgNodeTree]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoPgNodeTree {
   implicit lazy val jsonDecoder: JsonDecoder[TypoPgNodeTree] = JsonDecoder.string.map(TypoPgNodeTree.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoPgNodeTree] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoPgNodeTree] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoPgNodeTree] = new ParameterMetaData[TypoPgNodeTree] {
-    override def sqlType: String = "pg_node_tree"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoPgNodeTree] = ParameterMetaData.instance[TypoPgNodeTree]("pg_node_tree", Types.OTHER)
   implicit lazy val setter: Setter[TypoPgNodeTree] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

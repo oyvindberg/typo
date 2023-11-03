@@ -8,7 +8,6 @@ package customtypes
 
 import java.sql.ResultSet
 import java.sql.Types
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -21,20 +20,12 @@ import zio.json.JsonEncoder
 case class TypoUnknownPgMcvList(value: String)
 
 object TypoUnknownPgMcvList {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoUnknownPgMcvList]): JdbcDecoder[Array[TypoUnknownPgMcvList]] = JdbcDecoder[Array[TypoUnknownPgMcvList]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoUnknownPgMcvList(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoUnknownPgMcvList]] = JdbcDecoder[Array[TypoUnknownPgMcvList]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoUnknownPgMcvList(x.asInstanceOf[String]))
     },
-    "java.lang.String"
+    "scala.Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUnknownPgMcvList]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoUnknownPgMcvList]] = Setter.forSqlType((ps, i, v) =>
@@ -61,10 +52,7 @@ object TypoUnknownPgMcvList {
   implicit lazy val jsonDecoder: JsonDecoder[TypoUnknownPgMcvList] = JsonDecoder.string.map(TypoUnknownPgMcvList.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoUnknownPgMcvList] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoUnknownPgMcvList] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoUnknownPgMcvList] = new ParameterMetaData[TypoUnknownPgMcvList] {
-    override def sqlType: String = "pg_mcv_list"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoUnknownPgMcvList] = ParameterMetaData.instance[TypoUnknownPgMcvList]("pg_mcv_list", Types.OTHER)
   implicit lazy val setter: Setter[TypoUnknownPgMcvList] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

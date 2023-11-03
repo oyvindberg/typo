@@ -60,9 +60,6 @@ object Number {
   implicit lazy val jsonDecoder: JsonDecoder[Number] = JsonDecoder.string.mapOrFail(Number.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Number] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Number] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Number] = new ParameterMetaData[Number] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[Number] = ParameterMetaData.instance[Number](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[Number] = Setter.stringSetter.contramap(_.value)
 }

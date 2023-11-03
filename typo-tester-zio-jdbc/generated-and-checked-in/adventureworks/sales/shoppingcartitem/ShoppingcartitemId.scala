@@ -25,9 +25,6 @@ object ShoppingcartitemId {
   implicit lazy val jsonDecoder: JsonDecoder[ShoppingcartitemId] = JsonDecoder.int.map(ShoppingcartitemId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[ShoppingcartitemId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[ShoppingcartitemId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[ShoppingcartitemId] = new ParameterMetaData[ShoppingcartitemId] {
-    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[ShoppingcartitemId] = ParameterMetaData.instance[ShoppingcartitemId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[ShoppingcartitemId] = Setter.intSetter.contramap(_.value)
 }

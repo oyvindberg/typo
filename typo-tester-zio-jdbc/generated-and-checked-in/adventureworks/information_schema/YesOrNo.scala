@@ -26,9 +26,6 @@ object YesOrNo {
   implicit lazy val jsonDecoder: JsonDecoder[YesOrNo] = JsonDecoder.string.map(YesOrNo.apply)
   implicit lazy val jsonEncoder: JsonEncoder[YesOrNo] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[YesOrNo] = new ParameterMetaData[YesOrNo] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[YesOrNo] = ParameterMetaData.instance[YesOrNo](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[YesOrNo] = Setter.stringSetter.contramap(_.value)
 }

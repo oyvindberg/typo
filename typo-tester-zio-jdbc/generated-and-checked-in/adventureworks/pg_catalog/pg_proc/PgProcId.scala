@@ -25,9 +25,6 @@ object PgProcId {
   implicit lazy val jsonDecoder: JsonDecoder[PgProcId] = JsonDecoder.long.map(PgProcId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[PgProcId] = JsonEncoder.long.contramap(_.value)
   implicit lazy val ordering: Ordering[PgProcId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[PgProcId] = new ParameterMetaData[PgProcId] {
-    override def sqlType: String = ParameterMetaData.LongParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.LongParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[PgProcId] = ParameterMetaData.instance[PgProcId](ParameterMetaData.LongParameterMetaData.sqlType, ParameterMetaData.LongParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[PgProcId] = Setter.longSetter.contramap(_.value)
 }

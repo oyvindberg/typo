@@ -25,9 +25,6 @@ object ShiftId {
   implicit lazy val jsonDecoder: JsonDecoder[ShiftId] = JsonDecoder.int.map(ShiftId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[ShiftId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[ShiftId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[ShiftId] = new ParameterMetaData[ShiftId] {
-    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[ShiftId] = ParameterMetaData.instance[ShiftId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[ShiftId] = Setter.intSetter.contramap(_.value)
 }

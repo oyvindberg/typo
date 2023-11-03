@@ -10,7 +10,6 @@ import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGlseg
 import org.postgresql.geometric.PGpoint
-import scala.reflect.ClassTag
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
@@ -24,20 +23,12 @@ import zio.json.internal.Write
 case class TypoLineSegment(p1: TypoPoint, p2: TypoPoint)
 
 object TypoLineSegment {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoLineSegment]): JdbcDecoder[Array[TypoLineSegment]] = JdbcDecoder[Array[TypoLineSegment]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoLineSegment(TypoPoint(x.asInstanceOf[PGlseg].point(0).x, x.asInstanceOf[PGlseg].point(0).y), TypoPoint(x.asInstanceOf[PGlseg].point(1).x, x.asInstanceOf[PGlseg].point(1).y))
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoLineSegment]] = JdbcDecoder[Array[TypoLineSegment]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoLineSegment(TypoPoint(x.asInstanceOf[PGlseg].point(0).x, x.asInstanceOf[PGlseg].point(0).y), TypoPoint(x.asInstanceOf[PGlseg].point(1).x, x.asInstanceOf[PGlseg].point(1).y)))
     },
-    "org.postgresql.geometric.PGlseg"
+    "scala.Array[org.postgresql.geometric.PGlseg]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLineSegment]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLineSegment]] = Setter.forSqlType((ps, i, v) =>
@@ -79,10 +70,7 @@ object TypoLineSegment {
     }
   }
   implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoLineSegment] = Ordering.by(x => (x.p1, x.p2))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLineSegment] = new ParameterMetaData[TypoLineSegment] {
-    override def sqlType: String = "lseg"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoLineSegment] = ParameterMetaData.instance[TypoLineSegment]("lseg", Types.OTHER)
   implicit lazy val setter: Setter[TypoLineSegment] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

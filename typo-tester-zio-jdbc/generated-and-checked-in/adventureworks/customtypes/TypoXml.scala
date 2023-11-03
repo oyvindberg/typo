@@ -10,7 +10,6 @@ import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.jdbc.PgSQLXML
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -23,20 +22,12 @@ import zio.json.JsonEncoder
 case class TypoXml(value: String)
 
 object TypoXml {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoXml]): JdbcDecoder[Array[TypoXml]] = JdbcDecoder[Array[TypoXml]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoXml(x.asInstanceOf[PGobject].getValue)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoXml]] = JdbcDecoder[Array[TypoXml]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoXml(x.asInstanceOf[PGobject].getValue))
     },
-    "java.lang.String"
+    "scala.Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoXml]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoXml]] = Setter.forSqlType((ps, i, v) =>
@@ -68,10 +59,7 @@ object TypoXml {
   implicit lazy val jsonDecoder: JsonDecoder[TypoXml] = JsonDecoder.string.map(TypoXml.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoXml] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoXml] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoXml] = new ParameterMetaData[TypoXml] {
-    override def sqlType: String = "xml"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoXml] = ParameterMetaData.instance[TypoXml]("xml", Types.OTHER)
   implicit lazy val setter: Setter[TypoXml] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

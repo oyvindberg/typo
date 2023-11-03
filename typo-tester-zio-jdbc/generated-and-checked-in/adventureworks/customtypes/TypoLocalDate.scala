@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import java.time.LocalDate
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -24,20 +23,12 @@ case class TypoLocalDate(value: LocalDate)
 object TypoLocalDate {
   def now = TypoLocalDate(LocalDate.now)
   def apply(str: String): TypoLocalDate = TypoLocalDate(LocalDate.parse(str))
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoLocalDate]): JdbcDecoder[Array[TypoLocalDate]] = JdbcDecoder[Array[TypoLocalDate]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoLocalDate(LocalDate.parse(x.asInstanceOf[String]))
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoLocalDate]] = JdbcDecoder[Array[TypoLocalDate]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoLocalDate(LocalDate.parse(x.asInstanceOf[String])))
     },
-    "java.lang.String"
+    "scala.Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLocalDate]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLocalDate]] = Setter.forSqlType((ps, i, v) =>
@@ -64,10 +55,7 @@ object TypoLocalDate {
   implicit lazy val jsonDecoder: JsonDecoder[TypoLocalDate] = JsonDecoder.localDate.map(TypoLocalDate.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoLocalDate] = JsonEncoder.localDate.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[LocalDate]): Ordering[TypoLocalDate] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalDate] = new ParameterMetaData[TypoLocalDate] {
-    override def sqlType: String = "date"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalDate] = ParameterMetaData.instance[TypoLocalDate]("date", Types.OTHER)
   implicit lazy val setter: Setter[TypoLocalDate] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

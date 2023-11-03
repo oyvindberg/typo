@@ -59,9 +59,6 @@ object Myenum {
   implicit lazy val jsonDecoder: JsonDecoder[Myenum] = JsonDecoder.string.mapOrFail(Myenum.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Myenum] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Myenum] = new ParameterMetaData[Myenum] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[Myenum] = ParameterMetaData.instance[Myenum](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[Myenum] = Setter.stringSetter.contramap(_.value)
 }

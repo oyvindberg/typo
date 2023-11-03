@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGline
-import scala.reflect.ClassTag
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
@@ -23,20 +22,12 @@ import zio.json.internal.Write
 case class TypoLine(a: Double, b: Double, c: Double)
 
 object TypoLine {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoLine]): JdbcDecoder[Array[TypoLine]] = JdbcDecoder[Array[TypoLine]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoLine(x.asInstanceOf[PGline].a, x.asInstanceOf[PGline].b, x.asInstanceOf[PGline].c)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoLine]] = JdbcDecoder[Array[TypoLine]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoLine(x.asInstanceOf[PGline].a, x.asInstanceOf[PGline].b, x.asInstanceOf[PGline].c))
     },
-    "org.postgresql.geometric.PGline"
+    "scala.Array[org.postgresql.geometric.PGline]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLine]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLine]] = Setter.forSqlType((ps, i, v) =>
@@ -82,10 +73,7 @@ object TypoLine {
     }
   }
   implicit lazy val ordering: Ordering[TypoLine] = Ordering.by(x => (x.a, x.b, x.c))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLine] = new ParameterMetaData[TypoLine] {
-    override def sqlType: String = "line"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoLine] = ParameterMetaData.instance[TypoLine]("line", Types.OTHER)
   implicit lazy val setter: Setter[TypoLine] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

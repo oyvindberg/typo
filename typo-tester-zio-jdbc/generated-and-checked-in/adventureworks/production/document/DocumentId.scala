@@ -25,9 +25,6 @@ object DocumentId {
   implicit lazy val jsonDecoder: JsonDecoder[DocumentId] = JsonDecoder.string.map(DocumentId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[DocumentId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[DocumentId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[DocumentId] = new ParameterMetaData[DocumentId] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[DocumentId] = ParameterMetaData.instance[DocumentId](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[DocumentId] = Setter.stringSetter.contramap(_.value)
 }

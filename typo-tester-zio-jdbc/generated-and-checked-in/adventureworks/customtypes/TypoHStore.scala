@@ -37,10 +37,7 @@ object TypoHStore {
   implicit lazy val jsonDecoder: JsonDecoder[TypoHStore] = JsonDecoder[Map[String, String]].map(TypoHStore.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoHStore] = JsonEncoder[Map[String, String]].contramap(_.value)
   implicit def ordering(implicit O0: Ordering[Map[String, String]]): Ordering[TypoHStore] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoHStore] = new ParameterMetaData[TypoHStore] {
-    override def sqlType: String = "hstore"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoHStore] = ParameterMetaData.instance[TypoHStore]("hstore", Types.OTHER)
   implicit lazy val setter: Setter[TypoHStore] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

@@ -25,9 +25,6 @@ object AddresstypeId {
   implicit lazy val jsonDecoder: JsonDecoder[AddresstypeId] = JsonDecoder.int.map(AddresstypeId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[AddresstypeId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[AddresstypeId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[AddresstypeId] = new ParameterMetaData[AddresstypeId] {
-    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[AddresstypeId] = ParameterMetaData.instance[AddresstypeId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[AddresstypeId] = Setter.intSetter.contramap(_.value)
 }

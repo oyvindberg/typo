@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoRegtype(value: String)
 
 object TypoRegtype {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoRegtype]): JdbcDecoder[Array[TypoRegtype]] = JdbcDecoder[Array[TypoRegtype]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoRegtype(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoRegtype]] = JdbcDecoder[Array[TypoRegtype]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoRegtype(x.asInstanceOf[String]))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoRegtype]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoRegtype]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoRegtype {
   implicit lazy val jsonDecoder: JsonDecoder[TypoRegtype] = JsonDecoder.string.map(TypoRegtype.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoRegtype] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoRegtype] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoRegtype] = new ParameterMetaData[TypoRegtype] {
-    override def sqlType: String = "regtype"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoRegtype] = ParameterMetaData.instance[TypoRegtype]("regtype", Types.OTHER)
   implicit lazy val setter: Setter[TypoRegtype] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

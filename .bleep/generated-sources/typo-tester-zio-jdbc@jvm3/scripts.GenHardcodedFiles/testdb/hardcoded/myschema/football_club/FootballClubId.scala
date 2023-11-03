@@ -26,9 +26,6 @@ object FootballClubId {
   implicit lazy val jsonDecoder: JsonDecoder[FootballClubId] = JsonDecoder.long.map(FootballClubId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[FootballClubId] = JsonEncoder.long.contramap(_.value)
   implicit lazy val ordering: Ordering[FootballClubId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[FootballClubId] = new ParameterMetaData[FootballClubId] {
-    override def sqlType: String = ParameterMetaData.LongParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.LongParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[FootballClubId] = ParameterMetaData.instance[FootballClubId](ParameterMetaData.LongParameterMetaData.sqlType, ParameterMetaData.LongParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[FootballClubId] = Setter.longSetter.contramap(_.value)
 }

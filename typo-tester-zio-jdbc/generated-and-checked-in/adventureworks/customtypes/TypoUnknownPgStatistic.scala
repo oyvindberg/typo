@@ -8,7 +8,6 @@ package customtypes
 
 import java.sql.ResultSet
 import java.sql.Types
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -21,20 +20,12 @@ import zio.json.JsonEncoder
 case class TypoUnknownPgStatistic(value: String)
 
 object TypoUnknownPgStatistic {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoUnknownPgStatistic]): JdbcDecoder[Array[TypoUnknownPgStatistic]] = JdbcDecoder[Array[TypoUnknownPgStatistic]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoUnknownPgStatistic(x.asInstanceOf[String])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoUnknownPgStatistic]] = JdbcDecoder[Array[TypoUnknownPgStatistic]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoUnknownPgStatistic(x.asInstanceOf[String]))
     },
-    "java.lang.String"
+    "scala.Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUnknownPgStatistic]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoUnknownPgStatistic]] = Setter.forSqlType((ps, i, v) =>
@@ -61,10 +52,7 @@ object TypoUnknownPgStatistic {
   implicit lazy val jsonDecoder: JsonDecoder[TypoUnknownPgStatistic] = JsonDecoder.string.map(TypoUnknownPgStatistic.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoUnknownPgStatistic] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoUnknownPgStatistic] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoUnknownPgStatistic] = new ParameterMetaData[TypoUnknownPgStatistic] {
-    override def sqlType: String = "pg_statistic"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoUnknownPgStatistic] = ParameterMetaData.instance[TypoUnknownPgStatistic]("pg_statistic", Types.OTHER)
   implicit lazy val setter: Setter[TypoUnknownPgStatistic] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

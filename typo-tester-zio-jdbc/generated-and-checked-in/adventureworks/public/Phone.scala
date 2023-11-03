@@ -26,9 +26,6 @@ object Phone {
   implicit lazy val jsonDecoder: JsonDecoder[Phone] = JsonDecoder.string.map(Phone.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Phone] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Phone] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Phone] = new ParameterMetaData[Phone] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[Phone] = ParameterMetaData.instance[Phone](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[Phone] = Setter.stringSetter.contramap(_.value)
 }

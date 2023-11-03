@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import scala.math.Numeric
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -35,20 +34,12 @@ object TypoShort {
       override def toDouble(x: TypoShort): Double = x.toDouble
       def parseString(str: String): Option[TypoShort] = (str, Option.empty[TypoShort])._2 // sorry mac, this was too much trouble to implement for 2.12
     }
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoShort]): JdbcDecoder[Array[TypoShort]] = JdbcDecoder[Array[TypoShort]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoShort(x.asInstanceOf[java.lang.Short])
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoShort]] = JdbcDecoder[Array[TypoShort]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoShort(x.asInstanceOf[java.lang.Short]))
     },
-    "java.lang.Integer"
+    "scala.Array[java.lang.Integer]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoShort]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoShort]] = Setter.forSqlType((ps, i, v) =>
@@ -75,10 +66,7 @@ object TypoShort {
   implicit lazy val jsonDecoder: JsonDecoder[TypoShort] = JsonDecoder[Short].map(TypoShort.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoShort] = JsonEncoder[Short].contramap(_.value)
   implicit lazy val ordering: Ordering[TypoShort] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoShort] = new ParameterMetaData[TypoShort] {
-    override def sqlType: String = "int2"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoShort] = ParameterMetaData.instance[TypoShort]("int2", Types.OTHER)
   implicit lazy val setter: Setter[TypoShort] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

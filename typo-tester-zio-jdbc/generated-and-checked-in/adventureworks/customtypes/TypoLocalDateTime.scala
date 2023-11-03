@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -30,20 +29,12 @@ object TypoLocalDateTime {
   def apply(value: LocalDateTime): TypoLocalDateTime = new TypoLocalDateTime(value.truncatedTo(ChronoUnit.MICROS))
   def apply(str: String): TypoLocalDateTime = apply(LocalDateTime.parse(str, parser))
   def now = TypoLocalDateTime(LocalDateTime.now)
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoLocalDateTime]): JdbcDecoder[Array[TypoLocalDateTime]] = JdbcDecoder[Array[TypoLocalDateTime]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoLocalDateTime(LocalDateTime.parse(x.asInstanceOf[String], parser))
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoLocalDateTime]] = JdbcDecoder[Array[TypoLocalDateTime]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoLocalDateTime(LocalDateTime.parse(x.asInstanceOf[String], parser)))
     },
-    "java.lang.String"
+    "scala.Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLocalDateTime]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLocalDateTime]] = Setter.forSqlType((ps, i, v) =>
@@ -70,10 +61,7 @@ object TypoLocalDateTime {
   implicit lazy val jsonDecoder: JsonDecoder[TypoLocalDateTime] = JsonDecoder.localDateTime.map(TypoLocalDateTime.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoLocalDateTime] = JsonEncoder.localDateTime.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[TypoLocalDateTime] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalDateTime] = new ParameterMetaData[TypoLocalDateTime] {
-    override def sqlType: String = "timestamp"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalDateTime] = ParameterMetaData.instance[TypoLocalDateTime]("timestamp", Types.OTHER)
   implicit lazy val setter: Setter[TypoLocalDateTime] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

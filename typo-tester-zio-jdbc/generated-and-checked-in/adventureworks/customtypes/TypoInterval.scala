@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGInterval
-import scala.reflect.ClassTag
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
@@ -23,20 +22,12 @@ import zio.json.internal.Write
 case class TypoInterval(years: Int, months: Int, days: Int, hours: Int, minutes: Int, seconds: Double)
 
 object TypoInterval {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoInterval]): JdbcDecoder[Array[TypoInterval]] = JdbcDecoder[Array[TypoInterval]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoInterval(x.asInstanceOf[PGInterval].getYears, x.asInstanceOf[PGInterval].getMonths, x.asInstanceOf[PGInterval].getDays, x.asInstanceOf[PGInterval].getHours, x.asInstanceOf[PGInterval].getMinutes, x.asInstanceOf[PGInterval].getSeconds)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoInterval]] = JdbcDecoder[Array[TypoInterval]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoInterval(x.asInstanceOf[PGInterval].getYears, x.asInstanceOf[PGInterval].getMonths, x.asInstanceOf[PGInterval].getDays, x.asInstanceOf[PGInterval].getHours, x.asInstanceOf[PGInterval].getMinutes, x.asInstanceOf[PGInterval].getSeconds))
     },
-    "org.postgresql.util.PGInterval"
+    "scala.Array[org.postgresql.util.PGInterval]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInterval]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInterval]] = Setter.forSqlType((ps, i, v) =>
@@ -94,10 +85,7 @@ object TypoInterval {
     }
   }
   implicit lazy val ordering: Ordering[TypoInterval] = Ordering.by(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoInterval] = new ParameterMetaData[TypoInterval] {
-    override def sqlType: String = "interval"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoInterval] = ParameterMetaData.instance[TypoInterval]("interval", Types.OTHER)
   implicit lazy val setter: Setter[TypoInterval] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

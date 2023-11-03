@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -22,20 +21,12 @@ import zio.json.JsonEncoder
 case class TypoInet(value: String)
 
 object TypoInet {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoInet]): JdbcDecoder[Array[TypoInet]] = JdbcDecoder[Array[TypoInet]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoInet(x.asInstanceOf[PGobject].getValue)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoInet]] = JdbcDecoder[Array[TypoInet]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoInet(x.asInstanceOf[PGobject].getValue))
     },
-    "org.postgresql.util.PGobject"
+    "scala.Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInet]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInet]] = Setter.forSqlType((ps, i, v) =>
@@ -67,10 +58,7 @@ object TypoInet {
   implicit lazy val jsonDecoder: JsonDecoder[TypoInet] = JsonDecoder.string.map(TypoInet.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoInet] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoInet] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoInet] = new ParameterMetaData[TypoInet] {
-    override def sqlType: String = "inet"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoInet] = ParameterMetaData.instance[TypoInet]("inet", Types.OTHER)
   implicit lazy val setter: Setter[TypoInet] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

@@ -25,9 +25,6 @@ object ProductdescriptionId {
   implicit lazy val jsonDecoder: JsonDecoder[ProductdescriptionId] = JsonDecoder.int.map(ProductdescriptionId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[ProductdescriptionId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[ProductdescriptionId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[ProductdescriptionId] = new ParameterMetaData[ProductdescriptionId] {
-    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[ProductdescriptionId] = ParameterMetaData.instance[ProductdescriptionId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[ProductdescriptionId] = Setter.intSetter.contramap(_.value)
 }

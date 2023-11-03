@@ -26,9 +26,6 @@ object Flag {
   implicit lazy val jsonDecoder: JsonDecoder[Flag] = JsonDecoder.boolean.map(Flag.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Flag] = JsonEncoder.boolean.contramap(_.value)
   implicit lazy val ordering: Ordering[Flag] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Flag] = new ParameterMetaData[Flag] {
-    override def sqlType: String = ParameterMetaData.BooleanParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.BooleanParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[Flag] = ParameterMetaData.instance[Flag](ParameterMetaData.BooleanParameterMetaData.sqlType, ParameterMetaData.BooleanParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[Flag] = Setter.booleanSetter.contramap(_.value)
 }

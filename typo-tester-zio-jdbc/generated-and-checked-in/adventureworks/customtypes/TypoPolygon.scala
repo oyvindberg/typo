@@ -10,7 +10,6 @@ import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGpoint
 import org.postgresql.geometric.PGpolygon
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -23,20 +22,12 @@ import zio.json.JsonEncoder
 case class TypoPolygon(points: List[TypoPoint])
 
 object TypoPolygon {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoPolygon]): JdbcDecoder[Array[TypoPolygon]] = JdbcDecoder[Array[TypoPolygon]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoPolygon(x.asInstanceOf[PGpolygon].points.map(p => TypoPoint(p.x, p.y)).toList)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoPolygon]] = JdbcDecoder[Array[TypoPolygon]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoPolygon(x.asInstanceOf[PGpolygon].points.map(p => TypoPoint(p.x, p.y)).toList))
     },
-    "org.postgresql.geometric.PGpolygon"
+    "scala.Array[org.postgresql.geometric.PGpolygon]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPolygon]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoPolygon]] = Setter.forSqlType((ps, i, v) =>
@@ -63,10 +54,7 @@ object TypoPolygon {
   implicit lazy val jsonDecoder: JsonDecoder[TypoPolygon] = JsonDecoder[List[TypoPoint]].map(TypoPolygon.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoPolygon] = JsonEncoder[List[TypoPoint]].contramap(_.points)
   implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPolygon] = Ordering.by(_.points)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoPolygon] = new ParameterMetaData[TypoPolygon] {
-    override def sqlType: String = "polygon"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoPolygon] = ParameterMetaData.instance[TypoPolygon]("polygon", Types.OTHER)
   implicit lazy val setter: Setter[TypoPolygon] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

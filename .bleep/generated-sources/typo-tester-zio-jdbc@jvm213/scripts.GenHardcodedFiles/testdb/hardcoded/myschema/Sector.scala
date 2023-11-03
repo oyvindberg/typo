@@ -60,9 +60,6 @@ object Sector {
   implicit lazy val jsonDecoder: JsonDecoder[Sector] = JsonDecoder.string.mapOrFail(Sector.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Sector] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Sector] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[Sector] = ParameterMetaData.instance[Sector](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[Sector] = Setter.stringSetter.contramap(_.value)
 }

@@ -9,7 +9,6 @@ package customtypes
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGbox
-import scala.reflect.ClassTag
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
@@ -23,20 +22,12 @@ import zio.json.internal.Write
 case class TypoBox(x1: Double, y1: Double, x2: Double, y2: Double)
 
 object TypoBox {
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoBox]): JdbcDecoder[Array[TypoBox]] = JdbcDecoder[Array[TypoBox]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoBox(x.asInstanceOf[PGbox].point(0).x, x.asInstanceOf[PGbox].point(0).y, x.asInstanceOf[PGbox].point(1).x, x.asInstanceOf[PGbox].point(1).y)
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoBox]] = JdbcDecoder[Array[TypoBox]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoBox(x.asInstanceOf[PGbox].point(0).x, x.asInstanceOf[PGbox].point(0).y, x.asInstanceOf[PGbox].point(1).x, x.asInstanceOf[PGbox].point(1).y))
     },
-    "org.postgresql.geometric.PGbox"
+    "scala.Array[org.postgresql.geometric.PGbox]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoBox]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoBox]] = Setter.forSqlType((ps, i, v) =>
@@ -86,10 +77,7 @@ object TypoBox {
     }
   }
   implicit lazy val ordering: Ordering[TypoBox] = Ordering.by(x => (x.x1, x.y1, x.x2, x.y2))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoBox] = new ParameterMetaData[TypoBox] {
-    override def sqlType: String = "box"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoBox] = ParameterMetaData.instance[TypoBox]("box", Types.OTHER)
   implicit lazy val setter: Setter[TypoBox] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

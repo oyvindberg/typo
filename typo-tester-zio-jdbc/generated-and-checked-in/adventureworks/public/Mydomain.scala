@@ -26,9 +26,6 @@ object Mydomain {
   implicit lazy val jsonDecoder: JsonDecoder[Mydomain] = JsonDecoder.string.map(Mydomain.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Mydomain] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Mydomain] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Mydomain] = new ParameterMetaData[Mydomain] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[Mydomain] = ParameterMetaData.instance[Mydomain](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
   implicit lazy val setter: Setter[Mydomain] = Setter.stringSetter.contramap(_.value)
 }

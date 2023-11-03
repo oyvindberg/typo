@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
-import scala.reflect.ClassTag
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -30,20 +29,12 @@ object TypoOffsetTime {
   def apply(value: OffsetTime): TypoOffsetTime = new TypoOffsetTime(value.truncatedTo(ChronoUnit.MICROS))
   def apply(str: String): TypoOffsetTime = apply(OffsetTime.parse(str, parser))
   def now = TypoOffsetTime(OffsetTime.now)
-  implicit def arrayJdbcDecoder(implicit classTag: ClassTag[TypoOffsetTime]): JdbcDecoder[Array[TypoOffsetTime]] = JdbcDecoder[Array[TypoOffsetTime]](
-    (rs: ResultSet) => (i: Int) => {
-      val arr = rs.getArray(i)
-      if (arr eq null) null
-      else
-        arr
-          .getArray
-          .asInstanceOf[Array[AnyRef]]
-          .foldLeft(Array.newBuilder(classTag)) {
-            case (b, x) => b += TypoOffsetTime(OffsetTime.parse(x.asInstanceOf[String], parser))
-          }
-          .result()
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TypoOffsetTime]] = JdbcDecoder[Array[TypoOffsetTime]]((rs: ResultSet) => (i: Int) =>
+    rs.getArray(i) match {
+      case null => null
+      case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoOffsetTime(OffsetTime.parse(x.asInstanceOf[String], parser)))
     },
-    "java.lang.String"
+    "scala.Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoOffsetTime]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoOffsetTime]] = Setter.forSqlType((ps, i, v) =>
@@ -70,10 +61,7 @@ object TypoOffsetTime {
   implicit lazy val jsonDecoder: JsonDecoder[TypoOffsetTime] = JsonDecoder.offsetTime.map(TypoOffsetTime.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoOffsetTime] = JsonEncoder.offsetTime.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[OffsetTime]): Ordering[TypoOffsetTime] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoOffsetTime] = new ParameterMetaData[TypoOffsetTime] {
-    override def sqlType: String = "timetz"
-    override def jdbcType: Int = Types.OTHER
-  }
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoOffsetTime] = ParameterMetaData.instance[TypoOffsetTime]("timetz", Types.OTHER)
   implicit lazy val setter: Setter[TypoOffsetTime] = Setter.other(
     (ps, i, v) => {
       ps.setObject(
