@@ -21,7 +21,7 @@ val options = Options(
 | Field Name            | Effect                                                                                                                               |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | `pkg`                 | Specifies the package name for the generated code.                                                                                   |
-| `dbLib`               | Defines the database library to use for code generation (anorm, doobie or none).                                                     |
+| `dbLib`               | Defines the database library to use for code generation (anorm, doobie, zio-jdbc or `None`).                                         |
 | `jsonLibs`            | JSON libraries to generate codecs for (default is empty).                                                                            |
 | `silentBanner`        | Controls whether to suppress the Typo banner while running Typo (default is `false`).                                                |
 | `fileHeader`          | Sets the header text that appears at the top of generated files.                                                                     |

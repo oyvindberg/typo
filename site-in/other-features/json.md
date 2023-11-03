@@ -9,7 +9,7 @@ PostgreSQL or write some generic code across tables, it's very convenient to be 
 
 You add the wanted JSON libraries to `typo.Options` when running typo to get the codecs.
 
-Currently, you can choose between `play-json` and `circe`. 
+Currently, you can choose between `play-json`, `circe` and `zio-json`. 
 It's likely quite easy to add another one if you want to contribute! 
 
 For instance:
@@ -19,7 +19,7 @@ import typo.*
 
 val options = Options(
   pkg = "org.foo",
-  jsonLibs = List(JsonLibName.PlayJson), // or List() if you don't want json
+  jsonLibs = List(JsonLibName.PlayJson), // or `Nil` if you don't want json
   dbLib = Some(DbLibName.Anorm)
 )
 ```
