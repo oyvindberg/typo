@@ -15,6 +15,7 @@ case class InternalOptions(
     enableFieldValue: Selector,
     enableDsl: Boolean,
     enableTestInserts: Selector,
+    readonlyRepo: Selector,
     keepDependencies: Boolean,
     debugTypes: Boolean
 )

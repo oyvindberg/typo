@@ -13,6 +13,7 @@ case class Options(
     generateMockRepos: Selector = Selector.All,
     enableFieldValue: Selector = Selector.None,
     enableTestInserts: Selector = Selector.None,
+    readonlyRepo: Selector = Selector.None,
     enableDsl: Boolean = false,
     debugTypes: Boolean = false,
     inlineImplicits: Boolean = true,

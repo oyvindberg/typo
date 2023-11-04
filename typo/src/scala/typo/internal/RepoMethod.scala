@@ -4,24 +4,27 @@ package internal
 sealed trait RepoMethod
 
 object RepoMethod {
+  sealed trait Mutator extends RepoMethod
+  sealed trait Selector extends RepoMethod
+
   case class SelectAll(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Selector
 
   case class SelectBuilder(
       relName: db.RelationName,
       fieldsType: sc.Type,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Selector
 
   case class SelectById(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       id: IdComputed,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Selector
 
   case class SelectAllByIds(
       relName: db.RelationName,
@@ -29,13 +32,13 @@ object RepoMethod {
       unaryId: IdComputed.Unary,
       idsParam: sc.Param,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Selector
 
   case class SelectByUnique(
       relName: db.RelationName,
       params: NonEmptyList[ComputedColumn],
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Selector
 
   case class SelectByFieldValues(
       relName: db.RelationName,
@@ -43,13 +46,13 @@ object RepoMethod {
       fieldValueType: sc.Type.Qualified,
       fieldValueOrIdsParam: sc.Param,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Selector
 
   case class UpdateBuilder(
       relName: db.RelationName,
       fieldsType: sc.Type,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Mutator
 
   case class UpdateFieldValues(
       relName: db.RelationName,
@@ -58,7 +61,7 @@ object RepoMethod {
       fieldValueType: sc.Type.Qualified,
       cases: NonEmptyList[ComputedColumn],
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Mutator
 
   case class Update(
       relName: db.RelationName,
@@ -66,7 +69,7 @@ object RepoMethod {
       id: IdComputed,
       param: sc.Param,
       colsNotId: NonEmptyList[ComputedColumn]
-  ) extends RepoMethod
+  ) extends Mutator
 
   case class Upsert(
       relName: db.RelationName,
@@ -74,14 +77,14 @@ object RepoMethod {
       id: IdComputed,
       unsavedParam: sc.Param,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Mutator
 
   case class Insert(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       unsavedParam: sc.Param,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Mutator
 
   case class InsertUnsaved(
       relName: db.RelationName,
@@ -90,18 +93,18 @@ object RepoMethod {
       unsavedParam: sc.Param,
       default: ComputedDefault,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Mutator
 
   case class Delete(
       relName: db.RelationName,
       id: IdComputed
-  ) extends RepoMethod
+  ) extends Mutator
 
   case class DeleteBuilder(
       relName: db.RelationName,
       fieldsType: sc.Type,
       rowType: sc.Type
-  ) extends RepoMethod
+  ) extends Mutator
 
   case class SqlFile(sqlFile: ComputedSqlFile) extends RepoMethod
 
