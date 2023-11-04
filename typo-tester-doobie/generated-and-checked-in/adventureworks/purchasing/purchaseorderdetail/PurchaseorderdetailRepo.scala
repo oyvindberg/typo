@@ -9,19 +9,10 @@ package purchaseorderdetail
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
-import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
 
 trait PurchaseorderdetailRepo {
-  def delete(compositeId: PurchaseorderdetailId): ConnectionIO[Boolean]
-  def delete: DeleteBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow]
-  def insert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow]
-  def insert(unsaved: PurchaseorderdetailRowUnsaved): ConnectionIO[PurchaseorderdetailRow]
   def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow]
   def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow]
   def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]]
-  def update(row: PurchaseorderdetailRow): ConnectionIO[Boolean]
-  def update: UpdateBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow]
-  def upsert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow]
 }

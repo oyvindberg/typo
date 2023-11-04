@@ -38,6 +38,7 @@ object generate {
       fileHeader = publicOptions.fileHeader,
       enableFieldValue = publicOptions.enableFieldValue,
       enableDsl = publicOptions.enableDsl,
+      readonlyRepo = publicOptions.readonlyRepo,
       enableTestInserts = publicOptions.enableTestInserts,
       keepDependencies = publicOptions.keepDependencies,
       debugTypes = publicOptions.debugTypes

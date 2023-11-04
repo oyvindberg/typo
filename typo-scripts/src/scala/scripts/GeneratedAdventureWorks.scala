@@ -47,7 +47,8 @@ object GeneratedAdventureWorks {
                 case ("sales.creditcard", "creditcardid") => "adventureworks.userdefined.CustomCreditcardId"
               },
               enableDsl = true,
-              enableTestInserts = Selector.All
+              enableTestInserts = Selector.All,
+              readonlyRepo = Selector.relationNames("purchaseorderdetail")
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 

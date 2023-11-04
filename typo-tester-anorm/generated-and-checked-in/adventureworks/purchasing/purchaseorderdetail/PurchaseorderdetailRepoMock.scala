@@ -8,36 +8,11 @@ package purchasing
 package purchaseorderdetail
 
 import java.sql.Connection
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderMock
 import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
 
-class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved, PurchaseorderdetailRow],
-                                  map: scala.collection.mutable.Map[PurchaseorderdetailId, PurchaseorderdetailRow] = scala.collection.mutable.Map.empty) extends PurchaseorderdetailRepo {
-  override def delete(compositeId: PurchaseorderdetailId)(implicit c: Connection): Boolean = {
-    map.remove(compositeId).isDefined
-  }
-  override def delete: DeleteBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PurchaseorderdetailFields, map)
-  }
-  override def insert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
-    val _ = if (map.contains(unsaved.compositeId))
-      sys.error(s"id ${unsaved.compositeId} already exists")
-    else
-      map.put(unsaved.compositeId, unsaved)
-    
-    unsaved
-  }
-  override def insert(unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): PurchaseorderdetailRow = {
-    insert(toRow(unsaved))
-  }
+class PurchaseorderdetailRepoMock(map: scala.collection.mutable.Map[PurchaseorderdetailId, PurchaseorderdetailRow] = scala.collection.mutable.Map.empty) extends PurchaseorderdetailRepo {
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
     SelectBuilderMock(PurchaseorderdetailFields, () => map.values.toList, SelectParams.empty)
   }
@@ -46,21 +21,5 @@ class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved
   }
   override def selectById(compositeId: PurchaseorderdetailId)(implicit c: Connection): Option[PurchaseorderdetailRow] = {
     map.get(compositeId)
-  }
-  override def update(row: PurchaseorderdetailRow)(implicit c: Connection): Boolean = {
-    map.get(row.compositeId) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.compositeId, row): @nowarn
-        true
-      case None => false
-    }
-  }
-  override def update: UpdateBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PurchaseorderdetailFields, map)
-  }
-  override def upsert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
-    map.put(unsaved.compositeId, unsaved): @nowarn
-    unsaved
   }
 }

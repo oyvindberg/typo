@@ -85,23 +85,24 @@ object ComputedTestInserts {
 
     new ComputedTestInserts(
       sc.Type.Qualified(options.pkg / sc.Ident("testInsert")),
-      computedTables.map { table =>
-        val cols: NonEmptyList[ComputedColumn] =
-          table.maybeUnsavedRow match {
-            case Some(unsaved) => unsaved.allCols
-            case None          => table.cols
+      computedTables.collect {
+        case table if !options.readonlyRepo.include(table.dbTable.name) =>
+          val cols: NonEmptyList[ComputedColumn] =
+            table.maybeUnsavedRow match {
+              case Some(unsaved) => unsaved.allCols
+              case None          => table.cols
+            }
+
+          val params: List[sc.Param] = {
+            val asParams = cols.map { col =>
+              val default = defaultFor(table, col.tpe, col.dbCol.tpe)
+              sc.Param(col.name, col.tpe, default)
+            }
+            val (requiredParams, optionalParams) = asParams.toList.partition(_.default.isEmpty)
+            requiredParams ++ optionalParams
           }
 
-        val params: List[sc.Param] = {
-          val asParams = cols.map { col =>
-            val default = defaultFor(table, col.tpe, col.dbCol.tpe)
-            sc.Param(col.name, col.tpe, default)
-          }
-          val (requiredParams, optionalParams) = asParams.toList.partition(_.default.isEmpty)
-          requiredParams ++ optionalParams
-        }
-
-        ComputedTestInserts.InsertMethod(table, params)
+          ComputedTestInserts.InsertMethod(table, params)
       }.toList
     )
   }
