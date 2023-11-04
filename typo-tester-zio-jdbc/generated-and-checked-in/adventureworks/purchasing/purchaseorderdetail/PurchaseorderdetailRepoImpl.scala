@@ -7,68 +7,17 @@ package adventureworks
 package purchasing
 package purchaseorderdetail
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
 import zio.ZIO
-import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
 import zio.jdbc.SqlFragment.Setter
-import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
-  override def delete(compositeId: PurchaseorderdetailId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from purchasing.purchaseorderdetail where "purchaseorderid" = ${Segment.paramSegment(compositeId.purchaseorderid)(Setter[PurchaseorderheaderId])} AND "purchaseorderdetailid" = ${Segment.paramSegment(compositeId.purchaseorderdetailid)(Setter.intSetter)}""".delete.map(_ > 0)
-  }
-  override def delete: DeleteBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    DeleteBuilder("purchasing.purchaseorderdetail", PurchaseorderdetailFields)
-  }
-  override def insert(unsaved: PurchaseorderdetailRow): ZIO[ZConnection, Throwable, PurchaseorderdetailRow] = {
-    sql"""insert into purchasing.purchaseorderdetail("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")
-          values (${Segment.paramSegment(unsaved.purchaseorderid)(Setter[PurchaseorderheaderId])}::int4, ${Segment.paramSegment(unsaved.purchaseorderdetailid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.orderqty)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.receivedqty)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rejectedqty)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
-          returning "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
-       """.insertReturning(PurchaseorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insert(unsaved: PurchaseorderdetailRowUnsaved): ZIO[ZConnection, Throwable, PurchaseorderdetailRow] = {
-    val fs = List(
-      Some((sql""""purchaseorderid"""", sql"${Segment.paramSegment(unsaved.purchaseorderid)(Setter[PurchaseorderheaderId])}::int4")),
-      Some((sql""""duedate"""", sql"${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""orderqty"""", sql"${Segment.paramSegment(unsaved.orderqty)(Setter[TypoShort])}::int2")),
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
-      Some((sql""""unitprice"""", sql"${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric")),
-      Some((sql""""receivedqty"""", sql"${Segment.paramSegment(unsaved.receivedqty)(Setter.bigDecimalScalaSetter)}::numeric")),
-      Some((sql""""rejectedqty"""", sql"${Segment.paramSegment(unsaved.rejectedqty)(Setter.bigDecimalScalaSetter)}::numeric")),
-      unsaved.purchaseorderdetailid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""purchaseorderdetailid"""", sql"${Segment.paramSegment(value: Int)(Setter.intSetter)}::int4"))
-      },
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
-      }
-    ).flatten
-    
-    val q = if (fs.isEmpty) {
-      sql"""insert into purchasing.purchaseorderdetail default values
-            returning "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
-         """
-    } else {
-      val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
-      val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into purchasing.purchaseorderdetail($names) values ($values) returning "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text"""
-    }
-    q.insertReturning(PurchaseorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
-    
-  }
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
     SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.jdbcDecoder)
   }
@@ -77,44 +26,5 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   }
   override def selectById(compositeId: PurchaseorderdetailId): ZIO[ZConnection, Throwable, Option[PurchaseorderdetailRow]] = {
     sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail where "purchaseorderid" = ${Segment.paramSegment(compositeId.purchaseorderid)(Setter[PurchaseorderheaderId])} AND "purchaseorderdetailid" = ${Segment.paramSegment(compositeId.purchaseorderdetailid)(Setter.intSetter)}""".query(PurchaseorderdetailRow.jdbcDecoder).selectOne
-  }
-  override def update(row: PurchaseorderdetailRow): ZIO[ZConnection, Throwable, Boolean] = {
-    val compositeId = row.compositeId
-    sql"""update purchasing.purchaseorderdetail
-          set "duedate" = ${Segment.paramSegment(row.duedate)(Setter[TypoLocalDateTime])}::timestamp,
-              "orderqty" = ${Segment.paramSegment(row.orderqty)(Setter[TypoShort])}::int2,
-              "productid" = ${Segment.paramSegment(row.productid)(Setter[ProductId])}::int4,
-              "unitprice" = ${Segment.paramSegment(row.unitprice)(Setter.bigDecimalScalaSetter)}::numeric,
-              "receivedqty" = ${Segment.paramSegment(row.receivedqty)(Setter.bigDecimalScalaSetter)}::numeric,
-              "rejectedqty" = ${Segment.paramSegment(row.rejectedqty)(Setter.bigDecimalScalaSetter)}::numeric,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "purchaseorderid" = ${Segment.paramSegment(compositeId.purchaseorderid)(Setter[PurchaseorderheaderId])} AND "purchaseorderdetailid" = ${Segment.paramSegment(compositeId.purchaseorderdetailid)(Setter.intSetter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    UpdateBuilder("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.jdbcDecoder)
-  }
-  override def upsert(unsaved: PurchaseorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[PurchaseorderdetailRow]] = {
-    sql"""insert into purchasing.purchaseorderdetail("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")
-          values (
-            ${Segment.paramSegment(unsaved.purchaseorderid)(Setter[PurchaseorderheaderId])}::int4,
-            ${Segment.paramSegment(unsaved.purchaseorderdetailid)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.orderqty)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.receivedqty)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.rejectedqty)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          )
-          on conflict ("purchaseorderid", "purchaseorderdetailid")
-          do update set
-            "duedate" = EXCLUDED."duedate",
-            "orderqty" = EXCLUDED."orderqty",
-            "productid" = EXCLUDED."productid",
-            "unitprice" = EXCLUDED."unitprice",
-            "receivedqty" = EXCLUDED."receivedqty",
-            "rejectedqty" = EXCLUDED."rejectedqty",
-            "modifieddate" = EXCLUDED."modifieddate"
-          returning "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text""".insertReturning(PurchaseorderdetailRow.jdbcDecoder)
   }
 }
