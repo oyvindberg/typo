@@ -19,6 +19,8 @@ trait UsersRepo {
   def delete: DeleteBuilder[UsersFields, UsersRow]
   def insert(unsaved: UsersRow): ConnectionIO[UsersRow]
   def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow]
+  def insertMany(unsaved: Seq[UsersRow]): Stream[ConnectionIO, UsersRow]
+  def insertManyUnsaved(unsaved: Seq[UsersRowUnsaved]): Stream[ConnectionIO, UsersRow]
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll: Stream[ConnectionIO, UsersRow]
   def selectById(userId: UsersId): ConnectionIO[Option[UsersRow]]

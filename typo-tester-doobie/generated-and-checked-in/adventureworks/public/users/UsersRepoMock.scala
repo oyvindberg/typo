@@ -43,6 +43,12 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow] = {
     insert(toRow(unsaved))
   }
+  override def insertMany(unsaved: Seq[UsersRow]): Stream[ConnectionIO, UsersRow] = {
+    ???
+  }
+  override def insertManyUnsaved(unsaved: Seq[UsersRowUnsaved]): Stream[ConnectionIO, UsersRow] = {
+    ???
+  }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
     SelectBuilderMock(UsersFields, delay(map.values.toList), SelectParams.empty)
   }
