@@ -191,6 +191,11 @@ case class ComputedTable(
         }
         .distinctByCompat(x => x.params.map(_.tpe)) // avoid erasure clashes
     )
-    NonEmptyList.fromList(maybeMethods.flatten.sorted)
+    val valid = maybeMethods.flatten.filter {
+      case _: RepoMethod.Mutator => !options.readonlyRepo.include(dbTable.name)
+      case _                     => true
+    }.sorted
+
+    NonEmptyList.fromList(valid)
   }
 }

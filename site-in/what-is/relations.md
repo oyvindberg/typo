@@ -151,6 +151,11 @@ case class AddressRowUnsaved(
 ) 
 ```
 
+### Readonly repositories
+
+If you have a bunch of tables you just want to read, you can [customize](customization/overview.md) 
+the repositories to only expose read methods.
+
 ## Views
 
 Typo also excels at simplifying code generation for views. 

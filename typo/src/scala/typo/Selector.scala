@@ -20,4 +20,9 @@ object Selector {
     val wanted = names.toSet
     rel => wanted(rel.name)
   }
+
+  def schemas(names: String*): Selector = {
+    val wanted = names.toSet
+    rel => rel.schema.exists(wanted.apply)
+  }
 }
