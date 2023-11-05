@@ -6,6 +6,7 @@
 package adventureworks
 package customtypes
 
+import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 import io.circe.Json
@@ -27,4 +28,15 @@ object Defaulted {
     case Provided(value) => Json.obj("provided" -> Encoder[T].apply(value))
     case UseDefault      => Json.fromString("defaulted")
   }
+  val DEFAULT_VALUE = "__DEFAULT_VALUE__"
+  implicit def textEncoder[T: Text]: Text[Defaulted[T]] =
+    Text.instance { (t, s) => {
+        val encoded = t match {
+          case Defaulted.Provided(value) => implicitly[Text[T]].encode(value)
+          case Defaulted.UseDefault      => DEFAULT_VALUE
+        }
+        s.append(encoded)
+        ()
+      }
+    }
 }

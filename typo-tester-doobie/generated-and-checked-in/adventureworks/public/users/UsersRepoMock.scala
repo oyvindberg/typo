@@ -44,6 +44,7 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
     insert(toRow(unsaved))
   }
   override def bulkInsert(unsaved: List[UsersRow]): ConnectionIO[Long] = ???
+  override def bulkInsertUnsaved(unsaved: List[UsersRowUnsaved]): ConnectionIO[Long] = ???
   override def select: SelectBuilder[UsersFields, UsersRow] = {
     SelectBuilderMock(UsersFields, delay(map.values.toList), SelectParams.empty)
   }
