@@ -20,6 +20,7 @@ trait UsersRepo {
   def insert(unsaved: UsersRow): ConnectionIO[UsersRow]
   def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow]
   def bulkInsert(unsaved: List[UsersRow]): ConnectionIO[Long]
+  def bulkInsertUnsaved(unsaved: List[UsersRowUnsaved]): ConnectionIO[Long]
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll: Stream[ConnectionIO, UsersRow]
   def selectById(userId: UsersId): ConnectionIO[Option[UsersRow]]
