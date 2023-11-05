@@ -8,6 +8,7 @@ package public
 package users
 
 import adventureworks.customtypes.TypoUUID
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -25,4 +26,5 @@ object UsersId {
   implicit lazy val get: Get[UsersId] = TypoUUID.get.map(UsersId.apply)
   implicit def ordering(implicit O0: Ordering[TypoUUID]): Ordering[UsersId] = Ordering.by(_.value)
   implicit lazy val put: Put[UsersId] = TypoUUID.put.contramap(_.value)
+  implicit val textEncoder: Text[UsersId] = Text.stringInstance.contramap(_.value.value.toString)
 }

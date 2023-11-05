@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -28,4 +29,5 @@ object TypoUnknownCitext {
     .map(v => TypoUnknownCitext(v))
   implicit lazy val ordering: Ordering[TypoUnknownCitext] = Ordering.by(_.value)
   implicit lazy val put: Put[TypoUnknownCitext] = Put.Advanced.other[String](NonEmptyList.one("citext")).contramap(v => v.value)
+  implicit val usersIdTextEncoder: Text[TypoUnknownCitext] = Text.stringInstance.contramap(_.value)
 }
