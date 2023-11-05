@@ -11,9 +11,9 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.fragment.toFragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
-import doobie.Update
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
@@ -64,22 +64,8 @@ object UsersRepoImpl extends UsersRepo {
     q.query(UsersRow.read).unique
 
   }
-
-  override def insertMany(unsaved: Seq[UsersRow]): Stream[ConnectionIO, UsersRow] = {
-    val sql =
-      """insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
-         values (?::uuid, ?, ?, ?::citext, ?, ?::timestamptz, ?::timestamptz)
-         returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text"""
-    Update[UsersRow](sql).updateManyWithGeneratedKeys[UsersRow]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(unsaved.toList)
-  }
-
-  override def insertManyUnsaved(unsaved: Seq[UsersRowUnsaved]): Stream[ConnectionIO, UsersRow] = {
-    val sql =
-      """insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
-         values (?::uuid, ?, ?, ?::citext, ?, ?::timestamptz, ?::timestamptz)
-         returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text"""
-    Update[UsersRowUnsaved](sql)
-      .updateManyWithGeneratedKeys[UsersRow]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(unsaved.toList)
+  override def bulkInsert(unsaved: List[UsersRow]): ConnectionIO[Long] = {
+    sql"""copy public.users ("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""".copyIn(unsaved)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
     SelectBuilderSql("public.users", UsersFields, UsersRow.read)

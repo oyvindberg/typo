@@ -36,7 +36,7 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
     runTest(usersRepo = UsersRepoImpl)
   }
 
-  val unsavedManyDefaulted = List.tabulate(20)(idx =>
+  val unsavedManyDefaulted = List.tabulate(100)(idx =>
     UsersRowUnsaved(
       userId = UsersId(TypoUUID.randomUUID),
       name = "name",
@@ -48,39 +48,16 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
     )
   )
 
-  test("insertMany") {
+  test("bulkInsert") {
     val usersRepo = UsersRepoImpl
     val unsaved = unsavedManyDefaulted.map(_.toRow(TypoInstant.now))
     withConnection {
       for {
-        inserted <- usersRepo.insertMany(unsaved).compile.toList
+        _ <- usersRepo.bulkInsert(unsaved)
         retrieved <- usersRepo.selectByIds(unsaved.map(_.userId).toArray).compile.toList
       } yield {
-        assert(inserted === retrieved)
         assert(unsaved === retrieved)
       }
     }
-  }
-
-  def testInsertManyUnsaved(inputs: Seq[UsersRowUnsaved]) = {
-    val usersRepo = UsersRepoImpl
-    withConnection {
-      for {
-        inserted <- usersRepo.insertManyUnsaved(inputs).compile.toList
-        retrieved <- usersRepo.selectByIds(inputs.map(_.userId).toArray).compile.toList
-      } yield {
-        assert(inserted === retrieved)
-        assert(inputs.map(_.toRow(???)) === retrieved)
-      }
-    }
-  }
-
-  test("insertManyUnsavedProvided") {
-    val unsavedManyProvided = unsavedManyDefaulted.map(_.copy(createdAt = Defaulted.Provided(TypoInstant.now)))
-    testInsertManyUnsaved(unsavedManyProvided)
-  }
-
-  test("insertManyUnsavedDefaulted") {
-    testInsertManyUnsaved(unsavedManyDefaulted)
   }
 }

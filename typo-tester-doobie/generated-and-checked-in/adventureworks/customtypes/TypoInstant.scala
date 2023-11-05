@@ -7,6 +7,7 @@ package adventureworks
 package customtypes
 
 import cats.data.NonEmptyList
+import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
@@ -38,4 +39,5 @@ object TypoInstant {
     .map(v => TypoInstant(v))
   implicit def ordering(implicit O0: Ordering[Instant]): Ordering[TypoInstant] = Ordering.by(_.value)
   implicit lazy val put: Put[TypoInstant] = Put.Advanced.other[String](NonEmptyList.one("timestamptz")).contramap(v => v.value.toString)
+  implicit val textEncoder: Text[TypoInstant] = Text.stringInstance.contramap(_.value.toString)
 }
