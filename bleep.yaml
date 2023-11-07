@@ -12,7 +12,7 @@ projects:
   # main project
   typo:
     dependencies:
-    - com.typesafe.play::play-json:2.10.0-RC9
+    - com.typesafe.play::play-json:2.10.3
     - org.playframework.anorm::anorm:2.7.0
     - org.postgresql:postgresql:42.6.0
     extends: template-cross
@@ -46,25 +46,24 @@ projects:
     dependencies: dev.zio::zio-jdbc:0.1.1
     extends: template-cross
     sources: ../typo-dsl-shared
-  # scripts for generating docs
+  # scripts for publishing, codegen and so on
+  typo-scripts:
+    dependencies: build.bleep::bleep-plugin-ci-release:${BLEEP_VERSION}
+    dependsOn: typo
+    extends: template-nocross
+    # scripts for generating docs
   typo-scripts-doc:
     dependencies:
-    - build.bleep::bleep-plugin-mdoc:${BLEEP_VERSION}
     - build.bleep::bleep-plugin-dynver:${BLEEP_VERSION}
+    - build.bleep::bleep-plugin-mdoc:${BLEEP_VERSION}
     dependsOn:
     - typo
     - typo-tester-anorm
     extends: template-nocross
-  # scripts for publishing, codegen and so on
-  typo-scripts:
-    dependencies:
-    - build.bleep::bleep-plugin-ci-release:${BLEEP_VERSION}
-    dependsOn: typo
-    extends: template-nocross
   # scripts generate code into this project, and there are hand-written tests as well
   typo-tester-anorm:
     dependencies:
-    - com.typesafe.play::play-json:2.10.0-RC9
+    - com.typesafe.play::play-json:2.10.3
     - org.postgresql:postgresql:42.6.0
     - org.scalatest::scalatest:3.3.0-SNAP4
     dependsOn: typo-dsl-anorm
@@ -88,9 +87,9 @@ projects:
     sources: ./generated-and-checked-in
   typo-tester-zio-jdbc:
     dependencies:
-      - dev.zio::zio-json:0.6.2
-      - org.postgresql:postgresql:42.6.0
-      - org.scalatest::scalatest:3.3.0-SNAP4
+    - dev.zio::zio-json:0.6.2
+    - org.postgresql:postgresql:42.6.0
+    - org.scalatest::scalatest:3.3.0-SNAP4
     dependsOn: typo-dsl-zio-jdbc
     extends: template-cross
     isTestProject: true
