@@ -124,7 +124,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         _ <- delay(assert(updated.name === Name("MANf")))
         _ <- delay(assert(updated.listprice === BigDecimal(2)))
         _ <- delay(assert(updated.reorderpoint === TypoShort(40)))
-        _ <- delay {
+        _ <- {
           val q = productRepo.select
             .where(p => !p.name.like("foo%"))
             .where(p => !(p.name.underlying || p.color).like("foo%"))
@@ -136,7 +136,6 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
           q.sql.foreach(f => println(f))
           q.toList.map(list => list.foreach(println))
-
         }
         _ <- {
           val q = productRepo.select

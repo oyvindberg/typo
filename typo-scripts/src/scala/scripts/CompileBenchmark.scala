@@ -22,8 +22,10 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
 
     val crossIds = List("jvm212", "jvm213", "jvm3").map(str => model.CrossId(str))
     val variants = List(
+      (Some(DbLibName.ZioJdbc), Nil, "typo-tester-zio-jdbc"),
       (Some(DbLibName.Doobie), Nil, "typo-tester-doobie"),
       (Some(DbLibName.Anorm), Nil, "typo-tester-anorm"),
+      (None, List(JsonLibName.ZioJson), "typo-tester-zio-jdbc"),
       (None, List(JsonLibName.Circe), "typo-tester-doobie"),
       (None, List(JsonLibName.PlayJson), "typo-tester-anorm")
     )

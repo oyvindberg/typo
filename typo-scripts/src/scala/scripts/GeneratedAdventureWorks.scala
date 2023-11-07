@@ -2,9 +2,9 @@ package scripts
 
 import bleep.logging.{Formatter, LogLevel, Loggers}
 import bleep.{FileWatching, LogPatterns, cli}
+import typo.*
 import typo.internal.sqlfiles.readSqlFileDirectories
 import typo.internal.{FileSync, generate}
-import typo.*
 
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
@@ -30,7 +30,8 @@ object GeneratedAdventureWorks {
 
         val variants = List(
           (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, sc.Code])),
-          (DbLibName.Doobie, JsonLibName.Circe, "typo-tester-doobie", new AtomicReference(Map.empty[RelPath, sc.Code]))
+          (DbLibName.Doobie, JsonLibName.Circe, "typo-tester-doobie", new AtomicReference(Map.empty[RelPath, sc.Code])),
+          (DbLibName.ZioJdbc, JsonLibName.ZioJson, "typo-tester-zio-jdbc", new AtomicReference(Map.empty[RelPath, sc.Code]))
         )
 
         def go(): Unit = {

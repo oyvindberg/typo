@@ -3,7 +3,7 @@ title: Getting started
 ---
 
 ## Database library
-Note that you're supposed to [bring your own database library](other-features/flexible.md). You choose either anorm or doobie in `Options` (see below),
+Note that you're supposed to [bring your own database library](other-features/flexible.md). You choose either anorm, doobie or zio-jdbc in `Options` (see below),
 and you need to have that added to your build as well.
 
 ## Getting started with DSL
@@ -22,6 +22,7 @@ Options(
 You also need to add a dependency to your build in that case, which varies by database library:
 - for doobie: https://mvnrepository.com/artifact/com.olvind.typo/typo-dsl-doobie
 - for anorm: https://mvnrepository.com/artifact/com.olvind.typo/typo-dsl-anorm
+- for zio-jdbc: https://mvnrepository.com/artifact/com.olvind.typo/typo-dsl-zio-jdbc
 
 ## example script
 

@@ -15,7 +15,7 @@ Everything works on 2.12, 2.13, and 3.3.
 
 Not wanting to invent all the wheels, Typo expects you to already use a Scala database library.
 
-For now you have the option of `doobie` or `anorm`, with `skunk` to follow. Maybe also plain `jdbc` mode later.
+For now you have the option of `doobie`, `anorm` or `zio-jdbc`, with `skunk` to follow. Maybe also plain `jdbc` mode later.
 
 ## Bring your own JSON library
 

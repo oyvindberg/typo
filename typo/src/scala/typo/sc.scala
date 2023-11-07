@@ -168,6 +168,7 @@ object sc {
     val ChronoUnit = Qualified("java.time.temporal.ChronoUnit")
     val Numeric = Qualified("scala.math.Numeric")
     val nowarn = Qualified("scala.annotation.nowarn")
+    val Throwable = sc.Type.Qualified("java.lang.Throwable")
 
     object dsl {
       val Bijection = Qualified("typo.dsl.Bijection")
@@ -219,7 +220,8 @@ object sc {
         Some,
         String,
         StringContext,
-        Unit
+        Unit,
+        Throwable
       )
         .map(x => (x.value.name, x))
         .toMap
