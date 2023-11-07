@@ -26,23 +26,23 @@ import zio.stream.ZStream
 
 object ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(Setter[ShipmethodId])}""".delete.map(_ > 0)
+    sql"""delete from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
     DeleteBuilder("purchasing.shipmethod", ShipmethodFields)
   }
   override def insert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.shipmethodid)(Setter[ShipmethodId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.shipbase)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.shiprate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.shipbase)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.shiprate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
        """.insertReturning(ShipmethodRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ShipmethodRowUnsaved): ZIO[ZConnection, Throwable, ShipmethodRow] = {
     val fs = List(
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
       unsaved.shipmethodid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""shipmethodid"""", sql"${Segment.paramSegment(value: ShipmethodId)(Setter[ShipmethodId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""shipmethodid"""", sql"${Segment.paramSegment(value: ShipmethodId)(ShipmethodId.setter)}::int4"))
       },
       unsaved.shipbase match {
         case Defaulted.UseDefault => None
@@ -54,11 +54,11 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -81,7 +81,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod""".query(ShipmethodRow.jdbcDecoder).selectStream
   }
   override def selectById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Option[ShipmethodRow]] = {
-    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(Setter[ShipmethodId])}""".query(ShipmethodRow.jdbcDecoder).selectOne
+    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".query(ShipmethodRow.jdbcDecoder).selectOne
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId]): ZStream[ZConnection, Throwable, ShipmethodRow] = {
     sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ANY(${Segment.paramSegment(shipmethodids)(ShipmethodId.arraySetter)})""".query(ShipmethodRow.jdbcDecoder).selectStream
@@ -89,12 +89,12 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean] = {
     val shipmethodid = row.shipmethodid
     sql"""update purchasing.shipmethod
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "shipbase" = ${Segment.paramSegment(row.shipbase)(Setter.bigDecimalScalaSetter)}::numeric,
               "shiprate" = ${Segment.paramSegment(row.shiprate)(Setter.bigDecimalScalaSetter)}::numeric,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(Setter[ShipmethodId])}""".update.map(_ > 0)
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilder("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.jdbcDecoder)
@@ -102,12 +102,12 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]] = {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.shipmethodid)(Setter[ShipmethodId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
+            ${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
             ${Segment.paramSegment(unsaved.shipbase)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.shiprate)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("shipmethodid")
           do update set

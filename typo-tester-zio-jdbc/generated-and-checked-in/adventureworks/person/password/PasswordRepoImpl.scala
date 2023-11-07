@@ -26,29 +26,29 @@ import zio.stream.ZStream
 
 object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.password where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".delete.map(_ > 0)
+    sql"""delete from person.password where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
     DeleteBuilder("person.password", PasswordFields)
   }
   override def insert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, PasswordRow] = {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.passwordhash)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.passwordsalt)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.passwordhash)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.passwordsalt)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """.insertReturning(PasswordRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: PasswordRowUnsaved): ZIO[ZConnection, Throwable, PasswordRow] = {
     val fs = List(
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
       Some((sql""""passwordhash"""", sql"${Segment.paramSegment(unsaved.passwordhash)(Setter.stringSetter)}")),
       Some((sql""""passwordsalt"""", sql"${Segment.paramSegment(unsaved.passwordsalt)(Setter.stringSetter)}")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -71,7 +71,7 @@ object PasswordRepoImpl extends PasswordRepo {
     sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password""".query(PasswordRow.jdbcDecoder).selectStream
   }
   override def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[PasswordRow]] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".query(PasswordRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(PasswordRow.jdbcDecoder).selectOne
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PasswordRow] = {
     sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(PasswordRow.jdbcDecoder).selectStream
@@ -81,9 +81,9 @@ object PasswordRepoImpl extends PasswordRepo {
     sql"""update person.password
           set "passwordhash" = ${Segment.paramSegment(row.passwordhash)(Setter.stringSetter)},
               "passwordsalt" = ${Segment.paramSegment(row.passwordsalt)(Setter.stringSetter)},
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".update.map(_ > 0)
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
     UpdateBuilder("person.password", PasswordFields, PasswordRow.jdbcDecoder)
@@ -91,11 +91,11 @@ object PasswordRepoImpl extends PasswordRepo {
   override def upsert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, UpdateResult[PasswordRow]] = {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4,
+            ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
             ${Segment.paramSegment(unsaved.passwordhash)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.passwordsalt)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("businessentityid")
           do update set

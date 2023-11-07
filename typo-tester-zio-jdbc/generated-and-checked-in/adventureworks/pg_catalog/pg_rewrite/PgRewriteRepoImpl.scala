@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgRewriteRepoImpl extends PgRewriteRepo {
   override def delete(oid: PgRewriteId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_rewrite where "oid" = ${Segment.paramSegment(oid)(Setter[PgRewriteId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_rewrite where "oid" = ${Segment.paramSegment(oid)(PgRewriteId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgRewriteFields, PgRewriteRow] = {
     DeleteBuilder("pg_catalog.pg_rewrite", PgRewriteFields)
   }
   override def insert(unsaved: PgRewriteRow): ZIO[ZConnection, Throwable, PgRewriteRow] = {
     sql"""insert into pg_catalog.pg_rewrite("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgRewriteId])}::oid, ${Segment.paramSegment(unsaved.rulename)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.evClass)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.evType)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.evEnabled)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.isInstead)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.evQual)(Setter[TypoPgNodeTree])}::pg_node_tree, ${Segment.paramSegment(unsaved.evAction)(Setter[TypoPgNodeTree])}::pg_node_tree)
+          values (${Segment.paramSegment(unsaved.oid)(PgRewriteId.setter)}::oid, ${Segment.paramSegment(unsaved.rulename)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.evClass)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.evType)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.evEnabled)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.isInstead)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.evQual)(TypoPgNodeTree.setter)}::pg_node_tree, ${Segment.paramSegment(unsaved.evAction)(TypoPgNodeTree.setter)}::pg_node_tree)
           returning "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action"
        """.insertReturning(PgRewriteRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
     sql"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action" from pg_catalog.pg_rewrite""".query(PgRewriteRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgRewriteId): ZIO[ZConnection, Throwable, Option[PgRewriteRow]] = {
-    sql"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action" from pg_catalog.pg_rewrite where "oid" = ${Segment.paramSegment(oid)(Setter[PgRewriteId])}""".query(PgRewriteRow.jdbcDecoder).selectOne
+    sql"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action" from pg_catalog.pg_rewrite where "oid" = ${Segment.paramSegment(oid)(PgRewriteId.setter)}""".query(PgRewriteRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgRewriteId]): ZStream[ZConnection, Throwable, PgRewriteRow] = {
     sql"""select "oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action" from pg_catalog.pg_rewrite where "oid" = ANY(${Segment.paramSegment(oids)(PgRewriteId.arraySetter)})""".query(PgRewriteRow.jdbcDecoder).selectStream
@@ -59,9 +59,9 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
               "ev_type" = ${Segment.paramSegment(row.evType)(Setter.stringSetter)}::char,
               "ev_enabled" = ${Segment.paramSegment(row.evEnabled)(Setter.stringSetter)}::char,
               "is_instead" = ${Segment.paramSegment(row.isInstead)(Setter.booleanSetter)},
-              "ev_qual" = ${Segment.paramSegment(row.evQual)(Setter[TypoPgNodeTree])}::pg_node_tree,
-              "ev_action" = ${Segment.paramSegment(row.evAction)(Setter[TypoPgNodeTree])}::pg_node_tree
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgRewriteId])}""".update.map(_ > 0)
+              "ev_qual" = ${Segment.paramSegment(row.evQual)(TypoPgNodeTree.setter)}::pg_node_tree,
+              "ev_action" = ${Segment.paramSegment(row.evAction)(TypoPgNodeTree.setter)}::pg_node_tree
+          where "oid" = ${Segment.paramSegment(oid)(PgRewriteId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgRewriteFields, PgRewriteRow] = {
     UpdateBuilder("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.jdbcDecoder)
@@ -69,14 +69,14 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
   override def upsert(unsaved: PgRewriteRow): ZIO[ZConnection, Throwable, UpdateResult[PgRewriteRow]] = {
     sql"""insert into pg_catalog.pg_rewrite("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgRewriteId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgRewriteId.setter)}::oid,
             ${Segment.paramSegment(unsaved.rulename)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.evClass)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.evType)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.evEnabled)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.isInstead)(Setter.booleanSetter)},
-            ${Segment.paramSegment(unsaved.evQual)(Setter[TypoPgNodeTree])}::pg_node_tree,
-            ${Segment.paramSegment(unsaved.evAction)(Setter[TypoPgNodeTree])}::pg_node_tree
+            ${Segment.paramSegment(unsaved.evQual)(TypoPgNodeTree.setter)}::pg_node_tree,
+            ${Segment.paramSegment(unsaved.evAction)(TypoPgNodeTree.setter)}::pg_node_tree
           )
           on conflict ("oid")
           do update set

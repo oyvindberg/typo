@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 object PgIndexRepoImpl extends PgIndexRepo {
   override def delete(indexrelid: PgIndexId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_index where "indexrelid" = ${Segment.paramSegment(indexrelid)(Setter[PgIndexId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_index where "indexrelid" = ${Segment.paramSegment(indexrelid)(PgIndexId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgIndexFields, PgIndexRow] = {
     DeleteBuilder("pg_catalog.pg_index", PgIndexFields)
   }
   override def insert(unsaved: PgIndexRow): ZIO[ZConnection, Throwable, PgIndexRow] = {
     sql"""insert into pg_catalog.pg_index("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")
-          values (${Segment.paramSegment(unsaved.indexrelid)(Setter[PgIndexId])}::oid, ${Segment.paramSegment(unsaved.indrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.indnatts)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.indnkeyatts)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.indisunique)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisprimary)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisexclusion)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indimmediate)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisclustered)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisvalid)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indcheckxmin)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisready)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indislive)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisreplident)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indkey)(Setter[TypoInt2Vector])}::int2vector, ${Segment.paramSegment(unsaved.indcollation)(Setter[TypoOidVector])}::oidvector, ${Segment.paramSegment(unsaved.indclass)(Setter[TypoOidVector])}::oidvector, ${Segment.paramSegment(unsaved.indoption)(Setter[TypoInt2Vector])}::int2vector, ${Segment.paramSegment(unsaved.indexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree, ${Segment.paramSegment(unsaved.indpred)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree)
+          values (${Segment.paramSegment(unsaved.indexrelid)(PgIndexId.setter)}::oid, ${Segment.paramSegment(unsaved.indrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.indnatts)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.indnkeyatts)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.indisunique)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisprimary)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisexclusion)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indimmediate)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisclustered)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisvalid)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indcheckxmin)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisready)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indislive)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indisreplident)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.indkey)(TypoInt2Vector.setter)}::int2vector, ${Segment.paramSegment(unsaved.indcollation)(TypoOidVector.setter)}::oidvector, ${Segment.paramSegment(unsaved.indclass)(TypoOidVector.setter)}::oidvector, ${Segment.paramSegment(unsaved.indoption)(TypoInt2Vector.setter)}::int2vector, ${Segment.paramSegment(unsaved.indexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree, ${Segment.paramSegment(unsaved.indpred)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree)
           returning "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred"
        """.insertReturning(PgIndexRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -43,7 +43,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
     sql"""select "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred" from pg_catalog.pg_index""".query(PgIndexRow.jdbcDecoder).selectStream
   }
   override def selectById(indexrelid: PgIndexId): ZIO[ZConnection, Throwable, Option[PgIndexRow]] = {
-    sql"""select "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred" from pg_catalog.pg_index where "indexrelid" = ${Segment.paramSegment(indexrelid)(Setter[PgIndexId])}""".query(PgIndexRow.jdbcDecoder).selectOne
+    sql"""select "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred" from pg_catalog.pg_index where "indexrelid" = ${Segment.paramSegment(indexrelid)(PgIndexId.setter)}""".query(PgIndexRow.jdbcDecoder).selectOne
   }
   override def selectByIds(indexrelids: Array[PgIndexId]): ZStream[ZConnection, Throwable, PgIndexRow] = {
     sql"""select "indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred" from pg_catalog.pg_index where "indexrelid" = ANY(${Segment.paramSegment(indexrelids)(PgIndexId.arraySetter)})""".query(PgIndexRow.jdbcDecoder).selectStream
@@ -52,8 +52,8 @@ object PgIndexRepoImpl extends PgIndexRepo {
     val indexrelid = row.indexrelid
     sql"""update pg_catalog.pg_index
           set "indrelid" = ${Segment.paramSegment(row.indrelid)(Setter.longSetter)}::oid,
-              "indnatts" = ${Segment.paramSegment(row.indnatts)(Setter[TypoShort])}::int2,
-              "indnkeyatts" = ${Segment.paramSegment(row.indnkeyatts)(Setter[TypoShort])}::int2,
+              "indnatts" = ${Segment.paramSegment(row.indnatts)(TypoShort.setter)}::int2,
+              "indnkeyatts" = ${Segment.paramSegment(row.indnkeyatts)(TypoShort.setter)}::int2,
               "indisunique" = ${Segment.paramSegment(row.indisunique)(Setter.booleanSetter)},
               "indisprimary" = ${Segment.paramSegment(row.indisprimary)(Setter.booleanSetter)},
               "indisexclusion" = ${Segment.paramSegment(row.indisexclusion)(Setter.booleanSetter)},
@@ -64,13 +64,13 @@ object PgIndexRepoImpl extends PgIndexRepo {
               "indisready" = ${Segment.paramSegment(row.indisready)(Setter.booleanSetter)},
               "indislive" = ${Segment.paramSegment(row.indislive)(Setter.booleanSetter)},
               "indisreplident" = ${Segment.paramSegment(row.indisreplident)(Setter.booleanSetter)},
-              "indkey" = ${Segment.paramSegment(row.indkey)(Setter[TypoInt2Vector])}::int2vector,
-              "indcollation" = ${Segment.paramSegment(row.indcollation)(Setter[TypoOidVector])}::oidvector,
-              "indclass" = ${Segment.paramSegment(row.indclass)(Setter[TypoOidVector])}::oidvector,
-              "indoption" = ${Segment.paramSegment(row.indoption)(Setter[TypoInt2Vector])}::int2vector,
-              "indexprs" = ${Segment.paramSegment(row.indexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
-              "indpred" = ${Segment.paramSegment(row.indpred)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
-          where "indexrelid" = ${Segment.paramSegment(indexrelid)(Setter[PgIndexId])}""".update.map(_ > 0)
+              "indkey" = ${Segment.paramSegment(row.indkey)(TypoInt2Vector.setter)}::int2vector,
+              "indcollation" = ${Segment.paramSegment(row.indcollation)(TypoOidVector.setter)}::oidvector,
+              "indclass" = ${Segment.paramSegment(row.indclass)(TypoOidVector.setter)}::oidvector,
+              "indoption" = ${Segment.paramSegment(row.indoption)(TypoInt2Vector.setter)}::int2vector,
+              "indexprs" = ${Segment.paramSegment(row.indexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
+              "indpred" = ${Segment.paramSegment(row.indpred)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
+          where "indexrelid" = ${Segment.paramSegment(indexrelid)(PgIndexId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgIndexFields, PgIndexRow] = {
     UpdateBuilder("pg_catalog.pg_index", PgIndexFields, PgIndexRow.jdbcDecoder)
@@ -78,10 +78,10 @@ object PgIndexRepoImpl extends PgIndexRepo {
   override def upsert(unsaved: PgIndexRow): ZIO[ZConnection, Throwable, UpdateResult[PgIndexRow]] = {
     sql"""insert into pg_catalog.pg_index("indexrelid", "indrelid", "indnatts", "indnkeyatts", "indisunique", "indisprimary", "indisexclusion", "indimmediate", "indisclustered", "indisvalid", "indcheckxmin", "indisready", "indislive", "indisreplident", "indkey", "indcollation", "indclass", "indoption", "indexprs", "indpred")
           values (
-            ${Segment.paramSegment(unsaved.indexrelid)(Setter[PgIndexId])}::oid,
+            ${Segment.paramSegment(unsaved.indexrelid)(PgIndexId.setter)}::oid,
             ${Segment.paramSegment(unsaved.indrelid)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.indnatts)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.indnkeyatts)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.indnatts)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.indnkeyatts)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.indisunique)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.indisprimary)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.indisexclusion)(Setter.booleanSetter)},
@@ -92,12 +92,12 @@ object PgIndexRepoImpl extends PgIndexRepo {
             ${Segment.paramSegment(unsaved.indisready)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.indislive)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.indisreplident)(Setter.booleanSetter)},
-            ${Segment.paramSegment(unsaved.indkey)(Setter[TypoInt2Vector])}::int2vector,
-            ${Segment.paramSegment(unsaved.indcollation)(Setter[TypoOidVector])}::oidvector,
-            ${Segment.paramSegment(unsaved.indclass)(Setter[TypoOidVector])}::oidvector,
-            ${Segment.paramSegment(unsaved.indoption)(Setter[TypoInt2Vector])}::int2vector,
-            ${Segment.paramSegment(unsaved.indexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
-            ${Segment.paramSegment(unsaved.indpred)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
+            ${Segment.paramSegment(unsaved.indkey)(TypoInt2Vector.setter)}::int2vector,
+            ${Segment.paramSegment(unsaved.indcollation)(TypoOidVector.setter)}::oidvector,
+            ${Segment.paramSegment(unsaved.indclass)(TypoOidVector.setter)}::oidvector,
+            ${Segment.paramSegment(unsaved.indoption)(TypoInt2Vector.setter)}::int2vector,
+            ${Segment.paramSegment(unsaved.indexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
+            ${Segment.paramSegment(unsaved.indpred)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
           )
           on conflict ("indexrelid")
           do update set

@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgAuthidRepoImpl extends PgAuthidRepo {
   override def delete(oid: PgAuthidId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_authid where "oid" = ${Segment.paramSegment(oid)(Setter[PgAuthidId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_authid where "oid" = ${Segment.paramSegment(oid)(PgAuthidId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgAuthidFields, PgAuthidRow] = {
     DeleteBuilder("pg_catalog.pg_authid", PgAuthidFields)
   }
   override def insert(unsaved: PgAuthidRow): ZIO[ZConnection, Throwable, PgAuthidRow] = {
     sql"""insert into pg_catalog.pg_authid("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgAuthidId])}::oid, ${Segment.paramSegment(unsaved.rolname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.rolsuper)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolinherit)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolcreaterole)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolcreatedb)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolcanlogin)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolreplication)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolbypassrls)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolconnlimit)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.rolpassword)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.rolvaliduntil)(Setter.optionParamSetter(Setter[TypoInstant]))}::timestamptz)
+          values (${Segment.paramSegment(unsaved.oid)(PgAuthidId.setter)}::oid, ${Segment.paramSegment(unsaved.rolname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.rolsuper)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolinherit)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolcreaterole)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolcreatedb)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolcanlogin)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolreplication)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolbypassrls)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.rolconnlimit)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.rolpassword)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.rolvaliduntil)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz)
           returning "oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil"::text
        """.insertReturning(PgAuthidRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
     sql"""select "oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil"::text from pg_catalog.pg_authid""".query(PgAuthidRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgAuthidId): ZIO[ZConnection, Throwable, Option[PgAuthidRow]] = {
-    sql"""select "oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil"::text from pg_catalog.pg_authid where "oid" = ${Segment.paramSegment(oid)(Setter[PgAuthidId])}""".query(PgAuthidRow.jdbcDecoder).selectOne
+    sql"""select "oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil"::text from pg_catalog.pg_authid where "oid" = ${Segment.paramSegment(oid)(PgAuthidId.setter)}""".query(PgAuthidRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgAuthidId]): ZStream[ZConnection, Throwable, PgAuthidRow] = {
     sql"""select "oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil"::text from pg_catalog.pg_authid where "oid" = ANY(${Segment.paramSegment(oids)(PgAuthidId.arraySetter)})""".query(PgAuthidRow.jdbcDecoder).selectStream
@@ -64,8 +64,8 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
               "rolbypassrls" = ${Segment.paramSegment(row.rolbypassrls)(Setter.booleanSetter)},
               "rolconnlimit" = ${Segment.paramSegment(row.rolconnlimit)(Setter.intSetter)}::int4,
               "rolpassword" = ${Segment.paramSegment(row.rolpassword)(Setter.optionParamSetter(Setter.stringSetter))},
-              "rolvaliduntil" = ${Segment.paramSegment(row.rolvaliduntil)(Setter.optionParamSetter(Setter[TypoInstant]))}::timestamptz
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgAuthidId])}""".update.map(_ > 0)
+              "rolvaliduntil" = ${Segment.paramSegment(row.rolvaliduntil)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz
+          where "oid" = ${Segment.paramSegment(oid)(PgAuthidId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgAuthidFields, PgAuthidRow] = {
     UpdateBuilder("pg_catalog.pg_authid", PgAuthidFields, PgAuthidRow.jdbcDecoder)
@@ -73,7 +73,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   override def upsert(unsaved: PgAuthidRow): ZIO[ZConnection, Throwable, UpdateResult[PgAuthidRow]] = {
     sql"""insert into pg_catalog.pg_authid("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgAuthidId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgAuthidId.setter)}::oid,
             ${Segment.paramSegment(unsaved.rolname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.rolsuper)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.rolinherit)(Setter.booleanSetter)},
@@ -84,7 +84,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
             ${Segment.paramSegment(unsaved.rolbypassrls)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.rolconnlimit)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.rolpassword)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.rolvaliduntil)(Setter.optionParamSetter(Setter[TypoInstant]))}::timestamptz
+            ${Segment.paramSegment(unsaved.rolvaliduntil)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz
           )
           on conflict ("oid")
           do update set

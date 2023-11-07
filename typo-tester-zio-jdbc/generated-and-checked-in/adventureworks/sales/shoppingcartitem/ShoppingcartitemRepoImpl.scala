@@ -25,24 +25,24 @@ import zio.stream.ZStream
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(Setter[ShoppingcartitemId])}""".delete.map(_ > 0)
+    sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields)
   }
   override def insert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
-          values (${Segment.paramSegment(unsaved.shoppingcartitemid)(Setter[ShoppingcartitemId])}::int4, ${Segment.paramSegment(unsaved.shoppingcartid)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.datecreated)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.shoppingcartitemid)(ShoppingcartitemId.setter)}::int4, ${Segment.paramSegment(unsaved.shoppingcartid)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.datecreated)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """.insertReturning(ShoppingcartitemRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ZIO[ZConnection, Throwable, ShoppingcartitemRow] = {
     val fs = List(
       Some((sql""""shoppingcartid"""", sql"${Segment.paramSegment(unsaved.shoppingcartid)(Setter.stringSetter)}")),
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
       unsaved.shoppingcartitemid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""shoppingcartitemid"""", sql"${Segment.paramSegment(value: ShoppingcartitemId)(Setter[ShoppingcartitemId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""shoppingcartitemid"""", sql"${Segment.paramSegment(value: ShoppingcartitemId)(ShoppingcartitemId.setter)}::int4"))
       },
       unsaved.quantity match {
         case Defaulted.UseDefault => None
@@ -50,11 +50,11 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       },
       unsaved.datecreated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""datecreated"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""datecreated"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -77,7 +77,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem""".query(ShoppingcartitemRow.jdbcDecoder).selectStream
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId): ZIO[ZConnection, Throwable, Option[ShoppingcartitemRow]] = {
-    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(Setter[ShoppingcartitemId])}""".query(ShoppingcartitemRow.jdbcDecoder).selectOne
+    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".query(ShoppingcartitemRow.jdbcDecoder).selectOne
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ZStream[ZConnection, Throwable, ShoppingcartitemRow] = {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${Segment.paramSegment(shoppingcartitemids)(ShoppingcartitemId.arraySetter)})""".query(ShoppingcartitemRow.jdbcDecoder).selectStream
@@ -87,10 +87,10 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"""update sales.shoppingcartitem
           set "shoppingcartid" = ${Segment.paramSegment(row.shoppingcartid)(Setter.stringSetter)},
               "quantity" = ${Segment.paramSegment(row.quantity)(Setter.intSetter)}::int4,
-              "productid" = ${Segment.paramSegment(row.productid)(Setter[ProductId])}::int4,
-              "datecreated" = ${Segment.paramSegment(row.datecreated)(Setter[TypoLocalDateTime])}::timestamp,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(Setter[ShoppingcartitemId])}""".update.map(_ > 0)
+              "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
+              "datecreated" = ${Segment.paramSegment(row.datecreated)(TypoLocalDateTime.setter)}::timestamp,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.jdbcDecoder)
@@ -98,12 +98,12 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def upsert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, UpdateResult[ShoppingcartitemRow]] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.shoppingcartitemid)(Setter[ShoppingcartitemId])}::int4,
+            ${Segment.paramSegment(unsaved.shoppingcartitemid)(ShoppingcartitemId.setter)}::int4,
             ${Segment.paramSegment(unsaved.shoppingcartid)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.datecreated)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.datecreated)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("shoppingcartitemid")
           do update set

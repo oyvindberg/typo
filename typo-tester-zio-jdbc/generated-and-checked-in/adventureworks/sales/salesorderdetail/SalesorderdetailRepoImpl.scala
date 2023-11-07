@@ -29,24 +29,24 @@ import zio.stream.ZStream
 
 object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(Setter[SalesorderheaderId])} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".delete.map(_ > 0)
+    sql"""delete from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields)
   }
   override def insert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.salesorderid)(Setter[SalesorderheaderId])}::int4, ${Segment.paramSegment(unsaved.salesorderdetailid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.orderqty)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.specialofferid)(Setter[SpecialofferId])}::int4, ${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.unitpricediscount)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.salesorderdetailid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.orderqty)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4, ${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.unitpricediscount)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """.insertReturning(SalesorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved): ZIO[ZConnection, Throwable, SalesorderdetailRow] = {
     val fs = List(
-      Some((sql""""salesorderid"""", sql"${Segment.paramSegment(unsaved.salesorderid)(Setter[SalesorderheaderId])}::int4")),
+      Some((sql""""salesorderid"""", sql"${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4")),
       Some((sql""""carriertrackingnumber"""", sql"${Segment.paramSegment(unsaved.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""orderqty"""", sql"${Segment.paramSegment(unsaved.orderqty)(Setter[TypoShort])}::int2")),
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
-      Some((sql""""specialofferid"""", sql"${Segment.paramSegment(unsaved.specialofferid)(Setter[SpecialofferId])}::int4")),
+      Some((sql""""orderqty"""", sql"${Segment.paramSegment(unsaved.orderqty)(TypoShort.setter)}::int2")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
+      Some((sql""""specialofferid"""", sql"${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4")),
       Some((sql""""unitprice"""", sql"${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric")),
       unsaved.salesorderdetailid match {
         case Defaulted.UseDefault => None
@@ -58,11 +58,11 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -85,20 +85,20 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail""".query(SalesorderdetailRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Option[SalesorderdetailRow]] = {
-    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(Setter[SalesorderheaderId])} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".query(SalesorderdetailRow.jdbcDecoder).selectOne
+    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".query(SalesorderdetailRow.jdbcDecoder).selectOne
   }
   override def update(row: SalesorderdetailRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderdetail
           set "carriertrackingnumber" = ${Segment.paramSegment(row.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))},
-              "orderqty" = ${Segment.paramSegment(row.orderqty)(Setter[TypoShort])}::int2,
-              "productid" = ${Segment.paramSegment(row.productid)(Setter[ProductId])}::int4,
-              "specialofferid" = ${Segment.paramSegment(row.specialofferid)(Setter[SpecialofferId])}::int4,
+              "orderqty" = ${Segment.paramSegment(row.orderqty)(TypoShort.setter)}::int2,
+              "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
+              "specialofferid" = ${Segment.paramSegment(row.specialofferid)(SpecialofferId.setter)}::int4,
               "unitprice" = ${Segment.paramSegment(row.unitprice)(Setter.bigDecimalScalaSetter)}::numeric,
               "unitpricediscount" = ${Segment.paramSegment(row.unitpricediscount)(Setter.bigDecimalScalaSetter)}::numeric,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(Setter[SalesorderheaderId])} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".update.map(_ > 0)
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.jdbcDecoder)
@@ -106,16 +106,16 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def upsert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderdetailRow]] = {
     sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.salesorderid)(Setter[SalesorderheaderId])}::int4,
+            ${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4,
             ${Segment.paramSegment(unsaved.salesorderdetailid)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.orderqty)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.specialofferid)(Setter[SpecialofferId])}::int4,
+            ${Segment.paramSegment(unsaved.orderqty)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4,
             ${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.unitpricediscount)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("salesorderid", "salesorderdetailid")
           do update set

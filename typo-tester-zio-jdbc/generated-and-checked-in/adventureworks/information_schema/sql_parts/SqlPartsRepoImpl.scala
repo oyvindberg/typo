@@ -26,7 +26,7 @@ object SqlPartsRepoImpl extends SqlPartsRepo {
   }
   override def insert(unsaved: SqlPartsRow): ZIO[ZConnection, Throwable, SqlPartsRow] = {
     sql"""insert into information_schema.sql_parts("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")
-          values (${Segment.paramSegment(unsaved.featureId)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar, ${Segment.paramSegment(unsaved.featureName)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar, ${Segment.paramSegment(unsaved.isSupported)(Setter.optionParamSetter(Setter[YesOrNo]))}::varchar, ${Segment.paramSegment(unsaved.isVerifiedBy)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar)
+          values (${Segment.paramSegment(unsaved.featureId)(Setter.optionParamSetter(CharacterData.setter))}::varchar, ${Segment.paramSegment(unsaved.featureName)(Setter.optionParamSetter(CharacterData.setter))}::varchar, ${Segment.paramSegment(unsaved.isSupported)(Setter.optionParamSetter(YesOrNo.setter))}::varchar, ${Segment.paramSegment(unsaved.isVerifiedBy)(Setter.optionParamSetter(CharacterData.setter))}::varchar, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(CharacterData.setter))}::varchar)
           returning "feature_id", "feature_name", "is_supported", "is_verified_by", "comments"
        """.insertReturning(SqlPartsRow.jdbcDecoder).map(_.updatedKeys.head)
   }

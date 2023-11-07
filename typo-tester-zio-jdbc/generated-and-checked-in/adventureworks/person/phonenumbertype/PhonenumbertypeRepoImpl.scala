@@ -17,7 +17,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -25,27 +24,27 @@ import zio.stream.ZStream
 
 object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.phonenumbertype where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(Setter[PhonenumbertypeId])}""".delete.map(_ > 0)
+    sql"""delete from person.phonenumbertype where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields)
   }
   override def insert(unsaved: PhonenumbertypeRow): ZIO[ZConnection, Throwable, PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
-          values (${Segment.paramSegment(unsaved.phonenumbertypeid)(Setter[PhonenumbertypeId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.phonenumbertypeid)(PhonenumbertypeId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "phonenumbertypeid", "name", "modifieddate"::text
        """.insertReturning(PhonenumbertypeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ZIO[ZConnection, Throwable, PhonenumbertypeRow] = {
     val fs = List(
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
       unsaved.phonenumbertypeid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""phonenumbertypeid"""", sql"${Segment.paramSegment(value: PhonenumbertypeId)(Setter[PhonenumbertypeId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""phonenumbertypeid"""", sql"${Segment.paramSegment(value: PhonenumbertypeId)(PhonenumbertypeId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -68,7 +67,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype""".query(PhonenumbertypeRow.jdbcDecoder).selectStream
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Option[PhonenumbertypeRow]] = {
-    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(Setter[PhonenumbertypeId])}""".query(PhonenumbertypeRow.jdbcDecoder).selectOne
+    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".query(PhonenumbertypeRow.jdbcDecoder).selectOne
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ZStream[ZConnection, Throwable, PhonenumbertypeRow] = {
     sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ANY(${Segment.paramSegment(phonenumbertypeids)(PhonenumbertypeId.arraySetter)})""".query(PhonenumbertypeRow.jdbcDecoder).selectStream
@@ -76,9 +75,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def update(row: PhonenumbertypeRow): ZIO[ZConnection, Throwable, Boolean] = {
     val phonenumbertypeid = row.phonenumbertypeid
     sql"""update person.phonenumbertype
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(Setter[PhonenumbertypeId])}""".update.map(_ > 0)
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.jdbcDecoder)
@@ -86,9 +85,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def upsert(unsaved: PhonenumbertypeRow): ZIO[ZConnection, Throwable, UpdateResult[PhonenumbertypeRow]] = {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.phonenumbertypeid)(Setter[PhonenumbertypeId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.phonenumbertypeid)(PhonenumbertypeId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("phonenumbertypeid")
           do update set

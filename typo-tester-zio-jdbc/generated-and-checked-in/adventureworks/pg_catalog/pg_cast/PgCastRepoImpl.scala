@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgCastRepoImpl extends PgCastRepo {
   override def delete(oid: PgCastId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_cast where "oid" = ${Segment.paramSegment(oid)(Setter[PgCastId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_cast where "oid" = ${Segment.paramSegment(oid)(PgCastId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgCastFields, PgCastRow] = {
     DeleteBuilder("pg_catalog.pg_cast", PgCastFields)
   }
   override def insert(unsaved: PgCastRow): ZIO[ZConnection, Throwable, PgCastRow] = {
     sql"""insert into pg_catalog.pg_cast("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgCastId])}::oid, ${Segment.paramSegment(unsaved.castsource)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.casttarget)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.castfunc)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.castcontext)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.castmethod)(Setter.stringSetter)}::char)
+          values (${Segment.paramSegment(unsaved.oid)(PgCastId.setter)}::oid, ${Segment.paramSegment(unsaved.castsource)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.casttarget)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.castfunc)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.castcontext)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.castmethod)(Setter.stringSetter)}::char)
           returning "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod"
        """.insertReturning(PgCastRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgCastRepoImpl extends PgCastRepo {
     sql"""select "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod" from pg_catalog.pg_cast""".query(PgCastRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgCastId): ZIO[ZConnection, Throwable, Option[PgCastRow]] = {
-    sql"""select "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod" from pg_catalog.pg_cast where "oid" = ${Segment.paramSegment(oid)(Setter[PgCastId])}""".query(PgCastRow.jdbcDecoder).selectOne
+    sql"""select "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod" from pg_catalog.pg_cast where "oid" = ${Segment.paramSegment(oid)(PgCastId.setter)}""".query(PgCastRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgCastId]): ZStream[ZConnection, Throwable, PgCastRow] = {
     sql"""select "oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod" from pg_catalog.pg_cast where "oid" = ANY(${Segment.paramSegment(oids)(PgCastId.arraySetter)})""".query(PgCastRow.jdbcDecoder).selectStream
@@ -58,7 +58,7 @@ object PgCastRepoImpl extends PgCastRepo {
               "castfunc" = ${Segment.paramSegment(row.castfunc)(Setter.longSetter)}::oid,
               "castcontext" = ${Segment.paramSegment(row.castcontext)(Setter.stringSetter)}::char,
               "castmethod" = ${Segment.paramSegment(row.castmethod)(Setter.stringSetter)}::char
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgCastId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgCastId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgCastFields, PgCastRow] = {
     UpdateBuilder("pg_catalog.pg_cast", PgCastFields, PgCastRow.jdbcDecoder)
@@ -66,7 +66,7 @@ object PgCastRepoImpl extends PgCastRepo {
   override def upsert(unsaved: PgCastRow): ZIO[ZConnection, Throwable, UpdateResult[PgCastRow]] = {
     sql"""insert into pg_catalog.pg_cast("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgCastId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgCastId.setter)}::oid,
             ${Segment.paramSegment(unsaved.castsource)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.casttarget)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.castfunc)(Setter.longSetter)}::oid,

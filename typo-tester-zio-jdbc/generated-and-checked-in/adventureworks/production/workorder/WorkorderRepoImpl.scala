@@ -27,33 +27,33 @@ import zio.stream.ZStream
 
 object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(Setter[WorkorderId])}""".delete.map(_ > 0)
+    sql"""delete from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
     DeleteBuilder("production.workorder", WorkorderFields)
   }
   override def insert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, WorkorderRow] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.workorderid)(Setter[WorkorderId])}::int4, ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.orderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.scrappedqty)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(Setter[ScrapreasonId]))}::int2, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.orderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.scrappedqty)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """.insertReturning(WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: WorkorderRowUnsaved): ZIO[ZConnection, Throwable, WorkorderRow] = {
     val fs = List(
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
       Some((sql""""orderqty"""", sql"${Segment.paramSegment(unsaved.orderqty)(Setter.intSetter)}::int4")),
-      Some((sql""""scrappedqty"""", sql"${Segment.paramSegment(unsaved.scrappedqty)(Setter[TypoShort])}::int2")),
-      Some((sql""""startdate"""", sql"${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""enddate"""", sql"${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
-      Some((sql""""duedate"""", sql"${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""scrapreasonid"""", sql"${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(Setter[ScrapreasonId]))}::int2")),
+      Some((sql""""scrappedqty"""", sql"${Segment.paramSegment(unsaved.scrappedqty)(TypoShort.setter)}::int2")),
+      Some((sql""""startdate"""", sql"${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp")),
+      Some((sql""""enddate"""", sql"${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
+      Some((sql""""duedate"""", sql"${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp")),
+      Some((sql""""scrapreasonid"""", sql"${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2")),
       unsaved.workorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""workorderid"""", sql"${Segment.paramSegment(value: WorkorderId)(Setter[WorkorderId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""workorderid"""", sql"${Segment.paramSegment(value: WorkorderId)(WorkorderId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -76,7 +76,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder""".query(WorkorderRow.jdbcDecoder).selectStream
   }
   override def selectById(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Option[WorkorderRow]] = {
-    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(Setter[WorkorderId])}""".query(WorkorderRow.jdbcDecoder).selectOne
+    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".query(WorkorderRow.jdbcDecoder).selectOne
   }
   override def selectByIds(workorderids: Array[WorkorderId]): ZStream[ZConnection, Throwable, WorkorderRow] = {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${Segment.paramSegment(workorderids)(WorkorderId.arraySetter)})""".query(WorkorderRow.jdbcDecoder).selectStream
@@ -84,15 +84,15 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def update(row: WorkorderRow): ZIO[ZConnection, Throwable, Boolean] = {
     val workorderid = row.workorderid
     sql"""update production.workorder
-          set "productid" = ${Segment.paramSegment(row.productid)(Setter[ProductId])}::int4,
+          set "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
               "orderqty" = ${Segment.paramSegment(row.orderqty)(Setter.intSetter)}::int4,
-              "scrappedqty" = ${Segment.paramSegment(row.scrappedqty)(Setter[TypoShort])}::int2,
-              "startdate" = ${Segment.paramSegment(row.startdate)(Setter[TypoLocalDateTime])}::timestamp,
-              "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-              "duedate" = ${Segment.paramSegment(row.duedate)(Setter[TypoLocalDateTime])}::timestamp,
-              "scrapreasonid" = ${Segment.paramSegment(row.scrapreasonid)(Setter.optionParamSetter(Setter[ScrapreasonId]))}::int2,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "workorderid" = ${Segment.paramSegment(workorderid)(Setter[WorkorderId])}""".update.map(_ > 0)
+              "scrappedqty" = ${Segment.paramSegment(row.scrappedqty)(TypoShort.setter)}::int2,
+              "startdate" = ${Segment.paramSegment(row.startdate)(TypoLocalDateTime.setter)}::timestamp,
+              "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+              "duedate" = ${Segment.paramSegment(row.duedate)(TypoLocalDateTime.setter)}::timestamp,
+              "scrapreasonid" = ${Segment.paramSegment(row.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilder("production.workorder", WorkorderFields, WorkorderRow.jdbcDecoder)
@@ -100,15 +100,15 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def upsert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderRow]] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.workorderid)(Setter[WorkorderId])}::int4,
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
+            ${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
             ${Segment.paramSegment(unsaved.orderqty)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.scrappedqty)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-            ${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(Setter[ScrapreasonId]))}::int2,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.scrappedqty)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+            ${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("workorderid")
           do update set

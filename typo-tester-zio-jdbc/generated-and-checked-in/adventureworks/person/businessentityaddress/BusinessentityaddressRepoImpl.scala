@@ -20,7 +20,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -28,29 +27,29 @@ import zio.stream.ZStream
 
 object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def delete(compositeId: BusinessentityaddressId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.businessentityaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(Setter[AddressId])} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(Setter[AddresstypeId])}""".delete.map(_ > 0)
+    sql"""delete from person.businessentityaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(AddressId.setter)} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(AddresstypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     DeleteBuilder("person.businessentityaddress", BusinessentityaddressFields)
   }
   override def insert(unsaved: BusinessentityaddressRow): ZIO[ZConnection, Throwable, BusinessentityaddressRow] = {
     sql"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.addressid)(Setter[AddressId])}::int4, ${Segment.paramSegment(unsaved.addresstypeid)(Setter[AddresstypeId])}::int4, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.addresstypeid)(AddresstypeId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
        """.insertReturning(BusinessentityaddressRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved): ZIO[ZConnection, Throwable, BusinessentityaddressRow] = {
     val fs = List(
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4")),
-      Some((sql""""addressid"""", sql"${Segment.paramSegment(unsaved.addressid)(Setter[AddressId])}::int4")),
-      Some((sql""""addresstypeid"""", sql"${Segment.paramSegment(unsaved.addresstypeid)(Setter[AddresstypeId])}::int4")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
+      Some((sql""""addressid"""", sql"${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4")),
+      Some((sql""""addresstypeid"""", sql"${Segment.paramSegment(unsaved.addresstypeid)(AddresstypeId.setter)}::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -73,14 +72,14 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress""".query(BusinessentityaddressRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: BusinessentityaddressId): ZIO[ZConnection, Throwable, Option[BusinessentityaddressRow]] = {
-    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(Setter[AddressId])} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(Setter[AddresstypeId])}""".query(BusinessentityaddressRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(AddressId.setter)} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(AddresstypeId.setter)}""".query(BusinessentityaddressRow.jdbcDecoder).selectOne
   }
   override def update(row: BusinessentityaddressRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.businessentityaddress
-          set "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(Setter[AddressId])} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(Setter[AddresstypeId])}""".update.map(_ > 0)
+          set "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(AddressId.setter)} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(AddresstypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     UpdateBuilder("person.businessentityaddress", BusinessentityaddressFields, BusinessentityaddressRow.jdbcDecoder)
@@ -88,11 +87,11 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def upsert(unsaved: BusinessentityaddressRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentityaddressRow]] = {
     sql"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4,
-            ${Segment.paramSegment(unsaved.addressid)(Setter[AddressId])}::int4,
-            ${Segment.paramSegment(unsaved.addresstypeid)(Setter[AddresstypeId])}::int4,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.addresstypeid)(AddresstypeId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("businessentityid", "addressid", "addresstypeid")
           do update set

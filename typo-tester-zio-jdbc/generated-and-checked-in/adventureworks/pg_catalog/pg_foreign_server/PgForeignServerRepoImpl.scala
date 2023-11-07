@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def delete(oid: PgForeignServerId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_foreign_server where "oid" = ${Segment.paramSegment(oid)(Setter[PgForeignServerId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_foreign_server where "oid" = ${Segment.paramSegment(oid)(PgForeignServerId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgForeignServerFields, PgForeignServerRow] = {
     DeleteBuilder("pg_catalog.pg_foreign_server", PgForeignServerFields)
   }
   override def insert(unsaved: PgForeignServerRow): ZIO[ZConnection, Throwable, PgForeignServerRow] = {
     sql"""insert into pg_catalog.pg_foreign_server("oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgForeignServerId])}::oid, ${Segment.paramSegment(unsaved.srvname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.srvowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.srvfdw)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.srvtype)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.srvversion)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.srvacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.srvoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
+          values (${Segment.paramSegment(unsaved.oid)(PgForeignServerId.setter)}::oid, ${Segment.paramSegment(unsaved.srvname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.srvowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.srvfdw)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.srvtype)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.srvversion)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.srvacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.srvoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
           returning "oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions"
        """.insertReturning(PgForeignServerRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
     sql"""select "oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions" from pg_catalog.pg_foreign_server""".query(PgForeignServerRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgForeignServerId): ZIO[ZConnection, Throwable, Option[PgForeignServerRow]] = {
-    sql"""select "oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions" from pg_catalog.pg_foreign_server where "oid" = ${Segment.paramSegment(oid)(Setter[PgForeignServerId])}""".query(PgForeignServerRow.jdbcDecoder).selectOne
+    sql"""select "oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions" from pg_catalog.pg_foreign_server where "oid" = ${Segment.paramSegment(oid)(PgForeignServerId.setter)}""".query(PgForeignServerRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgForeignServerId]): ZStream[ZConnection, Throwable, PgForeignServerRow] = {
     sql"""select "oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions" from pg_catalog.pg_foreign_server where "oid" = ANY(${Segment.paramSegment(oids)(PgForeignServerId.arraySetter)})""".query(PgForeignServerRow.jdbcDecoder).selectStream
@@ -61,7 +61,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
               "srvversion" = ${Segment.paramSegment(row.srvversion)(Setter.optionParamSetter(Setter.stringSetter))},
               "srvacl" = ${Segment.paramSegment(row.srvacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem,
               "srvoptions" = ${Segment.paramSegment(row.srvoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgForeignServerId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgForeignServerId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgForeignServerFields, PgForeignServerRow] = {
     UpdateBuilder("pg_catalog.pg_foreign_server", PgForeignServerFields, PgForeignServerRow.jdbcDecoder)
@@ -69,7 +69,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def upsert(unsaved: PgForeignServerRow): ZIO[ZConnection, Throwable, UpdateResult[PgForeignServerRow]] = {
     sql"""insert into pg_catalog.pg_foreign_server("oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgForeignServerId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgForeignServerId.setter)}::oid,
             ${Segment.paramSegment(unsaved.srvname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.srvowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.srvfdw)(Setter.longSetter)}::oid,

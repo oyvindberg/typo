@@ -28,34 +28,34 @@ import zio.stream.ZStream
 
 object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(Setter[LocationId])}""".delete.map(_ > 0)
+    sql"""delete from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
     DeleteBuilder("production.productinventory", ProductinventoryFields)
   }
   override def insert(unsaved: ProductinventoryRow): ZIO[ZConnection, Throwable, ProductinventoryRow] = {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.locationid)(Setter[LocationId])}::int2, ${Segment.paramSegment(unsaved.shelf)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.bin)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.quantity)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int2, ${Segment.paramSegment(unsaved.shelf)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.bin)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.quantity)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
        """.insertReturning(ProductinventoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductinventoryRowUnsaved): ZIO[ZConnection, Throwable, ProductinventoryRow] = {
     val fs = List(
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
-      Some((sql""""locationid"""", sql"${Segment.paramSegment(unsaved.locationid)(Setter[LocationId])}::int2")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
+      Some((sql""""locationid"""", sql"${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int2")),
       Some((sql""""shelf"""", sql"${Segment.paramSegment(unsaved.shelf)(Setter.stringSetter)}")),
-      Some((sql""""bin"""", sql"${Segment.paramSegment(unsaved.bin)(Setter[TypoShort])}::int2")),
+      Some((sql""""bin"""", sql"${Segment.paramSegment(unsaved.bin)(TypoShort.setter)}::int2")),
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""quantity"""", sql"${Segment.paramSegment(value: TypoShort)(Setter[TypoShort])}::int2"))
+        case Defaulted.Provided(value) => Some((sql""""quantity"""", sql"${Segment.paramSegment(value: TypoShort)(TypoShort.setter)}::int2"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -78,17 +78,17 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory""".query(ProductinventoryRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: ProductinventoryId): ZIO[ZConnection, Throwable, Option[ProductinventoryRow]] = {
-    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(Setter[LocationId])}""".query(ProductinventoryRow.jdbcDecoder).selectOne
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".query(ProductinventoryRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductinventoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productinventory
           set "shelf" = ${Segment.paramSegment(row.shelf)(Setter.stringSetter)},
-              "bin" = ${Segment.paramSegment(row.bin)(Setter[TypoShort])}::int2,
-              "quantity" = ${Segment.paramSegment(row.quantity)(Setter[TypoShort])}::int2,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(Setter[LocationId])}""".update.map(_ > 0)
+              "bin" = ${Segment.paramSegment(row.bin)(TypoShort.setter)}::int2,
+              "quantity" = ${Segment.paramSegment(row.quantity)(TypoShort.setter)}::int2,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
     UpdateBuilder("production.productinventory", ProductinventoryFields, ProductinventoryRow.jdbcDecoder)
@@ -96,13 +96,13 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def upsert(unsaved: ProductinventoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductinventoryRow]] = {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.locationid)(Setter[LocationId])}::int2,
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int2,
             ${Segment.paramSegment(unsaved.shelf)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.bin)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.quantity)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.bin)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.quantity)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productid", "locationid")
           do update set

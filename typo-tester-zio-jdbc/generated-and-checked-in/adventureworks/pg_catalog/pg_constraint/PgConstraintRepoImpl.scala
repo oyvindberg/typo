@@ -23,14 +23,14 @@ import zio.stream.ZStream
 
 object PgConstraintRepoImpl extends PgConstraintRepo {
   override def delete(oid: PgConstraintId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_constraint where "oid" = ${Segment.paramSegment(oid)(Setter[PgConstraintId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_constraint where "oid" = ${Segment.paramSegment(oid)(PgConstraintId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgConstraintFields, PgConstraintRow] = {
     DeleteBuilder("pg_catalog.pg_constraint", PgConstraintFields)
   }
   override def insert(unsaved: PgConstraintRow): ZIO[ZConnection, Throwable, PgConstraintRow] = {
     sql"""insert into pg_catalog.pg_constraint("oid", "conname", "connamespace", "contype", "condeferrable", "condeferred", "convalidated", "conrelid", "contypid", "conindid", "conparentid", "confrelid", "confupdtype", "confdeltype", "confmatchtype", "conislocal", "coninhcount", "connoinherit", "conkey", "confkey", "conpfeqop", "conppeqop", "conffeqop", "conexclop", "conbin")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgConstraintId])}::oid, ${Segment.paramSegment(unsaved.conname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.connamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.contype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.condeferrable)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.condeferred)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.convalidated)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.conrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.contypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.conindid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.conparentid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.confrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.confupdtype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.confdeltype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.confmatchtype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.conislocal)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.coninhcount)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.connoinherit)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.conkey)(Setter.optionParamSetter(TypoShort.arraySetter))}::_int2, ${Segment.paramSegment(unsaved.confkey)(Setter.optionParamSetter(TypoShort.arraySetter))}::_int2, ${Segment.paramSegment(unsaved.conpfeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.conppeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.conffeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.conexclop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.conbin)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree)
+          values (${Segment.paramSegment(unsaved.oid)(PgConstraintId.setter)}::oid, ${Segment.paramSegment(unsaved.conname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.connamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.contype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.condeferrable)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.condeferred)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.convalidated)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.conrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.contypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.conindid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.conparentid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.confrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.confupdtype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.confdeltype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.confmatchtype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.conislocal)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.coninhcount)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.connoinherit)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.conkey)(Setter.optionParamSetter(TypoShort.arraySetter))}::_int2, ${Segment.paramSegment(unsaved.confkey)(Setter.optionParamSetter(TypoShort.arraySetter))}::_int2, ${Segment.paramSegment(unsaved.conpfeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.conppeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.conffeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.conexclop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.conbin)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree)
           returning "oid", "conname", "connamespace", "contype", "condeferrable", "condeferred", "convalidated", "conrelid", "contypid", "conindid", "conparentid", "confrelid", "confupdtype", "confdeltype", "confmatchtype", "conislocal", "coninhcount", "connoinherit", "conkey", "confkey", "conpfeqop", "conppeqop", "conffeqop", "conexclop", "conbin"
        """.insertReturning(PgConstraintRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,7 +41,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
     sql"""select "oid", "conname", "connamespace", "contype", "condeferrable", "condeferred", "convalidated", "conrelid", "contypid", "conindid", "conparentid", "confrelid", "confupdtype", "confdeltype", "confmatchtype", "conislocal", "coninhcount", "connoinherit", "conkey", "confkey", "conpfeqop", "conppeqop", "conffeqop", "conexclop", "conbin" from pg_catalog.pg_constraint""".query(PgConstraintRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgConstraintId): ZIO[ZConnection, Throwable, Option[PgConstraintRow]] = {
-    sql"""select "oid", "conname", "connamespace", "contype", "condeferrable", "condeferred", "convalidated", "conrelid", "contypid", "conindid", "conparentid", "confrelid", "confupdtype", "confdeltype", "confmatchtype", "conislocal", "coninhcount", "connoinherit", "conkey", "confkey", "conpfeqop", "conppeqop", "conffeqop", "conexclop", "conbin" from pg_catalog.pg_constraint where "oid" = ${Segment.paramSegment(oid)(Setter[PgConstraintId])}""".query(PgConstraintRow.jdbcDecoder).selectOne
+    sql"""select "oid", "conname", "connamespace", "contype", "condeferrable", "condeferred", "convalidated", "conrelid", "contypid", "conindid", "conparentid", "confrelid", "confupdtype", "confdeltype", "confmatchtype", "conislocal", "coninhcount", "connoinherit", "conkey", "confkey", "conpfeqop", "conppeqop", "conffeqop", "conexclop", "conbin" from pg_catalog.pg_constraint where "oid" = ${Segment.paramSegment(oid)(PgConstraintId.setter)}""".query(PgConstraintRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgConstraintId]): ZStream[ZConnection, Throwable, PgConstraintRow] = {
     sql"""select "oid", "conname", "connamespace", "contype", "condeferrable", "condeferred", "convalidated", "conrelid", "contypid", "conindid", "conparentid", "confrelid", "confupdtype", "confdeltype", "confmatchtype", "conislocal", "coninhcount", "connoinherit", "conkey", "confkey", "conpfeqop", "conppeqop", "conffeqop", "conexclop", "conbin" from pg_catalog.pg_constraint where "oid" = ANY(${Segment.paramSegment(oids)(PgConstraintId.arraySetter)})""".query(PgConstraintRow.jdbcDecoder).selectStream
@@ -78,8 +78,8 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
               "conppeqop" = ${Segment.paramSegment(row.conppeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
               "conffeqop" = ${Segment.paramSegment(row.conffeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
               "conexclop" = ${Segment.paramSegment(row.conexclop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
-              "conbin" = ${Segment.paramSegment(row.conbin)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgConstraintId])}""".update.map(_ > 0)
+              "conbin" = ${Segment.paramSegment(row.conbin)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
+          where "oid" = ${Segment.paramSegment(oid)(PgConstraintId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgConstraintFields, PgConstraintRow] = {
     UpdateBuilder("pg_catalog.pg_constraint", PgConstraintFields, PgConstraintRow.jdbcDecoder)
@@ -87,7 +87,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
   override def upsert(unsaved: PgConstraintRow): ZIO[ZConnection, Throwable, UpdateResult[PgConstraintRow]] = {
     sql"""insert into pg_catalog.pg_constraint("oid", "conname", "connamespace", "contype", "condeferrable", "condeferred", "convalidated", "conrelid", "contypid", "conindid", "conparentid", "confrelid", "confupdtype", "confdeltype", "confmatchtype", "conislocal", "coninhcount", "connoinherit", "conkey", "confkey", "conpfeqop", "conppeqop", "conffeqop", "conexclop", "conbin")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgConstraintId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgConstraintId.setter)}::oid,
             ${Segment.paramSegment(unsaved.conname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.connamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.contype)(Setter.stringSetter)}::char,
@@ -111,7 +111,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
             ${Segment.paramSegment(unsaved.conppeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
             ${Segment.paramSegment(unsaved.conffeqop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
             ${Segment.paramSegment(unsaved.conexclop)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
-            ${Segment.paramSegment(unsaved.conbin)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
+            ${Segment.paramSegment(unsaved.conbin)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
           )
           on conflict ("oid")
           do update set

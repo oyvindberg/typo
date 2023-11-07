@@ -19,7 +19,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -27,32 +26,32 @@ import zio.stream.ZStream
 
 object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productsubcategory where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(Setter[ProductsubcategoryId])}""".delete.map(_ > 0)
+    sql"""delete from production.productsubcategory where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     DeleteBuilder("production.productsubcategory", ProductsubcategoryFields)
   }
   override def insert(unsaved: ProductsubcategoryRow): ZIO[ZConnection, Throwable, ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productsubcategoryid)(Setter[ProductsubcategoryId])}::int4, ${Segment.paramSegment(unsaved.productcategoryid)(Setter[ProductcategoryId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productsubcategoryid)(ProductsubcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
        """.insertReturning(ProductsubcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved): ZIO[ZConnection, Throwable, ProductsubcategoryRow] = {
     val fs = List(
-      Some((sql""""productcategoryid"""", sql"${Segment.paramSegment(unsaved.productcategoryid)(Setter[ProductcategoryId])}::int4")),
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
+      Some((sql""""productcategoryid"""", sql"${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
       unsaved.productsubcategoryid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""productsubcategoryid"""", sql"${Segment.paramSegment(value: ProductsubcategoryId)(Setter[ProductsubcategoryId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""productsubcategoryid"""", sql"${Segment.paramSegment(value: ProductsubcategoryId)(ProductsubcategoryId.setter)}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -75,7 +74,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory""".query(ProductsubcategoryRow.jdbcDecoder).selectStream
   }
   override def selectById(productsubcategoryid: ProductsubcategoryId): ZIO[ZConnection, Throwable, Option[ProductsubcategoryRow]] = {
-    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(Setter[ProductsubcategoryId])}""".query(ProductsubcategoryRow.jdbcDecoder).selectOne
+    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}""".query(ProductsubcategoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): ZStream[ZConnection, Throwable, ProductsubcategoryRow] = {
     sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ANY(${Segment.paramSegment(productsubcategoryids)(ProductsubcategoryId.arraySetter)})""".query(ProductsubcategoryRow.jdbcDecoder).selectStream
@@ -83,11 +82,11 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def update(row: ProductsubcategoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productsubcategoryid = row.productsubcategoryid
     sql"""update production.productsubcategory
-          set "productcategoryid" = ${Segment.paramSegment(row.productcategoryid)(Setter[ProductcategoryId])}::int4,
-              "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(Setter[ProductsubcategoryId])}""".update.map(_ > 0)
+          set "productcategoryid" = ${Segment.paramSegment(row.productcategoryid)(ProductcategoryId.setter)}::int4,
+              "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     UpdateBuilder("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.jdbcDecoder)
@@ -95,11 +94,11 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def upsert(unsaved: ProductsubcategoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductsubcategoryRow]] = {
     sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productsubcategoryid)(Setter[ProductsubcategoryId])}::int4,
-            ${Segment.paramSegment(unsaved.productcategoryid)(Setter[ProductcategoryId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.productsubcategoryid)(ProductsubcategoryId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productsubcategoryid")
           do update set

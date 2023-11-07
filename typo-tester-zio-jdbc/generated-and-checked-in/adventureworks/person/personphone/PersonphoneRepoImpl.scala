@@ -19,7 +19,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -27,25 +26,25 @@ import zio.stream.ZStream
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Setter[Phone])} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(Setter[PhonenumbertypeId])}""".delete.map(_ > 0)
+    sql"""delete from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
     DeleteBuilder("person.personphone", PersonphoneFields)
   }
   override def insert(unsaved: PersonphoneRow): ZIO[ZConnection, Throwable, PersonphoneRow] = {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.phonenumber)(Setter[Phone])}::varchar, ${Segment.paramSegment(unsaved.phonenumbertypeid)(Setter[PhonenumbertypeId])}::int4, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.phonenumber)(Phone.setter)}::varchar, ${Segment.paramSegment(unsaved.phonenumbertypeid)(PhonenumbertypeId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
        """.insertReturning(PersonphoneRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ZIO[ZConnection, Throwable, PersonphoneRow] = {
     val fs = List(
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4")),
-      Some((sql""""phonenumber"""", sql"${Segment.paramSegment(unsaved.phonenumber)(Setter[Phone])}::varchar")),
-      Some((sql""""phonenumbertypeid"""", sql"${Segment.paramSegment(unsaved.phonenumbertypeid)(Setter[PhonenumbertypeId])}::int4")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
+      Some((sql""""phonenumber"""", sql"${Segment.paramSegment(unsaved.phonenumber)(Phone.setter)}::varchar")),
+      Some((sql""""phonenumbertypeid"""", sql"${Segment.paramSegment(unsaved.phonenumbertypeid)(PhonenumbertypeId.setter)}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -68,13 +67,13 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone""".query(PersonphoneRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: PersonphoneId): ZIO[ZConnection, Throwable, Option[PersonphoneRow]] = {
-    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Setter[Phone])} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(Setter[PhonenumbertypeId])}""".query(PersonphoneRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".query(PersonphoneRow.jdbcDecoder).selectOne
   }
   override def update(row: PersonphoneRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.personphone
-          set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Setter[Phone])} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(Setter[PhonenumbertypeId])}""".update.map(_ > 0)
+          set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
     UpdateBuilder("person.personphone", PersonphoneFields, PersonphoneRow.jdbcDecoder)
@@ -82,10 +81,10 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def upsert(unsaved: PersonphoneRow): ZIO[ZConnection, Throwable, UpdateResult[PersonphoneRow]] = {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4,
-            ${Segment.paramSegment(unsaved.phonenumber)(Setter[Phone])}::varchar,
-            ${Segment.paramSegment(unsaved.phonenumbertypeid)(Setter[PhonenumbertypeId])}::int4,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.phonenumber)(Phone.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.phonenumbertypeid)(PhonenumbertypeId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
           do update set

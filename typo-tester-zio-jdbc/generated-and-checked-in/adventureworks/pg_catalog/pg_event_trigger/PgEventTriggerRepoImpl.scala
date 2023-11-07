@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def delete(oid: PgEventTriggerId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_event_trigger where "oid" = ${Segment.paramSegment(oid)(Setter[PgEventTriggerId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_event_trigger where "oid" = ${Segment.paramSegment(oid)(PgEventTriggerId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
     DeleteBuilder("pg_catalog.pg_event_trigger", PgEventTriggerFields)
   }
   override def insert(unsaved: PgEventTriggerRow): ZIO[ZConnection, Throwable, PgEventTriggerRow] = {
     sql"""insert into pg_catalog.pg_event_trigger("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgEventTriggerId])}::oid, ${Segment.paramSegment(unsaved.evtname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.evtevent)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.evtowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.evtfoid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.evtenabled)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.evttags)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
+          values (${Segment.paramSegment(unsaved.oid)(PgEventTriggerId.setter)}::oid, ${Segment.paramSegment(unsaved.evtname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.evtevent)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.evtowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.evtfoid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.evtenabled)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.evttags)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
           returning "oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags"
        """.insertReturning(PgEventTriggerRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
     sql"""select "oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags" from pg_catalog.pg_event_trigger""".query(PgEventTriggerRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgEventTriggerId): ZIO[ZConnection, Throwable, Option[PgEventTriggerRow]] = {
-    sql"""select "oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags" from pg_catalog.pg_event_trigger where "oid" = ${Segment.paramSegment(oid)(Setter[PgEventTriggerId])}""".query(PgEventTriggerRow.jdbcDecoder).selectOne
+    sql"""select "oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags" from pg_catalog.pg_event_trigger where "oid" = ${Segment.paramSegment(oid)(PgEventTriggerId.setter)}""".query(PgEventTriggerRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgEventTriggerId]): ZStream[ZConnection, Throwable, PgEventTriggerRow] = {
     sql"""select "oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags" from pg_catalog.pg_event_trigger where "oid" = ANY(${Segment.paramSegment(oids)(PgEventTriggerId.arraySetter)})""".query(PgEventTriggerRow.jdbcDecoder).selectStream
@@ -59,7 +59,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
               "evtfoid" = ${Segment.paramSegment(row.evtfoid)(Setter.longSetter)}::oid,
               "evtenabled" = ${Segment.paramSegment(row.evtenabled)(Setter.stringSetter)}::char,
               "evttags" = ${Segment.paramSegment(row.evttags)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgEventTriggerId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgEventTriggerId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
     UpdateBuilder("pg_catalog.pg_event_trigger", PgEventTriggerFields, PgEventTriggerRow.jdbcDecoder)
@@ -67,7 +67,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def upsert(unsaved: PgEventTriggerRow): ZIO[ZConnection, Throwable, UpdateResult[PgEventTriggerRow]] = {
     sql"""insert into pg_catalog.pg_event_trigger("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgEventTriggerId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgEventTriggerId.setter)}::oid,
             ${Segment.paramSegment(unsaved.evtname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.evtevent)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.evtowner)(Setter.longSetter)}::oid,

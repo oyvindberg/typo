@@ -25,27 +25,27 @@ import zio.stream.ZStream
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(Setter[IllustrationId])}""".delete.map(_ > 0)
+    sql"""delete from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
     DeleteBuilder("production.illustration", IllustrationFields)
   }
   override def insert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, IllustrationRow] = {
     sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
-          values (${Segment.paramSegment(unsaved.illustrationid)(Setter[IllustrationId])}::int4, ${Segment.paramSegment(unsaved.diagram)(Setter.optionParamSetter(Setter[TypoXml]))}::xml, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.illustrationid)(IllustrationId.setter)}::int4, ${Segment.paramSegment(unsaved.diagram)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "illustrationid", "diagram", "modifieddate"::text
        """.insertReturning(IllustrationRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: IllustrationRowUnsaved): ZIO[ZConnection, Throwable, IllustrationRow] = {
     val fs = List(
-      Some((sql""""diagram"""", sql"${Segment.paramSegment(unsaved.diagram)(Setter.optionParamSetter(Setter[TypoXml]))}::xml")),
+      Some((sql""""diagram"""", sql"${Segment.paramSegment(unsaved.diagram)(Setter.optionParamSetter(TypoXml.setter))}::xml")),
       unsaved.illustrationid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""illustrationid"""", sql"${Segment.paramSegment(value: IllustrationId)(Setter[IllustrationId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""illustrationid"""", sql"${Segment.paramSegment(value: IllustrationId)(IllustrationId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -68,7 +68,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration""".query(IllustrationRow.jdbcDecoder).selectStream
   }
   override def selectById(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Option[IllustrationRow]] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(Setter[IllustrationId])}""".query(IllustrationRow.jdbcDecoder).selectOne
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".query(IllustrationRow.jdbcDecoder).selectOne
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): ZStream[ZConnection, Throwable, IllustrationRow] = {
     sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ANY(${Segment.paramSegment(illustrationids)(IllustrationId.arraySetter)})""".query(IllustrationRow.jdbcDecoder).selectStream
@@ -76,9 +76,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def update(row: IllustrationRow): ZIO[ZConnection, Throwable, Boolean] = {
     val illustrationid = row.illustrationid
     sql"""update production.illustration
-          set "diagram" = ${Segment.paramSegment(row.diagram)(Setter.optionParamSetter(Setter[TypoXml]))}::xml,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "illustrationid" = ${Segment.paramSegment(illustrationid)(Setter[IllustrationId])}""".update.map(_ > 0)
+          set "diagram" = ${Segment.paramSegment(row.diagram)(Setter.optionParamSetter(TypoXml.setter))}::xml,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilder("production.illustration", IllustrationFields, IllustrationRow.jdbcDecoder)
@@ -86,9 +86,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def upsert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, UpdateResult[IllustrationRow]] = {
     sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.illustrationid)(Setter[IllustrationId])}::int4,
-            ${Segment.paramSegment(unsaved.diagram)(Setter.optionParamSetter(Setter[TypoXml]))}::xml,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.illustrationid)(IllustrationId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.diagram)(Setter.optionParamSetter(TypoXml.setter))}::xml,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("illustrationid")
           do update set

@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def delete(roident: PgReplicationOriginId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_replication_origin where "roident" = ${Segment.paramSegment(roident)(Setter[PgReplicationOriginId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_replication_origin where "roident" = ${Segment.paramSegment(roident)(PgReplicationOriginId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
     DeleteBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields)
   }
   override def insert(unsaved: PgReplicationOriginRow): ZIO[ZConnection, Throwable, PgReplicationOriginRow] = {
     sql"""insert into pg_catalog.pg_replication_origin("roident", "roname")
-          values (${Segment.paramSegment(unsaved.roident)(Setter[PgReplicationOriginId])}::oid, ${Segment.paramSegment(unsaved.roname)(Setter.stringSetter)})
+          values (${Segment.paramSegment(unsaved.roident)(PgReplicationOriginId.setter)}::oid, ${Segment.paramSegment(unsaved.roname)(Setter.stringSetter)})
           returning "roident", "roname"
        """.insertReturning(PgReplicationOriginRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     sql"""select "roident", "roname" from pg_catalog.pg_replication_origin""".query(PgReplicationOriginRow.jdbcDecoder).selectStream
   }
   override def selectById(roident: PgReplicationOriginId): ZIO[ZConnection, Throwable, Option[PgReplicationOriginRow]] = {
-    sql"""select "roident", "roname" from pg_catalog.pg_replication_origin where "roident" = ${Segment.paramSegment(roident)(Setter[PgReplicationOriginId])}""".query(PgReplicationOriginRow.jdbcDecoder).selectOne
+    sql"""select "roident", "roname" from pg_catalog.pg_replication_origin where "roident" = ${Segment.paramSegment(roident)(PgReplicationOriginId.setter)}""".query(PgReplicationOriginRow.jdbcDecoder).selectOne
   }
   override def selectByIds(roidents: Array[PgReplicationOriginId]): ZStream[ZConnection, Throwable, PgReplicationOriginRow] = {
     sql"""select "roident", "roname" from pg_catalog.pg_replication_origin where "roident" = ANY(${Segment.paramSegment(roidents)(PgReplicationOriginId.arraySetter)})""".query(PgReplicationOriginRow.jdbcDecoder).selectStream
@@ -54,7 +54,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     val roident = row.roident
     sql"""update pg_catalog.pg_replication_origin
           set "roname" = ${Segment.paramSegment(row.roname)(Setter.stringSetter)}
-          where "roident" = ${Segment.paramSegment(roident)(Setter[PgReplicationOriginId])}""".update.map(_ > 0)
+          where "roident" = ${Segment.paramSegment(roident)(PgReplicationOriginId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
     UpdateBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields, PgReplicationOriginRow.jdbcDecoder)
@@ -62,7 +62,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def upsert(unsaved: PgReplicationOriginRow): ZIO[ZConnection, Throwable, UpdateResult[PgReplicationOriginRow]] = {
     sql"""insert into pg_catalog.pg_replication_origin("roident", "roname")
           values (
-            ${Segment.paramSegment(unsaved.roident)(Setter[PgReplicationOriginId])}::oid,
+            ${Segment.paramSegment(unsaved.roident)(PgReplicationOriginId.setter)}::oid,
             ${Segment.paramSegment(unsaved.roname)(Setter.stringSetter)}
           )
           on conflict ("roident")

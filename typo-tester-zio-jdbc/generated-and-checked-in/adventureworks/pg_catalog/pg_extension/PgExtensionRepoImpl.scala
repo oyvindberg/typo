@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgExtensionRepoImpl extends PgExtensionRepo {
   override def delete(oid: PgExtensionId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_extension where "oid" = ${Segment.paramSegment(oid)(Setter[PgExtensionId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_extension where "oid" = ${Segment.paramSegment(oid)(PgExtensionId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgExtensionFields, PgExtensionRow] = {
     DeleteBuilder("pg_catalog.pg_extension", PgExtensionFields)
   }
   override def insert(unsaved: PgExtensionRow): ZIO[ZConnection, Throwable, PgExtensionRow] = {
     sql"""insert into pg_catalog.pg_extension("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgExtensionId])}::oid, ${Segment.paramSegment(unsaved.extname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.extowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.extnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.extrelocatable)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.extversion)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.extconfig)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.extcondition)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
+          values (${Segment.paramSegment(unsaved.oid)(PgExtensionId.setter)}::oid, ${Segment.paramSegment(unsaved.extname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.extowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.extnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.extrelocatable)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.extversion)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.extconfig)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.extcondition)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
           returning "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition"
        """.insertReturning(PgExtensionRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
     sql"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition" from pg_catalog.pg_extension""".query(PgExtensionRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgExtensionId): ZIO[ZConnection, Throwable, Option[PgExtensionRow]] = {
-    sql"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition" from pg_catalog.pg_extension where "oid" = ${Segment.paramSegment(oid)(Setter[PgExtensionId])}""".query(PgExtensionRow.jdbcDecoder).selectOne
+    sql"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition" from pg_catalog.pg_extension where "oid" = ${Segment.paramSegment(oid)(PgExtensionId.setter)}""".query(PgExtensionRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgExtensionId]): ZStream[ZConnection, Throwable, PgExtensionRow] = {
     sql"""select "oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition" from pg_catalog.pg_extension where "oid" = ANY(${Segment.paramSegment(oids)(PgExtensionId.arraySetter)})""".query(PgExtensionRow.jdbcDecoder).selectStream
@@ -60,7 +60,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
               "extversion" = ${Segment.paramSegment(row.extversion)(Setter.stringSetter)},
               "extconfig" = ${Segment.paramSegment(row.extconfig)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
               "extcondition" = ${Segment.paramSegment(row.extcondition)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgExtensionId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgExtensionId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgExtensionFields, PgExtensionRow] = {
     UpdateBuilder("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.jdbcDecoder)
@@ -68,7 +68,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
   override def upsert(unsaved: PgExtensionRow): ZIO[ZConnection, Throwable, UpdateResult[PgExtensionRow]] = {
     sql"""insert into pg_catalog.pg_extension("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgExtensionId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgExtensionId.setter)}::oid,
             ${Segment.paramSegment(unsaved.extname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.extowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.extnamespace)(Setter.longSetter)}::oid,

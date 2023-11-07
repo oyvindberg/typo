@@ -28,27 +28,27 @@ import zio.stream.ZStream
 
 object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def delete(compositeId: EmployeedepartmenthistoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from humanresources.employeedepartmenthistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(Setter[TypoLocalDate])} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(Setter[DepartmentId])} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(Setter[ShiftId])}""".delete.map(_ > 0)
+    sql"""delete from humanresources.employeedepartmenthistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDate.setter)} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(DepartmentId.setter)} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
     DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, EmployeedepartmenthistoryRow] = {
     sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
-          values (${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.departmentid)(Setter[DepartmentId])}::int2, ${Segment.paramSegment(unsaved.shiftid)(Setter[ShiftId])}::int2, ${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDate])}::date, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDate]))}::date, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.departmentid)(DepartmentId.setter)}::int2, ${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int2, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDate.setter)}::date, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDate.setter))}::date, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
        """.insertReturning(EmployeedepartmenthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved): ZIO[ZConnection, Throwable, EmployeedepartmenthistoryRow] = {
     val fs = List(
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4")),
-      Some((sql""""departmentid"""", sql"${Segment.paramSegment(unsaved.departmentid)(Setter[DepartmentId])}::int2")),
-      Some((sql""""shiftid"""", sql"${Segment.paramSegment(unsaved.shiftid)(Setter[ShiftId])}::int2")),
-      Some((sql""""startdate"""", sql"${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDate])}::date")),
-      Some((sql""""enddate"""", sql"${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDate]))}::date")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
+      Some((sql""""departmentid"""", sql"${Segment.paramSegment(unsaved.departmentid)(DepartmentId.setter)}::int2")),
+      Some((sql""""shiftid"""", sql"${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int2")),
+      Some((sql""""startdate"""", sql"${Segment.paramSegment(unsaved.startdate)(TypoLocalDate.setter)}::date")),
+      Some((sql""""enddate"""", sql"${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDate.setter))}::date")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -71,14 +71,14 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory""".query(EmployeedepartmenthistoryRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: EmployeedepartmenthistoryId): ZIO[ZConnection, Throwable, Option[EmployeedepartmenthistoryRow]] = {
-    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(Setter[TypoLocalDate])} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(Setter[DepartmentId])} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(Setter[ShiftId])}""".query(EmployeedepartmenthistoryRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDate.setter)} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(DepartmentId.setter)} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(ShiftId.setter)}""".query(EmployeedepartmenthistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update humanresources.employeedepartmenthistory
-          set "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(Setter[TypoLocalDate]))}::date,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(Setter[TypoLocalDate])} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(Setter[DepartmentId])} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(Setter[ShiftId])}""".update.map(_ > 0)
+          set "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(TypoLocalDate.setter))}::date,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDate.setter)} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(DepartmentId.setter)} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(ShiftId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
     UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.jdbcDecoder)
@@ -86,12 +86,12 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def upsert(unsaved: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeedepartmenthistoryRow]] = {
     sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4,
-            ${Segment.paramSegment(unsaved.departmentid)(Setter[DepartmentId])}::int2,
-            ${Segment.paramSegment(unsaved.shiftid)(Setter[ShiftId])}::int2,
-            ${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDate])}::date,
-            ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDate]))}::date,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.departmentid)(DepartmentId.setter)}::int2,
+            ${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int2,
+            ${Segment.paramSegment(unsaved.startdate)(TypoLocalDate.setter)}::date,
+            ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDate.setter))}::date,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
           do update set

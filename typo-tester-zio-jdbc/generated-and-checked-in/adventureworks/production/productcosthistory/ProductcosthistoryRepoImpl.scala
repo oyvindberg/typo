@@ -25,26 +25,26 @@ import zio.stream.ZStream
 
 object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(Setter[TypoLocalDateTime])}""".delete.map(_ > 0)
+    sql"""delete from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     DeleteBuilder("production.productcosthistory", ProductcosthistoryFields)
   }
   override def insert(unsaved: ProductcosthistoryRow): ZIO[ZConnection, Throwable, ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.insertReturning(ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved): ZIO[ZConnection, Throwable, ProductcosthistoryRow] = {
     val fs = List(
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
-      Some((sql""""startdate"""", sql"${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""enddate"""", sql"${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
+      Some((sql""""startdate"""", sql"${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp")),
+      Some((sql""""enddate"""", sql"${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
       Some((sql""""standardcost"""", sql"${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -67,15 +67,15 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory""".query(ProductcosthistoryRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Option[ProductcosthistoryRow]] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(Setter[TypoLocalDateTime])}""".query(ProductcosthistoryRow.jdbcDecoder).selectOne
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".query(ProductcosthistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductcosthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productcosthistory
-          set "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
+          set "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
               "standardcost" = ${Segment.paramSegment(row.standardcost)(Setter.bigDecimalScalaSetter)}::numeric,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(Setter[TypoLocalDateTime])}""".update.map(_ > 0)
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     UpdateBuilder("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.jdbcDecoder)
@@ -83,11 +83,11 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def upsert(unsaved: ProductcosthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductcosthistoryRow]] = {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
             ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productid", "startdate")
           do update set

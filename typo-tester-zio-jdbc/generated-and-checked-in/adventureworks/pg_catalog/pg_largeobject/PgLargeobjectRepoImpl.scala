@@ -29,7 +29,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
   }
   override def insert(unsaved: PgLargeobjectRow): ZIO[ZConnection, Throwable, PgLargeobjectRow] = {
     sql"""insert into pg_catalog.pg_largeobject("loid", "pageno", "data")
-          values (${Segment.paramSegment(unsaved.loid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.pageno)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.data)(Setter[TypoBytea])}::bytea)
+          values (${Segment.paramSegment(unsaved.loid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.pageno)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.data)(TypoBytea.setter)}::bytea)
           returning "loid", "pageno", "data"
        """.insertReturning(PgLargeobjectRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -45,7 +45,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
   override def update(row: PgLargeobjectRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_largeobject
-          set "data" = ${Segment.paramSegment(row.data)(Setter[TypoBytea])}::bytea
+          set "data" = ${Segment.paramSegment(row.data)(TypoBytea.setter)}::bytea
           where "loid" = ${Segment.paramSegment(compositeId.loid)(Setter.longSetter)} AND "pageno" = ${Segment.paramSegment(compositeId.pageno)(Setter.intSetter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
@@ -56,7 +56,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           values (
             ${Segment.paramSegment(unsaved.loid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.pageno)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.data)(Setter[TypoBytea])}::bytea
+            ${Segment.paramSegment(unsaved.data)(TypoBytea.setter)}::bytea
           )
           on conflict ("loid", "pageno")
           do update set

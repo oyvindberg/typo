@@ -18,7 +18,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -26,27 +25,27 @@ import zio.stream.ZStream
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(Setter[DocumentId])}""".delete.map(_ > 0)
+    sql"""delete from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
     DeleteBuilder("production.productdocument", ProductdocumentFields)
   }
   override def insert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
-          values (${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(Setter[DocumentId])})
+          values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)})
           returning "productid", "modifieddate"::text, "documentnode"
        """.insertReturning(ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
     val fs = List(
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""documentnode"""", sql"${Segment.paramSegment(value: DocumentId)(Setter[DocumentId])}"))
+        case Defaulted.Provided(value) => Some((sql""""documentnode"""", sql"${Segment.paramSegment(value: DocumentId)(DocumentId.setter)}"))
       }
     ).flatten
     
@@ -69,13 +68,13 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument""".query(ProductdocumentRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Option[ProductdocumentRow]] = {
-    sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(Setter[DocumentId])}""".query(ProductdocumentRow.jdbcDecoder).selectOne
+    sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".query(ProductdocumentRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductdocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productdocument
-          set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(Setter[DocumentId])}""".update.map(_ > 0)
+          set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
     UpdateBuilder("production.productdocument", ProductdocumentFields, ProductdocumentRow.jdbcDecoder)
@@ -83,9 +82,9 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def upsert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdocumentRow]] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
           values (
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.documentnode)(Setter[DocumentId])}
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)}
           )
           on conflict ("productid", "documentnode")
           do update set

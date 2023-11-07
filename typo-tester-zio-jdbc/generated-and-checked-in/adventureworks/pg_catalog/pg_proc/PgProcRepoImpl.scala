@@ -26,14 +26,14 @@ import zio.stream.ZStream
 
 object PgProcRepoImpl extends PgProcRepo {
   override def delete(oid: PgProcId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_proc where "oid" = ${Segment.paramSegment(oid)(Setter[PgProcId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_proc where "oid" = ${Segment.paramSegment(oid)(PgProcId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgProcFields, PgProcRow] = {
     DeleteBuilder("pg_catalog.pg_proc", PgProcFields)
   }
   override def insert(unsaved: PgProcRow): ZIO[ZConnection, Throwable, PgProcRow] = {
     sql"""insert into pg_catalog.pg_proc("oid", "proname", "pronamespace", "proowner", "prolang", "procost", "prorows", "provariadic", "prosupport", "prokind", "prosecdef", "proleakproof", "proisstrict", "proretset", "provolatile", "proparallel", "pronargs", "pronargdefaults", "prorettype", "proargtypes", "proallargtypes", "proargmodes", "proargnames", "proargdefaults", "protrftypes", "prosrc", "probin", "prosqlbody", "proconfig", "proacl")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgProcId])}::oid, ${Segment.paramSegment(unsaved.proname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.pronamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.proowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.prolang)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.procost)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.prorows)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.provariadic)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.prosupport)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.prokind)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.prosecdef)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.proleakproof)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.proisstrict)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.proretset)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.provolatile)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.proparallel)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.pronargs)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.pronargdefaults)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.prorettype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.proargtypes)(Setter[TypoOidVector])}::oidvector, ${Segment.paramSegment(unsaved.proallargtypes)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.proargmodes)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_char, ${Segment.paramSegment(unsaved.proargnames)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.proargdefaults)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree, ${Segment.paramSegment(unsaved.protrftypes)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.prosrc)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.probin)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.prosqlbody)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree, ${Segment.paramSegment(unsaved.proconfig)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.proacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
+          values (${Segment.paramSegment(unsaved.oid)(PgProcId.setter)}::oid, ${Segment.paramSegment(unsaved.proname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.pronamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.proowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.prolang)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.procost)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.prorows)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.provariadic)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.prosupport)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.prokind)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.prosecdef)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.proleakproof)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.proisstrict)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.proretset)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.provolatile)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.proparallel)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.pronargs)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.pronargdefaults)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.prorettype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.proargtypes)(TypoOidVector.setter)}::oidvector, ${Segment.paramSegment(unsaved.proallargtypes)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.proargmodes)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_char, ${Segment.paramSegment(unsaved.proargnames)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.proargdefaults)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree, ${Segment.paramSegment(unsaved.protrftypes)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid, ${Segment.paramSegment(unsaved.prosrc)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.probin)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.prosqlbody)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree, ${Segment.paramSegment(unsaved.proconfig)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.proacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
           returning "oid", "proname", "pronamespace", "proowner", "prolang", "procost", "prorows", "provariadic", "prosupport", "prokind", "prosecdef", "proleakproof", "proisstrict", "proretset", "provolatile", "proparallel", "pronargs", "pronargdefaults", "prorettype", "proargtypes", "proallargtypes", "proargmodes", "proargnames", "proargdefaults", "protrftypes", "prosrc", "probin", "prosqlbody", "proconfig", "proacl"
        """.insertReturning(PgProcRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -44,7 +44,7 @@ object PgProcRepoImpl extends PgProcRepo {
     sql"""select "oid", "proname", "pronamespace", "proowner", "prolang", "procost", "prorows", "provariadic", "prosupport", "prokind", "prosecdef", "proleakproof", "proisstrict", "proretset", "provolatile", "proparallel", "pronargs", "pronargdefaults", "prorettype", "proargtypes", "proallargtypes", "proargmodes", "proargnames", "proargdefaults", "protrftypes", "prosrc", "probin", "prosqlbody", "proconfig", "proacl" from pg_catalog.pg_proc""".query(PgProcRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgProcId): ZIO[ZConnection, Throwable, Option[PgProcRow]] = {
-    sql"""select "oid", "proname", "pronamespace", "proowner", "prolang", "procost", "prorows", "provariadic", "prosupport", "prokind", "prosecdef", "proleakproof", "proisstrict", "proretset", "provolatile", "proparallel", "pronargs", "pronargdefaults", "prorettype", "proargtypes", "proallargtypes", "proargmodes", "proargnames", "proargdefaults", "protrftypes", "prosrc", "probin", "prosqlbody", "proconfig", "proacl" from pg_catalog.pg_proc where "oid" = ${Segment.paramSegment(oid)(Setter[PgProcId])}""".query(PgProcRow.jdbcDecoder).selectOne
+    sql"""select "oid", "proname", "pronamespace", "proowner", "prolang", "procost", "prorows", "provariadic", "prosupport", "prokind", "prosecdef", "proleakproof", "proisstrict", "proretset", "provolatile", "proparallel", "pronargs", "pronargdefaults", "prorettype", "proargtypes", "proallargtypes", "proargmodes", "proargnames", "proargdefaults", "protrftypes", "prosrc", "probin", "prosqlbody", "proconfig", "proacl" from pg_catalog.pg_proc where "oid" = ${Segment.paramSegment(oid)(PgProcId.setter)}""".query(PgProcRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgProcId]): ZStream[ZConnection, Throwable, PgProcRow] = {
     sql"""select "oid", "proname", "pronamespace", "proowner", "prolang", "procost", "prorows", "provariadic", "prosupport", "prokind", "prosecdef", "proleakproof", "proisstrict", "proretset", "provolatile", "proparallel", "pronargs", "pronargdefaults", "prorettype", "proargtypes", "proallargtypes", "proargmodes", "proargnames", "proargdefaults", "protrftypes", "prosrc", "probin", "prosqlbody", "proconfig", "proacl" from pg_catalog.pg_proc where "oid" = ANY(${Segment.paramSegment(oids)(PgProcId.arraySetter)})""".query(PgProcRow.jdbcDecoder).selectStream
@@ -52,7 +52,7 @@ object PgProcRepoImpl extends PgProcRepo {
   override def selectByUnique(proname: String, proargtypes: TypoOidVector, pronamespace: /* oid */ Long): ZIO[ZConnection, Throwable, Option[PgProcRow]] = {
     sql"""select "proname", "proargtypes", "pronamespace"
           from pg_catalog.pg_proc
-          where "proname" = ${Segment.paramSegment(proname)(Setter.stringSetter)} AND "proargtypes" = ${Segment.paramSegment(proargtypes)(Setter[TypoOidVector])} AND "pronamespace" = ${Segment.paramSegment(pronamespace)(Setter.longSetter)}
+          where "proname" = ${Segment.paramSegment(proname)(Setter.stringSetter)} AND "proargtypes" = ${Segment.paramSegment(proargtypes)(TypoOidVector.setter)} AND "pronamespace" = ${Segment.paramSegment(pronamespace)(Setter.longSetter)}
        """.query(PgProcRow.jdbcDecoder).selectOne
   }
   override def update(row: PgProcRow): ZIO[ZConnection, Throwable, Boolean] = {
@@ -65,7 +65,7 @@ object PgProcRepoImpl extends PgProcRepo {
               "procost" = ${Segment.paramSegment(row.procost)(Setter.floatSetter)}::float4,
               "prorows" = ${Segment.paramSegment(row.prorows)(Setter.floatSetter)}::float4,
               "provariadic" = ${Segment.paramSegment(row.provariadic)(Setter.longSetter)}::oid,
-              "prosupport" = ${Segment.paramSegment(row.prosupport)(Setter[TypoRegproc])}::regproc,
+              "prosupport" = ${Segment.paramSegment(row.prosupport)(TypoRegproc.setter)}::regproc,
               "prokind" = ${Segment.paramSegment(row.prokind)(Setter.stringSetter)}::char,
               "prosecdef" = ${Segment.paramSegment(row.prosecdef)(Setter.booleanSetter)},
               "proleakproof" = ${Segment.paramSegment(row.proleakproof)(Setter.booleanSetter)},
@@ -73,21 +73,21 @@ object PgProcRepoImpl extends PgProcRepo {
               "proretset" = ${Segment.paramSegment(row.proretset)(Setter.booleanSetter)},
               "provolatile" = ${Segment.paramSegment(row.provolatile)(Setter.stringSetter)}::char,
               "proparallel" = ${Segment.paramSegment(row.proparallel)(Setter.stringSetter)}::char,
-              "pronargs" = ${Segment.paramSegment(row.pronargs)(Setter[TypoShort])}::int2,
-              "pronargdefaults" = ${Segment.paramSegment(row.pronargdefaults)(Setter[TypoShort])}::int2,
+              "pronargs" = ${Segment.paramSegment(row.pronargs)(TypoShort.setter)}::int2,
+              "pronargdefaults" = ${Segment.paramSegment(row.pronargdefaults)(TypoShort.setter)}::int2,
               "prorettype" = ${Segment.paramSegment(row.prorettype)(Setter.longSetter)}::oid,
-              "proargtypes" = ${Segment.paramSegment(row.proargtypes)(Setter[TypoOidVector])}::oidvector,
+              "proargtypes" = ${Segment.paramSegment(row.proargtypes)(TypoOidVector.setter)}::oidvector,
               "proallargtypes" = ${Segment.paramSegment(row.proallargtypes)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
               "proargmodes" = ${Segment.paramSegment(row.proargmodes)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_char,
               "proargnames" = ${Segment.paramSegment(row.proargnames)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
-              "proargdefaults" = ${Segment.paramSegment(row.proargdefaults)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
+              "proargdefaults" = ${Segment.paramSegment(row.proargdefaults)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
               "protrftypes" = ${Segment.paramSegment(row.protrftypes)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
               "prosrc" = ${Segment.paramSegment(row.prosrc)(Setter.stringSetter)},
               "probin" = ${Segment.paramSegment(row.probin)(Setter.optionParamSetter(Setter.stringSetter))},
-              "prosqlbody" = ${Segment.paramSegment(row.prosqlbody)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
+              "prosqlbody" = ${Segment.paramSegment(row.prosqlbody)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
               "proconfig" = ${Segment.paramSegment(row.proconfig)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
               "proacl" = ${Segment.paramSegment(row.proacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgProcId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgProcId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgProcFields, PgProcRow] = {
     UpdateBuilder("pg_catalog.pg_proc", PgProcFields, PgProcRow.jdbcDecoder)
@@ -95,7 +95,7 @@ object PgProcRepoImpl extends PgProcRepo {
   override def upsert(unsaved: PgProcRow): ZIO[ZConnection, Throwable, UpdateResult[PgProcRow]] = {
     sql"""insert into pg_catalog.pg_proc("oid", "proname", "pronamespace", "proowner", "prolang", "procost", "prorows", "provariadic", "prosupport", "prokind", "prosecdef", "proleakproof", "proisstrict", "proretset", "provolatile", "proparallel", "pronargs", "pronargdefaults", "prorettype", "proargtypes", "proallargtypes", "proargmodes", "proargnames", "proargdefaults", "protrftypes", "prosrc", "probin", "prosqlbody", "proconfig", "proacl")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgProcId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgProcId.setter)}::oid,
             ${Segment.paramSegment(unsaved.proname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.pronamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.proowner)(Setter.longSetter)}::oid,
@@ -103,7 +103,7 @@ object PgProcRepoImpl extends PgProcRepo {
             ${Segment.paramSegment(unsaved.procost)(Setter.floatSetter)}::float4,
             ${Segment.paramSegment(unsaved.prorows)(Setter.floatSetter)}::float4,
             ${Segment.paramSegment(unsaved.provariadic)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.prosupport)(Setter[TypoRegproc])}::regproc,
+            ${Segment.paramSegment(unsaved.prosupport)(TypoRegproc.setter)}::regproc,
             ${Segment.paramSegment(unsaved.prokind)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.prosecdef)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.proleakproof)(Setter.booleanSetter)},
@@ -111,18 +111,18 @@ object PgProcRepoImpl extends PgProcRepo {
             ${Segment.paramSegment(unsaved.proretset)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.provolatile)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.proparallel)(Setter.stringSetter)}::char,
-            ${Segment.paramSegment(unsaved.pronargs)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.pronargdefaults)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.pronargs)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.pronargdefaults)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.prorettype)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.proargtypes)(Setter[TypoOidVector])}::oidvector,
+            ${Segment.paramSegment(unsaved.proargtypes)(TypoOidVector.setter)}::oidvector,
             ${Segment.paramSegment(unsaved.proallargtypes)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
             ${Segment.paramSegment(unsaved.proargmodes)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_char,
             ${Segment.paramSegment(unsaved.proargnames)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
-            ${Segment.paramSegment(unsaved.proargdefaults)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
+            ${Segment.paramSegment(unsaved.proargdefaults)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
             ${Segment.paramSegment(unsaved.protrftypes)(Setter.optionParamSetter(adventureworks.LongArraySetter))}::_oid,
             ${Segment.paramSegment(unsaved.prosrc)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.probin)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.prosqlbody)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
+            ${Segment.paramSegment(unsaved.prosqlbody)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
             ${Segment.paramSegment(unsaved.proconfig)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
             ${Segment.paramSegment(unsaved.proacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
           )

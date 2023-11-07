@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgAmRepoImpl extends PgAmRepo {
   override def delete(oid: PgAmId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_am where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_am where "oid" = ${Segment.paramSegment(oid)(PgAmId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgAmFields, PgAmRow] = {
     DeleteBuilder("pg_catalog.pg_am", PgAmFields)
   }
   override def insert(unsaved: PgAmRow): ZIO[ZConnection, Throwable, PgAmRow] = {
     sql"""insert into pg_catalog.pg_am("oid", "amname", "amhandler", "amtype")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgAmId])}::oid, ${Segment.paramSegment(unsaved.amname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.amhandler)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.amtype)(Setter.stringSetter)}::char)
+          values (${Segment.paramSegment(unsaved.oid)(PgAmId.setter)}::oid, ${Segment.paramSegment(unsaved.amname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.amhandler)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.amtype)(Setter.stringSetter)}::char)
           returning "oid", "amname", "amhandler", "amtype"
        """.insertReturning(PgAmRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgAmRepoImpl extends PgAmRepo {
     sql"""select "oid", "amname", "amhandler", "amtype" from pg_catalog.pg_am""".query(PgAmRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgAmId): ZIO[ZConnection, Throwable, Option[PgAmRow]] = {
-    sql"""select "oid", "amname", "amhandler", "amtype" from pg_catalog.pg_am where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmId])}""".query(PgAmRow.jdbcDecoder).selectOne
+    sql"""select "oid", "amname", "amhandler", "amtype" from pg_catalog.pg_am where "oid" = ${Segment.paramSegment(oid)(PgAmId.setter)}""".query(PgAmRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgAmId]): ZStream[ZConnection, Throwable, PgAmRow] = {
     sql"""select "oid", "amname", "amhandler", "amtype" from pg_catalog.pg_am where "oid" = ANY(${Segment.paramSegment(oids)(PgAmId.arraySetter)})""".query(PgAmRow.jdbcDecoder).selectStream
@@ -55,9 +55,9 @@ object PgAmRepoImpl extends PgAmRepo {
     val oid = row.oid
     sql"""update pg_catalog.pg_am
           set "amname" = ${Segment.paramSegment(row.amname)(Setter.stringSetter)}::name,
-              "amhandler" = ${Segment.paramSegment(row.amhandler)(Setter[TypoRegproc])}::regproc,
+              "amhandler" = ${Segment.paramSegment(row.amhandler)(TypoRegproc.setter)}::regproc,
               "amtype" = ${Segment.paramSegment(row.amtype)(Setter.stringSetter)}::char
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgAmId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgAmFields, PgAmRow] = {
     UpdateBuilder("pg_catalog.pg_am", PgAmFields, PgAmRow.jdbcDecoder)
@@ -65,9 +65,9 @@ object PgAmRepoImpl extends PgAmRepo {
   override def upsert(unsaved: PgAmRow): ZIO[ZConnection, Throwable, UpdateResult[PgAmRow]] = {
     sql"""insert into pg_catalog.pg_am("oid", "amname", "amhandler", "amtype")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgAmId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgAmId.setter)}::oid,
             ${Segment.paramSegment(unsaved.amname)(Setter.stringSetter)}::name,
-            ${Segment.paramSegment(unsaved.amhandler)(Setter[TypoRegproc])}::regproc,
+            ${Segment.paramSegment(unsaved.amhandler)(TypoRegproc.setter)}::regproc,
             ${Segment.paramSegment(unsaved.amtype)(Setter.stringSetter)}::char
           )
           on conflict ("oid")

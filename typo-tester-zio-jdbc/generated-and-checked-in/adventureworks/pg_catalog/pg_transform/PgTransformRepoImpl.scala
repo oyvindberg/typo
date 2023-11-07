@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgTransformRepoImpl extends PgTransformRepo {
   override def delete(oid: PgTransformId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_transform where "oid" = ${Segment.paramSegment(oid)(Setter[PgTransformId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_transform where "oid" = ${Segment.paramSegment(oid)(PgTransformId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTransformFields, PgTransformRow] = {
     DeleteBuilder("pg_catalog.pg_transform", PgTransformFields)
   }
   override def insert(unsaved: PgTransformRow): ZIO[ZConnection, Throwable, PgTransformRow] = {
     sql"""insert into pg_catalog.pg_transform("oid", "trftype", "trflang", "trffromsql", "trftosql")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgTransformId])}::oid, ${Segment.paramSegment(unsaved.trftype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.trflang)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.trffromsql)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.trftosql)(Setter[TypoRegproc])}::regproc)
+          values (${Segment.paramSegment(unsaved.oid)(PgTransformId.setter)}::oid, ${Segment.paramSegment(unsaved.trftype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.trflang)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.trffromsql)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.trftosql)(TypoRegproc.setter)}::regproc)
           returning "oid", "trftype", "trflang", "trffromsql", "trftosql"
        """.insertReturning(PgTransformRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
     sql"""select "oid", "trftype", "trflang", "trffromsql", "trftosql" from pg_catalog.pg_transform""".query(PgTransformRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgTransformId): ZIO[ZConnection, Throwable, Option[PgTransformRow]] = {
-    sql"""select "oid", "trftype", "trflang", "trffromsql", "trftosql" from pg_catalog.pg_transform where "oid" = ${Segment.paramSegment(oid)(Setter[PgTransformId])}""".query(PgTransformRow.jdbcDecoder).selectOne
+    sql"""select "oid", "trftype", "trflang", "trffromsql", "trftosql" from pg_catalog.pg_transform where "oid" = ${Segment.paramSegment(oid)(PgTransformId.setter)}""".query(PgTransformRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgTransformId]): ZStream[ZConnection, Throwable, PgTransformRow] = {
     sql"""select "oid", "trftype", "trflang", "trffromsql", "trftosql" from pg_catalog.pg_transform where "oid" = ANY(${Segment.paramSegment(oids)(PgTransformId.arraySetter)})""".query(PgTransformRow.jdbcDecoder).selectStream
@@ -56,9 +56,9 @@ object PgTransformRepoImpl extends PgTransformRepo {
     sql"""update pg_catalog.pg_transform
           set "trftype" = ${Segment.paramSegment(row.trftype)(Setter.longSetter)}::oid,
               "trflang" = ${Segment.paramSegment(row.trflang)(Setter.longSetter)}::oid,
-              "trffromsql" = ${Segment.paramSegment(row.trffromsql)(Setter[TypoRegproc])}::regproc,
-              "trftosql" = ${Segment.paramSegment(row.trftosql)(Setter[TypoRegproc])}::regproc
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgTransformId])}""".update.map(_ > 0)
+              "trffromsql" = ${Segment.paramSegment(row.trffromsql)(TypoRegproc.setter)}::regproc,
+              "trftosql" = ${Segment.paramSegment(row.trftosql)(TypoRegproc.setter)}::regproc
+          where "oid" = ${Segment.paramSegment(oid)(PgTransformId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgTransformFields, PgTransformRow] = {
     UpdateBuilder("pg_catalog.pg_transform", PgTransformFields, PgTransformRow.jdbcDecoder)
@@ -66,11 +66,11 @@ object PgTransformRepoImpl extends PgTransformRepo {
   override def upsert(unsaved: PgTransformRow): ZIO[ZConnection, Throwable, UpdateResult[PgTransformRow]] = {
     sql"""insert into pg_catalog.pg_transform("oid", "trftype", "trflang", "trffromsql", "trftosql")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgTransformId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgTransformId.setter)}::oid,
             ${Segment.paramSegment(unsaved.trftype)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.trflang)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.trffromsql)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.trftosql)(Setter[TypoRegproc])}::regproc
+            ${Segment.paramSegment(unsaved.trffromsql)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.trftosql)(TypoRegproc.setter)}::regproc
           )
           on conflict ("oid")
           do update set

@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
   override def delete(oid: PgForeignDataWrapperId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_foreign_data_wrapper where "oid" = ${Segment.paramSegment(oid)(Setter[PgForeignDataWrapperId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_foreign_data_wrapper where "oid" = ${Segment.paramSegment(oid)(PgForeignDataWrapperId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
     DeleteBuilder("pg_catalog.pg_foreign_data_wrapper", PgForeignDataWrapperFields)
   }
   override def insert(unsaved: PgForeignDataWrapperRow): ZIO[ZConnection, Throwable, PgForeignDataWrapperRow] = {
     sql"""insert into pg_catalog.pg_foreign_data_wrapper("oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgForeignDataWrapperId])}::oid, ${Segment.paramSegment(unsaved.fdwname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.fdwowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.fdwhandler)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.fdwvalidator)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.fdwacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.fdwoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
+          values (${Segment.paramSegment(unsaved.oid)(PgForeignDataWrapperId.setter)}::oid, ${Segment.paramSegment(unsaved.fdwname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.fdwowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.fdwhandler)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.fdwvalidator)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.fdwacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.fdwoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
           returning "oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions"
        """.insertReturning(PgForeignDataWrapperRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
     sql"""select "oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions" from pg_catalog.pg_foreign_data_wrapper""".query(PgForeignDataWrapperRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgForeignDataWrapperId): ZIO[ZConnection, Throwable, Option[PgForeignDataWrapperRow]] = {
-    sql"""select "oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions" from pg_catalog.pg_foreign_data_wrapper where "oid" = ${Segment.paramSegment(oid)(Setter[PgForeignDataWrapperId])}""".query(PgForeignDataWrapperRow.jdbcDecoder).selectOne
+    sql"""select "oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions" from pg_catalog.pg_foreign_data_wrapper where "oid" = ${Segment.paramSegment(oid)(PgForeignDataWrapperId.setter)}""".query(PgForeignDataWrapperRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgForeignDataWrapperId]): ZStream[ZConnection, Throwable, PgForeignDataWrapperRow] = {
     sql"""select "oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions" from pg_catalog.pg_foreign_data_wrapper where "oid" = ANY(${Segment.paramSegment(oids)(PgForeignDataWrapperId.arraySetter)})""".query(PgForeignDataWrapperRow.jdbcDecoder).selectStream
@@ -60,7 +60,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
               "fdwvalidator" = ${Segment.paramSegment(row.fdwvalidator)(Setter.longSetter)}::oid,
               "fdwacl" = ${Segment.paramSegment(row.fdwacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem,
               "fdwoptions" = ${Segment.paramSegment(row.fdwoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgForeignDataWrapperId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgForeignDataWrapperId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
     UpdateBuilder("pg_catalog.pg_foreign_data_wrapper", PgForeignDataWrapperFields, PgForeignDataWrapperRow.jdbcDecoder)
@@ -68,7 +68,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
   override def upsert(unsaved: PgForeignDataWrapperRow): ZIO[ZConnection, Throwable, UpdateResult[PgForeignDataWrapperRow]] = {
     sql"""insert into pg_catalog.pg_foreign_data_wrapper("oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgForeignDataWrapperId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgForeignDataWrapperId.setter)}::oid,
             ${Segment.paramSegment(unsaved.fdwname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.fdwowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.fdwhandler)(Setter.longSetter)}::oid,

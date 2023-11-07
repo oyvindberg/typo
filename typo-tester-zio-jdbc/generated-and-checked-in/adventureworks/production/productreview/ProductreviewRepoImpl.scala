@@ -26,35 +26,35 @@ import zio.stream.ZStream
 
 object ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productreview where "productreviewid" = ${Segment.paramSegment(productreviewid)(Setter[ProductreviewId])}""".delete.map(_ > 0)
+    sql"""delete from production.productreview where "productreviewid" = ${Segment.paramSegment(productreviewid)(ProductreviewId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
     DeleteBuilder("production.productreview", ProductreviewFields)
   }
   override def insert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, ProductreviewRow] = {
     sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productreviewid)(Setter[ProductreviewId])}::int4, ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.reviewername)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.reviewdate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.emailaddress)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rating)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productreviewid)(ProductreviewId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.reviewername)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.reviewdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.emailaddress)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rating)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """.insertReturning(ProductreviewRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ZIO[ZConnection, Throwable, ProductreviewRow] = {
     val fs = List(
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
-      Some((sql""""reviewername"""", sql"${Segment.paramSegment(unsaved.reviewername)(Setter[Name])}::varchar")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
+      Some((sql""""reviewername"""", sql"${Segment.paramSegment(unsaved.reviewername)(Name.setter)}::varchar")),
       Some((sql""""emailaddress"""", sql"${Segment.paramSegment(unsaved.emailaddress)(Setter.stringSetter)}")),
       Some((sql""""rating"""", sql"${Segment.paramSegment(unsaved.rating)(Setter.intSetter)}::int4")),
       Some((sql""""comments"""", sql"${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter.stringSetter))}")),
       unsaved.productreviewid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""productreviewid"""", sql"${Segment.paramSegment(value: ProductreviewId)(Setter[ProductreviewId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""productreviewid"""", sql"${Segment.paramSegment(value: ProductreviewId)(ProductreviewId.setter)}::int4"))
       },
       unsaved.reviewdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""reviewdate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""reviewdate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -77,7 +77,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview""".query(ProductreviewRow.jdbcDecoder).selectStream
   }
   override def selectById(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Option[ProductreviewRow]] = {
-    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ${Segment.paramSegment(productreviewid)(Setter[ProductreviewId])}""".query(ProductreviewRow.jdbcDecoder).selectOne
+    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ${Segment.paramSegment(productreviewid)(ProductreviewId.setter)}""".query(ProductreviewRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productreviewids: Array[ProductreviewId]): ZStream[ZConnection, Throwable, ProductreviewRow] = {
     sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ANY(${Segment.paramSegment(productreviewids)(ProductreviewId.arraySetter)})""".query(ProductreviewRow.jdbcDecoder).selectStream
@@ -85,14 +85,14 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   override def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productreviewid = row.productreviewid
     sql"""update production.productreview
-          set "productid" = ${Segment.paramSegment(row.productid)(Setter[ProductId])}::int4,
-              "reviewername" = ${Segment.paramSegment(row.reviewername)(Setter[Name])}::varchar,
-              "reviewdate" = ${Segment.paramSegment(row.reviewdate)(Setter[TypoLocalDateTime])}::timestamp,
+          set "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
+              "reviewername" = ${Segment.paramSegment(row.reviewername)(Name.setter)}::varchar,
+              "reviewdate" = ${Segment.paramSegment(row.reviewdate)(TypoLocalDateTime.setter)}::timestamp,
               "emailaddress" = ${Segment.paramSegment(row.emailaddress)(Setter.stringSetter)},
               "rating" = ${Segment.paramSegment(row.rating)(Setter.intSetter)}::int4,
               "comments" = ${Segment.paramSegment(row.comments)(Setter.optionParamSetter(Setter.stringSetter))},
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productreviewid" = ${Segment.paramSegment(productreviewid)(Setter[ProductreviewId])}""".update.map(_ > 0)
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productreviewid" = ${Segment.paramSegment(productreviewid)(ProductreviewId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
     UpdateBuilder("production.productreview", ProductreviewFields, ProductreviewRow.jdbcDecoder)
@@ -100,14 +100,14 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   override def upsert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, UpdateResult[ProductreviewRow]] = {
     sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productreviewid)(Setter[ProductreviewId])}::int4,
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.reviewername)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.reviewdate)(Setter[TypoLocalDateTime])}::timestamp,
+            ${Segment.paramSegment(unsaved.productreviewid)(ProductreviewId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.reviewername)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.reviewdate)(TypoLocalDateTime.setter)}::timestamp,
             ${Segment.paramSegment(unsaved.emailaddress)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.rating)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productreviewid")
           do update set

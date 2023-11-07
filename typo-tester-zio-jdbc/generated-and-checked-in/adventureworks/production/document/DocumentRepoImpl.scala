@@ -29,30 +29,30 @@ import zio.stream.ZStream
 
 object DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(Setter[DocumentId])}""".delete.map(_ > 0)
+    sql"""delete from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
     DeleteBuilder("production.document", DocumentFields)
   }
   override def insert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, DocumentRow] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
-          values (${Segment.paramSegment(unsaved.title)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.owner)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.folderflag)(Setter[Flag])}::bool, ${Segment.paramSegment(unsaved.filename)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.fileextension)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.revision)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.changenumber)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.status)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.documentsummary)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(Setter[DocumentId])})
+          values (${Segment.paramSegment(unsaved.title)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.owner)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.folderflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.filename)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.fileextension)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.revision)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.changenumber)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.documentsummary)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)})
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.insertReturning(DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: DocumentRowUnsaved): ZIO[ZConnection, Throwable, DocumentRow] = {
     val fs = List(
       Some((sql""""title"""", sql"${Segment.paramSegment(unsaved.title)(Setter.stringSetter)}")),
-      Some((sql""""owner"""", sql"${Segment.paramSegment(unsaved.owner)(Setter[BusinessentityId])}::int4")),
+      Some((sql""""owner"""", sql"${Segment.paramSegment(unsaved.owner)(BusinessentityId.setter)}::int4")),
       Some((sql""""filename"""", sql"${Segment.paramSegment(unsaved.filename)(Setter.stringSetter)}")),
       Some((sql""""fileextension"""", sql"${Segment.paramSegment(unsaved.fileextension)(Setter.optionParamSetter(Setter.stringSetter))}")),
       Some((sql""""revision"""", sql"${Segment.paramSegment(unsaved.revision)(Setter.stringSetter)}::bpchar")),
-      Some((sql""""status"""", sql"${Segment.paramSegment(unsaved.status)(Setter[TypoShort])}::int2")),
+      Some((sql""""status"""", sql"${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2")),
       Some((sql""""documentsummary"""", sql"${Segment.paramSegment(unsaved.documentsummary)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""document"""", sql"${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea")),
+      Some((sql""""document"""", sql"${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(TypoBytea.setter))}::bytea")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""folderflag"""", sql"${Segment.paramSegment(value: Flag)(Setter[Flag])}::bool"))
+        case Defaulted.Provided(value) => Some((sql""""folderflag"""", sql"${Segment.paramSegment(value: Flag)(Flag.setter)}::bool"))
       },
       unsaved.changenumber match {
         case Defaulted.UseDefault => None
@@ -60,15 +60,15 @@ object DocumentRepoImpl extends DocumentRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""documentnode"""", sql"${Segment.paramSegment(value: DocumentId)(Setter[DocumentId])}"))
+        case Defaulted.Provided(value) => Some((sql""""documentnode"""", sql"${Segment.paramSegment(value: DocumentId)(DocumentId.setter)}"))
       }
     ).flatten
     
@@ -91,7 +91,7 @@ object DocumentRepoImpl extends DocumentRepo {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document""".query(DocumentRow.jdbcDecoder).selectStream
   }
   override def selectById(documentnode: DocumentId): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(Setter[DocumentId])}""".query(DocumentRow.jdbcDecoder).selectOne
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".query(DocumentRow.jdbcDecoder).selectOne
   }
   override def selectByIds(documentnodes: Array[DocumentId]): ZStream[ZConnection, Throwable, DocumentRow] = {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ANY(${Segment.paramSegment(documentnodes)(DocumentId.arraySetter)})""".query(DocumentRow.jdbcDecoder).selectStream
@@ -99,25 +99,25 @@ object DocumentRepoImpl extends DocumentRepo {
   override def selectByUnique(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {
     sql"""select "rowguid"
           from production.document
-          where "rowguid" = ${Segment.paramSegment(rowguid)(Setter[TypoUUID])}
+          where "rowguid" = ${Segment.paramSegment(rowguid)(TypoUUID.setter)}
        """.query(DocumentRow.jdbcDecoder).selectOne
   }
   override def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val documentnode = row.documentnode
     sql"""update production.document
           set "title" = ${Segment.paramSegment(row.title)(Setter.stringSetter)},
-              "owner" = ${Segment.paramSegment(row.owner)(Setter[BusinessentityId])}::int4,
-              "folderflag" = ${Segment.paramSegment(row.folderflag)(Setter[Flag])}::bool,
+              "owner" = ${Segment.paramSegment(row.owner)(BusinessentityId.setter)}::int4,
+              "folderflag" = ${Segment.paramSegment(row.folderflag)(Flag.setter)}::bool,
               "filename" = ${Segment.paramSegment(row.filename)(Setter.stringSetter)},
               "fileextension" = ${Segment.paramSegment(row.fileextension)(Setter.optionParamSetter(Setter.stringSetter))},
               "revision" = ${Segment.paramSegment(row.revision)(Setter.stringSetter)}::bpchar,
               "changenumber" = ${Segment.paramSegment(row.changenumber)(Setter.intSetter)}::int4,
-              "status" = ${Segment.paramSegment(row.status)(Setter[TypoShort])}::int2,
+              "status" = ${Segment.paramSegment(row.status)(TypoShort.setter)}::int2,
               "documentsummary" = ${Segment.paramSegment(row.documentsummary)(Setter.optionParamSetter(Setter.stringSetter))},
-              "document" = ${Segment.paramSegment(row.document)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "documentnode" = ${Segment.paramSegment(documentnode)(Setter[DocumentId])}""".update.map(_ > 0)
+              "document" = ${Segment.paramSegment(row.document)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
     UpdateBuilder("production.document", DocumentFields, DocumentRow.jdbcDecoder)
@@ -126,18 +126,18 @@ object DocumentRepoImpl extends DocumentRepo {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (
             ${Segment.paramSegment(unsaved.title)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.owner)(Setter[BusinessentityId])}::int4,
-            ${Segment.paramSegment(unsaved.folderflag)(Setter[Flag])}::bool,
+            ${Segment.paramSegment(unsaved.owner)(BusinessentityId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.folderflag)(Flag.setter)}::bool,
             ${Segment.paramSegment(unsaved.filename)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.fileextension)(Setter.optionParamSetter(Setter.stringSetter))},
             ${Segment.paramSegment(unsaved.revision)(Setter.stringSetter)}::bpchar,
             ${Segment.paramSegment(unsaved.changenumber)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.status)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.documentsummary)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.documentnode)(Setter[DocumentId])}
+            ${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)}
           )
           on conflict ("documentnode")
           do update set

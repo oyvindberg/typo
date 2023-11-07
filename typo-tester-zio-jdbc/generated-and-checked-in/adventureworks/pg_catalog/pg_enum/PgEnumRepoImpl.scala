@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgEnumRepoImpl extends PgEnumRepo {
   override def delete(oid: PgEnumId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_enum where "oid" = ${Segment.paramSegment(oid)(Setter[PgEnumId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_enum where "oid" = ${Segment.paramSegment(oid)(PgEnumId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgEnumFields, PgEnumRow] = {
     DeleteBuilder("pg_catalog.pg_enum", PgEnumFields)
   }
   override def insert(unsaved: PgEnumRow): ZIO[ZConnection, Throwable, PgEnumRow] = {
     sql"""insert into pg_catalog.pg_enum("oid", "enumtypid", "enumsortorder", "enumlabel")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgEnumId])}::oid, ${Segment.paramSegment(unsaved.enumtypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.enumsortorder)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.enumlabel)(Setter.stringSetter)}::name)
+          values (${Segment.paramSegment(unsaved.oid)(PgEnumId.setter)}::oid, ${Segment.paramSegment(unsaved.enumtypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.enumsortorder)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.enumlabel)(Setter.stringSetter)}::name)
           returning "oid", "enumtypid", "enumsortorder", "enumlabel"
        """.insertReturning(PgEnumRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
     sql"""select "oid", "enumtypid", "enumsortorder", "enumlabel" from pg_catalog.pg_enum""".query(PgEnumRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgEnumId): ZIO[ZConnection, Throwable, Option[PgEnumRow]] = {
-    sql"""select "oid", "enumtypid", "enumsortorder", "enumlabel" from pg_catalog.pg_enum where "oid" = ${Segment.paramSegment(oid)(Setter[PgEnumId])}""".query(PgEnumRow.jdbcDecoder).selectOne
+    sql"""select "oid", "enumtypid", "enumsortorder", "enumlabel" from pg_catalog.pg_enum where "oid" = ${Segment.paramSegment(oid)(PgEnumId.setter)}""".query(PgEnumRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgEnumId]): ZStream[ZConnection, Throwable, PgEnumRow] = {
     sql"""select "oid", "enumtypid", "enumsortorder", "enumlabel" from pg_catalog.pg_enum where "oid" = ANY(${Segment.paramSegment(oids)(PgEnumId.arraySetter)})""".query(PgEnumRow.jdbcDecoder).selectStream
@@ -62,7 +62,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
           set "enumtypid" = ${Segment.paramSegment(row.enumtypid)(Setter.longSetter)}::oid,
               "enumsortorder" = ${Segment.paramSegment(row.enumsortorder)(Setter.floatSetter)}::float4,
               "enumlabel" = ${Segment.paramSegment(row.enumlabel)(Setter.stringSetter)}::name
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgEnumId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgEnumId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgEnumFields, PgEnumRow] = {
     UpdateBuilder("pg_catalog.pg_enum", PgEnumFields, PgEnumRow.jdbcDecoder)
@@ -70,7 +70,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
   override def upsert(unsaved: PgEnumRow): ZIO[ZConnection, Throwable, UpdateResult[PgEnumRow]] = {
     sql"""insert into pg_catalog.pg_enum("oid", "enumtypid", "enumsortorder", "enumlabel")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgEnumId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgEnumId.setter)}::oid,
             ${Segment.paramSegment(unsaved.enumtypid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.enumsortorder)(Setter.floatSetter)}::float4,
             ${Segment.paramSegment(unsaved.enumlabel)(Setter.stringSetter)}::name

@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgOpclassRepoImpl extends PgOpclassRepo {
   override def delete(oid: PgOpclassId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_opclass where "oid" = ${Segment.paramSegment(oid)(Setter[PgOpclassId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_opclass where "oid" = ${Segment.paramSegment(oid)(PgOpclassId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgOpclassFields, PgOpclassRow] = {
     DeleteBuilder("pg_catalog.pg_opclass", PgOpclassFields)
   }
   override def insert(unsaved: PgOpclassRow): ZIO[ZConnection, Throwable, PgOpclassRow] = {
     sql"""insert into pg_catalog.pg_opclass("oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgOpclassId])}::oid, ${Segment.paramSegment(unsaved.opcmethod)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.opcnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcfamily)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcintype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcdefault)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.opckeytype)(Setter.longSetter)}::oid)
+          values (${Segment.paramSegment(unsaved.oid)(PgOpclassId.setter)}::oid, ${Segment.paramSegment(unsaved.opcmethod)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.opcnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcfamily)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcintype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opcdefault)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.opckeytype)(Setter.longSetter)}::oid)
           returning "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype"
        """.insertReturning(PgOpclassRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
     sql"""select "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype" from pg_catalog.pg_opclass""".query(PgOpclassRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgOpclassId): ZIO[ZConnection, Throwable, Option[PgOpclassRow]] = {
-    sql"""select "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype" from pg_catalog.pg_opclass where "oid" = ${Segment.paramSegment(oid)(Setter[PgOpclassId])}""".query(PgOpclassRow.jdbcDecoder).selectOne
+    sql"""select "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype" from pg_catalog.pg_opclass where "oid" = ${Segment.paramSegment(oid)(PgOpclassId.setter)}""".query(PgOpclassRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgOpclassId]): ZStream[ZConnection, Throwable, PgOpclassRow] = {
     sql"""select "oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype" from pg_catalog.pg_opclass where "oid" = ANY(${Segment.paramSegment(oids)(PgOpclassId.arraySetter)})""".query(PgOpclassRow.jdbcDecoder).selectStream
@@ -61,7 +61,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
               "opcintype" = ${Segment.paramSegment(row.opcintype)(Setter.longSetter)}::oid,
               "opcdefault" = ${Segment.paramSegment(row.opcdefault)(Setter.booleanSetter)},
               "opckeytype" = ${Segment.paramSegment(row.opckeytype)(Setter.longSetter)}::oid
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgOpclassId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgOpclassId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgOpclassFields, PgOpclassRow] = {
     UpdateBuilder("pg_catalog.pg_opclass", PgOpclassFields, PgOpclassRow.jdbcDecoder)
@@ -69,7 +69,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
   override def upsert(unsaved: PgOpclassRow): ZIO[ZConnection, Throwable, UpdateResult[PgOpclassRow]] = {
     sql"""insert into pg_catalog.pg_opclass("oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgOpclassId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgOpclassId.setter)}::oid,
             ${Segment.paramSegment(unsaved.opcmethod)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.opcname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.opcnamespace)(Setter.longSetter)}::oid,

@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_default_acl where "oid" = ${Segment.paramSegment(oid)(Setter[PgDefaultAclId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_default_acl where "oid" = ${Segment.paramSegment(oid)(PgDefaultAclId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
     DeleteBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields)
   }
   override def insert(unsaved: PgDefaultAclRow): ZIO[ZConnection, Throwable, PgDefaultAclRow] = {
     sql"""insert into pg_catalog.pg_default_acl("oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgDefaultAclId])}::oid, ${Segment.paramSegment(unsaved.defaclrole)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.defaclnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.defaclobjtype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.defaclacl)(TypoAclItem.arraySetter)}::_aclitem)
+          values (${Segment.paramSegment(unsaved.oid)(PgDefaultAclId.setter)}::oid, ${Segment.paramSegment(unsaved.defaclrole)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.defaclnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.defaclobjtype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.defaclacl)(TypoAclItem.arraySetter)}::_aclitem)
           returning "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl"
        """.insertReturning(PgDefaultAclRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
     sql"""select "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl" from pg_catalog.pg_default_acl""".query(PgDefaultAclRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgDefaultAclId): ZIO[ZConnection, Throwable, Option[PgDefaultAclRow]] = {
-    sql"""select "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl" from pg_catalog.pg_default_acl where "oid" = ${Segment.paramSegment(oid)(Setter[PgDefaultAclId])}""".query(PgDefaultAclRow.jdbcDecoder).selectOne
+    sql"""select "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl" from pg_catalog.pg_default_acl where "oid" = ${Segment.paramSegment(oid)(PgDefaultAclId.setter)}""".query(PgDefaultAclRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgDefaultAclId]): ZStream[ZConnection, Throwable, PgDefaultAclRow] = {
     sql"""select "oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl" from pg_catalog.pg_default_acl where "oid" = ANY(${Segment.paramSegment(oids)(PgDefaultAclId.arraySetter)})""".query(PgDefaultAclRow.jdbcDecoder).selectStream
@@ -58,7 +58,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
               "defaclnamespace" = ${Segment.paramSegment(row.defaclnamespace)(Setter.longSetter)}::oid,
               "defaclobjtype" = ${Segment.paramSegment(row.defaclobjtype)(Setter.stringSetter)}::char,
               "defaclacl" = ${Segment.paramSegment(row.defaclacl)(TypoAclItem.arraySetter)}::_aclitem
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgDefaultAclId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgDefaultAclId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
     UpdateBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields, PgDefaultAclRow.jdbcDecoder)
@@ -66,7 +66,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def upsert(unsaved: PgDefaultAclRow): ZIO[ZConnection, Throwable, UpdateResult[PgDefaultAclRow]] = {
     sql"""insert into pg_catalog.pg_default_acl("oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgDefaultAclId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgDefaultAclId.setter)}::oid,
             ${Segment.paramSegment(unsaved.defaclrole)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.defaclnamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.defaclobjtype)(Setter.stringSetter)}::char,

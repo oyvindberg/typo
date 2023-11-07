@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def delete(productdescriptionid: ProductdescriptionId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productdescription where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(Setter[ProductdescriptionId])}""".delete.map(_ > 0)
+    sql"""delete from production.productdescription where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
     DeleteBuilder("production.productdescription", ProductdescriptionFields)
   }
   override def insert(unsaved: ProductdescriptionRow): ZIO[ZConnection, Throwable, ProductdescriptionRow] = {
     sql"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productdescriptionid)(Setter[ProductdescriptionId])}::int4, ${Segment.paramSegment(unsaved.description)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productdescriptionid)(ProductdescriptionId.setter)}::int4, ${Segment.paramSegment(unsaved.description)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productdescriptionid", "description", "rowguid", "modifieddate"::text
        """.insertReturning(ProductdescriptionRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,15 +41,15 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       Some((sql""""description"""", sql"${Segment.paramSegment(unsaved.description)(Setter.stringSetter)}")),
       unsaved.productdescriptionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""productdescriptionid"""", sql"${Segment.paramSegment(value: ProductdescriptionId)(Setter[ProductdescriptionId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""productdescriptionid"""", sql"${Segment.paramSegment(value: ProductdescriptionId)(ProductdescriptionId.setter)}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -72,7 +72,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription""".query(ProductdescriptionRow.jdbcDecoder).selectStream
   }
   override def selectById(productdescriptionid: ProductdescriptionId): ZIO[ZConnection, Throwable, Option[ProductdescriptionRow]] = {
-    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(Setter[ProductdescriptionId])}""".query(ProductdescriptionRow.jdbcDecoder).selectOne
+    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}""".query(ProductdescriptionRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId]): ZStream[ZConnection, Throwable, ProductdescriptionRow] = {
     sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ANY(${Segment.paramSegment(productdescriptionids)(ProductdescriptionId.arraySetter)})""".query(ProductdescriptionRow.jdbcDecoder).selectStream
@@ -81,9 +81,9 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     val productdescriptionid = row.productdescriptionid
     sql"""update production.productdescription
           set "description" = ${Segment.paramSegment(row.description)(Setter.stringSetter)},
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(Setter[ProductdescriptionId])}""".update.map(_ > 0)
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
     UpdateBuilder("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.jdbcDecoder)
@@ -91,10 +91,10 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def upsert(unsaved: ProductdescriptionRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdescriptionRow]] = {
     sql"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productdescriptionid)(Setter[ProductdescriptionId])}::int4,
+            ${Segment.paramSegment(unsaved.productdescriptionid)(ProductdescriptionId.setter)}::int4,
             ${Segment.paramSegment(unsaved.description)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productdescriptionid")
           do update set

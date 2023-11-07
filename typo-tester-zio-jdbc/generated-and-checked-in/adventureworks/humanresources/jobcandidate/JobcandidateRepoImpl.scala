@@ -26,28 +26,28 @@ import zio.stream.ZStream
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(Setter[JobcandidateId])}""".delete.map(_ > 0)
+    sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
     DeleteBuilder("humanresources.jobcandidate", JobcandidateFields)
   }
   override def insert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
-          values (${Segment.paramSegment(unsaved.jobcandidateid)(Setter[JobcandidateId])}::int4, ${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4, ${Segment.paramSegment(unsaved.resume)(Setter.optionParamSetter(Setter[TypoXml]))}::xml, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.jobcandidateid)(JobcandidateId.setter)}::int4, ${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.resume)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
        """.insertReturning(JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ZIO[ZConnection, Throwable, JobcandidateRow] = {
     val fs = List(
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4")),
-      Some((sql""""resume"""", sql"${Segment.paramSegment(unsaved.resume)(Setter.optionParamSetter(Setter[TypoXml]))}::xml")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4")),
+      Some((sql""""resume"""", sql"${Segment.paramSegment(unsaved.resume)(Setter.optionParamSetter(TypoXml.setter))}::xml")),
       unsaved.jobcandidateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""jobcandidateid"""", sql"${Segment.paramSegment(value: JobcandidateId)(Setter[JobcandidateId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""jobcandidateid"""", sql"${Segment.paramSegment(value: JobcandidateId)(JobcandidateId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -70,7 +70,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(JobcandidateRow.jdbcDecoder).selectStream
   }
   override def selectById(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Option[JobcandidateRow]] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(Setter[JobcandidateId])}""".query(JobcandidateRow.jdbcDecoder).selectOne
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".query(JobcandidateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): ZStream[ZConnection, Throwable, JobcandidateRow] = {
     sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${Segment.paramSegment(jobcandidateids)(JobcandidateId.arraySetter)})""".query(JobcandidateRow.jdbcDecoder).selectStream
@@ -78,10 +78,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Boolean] = {
     val jobcandidateid = row.jobcandidateid
     sql"""update humanresources.jobcandidate
-          set "businessentityid" = ${Segment.paramSegment(row.businessentityid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4,
-              "resume" = ${Segment.paramSegment(row.resume)(Setter.optionParamSetter(Setter[TypoXml]))}::xml,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(Setter[JobcandidateId])}""".update.map(_ > 0)
+          set "businessentityid" = ${Segment.paramSegment(row.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
+              "resume" = ${Segment.paramSegment(row.resume)(Setter.optionParamSetter(TypoXml.setter))}::xml,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
     UpdateBuilder("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.jdbcDecoder)
@@ -89,10 +89,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def upsert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, UpdateResult[JobcandidateRow]] = {
     sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.jobcandidateid)(Setter[JobcandidateId])}::int4,
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4,
-            ${Segment.paramSegment(unsaved.resume)(Setter.optionParamSetter(Setter[TypoXml]))}::xml,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.jobcandidateid)(JobcandidateId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
+            ${Segment.paramSegment(unsaved.resume)(Setter.optionParamSetter(TypoXml.setter))}::xml,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("jobcandidateid")
           do update set

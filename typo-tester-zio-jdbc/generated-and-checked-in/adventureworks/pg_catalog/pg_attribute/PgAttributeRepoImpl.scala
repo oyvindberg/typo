@@ -24,14 +24,14 @@ import zio.stream.ZStream
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_attribute where "attrelid" = ${Segment.paramSegment(compositeId.attrelid)(Setter.longSetter)} AND "attnum" = ${Segment.paramSegment(compositeId.attnum)(Setter[TypoShort])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_attribute where "attrelid" = ${Segment.paramSegment(compositeId.attrelid)(Setter.longSetter)} AND "attnum" = ${Segment.paramSegment(compositeId.attnum)(TypoShort.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgAttributeFields, PgAttributeRow] = {
     DeleteBuilder("pg_catalog.pg_attribute", PgAttributeFields)
   }
   override def insert(unsaved: PgAttributeRow): ZIO[ZConnection, Throwable, PgAttributeRow] = {
     sql"""insert into pg_catalog.pg_attribute("attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval")
-          values (${Segment.paramSegment(unsaved.attrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.attname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.atttypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.attstattarget)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.attlen)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.attnum)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.attndims)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.attcacheoff)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.atttypmod)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.attbyval)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.attalign)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attstorage)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attcompression)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attnotnull)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.atthasdef)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.atthasmissing)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.attidentity)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attgenerated)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attisdropped)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.attislocal)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.attinhcount)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.attcollation)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.attacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.attoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.attfdwoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.attmissingval)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray)
+          values (${Segment.paramSegment(unsaved.attrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.attname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.atttypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.attstattarget)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.attlen)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.attnum)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.attndims)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.attcacheoff)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.atttypmod)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.attbyval)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.attalign)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attstorage)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attcompression)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attnotnull)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.atthasdef)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.atthasmissing)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.attidentity)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attgenerated)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.attisdropped)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.attislocal)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.attinhcount)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.attcollation)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.attacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.attoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.attfdwoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.attmissingval)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray)
           returning "attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval"
        """.insertReturning(PgAttributeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -42,7 +42,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
     sql"""select "attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval" from pg_catalog.pg_attribute""".query(PgAttributeRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: PgAttributeId): ZIO[ZConnection, Throwable, Option[PgAttributeRow]] = {
-    sql"""select "attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval" from pg_catalog.pg_attribute where "attrelid" = ${Segment.paramSegment(compositeId.attrelid)(Setter.longSetter)} AND "attnum" = ${Segment.paramSegment(compositeId.attnum)(Setter[TypoShort])}""".query(PgAttributeRow.jdbcDecoder).selectOne
+    sql"""select "attrelid", "attname", "atttypid", "attstattarget", "attlen", "attnum", "attndims", "attcacheoff", "atttypmod", "attbyval", "attalign", "attstorage", "attcompression", "attnotnull", "atthasdef", "atthasmissing", "attidentity", "attgenerated", "attisdropped", "attislocal", "attinhcount", "attcollation", "attacl", "attoptions", "attfdwoptions", "attmissingval" from pg_catalog.pg_attribute where "attrelid" = ${Segment.paramSegment(compositeId.attrelid)(Setter.longSetter)} AND "attnum" = ${Segment.paramSegment(compositeId.attnum)(TypoShort.setter)}""".query(PgAttributeRow.jdbcDecoder).selectOne
   }
   override def selectByUnique(attrelid: /* oid */ Long, attname: String): ZIO[ZConnection, Throwable, Option[PgAttributeRow]] = {
     sql"""select "attrelid", "attname"
@@ -56,7 +56,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           set "attname" = ${Segment.paramSegment(row.attname)(Setter.stringSetter)}::name,
               "atttypid" = ${Segment.paramSegment(row.atttypid)(Setter.longSetter)}::oid,
               "attstattarget" = ${Segment.paramSegment(row.attstattarget)(Setter.intSetter)}::int4,
-              "attlen" = ${Segment.paramSegment(row.attlen)(Setter[TypoShort])}::int2,
+              "attlen" = ${Segment.paramSegment(row.attlen)(TypoShort.setter)}::int2,
               "attndims" = ${Segment.paramSegment(row.attndims)(Setter.intSetter)}::int4,
               "attcacheoff" = ${Segment.paramSegment(row.attcacheoff)(Setter.intSetter)}::int4,
               "atttypmod" = ${Segment.paramSegment(row.atttypmod)(Setter.intSetter)}::int4,
@@ -76,8 +76,8 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
               "attacl" = ${Segment.paramSegment(row.attacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem,
               "attoptions" = ${Segment.paramSegment(row.attoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
               "attfdwoptions" = ${Segment.paramSegment(row.attfdwoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
-              "attmissingval" = ${Segment.paramSegment(row.attmissingval)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray
-          where "attrelid" = ${Segment.paramSegment(compositeId.attrelid)(Setter.longSetter)} AND "attnum" = ${Segment.paramSegment(compositeId.attnum)(Setter[TypoShort])}""".update.map(_ > 0)
+              "attmissingval" = ${Segment.paramSegment(row.attmissingval)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray
+          where "attrelid" = ${Segment.paramSegment(compositeId.attrelid)(Setter.longSetter)} AND "attnum" = ${Segment.paramSegment(compositeId.attnum)(TypoShort.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgAttributeFields, PgAttributeRow] = {
     UpdateBuilder("pg_catalog.pg_attribute", PgAttributeFields, PgAttributeRow.jdbcDecoder)
@@ -89,8 +89,8 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
             ${Segment.paramSegment(unsaved.attname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.atttypid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.attstattarget)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.attlen)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.attnum)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.attlen)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.attnum)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.attndims)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.attcacheoff)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.atttypmod)(Setter.intSetter)}::int4,
@@ -110,7 +110,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
             ${Segment.paramSegment(unsaved.attacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem,
             ${Segment.paramSegment(unsaved.attoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
             ${Segment.paramSegment(unsaved.attfdwoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
-            ${Segment.paramSegment(unsaved.attmissingval)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray
+            ${Segment.paramSegment(unsaved.attmissingval)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray
           )
           on conflict ("attrelid", "attnum")
           do update set

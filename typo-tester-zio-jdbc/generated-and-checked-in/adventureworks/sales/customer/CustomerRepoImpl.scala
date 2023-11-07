@@ -27,33 +27,33 @@ import zio.stream.ZStream
 
 object CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.customer where "customerid" = ${Segment.paramSegment(customerid)(Setter[CustomerId])}""".delete.map(_ > 0)
+    sql"""delete from sales.customer where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
     DeleteBuilder("sales.customer", CustomerFields)
   }
   override def insert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, CustomerRow] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.customerid)(Setter[CustomerId])}::int4, ${Segment.paramSegment(unsaved.personid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4, ${Segment.paramSegment(unsaved.storeid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4, ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(Setter[SalesterritoryId]))}::int4, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.customerid)(CustomerId.setter)}::int4, ${Segment.paramSegment(unsaved.personid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.storeid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
        """.insertReturning(CustomerRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: CustomerRowUnsaved): ZIO[ZConnection, Throwable, CustomerRow] = {
     val fs = List(
-      Some((sql""""personid"""", sql"${Segment.paramSegment(unsaved.personid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4")),
-      Some((sql""""storeid"""", sql"${Segment.paramSegment(unsaved.storeid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4")),
-      Some((sql""""territoryid"""", sql"${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(Setter[SalesterritoryId]))}::int4")),
+      Some((sql""""personid"""", sql"${Segment.paramSegment(unsaved.personid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4")),
+      Some((sql""""storeid"""", sql"${Segment.paramSegment(unsaved.storeid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4")),
+      Some((sql""""territoryid"""", sql"${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4")),
       unsaved.customerid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""customerid"""", sql"${Segment.paramSegment(value: CustomerId)(Setter[CustomerId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""customerid"""", sql"${Segment.paramSegment(value: CustomerId)(CustomerId.setter)}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -76,7 +76,7 @@ object CustomerRepoImpl extends CustomerRepo {
     sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer""".query(CustomerRow.jdbcDecoder).selectStream
   }
   override def selectById(customerid: CustomerId): ZIO[ZConnection, Throwable, Option[CustomerRow]] = {
-    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ${Segment.paramSegment(customerid)(Setter[CustomerId])}""".query(CustomerRow.jdbcDecoder).selectOne
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".query(CustomerRow.jdbcDecoder).selectOne
   }
   override def selectByIds(customerids: Array[CustomerId]): ZStream[ZConnection, Throwable, CustomerRow] = {
     sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${Segment.paramSegment(customerids)(CustomerId.arraySetter)})""".query(CustomerRow.jdbcDecoder).selectStream
@@ -84,12 +84,12 @@ object CustomerRepoImpl extends CustomerRepo {
   override def update(row: CustomerRow): ZIO[ZConnection, Throwable, Boolean] = {
     val customerid = row.customerid
     sql"""update sales.customer
-          set "personid" = ${Segment.paramSegment(row.personid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4,
-              "storeid" = ${Segment.paramSegment(row.storeid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4,
-              "territoryid" = ${Segment.paramSegment(row.territoryid)(Setter.optionParamSetter(Setter[SalesterritoryId]))}::int4,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "customerid" = ${Segment.paramSegment(customerid)(Setter[CustomerId])}""".update.map(_ > 0)
+          set "personid" = ${Segment.paramSegment(row.personid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
+              "storeid" = ${Segment.paramSegment(row.storeid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
+              "territoryid" = ${Segment.paramSegment(row.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
     UpdateBuilder("sales.customer", CustomerFields, CustomerRow.jdbcDecoder)
@@ -97,12 +97,12 @@ object CustomerRepoImpl extends CustomerRepo {
   override def upsert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, UpdateResult[CustomerRow]] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.customerid)(Setter[CustomerId])}::int4,
-            ${Segment.paramSegment(unsaved.personid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4,
-            ${Segment.paramSegment(unsaved.storeid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4,
-            ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(Setter[SalesterritoryId]))}::int4,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.customerid)(CustomerId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.personid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
+            ${Segment.paramSegment(unsaved.storeid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
+            ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("customerid")
           do update set

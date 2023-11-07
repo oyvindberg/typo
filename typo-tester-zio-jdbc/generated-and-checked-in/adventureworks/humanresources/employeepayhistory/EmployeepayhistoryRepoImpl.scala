@@ -26,26 +26,26 @@ import zio.stream.ZStream
 
 object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from humanresources.employeepayhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(Setter[TypoLocalDateTime])}""".delete.map(_ > 0)
+    sql"""delete from humanresources.employeepayhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields)
   }
   override def insert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
-          values (${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.ratechangedate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.rate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.payfrequency)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.ratechangedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.rate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.payfrequency)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
        """.insertReturning(EmployeepayhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved): ZIO[ZConnection, Throwable, EmployeepayhistoryRow] = {
     val fs = List(
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4")),
-      Some((sql""""ratechangedate"""", sql"${Segment.paramSegment(unsaved.ratechangedate)(Setter[TypoLocalDateTime])}::timestamp")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
+      Some((sql""""ratechangedate"""", sql"${Segment.paramSegment(unsaved.ratechangedate)(TypoLocalDateTime.setter)}::timestamp")),
       Some((sql""""rate"""", sql"${Segment.paramSegment(unsaved.rate)(Setter.bigDecimalScalaSetter)}::numeric")),
-      Some((sql""""payfrequency"""", sql"${Segment.paramSegment(unsaved.payfrequency)(Setter[TypoShort])}::int2")),
+      Some((sql""""payfrequency"""", sql"${Segment.paramSegment(unsaved.payfrequency)(TypoShort.setter)}::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -68,15 +68,15 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory""".query(EmployeepayhistoryRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Option[EmployeepayhistoryRow]] = {
-    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(Setter[TypoLocalDateTime])}""".query(EmployeepayhistoryRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(TypoLocalDateTime.setter)}""".query(EmployeepayhistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update humanresources.employeepayhistory
           set "rate" = ${Segment.paramSegment(row.rate)(Setter.bigDecimalScalaSetter)}::numeric,
-              "payfrequency" = ${Segment.paramSegment(row.payfrequency)(Setter[TypoShort])}::int2,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(Setter[TypoLocalDateTime])}""".update.map(_ > 0)
+              "payfrequency" = ${Segment.paramSegment(row.payfrequency)(TypoShort.setter)}::int2,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(TypoLocalDateTime.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields, EmployeepayhistoryRow.jdbcDecoder)
@@ -84,11 +84,11 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def upsert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeepayhistoryRow]] = {
     sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4,
-            ${Segment.paramSegment(unsaved.ratechangedate)(Setter[TypoLocalDateTime])}::timestamp,
+            ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.ratechangedate)(TypoLocalDateTime.setter)}::timestamp,
             ${Segment.paramSegment(unsaved.rate)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.payfrequency)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.payfrequency)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("businessentityid", "ratechangedate")
           do update set

@@ -23,14 +23,14 @@ import zio.stream.ZStream
 
 object PgStatisticRepoImpl extends PgStatisticRepo {
   override def delete(compositeId: PgStatisticId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_statistic where "starelid" = ${Segment.paramSegment(compositeId.starelid)(Setter.longSetter)} AND "staattnum" = ${Segment.paramSegment(compositeId.staattnum)(Setter[TypoShort])} AND "stainherit" = ${Segment.paramSegment(compositeId.stainherit)(Setter.booleanSetter)}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_statistic where "starelid" = ${Segment.paramSegment(compositeId.starelid)(Setter.longSetter)} AND "staattnum" = ${Segment.paramSegment(compositeId.staattnum)(TypoShort.setter)} AND "stainherit" = ${Segment.paramSegment(compositeId.stainherit)(Setter.booleanSetter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgStatisticFields, PgStatisticRow] = {
     DeleteBuilder("pg_catalog.pg_statistic", PgStatisticFields)
   }
   override def insert(unsaved: PgStatisticRow): ZIO[ZConnection, Throwable, PgStatisticRow] = {
     sql"""insert into pg_catalog.pg_statistic("starelid", "staattnum", "stainherit", "stanullfrac", "stawidth", "stadistinct", "stakind1", "stakind2", "stakind3", "stakind4", "stakind5", "staop1", "staop2", "staop3", "staop4", "staop5", "stacoll1", "stacoll2", "stacoll3", "stacoll4", "stacoll5", "stanumbers1", "stanumbers2", "stanumbers3", "stanumbers4", "stanumbers5", "stavalues1", "stavalues2", "stavalues3", "stavalues4", "stavalues5")
-          values (${Segment.paramSegment(unsaved.starelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staattnum)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.stainherit)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.stanullfrac)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.stawidth)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.stadistinct)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.stakind1)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.stakind2)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.stakind3)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.stakind4)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.stakind5)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.staop1)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staop2)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staop3)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staop4)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staop5)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll1)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll2)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll3)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll4)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll5)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stanumbers1)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stanumbers2)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stanumbers3)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stanumbers4)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stanumbers5)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stavalues1)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray, ${Segment.paramSegment(unsaved.stavalues2)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray, ${Segment.paramSegment(unsaved.stavalues3)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray, ${Segment.paramSegment(unsaved.stavalues4)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray, ${Segment.paramSegment(unsaved.stavalues5)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray)
+          values (${Segment.paramSegment(unsaved.starelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staattnum)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.stainherit)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.stanullfrac)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.stawidth)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.stadistinct)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.stakind1)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.stakind2)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.stakind3)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.stakind4)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.stakind5)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.staop1)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staop2)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staop3)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staop4)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.staop5)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll1)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll2)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll3)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll4)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stacoll5)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stanumbers1)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stanumbers2)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stanumbers3)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stanumbers4)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stanumbers5)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4, ${Segment.paramSegment(unsaved.stavalues1)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray, ${Segment.paramSegment(unsaved.stavalues2)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray, ${Segment.paramSegment(unsaved.stavalues3)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray, ${Segment.paramSegment(unsaved.stavalues4)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray, ${Segment.paramSegment(unsaved.stavalues5)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray)
           returning "starelid", "staattnum", "stainherit", "stanullfrac", "stawidth", "stadistinct", "stakind1", "stakind2", "stakind3", "stakind4", "stakind5", "staop1", "staop2", "staop3", "staop4", "staop5", "stacoll1", "stacoll2", "stacoll3", "stacoll4", "stacoll5", "stanumbers1", "stanumbers2", "stanumbers3", "stanumbers4", "stanumbers5", "stavalues1", "stavalues2", "stavalues3", "stavalues4", "stavalues5"
        """.insertReturning(PgStatisticRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,7 +41,7 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
     sql"""select "starelid", "staattnum", "stainherit", "stanullfrac", "stawidth", "stadistinct", "stakind1", "stakind2", "stakind3", "stakind4", "stakind5", "staop1", "staop2", "staop3", "staop4", "staop5", "stacoll1", "stacoll2", "stacoll3", "stacoll4", "stacoll5", "stanumbers1", "stanumbers2", "stanumbers3", "stanumbers4", "stanumbers5", "stavalues1", "stavalues2", "stavalues3", "stavalues4", "stavalues5" from pg_catalog.pg_statistic""".query(PgStatisticRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: PgStatisticId): ZIO[ZConnection, Throwable, Option[PgStatisticRow]] = {
-    sql"""select "starelid", "staattnum", "stainherit", "stanullfrac", "stawidth", "stadistinct", "stakind1", "stakind2", "stakind3", "stakind4", "stakind5", "staop1", "staop2", "staop3", "staop4", "staop5", "stacoll1", "stacoll2", "stacoll3", "stacoll4", "stacoll5", "stanumbers1", "stanumbers2", "stanumbers3", "stanumbers4", "stanumbers5", "stavalues1", "stavalues2", "stavalues3", "stavalues4", "stavalues5" from pg_catalog.pg_statistic where "starelid" = ${Segment.paramSegment(compositeId.starelid)(Setter.longSetter)} AND "staattnum" = ${Segment.paramSegment(compositeId.staattnum)(Setter[TypoShort])} AND "stainherit" = ${Segment.paramSegment(compositeId.stainherit)(Setter.booleanSetter)}""".query(PgStatisticRow.jdbcDecoder).selectOne
+    sql"""select "starelid", "staattnum", "stainherit", "stanullfrac", "stawidth", "stadistinct", "stakind1", "stakind2", "stakind3", "stakind4", "stakind5", "staop1", "staop2", "staop3", "staop4", "staop5", "stacoll1", "stacoll2", "stacoll3", "stacoll4", "stacoll5", "stanumbers1", "stanumbers2", "stanumbers3", "stanumbers4", "stanumbers5", "stavalues1", "stavalues2", "stavalues3", "stavalues4", "stavalues5" from pg_catalog.pg_statistic where "starelid" = ${Segment.paramSegment(compositeId.starelid)(Setter.longSetter)} AND "staattnum" = ${Segment.paramSegment(compositeId.staattnum)(TypoShort.setter)} AND "stainherit" = ${Segment.paramSegment(compositeId.stainherit)(Setter.booleanSetter)}""".query(PgStatisticRow.jdbcDecoder).selectOne
   }
   override def update(row: PgStatisticRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -49,11 +49,11 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
           set "stanullfrac" = ${Segment.paramSegment(row.stanullfrac)(Setter.floatSetter)}::float4,
               "stawidth" = ${Segment.paramSegment(row.stawidth)(Setter.intSetter)}::int4,
               "stadistinct" = ${Segment.paramSegment(row.stadistinct)(Setter.floatSetter)}::float4,
-              "stakind1" = ${Segment.paramSegment(row.stakind1)(Setter[TypoShort])}::int2,
-              "stakind2" = ${Segment.paramSegment(row.stakind2)(Setter[TypoShort])}::int2,
-              "stakind3" = ${Segment.paramSegment(row.stakind3)(Setter[TypoShort])}::int2,
-              "stakind4" = ${Segment.paramSegment(row.stakind4)(Setter[TypoShort])}::int2,
-              "stakind5" = ${Segment.paramSegment(row.stakind5)(Setter[TypoShort])}::int2,
+              "stakind1" = ${Segment.paramSegment(row.stakind1)(TypoShort.setter)}::int2,
+              "stakind2" = ${Segment.paramSegment(row.stakind2)(TypoShort.setter)}::int2,
+              "stakind3" = ${Segment.paramSegment(row.stakind3)(TypoShort.setter)}::int2,
+              "stakind4" = ${Segment.paramSegment(row.stakind4)(TypoShort.setter)}::int2,
+              "stakind5" = ${Segment.paramSegment(row.stakind5)(TypoShort.setter)}::int2,
               "staop1" = ${Segment.paramSegment(row.staop1)(Setter.longSetter)}::oid,
               "staop2" = ${Segment.paramSegment(row.staop2)(Setter.longSetter)}::oid,
               "staop3" = ${Segment.paramSegment(row.staop3)(Setter.longSetter)}::oid,
@@ -69,12 +69,12 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
               "stanumbers3" = ${Segment.paramSegment(row.stanumbers3)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4,
               "stanumbers4" = ${Segment.paramSegment(row.stanumbers4)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4,
               "stanumbers5" = ${Segment.paramSegment(row.stanumbers5)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4,
-              "stavalues1" = ${Segment.paramSegment(row.stavalues1)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray,
-              "stavalues2" = ${Segment.paramSegment(row.stavalues2)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray,
-              "stavalues3" = ${Segment.paramSegment(row.stavalues3)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray,
-              "stavalues4" = ${Segment.paramSegment(row.stavalues4)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray,
-              "stavalues5" = ${Segment.paramSegment(row.stavalues5)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray
-          where "starelid" = ${Segment.paramSegment(compositeId.starelid)(Setter.longSetter)} AND "staattnum" = ${Segment.paramSegment(compositeId.staattnum)(Setter[TypoShort])} AND "stainherit" = ${Segment.paramSegment(compositeId.stainherit)(Setter.booleanSetter)}""".update.map(_ > 0)
+              "stavalues1" = ${Segment.paramSegment(row.stavalues1)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray,
+              "stavalues2" = ${Segment.paramSegment(row.stavalues2)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray,
+              "stavalues3" = ${Segment.paramSegment(row.stavalues3)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray,
+              "stavalues4" = ${Segment.paramSegment(row.stavalues4)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray,
+              "stavalues5" = ${Segment.paramSegment(row.stavalues5)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray
+          where "starelid" = ${Segment.paramSegment(compositeId.starelid)(Setter.longSetter)} AND "staattnum" = ${Segment.paramSegment(compositeId.staattnum)(TypoShort.setter)} AND "stainherit" = ${Segment.paramSegment(compositeId.stainherit)(Setter.booleanSetter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgStatisticFields, PgStatisticRow] = {
     UpdateBuilder("pg_catalog.pg_statistic", PgStatisticFields, PgStatisticRow.jdbcDecoder)
@@ -83,16 +83,16 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
     sql"""insert into pg_catalog.pg_statistic("starelid", "staattnum", "stainherit", "stanullfrac", "stawidth", "stadistinct", "stakind1", "stakind2", "stakind3", "stakind4", "stakind5", "staop1", "staop2", "staop3", "staop4", "staop5", "stacoll1", "stacoll2", "stacoll3", "stacoll4", "stacoll5", "stanumbers1", "stanumbers2", "stanumbers3", "stanumbers4", "stanumbers5", "stavalues1", "stavalues2", "stavalues3", "stavalues4", "stavalues5")
           values (
             ${Segment.paramSegment(unsaved.starelid)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.staattnum)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.staattnum)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.stainherit)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.stanullfrac)(Setter.floatSetter)}::float4,
             ${Segment.paramSegment(unsaved.stawidth)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.stadistinct)(Setter.floatSetter)}::float4,
-            ${Segment.paramSegment(unsaved.stakind1)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.stakind2)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.stakind3)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.stakind4)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.stakind5)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.stakind1)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.stakind2)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.stakind3)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.stakind4)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.stakind5)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.staop1)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.staop2)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.staop3)(Setter.longSetter)}::oid,
@@ -108,11 +108,11 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
             ${Segment.paramSegment(unsaved.stanumbers3)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4,
             ${Segment.paramSegment(unsaved.stanumbers4)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4,
             ${Segment.paramSegment(unsaved.stanumbers5)(Setter.optionParamSetter(adventureworks.FloatArraySetter))}::_float4,
-            ${Segment.paramSegment(unsaved.stavalues1)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray,
-            ${Segment.paramSegment(unsaved.stavalues2)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray,
-            ${Segment.paramSegment(unsaved.stavalues3)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray,
-            ${Segment.paramSegment(unsaved.stavalues4)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray,
-            ${Segment.paramSegment(unsaved.stavalues5)(Setter.optionParamSetter(Setter[TypoAnyArray]))}::anyarray
+            ${Segment.paramSegment(unsaved.stavalues1)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray,
+            ${Segment.paramSegment(unsaved.stavalues2)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray,
+            ${Segment.paramSegment(unsaved.stavalues3)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray,
+            ${Segment.paramSegment(unsaved.stavalues4)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray,
+            ${Segment.paramSegment(unsaved.stavalues5)(Setter.optionParamSetter(TypoAnyArray.setter))}::anyarray
           )
           on conflict ("starelid", "staattnum", "stainherit")
           do update set

@@ -23,14 +23,14 @@ import zio.stream.ZStream
 
 object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def delete(oid: PgAttrdefId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_attrdef where "oid" = ${Segment.paramSegment(oid)(Setter[PgAttrdefId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_attrdef where "oid" = ${Segment.paramSegment(oid)(PgAttrdefId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgAttrdefFields, PgAttrdefRow] = {
     DeleteBuilder("pg_catalog.pg_attrdef", PgAttrdefFields)
   }
   override def insert(unsaved: PgAttrdefRow): ZIO[ZConnection, Throwable, PgAttrdefRow] = {
     sql"""insert into pg_catalog.pg_attrdef("oid", "adrelid", "adnum", "adbin")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgAttrdefId])}::oid, ${Segment.paramSegment(unsaved.adrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.adnum)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.adbin)(Setter[TypoPgNodeTree])}::pg_node_tree)
+          values (${Segment.paramSegment(unsaved.oid)(PgAttrdefId.setter)}::oid, ${Segment.paramSegment(unsaved.adrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.adnum)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.adbin)(TypoPgNodeTree.setter)}::pg_node_tree)
           returning "oid", "adrelid", "adnum", "adbin"
        """.insertReturning(PgAttrdefRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,7 +41,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
     sql"""select "oid", "adrelid", "adnum", "adbin" from pg_catalog.pg_attrdef""".query(PgAttrdefRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgAttrdefId): ZIO[ZConnection, Throwable, Option[PgAttrdefRow]] = {
-    sql"""select "oid", "adrelid", "adnum", "adbin" from pg_catalog.pg_attrdef where "oid" = ${Segment.paramSegment(oid)(Setter[PgAttrdefId])}""".query(PgAttrdefRow.jdbcDecoder).selectOne
+    sql"""select "oid", "adrelid", "adnum", "adbin" from pg_catalog.pg_attrdef where "oid" = ${Segment.paramSegment(oid)(PgAttrdefId.setter)}""".query(PgAttrdefRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgAttrdefId]): ZStream[ZConnection, Throwable, PgAttrdefRow] = {
     sql"""select "oid", "adrelid", "adnum", "adbin" from pg_catalog.pg_attrdef where "oid" = ANY(${Segment.paramSegment(oids)(PgAttrdefId.arraySetter)})""".query(PgAttrdefRow.jdbcDecoder).selectStream
@@ -49,16 +49,16 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def selectByUnique(adrelid: /* oid */ Long, adnum: TypoShort): ZIO[ZConnection, Throwable, Option[PgAttrdefRow]] = {
     sql"""select "adrelid", "adnum"
           from pg_catalog.pg_attrdef
-          where "adrelid" = ${Segment.paramSegment(adrelid)(Setter.longSetter)} AND "adnum" = ${Segment.paramSegment(adnum)(Setter[TypoShort])}
+          where "adrelid" = ${Segment.paramSegment(adrelid)(Setter.longSetter)} AND "adnum" = ${Segment.paramSegment(adnum)(TypoShort.setter)}
        """.query(PgAttrdefRow.jdbcDecoder).selectOne
   }
   override def update(row: PgAttrdefRow): ZIO[ZConnection, Throwable, Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_attrdef
           set "adrelid" = ${Segment.paramSegment(row.adrelid)(Setter.longSetter)}::oid,
-              "adnum" = ${Segment.paramSegment(row.adnum)(Setter[TypoShort])}::int2,
-              "adbin" = ${Segment.paramSegment(row.adbin)(Setter[TypoPgNodeTree])}::pg_node_tree
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgAttrdefId])}""".update.map(_ > 0)
+              "adnum" = ${Segment.paramSegment(row.adnum)(TypoShort.setter)}::int2,
+              "adbin" = ${Segment.paramSegment(row.adbin)(TypoPgNodeTree.setter)}::pg_node_tree
+          where "oid" = ${Segment.paramSegment(oid)(PgAttrdefId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgAttrdefFields, PgAttrdefRow] = {
     UpdateBuilder("pg_catalog.pg_attrdef", PgAttrdefFields, PgAttrdefRow.jdbcDecoder)
@@ -66,10 +66,10 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def upsert(unsaved: PgAttrdefRow): ZIO[ZConnection, Throwable, UpdateResult[PgAttrdefRow]] = {
     sql"""insert into pg_catalog.pg_attrdef("oid", "adrelid", "adnum", "adbin")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgAttrdefId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgAttrdefId.setter)}::oid,
             ${Segment.paramSegment(unsaved.adrelid)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.adnum)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.adbin)(Setter[TypoPgNodeTree])}::pg_node_tree
+            ${Segment.paramSegment(unsaved.adnum)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.adbin)(TypoPgNodeTree.setter)}::pg_node_tree
           )
           on conflict ("oid")
           do update set

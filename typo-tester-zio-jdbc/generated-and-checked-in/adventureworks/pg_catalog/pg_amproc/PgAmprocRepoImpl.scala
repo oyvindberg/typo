@@ -23,14 +23,14 @@ import zio.stream.ZStream
 
 object PgAmprocRepoImpl extends PgAmprocRepo {
   override def delete(oid: PgAmprocId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_amproc where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmprocId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_amproc where "oid" = ${Segment.paramSegment(oid)(PgAmprocId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgAmprocFields, PgAmprocRow] = {
     DeleteBuilder("pg_catalog.pg_amproc", PgAmprocFields)
   }
   override def insert(unsaved: PgAmprocRow): ZIO[ZConnection, Throwable, PgAmprocRow] = {
     sql"""insert into pg_catalog.pg_amproc("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgAmprocId])}::oid, ${Segment.paramSegment(unsaved.amprocfamily)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amproclefttype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amprocrighttype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amprocnum)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.amproc)(Setter[TypoRegproc])}::regproc)
+          values (${Segment.paramSegment(unsaved.oid)(PgAmprocId.setter)}::oid, ${Segment.paramSegment(unsaved.amprocfamily)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amproclefttype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amprocrighttype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amprocnum)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.amproc)(TypoRegproc.setter)}::regproc)
           returning "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc"
        """.insertReturning(PgAmprocRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,7 +41,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
     sql"""select "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc" from pg_catalog.pg_amproc""".query(PgAmprocRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgAmprocId): ZIO[ZConnection, Throwable, Option[PgAmprocRow]] = {
-    sql"""select "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc" from pg_catalog.pg_amproc where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmprocId])}""".query(PgAmprocRow.jdbcDecoder).selectOne
+    sql"""select "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc" from pg_catalog.pg_amproc where "oid" = ${Segment.paramSegment(oid)(PgAmprocId.setter)}""".query(PgAmprocRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgAmprocId]): ZStream[ZConnection, Throwable, PgAmprocRow] = {
     sql"""select "oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc" from pg_catalog.pg_amproc where "oid" = ANY(${Segment.paramSegment(oids)(PgAmprocId.arraySetter)})""".query(PgAmprocRow.jdbcDecoder).selectStream
@@ -49,7 +49,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   override def selectByUnique(amprocfamily: /* oid */ Long, amproclefttype: /* oid */ Long, amprocrighttype: /* oid */ Long, amprocnum: TypoShort): ZIO[ZConnection, Throwable, Option[PgAmprocRow]] = {
     sql"""select "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum"
           from pg_catalog.pg_amproc
-          where "amprocfamily" = ${Segment.paramSegment(amprocfamily)(Setter.longSetter)} AND "amproclefttype" = ${Segment.paramSegment(amproclefttype)(Setter.longSetter)} AND "amprocrighttype" = ${Segment.paramSegment(amprocrighttype)(Setter.longSetter)} AND "amprocnum" = ${Segment.paramSegment(amprocnum)(Setter[TypoShort])}
+          where "amprocfamily" = ${Segment.paramSegment(amprocfamily)(Setter.longSetter)} AND "amproclefttype" = ${Segment.paramSegment(amproclefttype)(Setter.longSetter)} AND "amprocrighttype" = ${Segment.paramSegment(amprocrighttype)(Setter.longSetter)} AND "amprocnum" = ${Segment.paramSegment(amprocnum)(TypoShort.setter)}
        """.query(PgAmprocRow.jdbcDecoder).selectOne
   }
   override def update(row: PgAmprocRow): ZIO[ZConnection, Throwable, Boolean] = {
@@ -58,9 +58,9 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
           set "amprocfamily" = ${Segment.paramSegment(row.amprocfamily)(Setter.longSetter)}::oid,
               "amproclefttype" = ${Segment.paramSegment(row.amproclefttype)(Setter.longSetter)}::oid,
               "amprocrighttype" = ${Segment.paramSegment(row.amprocrighttype)(Setter.longSetter)}::oid,
-              "amprocnum" = ${Segment.paramSegment(row.amprocnum)(Setter[TypoShort])}::int2,
-              "amproc" = ${Segment.paramSegment(row.amproc)(Setter[TypoRegproc])}::regproc
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmprocId])}""".update.map(_ > 0)
+              "amprocnum" = ${Segment.paramSegment(row.amprocnum)(TypoShort.setter)}::int2,
+              "amproc" = ${Segment.paramSegment(row.amproc)(TypoRegproc.setter)}::regproc
+          where "oid" = ${Segment.paramSegment(oid)(PgAmprocId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgAmprocFields, PgAmprocRow] = {
     UpdateBuilder("pg_catalog.pg_amproc", PgAmprocFields, PgAmprocRow.jdbcDecoder)
@@ -68,12 +68,12 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
   override def upsert(unsaved: PgAmprocRow): ZIO[ZConnection, Throwable, UpdateResult[PgAmprocRow]] = {
     sql"""insert into pg_catalog.pg_amproc("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgAmprocId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgAmprocId.setter)}::oid,
             ${Segment.paramSegment(unsaved.amprocfamily)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.amproclefttype)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.amprocrighttype)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.amprocnum)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.amproc)(Setter[TypoRegproc])}::regproc
+            ${Segment.paramSegment(unsaved.amprocnum)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.amproc)(TypoRegproc.setter)}::regproc
           )
           on conflict ("oid")
           do update set

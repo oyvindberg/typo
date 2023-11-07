@@ -27,33 +27,33 @@ import zio.stream.ZStream
 
 object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(Setter[WorkorderId])} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(Setter[TypoShort])}""".delete.map(_ > 0)
+    sql"""delete from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     DeleteBuilder("production.workorderrouting", WorkorderroutingFields)
   }
   override def insert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, WorkorderroutingRow] = {
     sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
-          values (${Segment.paramSegment(unsaved.workorderid)(Setter[WorkorderId])}::int4, ${Segment.paramSegment(unsaved.productid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.operationsequence)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.locationid)(Setter[LocationId])}::int2, ${Segment.paramSegment(unsaved.scheduledstartdate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.scheduledenddate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.actualstartdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.actualenddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.actualresourcehrs)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.plannedcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.actualcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.operationsequence)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int2, ${Segment.paramSegment(unsaved.scheduledstartdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.scheduledenddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.actualstartdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.actualenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.actualresourcehrs)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.plannedcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.actualcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
        """.insertReturning(WorkorderroutingRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved): ZIO[ZConnection, Throwable, WorkorderroutingRow] = {
     val fs = List(
-      Some((sql""""workorderid"""", sql"${Segment.paramSegment(unsaved.workorderid)(Setter[WorkorderId])}::int4")),
+      Some((sql""""workorderid"""", sql"${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4")),
       Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter.intSetter)}::int4")),
-      Some((sql""""operationsequence"""", sql"${Segment.paramSegment(unsaved.operationsequence)(Setter[TypoShort])}::int2")),
-      Some((sql""""locationid"""", sql"${Segment.paramSegment(unsaved.locationid)(Setter[LocationId])}::int2")),
-      Some((sql""""scheduledstartdate"""", sql"${Segment.paramSegment(unsaved.scheduledstartdate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""scheduledenddate"""", sql"${Segment.paramSegment(unsaved.scheduledenddate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""actualstartdate"""", sql"${Segment.paramSegment(unsaved.actualstartdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
-      Some((sql""""actualenddate"""", sql"${Segment.paramSegment(unsaved.actualenddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
+      Some((sql""""operationsequence"""", sql"${Segment.paramSegment(unsaved.operationsequence)(TypoShort.setter)}::int2")),
+      Some((sql""""locationid"""", sql"${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int2")),
+      Some((sql""""scheduledstartdate"""", sql"${Segment.paramSegment(unsaved.scheduledstartdate)(TypoLocalDateTime.setter)}::timestamp")),
+      Some((sql""""scheduledenddate"""", sql"${Segment.paramSegment(unsaved.scheduledenddate)(TypoLocalDateTime.setter)}::timestamp")),
+      Some((sql""""actualstartdate"""", sql"${Segment.paramSegment(unsaved.actualstartdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
+      Some((sql""""actualenddate"""", sql"${Segment.paramSegment(unsaved.actualenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
       Some((sql""""actualresourcehrs"""", sql"${Segment.paramSegment(unsaved.actualresourcehrs)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric")),
       Some((sql""""plannedcost"""", sql"${Segment.paramSegment(unsaved.plannedcost)(Setter.bigDecimalScalaSetter)}::numeric")),
       Some((sql""""actualcost"""", sql"${Segment.paramSegment(unsaved.actualcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -76,21 +76,21 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting""".query(WorkorderroutingRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Option[WorkorderroutingRow]] = {
-    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(Setter[WorkorderId])} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(Setter[TypoShort])}""".query(WorkorderroutingRow.jdbcDecoder).selectOne
+    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".query(WorkorderroutingRow.jdbcDecoder).selectOne
   }
   override def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.workorderrouting
-          set "locationid" = ${Segment.paramSegment(row.locationid)(Setter[LocationId])}::int2,
-              "scheduledstartdate" = ${Segment.paramSegment(row.scheduledstartdate)(Setter[TypoLocalDateTime])}::timestamp,
-              "scheduledenddate" = ${Segment.paramSegment(row.scheduledenddate)(Setter[TypoLocalDateTime])}::timestamp,
-              "actualstartdate" = ${Segment.paramSegment(row.actualstartdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-              "actualenddate" = ${Segment.paramSegment(row.actualenddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
+          set "locationid" = ${Segment.paramSegment(row.locationid)(LocationId.setter)}::int2,
+              "scheduledstartdate" = ${Segment.paramSegment(row.scheduledstartdate)(TypoLocalDateTime.setter)}::timestamp,
+              "scheduledenddate" = ${Segment.paramSegment(row.scheduledenddate)(TypoLocalDateTime.setter)}::timestamp,
+              "actualstartdate" = ${Segment.paramSegment(row.actualstartdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+              "actualenddate" = ${Segment.paramSegment(row.actualenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
               "actualresourcehrs" = ${Segment.paramSegment(row.actualresourcehrs)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
               "plannedcost" = ${Segment.paramSegment(row.plannedcost)(Setter.bigDecimalScalaSetter)}::numeric,
               "actualcost" = ${Segment.paramSegment(row.actualcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(Setter[WorkorderId])} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(Setter[TypoShort])}""".update.map(_ > 0)
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     UpdateBuilder("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.jdbcDecoder)
@@ -98,18 +98,18 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def upsert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderroutingRow]] = {
     sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.workorderid)(Setter[WorkorderId])}::int4,
+            ${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4,
             ${Segment.paramSegment(unsaved.productid)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.operationsequence)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.locationid)(Setter[LocationId])}::int2,
-            ${Segment.paramSegment(unsaved.scheduledstartdate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.scheduledenddate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.actualstartdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-            ${Segment.paramSegment(unsaved.actualenddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
+            ${Segment.paramSegment(unsaved.operationsequence)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int2,
+            ${Segment.paramSegment(unsaved.scheduledstartdate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.scheduledenddate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.actualstartdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+            ${Segment.paramSegment(unsaved.actualenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
             ${Segment.paramSegment(unsaved.actualresourcehrs)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
             ${Segment.paramSegment(unsaved.plannedcost)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.actualcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("workorderid", "productid", "operationsequence")
           do update set

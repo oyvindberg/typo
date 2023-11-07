@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgTsParserRepoImpl extends PgTsParserRepo {
   override def delete(oid: PgTsParserId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_ts_parser where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsParserId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_ts_parser where "oid" = ${Segment.paramSegment(oid)(PgTsParserId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTsParserFields, PgTsParserRow] = {
     DeleteBuilder("pg_catalog.pg_ts_parser", PgTsParserFields)
   }
   override def insert(unsaved: PgTsParserRow): ZIO[ZConnection, Throwable, PgTsParserRow] = {
     sql"""insert into pg_catalog.pg_ts_parser("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgTsParserId])}::oid, ${Segment.paramSegment(unsaved.prsname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.prsnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.prsstart)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.prstoken)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.prsend)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.prsheadline)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.prslextype)(Setter[TypoRegproc])}::regproc)
+          values (${Segment.paramSegment(unsaved.oid)(PgTsParserId.setter)}::oid, ${Segment.paramSegment(unsaved.prsname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.prsnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.prsstart)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.prstoken)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.prsend)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.prsheadline)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.prslextype)(TypoRegproc.setter)}::regproc)
           returning "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype"
        """.insertReturning(PgTsParserRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     sql"""select "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype" from pg_catalog.pg_ts_parser""".query(PgTsParserRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgTsParserId): ZIO[ZConnection, Throwable, Option[PgTsParserRow]] = {
-    sql"""select "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype" from pg_catalog.pg_ts_parser where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsParserId])}""".query(PgTsParserRow.jdbcDecoder).selectOne
+    sql"""select "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype" from pg_catalog.pg_ts_parser where "oid" = ${Segment.paramSegment(oid)(PgTsParserId.setter)}""".query(PgTsParserRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgTsParserId]): ZStream[ZConnection, Throwable, PgTsParserRow] = {
     sql"""select "oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype" from pg_catalog.pg_ts_parser where "oid" = ANY(${Segment.paramSegment(oids)(PgTsParserId.arraySetter)})""".query(PgTsParserRow.jdbcDecoder).selectStream
@@ -56,12 +56,12 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     sql"""update pg_catalog.pg_ts_parser
           set "prsname" = ${Segment.paramSegment(row.prsname)(Setter.stringSetter)}::name,
               "prsnamespace" = ${Segment.paramSegment(row.prsnamespace)(Setter.longSetter)}::oid,
-              "prsstart" = ${Segment.paramSegment(row.prsstart)(Setter[TypoRegproc])}::regproc,
-              "prstoken" = ${Segment.paramSegment(row.prstoken)(Setter[TypoRegproc])}::regproc,
-              "prsend" = ${Segment.paramSegment(row.prsend)(Setter[TypoRegproc])}::regproc,
-              "prsheadline" = ${Segment.paramSegment(row.prsheadline)(Setter[TypoRegproc])}::regproc,
-              "prslextype" = ${Segment.paramSegment(row.prslextype)(Setter[TypoRegproc])}::regproc
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsParserId])}""".update.map(_ > 0)
+              "prsstart" = ${Segment.paramSegment(row.prsstart)(TypoRegproc.setter)}::regproc,
+              "prstoken" = ${Segment.paramSegment(row.prstoken)(TypoRegproc.setter)}::regproc,
+              "prsend" = ${Segment.paramSegment(row.prsend)(TypoRegproc.setter)}::regproc,
+              "prsheadline" = ${Segment.paramSegment(row.prsheadline)(TypoRegproc.setter)}::regproc,
+              "prslextype" = ${Segment.paramSegment(row.prslextype)(TypoRegproc.setter)}::regproc
+          where "oid" = ${Segment.paramSegment(oid)(PgTsParserId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgTsParserFields, PgTsParserRow] = {
     UpdateBuilder("pg_catalog.pg_ts_parser", PgTsParserFields, PgTsParserRow.jdbcDecoder)
@@ -69,14 +69,14 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
   override def upsert(unsaved: PgTsParserRow): ZIO[ZConnection, Throwable, UpdateResult[PgTsParserRow]] = {
     sql"""insert into pg_catalog.pg_ts_parser("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgTsParserId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgTsParserId.setter)}::oid,
             ${Segment.paramSegment(unsaved.prsname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.prsnamespace)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.prsstart)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.prstoken)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.prsend)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.prsheadline)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.prslextype)(Setter[TypoRegproc])}::regproc
+            ${Segment.paramSegment(unsaved.prsstart)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.prstoken)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.prsend)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.prsheadline)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.prslextype)(TypoRegproc.setter)}::regproc
           )
           on conflict ("oid")
           do update set

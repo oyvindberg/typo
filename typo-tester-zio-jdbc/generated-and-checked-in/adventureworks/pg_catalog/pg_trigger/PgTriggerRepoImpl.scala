@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 object PgTriggerRepoImpl extends PgTriggerRepo {
   override def delete(oid: PgTriggerId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_trigger where "oid" = ${Segment.paramSegment(oid)(Setter[PgTriggerId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_trigger where "oid" = ${Segment.paramSegment(oid)(PgTriggerId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTriggerFields, PgTriggerRow] = {
     DeleteBuilder("pg_catalog.pg_trigger", PgTriggerFields)
   }
   override def insert(unsaved: PgTriggerRow): ZIO[ZConnection, Throwable, PgTriggerRow] = {
     sql"""insert into pg_catalog.pg_trigger("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgTriggerId])}::oid, ${Segment.paramSegment(unsaved.tgrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgparentid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.tgfoid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgtype)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.tgenabled)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.tgisinternal)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.tgconstrrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgconstrindid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgconstraint)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgdeferrable)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.tginitdeferred)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.tgnargs)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.tgattr)(Setter[TypoInt2Vector])}::int2vector, ${Segment.paramSegment(unsaved.tgargs)(Setter[TypoBytea])}::bytea, ${Segment.paramSegment(unsaved.tgqual)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree, ${Segment.paramSegment(unsaved.tgoldtable)(Setter.optionParamSetter(Setter.stringSetter))}::name, ${Segment.paramSegment(unsaved.tgnewtable)(Setter.optionParamSetter(Setter.stringSetter))}::name)
+          values (${Segment.paramSegment(unsaved.oid)(PgTriggerId.setter)}::oid, ${Segment.paramSegment(unsaved.tgrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgparentid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.tgfoid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgtype)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.tgenabled)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.tgisinternal)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.tgconstrrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgconstrindid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgconstraint)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tgdeferrable)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.tginitdeferred)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.tgnargs)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.tgattr)(TypoInt2Vector.setter)}::int2vector, ${Segment.paramSegment(unsaved.tgargs)(TypoBytea.setter)}::bytea, ${Segment.paramSegment(unsaved.tgqual)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree, ${Segment.paramSegment(unsaved.tgoldtable)(Setter.optionParamSetter(Setter.stringSetter))}::name, ${Segment.paramSegment(unsaved.tgnewtable)(Setter.optionParamSetter(Setter.stringSetter))}::name)
           returning "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable"
        """.insertReturning(PgTriggerRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -43,7 +43,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
     sql"""select "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable" from pg_catalog.pg_trigger""".query(PgTriggerRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgTriggerId): ZIO[ZConnection, Throwable, Option[PgTriggerRow]] = {
-    sql"""select "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable" from pg_catalog.pg_trigger where "oid" = ${Segment.paramSegment(oid)(Setter[PgTriggerId])}""".query(PgTriggerRow.jdbcDecoder).selectOne
+    sql"""select "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable" from pg_catalog.pg_trigger where "oid" = ${Segment.paramSegment(oid)(PgTriggerId.setter)}""".query(PgTriggerRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgTriggerId]): ZStream[ZConnection, Throwable, PgTriggerRow] = {
     sql"""select "oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable" from pg_catalog.pg_trigger where "oid" = ANY(${Segment.paramSegment(oids)(PgTriggerId.arraySetter)})""".query(PgTriggerRow.jdbcDecoder).selectStream
@@ -61,7 +61,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
               "tgparentid" = ${Segment.paramSegment(row.tgparentid)(Setter.longSetter)}::oid,
               "tgname" = ${Segment.paramSegment(row.tgname)(Setter.stringSetter)}::name,
               "tgfoid" = ${Segment.paramSegment(row.tgfoid)(Setter.longSetter)}::oid,
-              "tgtype" = ${Segment.paramSegment(row.tgtype)(Setter[TypoShort])}::int2,
+              "tgtype" = ${Segment.paramSegment(row.tgtype)(TypoShort.setter)}::int2,
               "tgenabled" = ${Segment.paramSegment(row.tgenabled)(Setter.stringSetter)}::char,
               "tgisinternal" = ${Segment.paramSegment(row.tgisinternal)(Setter.booleanSetter)},
               "tgconstrrelid" = ${Segment.paramSegment(row.tgconstrrelid)(Setter.longSetter)}::oid,
@@ -69,13 +69,13 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
               "tgconstraint" = ${Segment.paramSegment(row.tgconstraint)(Setter.longSetter)}::oid,
               "tgdeferrable" = ${Segment.paramSegment(row.tgdeferrable)(Setter.booleanSetter)},
               "tginitdeferred" = ${Segment.paramSegment(row.tginitdeferred)(Setter.booleanSetter)},
-              "tgnargs" = ${Segment.paramSegment(row.tgnargs)(Setter[TypoShort])}::int2,
-              "tgattr" = ${Segment.paramSegment(row.tgattr)(Setter[TypoInt2Vector])}::int2vector,
-              "tgargs" = ${Segment.paramSegment(row.tgargs)(Setter[TypoBytea])}::bytea,
-              "tgqual" = ${Segment.paramSegment(row.tgqual)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
+              "tgnargs" = ${Segment.paramSegment(row.tgnargs)(TypoShort.setter)}::int2,
+              "tgattr" = ${Segment.paramSegment(row.tgattr)(TypoInt2Vector.setter)}::int2vector,
+              "tgargs" = ${Segment.paramSegment(row.tgargs)(TypoBytea.setter)}::bytea,
+              "tgqual" = ${Segment.paramSegment(row.tgqual)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
               "tgoldtable" = ${Segment.paramSegment(row.tgoldtable)(Setter.optionParamSetter(Setter.stringSetter))}::name,
               "tgnewtable" = ${Segment.paramSegment(row.tgnewtable)(Setter.optionParamSetter(Setter.stringSetter))}::name
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgTriggerId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgTriggerId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgTriggerFields, PgTriggerRow] = {
     UpdateBuilder("pg_catalog.pg_trigger", PgTriggerFields, PgTriggerRow.jdbcDecoder)
@@ -83,12 +83,12 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
   override def upsert(unsaved: PgTriggerRow): ZIO[ZConnection, Throwable, UpdateResult[PgTriggerRow]] = {
     sql"""insert into pg_catalog.pg_trigger("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgTriggerId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgTriggerId.setter)}::oid,
             ${Segment.paramSegment(unsaved.tgrelid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.tgparentid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.tgname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.tgfoid)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.tgtype)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.tgtype)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.tgenabled)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.tgisinternal)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.tgconstrrelid)(Setter.longSetter)}::oid,
@@ -96,10 +96,10 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
             ${Segment.paramSegment(unsaved.tgconstraint)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.tgdeferrable)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.tginitdeferred)(Setter.booleanSetter)},
-            ${Segment.paramSegment(unsaved.tgnargs)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.tgattr)(Setter[TypoInt2Vector])}::int2vector,
-            ${Segment.paramSegment(unsaved.tgargs)(Setter[TypoBytea])}::bytea,
-            ${Segment.paramSegment(unsaved.tgqual)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
+            ${Segment.paramSegment(unsaved.tgnargs)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.tgattr)(TypoInt2Vector.setter)}::int2vector,
+            ${Segment.paramSegment(unsaved.tgargs)(TypoBytea.setter)}::bytea,
+            ${Segment.paramSegment(unsaved.tgqual)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
             ${Segment.paramSegment(unsaved.tgoldtable)(Setter.optionParamSetter(Setter.stringSetter))}::name,
             ${Segment.paramSegment(unsaved.tgnewtable)(Setter.optionParamSetter(Setter.stringSetter))}::name
           )

@@ -26,7 +26,7 @@ object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
   }
   override def insert(unsaved: SqlImplementationInfoRow): ZIO[ZConnection, Throwable, SqlImplementationInfoRow] = {
     sql"""insert into information_schema.sql_implementation_info("implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments")
-          values (${Segment.paramSegment(unsaved.implementationInfoId)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar, ${Segment.paramSegment(unsaved.implementationInfoName)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar, ${Segment.paramSegment(unsaved.integerValue)(Setter.optionParamSetter(Setter[CardinalNumber]))}::int4, ${Segment.paramSegment(unsaved.characterValue)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar)
+          values (${Segment.paramSegment(unsaved.implementationInfoId)(Setter.optionParamSetter(CharacterData.setter))}::varchar, ${Segment.paramSegment(unsaved.implementationInfoName)(Setter.optionParamSetter(CharacterData.setter))}::varchar, ${Segment.paramSegment(unsaved.integerValue)(Setter.optionParamSetter(CardinalNumber.setter))}::int4, ${Segment.paramSegment(unsaved.characterValue)(Setter.optionParamSetter(CharacterData.setter))}::varchar, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(CharacterData.setter))}::varchar)
           returning "implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments"
        """.insertReturning(SqlImplementationInfoRow.jdbcDecoder).map(_.updatedKeys.head)
   }

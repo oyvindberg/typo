@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgSequenceRepoImpl extends PgSequenceRepo {
   override def delete(seqrelid: PgSequenceId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_sequence where "seqrelid" = ${Segment.paramSegment(seqrelid)(Setter[PgSequenceId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_sequence where "seqrelid" = ${Segment.paramSegment(seqrelid)(PgSequenceId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgSequenceFields, PgSequenceRow] = {
     DeleteBuilder("pg_catalog.pg_sequence", PgSequenceFields)
   }
   override def insert(unsaved: PgSequenceRow): ZIO[ZConnection, Throwable, PgSequenceRow] = {
     sql"""insert into pg_catalog.pg_sequence("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")
-          values (${Segment.paramSegment(unsaved.seqrelid)(Setter[PgSequenceId])}::oid, ${Segment.paramSegment(unsaved.seqtypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.seqstart)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqincrement)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqmax)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqmin)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqcache)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqcycle)(Setter.booleanSetter)})
+          values (${Segment.paramSegment(unsaved.seqrelid)(PgSequenceId.setter)}::oid, ${Segment.paramSegment(unsaved.seqtypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.seqstart)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqincrement)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqmax)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqmin)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqcache)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.seqcycle)(Setter.booleanSetter)})
           returning "seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle"
        """.insertReturning(PgSequenceRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
     sql"""select "seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle" from pg_catalog.pg_sequence""".query(PgSequenceRow.jdbcDecoder).selectStream
   }
   override def selectById(seqrelid: PgSequenceId): ZIO[ZConnection, Throwable, Option[PgSequenceRow]] = {
-    sql"""select "seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle" from pg_catalog.pg_sequence where "seqrelid" = ${Segment.paramSegment(seqrelid)(Setter[PgSequenceId])}""".query(PgSequenceRow.jdbcDecoder).selectOne
+    sql"""select "seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle" from pg_catalog.pg_sequence where "seqrelid" = ${Segment.paramSegment(seqrelid)(PgSequenceId.setter)}""".query(PgSequenceRow.jdbcDecoder).selectOne
   }
   override def selectByIds(seqrelids: Array[PgSequenceId]): ZStream[ZConnection, Throwable, PgSequenceRow] = {
     sql"""select "seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle" from pg_catalog.pg_sequence where "seqrelid" = ANY(${Segment.paramSegment(seqrelids)(PgSequenceId.arraySetter)})""".query(PgSequenceRow.jdbcDecoder).selectStream
@@ -54,7 +54,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
               "seqmin" = ${Segment.paramSegment(row.seqmin)(Setter.longSetter)}::int8,
               "seqcache" = ${Segment.paramSegment(row.seqcache)(Setter.longSetter)}::int8,
               "seqcycle" = ${Segment.paramSegment(row.seqcycle)(Setter.booleanSetter)}
-          where "seqrelid" = ${Segment.paramSegment(seqrelid)(Setter[PgSequenceId])}""".update.map(_ > 0)
+          where "seqrelid" = ${Segment.paramSegment(seqrelid)(PgSequenceId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgSequenceFields, PgSequenceRow] = {
     UpdateBuilder("pg_catalog.pg_sequence", PgSequenceFields, PgSequenceRow.jdbcDecoder)
@@ -62,7 +62,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
   override def upsert(unsaved: PgSequenceRow): ZIO[ZConnection, Throwable, UpdateResult[PgSequenceRow]] = {
     sql"""insert into pg_catalog.pg_sequence("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")
           values (
-            ${Segment.paramSegment(unsaved.seqrelid)(Setter[PgSequenceId])}::oid,
+            ${Segment.paramSegment(unsaved.seqrelid)(PgSequenceId.setter)}::oid,
             ${Segment.paramSegment(unsaved.seqtypid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.seqstart)(Setter.longSetter)}::int8,
             ${Segment.paramSegment(unsaved.seqincrement)(Setter.longSetter)}::int8,

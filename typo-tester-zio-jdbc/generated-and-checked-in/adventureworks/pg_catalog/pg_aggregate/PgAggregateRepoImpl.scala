@@ -23,14 +23,14 @@ import zio.stream.ZStream
 
 object PgAggregateRepoImpl extends PgAggregateRepo {
   override def delete(aggfnoid: PgAggregateId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_aggregate where "aggfnoid" = ${Segment.paramSegment(aggfnoid)(Setter[PgAggregateId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_aggregate where "aggfnoid" = ${Segment.paramSegment(aggfnoid)(PgAggregateId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgAggregateFields, PgAggregateRow] = {
     DeleteBuilder("pg_catalog.pg_aggregate", PgAggregateFields)
   }
   override def insert(unsaved: PgAggregateRow): ZIO[ZConnection, Throwable, PgAggregateRow] = {
     sql"""insert into pg_catalog.pg_aggregate("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")
-          values (${Segment.paramSegment(unsaved.aggfnoid)(Setter[PgAggregateId])}::regproc, ${Segment.paramSegment(unsaved.aggkind)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.aggnumdirectargs)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.aggtransfn)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.aggfinalfn)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.aggcombinefn)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.aggserialfn)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.aggdeserialfn)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.aggmtransfn)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.aggminvtransfn)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.aggmfinalfn)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.aggfinalextra)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.aggmfinalextra)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.aggfinalmodify)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.aggmfinalmodify)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.aggsortop)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.aggtranstype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.aggtransspace)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.aggmtranstype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.aggmtransspace)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.agginitval)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.aggminitval)(Setter.optionParamSetter(Setter.stringSetter))})
+          values (${Segment.paramSegment(unsaved.aggfnoid)(PgAggregateId.setter)}::regproc, ${Segment.paramSegment(unsaved.aggkind)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.aggnumdirectargs)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.aggtransfn)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.aggfinalfn)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.aggcombinefn)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.aggserialfn)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.aggdeserialfn)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.aggmtransfn)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.aggminvtransfn)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.aggmfinalfn)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.aggfinalextra)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.aggmfinalextra)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.aggfinalmodify)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.aggmfinalmodify)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.aggsortop)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.aggtranstype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.aggtransspace)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.aggmtranstype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.aggmtransspace)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.agginitval)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.aggminitval)(Setter.optionParamSetter(Setter.stringSetter))})
           returning "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval"
        """.insertReturning(PgAggregateRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,7 +41,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
     sql"""select "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval" from pg_catalog.pg_aggregate""".query(PgAggregateRow.jdbcDecoder).selectStream
   }
   override def selectById(aggfnoid: PgAggregateId): ZIO[ZConnection, Throwable, Option[PgAggregateRow]] = {
-    sql"""select "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval" from pg_catalog.pg_aggregate where "aggfnoid" = ${Segment.paramSegment(aggfnoid)(Setter[PgAggregateId])}""".query(PgAggregateRow.jdbcDecoder).selectOne
+    sql"""select "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval" from pg_catalog.pg_aggregate where "aggfnoid" = ${Segment.paramSegment(aggfnoid)(PgAggregateId.setter)}""".query(PgAggregateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(aggfnoids: Array[PgAggregateId]): ZStream[ZConnection, Throwable, PgAggregateRow] = {
     sql"""select "aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval" from pg_catalog.pg_aggregate where "aggfnoid" = ANY(${Segment.paramSegment(aggfnoids)(PgAggregateId.arraySetter)})""".query(PgAggregateRow.jdbcDecoder).selectStream
@@ -50,15 +50,15 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
     val aggfnoid = row.aggfnoid
     sql"""update pg_catalog.pg_aggregate
           set "aggkind" = ${Segment.paramSegment(row.aggkind)(Setter.stringSetter)}::char,
-              "aggnumdirectargs" = ${Segment.paramSegment(row.aggnumdirectargs)(Setter[TypoShort])}::int2,
-              "aggtransfn" = ${Segment.paramSegment(row.aggtransfn)(Setter[TypoRegproc])}::regproc,
-              "aggfinalfn" = ${Segment.paramSegment(row.aggfinalfn)(Setter[TypoRegproc])}::regproc,
-              "aggcombinefn" = ${Segment.paramSegment(row.aggcombinefn)(Setter[TypoRegproc])}::regproc,
-              "aggserialfn" = ${Segment.paramSegment(row.aggserialfn)(Setter[TypoRegproc])}::regproc,
-              "aggdeserialfn" = ${Segment.paramSegment(row.aggdeserialfn)(Setter[TypoRegproc])}::regproc,
-              "aggmtransfn" = ${Segment.paramSegment(row.aggmtransfn)(Setter[TypoRegproc])}::regproc,
-              "aggminvtransfn" = ${Segment.paramSegment(row.aggminvtransfn)(Setter[TypoRegproc])}::regproc,
-              "aggmfinalfn" = ${Segment.paramSegment(row.aggmfinalfn)(Setter[TypoRegproc])}::regproc,
+              "aggnumdirectargs" = ${Segment.paramSegment(row.aggnumdirectargs)(TypoShort.setter)}::int2,
+              "aggtransfn" = ${Segment.paramSegment(row.aggtransfn)(TypoRegproc.setter)}::regproc,
+              "aggfinalfn" = ${Segment.paramSegment(row.aggfinalfn)(TypoRegproc.setter)}::regproc,
+              "aggcombinefn" = ${Segment.paramSegment(row.aggcombinefn)(TypoRegproc.setter)}::regproc,
+              "aggserialfn" = ${Segment.paramSegment(row.aggserialfn)(TypoRegproc.setter)}::regproc,
+              "aggdeserialfn" = ${Segment.paramSegment(row.aggdeserialfn)(TypoRegproc.setter)}::regproc,
+              "aggmtransfn" = ${Segment.paramSegment(row.aggmtransfn)(TypoRegproc.setter)}::regproc,
+              "aggminvtransfn" = ${Segment.paramSegment(row.aggminvtransfn)(TypoRegproc.setter)}::regproc,
+              "aggmfinalfn" = ${Segment.paramSegment(row.aggmfinalfn)(TypoRegproc.setter)}::regproc,
               "aggfinalextra" = ${Segment.paramSegment(row.aggfinalextra)(Setter.booleanSetter)},
               "aggmfinalextra" = ${Segment.paramSegment(row.aggmfinalextra)(Setter.booleanSetter)},
               "aggfinalmodify" = ${Segment.paramSegment(row.aggfinalmodify)(Setter.stringSetter)}::char,
@@ -70,7 +70,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
               "aggmtransspace" = ${Segment.paramSegment(row.aggmtransspace)(Setter.intSetter)}::int4,
               "agginitval" = ${Segment.paramSegment(row.agginitval)(Setter.optionParamSetter(Setter.stringSetter))},
               "aggminitval" = ${Segment.paramSegment(row.aggminitval)(Setter.optionParamSetter(Setter.stringSetter))}
-          where "aggfnoid" = ${Segment.paramSegment(aggfnoid)(Setter[PgAggregateId])}""".update.map(_ > 0)
+          where "aggfnoid" = ${Segment.paramSegment(aggfnoid)(PgAggregateId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgAggregateFields, PgAggregateRow] = {
     UpdateBuilder("pg_catalog.pg_aggregate", PgAggregateFields, PgAggregateRow.jdbcDecoder)
@@ -78,17 +78,17 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
   override def upsert(unsaved: PgAggregateRow): ZIO[ZConnection, Throwable, UpdateResult[PgAggregateRow]] = {
     sql"""insert into pg_catalog.pg_aggregate("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")
           values (
-            ${Segment.paramSegment(unsaved.aggfnoid)(Setter[PgAggregateId])}::regproc,
+            ${Segment.paramSegment(unsaved.aggfnoid)(PgAggregateId.setter)}::regproc,
             ${Segment.paramSegment(unsaved.aggkind)(Setter.stringSetter)}::char,
-            ${Segment.paramSegment(unsaved.aggnumdirectargs)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.aggtransfn)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.aggfinalfn)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.aggcombinefn)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.aggserialfn)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.aggdeserialfn)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.aggmtransfn)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.aggminvtransfn)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.aggmfinalfn)(Setter[TypoRegproc])}::regproc,
+            ${Segment.paramSegment(unsaved.aggnumdirectargs)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.aggtransfn)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.aggfinalfn)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.aggcombinefn)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.aggserialfn)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.aggdeserialfn)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.aggmtransfn)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.aggminvtransfn)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.aggmfinalfn)(TypoRegproc.setter)}::regproc,
             ${Segment.paramSegment(unsaved.aggfinalextra)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.aggmfinalextra)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.aggfinalmodify)(Setter.stringSetter)}::char,

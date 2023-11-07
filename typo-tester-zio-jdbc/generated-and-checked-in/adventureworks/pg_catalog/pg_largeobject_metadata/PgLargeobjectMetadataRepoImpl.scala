@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def delete(oid: PgLargeobjectMetadataId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_largeobject_metadata where "oid" = ${Segment.paramSegment(oid)(Setter[PgLargeobjectMetadataId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_largeobject_metadata where "oid" = ${Segment.paramSegment(oid)(PgLargeobjectMetadataId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
     DeleteBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields)
   }
   override def insert(unsaved: PgLargeobjectMetadataRow): ZIO[ZConnection, Throwable, PgLargeobjectMetadataRow] = {
     sql"""insert into pg_catalog.pg_largeobject_metadata("oid", "lomowner", "lomacl")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgLargeobjectMetadataId])}::oid, ${Segment.paramSegment(unsaved.lomowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.lomacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
+          values (${Segment.paramSegment(unsaved.oid)(PgLargeobjectMetadataId.setter)}::oid, ${Segment.paramSegment(unsaved.lomowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.lomacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
           returning "oid", "lomowner", "lomacl"
        """.insertReturning(PgLargeobjectMetadataRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     sql"""select "oid", "lomowner", "lomacl" from pg_catalog.pg_largeobject_metadata""".query(PgLargeobjectMetadataRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgLargeobjectMetadataId): ZIO[ZConnection, Throwable, Option[PgLargeobjectMetadataRow]] = {
-    sql"""select "oid", "lomowner", "lomacl" from pg_catalog.pg_largeobject_metadata where "oid" = ${Segment.paramSegment(oid)(Setter[PgLargeobjectMetadataId])}""".query(PgLargeobjectMetadataRow.jdbcDecoder).selectOne
+    sql"""select "oid", "lomowner", "lomacl" from pg_catalog.pg_largeobject_metadata where "oid" = ${Segment.paramSegment(oid)(PgLargeobjectMetadataId.setter)}""".query(PgLargeobjectMetadataRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgLargeobjectMetadataId]): ZStream[ZConnection, Throwable, PgLargeobjectMetadataRow] = {
     sql"""select "oid", "lomowner", "lomacl" from pg_catalog.pg_largeobject_metadata where "oid" = ANY(${Segment.paramSegment(oids)(PgLargeobjectMetadataId.arraySetter)})""".query(PgLargeobjectMetadataRow.jdbcDecoder).selectStream
@@ -50,7 +50,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     sql"""update pg_catalog.pg_largeobject_metadata
           set "lomowner" = ${Segment.paramSegment(row.lomowner)(Setter.longSetter)}::oid,
               "lomacl" = ${Segment.paramSegment(row.lomacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgLargeobjectMetadataId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgLargeobjectMetadataId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
     UpdateBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields, PgLargeobjectMetadataRow.jdbcDecoder)
@@ -58,7 +58,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def upsert(unsaved: PgLargeobjectMetadataRow): ZIO[ZConnection, Throwable, UpdateResult[PgLargeobjectMetadataRow]] = {
     sql"""insert into pg_catalog.pg_largeobject_metadata("oid", "lomowner", "lomacl")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgLargeobjectMetadataId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgLargeobjectMetadataId.setter)}::oid,
             ${Segment.paramSegment(unsaved.lomowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.lomacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
           )

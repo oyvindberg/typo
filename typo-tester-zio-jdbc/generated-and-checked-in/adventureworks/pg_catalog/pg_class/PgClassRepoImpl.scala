@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 object PgClassRepoImpl extends PgClassRepo {
   override def delete(oid: PgClassId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_class where "oid" = ${Segment.paramSegment(oid)(Setter[PgClassId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_class where "oid" = ${Segment.paramSegment(oid)(PgClassId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgClassFields, PgClassRow] = {
     DeleteBuilder("pg_catalog.pg_class", PgClassFields)
   }
   override def insert(unsaved: PgClassRow): ZIO[ZConnection, Throwable, PgClassRow] = {
     sql"""insert into pg_catalog.pg_class("oid", "relname", "relnamespace", "reltype", "reloftype", "relowner", "relam", "relfilenode", "reltablespace", "relpages", "reltuples", "relallvisible", "reltoastrelid", "relhasindex", "relisshared", "relpersistence", "relkind", "relnatts", "relchecks", "relhasrules", "relhastriggers", "relhassubclass", "relrowsecurity", "relforcerowsecurity", "relispopulated", "relreplident", "relispartition", "relrewrite", "relfrozenxid", "relminmxid", "relacl", "reloptions", "relpartbound")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgClassId])}::oid, ${Segment.paramSegment(unsaved.relname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.relnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.reltype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.reloftype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relam)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relfilenode)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.reltablespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relpages)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.reltuples)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.relallvisible)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.reltoastrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relhasindex)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relisshared)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relpersistence)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.relkind)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.relnatts)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.relchecks)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.relhasrules)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relhastriggers)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relhassubclass)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relrowsecurity)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relforcerowsecurity)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relispopulated)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relreplident)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.relispartition)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relrewrite)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relfrozenxid)(Setter[TypoXid])}::xid, ${Segment.paramSegment(unsaved.relminmxid)(Setter[TypoXid])}::xid, ${Segment.paramSegment(unsaved.relacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.reloptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.relpartbound)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree)
+          values (${Segment.paramSegment(unsaved.oid)(PgClassId.setter)}::oid, ${Segment.paramSegment(unsaved.relname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.relnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.reltype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.reloftype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relam)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relfilenode)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.reltablespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relpages)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.reltuples)(Setter.floatSetter)}::float4, ${Segment.paramSegment(unsaved.relallvisible)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.reltoastrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relhasindex)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relisshared)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relpersistence)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.relkind)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.relnatts)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.relchecks)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.relhasrules)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relhastriggers)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relhassubclass)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relrowsecurity)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relforcerowsecurity)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relispopulated)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relreplident)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.relispartition)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.relrewrite)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.relfrozenxid)(TypoXid.setter)}::xid, ${Segment.paramSegment(unsaved.relminmxid)(TypoXid.setter)}::xid, ${Segment.paramSegment(unsaved.relacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.reloptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text, ${Segment.paramSegment(unsaved.relpartbound)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree)
           returning "oid", "relname", "relnamespace", "reltype", "reloftype", "relowner", "relam", "relfilenode", "reltablespace", "relpages", "reltuples", "relallvisible", "reltoastrelid", "relhasindex", "relisshared", "relpersistence", "relkind", "relnatts", "relchecks", "relhasrules", "relhastriggers", "relhassubclass", "relrowsecurity", "relforcerowsecurity", "relispopulated", "relreplident", "relispartition", "relrewrite", "relfrozenxid", "relminmxid", "relacl", "reloptions", "relpartbound"
        """.insertReturning(PgClassRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -43,7 +43,7 @@ object PgClassRepoImpl extends PgClassRepo {
     sql"""select "oid", "relname", "relnamespace", "reltype", "reloftype", "relowner", "relam", "relfilenode", "reltablespace", "relpages", "reltuples", "relallvisible", "reltoastrelid", "relhasindex", "relisshared", "relpersistence", "relkind", "relnatts", "relchecks", "relhasrules", "relhastriggers", "relhassubclass", "relrowsecurity", "relforcerowsecurity", "relispopulated", "relreplident", "relispartition", "relrewrite", "relfrozenxid", "relminmxid", "relacl", "reloptions", "relpartbound" from pg_catalog.pg_class""".query(PgClassRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgClassId): ZIO[ZConnection, Throwable, Option[PgClassRow]] = {
-    sql"""select "oid", "relname", "relnamespace", "reltype", "reloftype", "relowner", "relam", "relfilenode", "reltablespace", "relpages", "reltuples", "relallvisible", "reltoastrelid", "relhasindex", "relisshared", "relpersistence", "relkind", "relnatts", "relchecks", "relhasrules", "relhastriggers", "relhassubclass", "relrowsecurity", "relforcerowsecurity", "relispopulated", "relreplident", "relispartition", "relrewrite", "relfrozenxid", "relminmxid", "relacl", "reloptions", "relpartbound" from pg_catalog.pg_class where "oid" = ${Segment.paramSegment(oid)(Setter[PgClassId])}""".query(PgClassRow.jdbcDecoder).selectOne
+    sql"""select "oid", "relname", "relnamespace", "reltype", "reloftype", "relowner", "relam", "relfilenode", "reltablespace", "relpages", "reltuples", "relallvisible", "reltoastrelid", "relhasindex", "relisshared", "relpersistence", "relkind", "relnatts", "relchecks", "relhasrules", "relhastriggers", "relhassubclass", "relrowsecurity", "relforcerowsecurity", "relispopulated", "relreplident", "relispartition", "relrewrite", "relfrozenxid", "relminmxid", "relacl", "reloptions", "relpartbound" from pg_catalog.pg_class where "oid" = ${Segment.paramSegment(oid)(PgClassId.setter)}""".query(PgClassRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgClassId]): ZStream[ZConnection, Throwable, PgClassRow] = {
     sql"""select "oid", "relname", "relnamespace", "reltype", "reloftype", "relowner", "relam", "relfilenode", "reltablespace", "relpages", "reltuples", "relallvisible", "reltoastrelid", "relhasindex", "relisshared", "relpersistence", "relkind", "relnatts", "relchecks", "relhasrules", "relhastriggers", "relhassubclass", "relrowsecurity", "relforcerowsecurity", "relispopulated", "relreplident", "relispartition", "relrewrite", "relfrozenxid", "relminmxid", "relacl", "reloptions", "relpartbound" from pg_catalog.pg_class where "oid" = ANY(${Segment.paramSegment(oids)(PgClassId.arraySetter)})""".query(PgClassRow.jdbcDecoder).selectStream
@@ -73,8 +73,8 @@ object PgClassRepoImpl extends PgClassRepo {
               "relisshared" = ${Segment.paramSegment(row.relisshared)(Setter.booleanSetter)},
               "relpersistence" = ${Segment.paramSegment(row.relpersistence)(Setter.stringSetter)}::char,
               "relkind" = ${Segment.paramSegment(row.relkind)(Setter.stringSetter)}::char,
-              "relnatts" = ${Segment.paramSegment(row.relnatts)(Setter[TypoShort])}::int2,
-              "relchecks" = ${Segment.paramSegment(row.relchecks)(Setter[TypoShort])}::int2,
+              "relnatts" = ${Segment.paramSegment(row.relnatts)(TypoShort.setter)}::int2,
+              "relchecks" = ${Segment.paramSegment(row.relchecks)(TypoShort.setter)}::int2,
               "relhasrules" = ${Segment.paramSegment(row.relhasrules)(Setter.booleanSetter)},
               "relhastriggers" = ${Segment.paramSegment(row.relhastriggers)(Setter.booleanSetter)},
               "relhassubclass" = ${Segment.paramSegment(row.relhassubclass)(Setter.booleanSetter)},
@@ -84,12 +84,12 @@ object PgClassRepoImpl extends PgClassRepo {
               "relreplident" = ${Segment.paramSegment(row.relreplident)(Setter.stringSetter)}::char,
               "relispartition" = ${Segment.paramSegment(row.relispartition)(Setter.booleanSetter)},
               "relrewrite" = ${Segment.paramSegment(row.relrewrite)(Setter.longSetter)}::oid,
-              "relfrozenxid" = ${Segment.paramSegment(row.relfrozenxid)(Setter[TypoXid])}::xid,
-              "relminmxid" = ${Segment.paramSegment(row.relminmxid)(Setter[TypoXid])}::xid,
+              "relfrozenxid" = ${Segment.paramSegment(row.relfrozenxid)(TypoXid.setter)}::xid,
+              "relminmxid" = ${Segment.paramSegment(row.relminmxid)(TypoXid.setter)}::xid,
               "relacl" = ${Segment.paramSegment(row.relacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem,
               "reloptions" = ${Segment.paramSegment(row.reloptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
-              "relpartbound" = ${Segment.paramSegment(row.relpartbound)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgClassId])}""".update.map(_ > 0)
+              "relpartbound" = ${Segment.paramSegment(row.relpartbound)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
+          where "oid" = ${Segment.paramSegment(oid)(PgClassId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgClassFields, PgClassRow] = {
     UpdateBuilder("pg_catalog.pg_class", PgClassFields, PgClassRow.jdbcDecoder)
@@ -97,7 +97,7 @@ object PgClassRepoImpl extends PgClassRepo {
   override def upsert(unsaved: PgClassRow): ZIO[ZConnection, Throwable, UpdateResult[PgClassRow]] = {
     sql"""insert into pg_catalog.pg_class("oid", "relname", "relnamespace", "reltype", "reloftype", "relowner", "relam", "relfilenode", "reltablespace", "relpages", "reltuples", "relallvisible", "reltoastrelid", "relhasindex", "relisshared", "relpersistence", "relkind", "relnatts", "relchecks", "relhasrules", "relhastriggers", "relhassubclass", "relrowsecurity", "relforcerowsecurity", "relispopulated", "relreplident", "relispartition", "relrewrite", "relfrozenxid", "relminmxid", "relacl", "reloptions", "relpartbound")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgClassId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgClassId.setter)}::oid,
             ${Segment.paramSegment(unsaved.relname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.relnamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.reltype)(Setter.longSetter)}::oid,
@@ -114,8 +114,8 @@ object PgClassRepoImpl extends PgClassRepo {
             ${Segment.paramSegment(unsaved.relisshared)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.relpersistence)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.relkind)(Setter.stringSetter)}::char,
-            ${Segment.paramSegment(unsaved.relnatts)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.relchecks)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.relnatts)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.relchecks)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.relhasrules)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.relhastriggers)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.relhassubclass)(Setter.booleanSetter)},
@@ -125,11 +125,11 @@ object PgClassRepoImpl extends PgClassRepo {
             ${Segment.paramSegment(unsaved.relreplident)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.relispartition)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.relrewrite)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.relfrozenxid)(Setter[TypoXid])}::xid,
-            ${Segment.paramSegment(unsaved.relminmxid)(Setter[TypoXid])}::xid,
+            ${Segment.paramSegment(unsaved.relfrozenxid)(TypoXid.setter)}::xid,
+            ${Segment.paramSegment(unsaved.relminmxid)(TypoXid.setter)}::xid,
             ${Segment.paramSegment(unsaved.relacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem,
             ${Segment.paramSegment(unsaved.reloptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text,
-            ${Segment.paramSegment(unsaved.relpartbound)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
+            ${Segment.paramSegment(unsaved.relpartbound)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
           )
           on conflict ("oid")
           do update set

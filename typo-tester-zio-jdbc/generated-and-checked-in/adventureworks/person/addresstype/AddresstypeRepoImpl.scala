@@ -18,7 +18,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -26,31 +25,31 @@ import zio.stream.ZStream
 
 object AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.addresstype where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(Setter[AddresstypeId])}""".delete.map(_ > 0)
+    sql"""delete from person.addresstype where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(AddresstypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
     DeleteBuilder("person.addresstype", AddresstypeFields)
   }
   override def insert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, AddresstypeRow] = {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.addresstypeid)(Setter[AddresstypeId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.addresstypeid)(AddresstypeId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text
        """.insertReturning(AddresstypeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ZIO[ZConnection, Throwable, AddresstypeRow] = {
     val fs = List(
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
       unsaved.addresstypeid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""addresstypeid"""", sql"${Segment.paramSegment(value: AddresstypeId)(Setter[AddresstypeId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""addresstypeid"""", sql"${Segment.paramSegment(value: AddresstypeId)(AddresstypeId.setter)}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -73,7 +72,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype""".query(AddresstypeRow.jdbcDecoder).selectStream
   }
   override def selectById(addresstypeid: AddresstypeId): ZIO[ZConnection, Throwable, Option[AddresstypeRow]] = {
-    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(Setter[AddresstypeId])}""".query(AddresstypeRow.jdbcDecoder).selectOne
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(AddresstypeId.setter)}""".query(AddresstypeRow.jdbcDecoder).selectOne
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId]): ZStream[ZConnection, Throwable, AddresstypeRow] = {
     sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ANY(${Segment.paramSegment(addresstypeids)(AddresstypeId.arraySetter)})""".query(AddresstypeRow.jdbcDecoder).selectStream
@@ -81,10 +80,10 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def update(row: AddresstypeRow): ZIO[ZConnection, Throwable, Boolean] = {
     val addresstypeid = row.addresstypeid
     sql"""update person.addresstype
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(Setter[AddresstypeId])}""".update.map(_ > 0)
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(AddresstypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
     UpdateBuilder("person.addresstype", AddresstypeFields, AddresstypeRow.jdbcDecoder)
@@ -92,10 +91,10 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def upsert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, UpdateResult[AddresstypeRow]] = {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.addresstypeid)(Setter[AddresstypeId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.addresstypeid)(AddresstypeId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("addresstypeid")
           do update set

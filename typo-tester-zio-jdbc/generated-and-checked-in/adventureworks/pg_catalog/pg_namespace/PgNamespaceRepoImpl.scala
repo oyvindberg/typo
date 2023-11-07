@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_namespace where "oid" = ${Segment.paramSegment(oid)(Setter[PgNamespaceId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_namespace where "oid" = ${Segment.paramSegment(oid)(PgNamespaceId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgNamespaceFields, PgNamespaceRow] = {
     DeleteBuilder("pg_catalog.pg_namespace", PgNamespaceFields)
   }
   override def insert(unsaved: PgNamespaceRow): ZIO[ZConnection, Throwable, PgNamespaceRow] = {
     sql"""insert into pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgNamespaceId])}::oid, ${Segment.paramSegment(unsaved.nspname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.nspowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.nspacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
+          values (${Segment.paramSegment(unsaved.oid)(PgNamespaceId.setter)}::oid, ${Segment.paramSegment(unsaved.nspname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.nspowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.nspacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
           returning "oid", "nspname", "nspowner", "nspacl"
        """.insertReturning(PgNamespaceRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     sql"""select "oid", "nspname", "nspowner", "nspacl" from pg_catalog.pg_namespace""".query(PgNamespaceRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgNamespaceId): ZIO[ZConnection, Throwable, Option[PgNamespaceRow]] = {
-    sql"""select "oid", "nspname", "nspowner", "nspacl" from pg_catalog.pg_namespace where "oid" = ${Segment.paramSegment(oid)(Setter[PgNamespaceId])}""".query(PgNamespaceRow.jdbcDecoder).selectOne
+    sql"""select "oid", "nspname", "nspowner", "nspacl" from pg_catalog.pg_namespace where "oid" = ${Segment.paramSegment(oid)(PgNamespaceId.setter)}""".query(PgNamespaceRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgNamespaceId]): ZStream[ZConnection, Throwable, PgNamespaceRow] = {
     sql"""select "oid", "nspname", "nspowner", "nspacl" from pg_catalog.pg_namespace where "oid" = ANY(${Segment.paramSegment(oids)(PgNamespaceId.arraySetter)})""".query(PgNamespaceRow.jdbcDecoder).selectStream
@@ -57,7 +57,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           set "nspname" = ${Segment.paramSegment(row.nspname)(Setter.stringSetter)}::name,
               "nspowner" = ${Segment.paramSegment(row.nspowner)(Setter.longSetter)}::oid,
               "nspacl" = ${Segment.paramSegment(row.nspacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgNamespaceId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgNamespaceId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgNamespaceFields, PgNamespaceRow] = {
     UpdateBuilder("pg_catalog.pg_namespace", PgNamespaceFields, PgNamespaceRow.jdbcDecoder)
@@ -65,7 +65,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def upsert(unsaved: PgNamespaceRow): ZIO[ZConnection, Throwable, UpdateResult[PgNamespaceRow]] = {
     sql"""insert into pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgNamespaceId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgNamespaceId.setter)}::oid,
             ${Segment.paramSegment(unsaved.nspname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.nspowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.nspacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem

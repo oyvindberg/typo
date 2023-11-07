@@ -17,7 +17,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -25,28 +24,28 @@ import zio.stream.ZStream
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.salesreason where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(Setter[SalesreasonId])}""".delete.map(_ > 0)
+    sql"""delete from sales.salesreason where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(SalesreasonId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
     DeleteBuilder("sales.salesreason", SalesreasonFields)
   }
   override def insert(unsaved: SalesreasonRow): ZIO[ZConnection, Throwable, SalesreasonRow] = {
     sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
-          values (${Segment.paramSegment(unsaved.salesreasonid)(Setter[SalesreasonId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.reasontype)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.salesreasonid)(SalesreasonId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.reasontype)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text
        """.insertReturning(SalesreasonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ZIO[ZConnection, Throwable, SalesreasonRow] = {
     val fs = List(
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
-      Some((sql""""reasontype"""", sql"${Segment.paramSegment(unsaved.reasontype)(Setter[Name])}::varchar")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
+      Some((sql""""reasontype"""", sql"${Segment.paramSegment(unsaved.reasontype)(Name.setter)}::varchar")),
       unsaved.salesreasonid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""salesreasonid"""", sql"${Segment.paramSegment(value: SalesreasonId)(Setter[SalesreasonId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""salesreasonid"""", sql"${Segment.paramSegment(value: SalesreasonId)(SalesreasonId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -69,7 +68,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason""".query(SalesreasonRow.jdbcDecoder).selectStream
   }
   override def selectById(salesreasonid: SalesreasonId): ZIO[ZConnection, Throwable, Option[SalesreasonRow]] = {
-    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(Setter[SalesreasonId])}""".query(SalesreasonRow.jdbcDecoder).selectOne
+    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(SalesreasonId.setter)}""".query(SalesreasonRow.jdbcDecoder).selectOne
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId]): ZStream[ZConnection, Throwable, SalesreasonRow] = {
     sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason where "salesreasonid" = ANY(${Segment.paramSegment(salesreasonids)(SalesreasonId.arraySetter)})""".query(SalesreasonRow.jdbcDecoder).selectStream
@@ -77,10 +76,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def update(row: SalesreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val salesreasonid = row.salesreasonid
     sql"""update sales.salesreason
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "reasontype" = ${Segment.paramSegment(row.reasontype)(Setter[Name])}::varchar,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(Setter[SalesreasonId])}""".update.map(_ > 0)
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "reasontype" = ${Segment.paramSegment(row.reasontype)(Name.setter)}::varchar,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(SalesreasonId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
     UpdateBuilder("sales.salesreason", SalesreasonFields, SalesreasonRow.jdbcDecoder)
@@ -88,10 +87,10 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def upsert(unsaved: SalesreasonRow): ZIO[ZConnection, Throwable, UpdateResult[SalesreasonRow]] = {
     sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.salesreasonid)(Setter[SalesreasonId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.reasontype)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.salesreasonid)(SalesreasonId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.reasontype)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("salesreasonid")
           do update set

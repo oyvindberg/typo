@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgRangeRepoImpl extends PgRangeRepo {
   override def delete(rngtypid: PgRangeId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_range where "rngtypid" = ${Segment.paramSegment(rngtypid)(Setter[PgRangeId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_range where "rngtypid" = ${Segment.paramSegment(rngtypid)(PgRangeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgRangeFields, PgRangeRow] = {
     DeleteBuilder("pg_catalog.pg_range", PgRangeFields)
   }
   override def insert(unsaved: PgRangeRow): ZIO[ZConnection, Throwable, PgRangeRow] = {
     sql"""insert into pg_catalog.pg_range("rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff")
-          values (${Segment.paramSegment(unsaved.rngtypid)(Setter[PgRangeId])}::oid, ${Segment.paramSegment(unsaved.rngsubtype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.rngmultitypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.rngcollation)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.rngsubopc)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.rngcanonical)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.rngsubdiff)(Setter[TypoRegproc])}::regproc)
+          values (${Segment.paramSegment(unsaved.rngtypid)(PgRangeId.setter)}::oid, ${Segment.paramSegment(unsaved.rngsubtype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.rngmultitypid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.rngcollation)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.rngsubopc)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.rngcanonical)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.rngsubdiff)(TypoRegproc.setter)}::regproc)
           returning "rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff"
        """.insertReturning(PgRangeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgRangeRepoImpl extends PgRangeRepo {
     sql"""select "rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff" from pg_catalog.pg_range""".query(PgRangeRow.jdbcDecoder).selectStream
   }
   override def selectById(rngtypid: PgRangeId): ZIO[ZConnection, Throwable, Option[PgRangeRow]] = {
-    sql"""select "rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff" from pg_catalog.pg_range where "rngtypid" = ${Segment.paramSegment(rngtypid)(Setter[PgRangeId])}""".query(PgRangeRow.jdbcDecoder).selectOne
+    sql"""select "rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff" from pg_catalog.pg_range where "rngtypid" = ${Segment.paramSegment(rngtypid)(PgRangeId.setter)}""".query(PgRangeRow.jdbcDecoder).selectOne
   }
   override def selectByIds(rngtypids: Array[PgRangeId]): ZStream[ZConnection, Throwable, PgRangeRow] = {
     sql"""select "rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff" from pg_catalog.pg_range where "rngtypid" = ANY(${Segment.paramSegment(rngtypids)(PgRangeId.arraySetter)})""".query(PgRangeRow.jdbcDecoder).selectStream
@@ -58,9 +58,9 @@ object PgRangeRepoImpl extends PgRangeRepo {
               "rngmultitypid" = ${Segment.paramSegment(row.rngmultitypid)(Setter.longSetter)}::oid,
               "rngcollation" = ${Segment.paramSegment(row.rngcollation)(Setter.longSetter)}::oid,
               "rngsubopc" = ${Segment.paramSegment(row.rngsubopc)(Setter.longSetter)}::oid,
-              "rngcanonical" = ${Segment.paramSegment(row.rngcanonical)(Setter[TypoRegproc])}::regproc,
-              "rngsubdiff" = ${Segment.paramSegment(row.rngsubdiff)(Setter[TypoRegproc])}::regproc
-          where "rngtypid" = ${Segment.paramSegment(rngtypid)(Setter[PgRangeId])}""".update.map(_ > 0)
+              "rngcanonical" = ${Segment.paramSegment(row.rngcanonical)(TypoRegproc.setter)}::regproc,
+              "rngsubdiff" = ${Segment.paramSegment(row.rngsubdiff)(TypoRegproc.setter)}::regproc
+          where "rngtypid" = ${Segment.paramSegment(rngtypid)(PgRangeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgRangeFields, PgRangeRow] = {
     UpdateBuilder("pg_catalog.pg_range", PgRangeFields, PgRangeRow.jdbcDecoder)
@@ -68,13 +68,13 @@ object PgRangeRepoImpl extends PgRangeRepo {
   override def upsert(unsaved: PgRangeRow): ZIO[ZConnection, Throwable, UpdateResult[PgRangeRow]] = {
     sql"""insert into pg_catalog.pg_range("rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff")
           values (
-            ${Segment.paramSegment(unsaved.rngtypid)(Setter[PgRangeId])}::oid,
+            ${Segment.paramSegment(unsaved.rngtypid)(PgRangeId.setter)}::oid,
             ${Segment.paramSegment(unsaved.rngsubtype)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.rngmultitypid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.rngcollation)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.rngsubopc)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.rngcanonical)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.rngsubdiff)(Setter[TypoRegproc])}::regproc
+            ${Segment.paramSegment(unsaved.rngcanonical)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.rngsubdiff)(TypoRegproc.setter)}::regproc
           )
           on conflict ("rngtypid")
           do update set

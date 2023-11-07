@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 object PgTypeRepoImpl extends PgTypeRepo {
   override def delete(oid: PgTypeId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_type where "oid" = ${Segment.paramSegment(oid)(Setter[PgTypeId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_type where "oid" = ${Segment.paramSegment(oid)(PgTypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTypeFields, PgTypeRow] = {
     DeleteBuilder("pg_catalog.pg_type", PgTypeFields)
   }
   override def insert(unsaved: PgTypeRow): ZIO[ZConnection, Throwable, PgTypeRow] = {
     sql"""insert into pg_catalog.pg_type("oid", "typname", "typnamespace", "typowner", "typlen", "typbyval", "typtype", "typcategory", "typispreferred", "typisdefined", "typdelim", "typrelid", "typsubscript", "typelem", "typarray", "typinput", "typoutput", "typreceive", "typsend", "typmodin", "typmodout", "typanalyze", "typalign", "typstorage", "typnotnull", "typbasetype", "typtypmod", "typndims", "typcollation", "typdefaultbin", "typdefault", "typacl")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgTypeId])}::oid, ${Segment.paramSegment(unsaved.typname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.typnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typlen)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.typbyval)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.typtype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typcategory)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typispreferred)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.typisdefined)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.typdelim)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typsubscript)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.typelem)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typarray)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typinput)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.typoutput)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.typreceive)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.typsend)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.typmodin)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.typmodout)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.typanalyze)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.typalign)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typstorage)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typnotnull)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.typbasetype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typtypmod)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.typndims)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.typcollation)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typdefaultbin)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree, ${Segment.paramSegment(unsaved.typdefault)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.typacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
+          values (${Segment.paramSegment(unsaved.oid)(PgTypeId.setter)}::oid, ${Segment.paramSegment(unsaved.typname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.typnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typlen)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.typbyval)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.typtype)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typcategory)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typispreferred)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.typisdefined)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.typdelim)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typsubscript)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.typelem)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typarray)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typinput)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.typoutput)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.typreceive)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.typsend)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.typmodin)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.typmodout)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.typanalyze)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.typalign)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typstorage)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.typnotnull)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.typbasetype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typtypmod)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.typndims)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.typcollation)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.typdefaultbin)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree, ${Segment.paramSegment(unsaved.typdefault)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.typacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
           returning "oid", "typname", "typnamespace", "typowner", "typlen", "typbyval", "typtype", "typcategory", "typispreferred", "typisdefined", "typdelim", "typrelid", "typsubscript", "typelem", "typarray", "typinput", "typoutput", "typreceive", "typsend", "typmodin", "typmodout", "typanalyze", "typalign", "typstorage", "typnotnull", "typbasetype", "typtypmod", "typndims", "typcollation", "typdefaultbin", "typdefault", "typacl"
        """.insertReturning(PgTypeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -43,7 +43,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
     sql"""select "oid", "typname", "typnamespace", "typowner", "typlen", "typbyval", "typtype", "typcategory", "typispreferred", "typisdefined", "typdelim", "typrelid", "typsubscript", "typelem", "typarray", "typinput", "typoutput", "typreceive", "typsend", "typmodin", "typmodout", "typanalyze", "typalign", "typstorage", "typnotnull", "typbasetype", "typtypmod", "typndims", "typcollation", "typdefaultbin", "typdefault", "typacl" from pg_catalog.pg_type""".query(PgTypeRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgTypeId): ZIO[ZConnection, Throwable, Option[PgTypeRow]] = {
-    sql"""select "oid", "typname", "typnamespace", "typowner", "typlen", "typbyval", "typtype", "typcategory", "typispreferred", "typisdefined", "typdelim", "typrelid", "typsubscript", "typelem", "typarray", "typinput", "typoutput", "typreceive", "typsend", "typmodin", "typmodout", "typanalyze", "typalign", "typstorage", "typnotnull", "typbasetype", "typtypmod", "typndims", "typcollation", "typdefaultbin", "typdefault", "typacl" from pg_catalog.pg_type where "oid" = ${Segment.paramSegment(oid)(Setter[PgTypeId])}""".query(PgTypeRow.jdbcDecoder).selectOne
+    sql"""select "oid", "typname", "typnamespace", "typowner", "typlen", "typbyval", "typtype", "typcategory", "typispreferred", "typisdefined", "typdelim", "typrelid", "typsubscript", "typelem", "typarray", "typinput", "typoutput", "typreceive", "typsend", "typmodin", "typmodout", "typanalyze", "typalign", "typstorage", "typnotnull", "typbasetype", "typtypmod", "typndims", "typcollation", "typdefaultbin", "typdefault", "typacl" from pg_catalog.pg_type where "oid" = ${Segment.paramSegment(oid)(PgTypeId.setter)}""".query(PgTypeRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgTypeId]): ZStream[ZConnection, Throwable, PgTypeRow] = {
     sql"""select "oid", "typname", "typnamespace", "typowner", "typlen", "typbyval", "typtype", "typcategory", "typispreferred", "typisdefined", "typdelim", "typrelid", "typsubscript", "typelem", "typarray", "typinput", "typoutput", "typreceive", "typsend", "typmodin", "typmodout", "typanalyze", "typalign", "typstorage", "typnotnull", "typbasetype", "typtypmod", "typndims", "typcollation", "typdefaultbin", "typdefault", "typacl" from pg_catalog.pg_type where "oid" = ANY(${Segment.paramSegment(oids)(PgTypeId.arraySetter)})""".query(PgTypeRow.jdbcDecoder).selectStream
@@ -60,7 +60,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
           set "typname" = ${Segment.paramSegment(row.typname)(Setter.stringSetter)}::name,
               "typnamespace" = ${Segment.paramSegment(row.typnamespace)(Setter.longSetter)}::oid,
               "typowner" = ${Segment.paramSegment(row.typowner)(Setter.longSetter)}::oid,
-              "typlen" = ${Segment.paramSegment(row.typlen)(Setter[TypoShort])}::int2,
+              "typlen" = ${Segment.paramSegment(row.typlen)(TypoShort.setter)}::int2,
               "typbyval" = ${Segment.paramSegment(row.typbyval)(Setter.booleanSetter)},
               "typtype" = ${Segment.paramSegment(row.typtype)(Setter.stringSetter)}::char,
               "typcategory" = ${Segment.paramSegment(row.typcategory)(Setter.stringSetter)}::char,
@@ -68,16 +68,16 @@ object PgTypeRepoImpl extends PgTypeRepo {
               "typisdefined" = ${Segment.paramSegment(row.typisdefined)(Setter.booleanSetter)},
               "typdelim" = ${Segment.paramSegment(row.typdelim)(Setter.stringSetter)}::char,
               "typrelid" = ${Segment.paramSegment(row.typrelid)(Setter.longSetter)}::oid,
-              "typsubscript" = ${Segment.paramSegment(row.typsubscript)(Setter[TypoRegproc])}::regproc,
+              "typsubscript" = ${Segment.paramSegment(row.typsubscript)(TypoRegproc.setter)}::regproc,
               "typelem" = ${Segment.paramSegment(row.typelem)(Setter.longSetter)}::oid,
               "typarray" = ${Segment.paramSegment(row.typarray)(Setter.longSetter)}::oid,
-              "typinput" = ${Segment.paramSegment(row.typinput)(Setter[TypoRegproc])}::regproc,
-              "typoutput" = ${Segment.paramSegment(row.typoutput)(Setter[TypoRegproc])}::regproc,
-              "typreceive" = ${Segment.paramSegment(row.typreceive)(Setter[TypoRegproc])}::regproc,
-              "typsend" = ${Segment.paramSegment(row.typsend)(Setter[TypoRegproc])}::regproc,
-              "typmodin" = ${Segment.paramSegment(row.typmodin)(Setter[TypoRegproc])}::regproc,
-              "typmodout" = ${Segment.paramSegment(row.typmodout)(Setter[TypoRegproc])}::regproc,
-              "typanalyze" = ${Segment.paramSegment(row.typanalyze)(Setter[TypoRegproc])}::regproc,
+              "typinput" = ${Segment.paramSegment(row.typinput)(TypoRegproc.setter)}::regproc,
+              "typoutput" = ${Segment.paramSegment(row.typoutput)(TypoRegproc.setter)}::regproc,
+              "typreceive" = ${Segment.paramSegment(row.typreceive)(TypoRegproc.setter)}::regproc,
+              "typsend" = ${Segment.paramSegment(row.typsend)(TypoRegproc.setter)}::regproc,
+              "typmodin" = ${Segment.paramSegment(row.typmodin)(TypoRegproc.setter)}::regproc,
+              "typmodout" = ${Segment.paramSegment(row.typmodout)(TypoRegproc.setter)}::regproc,
+              "typanalyze" = ${Segment.paramSegment(row.typanalyze)(TypoRegproc.setter)}::regproc,
               "typalign" = ${Segment.paramSegment(row.typalign)(Setter.stringSetter)}::char,
               "typstorage" = ${Segment.paramSegment(row.typstorage)(Setter.stringSetter)}::char,
               "typnotnull" = ${Segment.paramSegment(row.typnotnull)(Setter.booleanSetter)},
@@ -85,10 +85,10 @@ object PgTypeRepoImpl extends PgTypeRepo {
               "typtypmod" = ${Segment.paramSegment(row.typtypmod)(Setter.intSetter)}::int4,
               "typndims" = ${Segment.paramSegment(row.typndims)(Setter.intSetter)}::int4,
               "typcollation" = ${Segment.paramSegment(row.typcollation)(Setter.longSetter)}::oid,
-              "typdefaultbin" = ${Segment.paramSegment(row.typdefaultbin)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
+              "typdefaultbin" = ${Segment.paramSegment(row.typdefaultbin)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
               "typdefault" = ${Segment.paramSegment(row.typdefault)(Setter.optionParamSetter(Setter.stringSetter))},
               "typacl" = ${Segment.paramSegment(row.typacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgTypeId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgTypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgTypeFields, PgTypeRow] = {
     UpdateBuilder("pg_catalog.pg_type", PgTypeFields, PgTypeRow.jdbcDecoder)
@@ -96,11 +96,11 @@ object PgTypeRepoImpl extends PgTypeRepo {
   override def upsert(unsaved: PgTypeRow): ZIO[ZConnection, Throwable, UpdateResult[PgTypeRow]] = {
     sql"""insert into pg_catalog.pg_type("oid", "typname", "typnamespace", "typowner", "typlen", "typbyval", "typtype", "typcategory", "typispreferred", "typisdefined", "typdelim", "typrelid", "typsubscript", "typelem", "typarray", "typinput", "typoutput", "typreceive", "typsend", "typmodin", "typmodout", "typanalyze", "typalign", "typstorage", "typnotnull", "typbasetype", "typtypmod", "typndims", "typcollation", "typdefaultbin", "typdefault", "typacl")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgTypeId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgTypeId.setter)}::oid,
             ${Segment.paramSegment(unsaved.typname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.typnamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.typowner)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.typlen)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.typlen)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.typbyval)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.typtype)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.typcategory)(Setter.stringSetter)}::char,
@@ -108,16 +108,16 @@ object PgTypeRepoImpl extends PgTypeRepo {
             ${Segment.paramSegment(unsaved.typisdefined)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.typdelim)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.typrelid)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.typsubscript)(Setter[TypoRegproc])}::regproc,
+            ${Segment.paramSegment(unsaved.typsubscript)(TypoRegproc.setter)}::regproc,
             ${Segment.paramSegment(unsaved.typelem)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.typarray)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.typinput)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.typoutput)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.typreceive)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.typsend)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.typmodin)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.typmodout)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.typanalyze)(Setter[TypoRegproc])}::regproc,
+            ${Segment.paramSegment(unsaved.typinput)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.typoutput)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.typreceive)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.typsend)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.typmodin)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.typmodout)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.typanalyze)(TypoRegproc.setter)}::regproc,
             ${Segment.paramSegment(unsaved.typalign)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.typstorage)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.typnotnull)(Setter.booleanSetter)},
@@ -125,7 +125,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
             ${Segment.paramSegment(unsaved.typtypmod)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.typndims)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.typcollation)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.typdefaultbin)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
+            ${Segment.paramSegment(unsaved.typdefaultbin)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
             ${Segment.paramSegment(unsaved.typdefault)(Setter.optionParamSetter(Setter.stringSetter))},
             ${Segment.paramSegment(unsaved.typacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
           )

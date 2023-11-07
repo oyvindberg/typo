@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_tablespace where "oid" = ${Segment.paramSegment(oid)(Setter[PgTablespaceId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_tablespace where "oid" = ${Segment.paramSegment(oid)(PgTablespaceId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTablespaceFields, PgTablespaceRow] = {
     DeleteBuilder("pg_catalog.pg_tablespace", PgTablespaceFields)
   }
   override def insert(unsaved: PgTablespaceRow): ZIO[ZConnection, Throwable, PgTablespaceRow] = {
     sql"""insert into pg_catalog.pg_tablespace("oid", "spcname", "spcowner", "spcacl", "spcoptions")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgTablespaceId])}::oid, ${Segment.paramSegment(unsaved.spcname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.spcowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.spcacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.spcoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
+          values (${Segment.paramSegment(unsaved.oid)(PgTablespaceId.setter)}::oid, ${Segment.paramSegment(unsaved.spcname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.spcowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.spcacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem, ${Segment.paramSegment(unsaved.spcoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
           returning "oid", "spcname", "spcowner", "spcacl", "spcoptions"
        """.insertReturning(PgTablespaceRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
     sql"""select "oid", "spcname", "spcowner", "spcacl", "spcoptions" from pg_catalog.pg_tablespace""".query(PgTablespaceRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgTablespaceId): ZIO[ZConnection, Throwable, Option[PgTablespaceRow]] = {
-    sql"""select "oid", "spcname", "spcowner", "spcacl", "spcoptions" from pg_catalog.pg_tablespace where "oid" = ${Segment.paramSegment(oid)(Setter[PgTablespaceId])}""".query(PgTablespaceRow.jdbcDecoder).selectOne
+    sql"""select "oid", "spcname", "spcowner", "spcacl", "spcoptions" from pg_catalog.pg_tablespace where "oid" = ${Segment.paramSegment(oid)(PgTablespaceId.setter)}""".query(PgTablespaceRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgTablespaceId]): ZStream[ZConnection, Throwable, PgTablespaceRow] = {
     sql"""select "oid", "spcname", "spcowner", "spcacl", "spcoptions" from pg_catalog.pg_tablespace where "oid" = ANY(${Segment.paramSegment(oids)(PgTablespaceId.arraySetter)})""".query(PgTablespaceRow.jdbcDecoder).selectStream
@@ -58,7 +58,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
               "spcowner" = ${Segment.paramSegment(row.spcowner)(Setter.longSetter)}::oid,
               "spcacl" = ${Segment.paramSegment(row.spcacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem,
               "spcoptions" = ${Segment.paramSegment(row.spcoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgTablespaceId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgTablespaceId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgTablespaceFields, PgTablespaceRow] = {
     UpdateBuilder("pg_catalog.pg_tablespace", PgTablespaceFields, PgTablespaceRow.jdbcDecoder)
@@ -66,7 +66,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def upsert(unsaved: PgTablespaceRow): ZIO[ZConnection, Throwable, UpdateResult[PgTablespaceRow]] = {
     sql"""insert into pg_catalog.pg_tablespace("oid", "spcname", "spcowner", "spcacl", "spcoptions")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgTablespaceId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgTablespaceId.setter)}::oid,
             ${Segment.paramSegment(unsaved.spcname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.spcowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.spcacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem,

@@ -27,14 +27,14 @@ import zio.stream.ZStream
 
 object CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(Setter[CustomCreditcardId])}""".delete.map(_ > 0)
+    sql"""delete from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
     DeleteBuilder("sales.creditcard", CreditcardFields)
   }
   override def insert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, CreditcardRow] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
-          values (${Segment.paramSegment(unsaved.creditcardid)(Setter[CustomCreditcardId])}::int4, ${Segment.paramSegment(unsaved.cardtype)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.cardnumber)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.expmonth)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.expyear)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}::int4, ${Segment.paramSegment(unsaved.cardtype)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.cardnumber)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.expmonth)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.expyear)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """.insertReturning(CreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -42,15 +42,15 @@ object CreditcardRepoImpl extends CreditcardRepo {
     val fs = List(
       Some((sql""""cardtype"""", sql"${Segment.paramSegment(unsaved.cardtype)(Setter.stringSetter)}")),
       Some((sql""""cardnumber"""", sql"${Segment.paramSegment(unsaved.cardnumber)(Setter.stringSetter)}")),
-      Some((sql""""expmonth"""", sql"${Segment.paramSegment(unsaved.expmonth)(Setter[TypoShort])}::int2")),
-      Some((sql""""expyear"""", sql"${Segment.paramSegment(unsaved.expyear)(Setter[TypoShort])}::int2")),
+      Some((sql""""expmonth"""", sql"${Segment.paramSegment(unsaved.expmonth)(TypoShort.setter)}::int2")),
+      Some((sql""""expyear"""", sql"${Segment.paramSegment(unsaved.expyear)(TypoShort.setter)}::int2")),
       unsaved.creditcardid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""creditcardid"""", sql"${Segment.paramSegment(value: /* user-picked */ CustomCreditcardId)(Setter[CustomCreditcardId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""creditcardid"""", sql"${Segment.paramSegment(value: /* user-picked */ CustomCreditcardId)(/* user-picked */ CustomCreditcardId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -73,7 +73,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard""".query(CreditcardRow.jdbcDecoder).selectStream
   }
   override def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Option[CreditcardRow]] = {
-    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(Setter[CustomCreditcardId])}""".query(CreditcardRow.jdbcDecoder).selectOne
+    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".query(CreditcardRow.jdbcDecoder).selectOne
   }
   override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${Segment.paramSegment(creditcardids)(CustomCreditcardId.arraySetter)})""".query(CreditcardRow.jdbcDecoder).selectStream
@@ -83,10 +83,10 @@ object CreditcardRepoImpl extends CreditcardRepo {
     sql"""update sales.creditcard
           set "cardtype" = ${Segment.paramSegment(row.cardtype)(Setter.stringSetter)},
               "cardnumber" = ${Segment.paramSegment(row.cardnumber)(Setter.stringSetter)},
-              "expmonth" = ${Segment.paramSegment(row.expmonth)(Setter[TypoShort])}::int2,
-              "expyear" = ${Segment.paramSegment(row.expyear)(Setter[TypoShort])}::int2,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "creditcardid" = ${Segment.paramSegment(creditcardid)(Setter[CustomCreditcardId])}""".update.map(_ > 0)
+              "expmonth" = ${Segment.paramSegment(row.expmonth)(TypoShort.setter)}::int2,
+              "expyear" = ${Segment.paramSegment(row.expyear)(TypoShort.setter)}::int2,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
     UpdateBuilder("sales.creditcard", CreditcardFields, CreditcardRow.jdbcDecoder)
@@ -94,12 +94,12 @@ object CreditcardRepoImpl extends CreditcardRepo {
   override def upsert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[CreditcardRow]] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.creditcardid)(Setter[CustomCreditcardId])}::int4,
+            ${Segment.paramSegment(unsaved.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}::int4,
             ${Segment.paramSegment(unsaved.cardtype)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.cardnumber)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.expmonth)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.expyear)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.expmonth)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.expyear)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("creditcardid")
           do update set

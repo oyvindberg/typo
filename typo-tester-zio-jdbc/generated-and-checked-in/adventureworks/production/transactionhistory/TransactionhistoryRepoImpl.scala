@@ -25,27 +25,27 @@ import zio.stream.ZStream
 
 object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.transactionhistory where "transactionid" = ${Segment.paramSegment(transactionid)(Setter[TransactionhistoryId])}""".delete.map(_ > 0)
+    sql"""delete from production.transactionhistory where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     DeleteBuilder("production.transactionhistory", TransactionhistoryFields)
   }
   override def insert(unsaved: TransactionhistoryRow): ZIO[ZConnection, Throwable, TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
-          values (${Segment.paramSegment(unsaved.transactionid)(Setter[TransactionhistoryId])}::int4, ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.referenceorderid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.referenceorderlineid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.transactiondate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.transactiontype)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.actualcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.transactionid)(TransactionhistoryId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.referenceorderid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.referenceorderlineid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.transactiondate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.transactiontype)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.actualcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.insertReturning(TransactionhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved): ZIO[ZConnection, Throwable, TransactionhistoryRow] = {
     val fs = List(
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
       Some((sql""""referenceorderid"""", sql"${Segment.paramSegment(unsaved.referenceorderid)(Setter.intSetter)}::int4")),
       Some((sql""""transactiontype"""", sql"${Segment.paramSegment(unsaved.transactiontype)(Setter.stringSetter)}::bpchar")),
       Some((sql""""quantity"""", sql"${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4")),
       Some((sql""""actualcost"""", sql"${Segment.paramSegment(unsaved.actualcost)(Setter.bigDecimalScalaSetter)}::numeric")),
       unsaved.transactionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""transactionid"""", sql"${Segment.paramSegment(value: TransactionhistoryId)(Setter[TransactionhistoryId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""transactionid"""", sql"${Segment.paramSegment(value: TransactionhistoryId)(TransactionhistoryId.setter)}::int4"))
       },
       unsaved.referenceorderlineid match {
         case Defaulted.UseDefault => None
@@ -53,11 +53,11 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       },
       unsaved.transactiondate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""transactiondate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""transactiondate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -80,7 +80,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(TransactionhistoryRow.jdbcDecoder).selectStream
   }
   override def selectById(transactionid: TransactionhistoryId): ZIO[ZConnection, Throwable, Option[TransactionhistoryRow]] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ${Segment.paramSegment(transactionid)(Setter[TransactionhistoryId])}""".query(TransactionhistoryRow.jdbcDecoder).selectOne
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".query(TransactionhistoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId]): ZStream[ZConnection, Throwable, TransactionhistoryRow] = {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${Segment.paramSegment(transactionids)(TransactionhistoryId.arraySetter)})""".query(TransactionhistoryRow.jdbcDecoder).selectStream
@@ -88,15 +88,15 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def update(row: TransactionhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val transactionid = row.transactionid
     sql"""update production.transactionhistory
-          set "productid" = ${Segment.paramSegment(row.productid)(Setter[ProductId])}::int4,
+          set "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
               "referenceorderid" = ${Segment.paramSegment(row.referenceorderid)(Setter.intSetter)}::int4,
               "referenceorderlineid" = ${Segment.paramSegment(row.referenceorderlineid)(Setter.intSetter)}::int4,
-              "transactiondate" = ${Segment.paramSegment(row.transactiondate)(Setter[TypoLocalDateTime])}::timestamp,
+              "transactiondate" = ${Segment.paramSegment(row.transactiondate)(TypoLocalDateTime.setter)}::timestamp,
               "transactiontype" = ${Segment.paramSegment(row.transactiontype)(Setter.stringSetter)}::bpchar,
               "quantity" = ${Segment.paramSegment(row.quantity)(Setter.intSetter)}::int4,
               "actualcost" = ${Segment.paramSegment(row.actualcost)(Setter.bigDecimalScalaSetter)}::numeric,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "transactionid" = ${Segment.paramSegment(transactionid)(Setter[TransactionhistoryId])}""".update.map(_ > 0)
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     UpdateBuilder("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.jdbcDecoder)
@@ -104,15 +104,15 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def upsert(unsaved: TransactionhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryRow]] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.transactionid)(Setter[TransactionhistoryId])}::int4,
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
+            ${Segment.paramSegment(unsaved.transactionid)(TransactionhistoryId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
             ${Segment.paramSegment(unsaved.referenceorderid)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.referenceorderlineid)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.transactiondate)(Setter[TypoLocalDateTime])}::timestamp,
+            ${Segment.paramSegment(unsaved.transactiondate)(TypoLocalDateTime.setter)}::timestamp,
             ${Segment.paramSegment(unsaved.transactiontype)(Setter.stringSetter)}::bpchar,
             ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.actualcost)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("transactionid")
           do update set

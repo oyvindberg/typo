@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgUserMappingRepoImpl extends PgUserMappingRepo {
   override def delete(oid: PgUserMappingId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_user_mapping where "oid" = ${Segment.paramSegment(oid)(Setter[PgUserMappingId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_user_mapping where "oid" = ${Segment.paramSegment(oid)(PgUserMappingId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgUserMappingFields, PgUserMappingRow] = {
     DeleteBuilder("pg_catalog.pg_user_mapping", PgUserMappingFields)
   }
   override def insert(unsaved: PgUserMappingRow): ZIO[ZConnection, Throwable, PgUserMappingRow] = {
     sql"""insert into pg_catalog.pg_user_mapping("oid", "umuser", "umserver", "umoptions")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgUserMappingId])}::oid, ${Segment.paramSegment(unsaved.umuser)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.umserver)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.umoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
+          values (${Segment.paramSegment(unsaved.oid)(PgUserMappingId.setter)}::oid, ${Segment.paramSegment(unsaved.umuser)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.umserver)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.umoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
           returning "oid", "umuser", "umserver", "umoptions"
        """.insertReturning(PgUserMappingRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
     sql"""select "oid", "umuser", "umserver", "umoptions" from pg_catalog.pg_user_mapping""".query(PgUserMappingRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgUserMappingId): ZIO[ZConnection, Throwable, Option[PgUserMappingRow]] = {
-    sql"""select "oid", "umuser", "umserver", "umoptions" from pg_catalog.pg_user_mapping where "oid" = ${Segment.paramSegment(oid)(Setter[PgUserMappingId])}""".query(PgUserMappingRow.jdbcDecoder).selectOne
+    sql"""select "oid", "umuser", "umserver", "umoptions" from pg_catalog.pg_user_mapping where "oid" = ${Segment.paramSegment(oid)(PgUserMappingId.setter)}""".query(PgUserMappingRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgUserMappingId]): ZStream[ZConnection, Throwable, PgUserMappingRow] = {
     sql"""select "oid", "umuser", "umserver", "umoptions" from pg_catalog.pg_user_mapping where "oid" = ANY(${Segment.paramSegment(oids)(PgUserMappingId.arraySetter)})""".query(PgUserMappingRow.jdbcDecoder).selectStream
@@ -56,7 +56,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
           set "umuser" = ${Segment.paramSegment(row.umuser)(Setter.longSetter)}::oid,
               "umserver" = ${Segment.paramSegment(row.umserver)(Setter.longSetter)}::oid,
               "umoptions" = ${Segment.paramSegment(row.umoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgUserMappingId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgUserMappingId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgUserMappingFields, PgUserMappingRow] = {
     UpdateBuilder("pg_catalog.pg_user_mapping", PgUserMappingFields, PgUserMappingRow.jdbcDecoder)
@@ -64,7 +64,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
   override def upsert(unsaved: PgUserMappingRow): ZIO[ZConnection, Throwable, UpdateResult[PgUserMappingRow]] = {
     sql"""insert into pg_catalog.pg_user_mapping("oid", "umuser", "umserver", "umoptions")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgUserMappingId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgUserMappingId.setter)}::oid,
             ${Segment.paramSegment(unsaved.umuser)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.umserver)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.umoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text

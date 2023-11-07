@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   override def delete(partrelid: PgPartitionedTableId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_partitioned_table where "partrelid" = ${Segment.paramSegment(partrelid)(Setter[PgPartitionedTableId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_partitioned_table where "partrelid" = ${Segment.paramSegment(partrelid)(PgPartitionedTableId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
     DeleteBuilder("pg_catalog.pg_partitioned_table", PgPartitionedTableFields)
   }
   override def insert(unsaved: PgPartitionedTableRow): ZIO[ZConnection, Throwable, PgPartitionedTableRow] = {
     sql"""insert into pg_catalog.pg_partitioned_table("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")
-          values (${Segment.paramSegment(unsaved.partrelid)(Setter[PgPartitionedTableId])}::oid, ${Segment.paramSegment(unsaved.partstrat)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.partnatts)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.partdefid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.partattrs)(Setter[TypoInt2Vector])}::int2vector, ${Segment.paramSegment(unsaved.partclass)(Setter[TypoOidVector])}::oidvector, ${Segment.paramSegment(unsaved.partcollation)(Setter[TypoOidVector])}::oidvector, ${Segment.paramSegment(unsaved.partexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree)
+          values (${Segment.paramSegment(unsaved.partrelid)(PgPartitionedTableId.setter)}::oid, ${Segment.paramSegment(unsaved.partstrat)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.partnatts)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.partdefid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.partattrs)(TypoInt2Vector.setter)}::int2vector, ${Segment.paramSegment(unsaved.partclass)(TypoOidVector.setter)}::oidvector, ${Segment.paramSegment(unsaved.partcollation)(TypoOidVector.setter)}::oidvector, ${Segment.paramSegment(unsaved.partexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree)
           returning "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs"
        """.insertReturning(PgPartitionedTableRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -43,7 +43,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     sql"""select "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs" from pg_catalog.pg_partitioned_table""".query(PgPartitionedTableRow.jdbcDecoder).selectStream
   }
   override def selectById(partrelid: PgPartitionedTableId): ZIO[ZConnection, Throwable, Option[PgPartitionedTableRow]] = {
-    sql"""select "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs" from pg_catalog.pg_partitioned_table where "partrelid" = ${Segment.paramSegment(partrelid)(Setter[PgPartitionedTableId])}""".query(PgPartitionedTableRow.jdbcDecoder).selectOne
+    sql"""select "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs" from pg_catalog.pg_partitioned_table where "partrelid" = ${Segment.paramSegment(partrelid)(PgPartitionedTableId.setter)}""".query(PgPartitionedTableRow.jdbcDecoder).selectOne
   }
   override def selectByIds(partrelids: Array[PgPartitionedTableId]): ZStream[ZConnection, Throwable, PgPartitionedTableRow] = {
     sql"""select "partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs" from pg_catalog.pg_partitioned_table where "partrelid" = ANY(${Segment.paramSegment(partrelids)(PgPartitionedTableId.arraySetter)})""".query(PgPartitionedTableRow.jdbcDecoder).selectStream
@@ -52,13 +52,13 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     val partrelid = row.partrelid
     sql"""update pg_catalog.pg_partitioned_table
           set "partstrat" = ${Segment.paramSegment(row.partstrat)(Setter.stringSetter)}::char,
-              "partnatts" = ${Segment.paramSegment(row.partnatts)(Setter[TypoShort])}::int2,
+              "partnatts" = ${Segment.paramSegment(row.partnatts)(TypoShort.setter)}::int2,
               "partdefid" = ${Segment.paramSegment(row.partdefid)(Setter.longSetter)}::oid,
-              "partattrs" = ${Segment.paramSegment(row.partattrs)(Setter[TypoInt2Vector])}::int2vector,
-              "partclass" = ${Segment.paramSegment(row.partclass)(Setter[TypoOidVector])}::oidvector,
-              "partcollation" = ${Segment.paramSegment(row.partcollation)(Setter[TypoOidVector])}::oidvector,
-              "partexprs" = ${Segment.paramSegment(row.partexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
-          where "partrelid" = ${Segment.paramSegment(partrelid)(Setter[PgPartitionedTableId])}""".update.map(_ > 0)
+              "partattrs" = ${Segment.paramSegment(row.partattrs)(TypoInt2Vector.setter)}::int2vector,
+              "partclass" = ${Segment.paramSegment(row.partclass)(TypoOidVector.setter)}::oidvector,
+              "partcollation" = ${Segment.paramSegment(row.partcollation)(TypoOidVector.setter)}::oidvector,
+              "partexprs" = ${Segment.paramSegment(row.partexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
+          where "partrelid" = ${Segment.paramSegment(partrelid)(PgPartitionedTableId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
     UpdateBuilder("pg_catalog.pg_partitioned_table", PgPartitionedTableFields, PgPartitionedTableRow.jdbcDecoder)
@@ -66,14 +66,14 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   override def upsert(unsaved: PgPartitionedTableRow): ZIO[ZConnection, Throwable, UpdateResult[PgPartitionedTableRow]] = {
     sql"""insert into pg_catalog.pg_partitioned_table("partrelid", "partstrat", "partnatts", "partdefid", "partattrs", "partclass", "partcollation", "partexprs")
           values (
-            ${Segment.paramSegment(unsaved.partrelid)(Setter[PgPartitionedTableId])}::oid,
+            ${Segment.paramSegment(unsaved.partrelid)(PgPartitionedTableId.setter)}::oid,
             ${Segment.paramSegment(unsaved.partstrat)(Setter.stringSetter)}::char,
-            ${Segment.paramSegment(unsaved.partnatts)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.partnatts)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.partdefid)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.partattrs)(Setter[TypoInt2Vector])}::int2vector,
-            ${Segment.paramSegment(unsaved.partclass)(Setter[TypoOidVector])}::oidvector,
-            ${Segment.paramSegment(unsaved.partcollation)(Setter[TypoOidVector])}::oidvector,
-            ${Segment.paramSegment(unsaved.partexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
+            ${Segment.paramSegment(unsaved.partattrs)(TypoInt2Vector.setter)}::int2vector,
+            ${Segment.paramSegment(unsaved.partclass)(TypoOidVector.setter)}::oidvector,
+            ${Segment.paramSegment(unsaved.partcollation)(TypoOidVector.setter)}::oidvector,
+            ${Segment.paramSegment(unsaved.partexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
           )
           on conflict ("partrelid")
           do update set

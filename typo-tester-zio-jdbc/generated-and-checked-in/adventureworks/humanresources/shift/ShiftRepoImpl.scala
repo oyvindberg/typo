@@ -18,7 +18,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -26,29 +25,29 @@ import zio.stream.ZStream
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(Setter[ShiftId])}""".delete.map(_ > 0)
+    sql"""delete from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
     DeleteBuilder("humanresources.shift", ShiftFields)
   }
   override def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
-          values (${Segment.paramSegment(unsaved.shiftid)(Setter[ShiftId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.starttime)(Setter[TypoLocalTime])}::time, ${Segment.paramSegment(unsaved.endtime)(Setter[TypoLocalTime])}::time, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.starttime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.endtime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
        """.insertReturning(ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ShiftRowUnsaved): ZIO[ZConnection, Throwable, ShiftRow] = {
     val fs = List(
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
-      Some((sql""""starttime"""", sql"${Segment.paramSegment(unsaved.starttime)(Setter[TypoLocalTime])}::time")),
-      Some((sql""""endtime"""", sql"${Segment.paramSegment(unsaved.endtime)(Setter[TypoLocalTime])}::time")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
+      Some((sql""""starttime"""", sql"${Segment.paramSegment(unsaved.starttime)(TypoLocalTime.setter)}::time")),
+      Some((sql""""endtime"""", sql"${Segment.paramSegment(unsaved.endtime)(TypoLocalTime.setter)}::time")),
       unsaved.shiftid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""shiftid"""", sql"${Segment.paramSegment(value: ShiftId)(Setter[ShiftId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""shiftid"""", sql"${Segment.paramSegment(value: ShiftId)(ShiftId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -71,7 +70,7 @@ object ShiftRepoImpl extends ShiftRepo {
     sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(ShiftRow.jdbcDecoder).selectStream
   }
   override def selectById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Option[ShiftRow]] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(Setter[ShiftId])}""".query(ShiftRow.jdbcDecoder).selectOne
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".query(ShiftRow.jdbcDecoder).selectOne
   }
   override def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow] = {
     sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${Segment.paramSegment(shiftids)(ShiftId.arraySetter)})""".query(ShiftRow.jdbcDecoder).selectStream
@@ -79,11 +78,11 @@ object ShiftRepoImpl extends ShiftRepo {
   override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean] = {
     val shiftid = row.shiftid
     sql"""update humanresources.shift
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "starttime" = ${Segment.paramSegment(row.starttime)(Setter[TypoLocalTime])}::time,
-              "endtime" = ${Segment.paramSegment(row.endtime)(Setter[TypoLocalTime])}::time,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "shiftid" = ${Segment.paramSegment(shiftid)(Setter[ShiftId])}""".update.map(_ > 0)
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "starttime" = ${Segment.paramSegment(row.starttime)(TypoLocalTime.setter)}::time,
+              "endtime" = ${Segment.paramSegment(row.endtime)(TypoLocalTime.setter)}::time,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilder("humanresources.shift", ShiftFields, ShiftRow.jdbcDecoder)
@@ -91,11 +90,11 @@ object ShiftRepoImpl extends ShiftRepo {
   override def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.shiftid)(Setter[ShiftId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.starttime)(Setter[TypoLocalTime])}::time,
-            ${Segment.paramSegment(unsaved.endtime)(Setter[TypoLocalTime])}::time,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.starttime)(TypoLocalTime.setter)}::time,
+            ${Segment.paramSegment(unsaved.endtime)(TypoLocalTime.setter)}::time,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("shiftid")
           do update set

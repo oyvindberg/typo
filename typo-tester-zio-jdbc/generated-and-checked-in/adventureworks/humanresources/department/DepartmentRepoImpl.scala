@@ -17,7 +17,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -25,28 +24,28 @@ import zio.stream.ZStream
 
 object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(Setter[DepartmentId])}""".delete.map(_ > 0)
+    sql"""delete from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
     DeleteBuilder("humanresources.department", DepartmentFields)
   }
   override def insert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, DepartmentRow] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
-          values (${Segment.paramSegment(unsaved.departmentid)(Setter[DepartmentId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.groupname)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.departmentid)(DepartmentId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.groupname)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "departmentid", "name", "groupname", "modifieddate"::text
        """.insertReturning(DepartmentRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: DepartmentRowUnsaved): ZIO[ZConnection, Throwable, DepartmentRow] = {
     val fs = List(
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
-      Some((sql""""groupname"""", sql"${Segment.paramSegment(unsaved.groupname)(Setter[Name])}::varchar")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
+      Some((sql""""groupname"""", sql"${Segment.paramSegment(unsaved.groupname)(Name.setter)}::varchar")),
       unsaved.departmentid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""departmentid"""", sql"${Segment.paramSegment(value: DepartmentId)(Setter[DepartmentId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""departmentid"""", sql"${Segment.paramSegment(value: DepartmentId)(DepartmentId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -69,7 +68,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department""".query(DepartmentRow.jdbcDecoder).selectStream
   }
   override def selectById(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Option[DepartmentRow]] = {
-    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(Setter[DepartmentId])}""".query(DepartmentRow.jdbcDecoder).selectOne
+    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".query(DepartmentRow.jdbcDecoder).selectOne
   }
   override def selectByIds(departmentids: Array[DepartmentId]): ZStream[ZConnection, Throwable, DepartmentRow] = {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ANY(${Segment.paramSegment(departmentids)(DepartmentId.arraySetter)})""".query(DepartmentRow.jdbcDecoder).selectStream
@@ -77,10 +76,10 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def update(row: DepartmentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val departmentid = row.departmentid
     sql"""update humanresources.department
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "groupname" = ${Segment.paramSegment(row.groupname)(Setter[Name])}::varchar,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "departmentid" = ${Segment.paramSegment(departmentid)(Setter[DepartmentId])}""".update.map(_ > 0)
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "groupname" = ${Segment.paramSegment(row.groupname)(Name.setter)}::varchar,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilder("humanresources.department", DepartmentFields, DepartmentRow.jdbcDecoder)
@@ -88,10 +87,10 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def upsert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, UpdateResult[DepartmentRow]] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.departmentid)(Setter[DepartmentId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.groupname)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.departmentid)(DepartmentId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.groupname)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("departmentid")
           do update set

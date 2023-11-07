@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_collation where "oid" = ${Segment.paramSegment(oid)(Setter[PgCollationId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_collation where "oid" = ${Segment.paramSegment(oid)(PgCollationId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgCollationFields, PgCollationRow] = {
     DeleteBuilder("pg_catalog.pg_collation", PgCollationFields)
   }
   override def insert(unsaved: PgCollationRow): ZIO[ZConnection, Throwable, PgCollationRow] = {
     sql"""insert into pg_catalog.pg_collation("oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgCollationId])}::oid, ${Segment.paramSegment(unsaved.collname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.collnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.collowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.collprovider)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.collisdeterministic)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.collencoding)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.collcollate)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.collctype)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.collversion)(Setter.optionParamSetter(Setter.stringSetter))})
+          values (${Segment.paramSegment(unsaved.oid)(PgCollationId.setter)}::oid, ${Segment.paramSegment(unsaved.collname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.collnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.collowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.collprovider)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.collisdeterministic)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.collencoding)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.collcollate)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.collctype)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.collversion)(Setter.optionParamSetter(Setter.stringSetter))})
           returning "oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion"
        """.insertReturning(PgCollationRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
     sql"""select "oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion" from pg_catalog.pg_collation""".query(PgCollationRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgCollationId): ZIO[ZConnection, Throwable, Option[PgCollationRow]] = {
-    sql"""select "oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion" from pg_catalog.pg_collation where "oid" = ${Segment.paramSegment(oid)(Setter[PgCollationId])}""".query(PgCollationRow.jdbcDecoder).selectOne
+    sql"""select "oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion" from pg_catalog.pg_collation where "oid" = ${Segment.paramSegment(oid)(PgCollationId.setter)}""".query(PgCollationRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgCollationId]): ZStream[ZConnection, Throwable, PgCollationRow] = {
     sql"""select "oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion" from pg_catalog.pg_collation where "oid" = ANY(${Segment.paramSegment(oids)(PgCollationId.arraySetter)})""".query(PgCollationRow.jdbcDecoder).selectStream
@@ -62,7 +62,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
               "collcollate" = ${Segment.paramSegment(row.collcollate)(Setter.stringSetter)}::name,
               "collctype" = ${Segment.paramSegment(row.collctype)(Setter.stringSetter)}::name,
               "collversion" = ${Segment.paramSegment(row.collversion)(Setter.optionParamSetter(Setter.stringSetter))}
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgCollationId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgCollationId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgCollationFields, PgCollationRow] = {
     UpdateBuilder("pg_catalog.pg_collation", PgCollationFields, PgCollationRow.jdbcDecoder)
@@ -70,7 +70,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def upsert(unsaved: PgCollationRow): ZIO[ZConnection, Throwable, UpdateResult[PgCollationRow]] = {
     sql"""insert into pg_catalog.pg_collation("oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgCollationId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgCollationId.setter)}::oid,
             ${Segment.paramSegment(unsaved.collname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.collnamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.collowner)(Setter.longSetter)}::oid,

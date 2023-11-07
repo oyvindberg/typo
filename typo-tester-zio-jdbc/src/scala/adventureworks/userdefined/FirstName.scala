@@ -12,6 +12,6 @@ object FirstName {
   implicit lazy val jsonEncoder: JsonEncoder[FirstName] = JsonEncoder.string.contramap(_.value)
   implicit lazy val jdbcDecoder: JdbcDecoder[FirstName] = JdbcDecoder.stringDecoder.map(FirstName.apply)
   implicit lazy val jdbcEncoder: JdbcEncoder[FirstName] = JdbcEncoder.stringEncoder.contramap(_.value)
-  implicit lazy val jdbcSetter: Setter[FirstName] = Setter.stringSetter.contramap(_.value)
   implicit lazy val ordering: Ordering[FirstName] = Ordering.by(_.value)
+  implicit lazy val setter: Setter[FirstName] = Setter.stringSetter.contramap(_.value)
 }

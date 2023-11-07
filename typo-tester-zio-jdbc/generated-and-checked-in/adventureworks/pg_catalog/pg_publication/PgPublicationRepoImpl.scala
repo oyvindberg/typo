@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgPublicationRepoImpl extends PgPublicationRepo {
   override def delete(oid: PgPublicationId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_publication where "oid" = ${Segment.paramSegment(oid)(Setter[PgPublicationId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_publication where "oid" = ${Segment.paramSegment(oid)(PgPublicationId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgPublicationFields, PgPublicationRow] = {
     DeleteBuilder("pg_catalog.pg_publication", PgPublicationFields)
   }
   override def insert(unsaved: PgPublicationRow): ZIO[ZConnection, Throwable, PgPublicationRow] = {
     sql"""insert into pg_catalog.pg_publication("oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgPublicationId])}::oid, ${Segment.paramSegment(unsaved.pubname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.pubowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.puballtables)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubinsert)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubupdate)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubdelete)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubtruncate)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubviaroot)(Setter.booleanSetter)})
+          values (${Segment.paramSegment(unsaved.oid)(PgPublicationId.setter)}::oid, ${Segment.paramSegment(unsaved.pubname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.pubowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.puballtables)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubinsert)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubupdate)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubdelete)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubtruncate)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.pubviaroot)(Setter.booleanSetter)})
           returning "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot"
        """.insertReturning(PgPublicationRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
     sql"""select "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot" from pg_catalog.pg_publication""".query(PgPublicationRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgPublicationId): ZIO[ZConnection, Throwable, Option[PgPublicationRow]] = {
-    sql"""select "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot" from pg_catalog.pg_publication where "oid" = ${Segment.paramSegment(oid)(Setter[PgPublicationId])}""".query(PgPublicationRow.jdbcDecoder).selectOne
+    sql"""select "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot" from pg_catalog.pg_publication where "oid" = ${Segment.paramSegment(oid)(PgPublicationId.setter)}""".query(PgPublicationRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgPublicationId]): ZStream[ZConnection, Throwable, PgPublicationRow] = {
     sql"""select "oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot" from pg_catalog.pg_publication where "oid" = ANY(${Segment.paramSegment(oids)(PgPublicationId.arraySetter)})""".query(PgPublicationRow.jdbcDecoder).selectStream
@@ -61,7 +61,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
               "pubdelete" = ${Segment.paramSegment(row.pubdelete)(Setter.booleanSetter)},
               "pubtruncate" = ${Segment.paramSegment(row.pubtruncate)(Setter.booleanSetter)},
               "pubviaroot" = ${Segment.paramSegment(row.pubviaroot)(Setter.booleanSetter)}
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgPublicationId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgPublicationId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgPublicationFields, PgPublicationRow] = {
     UpdateBuilder("pg_catalog.pg_publication", PgPublicationFields, PgPublicationRow.jdbcDecoder)
@@ -69,7 +69,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
   override def upsert(unsaved: PgPublicationRow): ZIO[ZConnection, Throwable, UpdateResult[PgPublicationRow]] = {
     sql"""insert into pg_catalog.pg_publication("oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgPublicationId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgPublicationId.setter)}::oid,
             ${Segment.paramSegment(unsaved.pubname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.pubowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.puballtables)(Setter.booleanSetter)},

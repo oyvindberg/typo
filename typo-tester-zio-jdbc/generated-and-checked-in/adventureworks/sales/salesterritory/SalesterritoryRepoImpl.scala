@@ -27,25 +27,25 @@ import zio.stream.ZStream
 
 object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.salesterritory where "territoryid" = ${Segment.paramSegment(territoryid)(Setter[SalesterritoryId])}""".delete.map(_ > 0)
+    sql"""delete from sales.salesterritory where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
     DeleteBuilder("sales.salesterritory", SalesterritoryFields)
   }
   override def insert(unsaved: SalesterritoryRow): ZIO[ZConnection, Throwable, SalesterritoryRow] = {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.territoryid)(Setter[SalesterritoryId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.countryregioncode)(Setter[CountryregionId])}, ${Segment.paramSegment(unsaved.group)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.salesytd)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.saleslastyear)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.costytd)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.costlastyear)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.group)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.salesytd)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.saleslastyear)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.costytd)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.costlastyear)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
        """.insertReturning(SalesterritoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: SalesterritoryRowUnsaved): ZIO[ZConnection, Throwable, SalesterritoryRow] = {
     val fs = List(
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
-      Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(Setter[CountryregionId])}")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
+      Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}")),
       Some((sql""""group"""", sql"${Segment.paramSegment(unsaved.group)(Setter.stringSetter)}")),
       unsaved.territoryid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""territoryid"""", sql"${Segment.paramSegment(value: SalesterritoryId)(Setter[SalesterritoryId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""territoryid"""", sql"${Segment.paramSegment(value: SalesterritoryId)(SalesterritoryId.setter)}::int4"))
       },
       unsaved.salesytd match {
         case Defaulted.UseDefault => None
@@ -65,11 +65,11 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -92,7 +92,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory""".query(SalesterritoryRow.jdbcDecoder).selectStream
   }
   override def selectById(territoryid: SalesterritoryId): ZIO[ZConnection, Throwable, Option[SalesterritoryRow]] = {
-    sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ${Segment.paramSegment(territoryid)(Setter[SalesterritoryId])}""".query(SalesterritoryRow.jdbcDecoder).selectOne
+    sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".query(SalesterritoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(territoryids: Array[SalesterritoryId]): ZStream[ZConnection, Throwable, SalesterritoryRow] = {
     sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ANY(${Segment.paramSegment(territoryids)(SalesterritoryId.arraySetter)})""".query(SalesterritoryRow.jdbcDecoder).selectStream
@@ -100,16 +100,16 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def update(row: SalesterritoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val territoryid = row.territoryid
     sql"""update sales.salesterritory
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "countryregioncode" = ${Segment.paramSegment(row.countryregioncode)(Setter[CountryregionId])},
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "countryregioncode" = ${Segment.paramSegment(row.countryregioncode)(CountryregionId.setter)},
               "group" = ${Segment.paramSegment(row.group)(Setter.stringSetter)},
               "salesytd" = ${Segment.paramSegment(row.salesytd)(Setter.bigDecimalScalaSetter)}::numeric,
               "saleslastyear" = ${Segment.paramSegment(row.saleslastyear)(Setter.bigDecimalScalaSetter)}::numeric,
               "costytd" = ${Segment.paramSegment(row.costytd)(Setter.bigDecimalScalaSetter)}::numeric,
               "costlastyear" = ${Segment.paramSegment(row.costlastyear)(Setter.bigDecimalScalaSetter)}::numeric,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "territoryid" = ${Segment.paramSegment(territoryid)(Setter[SalesterritoryId])}""".update.map(_ > 0)
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
     UpdateBuilder("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.jdbcDecoder)
@@ -117,16 +117,16 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def upsert(unsaved: SalesterritoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalesterritoryRow]] = {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.territoryid)(Setter[SalesterritoryId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.countryregioncode)(Setter[CountryregionId])},
+            ${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)},
             ${Segment.paramSegment(unsaved.group)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.salesytd)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.saleslastyear)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.costytd)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.costlastyear)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("territoryid")
           do update set

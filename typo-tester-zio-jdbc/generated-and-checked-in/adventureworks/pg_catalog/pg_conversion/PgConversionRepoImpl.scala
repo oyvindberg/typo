@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_conversion where "oid" = ${Segment.paramSegment(oid)(Setter[PgConversionId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_conversion where "oid" = ${Segment.paramSegment(oid)(PgConversionId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgConversionFields, PgConversionRow] = {
     DeleteBuilder("pg_catalog.pg_conversion", PgConversionFields)
   }
   override def insert(unsaved: PgConversionRow): ZIO[ZConnection, Throwable, PgConversionRow] = {
     sql"""insert into pg_catalog.pg_conversion("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgConversionId])}::oid, ${Segment.paramSegment(unsaved.conname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.connamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.conowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.conforencoding)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.contoencoding)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.conproc)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.condefault)(Setter.booleanSetter)})
+          values (${Segment.paramSegment(unsaved.oid)(PgConversionId.setter)}::oid, ${Segment.paramSegment(unsaved.conname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.connamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.conowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.conforencoding)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.contoencoding)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.conproc)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.condefault)(Setter.booleanSetter)})
           returning "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault"
        """.insertReturning(PgConversionRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
     sql"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault" from pg_catalog.pg_conversion""".query(PgConversionRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgConversionId): ZIO[ZConnection, Throwable, Option[PgConversionRow]] = {
-    sql"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault" from pg_catalog.pg_conversion where "oid" = ${Segment.paramSegment(oid)(Setter[PgConversionId])}""".query(PgConversionRow.jdbcDecoder).selectOne
+    sql"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault" from pg_catalog.pg_conversion where "oid" = ${Segment.paramSegment(oid)(PgConversionId.setter)}""".query(PgConversionRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgConversionId]): ZStream[ZConnection, Throwable, PgConversionRow] = {
     sql"""select "oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault" from pg_catalog.pg_conversion where "oid" = ANY(${Segment.paramSegment(oids)(PgConversionId.arraySetter)})""".query(PgConversionRow.jdbcDecoder).selectStream
@@ -54,7 +54,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
   override def selectByUnique(connamespace: /* oid */ Long, conforencoding: Int, contoencoding: Int, oid: PgConversionId): ZIO[ZConnection, Throwable, Option[PgConversionRow]] = {
     sql"""select "connamespace", "conforencoding", "contoencoding", "oid"
           from pg_catalog.pg_conversion
-          where "connamespace" = ${Segment.paramSegment(connamespace)(Setter.longSetter)} AND "conforencoding" = ${Segment.paramSegment(conforencoding)(Setter.intSetter)} AND "contoencoding" = ${Segment.paramSegment(contoencoding)(Setter.intSetter)} AND "oid" = ${Segment.paramSegment(oid)(Setter[PgConversionId])}
+          where "connamespace" = ${Segment.paramSegment(connamespace)(Setter.longSetter)} AND "conforencoding" = ${Segment.paramSegment(conforencoding)(Setter.intSetter)} AND "contoencoding" = ${Segment.paramSegment(contoencoding)(Setter.intSetter)} AND "oid" = ${Segment.paramSegment(oid)(PgConversionId.setter)}
        """.query(PgConversionRow.jdbcDecoder).selectOne
   }
   override def update(row: PgConversionRow): ZIO[ZConnection, Throwable, Boolean] = {
@@ -65,9 +65,9 @@ object PgConversionRepoImpl extends PgConversionRepo {
               "conowner" = ${Segment.paramSegment(row.conowner)(Setter.longSetter)}::oid,
               "conforencoding" = ${Segment.paramSegment(row.conforencoding)(Setter.intSetter)}::int4,
               "contoencoding" = ${Segment.paramSegment(row.contoencoding)(Setter.intSetter)}::int4,
-              "conproc" = ${Segment.paramSegment(row.conproc)(Setter[TypoRegproc])}::regproc,
+              "conproc" = ${Segment.paramSegment(row.conproc)(TypoRegproc.setter)}::regproc,
               "condefault" = ${Segment.paramSegment(row.condefault)(Setter.booleanSetter)}
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgConversionId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgConversionId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgConversionFields, PgConversionRow] = {
     UpdateBuilder("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.jdbcDecoder)
@@ -75,13 +75,13 @@ object PgConversionRepoImpl extends PgConversionRepo {
   override def upsert(unsaved: PgConversionRow): ZIO[ZConnection, Throwable, UpdateResult[PgConversionRow]] = {
     sql"""insert into pg_catalog.pg_conversion("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgConversionId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgConversionId.setter)}::oid,
             ${Segment.paramSegment(unsaved.conname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.connamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.conowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.conforencoding)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.contoencoding)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.conproc)(Setter[TypoRegproc])}::regproc,
+            ${Segment.paramSegment(unsaved.conproc)(TypoRegproc.setter)}::regproc,
             ${Segment.paramSegment(unsaved.condefault)(Setter.booleanSetter)}
           )
           on conflict ("oid")

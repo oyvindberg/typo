@@ -19,7 +19,7 @@ object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
       sql"""with row as (
               update person.person
               set firstname = firstname || '-' || ${Segment.paramSegment(suffix)(Setter.optionParamSetter(Setter.stringSetter))}
-              where modifieddate < ${Segment.paramSegment(cutoff)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp
+              where modifieddate < ${Segment.paramSegment(cutoff)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp
               returning firstname, modifieddate
             )
             select row."firstname", row."modifieddate"::text

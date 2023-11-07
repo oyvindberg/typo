@@ -28,25 +28,25 @@ import zio.stream.ZStream
 
 object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(Setter[SalestaxrateId])}""".delete.map(_ > 0)
+    sql"""delete from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
     DeleteBuilder("sales.salestaxrate", SalestaxrateFields)
   }
   override def insert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.salestaxrateid)(Setter[SalestaxrateId])}::int4, ${Segment.paramSegment(unsaved.stateprovinceid)(Setter[StateprovinceId])}::int4, ${Segment.paramSegment(unsaved.taxtype)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.taxrate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.salestaxrateid)(SalestaxrateId.setter)}::int4, ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.taxtype)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.taxrate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """.insertReturning(SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: SalestaxrateRowUnsaved): ZIO[ZConnection, Throwable, SalestaxrateRow] = {
     val fs = List(
-      Some((sql""""stateprovinceid"""", sql"${Segment.paramSegment(unsaved.stateprovinceid)(Setter[StateprovinceId])}::int4")),
-      Some((sql""""taxtype"""", sql"${Segment.paramSegment(unsaved.taxtype)(Setter[TypoShort])}::int2")),
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
+      Some((sql""""stateprovinceid"""", sql"${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4")),
+      Some((sql""""taxtype"""", sql"${Segment.paramSegment(unsaved.taxtype)(TypoShort.setter)}::int2")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
       unsaved.salestaxrateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""salestaxrateid"""", sql"${Segment.paramSegment(value: SalestaxrateId)(Setter[SalestaxrateId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""salestaxrateid"""", sql"${Segment.paramSegment(value: SalestaxrateId)(SalestaxrateId.setter)}::int4"))
       },
       unsaved.taxrate match {
         case Defaulted.UseDefault => None
@@ -54,11 +54,11 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -81,7 +81,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate""".query(SalestaxrateRow.jdbcDecoder).selectStream
   }
   override def selectById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Option[SalestaxrateRow]] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(Setter[SalestaxrateId])}""".query(SalestaxrateRow.jdbcDecoder).selectOne
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".query(SalestaxrateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): ZStream[ZConnection, Throwable, SalestaxrateRow] = {
     sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ANY(${Segment.paramSegment(salestaxrateids)(SalestaxrateId.arraySetter)})""".query(SalestaxrateRow.jdbcDecoder).selectStream
@@ -89,13 +89,13 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Boolean] = {
     val salestaxrateid = row.salestaxrateid
     sql"""update sales.salestaxrate
-          set "stateprovinceid" = ${Segment.paramSegment(row.stateprovinceid)(Setter[StateprovinceId])}::int4,
-              "taxtype" = ${Segment.paramSegment(row.taxtype)(Setter[TypoShort])}::int2,
+          set "stateprovinceid" = ${Segment.paramSegment(row.stateprovinceid)(StateprovinceId.setter)}::int4,
+              "taxtype" = ${Segment.paramSegment(row.taxtype)(TypoShort.setter)}::int2,
               "taxrate" = ${Segment.paramSegment(row.taxrate)(Setter.bigDecimalScalaSetter)}::numeric,
-              "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(Setter[SalestaxrateId])}""".update.map(_ > 0)
+              "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilder("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.jdbcDecoder)
@@ -103,13 +103,13 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def upsert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, UpdateResult[SalestaxrateRow]] = {
     sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.salestaxrateid)(Setter[SalestaxrateId])}::int4,
-            ${Segment.paramSegment(unsaved.stateprovinceid)(Setter[StateprovinceId])}::int4,
-            ${Segment.paramSegment(unsaved.taxtype)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.salestaxrateid)(SalestaxrateId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.taxtype)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.taxrate)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("salestaxrateid")
           do update set

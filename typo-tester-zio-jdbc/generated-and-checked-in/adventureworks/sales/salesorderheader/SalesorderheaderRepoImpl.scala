@@ -36,53 +36,53 @@ import zio.stream.ZStream
 
 object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.salesorderheader where "salesorderid" = ${Segment.paramSegment(salesorderid)(Setter[SalesorderheaderId])}""".delete.map(_ > 0)
+    sql"""delete from sales.salesorderheader where "salesorderid" = ${Segment.paramSegment(salesorderid)(SalesorderheaderId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     DeleteBuilder("sales.salesorderheader", SalesorderheaderFields)
   }
   override def insert(unsaved: SalesorderheaderRow): ZIO[ZConnection, Throwable, SalesorderheaderRow] = {
     sql"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.salesorderid)(Setter[SalesorderheaderId])}::int4, ${Segment.paramSegment(unsaved.revisionnumber)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.orderdate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.status)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.onlineorderflag)(Setter[Flag])}::bool, ${Segment.paramSegment(unsaved.purchaseordernumber)(Setter.optionParamSetter(Setter[OrderNumber]))}::varchar, ${Segment.paramSegment(unsaved.accountnumber)(Setter.optionParamSetter(Setter[AccountNumber]))}::varchar, ${Segment.paramSegment(unsaved.customerid)(Setter[CustomerId])}::int4, ${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4, ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(Setter[SalesterritoryId]))}::int4, ${Segment.paramSegment(unsaved.billtoaddressid)(Setter[AddressId])}::int4, ${Segment.paramSegment(unsaved.shiptoaddressid)(Setter[AddressId])}::int4, ${Segment.paramSegment(unsaved.shipmethodid)(Setter[ShipmethodId])}::int4, ${Segment.paramSegment(unsaved.creditcardid)(Setter.optionParamSetter(Setter[CustomCreditcardId]))}::int4, ${Segment.paramSegment(unsaved.creditcardapprovalcode)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.currencyrateid)(Setter.optionParamSetter(Setter[CurrencyrateId]))}::int4, ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.totaldue)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.comment)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.revisionnumber)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.orderdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.onlineorderflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.purchaseordernumber)(Setter.optionParamSetter(OrderNumber.setter))}::varchar, ${Segment.paramSegment(unsaved.accountnumber)(Setter.optionParamSetter(AccountNumber.setter))}::varchar, ${Segment.paramSegment(unsaved.customerid)(CustomerId.setter)}::int4, ${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4, ${Segment.paramSegment(unsaved.billtoaddressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.shiptoaddressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4, ${Segment.paramSegment(unsaved.creditcardid)(Setter.optionParamSetter(CustomCreditcardId.setter))}::int4, ${Segment.paramSegment(unsaved.creditcardapprovalcode)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.currencyrateid)(Setter.optionParamSetter(CurrencyrateId.setter))}::int4, ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.totaldue)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.comment)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
        """.insertReturning(SalesorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved): ZIO[ZConnection, Throwable, SalesorderheaderRow] = {
     val fs = List(
-      Some((sql""""duedate"""", sql"${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""shipdate"""", sql"${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
-      Some((sql""""purchaseordernumber"""", sql"${Segment.paramSegment(unsaved.purchaseordernumber)(Setter.optionParamSetter(Setter[OrderNumber]))}::varchar")),
-      Some((sql""""accountnumber"""", sql"${Segment.paramSegment(unsaved.accountnumber)(Setter.optionParamSetter(Setter[AccountNumber]))}::varchar")),
-      Some((sql""""customerid"""", sql"${Segment.paramSegment(unsaved.customerid)(Setter[CustomerId])}::int4")),
-      Some((sql""""salespersonid"""", sql"${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4")),
-      Some((sql""""territoryid"""", sql"${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(Setter[SalesterritoryId]))}::int4")),
-      Some((sql""""billtoaddressid"""", sql"${Segment.paramSegment(unsaved.billtoaddressid)(Setter[AddressId])}::int4")),
-      Some((sql""""shiptoaddressid"""", sql"${Segment.paramSegment(unsaved.shiptoaddressid)(Setter[AddressId])}::int4")),
-      Some((sql""""shipmethodid"""", sql"${Segment.paramSegment(unsaved.shipmethodid)(Setter[ShipmethodId])}::int4")),
-      Some((sql""""creditcardid"""", sql"${Segment.paramSegment(unsaved.creditcardid)(Setter.optionParamSetter(Setter[CustomCreditcardId]))}::int4")),
+      Some((sql""""duedate"""", sql"${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp")),
+      Some((sql""""shipdate"""", sql"${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
+      Some((sql""""purchaseordernumber"""", sql"${Segment.paramSegment(unsaved.purchaseordernumber)(Setter.optionParamSetter(OrderNumber.setter))}::varchar")),
+      Some((sql""""accountnumber"""", sql"${Segment.paramSegment(unsaved.accountnumber)(Setter.optionParamSetter(AccountNumber.setter))}::varchar")),
+      Some((sql""""customerid"""", sql"${Segment.paramSegment(unsaved.customerid)(CustomerId.setter)}::int4")),
+      Some((sql""""salespersonid"""", sql"${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4")),
+      Some((sql""""territoryid"""", sql"${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4")),
+      Some((sql""""billtoaddressid"""", sql"${Segment.paramSegment(unsaved.billtoaddressid)(AddressId.setter)}::int4")),
+      Some((sql""""shiptoaddressid"""", sql"${Segment.paramSegment(unsaved.shiptoaddressid)(AddressId.setter)}::int4")),
+      Some((sql""""shipmethodid"""", sql"${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4")),
+      Some((sql""""creditcardid"""", sql"${Segment.paramSegment(unsaved.creditcardid)(Setter.optionParamSetter(CustomCreditcardId.setter))}::int4")),
       Some((sql""""creditcardapprovalcode"""", sql"${Segment.paramSegment(unsaved.creditcardapprovalcode)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""currencyrateid"""", sql"${Segment.paramSegment(unsaved.currencyrateid)(Setter.optionParamSetter(Setter[CurrencyrateId]))}::int4")),
+      Some((sql""""currencyrateid"""", sql"${Segment.paramSegment(unsaved.currencyrateid)(Setter.optionParamSetter(CurrencyrateId.setter))}::int4")),
       Some((sql""""totaldue"""", sql"${Segment.paramSegment(unsaved.totaldue)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric")),
       Some((sql""""comment"""", sql"${Segment.paramSegment(unsaved.comment)(Setter.optionParamSetter(Setter.stringSetter))}")),
       unsaved.salesorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""salesorderid"""", sql"${Segment.paramSegment(value: SalesorderheaderId)(Setter[SalesorderheaderId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""salesorderid"""", sql"${Segment.paramSegment(value: SalesorderheaderId)(SalesorderheaderId.setter)}::int4"))
       },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""revisionnumber"""", sql"${Segment.paramSegment(value: TypoShort)(Setter[TypoShort])}::int2"))
+        case Defaulted.Provided(value) => Some((sql""""revisionnumber"""", sql"${Segment.paramSegment(value: TypoShort)(TypoShort.setter)}::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""orderdate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""orderdate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       },
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""status"""", sql"${Segment.paramSegment(value: TypoShort)(Setter[TypoShort])}::int2"))
+        case Defaulted.Provided(value) => Some((sql""""status"""", sql"${Segment.paramSegment(value: TypoShort)(TypoShort.setter)}::int2"))
       },
       unsaved.onlineorderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""onlineorderflag"""", sql"${Segment.paramSegment(value: Flag)(Setter[Flag])}::bool"))
+        case Defaulted.Provided(value) => Some((sql""""onlineorderflag"""", sql"${Segment.paramSegment(value: Flag)(Flag.setter)}::bool"))
       },
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
@@ -98,11 +98,11 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -125,7 +125,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     sql"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from sales.salesorderheader""".query(SalesorderheaderRow.jdbcDecoder).selectStream
   }
   override def selectById(salesorderid: SalesorderheaderId): ZIO[ZConnection, Throwable, Option[SalesorderheaderRow]] = {
-    sql"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from sales.salesorderheader where "salesorderid" = ${Segment.paramSegment(salesorderid)(Setter[SalesorderheaderId])}""".query(SalesorderheaderRow.jdbcDecoder).selectOne
+    sql"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from sales.salesorderheader where "salesorderid" = ${Segment.paramSegment(salesorderid)(SalesorderheaderId.setter)}""".query(SalesorderheaderRow.jdbcDecoder).selectOne
   }
   override def selectByIds(salesorderids: Array[SalesorderheaderId]): ZStream[ZConnection, Throwable, SalesorderheaderRow] = {
     sql"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from sales.salesorderheader where "salesorderid" = ANY(${Segment.paramSegment(salesorderids)(SalesorderheaderId.arraySetter)})""".query(SalesorderheaderRow.jdbcDecoder).selectStream
@@ -133,31 +133,31 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def update(row: SalesorderheaderRow): ZIO[ZConnection, Throwable, Boolean] = {
     val salesorderid = row.salesorderid
     sql"""update sales.salesorderheader
-          set "revisionnumber" = ${Segment.paramSegment(row.revisionnumber)(Setter[TypoShort])}::int2,
-              "orderdate" = ${Segment.paramSegment(row.orderdate)(Setter[TypoLocalDateTime])}::timestamp,
-              "duedate" = ${Segment.paramSegment(row.duedate)(Setter[TypoLocalDateTime])}::timestamp,
-              "shipdate" = ${Segment.paramSegment(row.shipdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-              "status" = ${Segment.paramSegment(row.status)(Setter[TypoShort])}::int2,
-              "onlineorderflag" = ${Segment.paramSegment(row.onlineorderflag)(Setter[Flag])}::bool,
-              "purchaseordernumber" = ${Segment.paramSegment(row.purchaseordernumber)(Setter.optionParamSetter(Setter[OrderNumber]))}::varchar,
-              "accountnumber" = ${Segment.paramSegment(row.accountnumber)(Setter.optionParamSetter(Setter[AccountNumber]))}::varchar,
-              "customerid" = ${Segment.paramSegment(row.customerid)(Setter[CustomerId])}::int4,
-              "salespersonid" = ${Segment.paramSegment(row.salespersonid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4,
-              "territoryid" = ${Segment.paramSegment(row.territoryid)(Setter.optionParamSetter(Setter[SalesterritoryId]))}::int4,
-              "billtoaddressid" = ${Segment.paramSegment(row.billtoaddressid)(Setter[AddressId])}::int4,
-              "shiptoaddressid" = ${Segment.paramSegment(row.shiptoaddressid)(Setter[AddressId])}::int4,
-              "shipmethodid" = ${Segment.paramSegment(row.shipmethodid)(Setter[ShipmethodId])}::int4,
-              "creditcardid" = ${Segment.paramSegment(row.creditcardid)(Setter.optionParamSetter(Setter[CustomCreditcardId]))}::int4,
+          set "revisionnumber" = ${Segment.paramSegment(row.revisionnumber)(TypoShort.setter)}::int2,
+              "orderdate" = ${Segment.paramSegment(row.orderdate)(TypoLocalDateTime.setter)}::timestamp,
+              "duedate" = ${Segment.paramSegment(row.duedate)(TypoLocalDateTime.setter)}::timestamp,
+              "shipdate" = ${Segment.paramSegment(row.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+              "status" = ${Segment.paramSegment(row.status)(TypoShort.setter)}::int2,
+              "onlineorderflag" = ${Segment.paramSegment(row.onlineorderflag)(Flag.setter)}::bool,
+              "purchaseordernumber" = ${Segment.paramSegment(row.purchaseordernumber)(Setter.optionParamSetter(OrderNumber.setter))}::varchar,
+              "accountnumber" = ${Segment.paramSegment(row.accountnumber)(Setter.optionParamSetter(AccountNumber.setter))}::varchar,
+              "customerid" = ${Segment.paramSegment(row.customerid)(CustomerId.setter)}::int4,
+              "salespersonid" = ${Segment.paramSegment(row.salespersonid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
+              "territoryid" = ${Segment.paramSegment(row.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4,
+              "billtoaddressid" = ${Segment.paramSegment(row.billtoaddressid)(AddressId.setter)}::int4,
+              "shiptoaddressid" = ${Segment.paramSegment(row.shiptoaddressid)(AddressId.setter)}::int4,
+              "shipmethodid" = ${Segment.paramSegment(row.shipmethodid)(ShipmethodId.setter)}::int4,
+              "creditcardid" = ${Segment.paramSegment(row.creditcardid)(Setter.optionParamSetter(CustomCreditcardId.setter))}::int4,
               "creditcardapprovalcode" = ${Segment.paramSegment(row.creditcardapprovalcode)(Setter.optionParamSetter(Setter.stringSetter))},
-              "currencyrateid" = ${Segment.paramSegment(row.currencyrateid)(Setter.optionParamSetter(Setter[CurrencyrateId]))}::int4,
+              "currencyrateid" = ${Segment.paramSegment(row.currencyrateid)(Setter.optionParamSetter(CurrencyrateId.setter))}::int4,
               "subtotal" = ${Segment.paramSegment(row.subtotal)(Setter.bigDecimalScalaSetter)}::numeric,
               "taxamt" = ${Segment.paramSegment(row.taxamt)(Setter.bigDecimalScalaSetter)}::numeric,
               "freight" = ${Segment.paramSegment(row.freight)(Setter.bigDecimalScalaSetter)}::numeric,
               "totaldue" = ${Segment.paramSegment(row.totaldue)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
               "comment" = ${Segment.paramSegment(row.comment)(Setter.optionParamSetter(Setter.stringSetter))},
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "salesorderid" = ${Segment.paramSegment(salesorderid)(Setter[SalesorderheaderId])}""".update.map(_ > 0)
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "salesorderid" = ${Segment.paramSegment(salesorderid)(SalesorderheaderId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     UpdateBuilder("sales.salesorderheader", SalesorderheaderFields, SalesorderheaderRow.jdbcDecoder)
@@ -165,31 +165,31 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def upsert(unsaved: SalesorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderheaderRow]] = {
     sql"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.salesorderid)(Setter[SalesorderheaderId])}::int4,
-            ${Segment.paramSegment(unsaved.revisionnumber)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.orderdate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.duedate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-            ${Segment.paramSegment(unsaved.status)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.onlineorderflag)(Setter[Flag])}::bool,
-            ${Segment.paramSegment(unsaved.purchaseordernumber)(Setter.optionParamSetter(Setter[OrderNumber]))}::varchar,
-            ${Segment.paramSegment(unsaved.accountnumber)(Setter.optionParamSetter(Setter[AccountNumber]))}::varchar,
-            ${Segment.paramSegment(unsaved.customerid)(Setter[CustomerId])}::int4,
-            ${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(Setter[BusinessentityId]))}::int4,
-            ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(Setter[SalesterritoryId]))}::int4,
-            ${Segment.paramSegment(unsaved.billtoaddressid)(Setter[AddressId])}::int4,
-            ${Segment.paramSegment(unsaved.shiptoaddressid)(Setter[AddressId])}::int4,
-            ${Segment.paramSegment(unsaved.shipmethodid)(Setter[ShipmethodId])}::int4,
-            ${Segment.paramSegment(unsaved.creditcardid)(Setter.optionParamSetter(Setter[CustomCreditcardId]))}::int4,
+            ${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.revisionnumber)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.orderdate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+            ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.onlineorderflag)(Flag.setter)}::bool,
+            ${Segment.paramSegment(unsaved.purchaseordernumber)(Setter.optionParamSetter(OrderNumber.setter))}::varchar,
+            ${Segment.paramSegment(unsaved.accountnumber)(Setter.optionParamSetter(AccountNumber.setter))}::varchar,
+            ${Segment.paramSegment(unsaved.customerid)(CustomerId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
+            ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4,
+            ${Segment.paramSegment(unsaved.billtoaddressid)(AddressId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.shiptoaddressid)(AddressId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.creditcardid)(Setter.optionParamSetter(CustomCreditcardId.setter))}::int4,
             ${Segment.paramSegment(unsaved.creditcardapprovalcode)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.currencyrateid)(Setter.optionParamSetter(Setter[CurrencyrateId]))}::int4,
+            ${Segment.paramSegment(unsaved.currencyrateid)(Setter.optionParamSetter(CurrencyrateId.setter))}::int4,
             ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.totaldue)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
             ${Segment.paramSegment(unsaved.comment)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("salesorderid")
           do update set

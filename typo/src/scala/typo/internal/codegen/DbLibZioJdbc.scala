@@ -117,7 +117,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$Setter.byteArraySetter"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
-          code"${Setter.of(x)}" // TODO: Can we do better?
+          code"$tpe.$setterName"
         case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
           code"$targ.$arraySetterName"
         case x if missingInstancesByType.contains(Setter.of(x)) =>
@@ -625,7 +625,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
 
     /** Adapted from Quill implementation
       *
-      * Works for primitive types but not for more complex types TODO: Make it work for complex types
+      * Works for primitive types but not for more complex types
       */
     def primitiveArrayDecoder(T: sc.Type.Qualified) = {
       val body =

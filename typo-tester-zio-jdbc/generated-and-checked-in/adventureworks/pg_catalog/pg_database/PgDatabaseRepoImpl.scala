@@ -23,14 +23,14 @@ import zio.stream.ZStream
 
 object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def delete(oid: PgDatabaseId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_database where "oid" = ${Segment.paramSegment(oid)(Setter[PgDatabaseId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_database where "oid" = ${Segment.paramSegment(oid)(PgDatabaseId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgDatabaseFields, PgDatabaseRow] = {
     DeleteBuilder("pg_catalog.pg_database", PgDatabaseFields)
   }
   override def insert(unsaved: PgDatabaseRow): ZIO[ZConnection, Throwable, PgDatabaseRow] = {
     sql"""insert into pg_catalog.pg_database("oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgDatabaseId])}::oid, ${Segment.paramSegment(unsaved.datname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.datdba)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.encoding)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.datcollate)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.datctype)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.datistemplate)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.datallowconn)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.datconnlimit)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.datlastsysoid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.datfrozenxid)(Setter[TypoXid])}::xid, ${Segment.paramSegment(unsaved.datminmxid)(Setter[TypoXid])}::xid, ${Segment.paramSegment(unsaved.dattablespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.datacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
+          values (${Segment.paramSegment(unsaved.oid)(PgDatabaseId.setter)}::oid, ${Segment.paramSegment(unsaved.datname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.datdba)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.encoding)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.datcollate)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.datctype)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.datistemplate)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.datallowconn)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.datconnlimit)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.datlastsysoid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.datfrozenxid)(TypoXid.setter)}::xid, ${Segment.paramSegment(unsaved.datminmxid)(TypoXid.setter)}::xid, ${Segment.paramSegment(unsaved.dattablespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.datacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
           returning "oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl"
        """.insertReturning(PgDatabaseRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,7 +41,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
     sql"""select "oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl" from pg_catalog.pg_database""".query(PgDatabaseRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgDatabaseId): ZIO[ZConnection, Throwable, Option[PgDatabaseRow]] = {
-    sql"""select "oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl" from pg_catalog.pg_database where "oid" = ${Segment.paramSegment(oid)(Setter[PgDatabaseId])}""".query(PgDatabaseRow.jdbcDecoder).selectOne
+    sql"""select "oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl" from pg_catalog.pg_database where "oid" = ${Segment.paramSegment(oid)(PgDatabaseId.setter)}""".query(PgDatabaseRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgDatabaseId]): ZStream[ZConnection, Throwable, PgDatabaseRow] = {
     sql"""select "oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl" from pg_catalog.pg_database where "oid" = ANY(${Segment.paramSegment(oids)(PgDatabaseId.arraySetter)})""".query(PgDatabaseRow.jdbcDecoder).selectStream
@@ -64,11 +64,11 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
               "datallowconn" = ${Segment.paramSegment(row.datallowconn)(Setter.booleanSetter)},
               "datconnlimit" = ${Segment.paramSegment(row.datconnlimit)(Setter.intSetter)}::int4,
               "datlastsysoid" = ${Segment.paramSegment(row.datlastsysoid)(Setter.longSetter)}::oid,
-              "datfrozenxid" = ${Segment.paramSegment(row.datfrozenxid)(Setter[TypoXid])}::xid,
-              "datminmxid" = ${Segment.paramSegment(row.datminmxid)(Setter[TypoXid])}::xid,
+              "datfrozenxid" = ${Segment.paramSegment(row.datfrozenxid)(TypoXid.setter)}::xid,
+              "datminmxid" = ${Segment.paramSegment(row.datminmxid)(TypoXid.setter)}::xid,
               "dattablespace" = ${Segment.paramSegment(row.dattablespace)(Setter.longSetter)}::oid,
               "datacl" = ${Segment.paramSegment(row.datacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgDatabaseId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgDatabaseId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgDatabaseFields, PgDatabaseRow] = {
     UpdateBuilder("pg_catalog.pg_database", PgDatabaseFields, PgDatabaseRow.jdbcDecoder)
@@ -76,7 +76,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def upsert(unsaved: PgDatabaseRow): ZIO[ZConnection, Throwable, UpdateResult[PgDatabaseRow]] = {
     sql"""insert into pg_catalog.pg_database("oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgDatabaseId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgDatabaseId.setter)}::oid,
             ${Segment.paramSegment(unsaved.datname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.datdba)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.encoding)(Setter.intSetter)}::int4,
@@ -86,8 +86,8 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
             ${Segment.paramSegment(unsaved.datallowconn)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.datconnlimit)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.datlastsysoid)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.datfrozenxid)(Setter[TypoXid])}::xid,
-            ${Segment.paramSegment(unsaved.datminmxid)(Setter[TypoXid])}::xid,
+            ${Segment.paramSegment(unsaved.datfrozenxid)(TypoXid.setter)}::xid,
+            ${Segment.paramSegment(unsaved.datminmxid)(TypoXid.setter)}::xid,
             ${Segment.paramSegment(unsaved.dattablespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.datacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
           )

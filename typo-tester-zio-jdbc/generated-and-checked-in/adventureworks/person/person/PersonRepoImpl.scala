@@ -30,31 +30,31 @@ import zio.stream.ZStream
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.person where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".delete.map(_ > 0)
+    sql"""delete from person.person where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("person.person", PersonFields)
   }
   override def insert(unsaved: PersonRow): ZIO[ZConnection, Throwable, PersonRow] = {
     sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.persontype)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.namestyle)(Setter[NameStyle])}::bool, ${Segment.paramSegment(unsaved.title)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.firstname)(Setter[FirstName])}::varchar, ${Segment.paramSegment(unsaved.middlename)(Setter.optionParamSetter(Setter[Name]))}::varchar, ${Segment.paramSegment(unsaved.lastname)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.suffix)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.emailpromotion)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.additionalcontactinfo)(Setter.optionParamSetter(Setter[TypoXml]))}::xml, ${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(Setter[TypoXml]))}::xml, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.persontype)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.namestyle)(NameStyle.setter)}::bool, ${Segment.paramSegment(unsaved.title)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.firstname)(/* user-picked */ FirstName.setter)}::varchar, ${Segment.paramSegment(unsaved.middlename)(Setter.optionParamSetter(Name.setter))}::varchar, ${Segment.paramSegment(unsaved.lastname)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.suffix)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.emailpromotion)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.additionalcontactinfo)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
        """.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: PersonRowUnsaved): ZIO[ZConnection, Throwable, PersonRow] = {
     val fs = List(
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
       Some((sql""""persontype"""", sql"${Segment.paramSegment(unsaved.persontype)(Setter.stringSetter)}::bpchar")),
       Some((sql""""title"""", sql"${Segment.paramSegment(unsaved.title)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""firstname"""", sql"${Segment.paramSegment(unsaved.firstname)(Setter[FirstName])}::varchar")),
-      Some((sql""""middlename"""", sql"${Segment.paramSegment(unsaved.middlename)(Setter.optionParamSetter(Setter[Name]))}::varchar")),
-      Some((sql""""lastname"""", sql"${Segment.paramSegment(unsaved.lastname)(Setter[Name])}::varchar")),
+      Some((sql""""firstname"""", sql"${Segment.paramSegment(unsaved.firstname)(/* user-picked */ FirstName.setter)}::varchar")),
+      Some((sql""""middlename"""", sql"${Segment.paramSegment(unsaved.middlename)(Setter.optionParamSetter(Name.setter))}::varchar")),
+      Some((sql""""lastname"""", sql"${Segment.paramSegment(unsaved.lastname)(Name.setter)}::varchar")),
       Some((sql""""suffix"""", sql"${Segment.paramSegment(unsaved.suffix)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""additionalcontactinfo"""", sql"${Segment.paramSegment(unsaved.additionalcontactinfo)(Setter.optionParamSetter(Setter[TypoXml]))}::xml")),
-      Some((sql""""demographics"""", sql"${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(Setter[TypoXml]))}::xml")),
+      Some((sql""""additionalcontactinfo"""", sql"${Segment.paramSegment(unsaved.additionalcontactinfo)(Setter.optionParamSetter(TypoXml.setter))}::xml")),
+      Some((sql""""demographics"""", sql"${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml")),
       unsaved.namestyle match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""namestyle"""", sql"${Segment.paramSegment(value: NameStyle)(Setter[NameStyle])}::bool"))
+        case Defaulted.Provided(value) => Some((sql""""namestyle"""", sql"${Segment.paramSegment(value: NameStyle)(NameStyle.setter)}::bool"))
       },
       unsaved.emailpromotion match {
         case Defaulted.UseDefault => None
@@ -62,11 +62,11 @@ object PersonRepoImpl extends PersonRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -89,7 +89,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person""".query(PersonRow.jdbcDecoder).selectStream
   }
   override def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
-    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".query(PersonRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(PersonRow.jdbcDecoder).selectOne
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PersonRow] = {
     sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(PersonRow.jdbcDecoder).selectStream
@@ -98,18 +98,18 @@ object PersonRepoImpl extends PersonRepo {
     val businessentityid = row.businessentityid
     sql"""update person.person
           set "persontype" = ${Segment.paramSegment(row.persontype)(Setter.stringSetter)}::bpchar,
-              "namestyle" = ${Segment.paramSegment(row.namestyle)(Setter[NameStyle])}::bool,
+              "namestyle" = ${Segment.paramSegment(row.namestyle)(NameStyle.setter)}::bool,
               "title" = ${Segment.paramSegment(row.title)(Setter.optionParamSetter(Setter.stringSetter))},
-              "firstname" = ${Segment.paramSegment(row.firstname)(Setter[FirstName])}::varchar,
-              "middlename" = ${Segment.paramSegment(row.middlename)(Setter.optionParamSetter(Setter[Name]))}::varchar,
-              "lastname" = ${Segment.paramSegment(row.lastname)(Setter[Name])}::varchar,
+              "firstname" = ${Segment.paramSegment(row.firstname)(/* user-picked */ FirstName.setter)}::varchar,
+              "middlename" = ${Segment.paramSegment(row.middlename)(Setter.optionParamSetter(Name.setter))}::varchar,
+              "lastname" = ${Segment.paramSegment(row.lastname)(Name.setter)}::varchar,
               "suffix" = ${Segment.paramSegment(row.suffix)(Setter.optionParamSetter(Setter.stringSetter))},
               "emailpromotion" = ${Segment.paramSegment(row.emailpromotion)(Setter.intSetter)}::int4,
-              "additionalcontactinfo" = ${Segment.paramSegment(row.additionalcontactinfo)(Setter.optionParamSetter(Setter[TypoXml]))}::xml,
-              "demographics" = ${Segment.paramSegment(row.demographics)(Setter.optionParamSetter(Setter[TypoXml]))}::xml,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".update.map(_ > 0)
+              "additionalcontactinfo" = ${Segment.paramSegment(row.additionalcontactinfo)(Setter.optionParamSetter(TypoXml.setter))}::xml,
+              "demographics" = ${Segment.paramSegment(row.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("person.person", PersonFields, PersonRow.jdbcDecoder)
@@ -117,19 +117,19 @@ object PersonRepoImpl extends PersonRepo {
   override def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]] = {
     sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4,
+            ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
             ${Segment.paramSegment(unsaved.persontype)(Setter.stringSetter)}::bpchar,
-            ${Segment.paramSegment(unsaved.namestyle)(Setter[NameStyle])}::bool,
+            ${Segment.paramSegment(unsaved.namestyle)(NameStyle.setter)}::bool,
             ${Segment.paramSegment(unsaved.title)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.firstname)(Setter[FirstName])}::varchar,
-            ${Segment.paramSegment(unsaved.middlename)(Setter.optionParamSetter(Setter[Name]))}::varchar,
-            ${Segment.paramSegment(unsaved.lastname)(Setter[Name])}::varchar,
+            ${Segment.paramSegment(unsaved.firstname)(/* user-picked */ FirstName.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.middlename)(Setter.optionParamSetter(Name.setter))}::varchar,
+            ${Segment.paramSegment(unsaved.lastname)(Name.setter)}::varchar,
             ${Segment.paramSegment(unsaved.suffix)(Setter.optionParamSetter(Setter.stringSetter))},
             ${Segment.paramSegment(unsaved.emailpromotion)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.additionalcontactinfo)(Setter.optionParamSetter(Setter[TypoXml]))}::xml,
-            ${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(Setter[TypoXml]))}::xml,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.additionalcontactinfo)(Setter.optionParamSetter(TypoXml.setter))}::xml,
+            ${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("businessentityid")
           do update set

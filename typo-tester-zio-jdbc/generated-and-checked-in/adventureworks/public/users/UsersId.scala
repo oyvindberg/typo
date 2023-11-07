@@ -27,5 +27,5 @@ object UsersId {
   implicit lazy val jsonEncoder: JsonEncoder[UsersId] = TypoUUID.jsonEncoder.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[TypoUUID]): Ordering[UsersId] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[UsersId] = ParameterMetaData.instance[UsersId](TypoUUID.parameterMetadata.sqlType, TypoUUID.parameterMetadata.jdbcType)
-  implicit lazy val setter: Setter[UsersId] = Setter[TypoUUID].contramap(_.value)
+  implicit lazy val setter: Setter[UsersId] = TypoUUID.setter.contramap(_.value)
 }

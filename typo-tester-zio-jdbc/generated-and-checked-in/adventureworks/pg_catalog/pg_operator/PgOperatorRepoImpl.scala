@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgOperatorRepoImpl extends PgOperatorRepo {
   override def delete(oid: PgOperatorId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_operator where "oid" = ${Segment.paramSegment(oid)(Setter[PgOperatorId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_operator where "oid" = ${Segment.paramSegment(oid)(PgOperatorId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgOperatorFields, PgOperatorRow] = {
     DeleteBuilder("pg_catalog.pg_operator", PgOperatorFields)
   }
   override def insert(unsaved: PgOperatorRow): ZIO[ZConnection, Throwable, PgOperatorRow] = {
     sql"""insert into pg_catalog.pg_operator("oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgOperatorId])}::oid, ${Segment.paramSegment(unsaved.oprname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.oprnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprkind)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.oprcanmerge)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.oprcanhash)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.oprleft)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprright)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprresult)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprcom)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprnegate)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprcode)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.oprrest)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.oprjoin)(Setter[TypoRegproc])}::regproc)
+          values (${Segment.paramSegment(unsaved.oid)(PgOperatorId.setter)}::oid, ${Segment.paramSegment(unsaved.oprname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.oprnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprkind)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.oprcanmerge)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.oprcanhash)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.oprleft)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprright)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprresult)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprcom)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprnegate)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.oprcode)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.oprrest)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.oprjoin)(TypoRegproc.setter)}::regproc)
           returning "oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin"
        """.insertReturning(PgOperatorRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
     sql"""select "oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin" from pg_catalog.pg_operator""".query(PgOperatorRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgOperatorId): ZIO[ZConnection, Throwable, Option[PgOperatorRow]] = {
-    sql"""select "oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin" from pg_catalog.pg_operator where "oid" = ${Segment.paramSegment(oid)(Setter[PgOperatorId])}""".query(PgOperatorRow.jdbcDecoder).selectOne
+    sql"""select "oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin" from pg_catalog.pg_operator where "oid" = ${Segment.paramSegment(oid)(PgOperatorId.setter)}""".query(PgOperatorRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgOperatorId]): ZStream[ZConnection, Throwable, PgOperatorRow] = {
     sql"""select "oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin" from pg_catalog.pg_operator where "oid" = ANY(${Segment.paramSegment(oids)(PgOperatorId.arraySetter)})""".query(PgOperatorRow.jdbcDecoder).selectStream
@@ -65,10 +65,10 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
               "oprresult" = ${Segment.paramSegment(row.oprresult)(Setter.longSetter)}::oid,
               "oprcom" = ${Segment.paramSegment(row.oprcom)(Setter.longSetter)}::oid,
               "oprnegate" = ${Segment.paramSegment(row.oprnegate)(Setter.longSetter)}::oid,
-              "oprcode" = ${Segment.paramSegment(row.oprcode)(Setter[TypoRegproc])}::regproc,
-              "oprrest" = ${Segment.paramSegment(row.oprrest)(Setter[TypoRegproc])}::regproc,
-              "oprjoin" = ${Segment.paramSegment(row.oprjoin)(Setter[TypoRegproc])}::regproc
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgOperatorId])}""".update.map(_ > 0)
+              "oprcode" = ${Segment.paramSegment(row.oprcode)(TypoRegproc.setter)}::regproc,
+              "oprrest" = ${Segment.paramSegment(row.oprrest)(TypoRegproc.setter)}::regproc,
+              "oprjoin" = ${Segment.paramSegment(row.oprjoin)(TypoRegproc.setter)}::regproc
+          where "oid" = ${Segment.paramSegment(oid)(PgOperatorId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgOperatorFields, PgOperatorRow] = {
     UpdateBuilder("pg_catalog.pg_operator", PgOperatorFields, PgOperatorRow.jdbcDecoder)
@@ -76,7 +76,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
   override def upsert(unsaved: PgOperatorRow): ZIO[ZConnection, Throwable, UpdateResult[PgOperatorRow]] = {
     sql"""insert into pg_catalog.pg_operator("oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgOperatorId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgOperatorId.setter)}::oid,
             ${Segment.paramSegment(unsaved.oprname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.oprnamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.oprowner)(Setter.longSetter)}::oid,
@@ -88,9 +88,9 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
             ${Segment.paramSegment(unsaved.oprresult)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.oprcom)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.oprnegate)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.oprcode)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.oprrest)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.oprjoin)(Setter[TypoRegproc])}::regproc
+            ${Segment.paramSegment(unsaved.oprcode)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.oprrest)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.oprjoin)(TypoRegproc.setter)}::regproc
           )
           on conflict ("oid")
           do update set

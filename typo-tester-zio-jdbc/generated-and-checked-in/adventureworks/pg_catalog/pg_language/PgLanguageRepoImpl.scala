@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgLanguageRepoImpl extends PgLanguageRepo {
   override def delete(oid: PgLanguageId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_language where "oid" = ${Segment.paramSegment(oid)(Setter[PgLanguageId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_language where "oid" = ${Segment.paramSegment(oid)(PgLanguageId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgLanguageFields, PgLanguageRow] = {
     DeleteBuilder("pg_catalog.pg_language", PgLanguageFields)
   }
   override def insert(unsaved: PgLanguageRow): ZIO[ZConnection, Throwable, PgLanguageRow] = {
     sql"""insert into pg_catalog.pg_language("oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgLanguageId])}::oid, ${Segment.paramSegment(unsaved.lanname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.lanowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.lanispl)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.lanpltrusted)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.lanplcallfoid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.laninline)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.lanvalidator)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.lanacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
+          values (${Segment.paramSegment(unsaved.oid)(PgLanguageId.setter)}::oid, ${Segment.paramSegment(unsaved.lanname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.lanowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.lanispl)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.lanpltrusted)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.lanplcallfoid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.laninline)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.lanvalidator)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.lanacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem)
           returning "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl"
        """.insertReturning(PgLanguageRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
     sql"""select "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl" from pg_catalog.pg_language""".query(PgLanguageRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgLanguageId): ZIO[ZConnection, Throwable, Option[PgLanguageRow]] = {
-    sql"""select "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl" from pg_catalog.pg_language where "oid" = ${Segment.paramSegment(oid)(Setter[PgLanguageId])}""".query(PgLanguageRow.jdbcDecoder).selectOne
+    sql"""select "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl" from pg_catalog.pg_language where "oid" = ${Segment.paramSegment(oid)(PgLanguageId.setter)}""".query(PgLanguageRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgLanguageId]): ZStream[ZConnection, Throwable, PgLanguageRow] = {
     sql"""select "oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl" from pg_catalog.pg_language where "oid" = ANY(${Segment.paramSegment(oids)(PgLanguageId.arraySetter)})""".query(PgLanguageRow.jdbcDecoder).selectStream
@@ -62,7 +62,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
               "laninline" = ${Segment.paramSegment(row.laninline)(Setter.longSetter)}::oid,
               "lanvalidator" = ${Segment.paramSegment(row.lanvalidator)(Setter.longSetter)}::oid,
               "lanacl" = ${Segment.paramSegment(row.lanacl)(Setter.optionParamSetter(TypoAclItem.arraySetter))}::_aclitem
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgLanguageId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgLanguageId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgLanguageFields, PgLanguageRow] = {
     UpdateBuilder("pg_catalog.pg_language", PgLanguageFields, PgLanguageRow.jdbcDecoder)
@@ -70,7 +70,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
   override def upsert(unsaved: PgLanguageRow): ZIO[ZConnection, Throwable, UpdateResult[PgLanguageRow]] = {
     sql"""insert into pg_catalog.pg_language("oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgLanguageId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgLanguageId.setter)}::oid,
             ${Segment.paramSegment(unsaved.lanname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.lanowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.lanispl)(Setter.booleanSetter)},

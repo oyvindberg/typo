@@ -27,14 +27,14 @@ import zio.stream.ZStream
 
 object AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.address where "addressid" = ${Segment.paramSegment(addressid)(Setter[AddressId])}""".delete.map(_ > 0)
+    sql"""delete from person.address where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
     DeleteBuilder("person.address", AddressFields)
   }
   override def insert(unsaved: AddressRow): ZIO[ZConnection, Throwable, AddressRow] = {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.addressid)(Setter[AddressId])}::int4, ${Segment.paramSegment(unsaved.addressline1)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.addressline2)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.city)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.stateprovinceid)(Setter[StateprovinceId])}::int4, ${Segment.paramSegment(unsaved.postalcode)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.spatiallocation)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.addressline1)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.addressline2)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.city)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.postalcode)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.spatiallocation)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """.insertReturning(AddressRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -43,20 +43,20 @@ object AddressRepoImpl extends AddressRepo {
       Some((sql""""addressline1"""", sql"${Segment.paramSegment(unsaved.addressline1)(Setter.stringSetter)}")),
       Some((sql""""addressline2"""", sql"${Segment.paramSegment(unsaved.addressline2)(Setter.optionParamSetter(Setter.stringSetter))}")),
       Some((sql""""city"""", sql"${Segment.paramSegment(unsaved.city)(Setter.stringSetter)}")),
-      Some((sql""""stateprovinceid"""", sql"${Segment.paramSegment(unsaved.stateprovinceid)(Setter[StateprovinceId])}::int4")),
+      Some((sql""""stateprovinceid"""", sql"${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4")),
       Some((sql""""postalcode"""", sql"${Segment.paramSegment(unsaved.postalcode)(Setter.stringSetter)}")),
-      Some((sql""""spatiallocation"""", sql"${Segment.paramSegment(unsaved.spatiallocation)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea")),
+      Some((sql""""spatiallocation"""", sql"${Segment.paramSegment(unsaved.spatiallocation)(Setter.optionParamSetter(TypoBytea.setter))}::bytea")),
       unsaved.addressid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""addressid"""", sql"${Segment.paramSegment(value: AddressId)(Setter[AddressId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""addressid"""", sql"${Segment.paramSegment(value: AddressId)(AddressId.setter)}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -79,7 +79,7 @@ object AddressRepoImpl extends AddressRepo {
     sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address""".query(AddressRow.jdbcDecoder).selectStream
   }
   override def selectById(addressid: AddressId): ZIO[ZConnection, Throwable, Option[AddressRow]] = {
-    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ${Segment.paramSegment(addressid)(Setter[AddressId])}""".query(AddressRow.jdbcDecoder).selectOne
+    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".query(AddressRow.jdbcDecoder).selectOne
   }
   override def selectByIds(addressids: Array[AddressId]): ZStream[ZConnection, Throwable, AddressRow] = {
     sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ANY(${Segment.paramSegment(addressids)(AddressId.arraySetter)})""".query(AddressRow.jdbcDecoder).selectStream
@@ -90,12 +90,12 @@ object AddressRepoImpl extends AddressRepo {
           set "addressline1" = ${Segment.paramSegment(row.addressline1)(Setter.stringSetter)},
               "addressline2" = ${Segment.paramSegment(row.addressline2)(Setter.optionParamSetter(Setter.stringSetter))},
               "city" = ${Segment.paramSegment(row.city)(Setter.stringSetter)},
-              "stateprovinceid" = ${Segment.paramSegment(row.stateprovinceid)(Setter[StateprovinceId])}::int4,
+              "stateprovinceid" = ${Segment.paramSegment(row.stateprovinceid)(StateprovinceId.setter)}::int4,
               "postalcode" = ${Segment.paramSegment(row.postalcode)(Setter.stringSetter)},
-              "spatiallocation" = ${Segment.paramSegment(row.spatiallocation)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "addressid" = ${Segment.paramSegment(addressid)(Setter[AddressId])}""".update.map(_ > 0)
+              "spatiallocation" = ${Segment.paramSegment(row.spatiallocation)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
     UpdateBuilder("person.address", AddressFields, AddressRow.jdbcDecoder)
@@ -103,15 +103,15 @@ object AddressRepoImpl extends AddressRepo {
   override def upsert(unsaved: AddressRow): ZIO[ZConnection, Throwable, UpdateResult[AddressRow]] = {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.addressid)(Setter[AddressId])}::int4,
+            ${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4,
             ${Segment.paramSegment(unsaved.addressline1)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.addressline2)(Setter.optionParamSetter(Setter.stringSetter))},
             ${Segment.paramSegment(unsaved.city)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.stateprovinceid)(Setter[StateprovinceId])}::int4,
+            ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4,
             ${Segment.paramSegment(unsaved.postalcode)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.spatiallocation)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.spatiallocation)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("addressid")
           do update set

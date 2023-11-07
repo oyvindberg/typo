@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgTsDictRepoImpl extends PgTsDictRepo {
   override def delete(oid: PgTsDictId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_ts_dict where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsDictId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_ts_dict where "oid" = ${Segment.paramSegment(oid)(PgTsDictId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTsDictFields, PgTsDictRow] = {
     DeleteBuilder("pg_catalog.pg_ts_dict", PgTsDictFields)
   }
   override def insert(unsaved: PgTsDictRow): ZIO[ZConnection, Throwable, PgTsDictRow] = {
     sql"""insert into pg_catalog.pg_ts_dict("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgTsDictId])}::oid, ${Segment.paramSegment(unsaved.dictname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.dictnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.dictowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.dicttemplate)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.dictinitoption)(Setter.optionParamSetter(Setter.stringSetter))})
+          values (${Segment.paramSegment(unsaved.oid)(PgTsDictId.setter)}::oid, ${Segment.paramSegment(unsaved.dictname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.dictnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.dictowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.dicttemplate)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.dictinitoption)(Setter.optionParamSetter(Setter.stringSetter))})
           returning "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption"
        """.insertReturning(PgTsDictRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
     sql"""select "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption" from pg_catalog.pg_ts_dict""".query(PgTsDictRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgTsDictId): ZIO[ZConnection, Throwable, Option[PgTsDictRow]] = {
-    sql"""select "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption" from pg_catalog.pg_ts_dict where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsDictId])}""".query(PgTsDictRow.jdbcDecoder).selectOne
+    sql"""select "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption" from pg_catalog.pg_ts_dict where "oid" = ${Segment.paramSegment(oid)(PgTsDictId.setter)}""".query(PgTsDictRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgTsDictId]): ZStream[ZConnection, Throwable, PgTsDictRow] = {
     sql"""select "oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption" from pg_catalog.pg_ts_dict where "oid" = ANY(${Segment.paramSegment(oids)(PgTsDictId.arraySetter)})""".query(PgTsDictRow.jdbcDecoder).selectStream
@@ -58,7 +58,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
               "dictowner" = ${Segment.paramSegment(row.dictowner)(Setter.longSetter)}::oid,
               "dicttemplate" = ${Segment.paramSegment(row.dicttemplate)(Setter.longSetter)}::oid,
               "dictinitoption" = ${Segment.paramSegment(row.dictinitoption)(Setter.optionParamSetter(Setter.stringSetter))}
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsDictId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgTsDictId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgTsDictFields, PgTsDictRow] = {
     UpdateBuilder("pg_catalog.pg_ts_dict", PgTsDictFields, PgTsDictRow.jdbcDecoder)
@@ -66,7 +66,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
   override def upsert(unsaved: PgTsDictRow): ZIO[ZConnection, Throwable, UpdateResult[PgTsDictRow]] = {
     sql"""insert into pg_catalog.pg_ts_dict("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgTsDictId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgTsDictId.setter)}::oid,
             ${Segment.paramSegment(unsaved.dictname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.dictnamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.dictowner)(Setter.longSetter)}::oid,

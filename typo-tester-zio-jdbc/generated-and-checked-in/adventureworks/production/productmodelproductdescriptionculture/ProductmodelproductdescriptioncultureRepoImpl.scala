@@ -19,7 +19,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -27,25 +26,25 @@ import zio.stream.ZStream
 
 object ProductmodelproductdescriptioncultureRepoImpl extends ProductmodelproductdescriptioncultureRepo {
   override def delete(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productmodelproductdescriptionculture where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(Setter[ProductmodelId])} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(Setter[ProductdescriptionId])} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(Setter[CultureId])}""".delete.map(_ > 0)
+    sql"""delete from production.productmodelproductdescriptionculture where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(ProductdescriptionId.setter)} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(CultureId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow] = {
     sql"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productmodelid)(Setter[ProductmodelId])}::int4, ${Segment.paramSegment(unsaved.productdescriptionid)(Setter[ProductdescriptionId])}::int4, ${Segment.paramSegment(unsaved.cultureid)(Setter[CultureId])}::bpchar, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productmodelid)(ProductmodelId.setter)}::int4, ${Segment.paramSegment(unsaved.productdescriptionid)(ProductdescriptionId.setter)}::int4, ${Segment.paramSegment(unsaved.cultureid)(CultureId.setter)}::bpchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
        """.insertReturning(ProductmodelproductdescriptioncultureRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved): ZIO[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow] = {
     val fs = List(
-      Some((sql""""productmodelid"""", sql"${Segment.paramSegment(unsaved.productmodelid)(Setter[ProductmodelId])}::int4")),
-      Some((sql""""productdescriptionid"""", sql"${Segment.paramSegment(unsaved.productdescriptionid)(Setter[ProductdescriptionId])}::int4")),
-      Some((sql""""cultureid"""", sql"${Segment.paramSegment(unsaved.cultureid)(Setter[CultureId])}::bpchar")),
+      Some((sql""""productmodelid"""", sql"${Segment.paramSegment(unsaved.productmodelid)(ProductmodelId.setter)}::int4")),
+      Some((sql""""productdescriptionid"""", sql"${Segment.paramSegment(unsaved.productdescriptionid)(ProductdescriptionId.setter)}::int4")),
+      Some((sql""""cultureid"""", sql"${Segment.paramSegment(unsaved.cultureid)(CultureId.setter)}::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -68,13 +67,13 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
     sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture""".query(ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Option[ProductmodelproductdescriptioncultureRow]] = {
-    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(Setter[ProductmodelId])} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(Setter[ProductdescriptionId])} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(Setter[CultureId])}""".query(ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectOne
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(ProductdescriptionId.setter)} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(CultureId.setter)}""".query(ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productmodelproductdescriptionculture
-          set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(Setter[ProductmodelId])} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(Setter[ProductdescriptionId])} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(Setter[CultureId])}""".update.map(_ > 0)
+          set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(ProductdescriptionId.setter)} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(CultureId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow.jdbcDecoder)
@@ -82,10 +81,10 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelproductdescriptioncultureRow]] = {
     sql"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productmodelid)(Setter[ProductmodelId])}::int4,
-            ${Segment.paramSegment(unsaved.productdescriptionid)(Setter[ProductdescriptionId])}::int4,
-            ${Segment.paramSegment(unsaved.cultureid)(Setter[CultureId])}::bpchar,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.productmodelid)(ProductmodelId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.productdescriptionid)(ProductdescriptionId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.cultureid)(CultureId.setter)}::bpchar,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productmodelid", "productdescriptionid", "cultureid")
           do update set

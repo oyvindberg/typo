@@ -29,35 +29,35 @@ import zio.stream.ZStream
 
 object VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from purchasing.vendor where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".delete.map(_ > 0)
+    sql"""delete from purchasing.vendor where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
     DeleteBuilder("purchasing.vendor", VendorFields)
   }
   override def insert(unsaved: VendorRow): ZIO[ZConnection, Throwable, VendorRow] = {
     sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
-          values (${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.accountnumber)(Setter[AccountNumber])}::varchar, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.creditrating)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.preferredvendorstatus)(Setter[Flag])}::bool, ${Segment.paramSegment(unsaved.activeflag)(Setter[Flag])}::bool, ${Segment.paramSegment(unsaved.purchasingwebserviceurl)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.accountnumber)(AccountNumber.setter)}::varchar, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.creditrating)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.preferredvendorstatus)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.activeflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.purchasingwebserviceurl)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
        """.insertReturning(VendorRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: VendorRowUnsaved): ZIO[ZConnection, Throwable, VendorRow] = {
     val fs = List(
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4")),
-      Some((sql""""accountnumber"""", sql"${Segment.paramSegment(unsaved.accountnumber)(Setter[AccountNumber])}::varchar")),
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
-      Some((sql""""creditrating"""", sql"${Segment.paramSegment(unsaved.creditrating)(Setter[TypoShort])}::int2")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
+      Some((sql""""accountnumber"""", sql"${Segment.paramSegment(unsaved.accountnumber)(AccountNumber.setter)}::varchar")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
+      Some((sql""""creditrating"""", sql"${Segment.paramSegment(unsaved.creditrating)(TypoShort.setter)}::int2")),
       Some((sql""""purchasingwebserviceurl"""", sql"${Segment.paramSegment(unsaved.purchasingwebserviceurl)(Setter.optionParamSetter(Setter.stringSetter))}")),
       unsaved.preferredvendorstatus match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""preferredvendorstatus"""", sql"${Segment.paramSegment(value: Flag)(Setter[Flag])}::bool"))
+        case Defaulted.Provided(value) => Some((sql""""preferredvendorstatus"""", sql"${Segment.paramSegment(value: Flag)(Flag.setter)}::bool"))
       },
       unsaved.activeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""activeflag"""", sql"${Segment.paramSegment(value: Flag)(Setter[Flag])}::bool"))
+        case Defaulted.Provided(value) => Some((sql""""activeflag"""", sql"${Segment.paramSegment(value: Flag)(Flag.setter)}::bool"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -80,7 +80,7 @@ object VendorRepoImpl extends VendorRepo {
     sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor""".query(VendorRow.jdbcDecoder).selectStream
   }
   override def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[VendorRow]] = {
-    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".query(VendorRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(VendorRow.jdbcDecoder).selectOne
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, VendorRow] = {
     sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(VendorRow.jdbcDecoder).selectStream
@@ -88,14 +88,14 @@ object VendorRepoImpl extends VendorRepo {
   override def update(row: VendorRow): ZIO[ZConnection, Throwable, Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update purchasing.vendor
-          set "accountnumber" = ${Segment.paramSegment(row.accountnumber)(Setter[AccountNumber])}::varchar,
-              "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "creditrating" = ${Segment.paramSegment(row.creditrating)(Setter[TypoShort])}::int2,
-              "preferredvendorstatus" = ${Segment.paramSegment(row.preferredvendorstatus)(Setter[Flag])}::bool,
-              "activeflag" = ${Segment.paramSegment(row.activeflag)(Setter[Flag])}::bool,
+          set "accountnumber" = ${Segment.paramSegment(row.accountnumber)(AccountNumber.setter)}::varchar,
+              "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "creditrating" = ${Segment.paramSegment(row.creditrating)(TypoShort.setter)}::int2,
+              "preferredvendorstatus" = ${Segment.paramSegment(row.preferredvendorstatus)(Flag.setter)}::bool,
+              "activeflag" = ${Segment.paramSegment(row.activeflag)(Flag.setter)}::bool,
               "purchasingwebserviceurl" = ${Segment.paramSegment(row.purchasingwebserviceurl)(Setter.optionParamSetter(Setter.stringSetter))},
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(Setter[BusinessentityId])}""".update.map(_ > 0)
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
     UpdateBuilder("purchasing.vendor", VendorFields, VendorRow.jdbcDecoder)
@@ -103,14 +103,14 @@ object VendorRepoImpl extends VendorRepo {
   override def upsert(unsaved: VendorRow): ZIO[ZConnection, Throwable, UpdateResult[VendorRow]] = {
     sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4,
-            ${Segment.paramSegment(unsaved.accountnumber)(Setter[AccountNumber])}::varchar,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.creditrating)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.preferredvendorstatus)(Setter[Flag])}::bool,
-            ${Segment.paramSegment(unsaved.activeflag)(Setter[Flag])}::bool,
+            ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.accountnumber)(AccountNumber.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.creditrating)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.preferredvendorstatus)(Flag.setter)}::bool,
+            ${Segment.paramSegment(unsaved.activeflag)(Flag.setter)}::bool,
             ${Segment.paramSegment(unsaved.purchasingwebserviceurl)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("businessentityid")
           do update set

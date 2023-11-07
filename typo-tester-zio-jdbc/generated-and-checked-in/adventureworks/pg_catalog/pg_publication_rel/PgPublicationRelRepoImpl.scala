@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_publication_rel where "oid" = ${Segment.paramSegment(oid)(Setter[PgPublicationRelId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_publication_rel where "oid" = ${Segment.paramSegment(oid)(PgPublicationRelId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
     DeleteBuilder("pg_catalog.pg_publication_rel", PgPublicationRelFields)
   }
   override def insert(unsaved: PgPublicationRelRow): ZIO[ZConnection, Throwable, PgPublicationRelRow] = {
     sql"""insert into pg_catalog.pg_publication_rel("oid", "prpubid", "prrelid")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgPublicationRelId])}::oid, ${Segment.paramSegment(unsaved.prpubid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.prrelid)(Setter.longSetter)}::oid)
+          values (${Segment.paramSegment(unsaved.oid)(PgPublicationRelId.setter)}::oid, ${Segment.paramSegment(unsaved.prpubid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.prrelid)(Setter.longSetter)}::oid)
           returning "oid", "prpubid", "prrelid"
        """.insertReturning(PgPublicationRelRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
     sql"""select "oid", "prpubid", "prrelid" from pg_catalog.pg_publication_rel""".query(PgPublicationRelRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgPublicationRelId): ZIO[ZConnection, Throwable, Option[PgPublicationRelRow]] = {
-    sql"""select "oid", "prpubid", "prrelid" from pg_catalog.pg_publication_rel where "oid" = ${Segment.paramSegment(oid)(Setter[PgPublicationRelId])}""".query(PgPublicationRelRow.jdbcDecoder).selectOne
+    sql"""select "oid", "prpubid", "prrelid" from pg_catalog.pg_publication_rel where "oid" = ${Segment.paramSegment(oid)(PgPublicationRelId.setter)}""".query(PgPublicationRelRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgPublicationRelId]): ZStream[ZConnection, Throwable, PgPublicationRelRow] = {
     sql"""select "oid", "prpubid", "prrelid" from pg_catalog.pg_publication_rel where "oid" = ANY(${Segment.paramSegment(oids)(PgPublicationRelId.arraySetter)})""".query(PgPublicationRelRow.jdbcDecoder).selectStream
@@ -55,7 +55,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
     sql"""update pg_catalog.pg_publication_rel
           set "prpubid" = ${Segment.paramSegment(row.prpubid)(Setter.longSetter)}::oid,
               "prrelid" = ${Segment.paramSegment(row.prrelid)(Setter.longSetter)}::oid
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgPublicationRelId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgPublicationRelId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
     UpdateBuilder("pg_catalog.pg_publication_rel", PgPublicationRelFields, PgPublicationRelRow.jdbcDecoder)
@@ -63,7 +63,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def upsert(unsaved: PgPublicationRelRow): ZIO[ZConnection, Throwable, UpdateResult[PgPublicationRelRow]] = {
     sql"""insert into pg_catalog.pg_publication_rel("oid", "prpubid", "prrelid")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgPublicationRelId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgPublicationRelId.setter)}::oid,
             ${Segment.paramSegment(unsaved.prpubid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.prrelid)(Setter.longSetter)}::oid
           )

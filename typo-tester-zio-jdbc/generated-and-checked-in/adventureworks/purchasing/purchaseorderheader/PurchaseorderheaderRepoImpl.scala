@@ -27,38 +27,38 @@ import zio.stream.ZStream
 
 object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(Setter[PurchaseorderheaderId])}""".delete.map(_ > 0)
+    sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields)
   }
   override def insert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
-          values (${Segment.paramSegment(unsaved.purchaseorderid)(Setter[PurchaseorderheaderId])}::int4, ${Segment.paramSegment(unsaved.revisionnumber)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.status)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.employeeid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.vendorid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.shipmethodid)(Setter[ShipmethodId])}::int4, ${Segment.paramSegment(unsaved.orderdate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.purchaseorderid)(PurchaseorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.revisionnumber)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.employeeid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.vendorid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4, ${Segment.paramSegment(unsaved.orderdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
        """.insertReturning(PurchaseorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved): ZIO[ZConnection, Throwable, PurchaseorderheaderRow] = {
     val fs = List(
-      Some((sql""""employeeid"""", sql"${Segment.paramSegment(unsaved.employeeid)(Setter[BusinessentityId])}::int4")),
-      Some((sql""""vendorid"""", sql"${Segment.paramSegment(unsaved.vendorid)(Setter[BusinessentityId])}::int4")),
-      Some((sql""""shipmethodid"""", sql"${Segment.paramSegment(unsaved.shipmethodid)(Setter[ShipmethodId])}::int4")),
-      Some((sql""""shipdate"""", sql"${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
+      Some((sql""""employeeid"""", sql"${Segment.paramSegment(unsaved.employeeid)(BusinessentityId.setter)}::int4")),
+      Some((sql""""vendorid"""", sql"${Segment.paramSegment(unsaved.vendorid)(BusinessentityId.setter)}::int4")),
+      Some((sql""""shipmethodid"""", sql"${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4")),
+      Some((sql""""shipdate"""", sql"${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
       unsaved.purchaseorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""purchaseorderid"""", sql"${Segment.paramSegment(value: PurchaseorderheaderId)(Setter[PurchaseorderheaderId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""purchaseorderid"""", sql"${Segment.paramSegment(value: PurchaseorderheaderId)(PurchaseorderheaderId.setter)}::int4"))
       },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""revisionnumber"""", sql"${Segment.paramSegment(value: TypoShort)(Setter[TypoShort])}::int2"))
+        case Defaulted.Provided(value) => Some((sql""""revisionnumber"""", sql"${Segment.paramSegment(value: TypoShort)(TypoShort.setter)}::int2"))
       },
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""status"""", sql"${Segment.paramSegment(value: TypoShort)(Setter[TypoShort])}::int2"))
+        case Defaulted.Provided(value) => Some((sql""""status"""", sql"${Segment.paramSegment(value: TypoShort)(TypoShort.setter)}::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""orderdate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""orderdate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       },
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
@@ -74,7 +74,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -97,7 +97,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader""".query(PurchaseorderheaderRow.jdbcDecoder).selectStream
   }
   override def selectById(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Option[PurchaseorderheaderRow]] = {
-    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(Setter[PurchaseorderheaderId])}""".query(PurchaseorderheaderRow.jdbcDecoder).selectOne
+    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".query(PurchaseorderheaderRow.jdbcDecoder).selectOne
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): ZStream[ZConnection, Throwable, PurchaseorderheaderRow] = {
     sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${Segment.paramSegment(purchaseorderids)(PurchaseorderheaderId.arraySetter)})""".query(PurchaseorderheaderRow.jdbcDecoder).selectStream
@@ -105,18 +105,18 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def update(row: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, Boolean] = {
     val purchaseorderid = row.purchaseorderid
     sql"""update purchasing.purchaseorderheader
-          set "revisionnumber" = ${Segment.paramSegment(row.revisionnumber)(Setter[TypoShort])}::int2,
-              "status" = ${Segment.paramSegment(row.status)(Setter[TypoShort])}::int2,
-              "employeeid" = ${Segment.paramSegment(row.employeeid)(Setter[BusinessentityId])}::int4,
-              "vendorid" = ${Segment.paramSegment(row.vendorid)(Setter[BusinessentityId])}::int4,
-              "shipmethodid" = ${Segment.paramSegment(row.shipmethodid)(Setter[ShipmethodId])}::int4,
-              "orderdate" = ${Segment.paramSegment(row.orderdate)(Setter[TypoLocalDateTime])}::timestamp,
-              "shipdate" = ${Segment.paramSegment(row.shipdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
+          set "revisionnumber" = ${Segment.paramSegment(row.revisionnumber)(TypoShort.setter)}::int2,
+              "status" = ${Segment.paramSegment(row.status)(TypoShort.setter)}::int2,
+              "employeeid" = ${Segment.paramSegment(row.employeeid)(BusinessentityId.setter)}::int4,
+              "vendorid" = ${Segment.paramSegment(row.vendorid)(BusinessentityId.setter)}::int4,
+              "shipmethodid" = ${Segment.paramSegment(row.shipmethodid)(ShipmethodId.setter)}::int4,
+              "orderdate" = ${Segment.paramSegment(row.orderdate)(TypoLocalDateTime.setter)}::timestamp,
+              "shipdate" = ${Segment.paramSegment(row.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
               "subtotal" = ${Segment.paramSegment(row.subtotal)(Setter.bigDecimalScalaSetter)}::numeric,
               "taxamt" = ${Segment.paramSegment(row.taxamt)(Setter.bigDecimalScalaSetter)}::numeric,
               "freight" = ${Segment.paramSegment(row.freight)(Setter.bigDecimalScalaSetter)}::numeric,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(Setter[PurchaseorderheaderId])}""".update.map(_ > 0)
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.jdbcDecoder)
@@ -124,18 +124,18 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def upsert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[PurchaseorderheaderRow]] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.purchaseorderid)(Setter[PurchaseorderheaderId])}::int4,
-            ${Segment.paramSegment(unsaved.revisionnumber)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.status)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.employeeid)(Setter[BusinessentityId])}::int4,
-            ${Segment.paramSegment(unsaved.vendorid)(Setter[BusinessentityId])}::int4,
-            ${Segment.paramSegment(unsaved.shipmethodid)(Setter[ShipmethodId])}::int4,
-            ${Segment.paramSegment(unsaved.orderdate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
+            ${Segment.paramSegment(unsaved.purchaseorderid)(PurchaseorderheaderId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.revisionnumber)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.employeeid)(BusinessentityId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.vendorid)(BusinessentityId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.orderdate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
             ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("purchaseorderid")
           do update set

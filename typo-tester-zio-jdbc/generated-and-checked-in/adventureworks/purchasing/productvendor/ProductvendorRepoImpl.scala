@@ -27,32 +27,32 @@ import zio.stream.ZStream
 
 object ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from purchasing.productvendor where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])}""".delete.map(_ > 0)
+    sql"""delete from purchasing.productvendor where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
     DeleteBuilder("purchasing.productvendor", ProductvendorFields)
   }
   override def insert(unsaved: ProductvendorRow): ZIO[ZConnection, Throwable, ProductvendorRow] = {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4, ${Segment.paramSegment(unsaved.averageleadtime)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.standardprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.lastreceiptcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.lastreceiptdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.minorderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.maxorderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.onorderqty)(Setter.optionParamSetter(Setter.intSetter))}::int4, ${Segment.paramSegment(unsaved.unitmeasurecode)(Setter[UnitmeasureId])}::bpchar, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.averageleadtime)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.standardprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.lastreceiptcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.lastreceiptdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.minorderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.maxorderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.onorderqty)(Setter.optionParamSetter(Setter.intSetter))}::int4, ${Segment.paramSegment(unsaved.unitmeasurecode)(UnitmeasureId.setter)}::bpchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
        """.insertReturning(ProductvendorRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductvendorRowUnsaved): ZIO[ZConnection, Throwable, ProductvendorRow] = {
     val fs = List(
-      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4")),
-      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4")),
+      Some((sql""""productid"""", sql"${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4")),
+      Some((sql""""businessentityid"""", sql"${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4")),
       Some((sql""""averageleadtime"""", sql"${Segment.paramSegment(unsaved.averageleadtime)(Setter.intSetter)}::int4")),
       Some((sql""""standardprice"""", sql"${Segment.paramSegment(unsaved.standardprice)(Setter.bigDecimalScalaSetter)}::numeric")),
       Some((sql""""lastreceiptcost"""", sql"${Segment.paramSegment(unsaved.lastreceiptcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric")),
-      Some((sql""""lastreceiptdate"""", sql"${Segment.paramSegment(unsaved.lastreceiptdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
+      Some((sql""""lastreceiptdate"""", sql"${Segment.paramSegment(unsaved.lastreceiptdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
       Some((sql""""minorderqty"""", sql"${Segment.paramSegment(unsaved.minorderqty)(Setter.intSetter)}::int4")),
       Some((sql""""maxorderqty"""", sql"${Segment.paramSegment(unsaved.maxorderqty)(Setter.intSetter)}::int4")),
       Some((sql""""onorderqty"""", sql"${Segment.paramSegment(unsaved.onorderqty)(Setter.optionParamSetter(Setter.intSetter))}::int4")),
-      Some((sql""""unitmeasurecode"""", sql"${Segment.paramSegment(unsaved.unitmeasurecode)(Setter[UnitmeasureId])}::bpchar")),
+      Some((sql""""unitmeasurecode"""", sql"${Segment.paramSegment(unsaved.unitmeasurecode)(UnitmeasureId.setter)}::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -75,7 +75,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor""".query(ProductvendorRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Option[ProductvendorRow]] = {
-    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])}""".query(ProductvendorRow.jdbcDecoder).selectOne
+    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".query(ProductvendorRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductvendorRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -83,13 +83,13 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
           set "averageleadtime" = ${Segment.paramSegment(row.averageleadtime)(Setter.intSetter)}::int4,
               "standardprice" = ${Segment.paramSegment(row.standardprice)(Setter.bigDecimalScalaSetter)}::numeric,
               "lastreceiptcost" = ${Segment.paramSegment(row.lastreceiptcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
-              "lastreceiptdate" = ${Segment.paramSegment(row.lastreceiptdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
+              "lastreceiptdate" = ${Segment.paramSegment(row.lastreceiptdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
               "minorderqty" = ${Segment.paramSegment(row.minorderqty)(Setter.intSetter)}::int4,
               "maxorderqty" = ${Segment.paramSegment(row.maxorderqty)(Setter.intSetter)}::int4,
               "onorderqty" = ${Segment.paramSegment(row.onorderqty)(Setter.optionParamSetter(Setter.intSetter))}::int4,
-              "unitmeasurecode" = ${Segment.paramSegment(row.unitmeasurecode)(Setter[UnitmeasureId])}::bpchar,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(Setter[ProductId])} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(Setter[BusinessentityId])}""".update.map(_ > 0)
+              "unitmeasurecode" = ${Segment.paramSegment(row.unitmeasurecode)(UnitmeasureId.setter)}::bpchar,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
     UpdateBuilder("purchasing.productvendor", ProductvendorFields, ProductvendorRow.jdbcDecoder)
@@ -97,17 +97,17 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   override def upsert(unsaved: ProductvendorRow): ZIO[ZConnection, Throwable, UpdateResult[ProductvendorRow]] = {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.businessentityid)(Setter[BusinessentityId])}::int4,
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
             ${Segment.paramSegment(unsaved.averageleadtime)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.standardprice)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.lastreceiptcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
-            ${Segment.paramSegment(unsaved.lastreceiptdate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
+            ${Segment.paramSegment(unsaved.lastreceiptdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
             ${Segment.paramSegment(unsaved.minorderqty)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.maxorderqty)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.onorderqty)(Setter.optionParamSetter(Setter.intSetter))}::int4,
-            ${Segment.paramSegment(unsaved.unitmeasurecode)(Setter[UnitmeasureId])}::bpchar,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.unitmeasurecode)(UnitmeasureId.setter)}::bpchar,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productid", "businessentityid")
           do update set

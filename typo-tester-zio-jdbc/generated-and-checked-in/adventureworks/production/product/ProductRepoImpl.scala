@@ -31,58 +31,58 @@ import zio.stream.ZStream
 
 object ProductRepoImpl extends ProductRepo {
   override def delete(productid: ProductId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.product where "productid" = ${Segment.paramSegment(productid)(Setter[ProductId])}""".delete.map(_ > 0)
+    sql"""delete from production.product where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductFields, ProductRow] = {
     DeleteBuilder("production.product", ProductFields)
   }
   override def insert(unsaved: ProductRow): ZIO[ZConnection, Throwable, ProductRow] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.productnumber)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.makeflag)(Setter[Flag])}::bool, ${Segment.paramSegment(unsaved.finishedgoodsflag)(Setter[Flag])}::bool, ${Segment.paramSegment(unsaved.color)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.safetystocklevel)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.reorderpoint)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.listprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.size)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(Setter[UnitmeasureId]))}::bpchar, ${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(Setter[UnitmeasureId]))}::bpchar, ${Segment.paramSegment(unsaved.weight)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.daystomanufacture)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productline)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.`class`)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.style)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(Setter[ProductsubcategoryId]))}::int4, ${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(Setter[ProductmodelId]))}::int4, ${Segment.paramSegment(unsaved.sellstartdate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.productnumber)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.makeflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.finishedgoodsflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.color)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.safetystocklevel)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.reorderpoint)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.listprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.size)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar, ${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar, ${Segment.paramSegment(unsaved.weight)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.daystomanufacture)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productline)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.`class`)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.style)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(ProductsubcategoryId.setter))}::int4, ${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(ProductmodelId.setter))}::int4, ${Segment.paramSegment(unsaved.sellstartdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
        """.insertReturning(ProductRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductRowUnsaved): ZIO[ZConnection, Throwable, ProductRow] = {
     val fs = List(
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
       Some((sql""""productnumber"""", sql"${Segment.paramSegment(unsaved.productnumber)(Setter.stringSetter)}")),
       Some((sql""""color"""", sql"${Segment.paramSegment(unsaved.color)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""safetystocklevel"""", sql"${Segment.paramSegment(unsaved.safetystocklevel)(Setter[TypoShort])}::int2")),
-      Some((sql""""reorderpoint"""", sql"${Segment.paramSegment(unsaved.reorderpoint)(Setter[TypoShort])}::int2")),
+      Some((sql""""safetystocklevel"""", sql"${Segment.paramSegment(unsaved.safetystocklevel)(TypoShort.setter)}::int2")),
+      Some((sql""""reorderpoint"""", sql"${Segment.paramSegment(unsaved.reorderpoint)(TypoShort.setter)}::int2")),
       Some((sql""""standardcost"""", sql"${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric")),
       Some((sql""""listprice"""", sql"${Segment.paramSegment(unsaved.listprice)(Setter.bigDecimalScalaSetter)}::numeric")),
       Some((sql""""size"""", sql"${Segment.paramSegment(unsaved.size)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""sizeunitmeasurecode"""", sql"${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(Setter[UnitmeasureId]))}::bpchar")),
-      Some((sql""""weightunitmeasurecode"""", sql"${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(Setter[UnitmeasureId]))}::bpchar")),
+      Some((sql""""sizeunitmeasurecode"""", sql"${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar")),
+      Some((sql""""weightunitmeasurecode"""", sql"${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar")),
       Some((sql""""weight"""", sql"${Segment.paramSegment(unsaved.weight)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric")),
       Some((sql""""daystomanufacture"""", sql"${Segment.paramSegment(unsaved.daystomanufacture)(Setter.intSetter)}::int4")),
       Some((sql""""productline"""", sql"${Segment.paramSegment(unsaved.productline)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar")),
       Some((sql""""class"""", sql"${Segment.paramSegment(unsaved.`class`)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar")),
       Some((sql""""style"""", sql"${Segment.paramSegment(unsaved.style)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar")),
-      Some((sql""""productsubcategoryid"""", sql"${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(Setter[ProductsubcategoryId]))}::int4")),
-      Some((sql""""productmodelid"""", sql"${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(Setter[ProductmodelId]))}::int4")),
-      Some((sql""""sellstartdate"""", sql"${Segment.paramSegment(unsaved.sellstartdate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""sellenddate"""", sql"${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
-      Some((sql""""discontinueddate"""", sql"${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp")),
+      Some((sql""""productsubcategoryid"""", sql"${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(ProductsubcategoryId.setter))}::int4")),
+      Some((sql""""productmodelid"""", sql"${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(ProductmodelId.setter))}::int4")),
+      Some((sql""""sellstartdate"""", sql"${Segment.paramSegment(unsaved.sellstartdate)(TypoLocalDateTime.setter)}::timestamp")),
+      Some((sql""""sellenddate"""", sql"${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
+      Some((sql""""discontinueddate"""", sql"${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp")),
       unsaved.productid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""productid"""", sql"${Segment.paramSegment(value: ProductId)(Setter[ProductId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""productid"""", sql"${Segment.paramSegment(value: ProductId)(ProductId.setter)}::int4"))
       },
       unsaved.makeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""makeflag"""", sql"${Segment.paramSegment(value: Flag)(Setter[Flag])}::bool"))
+        case Defaulted.Provided(value) => Some((sql""""makeflag"""", sql"${Segment.paramSegment(value: Flag)(Flag.setter)}::bool"))
       },
       unsaved.finishedgoodsflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""finishedgoodsflag"""", sql"${Segment.paramSegment(value: Flag)(Setter[Flag])}::bool"))
+        case Defaulted.Provided(value) => Some((sql""""finishedgoodsflag"""", sql"${Segment.paramSegment(value: Flag)(Flag.setter)}::bool"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -105,7 +105,7 @@ object ProductRepoImpl extends ProductRepo {
     sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product""".query(ProductRow.jdbcDecoder).selectStream
   }
   override def selectById(productid: ProductId): ZIO[ZConnection, Throwable, Option[ProductRow]] = {
-    sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product where "productid" = ${Segment.paramSegment(productid)(Setter[ProductId])}""".query(ProductRow.jdbcDecoder).selectOne
+    sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".query(ProductRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productids: Array[ProductId]): ZStream[ZConnection, Throwable, ProductRow] = {
     sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product where "productid" = ANY(${Segment.paramSegment(productids)(ProductId.arraySetter)})""".query(ProductRow.jdbcDecoder).selectStream
@@ -113,31 +113,31 @@ object ProductRepoImpl extends ProductRepo {
   override def update(row: ProductRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productid = row.productid
     sql"""update production.product
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "productnumber" = ${Segment.paramSegment(row.productnumber)(Setter.stringSetter)},
-              "makeflag" = ${Segment.paramSegment(row.makeflag)(Setter[Flag])}::bool,
-              "finishedgoodsflag" = ${Segment.paramSegment(row.finishedgoodsflag)(Setter[Flag])}::bool,
+              "makeflag" = ${Segment.paramSegment(row.makeflag)(Flag.setter)}::bool,
+              "finishedgoodsflag" = ${Segment.paramSegment(row.finishedgoodsflag)(Flag.setter)}::bool,
               "color" = ${Segment.paramSegment(row.color)(Setter.optionParamSetter(Setter.stringSetter))},
-              "safetystocklevel" = ${Segment.paramSegment(row.safetystocklevel)(Setter[TypoShort])}::int2,
-              "reorderpoint" = ${Segment.paramSegment(row.reorderpoint)(Setter[TypoShort])}::int2,
+              "safetystocklevel" = ${Segment.paramSegment(row.safetystocklevel)(TypoShort.setter)}::int2,
+              "reorderpoint" = ${Segment.paramSegment(row.reorderpoint)(TypoShort.setter)}::int2,
               "standardcost" = ${Segment.paramSegment(row.standardcost)(Setter.bigDecimalScalaSetter)}::numeric,
               "listprice" = ${Segment.paramSegment(row.listprice)(Setter.bigDecimalScalaSetter)}::numeric,
               "size" = ${Segment.paramSegment(row.size)(Setter.optionParamSetter(Setter.stringSetter))},
-              "sizeunitmeasurecode" = ${Segment.paramSegment(row.sizeunitmeasurecode)(Setter.optionParamSetter(Setter[UnitmeasureId]))}::bpchar,
-              "weightunitmeasurecode" = ${Segment.paramSegment(row.weightunitmeasurecode)(Setter.optionParamSetter(Setter[UnitmeasureId]))}::bpchar,
+              "sizeunitmeasurecode" = ${Segment.paramSegment(row.sizeunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar,
+              "weightunitmeasurecode" = ${Segment.paramSegment(row.weightunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar,
               "weight" = ${Segment.paramSegment(row.weight)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
               "daystomanufacture" = ${Segment.paramSegment(row.daystomanufacture)(Setter.intSetter)}::int4,
               "productline" = ${Segment.paramSegment(row.productline)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar,
               "class" = ${Segment.paramSegment(row.`class`)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar,
               "style" = ${Segment.paramSegment(row.style)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar,
-              "productsubcategoryid" = ${Segment.paramSegment(row.productsubcategoryid)(Setter.optionParamSetter(Setter[ProductsubcategoryId]))}::int4,
-              "productmodelid" = ${Segment.paramSegment(row.productmodelid)(Setter.optionParamSetter(Setter[ProductmodelId]))}::int4,
-              "sellstartdate" = ${Segment.paramSegment(row.sellstartdate)(Setter[TypoLocalDateTime])}::timestamp,
-              "sellenddate" = ${Segment.paramSegment(row.sellenddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-              "discontinueddate" = ${Segment.paramSegment(row.discontinueddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productid" = ${Segment.paramSegment(productid)(Setter[ProductId])}""".update.map(_ > 0)
+              "productsubcategoryid" = ${Segment.paramSegment(row.productsubcategoryid)(Setter.optionParamSetter(ProductsubcategoryId.setter))}::int4,
+              "productmodelid" = ${Segment.paramSegment(row.productmodelid)(Setter.optionParamSetter(ProductmodelId.setter))}::int4,
+              "sellstartdate" = ${Segment.paramSegment(row.sellstartdate)(TypoLocalDateTime.setter)}::timestamp,
+              "sellenddate" = ${Segment.paramSegment(row.sellenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+              "discontinueddate" = ${Segment.paramSegment(row.discontinueddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
     UpdateBuilder("production.product", ProductFields, ProductRow.jdbcDecoder)
@@ -145,31 +145,31 @@ object ProductRepoImpl extends ProductRepo {
   override def upsert(unsaved: ProductRow): ZIO[ZConnection, Throwable, UpdateResult[ProductRow]] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productid)(Setter[ProductId])}::int4,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
+            ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
             ${Segment.paramSegment(unsaved.productnumber)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.makeflag)(Setter[Flag])}::bool,
-            ${Segment.paramSegment(unsaved.finishedgoodsflag)(Setter[Flag])}::bool,
+            ${Segment.paramSegment(unsaved.makeflag)(Flag.setter)}::bool,
+            ${Segment.paramSegment(unsaved.finishedgoodsflag)(Flag.setter)}::bool,
             ${Segment.paramSegment(unsaved.color)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.safetystocklevel)(Setter[TypoShort])}::int2,
-            ${Segment.paramSegment(unsaved.reorderpoint)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.safetystocklevel)(TypoShort.setter)}::int2,
+            ${Segment.paramSegment(unsaved.reorderpoint)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.listprice)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.size)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(Setter[UnitmeasureId]))}::bpchar,
-            ${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(Setter[UnitmeasureId]))}::bpchar,
+            ${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar,
+            ${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar,
             ${Segment.paramSegment(unsaved.weight)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
             ${Segment.paramSegment(unsaved.daystomanufacture)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.productline)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar,
             ${Segment.paramSegment(unsaved.`class`)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar,
             ${Segment.paramSegment(unsaved.style)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar,
-            ${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(Setter[ProductsubcategoryId]))}::int4,
-            ${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(Setter[ProductmodelId]))}::int4,
-            ${Segment.paramSegment(unsaved.sellstartdate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-            ${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(Setter[TypoLocalDateTime]))}::timestamp,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(ProductsubcategoryId.setter))}::int4,
+            ${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(ProductmodelId.setter))}::int4,
+            ${Segment.paramSegment(unsaved.sellstartdate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+            ${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productid")
           do update set

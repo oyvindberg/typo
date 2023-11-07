@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgAmopRepoImpl extends PgAmopRepo {
   override def delete(oid: PgAmopId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_amop where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmopId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_amop where "oid" = ${Segment.paramSegment(oid)(PgAmopId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgAmopFields, PgAmopRow] = {
     DeleteBuilder("pg_catalog.pg_amop", PgAmopFields)
   }
   override def insert(unsaved: PgAmopRow): ZIO[ZConnection, Throwable, PgAmopRow] = {
     sql"""insert into pg_catalog.pg_amop("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgAmopId])}::oid, ${Segment.paramSegment(unsaved.amopfamily)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amoplefttype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amoprighttype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amopstrategy)(Setter[TypoShort])}::int2, ${Segment.paramSegment(unsaved.amoppurpose)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.amopopr)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amopmethod)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amopsortfamily)(Setter.longSetter)}::oid)
+          values (${Segment.paramSegment(unsaved.oid)(PgAmopId.setter)}::oid, ${Segment.paramSegment(unsaved.amopfamily)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amoplefttype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amoprighttype)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amopstrategy)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.amoppurpose)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.amopopr)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amopmethod)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.amopsortfamily)(Setter.longSetter)}::oid)
           returning "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily"
        """.insertReturning(PgAmopRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
     sql"""select "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily" from pg_catalog.pg_amop""".query(PgAmopRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgAmopId): ZIO[ZConnection, Throwable, Option[PgAmopRow]] = {
-    sql"""select "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily" from pg_catalog.pg_amop where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmopId])}""".query(PgAmopRow.jdbcDecoder).selectOne
+    sql"""select "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily" from pg_catalog.pg_amop where "oid" = ${Segment.paramSegment(oid)(PgAmopId.setter)}""".query(PgAmopRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgAmopId]): ZStream[ZConnection, Throwable, PgAmopRow] = {
     sql"""select "oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily" from pg_catalog.pg_amop where "oid" = ANY(${Segment.paramSegment(oids)(PgAmopId.arraySetter)})""".query(PgAmopRow.jdbcDecoder).selectStream
@@ -48,7 +48,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def selectByUnique(amopfamily: /* oid */ Long, amoplefttype: /* oid */ Long, amoprighttype: /* oid */ Long, amopstrategy: TypoShort): ZIO[ZConnection, Throwable, Option[PgAmopRow]] = {
     sql"""select "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy"
           from pg_catalog.pg_amop
-          where "amopfamily" = ${Segment.paramSegment(amopfamily)(Setter.longSetter)} AND "amoplefttype" = ${Segment.paramSegment(amoplefttype)(Setter.longSetter)} AND "amoprighttype" = ${Segment.paramSegment(amoprighttype)(Setter.longSetter)} AND "amopstrategy" = ${Segment.paramSegment(amopstrategy)(Setter[TypoShort])}
+          where "amopfamily" = ${Segment.paramSegment(amopfamily)(Setter.longSetter)} AND "amoplefttype" = ${Segment.paramSegment(amoplefttype)(Setter.longSetter)} AND "amoprighttype" = ${Segment.paramSegment(amoprighttype)(Setter.longSetter)} AND "amopstrategy" = ${Segment.paramSegment(amopstrategy)(TypoShort.setter)}
        """.query(PgAmopRow.jdbcDecoder).selectOne
   }
   override def selectByUnique(amopopr: /* oid */ Long, amoppurpose: String, amopfamily: /* oid */ Long): ZIO[ZConnection, Throwable, Option[PgAmopRow]] = {
@@ -63,12 +63,12 @@ object PgAmopRepoImpl extends PgAmopRepo {
           set "amopfamily" = ${Segment.paramSegment(row.amopfamily)(Setter.longSetter)}::oid,
               "amoplefttype" = ${Segment.paramSegment(row.amoplefttype)(Setter.longSetter)}::oid,
               "amoprighttype" = ${Segment.paramSegment(row.amoprighttype)(Setter.longSetter)}::oid,
-              "amopstrategy" = ${Segment.paramSegment(row.amopstrategy)(Setter[TypoShort])}::int2,
+              "amopstrategy" = ${Segment.paramSegment(row.amopstrategy)(TypoShort.setter)}::int2,
               "amoppurpose" = ${Segment.paramSegment(row.amoppurpose)(Setter.stringSetter)}::char,
               "amopopr" = ${Segment.paramSegment(row.amopopr)(Setter.longSetter)}::oid,
               "amopmethod" = ${Segment.paramSegment(row.amopmethod)(Setter.longSetter)}::oid,
               "amopsortfamily" = ${Segment.paramSegment(row.amopsortfamily)(Setter.longSetter)}::oid
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgAmopId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgAmopId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgAmopFields, PgAmopRow] = {
     UpdateBuilder("pg_catalog.pg_amop", PgAmopFields, PgAmopRow.jdbcDecoder)
@@ -76,11 +76,11 @@ object PgAmopRepoImpl extends PgAmopRepo {
   override def upsert(unsaved: PgAmopRow): ZIO[ZConnection, Throwable, UpdateResult[PgAmopRow]] = {
     sql"""insert into pg_catalog.pg_amop("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgAmopId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgAmopId.setter)}::oid,
             ${Segment.paramSegment(unsaved.amopfamily)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.amoplefttype)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.amoprighttype)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.amopstrategy)(Setter[TypoShort])}::int2,
+            ${Segment.paramSegment(unsaved.amopstrategy)(TypoShort.setter)}::int2,
             ${Segment.paramSegment(unsaved.amoppurpose)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.amopopr)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.amopmethod)(Setter.longSetter)}::oid,

@@ -17,7 +17,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -25,24 +24,24 @@ import zio.stream.ZStream
 
 object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.countryregion where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(Setter[CountryregionId])}""".delete.map(_ > 0)
+    sql"""delete from person.countryregion where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
     DeleteBuilder("person.countryregion", CountryregionFields)
   }
   override def insert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, CountryregionRow] = {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
-          values (${Segment.paramSegment(unsaved.countryregioncode)(Setter[CountryregionId])}, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "countryregioncode", "name", "modifieddate"::text
        """.insertReturning(CountryregionRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: CountryregionRowUnsaved): ZIO[ZConnection, Throwable, CountryregionRow] = {
     val fs = List(
-      Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(Setter[CountryregionId])}")),
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
+      Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -65,7 +64,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion""".query(CountryregionRow.jdbcDecoder).selectStream
   }
   override def selectById(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Option[CountryregionRow]] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(Setter[CountryregionId])}""".query(CountryregionRow.jdbcDecoder).selectOne
+    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".query(CountryregionRow.jdbcDecoder).selectOne
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): ZStream[ZConnection, Throwable, CountryregionRow] = {
     sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ANY(${Segment.paramSegment(countryregioncodes)(CountryregionId.arraySetter)})""".query(CountryregionRow.jdbcDecoder).selectStream
@@ -73,9 +72,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def update(row: CountryregionRow): ZIO[ZConnection, Throwable, Boolean] = {
     val countryregioncode = row.countryregioncode
     sql"""update person.countryregion
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(Setter[CountryregionId])}""".update.map(_ > 0)
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
     UpdateBuilder("person.countryregion", CountryregionFields, CountryregionRow.jdbcDecoder)
@@ -83,9 +82,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def upsert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregionRow]] = {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.countryregioncode)(Setter[CountryregionId])},
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)},
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("countryregioncode")
           do update set

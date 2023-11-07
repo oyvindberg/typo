@@ -25,28 +25,28 @@ import zio.stream.ZStream
 
 object UsersRepoImpl extends UsersRepo {
   override def delete(userId: UsersId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from public.users where "user_id" = ${Segment.paramSegment(userId)(Setter[UsersId])}""".delete.map(_ > 0)
+    sql"""delete from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
     DeleteBuilder("public.users", UsersFields)
   }
   override def insert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UsersRow] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
-          values (${Segment.paramSegment(unsaved.userId)(Setter[UsersId])}::uuid, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.lastName)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.email)(Setter[TypoUnknownCitext])}::citext, ${Segment.paramSegment(unsaved.password)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.createdAt)(Setter[TypoInstant])}::timestamptz, ${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(Setter[TypoInstant]))}::timestamptz)
+          values (${Segment.paramSegment(unsaved.userId)(UsersId.setter)}::uuid, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.lastName)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.email)(TypoUnknownCitext.setter)}::citext, ${Segment.paramSegment(unsaved.password)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.createdAt)(TypoInstant.setter)}::timestamptz, ${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """.insertReturning(UsersRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: UsersRowUnsaved): ZIO[ZConnection, Throwable, UsersRow] = {
     val fs = List(
-      Some((sql""""user_id"""", sql"${Segment.paramSegment(unsaved.userId)(Setter[UsersId])}::uuid")),
+      Some((sql""""user_id"""", sql"${Segment.paramSegment(unsaved.userId)(UsersId.setter)}::uuid")),
       Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}")),
       Some((sql""""last_name"""", sql"${Segment.paramSegment(unsaved.lastName)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""email"""", sql"${Segment.paramSegment(unsaved.email)(Setter[TypoUnknownCitext])}::citext")),
+      Some((sql""""email"""", sql"${Segment.paramSegment(unsaved.email)(TypoUnknownCitext.setter)}::citext")),
       Some((sql""""password"""", sql"${Segment.paramSegment(unsaved.password)(Setter.stringSetter)}")),
-      Some((sql""""verified_on"""", sql"${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(Setter[TypoInstant]))}::timestamptz")),
+      Some((sql""""verified_on"""", sql"${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz")),
       unsaved.createdAt match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""created_at"""", sql"${Segment.paramSegment(value: TypoInstant)(Setter[TypoInstant])}::timestamptz"))
+        case Defaulted.Provided(value) => Some((sql""""created_at"""", sql"${Segment.paramSegment(value: TypoInstant)(TypoInstant.setter)}::timestamptz"))
       }
     ).flatten
     
@@ -69,7 +69,7 @@ object UsersRepoImpl extends UsersRepo {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users""".query(UsersRow.jdbcDecoder).selectStream
   }
   override def selectById(userId: UsersId): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
-    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ${Segment.paramSegment(userId)(Setter[UsersId])}""".query(UsersRow.jdbcDecoder).selectOne
+    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".query(UsersRow.jdbcDecoder).selectOne
   }
   override def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".query(UsersRow.jdbcDecoder).selectStream
@@ -77,7 +77,7 @@ object UsersRepoImpl extends UsersRepo {
   override def selectByUnique(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
     sql"""select "email"::text
           from public.users
-          where "email" = ${Segment.paramSegment(email)(Setter[TypoUnknownCitext])}
+          where "email" = ${Segment.paramSegment(email)(TypoUnknownCitext.setter)}
        """.query(UsersRow.jdbcDecoder).selectOne
   }
   override def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean] = {
@@ -85,11 +85,11 @@ object UsersRepoImpl extends UsersRepo {
     sql"""update public.users
           set "name" = ${Segment.paramSegment(row.name)(Setter.stringSetter)},
               "last_name" = ${Segment.paramSegment(row.lastName)(Setter.optionParamSetter(Setter.stringSetter))},
-              "email" = ${Segment.paramSegment(row.email)(Setter[TypoUnknownCitext])}::citext,
+              "email" = ${Segment.paramSegment(row.email)(TypoUnknownCitext.setter)}::citext,
               "password" = ${Segment.paramSegment(row.password)(Setter.stringSetter)},
-              "created_at" = ${Segment.paramSegment(row.createdAt)(Setter[TypoInstant])}::timestamptz,
-              "verified_on" = ${Segment.paramSegment(row.verifiedOn)(Setter.optionParamSetter(Setter[TypoInstant]))}::timestamptz
-          where "user_id" = ${Segment.paramSegment(userId)(Setter[UsersId])}""".update.map(_ > 0)
+              "created_at" = ${Segment.paramSegment(row.createdAt)(TypoInstant.setter)}::timestamptz,
+              "verified_on" = ${Segment.paramSegment(row.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz
+          where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
     UpdateBuilder("public.users", UsersFields, UsersRow.jdbcDecoder)
@@ -97,13 +97,13 @@ object UsersRepoImpl extends UsersRepo {
   override def upsert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UpdateResult[UsersRow]] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (
-            ${Segment.paramSegment(unsaved.userId)(Setter[UsersId])}::uuid,
+            ${Segment.paramSegment(unsaved.userId)(UsersId.setter)}::uuid,
             ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.lastName)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.email)(Setter[TypoUnknownCitext])}::citext,
+            ${Segment.paramSegment(unsaved.email)(TypoUnknownCitext.setter)}::citext,
             ${Segment.paramSegment(unsaved.password)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.createdAt)(Setter[TypoInstant])}::timestamptz,
-            ${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(Setter[TypoInstant]))}::timestamptz
+            ${Segment.paramSegment(unsaved.createdAt)(TypoInstant.setter)}::timestamptz,
+            ${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz
           )
           on conflict ("user_id")
           do update set

@@ -25,30 +25,30 @@ import zio.stream.ZStream
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productphoto where "productphotoid" = ${Segment.paramSegment(productphotoid)(Setter[ProductphotoId])}""".delete.map(_ > 0)
+    sql"""delete from production.productphoto where "productphotoid" = ${Segment.paramSegment(productphotoid)(ProductphotoId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
     DeleteBuilder("production.productphoto", ProductphotoFields)
   }
   override def insert(unsaved: ProductphotoRow): ZIO[ZConnection, Throwable, ProductphotoRow] = {
     sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
-          values (${Segment.paramSegment(unsaved.productphotoid)(Setter[ProductphotoId])}::int4, ${Segment.paramSegment(unsaved.thumbnailphoto)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea, ${Segment.paramSegment(unsaved.thumbnailphotofilename)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.largephoto)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea, ${Segment.paramSegment(unsaved.largephotofilename)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.productphotoid)(ProductphotoId.setter)}::int4, ${Segment.paramSegment(unsaved.thumbnailphoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.thumbnailphotofilename)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.largephoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.largephotofilename)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
        """.insertReturning(ProductphotoRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: ProductphotoRowUnsaved): ZIO[ZConnection, Throwable, ProductphotoRow] = {
     val fs = List(
-      Some((sql""""thumbnailphoto"""", sql"${Segment.paramSegment(unsaved.thumbnailphoto)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea")),
+      Some((sql""""thumbnailphoto"""", sql"${Segment.paramSegment(unsaved.thumbnailphoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea")),
       Some((sql""""thumbnailphotofilename"""", sql"${Segment.paramSegment(unsaved.thumbnailphotofilename)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""largephoto"""", sql"${Segment.paramSegment(unsaved.largephoto)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea")),
+      Some((sql""""largephoto"""", sql"${Segment.paramSegment(unsaved.largephoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea")),
       Some((sql""""largephotofilename"""", sql"${Segment.paramSegment(unsaved.largephotofilename)(Setter.optionParamSetter(Setter.stringSetter))}")),
       unsaved.productphotoid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""productphotoid"""", sql"${Segment.paramSegment(value: ProductphotoId)(Setter[ProductphotoId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""productphotoid"""", sql"${Segment.paramSegment(value: ProductphotoId)(ProductphotoId.setter)}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -71,7 +71,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto""".query(ProductphotoRow.jdbcDecoder).selectStream
   }
   override def selectById(productphotoid: ProductphotoId): ZIO[ZConnection, Throwable, Option[ProductphotoRow]] = {
-    sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto where "productphotoid" = ${Segment.paramSegment(productphotoid)(Setter[ProductphotoId])}""".query(ProductphotoRow.jdbcDecoder).selectOne
+    sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto where "productphotoid" = ${Segment.paramSegment(productphotoid)(ProductphotoId.setter)}""".query(ProductphotoRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productphotoids: Array[ProductphotoId]): ZStream[ZConnection, Throwable, ProductphotoRow] = {
     sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto where "productphotoid" = ANY(${Segment.paramSegment(productphotoids)(ProductphotoId.arraySetter)})""".query(ProductphotoRow.jdbcDecoder).selectStream
@@ -79,12 +79,12 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def update(row: ProductphotoRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productphotoid = row.productphotoid
     sql"""update production.productphoto
-          set "thumbnailphoto" = ${Segment.paramSegment(row.thumbnailphoto)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea,
+          set "thumbnailphoto" = ${Segment.paramSegment(row.thumbnailphoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
               "thumbnailphotofilename" = ${Segment.paramSegment(row.thumbnailphotofilename)(Setter.optionParamSetter(Setter.stringSetter))},
-              "largephoto" = ${Segment.paramSegment(row.largephoto)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea,
+              "largephoto" = ${Segment.paramSegment(row.largephoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
               "largephotofilename" = ${Segment.paramSegment(row.largephotofilename)(Setter.optionParamSetter(Setter.stringSetter))},
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "productphotoid" = ${Segment.paramSegment(productphotoid)(Setter[ProductphotoId])}""".update.map(_ > 0)
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "productphotoid" = ${Segment.paramSegment(productphotoid)(ProductphotoId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
     UpdateBuilder("production.productphoto", ProductphotoFields, ProductphotoRow.jdbcDecoder)
@@ -92,12 +92,12 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def upsert(unsaved: ProductphotoRow): ZIO[ZConnection, Throwable, UpdateResult[ProductphotoRow]] = {
     sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.productphotoid)(Setter[ProductphotoId])}::int4,
-            ${Segment.paramSegment(unsaved.thumbnailphoto)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea,
+            ${Segment.paramSegment(unsaved.productphotoid)(ProductphotoId.setter)}::int4,
+            ${Segment.paramSegment(unsaved.thumbnailphoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
             ${Segment.paramSegment(unsaved.thumbnailphotofilename)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.largephoto)(Setter.optionParamSetter(Setter[TypoBytea]))}::bytea,
+            ${Segment.paramSegment(unsaved.largephoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
             ${Segment.paramSegment(unsaved.largephotofilename)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("productphotoid")
           do update set

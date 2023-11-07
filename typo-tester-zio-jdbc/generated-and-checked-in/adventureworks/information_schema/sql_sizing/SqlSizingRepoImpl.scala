@@ -26,7 +26,7 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
   }
   override def insert(unsaved: SqlSizingRow): ZIO[ZConnection, Throwable, SqlSizingRow] = {
     sql"""insert into information_schema.sql_sizing("sizing_id", "sizing_name", "supported_value", "comments")
-          values (${Segment.paramSegment(unsaved.sizingId)(Setter.optionParamSetter(Setter[CardinalNumber]))}::int4, ${Segment.paramSegment(unsaved.sizingName)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar, ${Segment.paramSegment(unsaved.supportedValue)(Setter.optionParamSetter(Setter[CardinalNumber]))}::int4, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter[CharacterData]))}::varchar)
+          values (${Segment.paramSegment(unsaved.sizingId)(Setter.optionParamSetter(CardinalNumber.setter))}::int4, ${Segment.paramSegment(unsaved.sizingName)(Setter.optionParamSetter(CharacterData.setter))}::varchar, ${Segment.paramSegment(unsaved.supportedValue)(Setter.optionParamSetter(CardinalNumber.setter))}::int4, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(CharacterData.setter))}::varchar)
           returning "sizing_id", "sizing_name", "supported_value", "comments"
        """.insertReturning(SqlSizingRow.jdbcDecoder).map(_.updatedKeys.head)
   }

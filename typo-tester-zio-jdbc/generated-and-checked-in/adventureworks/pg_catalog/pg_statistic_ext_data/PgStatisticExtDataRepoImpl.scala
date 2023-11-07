@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def delete(stxoid: PgStatisticExtDataId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_statistic_ext_data where "stxoid" = ${Segment.paramSegment(stxoid)(Setter[PgStatisticExtDataId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_statistic_ext_data where "stxoid" = ${Segment.paramSegment(stxoid)(PgStatisticExtDataId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
     DeleteBuilder("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields)
   }
   override def insert(unsaved: PgStatisticExtDataRow): ZIO[ZConnection, Throwable, PgStatisticExtDataRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
-          values (${Segment.paramSegment(unsaved.stxoid)(Setter[PgStatisticExtDataId])}::oid, ${Segment.paramSegment(unsaved.stxdndistinct)(Setter.optionParamSetter(Setter[TypoUnknownPgNdistinct]))}::pg_ndistinct, ${Segment.paramSegment(unsaved.stxddependencies)(Setter.optionParamSetter(Setter[TypoUnknownPgDependencies]))}::pg_dependencies, ${Segment.paramSegment(unsaved.stxdmcv)(Setter.optionParamSetter(Setter[TypoUnknownPgMcvList]))}::pg_mcv_list, ${Segment.paramSegment(unsaved.stxdexpr)(Setter.optionParamSetter(TypoUnknownPgStatistic.arraySetter))}::_pg_statistic)
+          values (${Segment.paramSegment(unsaved.stxoid)(PgStatisticExtDataId.setter)}::oid, ${Segment.paramSegment(unsaved.stxdndistinct)(Setter.optionParamSetter(TypoUnknownPgNdistinct.setter))}::pg_ndistinct, ${Segment.paramSegment(unsaved.stxddependencies)(Setter.optionParamSetter(TypoUnknownPgDependencies.setter))}::pg_dependencies, ${Segment.paramSegment(unsaved.stxdmcv)(Setter.optionParamSetter(TypoUnknownPgMcvList.setter))}::pg_mcv_list, ${Segment.paramSegment(unsaved.stxdexpr)(Setter.optionParamSetter(TypoUnknownPgStatistic.arraySetter))}::_pg_statistic)
           returning "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text[]
        """.insertReturning(PgStatisticExtDataRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -43,7 +43,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
     sql"""select "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text[] from pg_catalog.pg_statistic_ext_data""".query(PgStatisticExtDataRow.jdbcDecoder).selectStream
   }
   override def selectById(stxoid: PgStatisticExtDataId): ZIO[ZConnection, Throwable, Option[PgStatisticExtDataRow]] = {
-    sql"""select "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text[] from pg_catalog.pg_statistic_ext_data where "stxoid" = ${Segment.paramSegment(stxoid)(Setter[PgStatisticExtDataId])}""".query(PgStatisticExtDataRow.jdbcDecoder).selectOne
+    sql"""select "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text[] from pg_catalog.pg_statistic_ext_data where "stxoid" = ${Segment.paramSegment(stxoid)(PgStatisticExtDataId.setter)}""".query(PgStatisticExtDataRow.jdbcDecoder).selectOne
   }
   override def selectByIds(stxoids: Array[PgStatisticExtDataId]): ZStream[ZConnection, Throwable, PgStatisticExtDataRow] = {
     sql"""select "stxoid", "stxdndistinct"::text, "stxddependencies"::text, "stxdmcv"::text, "stxdexpr"::text[] from pg_catalog.pg_statistic_ext_data where "stxoid" = ANY(${Segment.paramSegment(stxoids)(PgStatisticExtDataId.arraySetter)})""".query(PgStatisticExtDataRow.jdbcDecoder).selectStream
@@ -51,11 +51,11 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def update(row: PgStatisticExtDataRow): ZIO[ZConnection, Throwable, Boolean] = {
     val stxoid = row.stxoid
     sql"""update pg_catalog.pg_statistic_ext_data
-          set "stxdndistinct" = ${Segment.paramSegment(row.stxdndistinct)(Setter.optionParamSetter(Setter[TypoUnknownPgNdistinct]))}::pg_ndistinct,
-              "stxddependencies" = ${Segment.paramSegment(row.stxddependencies)(Setter.optionParamSetter(Setter[TypoUnknownPgDependencies]))}::pg_dependencies,
-              "stxdmcv" = ${Segment.paramSegment(row.stxdmcv)(Setter.optionParamSetter(Setter[TypoUnknownPgMcvList]))}::pg_mcv_list,
+          set "stxdndistinct" = ${Segment.paramSegment(row.stxdndistinct)(Setter.optionParamSetter(TypoUnknownPgNdistinct.setter))}::pg_ndistinct,
+              "stxddependencies" = ${Segment.paramSegment(row.stxddependencies)(Setter.optionParamSetter(TypoUnknownPgDependencies.setter))}::pg_dependencies,
+              "stxdmcv" = ${Segment.paramSegment(row.stxdmcv)(Setter.optionParamSetter(TypoUnknownPgMcvList.setter))}::pg_mcv_list,
               "stxdexpr" = ${Segment.paramSegment(row.stxdexpr)(Setter.optionParamSetter(TypoUnknownPgStatistic.arraySetter))}::_pg_statistic
-          where "stxoid" = ${Segment.paramSegment(stxoid)(Setter[PgStatisticExtDataId])}""".update.map(_ > 0)
+          where "stxoid" = ${Segment.paramSegment(stxoid)(PgStatisticExtDataId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
     UpdateBuilder("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields, PgStatisticExtDataRow.jdbcDecoder)
@@ -63,10 +63,10 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def upsert(unsaved: PgStatisticExtDataRow): ZIO[ZConnection, Throwable, UpdateResult[PgStatisticExtDataRow]] = {
     sql"""insert into pg_catalog.pg_statistic_ext_data("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")
           values (
-            ${Segment.paramSegment(unsaved.stxoid)(Setter[PgStatisticExtDataId])}::oid,
-            ${Segment.paramSegment(unsaved.stxdndistinct)(Setter.optionParamSetter(Setter[TypoUnknownPgNdistinct]))}::pg_ndistinct,
-            ${Segment.paramSegment(unsaved.stxddependencies)(Setter.optionParamSetter(Setter[TypoUnknownPgDependencies]))}::pg_dependencies,
-            ${Segment.paramSegment(unsaved.stxdmcv)(Setter.optionParamSetter(Setter[TypoUnknownPgMcvList]))}::pg_mcv_list,
+            ${Segment.paramSegment(unsaved.stxoid)(PgStatisticExtDataId.setter)}::oid,
+            ${Segment.paramSegment(unsaved.stxdndistinct)(Setter.optionParamSetter(TypoUnknownPgNdistinct.setter))}::pg_ndistinct,
+            ${Segment.paramSegment(unsaved.stxddependencies)(Setter.optionParamSetter(TypoUnknownPgDependencies.setter))}::pg_dependencies,
+            ${Segment.paramSegment(unsaved.stxdmcv)(Setter.optionParamSetter(TypoUnknownPgMcvList.setter))}::pg_mcv_list,
             ${Segment.paramSegment(unsaved.stxdexpr)(Setter.optionParamSetter(TypoUnknownPgStatistic.arraySetter))}::_pg_statistic
           )
           on conflict ("stxoid")

@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 object SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.specialoffer where "specialofferid" = ${Segment.paramSegment(specialofferid)(Setter[SpecialofferId])}""".delete.map(_ > 0)
+    sql"""delete from sales.specialoffer where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
     DeleteBuilder("sales.specialoffer", SpecialofferFields)
   }
   override def insert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, SpecialofferRow] = {
     sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
-          values (${Segment.paramSegment(unsaved.specialofferid)(Setter[SpecialofferId])}::int4, ${Segment.paramSegment(unsaved.description)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.discountpct)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.`type`)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.category)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter[TypoLocalDateTime])}::timestamp, ${Segment.paramSegment(unsaved.minqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.maxqty)(Setter.optionParamSetter(Setter.intSetter))}::int4, ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4, ${Segment.paramSegment(unsaved.description)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.discountpct)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.`type`)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.category)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.minqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.maxqty)(Setter.optionParamSetter(Setter.intSetter))}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
        """.insertReturning(SpecialofferRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,12 +41,12 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       Some((sql""""description"""", sql"${Segment.paramSegment(unsaved.description)(Setter.stringSetter)}")),
       Some((sql""""type"""", sql"${Segment.paramSegment(unsaved.`type`)(Setter.stringSetter)}")),
       Some((sql""""category"""", sql"${Segment.paramSegment(unsaved.category)(Setter.stringSetter)}")),
-      Some((sql""""startdate"""", sql"${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp")),
-      Some((sql""""enddate"""", sql"${Segment.paramSegment(unsaved.enddate)(Setter[TypoLocalDateTime])}::timestamp")),
+      Some((sql""""startdate"""", sql"${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp")),
+      Some((sql""""enddate"""", sql"${Segment.paramSegment(unsaved.enddate)(TypoLocalDateTime.setter)}::timestamp")),
       Some((sql""""maxqty"""", sql"${Segment.paramSegment(unsaved.maxqty)(Setter.optionParamSetter(Setter.intSetter))}::int4")),
       unsaved.specialofferid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""specialofferid"""", sql"${Segment.paramSegment(value: SpecialofferId)(Setter[SpecialofferId])}::int4"))
+        case Defaulted.Provided(value) => Some((sql""""specialofferid"""", sql"${Segment.paramSegment(value: SpecialofferId)(SpecialofferId.setter)}::int4"))
       },
       unsaved.discountpct match {
         case Defaulted.UseDefault => None
@@ -58,11 +58,11 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(Setter[TypoUUID])}::uuid"))
+        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -85,7 +85,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer""".query(SpecialofferRow.jdbcDecoder).selectStream
   }
   override def selectById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Option[SpecialofferRow]] = {
-    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ${Segment.paramSegment(specialofferid)(Setter[SpecialofferId])}""".query(SpecialofferRow.jdbcDecoder).selectOne
+    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}""".query(SpecialofferRow.jdbcDecoder).selectOne
   }
   override def selectByIds(specialofferids: Array[SpecialofferId]): ZStream[ZConnection, Throwable, SpecialofferRow] = {
     sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ANY(${Segment.paramSegment(specialofferids)(SpecialofferId.arraySetter)})""".query(SpecialofferRow.jdbcDecoder).selectStream
@@ -97,13 +97,13 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
               "discountpct" = ${Segment.paramSegment(row.discountpct)(Setter.bigDecimalScalaSetter)}::numeric,
               "type" = ${Segment.paramSegment(row.`type`)(Setter.stringSetter)},
               "category" = ${Segment.paramSegment(row.category)(Setter.stringSetter)},
-              "startdate" = ${Segment.paramSegment(row.startdate)(Setter[TypoLocalDateTime])}::timestamp,
-              "enddate" = ${Segment.paramSegment(row.enddate)(Setter[TypoLocalDateTime])}::timestamp,
+              "startdate" = ${Segment.paramSegment(row.startdate)(TypoLocalDateTime.setter)}::timestamp,
+              "enddate" = ${Segment.paramSegment(row.enddate)(TypoLocalDateTime.setter)}::timestamp,
               "minqty" = ${Segment.paramSegment(row.minqty)(Setter.intSetter)}::int4,
               "maxqty" = ${Segment.paramSegment(row.maxqty)(Setter.optionParamSetter(Setter.intSetter))}::int4,
-              "rowguid" = ${Segment.paramSegment(row.rowguid)(Setter[TypoUUID])}::uuid,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "specialofferid" = ${Segment.paramSegment(specialofferid)(Setter[SpecialofferId])}""".update.map(_ > 0)
+              "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
     UpdateBuilder("sales.specialoffer", SpecialofferFields, SpecialofferRow.jdbcDecoder)
@@ -111,17 +111,17 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   override def upsert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferRow]] = {
     sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.specialofferid)(Setter[SpecialofferId])}::int4,
+            ${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4,
             ${Segment.paramSegment(unsaved.description)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.discountpct)(Setter.bigDecimalScalaSetter)}::numeric,
             ${Segment.paramSegment(unsaved.`type`)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.category)(Setter.stringSetter)},
-            ${Segment.paramSegment(unsaved.startdate)(Setter[TypoLocalDateTime])}::timestamp,
-            ${Segment.paramSegment(unsaved.enddate)(Setter[TypoLocalDateTime])}::timestamp,
+            ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp,
+            ${Segment.paramSegment(unsaved.enddate)(TypoLocalDateTime.setter)}::timestamp,
             ${Segment.paramSegment(unsaved.minqty)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.maxqty)(Setter.optionParamSetter(Setter.intSetter))}::int4,
-            ${Segment.paramSegment(unsaved.rowguid)(Setter[TypoUUID])}::uuid,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("specialofferid")
           do update set

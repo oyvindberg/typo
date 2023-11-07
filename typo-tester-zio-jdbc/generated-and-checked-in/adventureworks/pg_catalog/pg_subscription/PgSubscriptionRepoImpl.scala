@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def delete(oid: PgSubscriptionId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_subscription where "oid" = ${Segment.paramSegment(oid)(Setter[PgSubscriptionId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_subscription where "oid" = ${Segment.paramSegment(oid)(PgSubscriptionId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
     DeleteBuilder("pg_catalog.pg_subscription", PgSubscriptionFields)
   }
   override def insert(unsaved: PgSubscriptionRow): ZIO[ZConnection, Throwable, PgSubscriptionRow] = {
     sql"""insert into pg_catalog.pg_subscription("oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgSubscriptionId])}::oid, ${Segment.paramSegment(unsaved.subdbid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.subname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.subowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.subenabled)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.subbinary)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.substream)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.subconninfo)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.subslotname)(Setter.optionParamSetter(Setter.stringSetter))}::name, ${Segment.paramSegment(unsaved.subsynccommit)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.subpublications)(adventureworks.StringArraySetter)}::_text)
+          values (${Segment.paramSegment(unsaved.oid)(PgSubscriptionId.setter)}::oid, ${Segment.paramSegment(unsaved.subdbid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.subname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.subowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.subenabled)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.subbinary)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.substream)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.subconninfo)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.subslotname)(Setter.optionParamSetter(Setter.stringSetter))}::name, ${Segment.paramSegment(unsaved.subsynccommit)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.subpublications)(adventureworks.StringArraySetter)}::_text)
           returning "oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications"
        """.insertReturning(PgSubscriptionRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
     sql"""select "oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications" from pg_catalog.pg_subscription""".query(PgSubscriptionRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgSubscriptionId): ZIO[ZConnection, Throwable, Option[PgSubscriptionRow]] = {
-    sql"""select "oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications" from pg_catalog.pg_subscription where "oid" = ${Segment.paramSegment(oid)(Setter[PgSubscriptionId])}""".query(PgSubscriptionRow.jdbcDecoder).selectOne
+    sql"""select "oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications" from pg_catalog.pg_subscription where "oid" = ${Segment.paramSegment(oid)(PgSubscriptionId.setter)}""".query(PgSubscriptionRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgSubscriptionId]): ZStream[ZConnection, Throwable, PgSubscriptionRow] = {
     sql"""select "oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications" from pg_catalog.pg_subscription where "oid" = ANY(${Segment.paramSegment(oids)(PgSubscriptionId.arraySetter)})""".query(PgSubscriptionRow.jdbcDecoder).selectStream
@@ -63,7 +63,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
               "subslotname" = ${Segment.paramSegment(row.subslotname)(Setter.optionParamSetter(Setter.stringSetter))}::name,
               "subsynccommit" = ${Segment.paramSegment(row.subsynccommit)(Setter.stringSetter)},
               "subpublications" = ${Segment.paramSegment(row.subpublications)(adventureworks.StringArraySetter)}::_text
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgSubscriptionId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgSubscriptionId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
     UpdateBuilder("pg_catalog.pg_subscription", PgSubscriptionFields, PgSubscriptionRow.jdbcDecoder)
@@ -71,7 +71,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def upsert(unsaved: PgSubscriptionRow): ZIO[ZConnection, Throwable, UpdateResult[PgSubscriptionRow]] = {
     sql"""insert into pg_catalog.pg_subscription("oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgSubscriptionId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgSubscriptionId.setter)}::oid,
             ${Segment.paramSegment(unsaved.subdbid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.subname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.subowner)(Setter.longSetter)}::oid,

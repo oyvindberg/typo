@@ -23,14 +23,14 @@ import zio.stream.ZStream
 
 object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_statistic_ext where "oid" = ${Segment.paramSegment(oid)(Setter[PgStatisticExtId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_statistic_ext where "oid" = ${Segment.paramSegment(oid)(PgStatisticExtId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
     DeleteBuilder("pg_catalog.pg_statistic_ext", PgStatisticExtFields)
   }
   override def insert(unsaved: PgStatisticExtRow): ZIO[ZConnection, Throwable, PgStatisticExtRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgStatisticExtId])}::oid, ${Segment.paramSegment(unsaved.stxrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stxname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.stxnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stxowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stxstattarget)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.stxkeys)(Setter[TypoInt2Vector])}::int2vector, ${Segment.paramSegment(unsaved.stxkind)(adventureworks.StringArraySetter)}::_char, ${Segment.paramSegment(unsaved.stxexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree)
+          values (${Segment.paramSegment(unsaved.oid)(PgStatisticExtId.setter)}::oid, ${Segment.paramSegment(unsaved.stxrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stxname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.stxnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stxowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.stxstattarget)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.stxkeys)(TypoInt2Vector.setter)}::int2vector, ${Segment.paramSegment(unsaved.stxkind)(adventureworks.StringArraySetter)}::_char, ${Segment.paramSegment(unsaved.stxexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree)
           returning "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs"
        """.insertReturning(PgStatisticExtRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,7 +41,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
     sql"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs" from pg_catalog.pg_statistic_ext""".query(PgStatisticExtRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgStatisticExtId): ZIO[ZConnection, Throwable, Option[PgStatisticExtRow]] = {
-    sql"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs" from pg_catalog.pg_statistic_ext where "oid" = ${Segment.paramSegment(oid)(Setter[PgStatisticExtId])}""".query(PgStatisticExtRow.jdbcDecoder).selectOne
+    sql"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs" from pg_catalog.pg_statistic_ext where "oid" = ${Segment.paramSegment(oid)(PgStatisticExtId.setter)}""".query(PgStatisticExtRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgStatisticExtId]): ZStream[ZConnection, Throwable, PgStatisticExtRow] = {
     sql"""select "oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs" from pg_catalog.pg_statistic_ext where "oid" = ANY(${Segment.paramSegment(oids)(PgStatisticExtId.arraySetter)})""".query(PgStatisticExtRow.jdbcDecoder).selectStream
@@ -60,10 +60,10 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
               "stxnamespace" = ${Segment.paramSegment(row.stxnamespace)(Setter.longSetter)}::oid,
               "stxowner" = ${Segment.paramSegment(row.stxowner)(Setter.longSetter)}::oid,
               "stxstattarget" = ${Segment.paramSegment(row.stxstattarget)(Setter.intSetter)}::int4,
-              "stxkeys" = ${Segment.paramSegment(row.stxkeys)(Setter[TypoInt2Vector])}::int2vector,
+              "stxkeys" = ${Segment.paramSegment(row.stxkeys)(TypoInt2Vector.setter)}::int2vector,
               "stxkind" = ${Segment.paramSegment(row.stxkind)(adventureworks.StringArraySetter)}::_char,
-              "stxexprs" = ${Segment.paramSegment(row.stxexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgStatisticExtId])}""".update.map(_ > 0)
+              "stxexprs" = ${Segment.paramSegment(row.stxexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
+          where "oid" = ${Segment.paramSegment(oid)(PgStatisticExtId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
     UpdateBuilder("pg_catalog.pg_statistic_ext", PgStatisticExtFields, PgStatisticExtRow.jdbcDecoder)
@@ -71,15 +71,15 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def upsert(unsaved: PgStatisticExtRow): ZIO[ZConnection, Throwable, UpdateResult[PgStatisticExtRow]] = {
     sql"""insert into pg_catalog.pg_statistic_ext("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgStatisticExtId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgStatisticExtId.setter)}::oid,
             ${Segment.paramSegment(unsaved.stxrelid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.stxname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.stxnamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.stxowner)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.stxstattarget)(Setter.intSetter)}::int4,
-            ${Segment.paramSegment(unsaved.stxkeys)(Setter[TypoInt2Vector])}::int2vector,
+            ${Segment.paramSegment(unsaved.stxkeys)(TypoInt2Vector.setter)}::int2vector,
             ${Segment.paramSegment(unsaved.stxkind)(adventureworks.StringArraySetter)}::_char,
-            ${Segment.paramSegment(unsaved.stxexprs)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
+            ${Segment.paramSegment(unsaved.stxexprs)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
           )
           on conflict ("oid")
           do update set

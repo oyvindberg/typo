@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgPolicyRepoImpl extends PgPolicyRepo {
   override def delete(oid: PgPolicyId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_policy where "oid" = ${Segment.paramSegment(oid)(Setter[PgPolicyId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_policy where "oid" = ${Segment.paramSegment(oid)(PgPolicyId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgPolicyFields, PgPolicyRow] = {
     DeleteBuilder("pg_catalog.pg_policy", PgPolicyFields)
   }
   override def insert(unsaved: PgPolicyRow): ZIO[ZConnection, Throwable, PgPolicyRow] = {
     sql"""insert into pg_catalog.pg_policy("oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgPolicyId])}::oid, ${Segment.paramSegment(unsaved.polname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.polrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.polcmd)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.polpermissive)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.polroles)(adventureworks.LongArraySetter)}::_oid, ${Segment.paramSegment(unsaved.polqual)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree, ${Segment.paramSegment(unsaved.polwithcheck)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree)
+          values (${Segment.paramSegment(unsaved.oid)(PgPolicyId.setter)}::oid, ${Segment.paramSegment(unsaved.polname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.polrelid)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.polcmd)(Setter.stringSetter)}::char, ${Segment.paramSegment(unsaved.polpermissive)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.polroles)(adventureworks.LongArraySetter)}::_oid, ${Segment.paramSegment(unsaved.polqual)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree, ${Segment.paramSegment(unsaved.polwithcheck)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree)
           returning "oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck"
        """.insertReturning(PgPolicyRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
     sql"""select "oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck" from pg_catalog.pg_policy""".query(PgPolicyRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgPolicyId): ZIO[ZConnection, Throwable, Option[PgPolicyRow]] = {
-    sql"""select "oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck" from pg_catalog.pg_policy where "oid" = ${Segment.paramSegment(oid)(Setter[PgPolicyId])}""".query(PgPolicyRow.jdbcDecoder).selectOne
+    sql"""select "oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck" from pg_catalog.pg_policy where "oid" = ${Segment.paramSegment(oid)(PgPolicyId.setter)}""".query(PgPolicyRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgPolicyId]): ZStream[ZConnection, Throwable, PgPolicyRow] = {
     sql"""select "oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck" from pg_catalog.pg_policy where "oid" = ANY(${Segment.paramSegment(oids)(PgPolicyId.arraySetter)})""".query(PgPolicyRow.jdbcDecoder).selectStream
@@ -59,9 +59,9 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
               "polcmd" = ${Segment.paramSegment(row.polcmd)(Setter.stringSetter)}::char,
               "polpermissive" = ${Segment.paramSegment(row.polpermissive)(Setter.booleanSetter)},
               "polroles" = ${Segment.paramSegment(row.polroles)(adventureworks.LongArraySetter)}::_oid,
-              "polqual" = ${Segment.paramSegment(row.polqual)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
-              "polwithcheck" = ${Segment.paramSegment(row.polwithcheck)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgPolicyId])}""".update.map(_ > 0)
+              "polqual" = ${Segment.paramSegment(row.polqual)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
+              "polwithcheck" = ${Segment.paramSegment(row.polwithcheck)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
+          where "oid" = ${Segment.paramSegment(oid)(PgPolicyId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgPolicyFields, PgPolicyRow] = {
     UpdateBuilder("pg_catalog.pg_policy", PgPolicyFields, PgPolicyRow.jdbcDecoder)
@@ -69,14 +69,14 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
   override def upsert(unsaved: PgPolicyRow): ZIO[ZConnection, Throwable, UpdateResult[PgPolicyRow]] = {
     sql"""insert into pg_catalog.pg_policy("oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgPolicyId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgPolicyId.setter)}::oid,
             ${Segment.paramSegment(unsaved.polname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.polrelid)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.polcmd)(Setter.stringSetter)}::char,
             ${Segment.paramSegment(unsaved.polpermissive)(Setter.booleanSetter)},
             ${Segment.paramSegment(unsaved.polroles)(adventureworks.LongArraySetter)}::_oid,
-            ${Segment.paramSegment(unsaved.polqual)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree,
-            ${Segment.paramSegment(unsaved.polwithcheck)(Setter.optionParamSetter(Setter[TypoPgNodeTree]))}::pg_node_tree
+            ${Segment.paramSegment(unsaved.polqual)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree,
+            ${Segment.paramSegment(unsaved.polwithcheck)(Setter.optionParamSetter(TypoPgNodeTree.setter))}::pg_node_tree
           )
           on conflict ("oid")
           do update set

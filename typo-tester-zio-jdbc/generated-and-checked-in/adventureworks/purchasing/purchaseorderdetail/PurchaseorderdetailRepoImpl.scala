@@ -25,6 +25,6 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail""".query(PurchaseorderdetailRow.jdbcDecoder).selectStream
   }
   override def selectById(compositeId: PurchaseorderdetailId): ZIO[ZConnection, Throwable, Option[PurchaseorderdetailRow]] = {
-    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail where "purchaseorderid" = ${Segment.paramSegment(compositeId.purchaseorderid)(Setter[PurchaseorderheaderId])} AND "purchaseorderdetailid" = ${Segment.paramSegment(compositeId.purchaseorderdetailid)(Setter.intSetter)}""".query(PurchaseorderdetailRow.jdbcDecoder).selectOne
+    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail where "purchaseorderid" = ${Segment.paramSegment(compositeId.purchaseorderid)(PurchaseorderheaderId.setter)} AND "purchaseorderdetailid" = ${Segment.paramSegment(compositeId.purchaseorderdetailid)(Setter.intSetter)}""".query(PurchaseorderdetailRow.jdbcDecoder).selectOne
   }
 }

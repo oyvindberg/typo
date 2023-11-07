@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_ts_config where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsConfigId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_ts_config where "oid" = ${Segment.paramSegment(oid)(PgTsConfigId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTsConfigFields, PgTsConfigRow] = {
     DeleteBuilder("pg_catalog.pg_ts_config", PgTsConfigFields)
   }
   override def insert(unsaved: PgTsConfigRow): ZIO[ZConnection, Throwable, PgTsConfigRow] = {
     sql"""insert into pg_catalog.pg_ts_config("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgTsConfigId])}::oid, ${Segment.paramSegment(unsaved.cfgname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.cfgnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.cfgowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.cfgparser)(Setter.longSetter)}::oid)
+          values (${Segment.paramSegment(unsaved.oid)(PgTsConfigId.setter)}::oid, ${Segment.paramSegment(unsaved.cfgname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.cfgnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.cfgowner)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.cfgparser)(Setter.longSetter)}::oid)
           returning "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser"
        """.insertReturning(PgTsConfigRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     sql"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser" from pg_catalog.pg_ts_config""".query(PgTsConfigRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgTsConfigId): ZIO[ZConnection, Throwable, Option[PgTsConfigRow]] = {
-    sql"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser" from pg_catalog.pg_ts_config where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsConfigId])}""".query(PgTsConfigRow.jdbcDecoder).selectOne
+    sql"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser" from pg_catalog.pg_ts_config where "oid" = ${Segment.paramSegment(oid)(PgTsConfigId.setter)}""".query(PgTsConfigRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgTsConfigId]): ZStream[ZConnection, Throwable, PgTsConfigRow] = {
     sql"""select "oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser" from pg_catalog.pg_ts_config where "oid" = ANY(${Segment.paramSegment(oids)(PgTsConfigId.arraySetter)})""".query(PgTsConfigRow.jdbcDecoder).selectStream
@@ -57,7 +57,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
               "cfgnamespace" = ${Segment.paramSegment(row.cfgnamespace)(Setter.longSetter)}::oid,
               "cfgowner" = ${Segment.paramSegment(row.cfgowner)(Setter.longSetter)}::oid,
               "cfgparser" = ${Segment.paramSegment(row.cfgparser)(Setter.longSetter)}::oid
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsConfigId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgTsConfigId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgTsConfigFields, PgTsConfigRow] = {
     UpdateBuilder("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.jdbcDecoder)
@@ -65,7 +65,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def upsert(unsaved: PgTsConfigRow): ZIO[ZConnection, Throwable, UpdateResult[PgTsConfigRow]] = {
     sql"""insert into pg_catalog.pg_ts_config("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgTsConfigId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgTsConfigId.setter)}::oid,
             ${Segment.paramSegment(unsaved.cfgname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.cfgnamespace)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.cfgowner)(Setter.longSetter)}::oid,

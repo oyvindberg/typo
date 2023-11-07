@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def delete(oid: PgOpfamilyId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_opfamily where "oid" = ${Segment.paramSegment(oid)(Setter[PgOpfamilyId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_opfamily where "oid" = ${Segment.paramSegment(oid)(PgOpfamilyId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
     DeleteBuilder("pg_catalog.pg_opfamily", PgOpfamilyFields)
   }
   override def insert(unsaved: PgOpfamilyRow): ZIO[ZConnection, Throwable, PgOpfamilyRow] = {
     sql"""insert into pg_catalog.pg_opfamily("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgOpfamilyId])}::oid, ${Segment.paramSegment(unsaved.opfmethod)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opfname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.opfnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opfowner)(Setter.longSetter)}::oid)
+          values (${Segment.paramSegment(unsaved.oid)(PgOpfamilyId.setter)}::oid, ${Segment.paramSegment(unsaved.opfmethod)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opfname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.opfnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.opfowner)(Setter.longSetter)}::oid)
           returning "oid", "opfmethod", "opfname", "opfnamespace", "opfowner"
        """.insertReturning(PgOpfamilyRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
     sql"""select "oid", "opfmethod", "opfname", "opfnamespace", "opfowner" from pg_catalog.pg_opfamily""".query(PgOpfamilyRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgOpfamilyId): ZIO[ZConnection, Throwable, Option[PgOpfamilyRow]] = {
-    sql"""select "oid", "opfmethod", "opfname", "opfnamespace", "opfowner" from pg_catalog.pg_opfamily where "oid" = ${Segment.paramSegment(oid)(Setter[PgOpfamilyId])}""".query(PgOpfamilyRow.jdbcDecoder).selectOne
+    sql"""select "oid", "opfmethod", "opfname", "opfnamespace", "opfowner" from pg_catalog.pg_opfamily where "oid" = ${Segment.paramSegment(oid)(PgOpfamilyId.setter)}""".query(PgOpfamilyRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgOpfamilyId]): ZStream[ZConnection, Throwable, PgOpfamilyRow] = {
     sql"""select "oid", "opfmethod", "opfname", "opfnamespace", "opfowner" from pg_catalog.pg_opfamily where "oid" = ANY(${Segment.paramSegment(oids)(PgOpfamilyId.arraySetter)})""".query(PgOpfamilyRow.jdbcDecoder).selectStream
@@ -57,7 +57,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
               "opfname" = ${Segment.paramSegment(row.opfname)(Setter.stringSetter)}::name,
               "opfnamespace" = ${Segment.paramSegment(row.opfnamespace)(Setter.longSetter)}::oid,
               "opfowner" = ${Segment.paramSegment(row.opfowner)(Setter.longSetter)}::oid
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgOpfamilyId])}""".update.map(_ > 0)
+          where "oid" = ${Segment.paramSegment(oid)(PgOpfamilyId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
     UpdateBuilder("pg_catalog.pg_opfamily", PgOpfamilyFields, PgOpfamilyRow.jdbcDecoder)
@@ -65,7 +65,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def upsert(unsaved: PgOpfamilyRow): ZIO[ZConnection, Throwable, UpdateResult[PgOpfamilyRow]] = {
     sql"""insert into pg_catalog.pg_opfamily("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgOpfamilyId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgOpfamilyId.setter)}::oid,
             ${Segment.paramSegment(unsaved.opfmethod)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.opfname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.opfnamespace)(Setter.longSetter)}::oid,

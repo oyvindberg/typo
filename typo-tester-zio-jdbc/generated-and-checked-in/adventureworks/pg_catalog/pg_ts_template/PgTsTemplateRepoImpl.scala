@@ -22,14 +22,14 @@ import zio.stream.ZStream
 
 object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def delete(oid: PgTsTemplateId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_ts_template where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsTemplateId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_ts_template where "oid" = ${Segment.paramSegment(oid)(PgTsTemplateId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
     DeleteBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields)
   }
   override def insert(unsaved: PgTsTemplateRow): ZIO[ZConnection, Throwable, PgTsTemplateRow] = {
     sql"""insert into pg_catalog.pg_ts_template("oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize")
-          values (${Segment.paramSegment(unsaved.oid)(Setter[PgTsTemplateId])}::oid, ${Segment.paramSegment(unsaved.tmplname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.tmplnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tmplinit)(Setter[TypoRegproc])}::regproc, ${Segment.paramSegment(unsaved.tmpllexize)(Setter[TypoRegproc])}::regproc)
+          values (${Segment.paramSegment(unsaved.oid)(PgTsTemplateId.setter)}::oid, ${Segment.paramSegment(unsaved.tmplname)(Setter.stringSetter)}::name, ${Segment.paramSegment(unsaved.tmplnamespace)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.tmplinit)(TypoRegproc.setter)}::regproc, ${Segment.paramSegment(unsaved.tmpllexize)(TypoRegproc.setter)}::regproc)
           returning "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize"
        """.insertReturning(PgTsTemplateRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -40,7 +40,7 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     sql"""select "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize" from pg_catalog.pg_ts_template""".query(PgTsTemplateRow.jdbcDecoder).selectStream
   }
   override def selectById(oid: PgTsTemplateId): ZIO[ZConnection, Throwable, Option[PgTsTemplateRow]] = {
-    sql"""select "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize" from pg_catalog.pg_ts_template where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsTemplateId])}""".query(PgTsTemplateRow.jdbcDecoder).selectOne
+    sql"""select "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize" from pg_catalog.pg_ts_template where "oid" = ${Segment.paramSegment(oid)(PgTsTemplateId.setter)}""".query(PgTsTemplateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(oids: Array[PgTsTemplateId]): ZStream[ZConnection, Throwable, PgTsTemplateRow] = {
     sql"""select "oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize" from pg_catalog.pg_ts_template where "oid" = ANY(${Segment.paramSegment(oids)(PgTsTemplateId.arraySetter)})""".query(PgTsTemplateRow.jdbcDecoder).selectStream
@@ -56,9 +56,9 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     sql"""update pg_catalog.pg_ts_template
           set "tmplname" = ${Segment.paramSegment(row.tmplname)(Setter.stringSetter)}::name,
               "tmplnamespace" = ${Segment.paramSegment(row.tmplnamespace)(Setter.longSetter)}::oid,
-              "tmplinit" = ${Segment.paramSegment(row.tmplinit)(Setter[TypoRegproc])}::regproc,
-              "tmpllexize" = ${Segment.paramSegment(row.tmpllexize)(Setter[TypoRegproc])}::regproc
-          where "oid" = ${Segment.paramSegment(oid)(Setter[PgTsTemplateId])}""".update.map(_ > 0)
+              "tmplinit" = ${Segment.paramSegment(row.tmplinit)(TypoRegproc.setter)}::regproc,
+              "tmpllexize" = ${Segment.paramSegment(row.tmpllexize)(TypoRegproc.setter)}::regproc
+          where "oid" = ${Segment.paramSegment(oid)(PgTsTemplateId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
     UpdateBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields, PgTsTemplateRow.jdbcDecoder)
@@ -66,11 +66,11 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def upsert(unsaved: PgTsTemplateRow): ZIO[ZConnection, Throwable, UpdateResult[PgTsTemplateRow]] = {
     sql"""insert into pg_catalog.pg_ts_template("oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize")
           values (
-            ${Segment.paramSegment(unsaved.oid)(Setter[PgTsTemplateId])}::oid,
+            ${Segment.paramSegment(unsaved.oid)(PgTsTemplateId.setter)}::oid,
             ${Segment.paramSegment(unsaved.tmplname)(Setter.stringSetter)}::name,
             ${Segment.paramSegment(unsaved.tmplnamespace)(Setter.longSetter)}::oid,
-            ${Segment.paramSegment(unsaved.tmplinit)(Setter[TypoRegproc])}::regproc,
-            ${Segment.paramSegment(unsaved.tmpllexize)(Setter[TypoRegproc])}::regproc
+            ${Segment.paramSegment(unsaved.tmplinit)(TypoRegproc.setter)}::regproc,
+            ${Segment.paramSegment(unsaved.tmpllexize)(TypoRegproc.setter)}::regproc
           )
           on conflict ("oid")
           do update set

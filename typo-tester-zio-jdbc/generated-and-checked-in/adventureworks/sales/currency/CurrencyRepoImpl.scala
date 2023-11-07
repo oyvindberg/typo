@@ -17,7 +17,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -25,24 +24,24 @@ import zio.stream.ZStream
 
 object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(Setter[CurrencyId])}""".delete.map(_ > 0)
+    sql"""delete from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
     DeleteBuilder("sales.currency", CurrencyFields)
   }
   override def insert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, CurrencyRow] = {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")
-          values (${Segment.paramSegment(unsaved.currencycode)(Setter[CurrencyId])}::bpchar, ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp)
+          values (${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "currencycode", "name", "modifieddate"::text
        """.insertReturning(CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: CurrencyRowUnsaved): ZIO[ZConnection, Throwable, CurrencyRow] = {
     val fs = List(
-      Some((sql""""currencycode"""", sql"${Segment.paramSegment(unsaved.currencycode)(Setter[CurrencyId])}::bpchar")),
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar")),
+      Some((sql""""currencycode"""", sql"${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar")),
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(Setter[TypoLocalDateTime])}::timestamp"))
+        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
       }
     ).flatten
     
@@ -65,7 +64,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""select "currencycode", "name", "modifieddate"::text from sales.currency""".query(CurrencyRow.jdbcDecoder).selectStream
   }
   override def selectById(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Option[CurrencyRow]] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(Setter[CurrencyId])}""".query(CurrencyRow.jdbcDecoder).selectOne
+    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".query(CurrencyRow.jdbcDecoder).selectOne
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): ZStream[ZConnection, Throwable, CurrencyRow] = {
     sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ANY(${Segment.paramSegment(currencycodes)(CurrencyId.arraySetter)})""".query(CurrencyRow.jdbcDecoder).selectStream
@@ -73,9 +72,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     val currencycode = row.currencycode
     sql"""update sales.currency
-          set "name" = ${Segment.paramSegment(row.name)(Setter[Name])}::varchar,
-              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
-          where "currencycode" = ${Segment.paramSegment(currencycode)(Setter[CurrencyId])}""".update.map(_ > 0)
+          set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
+              "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
+          where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
     UpdateBuilder("sales.currency", CurrencyFields, CurrencyRow.jdbcDecoder)
@@ -83,9 +82,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]] = {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")
           values (
-            ${Segment.paramSegment(unsaved.currencycode)(Setter[CurrencyId])}::bpchar,
-            ${Segment.paramSegment(unsaved.name)(Setter[Name])}::varchar,
-            ${Segment.paramSegment(unsaved.modifieddate)(Setter[TypoLocalDateTime])}::timestamp
+            ${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar,
+            ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
+            ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           )
           on conflict ("currencycode")
           do update set

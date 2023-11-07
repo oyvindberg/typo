@@ -21,14 +21,14 @@ import zio.stream.ZStream
 
 object PgForeignTableRepoImpl extends PgForeignTableRepo {
   override def delete(ftrelid: PgForeignTableId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from pg_catalog.pg_foreign_table where "ftrelid" = ${Segment.paramSegment(ftrelid)(Setter[PgForeignTableId])}""".delete.map(_ > 0)
+    sql"""delete from pg_catalog.pg_foreign_table where "ftrelid" = ${Segment.paramSegment(ftrelid)(PgForeignTableId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PgForeignTableFields, PgForeignTableRow] = {
     DeleteBuilder("pg_catalog.pg_foreign_table", PgForeignTableFields)
   }
   override def insert(unsaved: PgForeignTableRow): ZIO[ZConnection, Throwable, PgForeignTableRow] = {
     sql"""insert into pg_catalog.pg_foreign_table("ftrelid", "ftserver", "ftoptions")
-          values (${Segment.paramSegment(unsaved.ftrelid)(Setter[PgForeignTableId])}::oid, ${Segment.paramSegment(unsaved.ftserver)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.ftoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
+          values (${Segment.paramSegment(unsaved.ftrelid)(PgForeignTableId.setter)}::oid, ${Segment.paramSegment(unsaved.ftserver)(Setter.longSetter)}::oid, ${Segment.paramSegment(unsaved.ftoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text)
           returning "ftrelid", "ftserver", "ftoptions"
        """.insertReturning(PgForeignTableRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -39,7 +39,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
     sql"""select "ftrelid", "ftserver", "ftoptions" from pg_catalog.pg_foreign_table""".query(PgForeignTableRow.jdbcDecoder).selectStream
   }
   override def selectById(ftrelid: PgForeignTableId): ZIO[ZConnection, Throwable, Option[PgForeignTableRow]] = {
-    sql"""select "ftrelid", "ftserver", "ftoptions" from pg_catalog.pg_foreign_table where "ftrelid" = ${Segment.paramSegment(ftrelid)(Setter[PgForeignTableId])}""".query(PgForeignTableRow.jdbcDecoder).selectOne
+    sql"""select "ftrelid", "ftserver", "ftoptions" from pg_catalog.pg_foreign_table where "ftrelid" = ${Segment.paramSegment(ftrelid)(PgForeignTableId.setter)}""".query(PgForeignTableRow.jdbcDecoder).selectOne
   }
   override def selectByIds(ftrelids: Array[PgForeignTableId]): ZStream[ZConnection, Throwable, PgForeignTableRow] = {
     sql"""select "ftrelid", "ftserver", "ftoptions" from pg_catalog.pg_foreign_table where "ftrelid" = ANY(${Segment.paramSegment(ftrelids)(PgForeignTableId.arraySetter)})""".query(PgForeignTableRow.jdbcDecoder).selectStream
@@ -49,7 +49,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
     sql"""update pg_catalog.pg_foreign_table
           set "ftserver" = ${Segment.paramSegment(row.ftserver)(Setter.longSetter)}::oid,
               "ftoptions" = ${Segment.paramSegment(row.ftoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text
-          where "ftrelid" = ${Segment.paramSegment(ftrelid)(Setter[PgForeignTableId])}""".update.map(_ > 0)
+          where "ftrelid" = ${Segment.paramSegment(ftrelid)(PgForeignTableId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PgForeignTableFields, PgForeignTableRow] = {
     UpdateBuilder("pg_catalog.pg_foreign_table", PgForeignTableFields, PgForeignTableRow.jdbcDecoder)
@@ -57,7 +57,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
   override def upsert(unsaved: PgForeignTableRow): ZIO[ZConnection, Throwable, UpdateResult[PgForeignTableRow]] = {
     sql"""insert into pg_catalog.pg_foreign_table("ftrelid", "ftserver", "ftoptions")
           values (
-            ${Segment.paramSegment(unsaved.ftrelid)(Setter[PgForeignTableId])}::oid,
+            ${Segment.paramSegment(unsaved.ftrelid)(PgForeignTableId.setter)}::oid,
             ${Segment.paramSegment(unsaved.ftserver)(Setter.longSetter)}::oid,
             ${Segment.paramSegment(unsaved.ftoptions)(Setter.optionParamSetter(adventureworks.StringArraySetter))}::_text
           )
