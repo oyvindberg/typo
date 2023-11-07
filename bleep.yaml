@@ -2,13 +2,6 @@ $schema: https://raw.githubusercontent.com/oyvindberg/bleep/master/schema.json
 $version: 0.0.3
 jvm:
   name: graalvm-java17:22.3.1
-resolvers:
-  - type: maven
-    uri: https://oss.sonatype.org/content/repositories/snapshots
-    name: sonatype-snapshots
-  - type: maven
-    uri: https://s01.oss.sonatype.org/content/repositories/snapshots
-    name: sonatype-s01-snapshots
 projects:
   # these tests do not depend on running codegen, just unit tests and so on
   tests:

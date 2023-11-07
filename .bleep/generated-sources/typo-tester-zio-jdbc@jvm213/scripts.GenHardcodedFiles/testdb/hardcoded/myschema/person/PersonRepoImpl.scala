@@ -29,20 +29,20 @@ import zio.stream.ZStream
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from myschema.person where "id" = ${Segment.paramSegment(id)(Setter[PersonId])}""".delete.map(_ > 0)
+    sql"""delete from myschema.person where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("myschema.person", PersonFields)
   }
   override def insert(unsaved: PersonRow): ZIO[ZConnection, Throwable, PersonRow] = {
     sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
-          values (${Segment.paramSegment(unsaved.id)(Setter[PersonId])}::int8, ${Segment.paramSegment(unsaved.favouriteFootballClubId)(Setter[FootballClubId])}, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.nickName)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.blogUrl)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.email)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.phone)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.likesPizza)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.maritalStatusId)(Setter[MaritalStatusId])}, ${Segment.paramSegment(unsaved.workEmail)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sector)(Setter[Sector])}::myschema.sector, ${Segment.paramSegment(unsaved.favoriteNumber)(Setter[Number])}::myschema.number)
+          values (${Segment.paramSegment(unsaved.id)(PersonId.setter)}::int8, ${Segment.paramSegment(unsaved.favouriteFootballClubId)(FootballClubId.setter)}, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.nickName)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.blogUrl)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.email)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.phone)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.likesPizza)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.maritalStatusId)(MaritalStatusId.setter)}, ${Segment.paramSegment(unsaved.workEmail)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sector)(Sector.setter)}::myschema.sector, ${Segment.paramSegment(unsaved.favoriteNumber)(Number.setter)}::myschema.number)
           returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insert(unsaved: PersonRowUnsaved): ZIO[ZConnection, Throwable, PersonRow] = {
     val fs = List(
-      Some((sql""""favourite_football_club_id"""", sql"${Segment.paramSegment(unsaved.favouriteFootballClubId)(Setter[FootballClubId])}")),
+      Some((sql""""favourite_football_club_id"""", sql"${Segment.paramSegment(unsaved.favouriteFootballClubId)(FootballClubId.setter)}")),
       Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}")),
       Some((sql""""nick_name"""", sql"${Segment.paramSegment(unsaved.nickName)(Setter.optionParamSetter(Setter.stringSetter))}")),
       Some((sql""""blog_url"""", sql"${Segment.paramSegment(unsaved.blogUrl)(Setter.optionParamSetter(Setter.stringSetter))}")),
@@ -52,19 +52,19 @@ object PersonRepoImpl extends PersonRepo {
       Some((sql""""work_email"""", sql"${Segment.paramSegment(unsaved.workEmail)(Setter.optionParamSetter(Setter.stringSetter))}")),
       unsaved.id match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""id"""", sql"${Segment.paramSegment(value: PersonId)(Setter[PersonId])}::int8"))
+        case Defaulted.Provided(value) => Some((sql""""id"""", sql"${Segment.paramSegment(value: PersonId)(PersonId.setter)}::int8"))
       },
       unsaved.maritalStatusId match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""marital_status_id"""", sql"${Segment.paramSegment(value: MaritalStatusId)(Setter[MaritalStatusId])}"))
+        case Defaulted.Provided(value) => Some((sql""""marital_status_id"""", sql"${Segment.paramSegment(value: MaritalStatusId)(MaritalStatusId.setter)}"))
       },
       unsaved.sector match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""sector"""", sql"${Segment.paramSegment(value: Sector)(Setter[Sector])}::myschema.sector"))
+        case Defaulted.Provided(value) => Some((sql""""sector"""", sql"${Segment.paramSegment(value: Sector)(Sector.setter)}::myschema.sector"))
       },
       unsaved.favoriteNumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""favorite_number"""", sql"${Segment.paramSegment(value: Number)(Setter[Number])}::myschema.number"))
+        case Defaulted.Provided(value) => Some((sql""""favorite_number"""", sql"${Segment.paramSegment(value: Number)(Number.setter)}::myschema.number"))
       }
     ).flatten
     
@@ -87,7 +87,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person""".query(PersonRow.jdbcDecoder).selectStream
   }
   override def selectById(id: PersonId): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
-    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ${Segment.paramSegment(id)(Setter[PersonId])}""".query(PersonRow.jdbcDecoder).selectOne
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".query(PersonRow.jdbcDecoder).selectOne
   }
   override def selectByIds(ids: Array[PersonId]): ZStream[ZConnection, Throwable, PersonRow] = {
     sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ANY(${Segment.paramSegment(ids)(PersonId.arraySetter)})""".query(PersonRow.jdbcDecoder).selectStream
@@ -98,18 +98,18 @@ object PersonRepoImpl extends PersonRepo {
       case nonEmpty =>
         val wheres = SqlFragment.empty.and(
           nonEmpty.map {
-            case PersonFieldValue.id(value) => sql""""id" = ${Segment.paramSegment(value)(Setter[PersonId])}"""
-            case PersonFieldValue.favouriteFootballClubId(value) => sql""""favourite_football_club_id" = ${Segment.paramSegment(value)(Setter[FootballClubId])}"""
+            case PersonFieldValue.id(value) => sql""""id" = ${Segment.paramSegment(value)(PersonId.setter)}"""
+            case PersonFieldValue.favouriteFootballClubId(value) => sql""""favourite_football_club_id" = ${Segment.paramSegment(value)(FootballClubId.setter)}"""
             case PersonFieldValue.name(value) => sql""""name" = ${Segment.paramSegment(value)(Setter.stringSetter)}"""
             case PersonFieldValue.nickName(value) => sql""""nick_name" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}"""
             case PersonFieldValue.blogUrl(value) => sql""""blog_url" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}"""
             case PersonFieldValue.email(value) => sql""""email" = ${Segment.paramSegment(value)(Setter.stringSetter)}"""
             case PersonFieldValue.phone(value) => sql""""phone" = ${Segment.paramSegment(value)(Setter.stringSetter)}"""
             case PersonFieldValue.likesPizza(value) => sql""""likes_pizza" = ${Segment.paramSegment(value)(Setter.booleanSetter)}"""
-            case PersonFieldValue.maritalStatusId(value) => sql""""marital_status_id" = ${Segment.paramSegment(value)(Setter[MaritalStatusId])}"""
+            case PersonFieldValue.maritalStatusId(value) => sql""""marital_status_id" = ${Segment.paramSegment(value)(MaritalStatusId.setter)}"""
             case PersonFieldValue.workEmail(value) => sql""""work_email" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}"""
-            case PersonFieldValue.sector(value) => sql""""sector" = ${Segment.paramSegment(value)(Setter[Sector])}"""
-            case PersonFieldValue.favoriteNumber(value) => sql""""favorite_number" = ${Segment.paramSegment(value)(Setter[Number])}"""
+            case PersonFieldValue.sector(value) => sql""""sector" = ${Segment.paramSegment(value)(Sector.setter)}"""
+            case PersonFieldValue.favoriteNumber(value) => sql""""favorite_number" = ${Segment.paramSegment(value)(Number.setter)}"""
           }
         )
         sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where $wheres""".query(PersonRow.jdbcDecoder).selectStream
@@ -118,18 +118,18 @@ object PersonRepoImpl extends PersonRepo {
   override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val id = row.id
     sql"""update myschema.person
-          set "favourite_football_club_id" = ${Segment.paramSegment(row.favouriteFootballClubId)(Setter[FootballClubId])},
+          set "favourite_football_club_id" = ${Segment.paramSegment(row.favouriteFootballClubId)(FootballClubId.setter)},
               "name" = ${Segment.paramSegment(row.name)(Setter.stringSetter)},
               "nick_name" = ${Segment.paramSegment(row.nickName)(Setter.optionParamSetter(Setter.stringSetter))},
               "blog_url" = ${Segment.paramSegment(row.blogUrl)(Setter.optionParamSetter(Setter.stringSetter))},
               "email" = ${Segment.paramSegment(row.email)(Setter.stringSetter)},
               "phone" = ${Segment.paramSegment(row.phone)(Setter.stringSetter)},
               "likes_pizza" = ${Segment.paramSegment(row.likesPizza)(Setter.booleanSetter)},
-              "marital_status_id" = ${Segment.paramSegment(row.maritalStatusId)(Setter[MaritalStatusId])},
+              "marital_status_id" = ${Segment.paramSegment(row.maritalStatusId)(MaritalStatusId.setter)},
               "work_email" = ${Segment.paramSegment(row.workEmail)(Setter.optionParamSetter(Setter.stringSetter))},
-              "sector" = ${Segment.paramSegment(row.sector)(Setter[Sector])}::myschema.sector,
-              "favorite_number" = ${Segment.paramSegment(row.favoriteNumber)(Setter[Number])}::myschema.number
-          where "id" = ${Segment.paramSegment(id)(Setter[PersonId])}""".update.map(_ > 0)
+              "sector" = ${Segment.paramSegment(row.sector)(Sector.setter)}::myschema.sector,
+              "favorite_number" = ${Segment.paramSegment(row.favoriteNumber)(Number.setter)}::myschema.number
+          where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("myschema.person", PersonFields, PersonRow.jdbcDecoder)
@@ -138,38 +138,38 @@ object PersonRepoImpl extends PersonRepo {
     NonEmptyChunk.fromIterableOption(fieldValues) match {
       case None           => ZIO.succeed(false)
       case Some(nonEmpty) =>
-        val updates = nonEmpty.map { case PersonFieldValue.favouriteFootballClubId(value) => sql""""favourite_football_club_id" = ${Segment.paramSegment(value)(Setter[FootballClubId])}"""
+        val updates = nonEmpty.map { case PersonFieldValue.favouriteFootballClubId(value) => sql""""favourite_football_club_id" = ${Segment.paramSegment(value)(FootballClubId.setter)}"""
                                      case PersonFieldValue.name(value) => sql""""name" = ${Segment.paramSegment(value)(Setter.stringSetter)}"""
                                      case PersonFieldValue.nickName(value) => sql""""nick_name" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}"""
                                      case PersonFieldValue.blogUrl(value) => sql""""blog_url" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}"""
                                      case PersonFieldValue.email(value) => sql""""email" = ${Segment.paramSegment(value)(Setter.stringSetter)}"""
                                      case PersonFieldValue.phone(value) => sql""""phone" = ${Segment.paramSegment(value)(Setter.stringSetter)}"""
                                      case PersonFieldValue.likesPizza(value) => sql""""likes_pizza" = ${Segment.paramSegment(value)(Setter.booleanSetter)}"""
-                                     case PersonFieldValue.maritalStatusId(value) => sql""""marital_status_id" = ${Segment.paramSegment(value)(Setter[MaritalStatusId])}"""
+                                     case PersonFieldValue.maritalStatusId(value) => sql""""marital_status_id" = ${Segment.paramSegment(value)(MaritalStatusId.setter)}"""
                                      case PersonFieldValue.workEmail(value) => sql""""work_email" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}"""
-                                     case PersonFieldValue.sector(value) => sql""""sector" = ${Segment.paramSegment(value)(Setter[Sector])}::myschema.sector"""
-                                     case PersonFieldValue.favoriteNumber(value) => sql""""favorite_number" = ${Segment.paramSegment(value)(Setter[Number])}::myschema.number""" }.mkFragment(SqlFragment(", "))
+                                     case PersonFieldValue.sector(value) => sql""""sector" = ${Segment.paramSegment(value)(Sector.setter)}::myschema.sector"""
+                                     case PersonFieldValue.favoriteNumber(value) => sql""""favorite_number" = ${Segment.paramSegment(value)(Number.setter)}::myschema.number""" }.mkFragment(SqlFragment(", "))
         sql"""update myschema.person
               set $updates
-              where "id" = ${Segment.paramSegment(id)(Setter[PersonId])}
+              where "id" = ${Segment.paramSegment(id)(PersonId.setter)}
            """.update.map(_ > 0)
     }
   }
   override def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]] = {
     sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
           values (
-            ${Segment.paramSegment(unsaved.id)(Setter[PersonId])}::int8,
-            ${Segment.paramSegment(unsaved.favouriteFootballClubId)(Setter[FootballClubId])},
+            ${Segment.paramSegment(unsaved.id)(PersonId.setter)}::int8,
+            ${Segment.paramSegment(unsaved.favouriteFootballClubId)(FootballClubId.setter)},
             ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.nickName)(Setter.optionParamSetter(Setter.stringSetter))},
             ${Segment.paramSegment(unsaved.blogUrl)(Setter.optionParamSetter(Setter.stringSetter))},
             ${Segment.paramSegment(unsaved.email)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.phone)(Setter.stringSetter)},
             ${Segment.paramSegment(unsaved.likesPizza)(Setter.booleanSetter)},
-            ${Segment.paramSegment(unsaved.maritalStatusId)(Setter[MaritalStatusId])},
+            ${Segment.paramSegment(unsaved.maritalStatusId)(MaritalStatusId.setter)},
             ${Segment.paramSegment(unsaved.workEmail)(Setter.optionParamSetter(Setter.stringSetter))},
-            ${Segment.paramSegment(unsaved.sector)(Setter[Sector])}::myschema.sector,
-            ${Segment.paramSegment(unsaved.favoriteNumber)(Setter[Number])}::myschema.number
+            ${Segment.paramSegment(unsaved.sector)(Sector.setter)}::myschema.sector,
+            ${Segment.paramSegment(unsaved.favoriteNumber)(Number.setter)}::myschema.number
           )
           on conflict ("id")
           do update set

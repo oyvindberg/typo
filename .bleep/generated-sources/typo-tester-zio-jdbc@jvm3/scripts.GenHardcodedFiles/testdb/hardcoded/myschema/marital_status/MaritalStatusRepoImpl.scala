@@ -15,7 +15,6 @@ import typo.dsl.UpdateBuilder
 import zio.ZIO
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
@@ -23,14 +22,14 @@ import zio.stream.ZStream
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from myschema.marital_status where "id" = ${Segment.paramSegment(id)(Setter[MaritalStatusId])}""".delete.map(_ > 0)
+    sql"""delete from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
     DeleteBuilder("myschema.marital_status", MaritalStatusFields)
   }
   override def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")
-          values (${Segment.paramSegment(unsaved.id)(Setter[MaritalStatusId])}::int8)
+          values (${Segment.paramSegment(unsaved.id)(MaritalStatusId.setter)}::int8)
           returning "id"
        """.insertReturning(MaritalStatusRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -41,7 +40,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     sql"""select "id" from myschema.marital_status""".query(MaritalStatusRow.jdbcDecoder).selectStream
   }
   override def selectById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Option[MaritalStatusRow]] = {
-    sql"""select "id" from myschema.marital_status where "id" = ${Segment.paramSegment(id)(Setter[MaritalStatusId])}""".query(MaritalStatusRow.jdbcDecoder).selectOne
+    sql"""select "id" from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".query(MaritalStatusRow.jdbcDecoder).selectOne
   }
   override def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status where "id" = ANY(${Segment.paramSegment(ids)(MaritalStatusId.arraySetter)})""".query(MaritalStatusRow.jdbcDecoder).selectStream
@@ -52,7 +51,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
       case nonEmpty =>
         val wheres = SqlFragment.empty.and(
           nonEmpty.map {
-            case MaritalStatusFieldValue.id(value) => sql""""id" = ${Segment.paramSegment(value)(Setter[MaritalStatusId])}"""
+            case MaritalStatusFieldValue.id(value) => sql""""id" = ${Segment.paramSegment(value)(MaritalStatusId.setter)}"""
           }
         )
         sql"""select "id" from myschema.marital_status where $wheres""".query(MaritalStatusRow.jdbcDecoder).selectStream
@@ -64,7 +63,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def upsert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, UpdateResult[MaritalStatusRow]] = {
     sql"""insert into myschema.marital_status("id")
           values (
-            ${Segment.paramSegment(unsaved.id)(Setter[MaritalStatusId])}::int8
+            ${Segment.paramSegment(unsaved.id)(MaritalStatusId.setter)}::int8
           )
           on conflict ("id")
           returning "id"""".insertReturning(MaritalStatusRow.jdbcDecoder)

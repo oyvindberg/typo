@@ -24,14 +24,14 @@ import zio.stream.ZStream
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from myschema.football_club where "id" = ${Segment.paramSegment(id)(Setter[FootballClubId])}""".delete.map(_ > 0)
+    sql"""delete from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
     DeleteBuilder("myschema.football_club", FootballClubFields)
   }
   override def insert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
-          values (${Segment.paramSegment(unsaved.id)(Setter[FootballClubId])}::int8, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)})
+          values (${Segment.paramSegment(unsaved.id)(FootballClubId.setter)}::int8, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)})
           returning "id", "name"
        """.insertReturning(FootballClubRow.jdbcDecoder).map(_.updatedKeys.head)
   }
@@ -42,7 +42,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     sql"""select "id", "name" from myschema.football_club""".query(FootballClubRow.jdbcDecoder).selectStream
   }
   override def selectById(id: FootballClubId): ZIO[ZConnection, Throwable, Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ${Segment.paramSegment(id)(Setter[FootballClubId])}""".query(FootballClubRow.jdbcDecoder).selectOne
+    sql"""select "id", "name" from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".query(FootballClubRow.jdbcDecoder).selectOne
   }
   override def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club where "id" = ANY(${Segment.paramSegment(ids)(FootballClubId.arraySetter)})""".query(FootballClubRow.jdbcDecoder).selectStream
@@ -53,7 +53,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
       case nonEmpty =>
         val wheres = SqlFragment.empty.and(
           nonEmpty.map {
-            case FootballClubFieldValue.id(value) => sql""""id" = ${Segment.paramSegment(value)(Setter[FootballClubId])}"""
+            case FootballClubFieldValue.id(value) => sql""""id" = ${Segment.paramSegment(value)(FootballClubId.setter)}"""
             case FootballClubFieldValue.name(value) => sql""""name" = ${Segment.paramSegment(value)(Setter.stringSetter)}"""
           }
         )
@@ -64,7 +64,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     val id = row.id
     sql"""update myschema.football_club
           set "name" = ${Segment.paramSegment(row.name)(Setter.stringSetter)}
-          where "id" = ${Segment.paramSegment(id)(Setter[FootballClubId])}""".update.map(_ > 0)
+          where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilder("myschema.football_club", FootballClubFields, FootballClubRow.jdbcDecoder)
@@ -76,14 +76,14 @@ object FootballClubRepoImpl extends FootballClubRepo {
         val updates = nonEmpty.map { case FootballClubFieldValue.name(value) => sql""""name" = ${Segment.paramSegment(value)(Setter.stringSetter)}""" }.mkFragment(SqlFragment(", "))
         sql"""update myschema.football_club
               set $updates
-              where "id" = ${Segment.paramSegment(id)(Setter[FootballClubId])}
+              where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}
            """.update.map(_ > 0)
     }
   }
   override def upsert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, UpdateResult[FootballClubRow]] = {
     sql"""insert into myschema.football_club("id", "name")
           values (
-            ${Segment.paramSegment(unsaved.id)(Setter[FootballClubId])}::int8,
+            ${Segment.paramSegment(unsaved.id)(FootballClubId.setter)}::int8,
             ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}
           )
           on conflict ("id")
