@@ -1,6 +1,5 @@
 package typo.dsl
 
-import typo.dsl.extensions.NonEmptyChunkOps
 import zio.jdbc.*
 import zio.{Chunk, NonEmptyChunk}
 

@@ -1,7 +1,6 @@
 package typo.dsl
 
 import zio.jdbc.*
-import extensions.*
 import zio.{Chunk, NonEmptyChunk, ZIO}
 
 import java.util.concurrent.atomic.AtomicInteger

@@ -2,7 +2,6 @@ package typo.dsl
 
 import zio.Chunk
 import zio.jdbc.*
-import extensions.FragmentOps
 import java.util.concurrent.atomic.AtomicInteger
 
 // sort by a field
