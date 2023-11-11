@@ -4,6 +4,8 @@ version: '3.1'
 services:
   db:
     image: ghcr.io/oyvindberg/typo/integration-test:main
+    # TODO switch to new images depending on PG_MAJOR once we've pushed them
+    # image: ghcr.io/oyvindberg/typo/typo-postgres${PG_MAJOR}:latest
     restart: always
     environment:
       POSTGRES_USER: postgres
