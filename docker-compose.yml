@@ -3,14 +3,13 @@ version: '3.1'
 
 services:
   db:
-    image: ghcr.io/oyvindberg/typo/integration-test:main
-    # TODO switch to new images depending on PG_MAJOR once we've pushed them
-    # image: ghcr.io/oyvindberg/typo/typo-postgres${PG_MAJOR}:latest
+    image: ghcr.io/oyvindberg/typo/typo-postgres${PG_MAJOR-16}:latest
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: world
+    platform: linux/x86_64
     ports:
       - 6432:5432
     volumes:
