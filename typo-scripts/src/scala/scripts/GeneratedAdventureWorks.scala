@@ -53,7 +53,7 @@ object GeneratedAdventureWorks {
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
             val newFiles: Generated =
-              generate(options, metadb, newSqlScripts, Selector.All)
+              generate(options, metadb, newSqlScripts, Selector.ExcludePostgresInternal)
 
             val knownUnchanged: Set[RelPath] = {
               val oldFiles = oldFilesRef.get()
