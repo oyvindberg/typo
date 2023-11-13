@@ -29,8 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         scala-version: [212, 213, 3]
-        # TODO add other postgres versions we want to run tests against once we've pushed the images
-        postgres-version: [14]
+        postgres-version: [12, 16]
     steps:
       - uses: actions/checkout@v4
       - uses: bleep-build/bleep-setup-action@0.0.1
