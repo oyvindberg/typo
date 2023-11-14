@@ -13,7 +13,7 @@ import fs2.Stream
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object EdhViewRepoImpl extends EdhViewRepo {
+class EdhViewRepoImpl extends EdhViewRepo {
   override def select: SelectBuilder[EdhViewFields, EdhViewRow] = {
     SelectBuilderSql("hr.edh", EdhViewFields, EdhViewRow.read)
   }

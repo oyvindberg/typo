@@ -93,11 +93,11 @@ import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
 import adventureworks.withConnection
 
-val productRepo: ProductRepo = ProductRepoImpl
-val projectModelRepo: ProductmodelRepo = ProductmodelRepoImpl
-val unitmeasureRepo: UnitmeasureRepo = UnitmeasureRepoImpl
-val productcategoryRepo: ProductcategoryRepo = ProductcategoryRepoImpl
-val productsubcategoryRepo: ProductsubcategoryRepo = ProductsubcategoryRepoImpl
+val productRepo: ProductRepo = new ProductRepoImpl
+val projectModelRepo: ProductmodelRepo = new ProductmodelRepoImpl
+val unitmeasureRepo: UnitmeasureRepo = new UnitmeasureRepoImpl
+val productcategoryRepo: ProductcategoryRepo = new ProductcategoryRepoImpl
+val productsubcategoryRepo: ProductsubcategoryRepo = new ProductsubcategoryRepoImpl
 ```
 
 ```scala mdoc:invisible

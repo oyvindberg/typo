@@ -23,7 +23,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
+class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def delete(transactionid: TransactionhistoryarchiveId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.transactionhistoryarchive where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryarchiveId.setter)}""".delete.map(_ > 0)
   }

@@ -24,7 +24,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
+class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
   override def delete(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salesorderheadersalesreason where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesreasonid" = ${Segment.paramSegment(compositeId.salesreasonid)(SalesreasonId.setter)}""".delete.map(_ > 0)
   }

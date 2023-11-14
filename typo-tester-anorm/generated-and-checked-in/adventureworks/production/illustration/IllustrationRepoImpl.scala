@@ -24,7 +24,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object IllustrationRepoImpl extends IllustrationRepo {
+class IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.illustration where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
   }

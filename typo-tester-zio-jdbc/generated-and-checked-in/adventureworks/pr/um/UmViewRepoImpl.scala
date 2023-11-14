@@ -13,7 +13,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object UmViewRepoImpl extends UmViewRepo {
+class UmViewRepoImpl extends UmViewRepo {
   override def select: SelectBuilder[UmViewFields, UmViewRow] = {
     SelectBuilderSql("pr.um", UmViewFields, UmViewRow.jdbcDecoder)
   }

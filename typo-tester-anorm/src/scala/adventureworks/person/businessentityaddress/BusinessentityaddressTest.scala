@@ -15,24 +15,30 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.annotation.nowarn
 
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  val repo = BusinessentityaddressRepoImpl
+  val businessentityaddressRepo = new BusinessentityaddressRepoImpl
+  val businessentityRepo = new BusinessentityRepoImpl
+  val countryregionRepo = new CountryregionRepoImpl
+  val salesterritoryRepo = new SalesterritoryRepoImpl
+  val stateprovinceRepo = new StateprovinceRepoImpl
+  val addressRepo = new AddressRepoImpl
+  val addresstypeRepo = new AddresstypeRepoImpl
 
   test("works") {
     withConnection { implicit c =>
       // setup
       val businessentityRow: BusinessentityRow =
-        BusinessentityRepoImpl.insert(
+        businessentityRepo.insert(
           BusinessentityRowUnsaved()
         )
 
       val countryregion =
-        CountryregionRepoImpl.insert(
+        countryregionRepo.insert(
           CountryregionRowUnsaved(
             countryregioncode = CountryregionId("max"),
             name = Name("max")
           )
         )
-      val salesTerritory = SalesterritoryRepoImpl.insert(
+      val salesTerritory = salesterritoryRepo.insert(
         SalesterritoryRowUnsaved(
           name = Name("name"),
           countryregioncode = countryregion.countryregioncode,
@@ -40,7 +46,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
           salesytd = Defaulted.Provided(1)
         )
       )
-      val stateProvidence = StateprovinceRepoImpl.insert(
+      val stateProvidence = stateprovinceRepo.insert(
         StateprovinceRowUnsaved(
           stateprovincecode = "cde",
           countryregioncode = countryregion.countryregioncode,
@@ -48,7 +54,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
           territoryid = salesTerritory.territoryid
         )
       )
-      val address = AddressRepoImpl.insert(
+      val address = addressRepo.insert(
         AddressRowUnsaved(
           addressline1 = "addressline1",
           addressline2 = Some("addressline2"),
@@ -58,7 +64,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
           spatiallocation = None
         )
       )
-      val addressType = AddresstypeRepoImpl.insert(
+      val addressType = addresstypeRepo.insert(
         new AddresstypeRowUnsaved(
           name = Name("name")
         )
@@ -72,20 +78,20 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
       )
 
       // insert and round trip check
-      val saved1 = repo.insert(unsaved1)
+      val saved1 = businessentityaddressRepo.insert(unsaved1)
       val saved2 = unsaved1.toRow(???, ???)
       assert(saved1 === saved2): @nowarn
 
       // check field values
       val newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
-      repo.update(saved1.copy(modifieddate = newModifiedDate)): @nowarn
-      val List(saved3) = repo.selectAll: @unchecked
+      businessentityaddressRepo.update(saved1.copy(modifieddate = newModifiedDate)): @nowarn
+      val List(saved3) = businessentityaddressRepo.selectAll: @unchecked
       assert(saved3.modifieddate == newModifiedDate): @nowarn
 
       // delete
-      repo.delete(saved1.compositeId): @nowarn
+      businessentityaddressRepo.delete(saved1.compositeId): @nowarn
 
-      val List() = repo.selectAll: @unchecked
+      val List() = businessentityaddressRepo.selectAll: @unchecked
 
       succeed
     }

@@ -25,7 +25,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
+class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productsubcategory where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}""".delete.map(_ > 0)
   }

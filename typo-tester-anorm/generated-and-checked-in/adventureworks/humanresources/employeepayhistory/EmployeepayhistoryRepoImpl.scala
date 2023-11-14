@@ -25,7 +25,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
+class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.employeepayhistory where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }

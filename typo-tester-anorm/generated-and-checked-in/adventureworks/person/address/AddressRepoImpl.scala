@@ -27,7 +27,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object AddressRepoImpl extends AddressRepo {
+class AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.address where "addressid" = ${ParameterValue(addressid, null, AddressId.toStatement)}""".executeUpdate() > 0
   }

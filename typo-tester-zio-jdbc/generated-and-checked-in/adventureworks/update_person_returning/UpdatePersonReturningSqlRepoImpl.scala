@@ -13,7 +13,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
+class UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
   override def apply(suffix: /* nullability unknown */ Option[String], cutoff: /* nullability unknown */ Option[TypoLocalDateTime]): ZStream[ZConnection, Throwable, UpdatePersonReturningSqlRow] = {
     val sql =
       sql"""with row as (

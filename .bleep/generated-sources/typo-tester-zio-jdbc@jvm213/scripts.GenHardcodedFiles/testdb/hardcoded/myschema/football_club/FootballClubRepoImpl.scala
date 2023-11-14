@@ -23,7 +23,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object FootballClubRepoImpl extends FootballClubRepo {
+class FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".delete.map(_ > 0)
   }

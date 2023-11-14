@@ -45,7 +45,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
             name = Name("name")
           )
         )
-        productmodel <- ProductmodelRepoImpl.insert(
+        productmodel <- projectModelRepo.insert(
           ProductmodelRowUnsaved(
             name = Name("name"),
             catalogdescription = Some(new TypoXml("<xml/>")),
@@ -194,11 +194,11 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
   test("pg") {
     runTest(
-      productRepo = ProductRepoImpl,
-      projectModelRepo = ProductmodelRepoImpl,
-      unitmeasureRepo = UnitmeasureRepoImpl,
-      productcategoryRepo = ProductcategoryRepoImpl,
-      productsubcategoryRepo = ProductsubcategoryRepoImpl
+      productRepo = new ProductRepoImpl,
+      projectModelRepo = new ProductmodelRepoImpl,
+      unitmeasureRepo = new UnitmeasureRepoImpl,
+      productcategoryRepo = new ProductcategoryRepoImpl,
+      productsubcategoryRepo = new ProductsubcategoryRepoImpl
     )
   }
 }

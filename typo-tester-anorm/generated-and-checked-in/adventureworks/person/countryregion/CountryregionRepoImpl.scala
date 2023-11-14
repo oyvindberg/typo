@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object CountryregionRepoImpl extends CountryregionRepo {
+class CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.countryregion where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}""".executeUpdate() > 0
   }

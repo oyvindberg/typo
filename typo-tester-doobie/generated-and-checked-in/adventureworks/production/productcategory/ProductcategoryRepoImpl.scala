@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ProductcategoryRepoImpl extends ProductcategoryRepo {
+class ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def delete(productcategoryid: ProductcategoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productcategory where "productcategoryid" = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}""".update.run.map(_ > 0)
   }

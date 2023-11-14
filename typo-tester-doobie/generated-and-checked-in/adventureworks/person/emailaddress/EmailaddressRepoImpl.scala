@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object EmailaddressRepoImpl extends EmailaddressRepo {
+class EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId): ConnectionIO[Boolean] = {
     sql"""delete from person.emailaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }

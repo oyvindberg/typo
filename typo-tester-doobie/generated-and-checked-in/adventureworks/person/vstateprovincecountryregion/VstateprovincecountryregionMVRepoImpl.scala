@@ -13,7 +13,7 @@ import fs2.Stream
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object VstateprovincecountryregionMVRepoImpl extends VstateprovincecountryregionMVRepo {
+class VstateprovincecountryregionMVRepoImpl extends VstateprovincecountryregionMVRepo {
   override def select: SelectBuilder[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow] = {
     SelectBuilderSql("person.vstateprovincecountryregion", VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow.read)
   }

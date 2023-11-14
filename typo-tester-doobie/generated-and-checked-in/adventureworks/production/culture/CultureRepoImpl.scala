@@ -21,7 +21,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object CultureRepoImpl extends CultureRepo {
+class CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId): ConnectionIO[Boolean] = {
     sql"""delete from production.culture where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".update.run.map(_ > 0)
   }

@@ -13,7 +13,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object AtViewRepoImpl extends AtViewRepo {
+class AtViewRepoImpl extends AtViewRepo {
   override def select: SelectBuilder[AtViewFields, AtViewRow] = {
     SelectBuilderSql("pe.at", AtViewFields, AtViewRow.jdbcDecoder)
   }

@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
+class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".update.run.map(_ > 0)
   }

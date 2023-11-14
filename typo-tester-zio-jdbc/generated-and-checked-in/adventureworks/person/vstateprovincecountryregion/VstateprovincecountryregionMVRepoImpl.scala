@@ -13,7 +13,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object VstateprovincecountryregionMVRepoImpl extends VstateprovincecountryregionMVRepo {
+class VstateprovincecountryregionMVRepoImpl extends VstateprovincecountryregionMVRepo {
   override def select: SelectBuilder[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow] = {
     SelectBuilderSql("person.vstateprovincecountryregion", VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow.jdbcDecoder)
   }

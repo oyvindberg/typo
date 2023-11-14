@@ -12,7 +12,7 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object EphViewRepoImpl extends EphViewRepo {
+class EphViewRepoImpl extends EphViewRepo {
   override def select: SelectBuilder[EphViewFields, EphViewRow] = {
     SelectBuilderSql("hr.eph", EphViewFields, EphViewRow.rowParser)
   }

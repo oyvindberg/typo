@@ -25,7 +25,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ProductinventoryRepoImpl extends ProductinventoryRepo {
+class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productinventory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }

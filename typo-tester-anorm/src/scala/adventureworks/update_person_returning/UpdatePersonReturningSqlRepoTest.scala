@@ -6,9 +6,10 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 class UpdatePersonReturningSqlRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
+  val updatePersonReturningSqlRepo = new UpdatePersonReturningSqlRepoImpl
   test("timestamp works") {
     withConnection { implicit c =>
-      UpdatePersonReturningSqlRepoImpl(Some("1"), Some(TypoLocalDateTime.now))
+      updatePersonReturningSqlRepo(Some("1"), Some(TypoLocalDateTime.now))
     }
   }
 }

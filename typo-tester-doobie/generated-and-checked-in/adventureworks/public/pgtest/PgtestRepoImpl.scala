@@ -44,7 +44,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object PgtestRepoImpl extends PgtestRepo {
+class PgtestRepoImpl extends PgtestRepo {
   override def delete: DeleteBuilder[PgtestFields, PgtestRow] = {
     DeleteBuilder("public.pgtest", PgtestFields)
   }

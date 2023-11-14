@@ -23,7 +23,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object CultureRepoImpl extends CultureRepo {
+class CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.culture where "cultureid" = ${Segment.paramSegment(cultureid)(CultureId.setter)}""".delete.map(_ > 0)
   }

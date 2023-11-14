@@ -12,7 +12,7 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object VproductmodelcatalogdescriptionViewRepoImpl extends VproductmodelcatalogdescriptionViewRepo {
+class VproductmodelcatalogdescriptionViewRepoImpl extends VproductmodelcatalogdescriptionViewRepo {
   override def select: SelectBuilder[VproductmodelcatalogdescriptionViewFields, VproductmodelcatalogdescriptionViewRow] = {
     SelectBuilderSql("production.vproductmodelcatalogdescription", VproductmodelcatalogdescriptionViewFields, VproductmodelcatalogdescriptionViewRow.rowParser)
   }

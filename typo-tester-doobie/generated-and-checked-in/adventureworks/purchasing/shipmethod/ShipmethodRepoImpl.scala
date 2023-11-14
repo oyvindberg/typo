@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ShipmethodRepoImpl extends ShipmethodRepo {
+class ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId): ConnectionIO[Boolean] = {
     sql"""delete from purchasing.shipmethod where "shipmethodid" = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}""".update.run.map(_ > 0)
   }

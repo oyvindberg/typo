@@ -10,7 +10,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object PersonRowJoinSqlRepoImpl extends PersonRowJoinSqlRepo {
+class PersonRowJoinSqlRepoImpl extends PersonRowJoinSqlRepo {
   override def apply(): ZStream[ZConnection, Throwable, PersonRowJoinSqlRow] = {
     val sql =
       sql"""SELECT s.businessentityid,

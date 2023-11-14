@@ -23,7 +23,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object UnitmeasureRepoImpl extends UnitmeasureRepo {
+class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.unitmeasure where "unitmeasurecode" = ${Segment.paramSegment(unitmeasurecode)(UnitmeasureId.setter)}""".delete.map(_ > 0)
   }

@@ -21,7 +21,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object UnitmeasureRepoImpl extends UnitmeasureRepo {
+class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean] = {
     sql"""delete from production.unitmeasure where "unitmeasurecode" = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}""".update.run.map(_ > 0)
   }

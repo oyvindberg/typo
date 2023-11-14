@@ -14,7 +14,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import fs2.Stream
 
-object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
+class PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
   override def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime): Stream[ConnectionIO, PersonDetailSqlRow] = {
     val sql =
       sql"""SELECT s.businessentityid,

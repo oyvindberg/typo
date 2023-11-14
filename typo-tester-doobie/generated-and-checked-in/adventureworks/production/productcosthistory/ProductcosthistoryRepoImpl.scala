@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
+class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }

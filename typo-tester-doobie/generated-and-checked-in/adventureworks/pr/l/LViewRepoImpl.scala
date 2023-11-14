@@ -13,7 +13,7 @@ import fs2.Stream
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object LViewRepoImpl extends LViewRepo {
+class LViewRepoImpl extends LViewRepo {
   override def select: SelectBuilder[LViewFields, LViewRow] = {
     SelectBuilderSql("pr.l", LViewFields, LViewRow.read)
   }

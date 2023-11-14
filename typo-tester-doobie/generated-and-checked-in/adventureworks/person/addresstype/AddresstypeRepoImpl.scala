@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object AddresstypeRepoImpl extends AddresstypeRepo {
+class AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
     sql"""delete from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".update.run.map(_ > 0)
   }

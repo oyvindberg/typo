@@ -17,7 +17,7 @@ import fs2.Stream
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
+class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
     SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.read)
   }

@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object FootballClubRepoImpl extends FootballClubRepo {
+class FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId): ConnectionIO[Boolean] = {
     sql"""delete from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
   }

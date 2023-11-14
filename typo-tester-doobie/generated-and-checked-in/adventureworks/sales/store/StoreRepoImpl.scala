@@ -24,7 +24,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object StoreRepoImpl extends StoreRepo {
+class StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"""delete from sales.store where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }

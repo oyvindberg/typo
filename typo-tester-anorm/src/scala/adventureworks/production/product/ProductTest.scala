@@ -20,9 +20,11 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
   // for scala 2.12
   implicit val `Ordering[LocalDateTime]` : Ordering[LocalDateTime] = (x: LocalDateTime, y: LocalDateTime) => x.compareTo(y)
 
+  val personDynamicSqlRepo = new PersonDynamicSqlRepoImpl
+
   test("flaf") {
     withConnection { implicit c =>
-      PersonDynamicSqlRepoImpl(Some("A"))
+      personDynamicSqlRepo(Some("A"))
     }
   }
 
@@ -227,11 +229,11 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
   test("pg") {
     runTest(
-      productRepo = ProductRepoImpl,
-      projectModelRepo = ProductmodelRepoImpl,
-      unitmeasureRepo = UnitmeasureRepoImpl,
-      productcategoryRepo = ProductcategoryRepoImpl,
-      productsubcategoryRepo = ProductsubcategoryRepoImpl
+      productRepo = new ProductRepoImpl,
+      projectModelRepo = new ProductmodelRepoImpl,
+      unitmeasureRepo = new UnitmeasureRepoImpl,
+      productcategoryRepo = new ProductcategoryRepoImpl,
+      productsubcategoryRepo = new ProductsubcategoryRepoImpl
     )
   }
 }

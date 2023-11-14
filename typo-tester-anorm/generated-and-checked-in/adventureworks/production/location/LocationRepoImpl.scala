@@ -24,7 +24,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object LocationRepoImpl extends LocationRepo {
+class LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.location where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
   }

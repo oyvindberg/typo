@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
+class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.phonenumbertype where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }

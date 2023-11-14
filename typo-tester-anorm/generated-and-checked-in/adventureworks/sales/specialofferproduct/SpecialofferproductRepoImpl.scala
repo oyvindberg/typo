@@ -25,7 +25,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
+class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.specialofferproduct where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}""".executeUpdate() > 0
   }

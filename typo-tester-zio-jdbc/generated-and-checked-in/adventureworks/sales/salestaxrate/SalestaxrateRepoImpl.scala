@@ -27,7 +27,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object SalestaxrateRepoImpl extends SalestaxrateRepo {
+class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".delete.map(_ > 0)
   }

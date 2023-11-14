@@ -24,7 +24,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object PersonRepoImpl extends PersonRepo {
+class PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId): ConnectionIO[Boolean] = {
     sql"""delete from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
   }

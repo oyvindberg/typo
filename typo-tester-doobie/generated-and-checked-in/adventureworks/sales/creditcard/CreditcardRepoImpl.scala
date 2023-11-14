@@ -24,7 +24,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object CreditcardRepoImpl extends CreditcardRepo {
+class CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Boolean] = {
     sql"""delete from sales.creditcard where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
   }

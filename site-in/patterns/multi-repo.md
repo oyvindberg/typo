@@ -140,10 +140,10 @@ val addressRow2 = testInsert.personAddress(stateprovinceRow.stateprovinceid)
 val addressRow3 = testInsert.personAddress(stateprovinceRow.stateprovinceid)
 
 val repo = new PersonWithAddressesRepo(
-personRepo = PersonRepoImpl,
-businessentityAddressRepo = BusinessentityaddressRepoImpl,
-addresstypeRepo = AddresstypeRepoImpl,
-addressRepo = AddressRepoImpl
+personRepo = new PersonRepoImpl,
+businessentityAddressRepo = new BusinessentityaddressRepoImpl,
+addresstypeRepo = new AddresstypeRepoImpl,
+addressRepo = new AddressRepoImpl
 )
 ```
 

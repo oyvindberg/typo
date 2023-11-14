@@ -21,7 +21,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object IllustrationRepoImpl extends IllustrationRepo {
+class IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ConnectionIO[Boolean] = {
     sql"""delete from production.illustration where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".update.run.map(_ > 0)
   }

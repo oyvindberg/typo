@@ -13,12 +13,14 @@ import java.time.LocalDate
 import scala.annotation.nowarn
 
 class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  val repo = EmployeeRepoImpl
+  val employeeRepo = new EmployeeRepoImpl
+  val personRepo = new PersonRepoImpl
+  val businessentityRepo = new BusinessentityRepoImpl
 
   test("works") {
     withConnection { implicit c =>
       val businessentityRow: BusinessentityRow =
-        BusinessentityRepoImpl.insert(
+        businessentityRepo.insert(
           BusinessentityRowUnsaved(
             businessentityid = Defaulted.UseDefault,
             rowguid = Defaulted.UseDefault,
@@ -26,7 +28,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           )
         )
 
-      val personRow = PersonRepoImpl.insert(
+      val personRow = personRepo.insert(
         PersonRowUnsaved(
           businessentityid = businessentityRow.businessentityid,
           persontype = "SC",
@@ -63,20 +65,20 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
       )
 
       // insert and round trip check
-      val saved1 = repo.insert(unsaved)
+      val saved1 = employeeRepo.insert(unsaved)
       val saved2 = unsaved.toRow(???, ???, ???, ???, ???, ???, ???)
       assert(saved1 === saved2): @nowarn
 
       // check field values
-      repo.update(saved1.copy(gender = "M")): @nowarn
-      val List(saved3) = repo.selectAll: @unchecked
-      val List(`saved3`) = repo.selectByIds(Array(saved1.businessentityid, BusinessentityId(22))): @unchecked
+      employeeRepo.update(saved1.copy(gender = "M")): @nowarn
+      val List(saved3) = employeeRepo.selectAll: @unchecked
+      val List(`saved3`) = employeeRepo.selectByIds(Array(saved1.businessentityid, BusinessentityId(22))): @unchecked
       assert(saved3.gender == "M"): @nowarn
 
       // delete
-      repo.delete(saved1.businessentityid): @nowarn
+      employeeRepo.delete(saved1.businessentityid): @nowarn
 
-      val List() = repo.selectAll: @unchecked
+      val List() = employeeRepo.selectAll: @unchecked
 
       {
         val unsaved = EmployeeRowUnsaved(
@@ -115,7 +117,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           _,
           _,
           Some("/")
-        ) = repo.insert(unsaved): @unchecked
+        ) = employeeRepo.insert(unsaved): @unchecked
       }
       succeed
     }

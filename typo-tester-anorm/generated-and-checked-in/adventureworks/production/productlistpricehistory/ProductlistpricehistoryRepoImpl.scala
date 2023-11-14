@@ -24,7 +24,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
+class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def delete(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productlistpricehistory where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }

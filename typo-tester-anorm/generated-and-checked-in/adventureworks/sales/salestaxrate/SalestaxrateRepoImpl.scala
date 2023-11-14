@@ -27,7 +27,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object SalestaxrateRepoImpl extends SalestaxrateRepo {
+class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salestaxrate where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}""".executeUpdate() > 0
   }

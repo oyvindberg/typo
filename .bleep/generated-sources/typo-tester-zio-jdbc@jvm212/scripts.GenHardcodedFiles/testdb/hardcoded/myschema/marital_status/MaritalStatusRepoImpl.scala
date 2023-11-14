@@ -21,7 +21,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object MaritalStatusRepoImpl extends MaritalStatusRepo {
+class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".delete.map(_ > 0)
   }

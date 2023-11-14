@@ -60,7 +60,7 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
   }
 
   test("testRoundtrip pg") {
-    testRoundtrip(usersRepo = UsersRepoImpl)
+    testRoundtrip(usersRepo = new UsersRepoImpl)
   }
 
   test("testInsertUnsavedStreaming in-memory") {
@@ -71,7 +71,7 @@ class UsersRepoTest extends AnyFunSuite with TypeCheckedTripleEquals {
     val versionString = withConnection(sql"SELECT VERSION()".query[String].unique)
     val version = versionString.split(' ')(1)
     version.toDouble match {
-      case n if n >= 16 => testInsertUnsavedStreaming(usersRepo = UsersRepoImpl)
+      case n if n >= 16 => testInsertUnsavedStreaming(new UsersRepoImpl)
       case _            => System.err.println(s"Skipping testInsertUnsavedStreaming pg because version $version < 16")
     }
   }

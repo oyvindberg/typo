@@ -12,6 +12,9 @@ import zio.json.JsonEncoder
 import zio.stream.ZStream
 
 class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
+  val pgtestnullRepo: PgtestnullRepoImpl = new PgtestnullRepoImpl
+  val pgtestRepo: PgtestRepoImpl = new PgtestRepoImpl
+
   // need to compare json instead of case classes because of arrays
   def assertJsonEquals[A: JsonEncoder](a1: A, a2: A): Assertion =
     assert(JsonEncoder[A].toJsonAST(a1) === JsonEncoder[A].toJsonAST(a2))
@@ -19,7 +22,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can insert pgtest rows") {
     withConnection {
       val before = ArrayTestData.pgTestRow
-      PgtestRepoImpl.insert(before).map { after =>
+      pgtestRepo.insert(before).map { after =>
         assertJsonEquals(before, after)
       }
     }
@@ -29,8 +32,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
     withConnection {
       val before = Chunk(ArrayTestData.pgTestRow)
       for {
-        _ <- PgtestRepoImpl.insertStreaming(ZStream.fromChunk(before), 1)
-        after <- PgtestRepoImpl.selectAll.runCollect
+        _ <- pgtestRepo.insertStreaming(ZStream.fromChunk(before), 1)
+        after <- pgtestRepo.selectAll.runCollect
       } yield assertJsonEquals(before, after)
     }
   }
@@ -48,7 +51,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can insert non-null pgtestnull rows") {
     withConnection {
       val before = ArrayTestData.pgtestnullRowWithValues
-      PgtestnullRepoImpl.insert(before).map { after =>
+      pgtestnullRepo.insert(before).map { after =>
         assertJsonEquals(before, after)
       }
     }
@@ -61,8 +64,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         ArrayTestData.pgtestnullRowWithValues
       )
       for {
-        _ <- PgtestnullRepoImpl.insertStreaming(ZStream.fromChunk(before), 1)
-        after <- PgtestnullRepoImpl.selectAll.runCollect
+        _ <- pgtestnullRepo.insertStreaming(ZStream.fromChunk(before), 1)
+        after <- pgtestnullRepo.selectAll.runCollect
       } yield assertJsonEquals(before, after)
     }
   }

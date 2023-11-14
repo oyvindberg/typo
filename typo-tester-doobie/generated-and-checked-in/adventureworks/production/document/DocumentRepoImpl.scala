@@ -26,7 +26,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object DocumentRepoImpl extends DocumentRepo {
+class DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId): ConnectionIO[Boolean] = {
     sql"""delete from production.document where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
   }

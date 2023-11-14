@@ -25,7 +25,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
+class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from humanresources.employeepayhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }

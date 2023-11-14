@@ -26,7 +26,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
+class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def delete(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salesterritoryhistory where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)} AND "territoryid" = ${ParameterValue(compositeId.territoryid, null, SalesterritoryId.toStatement)}""".executeUpdate() > 0
   }

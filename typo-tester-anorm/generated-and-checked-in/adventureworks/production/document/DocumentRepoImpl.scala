@@ -29,7 +29,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object DocumentRepoImpl extends DocumentRepo {
+class DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.document where "documentnode" = ${ParameterValue(documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
   }

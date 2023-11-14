@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object LocationRepoImpl extends LocationRepo {
+class LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId): ConnectionIO[Boolean] = {
     sql"""delete from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }

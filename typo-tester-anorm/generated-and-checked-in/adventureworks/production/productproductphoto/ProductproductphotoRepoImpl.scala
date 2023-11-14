@@ -25,7 +25,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
+class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productproductphoto where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "productphotoid" = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
   }

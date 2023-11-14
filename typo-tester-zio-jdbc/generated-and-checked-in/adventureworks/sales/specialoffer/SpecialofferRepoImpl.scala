@@ -24,7 +24,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object SpecialofferRepoImpl extends SpecialofferRepo {
+class SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.specialoffer where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}""".delete.map(_ > 0)
   }

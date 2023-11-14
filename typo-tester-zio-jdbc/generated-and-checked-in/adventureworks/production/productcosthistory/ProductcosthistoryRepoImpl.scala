@@ -24,7 +24,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
+class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }

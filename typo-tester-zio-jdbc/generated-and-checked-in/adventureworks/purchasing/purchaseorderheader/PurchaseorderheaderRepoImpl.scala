@@ -26,7 +26,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
+class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".delete.map(_ > 0)
   }

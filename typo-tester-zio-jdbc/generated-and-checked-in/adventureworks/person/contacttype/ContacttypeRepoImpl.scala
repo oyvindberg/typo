@@ -23,7 +23,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object ContacttypeRepoImpl extends ContacttypeRepo {
+class ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.contacttype where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".delete.map(_ > 0)
   }

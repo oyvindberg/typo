@@ -27,7 +27,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
+class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.workorderrouting where "workorderid" = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND "operationsequence" = ${ParameterValue(compositeId.operationsequence, null, TypoShort.toStatement)}""".executeUpdate() > 0
   }

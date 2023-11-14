@@ -10,6 +10,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import play.api.libs.json.{Json, Writes}
 
 class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
+  val pgtestnullRepo: PgtestnullRepoImpl = new PgtestnullRepoImpl
+  val pgtestRepo: PgtestRepoImpl = new PgtestRepoImpl
 
   // need to compare json instead of case classes because of arrays
   def assertJsonEquals[A: Writes](a1: A, a2: A): Assertion =
@@ -18,7 +20,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can insert pgtest rows") {
     withConnection { implicit c =>
       val before = ArrayTestData.pgTestRow
-      val after = PgtestRepoImpl.insert(before)
+      val after = pgtestRepo.insert(before)
       assertJsonEquals(before, after)
     }
   }
@@ -26,8 +28,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can stream pgtest rows") {
     withConnection { implicit c =>
       val before = List(ArrayTestData.pgTestRow)
-      val _ = PgtestRepoImpl.insertStreaming(before.iterator, 1)
-      val after = PgtestRepoImpl.selectAll
+      val _ = pgtestRepo.insertStreaming(before.iterator, 1)
+      val after = pgtestRepo.selectAll
       assertJsonEquals(before, after)
     }
   }
@@ -35,7 +37,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can insert null pgtestnull rows") {
     withConnection { implicit c =>
       val before = ArrayTestData.pgtestnullRow
-      val after = PgtestnullRepoImpl.insert(before)
+      val after = pgtestnullRepo.insert(before)
       assertJsonEquals(after, before)
     }
   }
@@ -43,7 +45,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can insert non-null pgtestnull rows") {
     withConnection { implicit c =>
       val before = ArrayTestData.pgtestnullRowWithValues
-      val after = PgtestnullRepoImpl.insert(before)
+      val after = pgtestnullRepo.insert(before)
       assertJsonEquals(before, after)
     }
   }
@@ -51,8 +53,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can stream pgtestnull rows") {
     withConnection { implicit c =>
       val before = List(ArrayTestData.pgtestnullRow, ArrayTestData.pgtestnullRowWithValues)
-      val _ = PgtestnullRepoImpl.insertStreaming(before.iterator, 1)
-      val after = PgtestnullRepoImpl.selectAll
+      val _ = pgtestnullRepo.insertStreaming(before.iterator, 1)
+      val after = pgtestnullRepo.selectAll
       assertJsonEquals(before, after)
     }
   }

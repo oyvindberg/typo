@@ -24,7 +24,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
+class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}""".executeUpdate() > 0
   }

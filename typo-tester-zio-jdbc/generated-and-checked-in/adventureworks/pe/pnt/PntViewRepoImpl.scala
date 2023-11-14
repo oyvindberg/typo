@@ -13,7 +13,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object PntViewRepoImpl extends PntViewRepo {
+class PntViewRepoImpl extends PntViewRepo {
   override def select: SelectBuilder[PntViewFields, PntViewRow] = {
     SelectBuilderSql("pe.pnt", PntViewFields, PntViewRow.jdbcDecoder)
   }

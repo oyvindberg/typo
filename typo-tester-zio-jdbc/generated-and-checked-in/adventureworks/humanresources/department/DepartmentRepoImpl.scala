@@ -23,7 +23,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object DepartmentRepoImpl extends DepartmentRepo {
+class DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".delete.map(_ > 0)
   }

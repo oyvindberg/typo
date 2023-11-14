@@ -25,7 +25,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object PersonphoneRepoImpl extends PersonphoneRepo {
+class PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".delete.map(_ > 0)
   }

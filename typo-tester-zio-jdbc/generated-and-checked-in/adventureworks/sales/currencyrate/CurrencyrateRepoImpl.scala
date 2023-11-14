@@ -24,7 +24,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object CurrencyrateRepoImpl extends CurrencyrateRepo {
+class CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.currencyrate where "currencyrateid" = ${Segment.paramSegment(currencyrateid)(CurrencyrateId.setter)}""".delete.map(_ > 0)
   }

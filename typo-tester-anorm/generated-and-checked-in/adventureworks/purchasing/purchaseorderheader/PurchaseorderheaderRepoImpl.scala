@@ -26,7 +26,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
+class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
     SQL"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${ParameterValue(purchaseorderid, null, PurchaseorderheaderId.toStatement)}""".executeUpdate() > 0
   }
