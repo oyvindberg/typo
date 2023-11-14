@@ -10,6 +10,8 @@ import scala.annotation.nowarn
 import scala.util.Random
 
 class RecordTest extends AnyFunSuite with TypeCheckedTripleEquals {
+  val personRowJoinSqlRepo = new PersonRowJoinSqlRepoImpl
+
   test("works") {
     withConnection { implicit c =>
       val testInsert = new testInsert(new Random(0))
@@ -18,7 +20,7 @@ class RecordTest extends AnyFunSuite with TypeCheckedTripleEquals {
       testInsert.personEmailaddress(personRow.businessentityid, Some("a@b.c")): @nowarn
       val employeeRow = testInsert.humanresourcesEmployee(personRow.businessentityid, gender = "M", maritalstatus = "M", hiredate = TypoLocalDate.apply("1997-01-01"))
       testInsert.salesSalesperson(employeeRow.businessentityid): @nowarn
-      PersonRowJoinSqlRepoImpl() foreach println
+      personRowJoinSqlRepo() foreach println
     }
   }
 }

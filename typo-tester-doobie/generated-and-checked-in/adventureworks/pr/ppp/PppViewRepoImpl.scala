@@ -13,7 +13,7 @@ import fs2.Stream
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object PppViewRepoImpl extends PppViewRepo {
+class PppViewRepoImpl extends PppViewRepo {
   override def select: SelectBuilder[PppViewFields, PppViewRow] = {
     SelectBuilderSql("pr.ppp", PppViewFields, PppViewRow.read)
   }

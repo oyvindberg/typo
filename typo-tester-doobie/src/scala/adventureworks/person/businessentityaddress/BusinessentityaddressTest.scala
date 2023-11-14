@@ -14,7 +14,13 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  val repo = BusinessentityaddressRepoImpl
+  val businessentityaddressRepo = new BusinessentityaddressRepoImpl
+  val businessentityRepo = new BusinessentityRepoImpl
+  val countryregionRepo = new CountryregionRepoImpl
+  val salesterritoryRepo = new SalesterritoryRepoImpl
+  val stateprovinceRepo = new StateprovinceRepoImpl
+  val addressRepoImpl = new AddressRepoImpl
+  val addresstypeRepoImpl = new AddresstypeRepoImpl
 
   test("json") {
     val initial = AddressRowUnsaved(
@@ -36,14 +42,14 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
     withConnection {
       for {
         // setup
-        businessentityRow <- BusinessentityRepoImpl.insert(BusinessentityRowUnsaved())
-        countryregion <- CountryregionRepoImpl.insert(
+        businessentityRow <- businessentityRepo.insert(BusinessentityRowUnsaved())
+        countryregion <- countryregionRepo.insert(
           CountryregionRowUnsaved(
             countryregioncode = CountryregionId("max"),
             name = Name("max")
           )
         )
-        salesTerritory <- SalesterritoryRepoImpl.insert(
+        salesTerritory <- salesterritoryRepo.insert(
           SalesterritoryRowUnsaved(
             name = Name("name"),
             countryregioncode = countryregion.countryregioncode,
@@ -51,7 +57,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
             salesytd = Defaulted.Provided(1)
           )
         )
-        stateProvidence <- StateprovinceRepoImpl.insert(
+        stateProvidence <- stateprovinceRepo.insert(
           StateprovinceRowUnsaved(
             stateprovincecode = "cde",
             countryregioncode = countryregion.countryregioncode,
@@ -59,7 +65,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
             territoryid = salesTerritory.territoryid
           )
         )
-        address <- AddressRepoImpl.insert(
+        address <- addressRepoImpl.insert(
           AddressRowUnsaved(
             addressline1 = "addressline1",
             addressline2 = Some("addressline2"),
@@ -69,7 +75,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
             spatiallocation = None
           )
         )
-        addressType <- AddresstypeRepoImpl.insert(
+        addressType <- addresstypeRepoImpl.insert(
           AddresstypeRowUnsaved(
             name = Name("name")
           )
@@ -82,20 +88,20 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
           modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
         )
         // insert and round trip check
-        saved1 <- repo.insert(unsaved1)
+        saved1 <- businessentityaddressRepo.insert(unsaved1)
         saved2 = unsaved1.toRow(???, ???)
         _ <- delay(assert(saved1 === saved2))
         // check field values
         newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
-        _ <- repo.update(saved1.copy(modifieddate = newModifiedDate))
-        saved3 <- repo.selectAll.compile.toList.map {
+        _ <- businessentityaddressRepo.update(saved1.copy(modifieddate = newModifiedDate))
+        saved3 <- businessentityaddressRepo.selectAll.compile.toList.map {
           case List(x) => x
           case other   => throw new MatchError(other)
         }
         _ <- delay(assert(saved3.modifieddate == newModifiedDate))
         // delete
-        _ <- repo.delete(saved1.compositeId)
-        _ <- repo.selectAll.compile.toList.map {
+        _ <- businessentityaddressRepo.delete(saved1.compositeId)
+        _ <- businessentityaddressRepo.selectAll.compile.toList.map {
           case Nil   => ()
           case other => throw new MatchError(other)
         }

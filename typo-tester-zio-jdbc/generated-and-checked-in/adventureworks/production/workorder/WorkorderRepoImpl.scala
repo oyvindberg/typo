@@ -26,7 +26,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object WorkorderRepoImpl extends WorkorderRepo {
+class WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".delete.map(_ > 0)
   }

@@ -26,7 +26,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object CreditcardRepoImpl extends CreditcardRepo {
+class CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".delete.map(_ > 0)
   }

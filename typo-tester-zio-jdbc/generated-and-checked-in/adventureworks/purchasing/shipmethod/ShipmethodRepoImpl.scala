@@ -25,7 +25,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object ShipmethodRepoImpl extends ShipmethodRepo {
+class ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".delete.map(_ > 0)
   }

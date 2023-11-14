@@ -12,7 +12,7 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 
-object UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
+class UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
   override def apply(suffix: String, cutoff: Option[TypoLocalDateTime])(implicit c: Connection): Int = {
     SQL"""update person.person
           set firstname = firstname || '-' || ${ParameterValue(suffix, null, ToStatement.stringToStatement)}

@@ -13,7 +13,7 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 
-object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
+class UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
   override def apply(suffix: /* nullability unknown */ Option[String], cutoff: /* nullability unknown */ Option[TypoLocalDateTime])(implicit c: Connection): List[UpdatePersonReturningSqlRow] = {
     val sql =
       SQL"""with row as (

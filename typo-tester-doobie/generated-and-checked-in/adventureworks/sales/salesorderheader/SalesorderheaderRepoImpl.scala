@@ -33,7 +33,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
+class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salesorderheader where "salesorderid" = ${fromWrite(salesorderid)(Write.fromPut(SalesorderheaderId.put))}""".update.run.map(_ > 0)
   }

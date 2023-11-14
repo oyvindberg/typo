@@ -12,7 +12,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
+class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
   override def apply(firstName: Option[String]): ZStream[ZConnection, Throwable, PersonDynamicSqlRow] = {
     val sql =
       sql"""SELECT p.title, p.firstname, p.middlename, p.lastname

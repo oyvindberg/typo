@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object CurrencyrateRepoImpl extends CurrencyrateRepo {
+class CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId): ConnectionIO[Boolean] = {
     sql"""delete from sales.currencyrate where "currencyrateid" = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}""".update.run.map(_ > 0)
   }

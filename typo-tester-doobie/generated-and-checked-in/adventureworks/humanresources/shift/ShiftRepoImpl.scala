@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ShiftRepoImpl extends ShiftRepo {
+class ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.shift where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
   }

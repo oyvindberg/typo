@@ -26,7 +26,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object AddressRepoImpl extends AddressRepo {
+class AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.address where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".delete.map(_ > 0)
   }

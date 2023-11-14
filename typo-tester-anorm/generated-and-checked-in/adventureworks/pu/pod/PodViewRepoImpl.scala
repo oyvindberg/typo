@@ -12,7 +12,7 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object PodViewRepoImpl extends PodViewRepo {
+class PodViewRepoImpl extends PodViewRepo {
   override def select: SelectBuilder[PodViewFields, PodViewRow] = {
     SelectBuilderSql("pu.pod", PodViewFields, PodViewRow.rowParser)
   }

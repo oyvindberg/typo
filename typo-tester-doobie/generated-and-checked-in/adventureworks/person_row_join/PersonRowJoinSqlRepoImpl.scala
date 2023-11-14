@@ -10,7 +10,7 @@ import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
 
-object PersonRowJoinSqlRepoImpl extends PersonRowJoinSqlRepo {
+class PersonRowJoinSqlRepoImpl extends PersonRowJoinSqlRepo {
   override def apply(): Stream[ConnectionIO, PersonRowJoinSqlRow] = {
     val sql =
       sql"""SELECT s.businessentityid,

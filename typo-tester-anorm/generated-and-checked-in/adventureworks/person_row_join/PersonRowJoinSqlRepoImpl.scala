@@ -9,7 +9,7 @@ package person_row_join
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-object PersonRowJoinSqlRepoImpl extends PersonRowJoinSqlRepo {
+class PersonRowJoinSqlRepoImpl extends PersonRowJoinSqlRepo {
   override def apply()(implicit c: Connection): List[PersonRowJoinSqlRow] = {
     val sql =
       SQL"""SELECT s.businessentityid,

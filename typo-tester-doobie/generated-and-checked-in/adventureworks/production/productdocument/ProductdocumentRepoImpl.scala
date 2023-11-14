@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ProductdocumentRepoImpl extends ProductdocumentRepo {
+class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
     sql"""delete from production.productdocument where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "documentnode" = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
   }

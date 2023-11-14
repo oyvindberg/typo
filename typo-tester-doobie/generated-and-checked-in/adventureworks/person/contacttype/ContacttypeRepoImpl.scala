@@ -21,7 +21,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ContacttypeRepoImpl extends ContacttypeRepo {
+class ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
     sql"""delete from person.contacttype where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".update.run.map(_ > 0)
   }

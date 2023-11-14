@@ -12,7 +12,7 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object CuViewRepoImpl extends CuViewRepo {
+class CuViewRepoImpl extends CuViewRepo {
   override def select: SelectBuilder[CuViewFields, CuViewRow] = {
     SelectBuilderSql("sa.cu", CuViewFields, CuViewRow.rowParser)
   }

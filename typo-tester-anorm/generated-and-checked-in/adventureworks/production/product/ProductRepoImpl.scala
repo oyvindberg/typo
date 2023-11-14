@@ -31,7 +31,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ProductRepoImpl extends ProductRepo {
+class ProductRepoImpl extends ProductRepo {
   override def delete(productid: ProductId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.product where "productid" = ${ParameterValue(productid, null, ProductId.toStatement)}""".executeUpdate() > 0
   }

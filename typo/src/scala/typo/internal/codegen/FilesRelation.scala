@@ -179,7 +179,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
              |}""".stripMargin
     }
     val str =
-      code"""|object ${names.RepoImplName.name} extends ${names.RepoName} {
+      code"""|class ${names.RepoImplName.name} extends ${names.RepoName} {
              |  ${renderedMethods.mkCode("\n")}
              |}
              |""".stripMargin

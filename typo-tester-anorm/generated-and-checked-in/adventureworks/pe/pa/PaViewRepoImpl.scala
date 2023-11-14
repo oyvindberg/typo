@@ -12,7 +12,7 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object PaViewRepoImpl extends PaViewRepo {
+class PaViewRepoImpl extends PaViewRepo {
   override def select: SelectBuilder[PaViewFields, PaViewRow] = {
     SelectBuilderSql("pe.pa", PaViewFields, PaViewRow.rowParser)
   }

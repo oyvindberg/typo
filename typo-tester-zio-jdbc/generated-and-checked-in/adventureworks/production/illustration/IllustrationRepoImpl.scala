@@ -24,7 +24,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object IllustrationRepoImpl extends IllustrationRepo {
+class IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".delete.map(_ > 0)
   }

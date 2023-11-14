@@ -24,7 +24,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
+class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def delete(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.employeedepartmenthistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
   }

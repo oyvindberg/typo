@@ -421,7 +421,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       x.params,
       Nil,
       ConnectionIO.of(x.table.names.RowName),
-      code"${x.table.names.RepoImplName}.insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
+      code"(new ${x.table.names.RepoImplName}).insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
     )
 
   override val defaultedInstance: List[sc.Given] =

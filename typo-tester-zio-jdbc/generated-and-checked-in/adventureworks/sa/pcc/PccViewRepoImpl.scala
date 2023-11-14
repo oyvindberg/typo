@@ -13,7 +13,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object PccViewRepoImpl extends PccViewRepo {
+class PccViewRepoImpl extends PccViewRepo {
   override def select: SelectBuilder[PccViewFields, PccViewRow] = {
     SelectBuilderSql("sa.pcc", PccViewFields, PccViewRow.jdbcDecoder)
   }

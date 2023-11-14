@@ -13,7 +13,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 
-object UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
+class UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
   override def apply(suffix: String, cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int] = {
     sql"""update person.person
           set firstname = firstname || '-' || ${fromWrite(suffix)(Write.fromPut(Meta.StringMeta.put))}

@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object DepartmentRepoImpl extends DepartmentRepo {
+class DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.department where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}""".executeUpdate() > 0
   }

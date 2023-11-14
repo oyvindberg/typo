@@ -13,7 +13,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object BecViewRepoImpl extends BecViewRepo {
+class BecViewRepoImpl extends BecViewRepo {
   override def select: SelectBuilder[BecViewFields, BecViewRow] = {
     SelectBuilderSql("pe.bec", BecViewFields, BecViewRow.jdbcDecoder)
   }

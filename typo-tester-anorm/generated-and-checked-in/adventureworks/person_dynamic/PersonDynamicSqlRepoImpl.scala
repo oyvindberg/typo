@@ -12,7 +12,7 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 
-object PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
+class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
   override def apply(firstName: Option[String])(implicit c: Connection): List[PersonDynamicSqlRow] = {
     val sql =
       SQL"""SELECT p.title, p.firstname, p.middlename, p.lastname

@@ -26,7 +26,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object ProductvendorRepoImpl extends ProductvendorRepo {
+class ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.productvendor where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }

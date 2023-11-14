@@ -26,7 +26,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
+class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".delete.map(_ > 0)
   }

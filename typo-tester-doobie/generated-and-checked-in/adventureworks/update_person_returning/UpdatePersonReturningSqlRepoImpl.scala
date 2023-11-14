@@ -14,7 +14,7 @@ import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
 
-object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
+class UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
   override def apply(suffix: /* nullability unknown */ Option[String], cutoff: /* nullability unknown */ Option[TypoLocalDateTime]): Stream[ConnectionIO, UpdatePersonReturningSqlRow] = {
     val sql =
       sql"""with row as (

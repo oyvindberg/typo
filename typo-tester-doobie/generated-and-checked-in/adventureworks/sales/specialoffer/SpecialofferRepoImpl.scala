@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object SpecialofferRepoImpl extends SpecialofferRepo {
+class SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId): ConnectionIO[Boolean] = {
     sql"""delete from sales.specialoffer where "specialofferid" = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}""".update.run.map(_ > 0)
   }

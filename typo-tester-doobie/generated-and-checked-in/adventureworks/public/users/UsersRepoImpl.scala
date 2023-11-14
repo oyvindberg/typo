@@ -22,7 +22,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object UsersRepoImpl extends UsersRepo {
+class UsersRepoImpl extends UsersRepo {
   override def delete(userId: UsersId): ConnectionIO[Boolean] = {
     sql"""delete from public.users where "user_id" = ${fromWrite(userId)(Write.fromPut(UsersId.put))}""".update.run.map(_ > 0)
   }

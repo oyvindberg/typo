@@ -25,7 +25,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object JobcandidateRepoImpl extends JobcandidateRepo {
+class JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.jobcandidate where "jobcandidateid" = ${ParameterValue(jobcandidateid, null, JobcandidateId.toStatement)}""".executeUpdate() > 0
   }

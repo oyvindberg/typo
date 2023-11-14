@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object ScrapreasonRepoImpl extends ScrapreasonRepo {
+class ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.scrapreason where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}""".executeUpdate() > 0
   }

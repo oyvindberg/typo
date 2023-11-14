@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object CustomerRepoImpl extends CustomerRepo {
+class CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId): ConnectionIO[Boolean] = {
     sql"""delete from sales.customer where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}""".update.run.map(_ > 0)
   }

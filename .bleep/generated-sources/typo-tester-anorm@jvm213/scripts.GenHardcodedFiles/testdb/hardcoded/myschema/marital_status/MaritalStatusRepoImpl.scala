@@ -21,7 +21,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object MaritalStatusRepoImpl extends MaritalStatusRepo {
+class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.marital_status where "id" = ${ParameterValue(id, null, MaritalStatusId.toStatement)}""".executeUpdate() > 0
   }

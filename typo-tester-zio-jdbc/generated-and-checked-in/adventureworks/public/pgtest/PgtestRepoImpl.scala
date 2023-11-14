@@ -45,7 +45,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object PgtestRepoImpl extends PgtestRepo {
+class PgtestRepoImpl extends PgtestRepo {
   override def delete: DeleteBuilder[PgtestFields, PgtestRow] = {
     DeleteBuilder("public.pgtest", PgtestFields)
   }

@@ -13,7 +13,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object VemployeedepartmentViewRepoImpl extends VemployeedepartmentViewRepo {
+class VemployeedepartmentViewRepoImpl extends VemployeedepartmentViewRepo {
   override def select: SelectBuilder[VemployeedepartmentViewFields, VemployeedepartmentViewRow] = {
     SelectBuilderSql("humanresources.vemployeedepartment", VemployeedepartmentViewFields, VemployeedepartmentViewRow.jdbcDecoder)
   }

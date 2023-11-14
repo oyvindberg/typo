@@ -10,6 +10,9 @@ import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
+  val pgtestnullRepo: PgtestnullRepoImpl = new PgtestnullRepoImpl
+  val pgtestRepo: PgtestRepoImpl = new PgtestRepoImpl
+
   // need to compare json instead of case classes because of arrays
   def assertJsonEquals[A: Encoder](a1: A, a2: A): Assertion =
     assert(Encoder[A].apply(a1) === Encoder[A].apply(a2))
@@ -17,7 +20,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can insert pgtest rows") {
     withConnection {
       val before = ArrayTestData.pgTestRow
-      PgtestRepoImpl.insert(before).map { after =>
+      pgtestRepo.insert(before).map { after =>
         assertJsonEquals(before, after)
       }
     }
@@ -27,8 +30,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
     withConnection {
       val before = List(ArrayTestData.pgTestRow)
       for {
-        _ <- PgtestRepoImpl.insertStreaming(fs2.Stream.emits(before), 1)
-        after <- PgtestRepoImpl.selectAll.compile.toList
+        _ <- pgtestRepo.insertStreaming(fs2.Stream.emits(before), 1)
+        after <- pgtestRepo.selectAll.compile.toList
       } yield assertJsonEquals(before, after)
     }
   }
@@ -36,7 +39,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can insert null pgtestnull rows") {
     withConnection {
       val before = ArrayTestData.pgtestnullRow
-      PgtestnullRepoImpl.insert(before).map { after =>
+      pgtestnullRepo.insert(before).map { after =>
         assertJsonEquals(before, after)
       }
     }
@@ -45,7 +48,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("can insert non-null pgtestnull rows") {
     withConnection {
       val before = ArrayTestData.pgtestnullRowWithValues
-      PgtestnullRepoImpl.insert(before).map { after =>
+      pgtestnullRepo.insert(before).map { after =>
         assertJsonEquals(before, after)
       }
     }
@@ -54,8 +57,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
     withConnection {
       val before = List(ArrayTestData.pgtestnullRow, ArrayTestData.pgtestnullRowWithValues)
       for {
-        _ <- PgtestnullRepoImpl.insertStreaming(fs2.Stream.emits(before), 1)
-        after <- PgtestnullRepoImpl.selectAll.compile.toList
+        _ <- pgtestnullRepo.insertStreaming(fs2.Stream.emits(before), 1)
+        after <- pgtestnullRepo.selectAll.compile.toList
       } yield assertJsonEquals(before, after)
     }
   }

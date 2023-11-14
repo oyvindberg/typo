@@ -12,7 +12,7 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object BecViewRepoImpl extends BecViewRepo {
+class BecViewRepoImpl extends BecViewRepo {
   override def select: SelectBuilder[BecViewFields, BecViewRow] = {
     SelectBuilderSql("pe.bec", BecViewFields, BecViewRow.rowParser)
   }

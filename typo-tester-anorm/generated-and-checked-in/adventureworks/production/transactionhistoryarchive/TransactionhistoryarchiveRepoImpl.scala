@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
+class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def delete(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.transactionhistoryarchive where "transactionid" = ${ParameterValue(transactionid, null, TransactionhistoryarchiveId.toStatement)}""".executeUpdate() > 0
   }

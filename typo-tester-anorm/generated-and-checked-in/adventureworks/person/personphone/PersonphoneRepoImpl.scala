@@ -25,7 +25,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object PersonphoneRepoImpl extends PersonphoneRepo {
+class PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.personphone where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }

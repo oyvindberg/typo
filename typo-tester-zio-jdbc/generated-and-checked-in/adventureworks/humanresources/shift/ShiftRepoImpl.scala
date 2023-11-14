@@ -24,7 +24,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object ShiftRepoImpl extends ShiftRepo {
+class ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
   }

@@ -24,7 +24,7 @@ import zio.jdbc.ZConnection
 import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
-object LocationRepoImpl extends LocationRepo {
+class LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.location where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".delete.map(_ > 0)
   }

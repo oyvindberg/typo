@@ -12,7 +12,7 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object PiViewRepoImpl extends PiViewRepo {
+class PiViewRepoImpl extends PiViewRepo {
   override def select: SelectBuilder[PiViewFields, PiViewRow] = {
     SelectBuilderSql("pr.pi", PiViewFields, PiViewRow.rowParser)
   }

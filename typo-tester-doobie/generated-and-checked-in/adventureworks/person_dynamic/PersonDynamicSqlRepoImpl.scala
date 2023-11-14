@@ -13,7 +13,7 @@ import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
 
-object PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
+class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
   override def apply(firstName: Option[String]): Stream[ConnectionIO, PersonDynamicSqlRow] = {
     val sql =
       sql"""SELECT p.title, p.firstname, p.middlename, p.lastname

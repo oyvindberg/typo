@@ -12,7 +12,7 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
+class PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
   override def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime)(implicit c: Connection): List[PersonDetailSqlRow] = {
     val sql =
       SQL"""SELECT s.businessentityid,

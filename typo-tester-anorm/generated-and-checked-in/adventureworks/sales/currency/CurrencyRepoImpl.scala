@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object CurrencyRepoImpl extends CurrencyRepo {
+class CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.currency where "currencycode" = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}""".executeUpdate() > 0
   }

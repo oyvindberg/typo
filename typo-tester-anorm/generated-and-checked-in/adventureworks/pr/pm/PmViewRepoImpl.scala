@@ -12,7 +12,7 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object PmViewRepoImpl extends PmViewRepo {
+class PmViewRepoImpl extends PmViewRepo {
   override def select: SelectBuilder[PmViewFields, PmViewRow] = {
     SelectBuilderSql("pr.pm", PmViewFields, PmViewRow.rowParser)
   }

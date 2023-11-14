@@ -21,7 +21,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object CountryregionRepoImpl extends CountryregionRepo {
+class CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
     sql"""delete from person.countryregion where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".update.run.map(_ > 0)
   }

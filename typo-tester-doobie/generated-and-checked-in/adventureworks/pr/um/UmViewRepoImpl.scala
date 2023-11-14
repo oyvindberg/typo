@@ -13,7 +13,7 @@ import fs2.Stream
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
-object UmViewRepoImpl extends UmViewRepo {
+class UmViewRepoImpl extends UmViewRepo {
   override def select: SelectBuilder[UmViewFields, UmViewRow] = {
     SelectBuilderSql("pr.um", UmViewFields, UmViewRow.read)
   }

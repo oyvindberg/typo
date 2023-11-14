@@ -99,16 +99,17 @@ class PersonWithAddressesTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val addressRow2 = testInsert.personAddress(stateprovinceRow.stateprovinceid)
       val addressRow3 = testInsert.personAddress(stateprovinceRow.stateprovinceid)
 
+      val businessentityaddressRepo = new BusinessentityaddressRepoImpl
       val repo = new PersonWithAddressesRepo(
-        personRepo = PersonRepoImpl,
-        businessentityAddressRepo = BusinessentityaddressRepoImpl,
-        addresstypeRepo = AddresstypeRepoImpl,
-        addressRepo = AddressRepoImpl
+        personRepo = new PersonRepoImpl,
+        businessentityAddressRepo = businessentityaddressRepo,
+        addresstypeRepo = new AddresstypeRepoImpl,
+        addressRepo = new AddressRepoImpl
       )
 
       repo.syncAddresses(PersonWithAddresses(personRow, Map(Name("HOME") -> addressRow1, Name("OFFICE") -> addressRow2))): @nowarn
 
-      def fetchBAs() = BusinessentityaddressRepoImpl.select.where(p => p.addressid in Array(addressRow1.addressid, addressRow2.addressid, addressRow3.addressid)).orderBy(_.addressid.asc).toList
+      def fetchBAs() = businessentityaddressRepo.select.where(p => p.addressid in Array(addressRow1.addressid, addressRow2.addressid, addressRow3.addressid)).orderBy(_.addressid.asc).toList
 
       val List(
         BusinessentityaddressRow(personRow.businessentityid, addressRow1.addressid, homeId, _, _),

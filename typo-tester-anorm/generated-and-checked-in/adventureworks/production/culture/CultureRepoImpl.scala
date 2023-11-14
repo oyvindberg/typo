@@ -23,7 +23,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
-object CultureRepoImpl extends CultureRepo {
+class CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.culture where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
