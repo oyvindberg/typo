@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -38,7 +39,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
        """.query(SalespersonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalespersonRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalespersonRow.text)
+    new FragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalespersonRow.text)
   }
   override def insert(unsaved: SalespersonRowUnsaved): ConnectionIO[SalespersonRow] = {
     val fs = List(
@@ -76,9 +77,9 @@ class SalespersonRepoImpl extends SalespersonRepo {
             returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into sales.salesperson(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into sales.salesperson(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
          """
     }
@@ -87,7 +88,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalespersonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalespersonRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalespersonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
     SelectBuilderSql("sales.salesperson", SalespersonFields, SalespersonRow.read)

@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -38,7 +39,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
        """.query(SalesterritoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesterritoryRow.text)
+    new FragmentOps(sql"""COPY sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesterritoryRow.text)
   }
   override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
     val fs = List(
@@ -80,9 +81,9 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
             returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into sales.salesterritory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into sales.salesterritory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
          """
     }
@@ -91,7 +92,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesterritory("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesterritoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salesterritory("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesterritoryRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
     SelectBuilderSql("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.read)

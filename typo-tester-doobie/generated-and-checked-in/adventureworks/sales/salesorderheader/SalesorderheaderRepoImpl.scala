@@ -22,6 +22,7 @@ import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import adventureworks.userdefined.CustomCreditcardId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -47,7 +48,7 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
        """.query(SalesorderheaderRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesorderheaderRow.text)
+    new FragmentOps(sql"""COPY sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesorderheaderRow.text)
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved): ConnectionIO[SalesorderheaderRow] = {
     val fs = List(
@@ -113,9 +114,9 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
             returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into sales.salesorderheader(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into sales.salesorderheader(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
          """
     }
@@ -124,7 +125,7 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesorderheader("duedate", "shipdate", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "totaldue", "comment", "salesorderid", "revisionnumber", "orderdate", "status", "onlineorderflag", "subtotal", "taxamt", "freight", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderheaderRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salesorderheader("duedate", "shipdate", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "totaldue", "comment", "salesorderid", "revisionnumber", "orderdate", "status", "onlineorderflag", "subtotal", "taxamt", "freight", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderheaderRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     SelectBuilderSql("sales.salesorderheader", SalesorderheaderFields, SalesorderheaderRow.read)

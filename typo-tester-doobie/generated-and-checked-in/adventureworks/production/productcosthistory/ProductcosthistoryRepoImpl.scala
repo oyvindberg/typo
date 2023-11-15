@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -36,7 +37,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
        """.query(ProductcosthistoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductcosthistoryRow.text)
+    new FragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductcosthistoryRow.text)
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved): ConnectionIO[ProductcosthistoryRow] = {
     val fs = List(
@@ -55,9 +56,9 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.productcosthistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.productcosthistory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
          """
     }
@@ -66,7 +67,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductcosthistoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductcosthistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.read)

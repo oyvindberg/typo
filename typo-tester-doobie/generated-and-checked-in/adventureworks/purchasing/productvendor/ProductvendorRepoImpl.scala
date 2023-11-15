@@ -13,6 +13,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -38,7 +39,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.query(ProductvendorRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductvendorRow.text)
+    new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductvendorRow.text)
   }
   override def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
     val fs = List(
@@ -63,9 +64,9 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
             returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into purchasing.productvendor(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into purchasing.productvendor(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
          """
     }
@@ -74,7 +75,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductvendorRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductvendorRowUnsaved.text)
+    new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductvendorRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
     SelectBuilderSql("purchasing.productvendor", ProductvendorFields, ProductvendorRow.read)

@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -38,7 +39,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
        """.query(WorkorderroutingRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(WorkorderroutingRow.text)
+    new FragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(WorkorderroutingRow.text)
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow] = {
     val fs = List(
@@ -64,9 +65,9 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.workorderrouting(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.workorderrouting(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
          """
     }
@@ -75,7 +76,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderroutingRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderroutingRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     SelectBuilderSql("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.read)

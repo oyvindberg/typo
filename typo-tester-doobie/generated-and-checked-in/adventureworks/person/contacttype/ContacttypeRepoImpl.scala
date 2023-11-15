@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -35,7 +36,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
        """.query(ContacttypeRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ContacttypeRow.text)
+    new FragmentOps(sql"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ContacttypeRow.text)
   }
   override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
     val fs = List(
@@ -55,9 +56,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
             returning "contacttypeid", "name", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into person.contacttype(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into person.contacttype(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "contacttypeid", "name", "modifieddate"::text
          """
     }
@@ -66,7 +67,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ContacttypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ContacttypeRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ContacttypeRowUnsaved.text)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
     SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.read)

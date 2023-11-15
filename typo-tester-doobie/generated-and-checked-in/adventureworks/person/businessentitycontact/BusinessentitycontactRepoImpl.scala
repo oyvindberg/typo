@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -37,7 +38,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
        """.query(BusinessentitycontactRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentitycontactRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(BusinessentitycontactRow.text)
+    new FragmentOps(sql"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(BusinessentitycontactRow.text)
   }
   override def insert(unsaved: BusinessentitycontactRowUnsaved): ConnectionIO[BusinessentitycontactRow] = {
     val fs = List(
@@ -59,9 +60,9 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
             returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into person.businessentitycontact(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into person.businessentitycontact(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
          """
     }
@@ -70,7 +71,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentitycontactRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BusinessentitycontactRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BusinessentitycontactRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     SelectBuilderSql("person.businessentitycontact", BusinessentitycontactFields, BusinessentitycontactRow.read)

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -36,7 +37,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """.query(ProductmodelillustrationRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelillustrationRow.text)
+    new FragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelillustrationRow.text)
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow] = {
     val fs = List(
@@ -53,9 +54,9 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
             returning "productmodelid", "illustrationid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.productmodelillustration(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.productmodelillustration(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productmodelid", "illustrationid", "modifieddate"::text
          """
     }
@@ -64,7 +65,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelillustrationRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelillustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.read)

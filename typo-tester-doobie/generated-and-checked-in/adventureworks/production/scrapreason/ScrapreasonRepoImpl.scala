@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -35,7 +36,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
        """.query(ScrapreasonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ScrapreasonRow.text)
+    new FragmentOps(sql"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ScrapreasonRow.text)
   }
   override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
     val fs = List(
@@ -55,9 +56,9 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
             returning "scrapreasonid", "name", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.scrapreason(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.scrapreason(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "scrapreasonid", "name", "modifieddate"::text
          """
     }
@@ -66,7 +67,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ScrapreasonRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ScrapreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
     SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.read)

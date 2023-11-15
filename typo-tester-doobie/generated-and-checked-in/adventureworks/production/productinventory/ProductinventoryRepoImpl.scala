@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -39,7 +40,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """.query(ProductinventoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductinventoryRow.text)
+    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductinventoryRow.text)
   }
   override def insert(unsaved: ProductinventoryRowUnsaved): ConnectionIO[ProductinventoryRow] = {
     val fs = List(
@@ -66,9 +67,9 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
             returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.productinventory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.productinventory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
          """
     }
@@ -77,7 +78,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductinventoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductinventoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
     SelectBuilderSql("production.productinventory", ProductinventoryFields, ProductinventoryRow.read)

@@ -15,6 +15,7 @@ import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -40,7 +41,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
        """.query(SalesorderdetailRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesorderdetailRow.text)
+    new FragmentOps(sql"""COPY sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesorderdetailRow.text)
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved): ConnectionIO[SalesorderdetailRow] = {
     val fs = List(
@@ -73,9 +74,9 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into sales.salesorderdetail(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into sales.salesorderdetail(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
          """
     }
@@ -84,7 +85,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesorderdetail("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderdetailRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salesorderdetail("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderdetailRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.read)

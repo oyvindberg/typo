@@ -18,6 +18,7 @@ case class Options(
     enableDsl: Boolean = false,
     debugTypes: Boolean = false,
     inlineImplicits: Boolean = true,
+    fixVerySlowImplicit: Boolean = true,
     keepDependencies: Boolean = false
 )
 

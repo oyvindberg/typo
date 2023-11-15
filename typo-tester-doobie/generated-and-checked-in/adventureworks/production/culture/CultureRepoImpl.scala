@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -35,7 +36,7 @@ class CultureRepoImpl extends CultureRepo {
        """.query(CultureRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CultureRow.text)
+    new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CultureRow.text)
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
@@ -52,9 +53,9 @@ class CultureRepoImpl extends CultureRepo {
             returning "cultureid", "name", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.culture(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.culture(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "cultureid", "name", "modifieddate"::text
          """
     }
@@ -63,7 +64,7 @@ class CultureRepoImpl extends CultureRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CultureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CultureRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CultureRowUnsaved.text)
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
     SelectBuilderSql("production.culture", CultureFields, CultureRow.read)

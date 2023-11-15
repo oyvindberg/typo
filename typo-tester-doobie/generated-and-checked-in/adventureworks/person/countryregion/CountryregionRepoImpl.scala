@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -35,7 +36,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
        """.query(CountryregionRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CountryregionRow.text)
+    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CountryregionRow.text)
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
@@ -52,9 +53,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
             returning "countryregioncode", "name", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into person.countryregion(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into person.countryregion(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "countryregioncode", "name", "modifieddate"::text
          """
     }
@@ -63,7 +64,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CountryregionRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CountryregionRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
     SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.read)

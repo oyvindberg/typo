@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -36,7 +37,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """.query(ProductdocumentRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(ProductdocumentRow.text)
+    new FragmentOps(sql"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(ProductdocumentRow.text)
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow] = {
     val fs = List(
@@ -56,9 +57,9 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
             returning "productid", "modifieddate"::text, "documentnode"
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.productdocument(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.productdocument(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productid", "modifieddate"::text, "documentnode"
          """
     }
@@ -67,7 +68,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductdocumentRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductdocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
     SelectBuilderSql("production.productdocument", ProductdocumentFields, ProductdocumentRow.read)

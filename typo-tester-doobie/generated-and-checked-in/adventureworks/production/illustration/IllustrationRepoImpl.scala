@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -35,7 +36,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
        """.query(IllustrationRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(IllustrationRow.text)
+    new FragmentOps(sql"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(IllustrationRow.text)
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     val fs = List(
@@ -55,9 +56,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
             returning "illustrationid", "diagram", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.illustration(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.illustration(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "illustrationid", "diagram", "modifieddate"::text
          """
     }
@@ -66,7 +67,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IllustrationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(IllustrationRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(IllustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
     SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.read)

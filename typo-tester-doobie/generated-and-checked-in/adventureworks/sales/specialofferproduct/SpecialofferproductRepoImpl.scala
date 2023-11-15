@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -37,7 +38,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
        """.query(SpecialofferproductRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SpecialofferproductRow.text)
+    new FragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SpecialofferproductRow.text)
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow] = {
     val fs = List(
@@ -58,9 +59,9 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             returning "specialofferid", "productid", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into sales.specialofferproduct(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into sales.specialofferproduct(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "specialofferid", "productid", "rowguid", "modifieddate"::text
          """
     }
@@ -69,7 +70,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SpecialofferproductRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SpecialofferproductRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.read)

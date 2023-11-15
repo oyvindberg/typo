@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -37,7 +38,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
        """.query(ProductsubcategoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductsubcategoryRow.text)
+    new FragmentOps(sql"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductsubcategoryRow.text)
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved): ConnectionIO[ProductsubcategoryRow] = {
     val fs = List(
@@ -62,9 +63,9 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.productsubcategory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.productsubcategory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
          """
     }
@@ -73,7 +74,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductsubcategoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductsubcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.read)

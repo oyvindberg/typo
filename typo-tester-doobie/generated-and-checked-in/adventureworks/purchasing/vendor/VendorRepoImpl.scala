@@ -15,6 +15,7 @@ import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -40,7 +41,7 @@ class VendorRepoImpl extends VendorRepo {
        """.query(VendorRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, VendorRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(VendorRow.text)
+    new FragmentOps(sql"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(VendorRow.text)
   }
   override def insert(unsaved: VendorRowUnsaved): ConnectionIO[VendorRow] = {
     val fs = List(
@@ -68,9 +69,9 @@ class VendorRepoImpl extends VendorRepo {
             returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into purchasing.vendor(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into purchasing.vendor(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
          """
     }
@@ -79,7 +80,7 @@ class VendorRepoImpl extends VendorRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, VendorRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(VendorRowUnsaved.text)
+    new FragmentOps(sql"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(VendorRowUnsaved.text)
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
     SelectBuilderSql("purchasing.vendor", VendorFields, VendorRow.read)

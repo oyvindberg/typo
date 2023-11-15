@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -36,7 +37,7 @@ class UsersRepoImpl extends UsersRepo {
        """.query(UsersRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""").copyIn(unsaved, batchSize)(UsersRow.text)
+    new FragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""").copyIn(unsaved, batchSize)(UsersRow.text)
   }
   override def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow] = {
     val fs = List(
@@ -57,9 +58,9 @@ class UsersRepoImpl extends UsersRepo {
             returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into public.users(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into public.users(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
          """
     }
@@ -68,7 +69,7 @@ class UsersRepoImpl extends UsersRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UsersRowUnsaved.text)
+    new FragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UsersRowUnsaved.text)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
     SelectBuilderSql("public.users", UsersFields, UsersRow.read)

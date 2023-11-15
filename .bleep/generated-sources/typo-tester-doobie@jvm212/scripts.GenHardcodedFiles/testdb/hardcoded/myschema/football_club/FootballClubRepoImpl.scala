@@ -11,6 +11,7 @@ package football_club
 import cats.data.NonEmptyList
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -36,7 +37,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
        """.query(FootballClubRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY myschema.football_club("id", "name") FROM STDIN""").copyIn(unsaved, batchSize)(FootballClubRow.text)
+    new FragmentOps(sql"""COPY myschema.football_club("id", "name") FROM STDIN""").copyIn(unsaved, batchSize)(FootballClubRow.text)
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
     SelectBuilderSql("myschema.football_club", FootballClubFields, FootballClubRow.read)

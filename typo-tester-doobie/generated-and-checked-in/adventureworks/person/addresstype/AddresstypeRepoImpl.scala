@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -36,7 +37,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
        """.query(AddresstypeRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(AddresstypeRow.text)
+    new FragmentOps(sql"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(AddresstypeRow.text)
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
     val fs = List(
@@ -60,9 +61,9 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
             returning "addresstypeid", "name", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into person.addresstype(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into person.addresstype(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "addresstypeid", "name", "rowguid", "modifieddate"::text
          """
     }
@@ -71,7 +72,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddresstypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(AddresstypeRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(AddresstypeRowUnsaved.text)
   }
   override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
     SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.read)

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Put
@@ -38,7 +39,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
        """.query(CreditcardRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CreditcardRow.text)
+    new FragmentOps(sql"""COPY sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CreditcardRow.text)
   }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     val fs = List(
@@ -61,9 +62,9 @@ class CreditcardRepoImpl extends CreditcardRepo {
             returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into sales.creditcard(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into sales.creditcard(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
          """
     }
@@ -72,7 +73,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CreditcardRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.creditcard("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CreditcardRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.creditcard("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CreditcardRowUnsaved.text)
   }
   override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
     SelectBuilderSql("sales.creditcard", CreditcardFields, CreditcardRow.read)

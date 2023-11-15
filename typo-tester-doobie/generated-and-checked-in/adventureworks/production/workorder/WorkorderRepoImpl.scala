@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -38,7 +39,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """.query(WorkorderRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(WorkorderRow.text)
+    new FragmentOps(sql"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(WorkorderRow.text)
   }
   override def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow] = {
     val fs = List(
@@ -64,9 +65,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
             returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.workorder(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.workorder(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
          """
     }
@@ -75,7 +76,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
     SelectBuilderSql("production.workorder", WorkorderFields, WorkorderRow.read)

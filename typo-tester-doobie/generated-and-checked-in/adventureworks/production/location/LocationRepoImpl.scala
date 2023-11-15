@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -36,7 +37,7 @@ class LocationRepoImpl extends LocationRepo {
        """.query(LocationRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(LocationRow.text)
+    new FragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(LocationRow.text)
   }
   override def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
     val fs = List(
@@ -64,9 +65,9 @@ class LocationRepoImpl extends LocationRepo {
             returning "locationid", "name", "costrate", "availability", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.location(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.location(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "locationid", "name", "costrate", "availability", "modifieddate"::text
          """
     }
@@ -75,7 +76,7 @@ class LocationRepoImpl extends LocationRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(LocationRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(LocationRowUnsaved.text)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
     SelectBuilderSql("production.location", LocationFields, LocationRow.read)

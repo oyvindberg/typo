@@ -11,6 +11,7 @@ package person
 import cats.data.NonEmptyList
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -38,7 +39,7 @@ class PersonRepoImpl extends PersonRepo {
        """.query(PersonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY compositepk.person("one", "two", "name") FROM STDIN""").copyIn(unsaved, batchSize)(PersonRow.text)
+    new FragmentOps(sql"""COPY compositepk.person("one", "two", "name") FROM STDIN""").copyIn(unsaved, batchSize)(PersonRow.text)
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
@@ -58,9 +59,9 @@ class PersonRepoImpl extends PersonRepo {
             returning "one", "two", "name"
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into compositepk.person(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into compositepk.person(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "one", "two", "name"
          """
     }
@@ -69,7 +70,7 @@ class PersonRepoImpl extends PersonRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonRowUnsaved.text)
+    new FragmentOps(sql"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("compositepk.person", PersonFields, PersonRow.read)

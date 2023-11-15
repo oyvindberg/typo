@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -37,7 +38,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
        """.query(EmployeepayhistoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, EmployeepayhistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(EmployeepayhistoryRow.text)
+    new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(EmployeepayhistoryRow.text)
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved): ConnectionIO[EmployeepayhistoryRow] = {
     val fs = List(
@@ -56,9 +57,9 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into humanresources.employeepayhistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into humanresources.employeepayhistory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
          """
     }
@@ -67,7 +68,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeepayhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(EmployeepayhistoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(EmployeepayhistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     SelectBuilderSql("humanresources.employeepayhistory", EmployeepayhistoryFields, EmployeepayhistoryRow.read)

@@ -13,6 +13,7 @@ import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -37,7 +38,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
        """.query(ProductmodelproductdescriptioncultureRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelproductdescriptioncultureRow.text)
+    new FragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelproductdescriptioncultureRow.text)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     val fs = List(
@@ -55,9 +56,9 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
             returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.productmodelproductdescriptionculture(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.productmodelproductdescriptionculture(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
          """
     }
@@ -66,7 +67,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelproductdescriptioncultureRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelproductdescriptioncultureRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow.read)

@@ -9,6 +9,7 @@ package myschema
 package marital_status
 
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -33,7 +34,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
        """.query(MaritalStatusRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY myschema.marital_status("id") FROM STDIN""").copyIn(unsaved, batchSize)(MaritalStatusRow.text)
+    new FragmentOps(sql"""COPY myschema.marital_status("id") FROM STDIN""").copyIn(unsaved, batchSize)(MaritalStatusRow.text)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
     SelectBuilderSql("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.read)

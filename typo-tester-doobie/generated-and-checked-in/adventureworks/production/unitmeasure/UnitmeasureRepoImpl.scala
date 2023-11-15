@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -35,7 +36,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
        """.query(UnitmeasureRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(UnitmeasureRow.text)
+    new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(UnitmeasureRow.text)
   }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
@@ -52,9 +53,9 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
             returning "unitmeasurecode", "name", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.unitmeasure(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.unitmeasure(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "unitmeasurecode", "name", "modifieddate"::text
          """
     }
@@ -63,7 +64,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UnitmeasureRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UnitmeasureRowUnsaved.text)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
     SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.read)

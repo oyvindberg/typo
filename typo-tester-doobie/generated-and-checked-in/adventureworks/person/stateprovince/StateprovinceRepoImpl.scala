@@ -15,6 +15,7 @@ import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -40,7 +41,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
        """.query(StateprovinceRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(StateprovinceRow.text)
+    new FragmentOps(sql"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(StateprovinceRow.text)
   }
   override def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow] = {
     val fs = List(
@@ -71,9 +72,9 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
             returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into person.stateprovince(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into person.stateprovince(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
          """
     }
@@ -82,7 +83,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StateprovinceRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(StateprovinceRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(StateprovinceRowUnsaved.text)
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
     SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.read)

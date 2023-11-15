@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -36,7 +37,7 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
        """.query(SalesorderheadersalesreasonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheadersalesreasonRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesorderheadersalesreasonRow.text)
+    new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesorderheadersalesreasonRow.text)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow] = {
     val fs = List(
@@ -53,9 +54,9 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
             returning "salesorderid", "salesreasonid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into sales.salesorderheadersalesreason(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into sales.salesorderheadersalesreason(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "salesorderid", "salesreasonid", "modifieddate"::text
          """
     }
@@ -64,7 +65,7 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderheadersalesreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderheadersalesreasonRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderheadersalesreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     SelectBuilderSql("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow.read)

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -37,7 +38,7 @@ class PasswordRepoImpl extends PasswordRepo {
        """.query(PasswordRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PasswordRow.text)
+    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PasswordRow.text)
   }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
     val fs = List(
@@ -59,9 +60,9 @@ class PasswordRepoImpl extends PasswordRepo {
             returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into person.password(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into person.password(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
          """
     }
@@ -70,7 +71,7 @@ class PasswordRepoImpl extends PasswordRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PasswordRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PasswordRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PasswordRowUnsaved.text)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
     SelectBuilderSql("person.password", PasswordFields, PasswordRow.read)

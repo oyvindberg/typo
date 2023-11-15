@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -35,7 +36,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
        """.query(DepartmentRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(DepartmentRow.text)
+    new FragmentOps(sql"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(DepartmentRow.text)
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
@@ -56,9 +57,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
             returning "departmentid", "name", "groupname", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into humanresources.department(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into humanresources.department(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "departmentid", "name", "groupname", "modifieddate"::text
          """
     }
@@ -67,7 +68,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DepartmentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(DepartmentRowUnsaved.text)
+    new FragmentOps(sql"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(DepartmentRowUnsaved.text)
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
     SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.read)

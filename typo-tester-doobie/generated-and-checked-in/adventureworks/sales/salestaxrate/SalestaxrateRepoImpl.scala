@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -39,7 +40,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
        """.query(SalestaxrateRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalestaxrateRow.text)
+    new FragmentOps(sql"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalestaxrateRow.text)
   }
   override def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow] = {
     val fs = List(
@@ -69,9 +70,9 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
             returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into sales.salestaxrate(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into sales.salestaxrate(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
          """
     }
@@ -80,7 +81,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalestaxrateRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalestaxrateRowUnsaved.text)
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
     SelectBuilderSql("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.read)

@@ -4,7 +4,7 @@ package codegen
 
 import typo.internal.analysis.MaybeReturnsRows
 
-class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean) extends DbLib {
+class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, fixVerySlowImplicit: Boolean) extends DbLib {
 
   val SqlInterpolator = sc.Type.Qualified("doobie.syntax.string.toSqlInterpolator")
   def SQL(content: sc.Code) =
@@ -25,6 +25,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   val fs2Stream = sc.Type.Qualified("fs2.Stream")
   val NonEmptyList = sc.Type.Qualified("cats.data.NonEmptyList")
   val fromWrite = sc.Type.Qualified("doobie.syntax.SqlInterpolator.SingleFragment.fromWrite")
+  val FragmentOps = sc.Type.Qualified("doobie.postgres.syntax.FragmentOps")
 
   val arrayGetName: sc.Ident = sc.Ident("arrayGet")
   val arrayPutName: sc.Ident = sc.Ident("arrayPut")
@@ -108,6 +109,10 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       code"def apply$params: $retType"
   }
 
+  def query(sql: sc.Code, rowType: sc.Type): sc.Code =
+    if (fixVerySlowImplicit) code"$sql.query($rowType.$readName)"
+    else code"$sql.query[$rowType]"
+
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectBuilder(relName, fieldsType, rowType) =>
@@ -116,12 +121,12 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName""")
-        code"""$sql.query($rowType.$readName).stream"""
+        code"""${query(sql, rowType)}.stream"""
 
       case RepoMethod.SelectById(relName, cols, id, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
-        code"""$sql.query($rowType.$readName).option"""
+        code"""${query(sql, rowType)}.option"""
 
       case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
@@ -129,7 +134,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         val sql = SQL(
           code"""select $joinedColNames from $relName where ${code"${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
         )
-        code"""$sql.query($rowType.$readName).stream"""
+        code"""${query(sql, rowType)}.stream"""
       case RepoMethod.SelectByUnique(relName, cols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
@@ -137,7 +142,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                  |where ${cols.map(c => code"${c.dbName.code} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
-        code"""$sql.query($rowType.$readName).option"""
+        code"""${query(sql, rowType)}.option"""
 
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases: NonEmptyList[sc.Code] =
@@ -152,7 +157,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
               |    ${cases.mkCode("\n")}
               |  }
               |)
-              |$sql.query($rowType.$readName).stream""".stripMargin
+              |${query(sql, rowType)}.stream""".stripMargin
 
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
@@ -207,8 +212,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         }
 
         val sql = SQL {
-          code"""|insert into $relName($${fs.map { case (n, _) => n }.intercalate(${frInterpolate(code", ")})})
-                 |values ($${fs.map { case (_, f) => f }.intercalate(${frInterpolate(code", ")})})
+          code"""|insert into $relName($${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+                 |values ($${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
                  |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
@@ -225,18 +230,22 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                |val q = if (fs.isEmpty) {
                |  $sqlEmpty
                |} else {
-               |  import cats.syntax.foldable.toFoldableOps
+               |  val CommaSeparate = $Fragment.FragmentMonoid.intercalate(fr", ")
                |  $sql
                |}
-               |q.query($rowType.$readName).unique
+               |${query(sc.Ident("q"), rowType)}.unique
                |"""
 
       case RepoMethod.InsertStreaming(relName, cols, rowType) =>
         val sql = SQL(code"COPY $relName(${dbNames(cols, isRead = false)}) FROM STDIN")
-        code"doobie.postgres.syntax.fragment.toFragmentOps($sql).copyIn(unsaved, batchSize)(${textSupport.get.lookupTextFor(rowType)})"
+
+        if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(${textSupport.get.lookupTextFor(rowType)})"
+        else code"new $FragmentOps($sql).copyIn[$rowType](unsaved, batchSize)"
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
         val sql = SQL(code"COPY $relName(${dbNames(unsaved.allCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
-        code"doobie.postgres.syntax.fragment.toFragmentOps($sql).copyIn(unsaved, batchSize)(${textSupport.get.lookupTextFor(unsaved.tpe)})"
+
+        if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(${textSupport.get.lookupTextFor(unsaved.tpe)})"
+        else code"new $FragmentOps($sql).copyIn[${unsaved.tpe}](unsaved, batchSize)"
 
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -259,7 +268,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                  |""".stripMargin
         }
 
-        code"$sql.query($rowType.$readName).unique"
+        code"${query(sql, rowType)}.unique"
 
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -272,7 +281,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                  |""".stripMargin
         }
 
-        code"$sql.query($rowType.$readName).unique"
+        code"${query(sql, rowType)}.unique"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
@@ -288,7 +297,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         }
         val ret = for {
           cols <- sqlScript.maybeCols.toOption
-          rowName <- sqlScript.maybeRowName.toOption
+          rowType <- sqlScript.maybeRowName.toOption
         } yield {
           // this is necessary to make custom types work with sql scripts, unfortunately.
           val renderedWithCasts: sc.Code =
@@ -306,7 +315,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
 
           code"""|val sql =
                  |  ${SQL(renderedWithCasts)}
-                 |sql.query($rowName.$readName).stream""".stripMargin
+                 |${query(sc.Ident("sql"), rowType)}.stream""".stripMargin
 
         }
         ret.getOrElse {

@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
@@ -37,7 +38,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
        """.query(ProductmodelRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelRow], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelRow.text)
+    new FragmentOps(sql"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelRow.text)
   }
   override def insert(unsaved: ProductmodelRowUnsaved): ConnectionIO[ProductmodelRow] = {
     val fs = List(
@@ -63,9 +64,9 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
             returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
          """
     } else {
-      import cats.syntax.foldable.toFoldableOps
-      sql"""insert into production.productmodel(${fs.map { case (n, _) => n }.intercalate(fr", ")})
-            values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into production.productmodel(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
          """
     }
@@ -74,7 +75,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    doobie.postgres.syntax.fragment.toFragmentOps(sql"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
     SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.read)
