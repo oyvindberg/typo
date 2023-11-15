@@ -169,7 +169,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
   private def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code = {
     if (inlineImplicits && !forbidInline)
       code"$${$Segment.paramSegment($name)(${lookupSetter(tpe)})}"
-    else code"$$$name"
+    else code"$${$name}"
   }
 
   private def matchId(id: IdComputed): sc.Code =
