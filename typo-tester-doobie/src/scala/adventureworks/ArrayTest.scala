@@ -4,6 +4,8 @@ import adventureworks.customtypes.*
 import adventureworks.public.pgtest.{PgtestRepoImpl, PgtestRow}
 import adventureworks.public.pgtestnull.{PgtestnullRepoImpl, PgtestnullRow}
 import adventureworks.public.{Mydomain, Myenum}
+import cats.effect.IO
+import doobie.{ConnectionIO, WeakAsync}
 import io.circe.Encoder
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
@@ -60,6 +62,23 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         _ <- pgtestnullRepo.insertStreaming(fs2.Stream.emits(before), 1)
         after <- pgtestnullRepo.selectAll.compile.toList
       } yield assertJsonEquals(before, after)
+    }
+  }
+
+  // this test is doobie-specific
+  test("can stream insert IO stream") {
+    val before = List(ArrayTestData.pgtestnullRow, ArrayTestData.pgtestnullRowWithValues)
+    val beforeIOStream: fs2.Stream[IO, PgtestnullRow] = fs2.Stream.emits(before).covary[IO]
+
+    WeakAsync.liftK[IO, ConnectionIO].use { liftK =>
+      val transaction = for {
+        _ <- pgtestnullRepo.insertStreaming(beforeIOStream.translate(liftK), 1)
+        after <- pgtestnullRepo.selectAll.compile.toList
+      } yield assertJsonEquals(before, after)
+
+      import doobie.syntax.all.*
+
+      transaction.transact(withConnection.testXa)
     }
   }
 }
