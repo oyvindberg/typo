@@ -50,6 +50,7 @@ const sidebars = {
             collapsible: true,
             collapsed: false,
             items: [
+                {type: "doc", id: "other-features/streaming-inserts"},
                 {type: "doc", id: "other-features/json"},
                 {type: "doc", id: "other-features/faster-compilation"},
                 {type: "doc", id: "other-features/flexible"},
