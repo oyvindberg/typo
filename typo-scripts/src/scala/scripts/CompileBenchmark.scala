@@ -2,6 +2,7 @@ package scripts
 
 import bleep.*
 import bleep.commands.SourceGen
+import bleep.model.{CrossProjectName, ProjectName}
 import typo.*
 import typo.internal.generate
 import typo.internal.sqlfiles.readSqlFileDirectories
@@ -12,7 +13,15 @@ import java.sql.{Connection, DriverManager}
 object CompileBenchmark extends BleepScript("CompileBenchmark") {
   val buildDir = Path.of(sys.props("user.dir"))
 
-  case class Result(lib: String, crossId: model.CrossId, inlineImplicits: Boolean, avgtime: Long, times: List[Long])
+  case class Result(
+      lib: String,
+      crossId: model.CrossId,
+      inlineImplicits: Boolean,
+      fixVerySlowImplicit: Boolean,
+      avgtime: Long,
+      mintime: Long,
+      times: List[Long]
+  )
 
   override def run(started: Started, commands: Commands, args: List[String]): Unit = {
     implicit val c: Connection = DriverManager.getConnection(
@@ -20,30 +29,51 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
     )
     val metadb = MetaDb.fromDb(TypoLogger.Noop)
 
-    val crossIds = List("jvm212", "jvm213", "jvm3").map(str => model.CrossId(str))
+    val crossIds = List(
+      "jvm212",
+      "jvm213",
+      "jvm3"
+    ).map(str => model.CrossId(str))
     val variants = List(
-      (Some(DbLibName.ZioJdbc), Nil, "typo-tester-zio-jdbc"),
-      (Some(DbLibName.Doobie), Nil, "typo-tester-doobie"),
-      (Some(DbLibName.Anorm), Nil, "typo-tester-anorm"),
-      (None, List(JsonLibName.ZioJson), "typo-tester-zio-jdbc"),
-      (None, List(JsonLibName.Circe), "typo-tester-doobie"),
-      (None, List(JsonLibName.PlayJson), "typo-tester-anorm")
+      ("baseline (only case class)", None, Nil, "typo-tester-none", true),
+      ("zio-jdbc", Some(DbLibName.ZioJdbc), Nil, "typo-tester-zio-jdbc", true),
+      ("doobie (with fix)", Some(DbLibName.Doobie), Nil, "typo-tester-doobie", true),
+      ("doobie (without fix)", Some(DbLibName.Doobie), Nil, "typo-tester-doobie", false),
+      ("anorm", Some(DbLibName.Anorm), Nil, "typo-tester-anorm", true),
+      ("zio-json", None, List(JsonLibName.ZioJson), "typo-tester-zio-jdbc", true),
+      ("circe", None, List(JsonLibName.Circe), "typo-tester-doobie", true),
+      ("play-json", None, List(JsonLibName.PlayJson), "typo-tester-anorm", true)
     )
+    val GeneratedAndCheckedIn = Path.of("generated-and-checked-in")
 
     val results: List[Result] =
-      variants.flatMap { case (dbLib, jsonLib, projectName) =>
-        val lib = (dbLib ++ jsonLib).mkString
-        val targetSources = buildDir.resolve(s"$projectName/generated-and-checked-in")
+      variants.flatMap { case (lib, dbLib, jsonLib, projectName, fixVerySlowImplicit) =>
+        val targetSources = buildDir.resolve(projectName).resolve(GeneratedAndCheckedIn)
+
         List(false, true).flatMap { inlineImplicits =>
           generate(
-            Options(pkg = "adventureworks", dbLib, jsonLib, enableDsl = true, enableTestInserts = Selector.All, inlineImplicits = inlineImplicits),
+            Options(
+              pkg = "adventureworks",
+              dbLib,
+              jsonLib,
+              enableDsl = dbLib.nonEmpty,
+              enableTestInserts = Selector.All,
+              inlineImplicits = inlineImplicits,
+              fixVerySlowImplicit = fixVerySlowImplicit,
+              enableStreamingInserts = false
+            ),
             metadb,
             readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql")),
-            Selector.All
+            Selector.ExcludePostgresInternal // All
           ).overwriteFolder(targetSources)
 
           crossIds.map { crossId =>
-            val desc = s"${crossId.value}, lib=$lib, inlineImplicits=$inlineImplicits"
+            started.projectPaths(CrossProjectName(ProjectName(projectName), Some(crossId))).sourcesDirs.fromSourceLayout.foreach { p =>
+              started.logger.warn(s"Deleting $p because tests will not compile")
+              bleep.internal.FileUtils.deleteDirectory(p)
+            }
+
+            val desc = s"${crossId.value}, lib=$lib, inlineImplicits=$inlineImplicits, fixVerySlowImplicit=$fixVerySlowImplicit"
             println(s"START $desc")
             val times = 0.to(2).map { _ =>
               val crossProjectName = model.CrossProjectName(model.ProjectName(projectName), Some(crossId))
@@ -52,8 +82,18 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
               time(commands.compile(List(crossProjectName)))
             }
             val avgtime = times.sum / times.length
-            println(s"END $desc, avgtime=$avgtime, times=$times")
-            Result(lib, crossId, inlineImplicits, avgtime, times.toList)
+            val mintime = times.min
+            val res = Result(
+              lib = lib,
+              crossId = crossId,
+              inlineImplicits = inlineImplicits,
+              fixVerySlowImplicit = fixVerySlowImplicit,
+              avgtime = avgtime,
+              mintime = mintime,
+              times = times.toList
+            )
+            println(res)
+            res
           }
         }
       }

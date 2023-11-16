@@ -60,7 +60,7 @@ projects:
     - typo
     - typo-tester-anorm
     extends: template-nocross
-  # scripts generate code into this project, and there are hand-written tests as well
+  # scripts generate code into the tester projects, and there are hand-written tests inside as well
   typo-tester-anorm:
     dependencies:
     - com.typesafe.play::play-json:2.10.3
@@ -85,6 +85,9 @@ projects:
       main: scripts.GenHardcodedFiles
       project: typo-scripts
     sources: ./generated-and-checked-in
+  typo-tester-none:
+    extends: template-cross
+    sources: ./generated-and-checked-in
   typo-tester-zio-jdbc:
     dependencies:
     - dev.zio::zio-json:0.6.2
@@ -102,6 +105,9 @@ scripts:
     main: scripts.GeneratedAdventureWorks
     project: typo-scripts
     sourceGlobs: ../adventureworks_sql
+  compile-benchmarks:
+    main: scripts.CompileBenchmark
+    project: typo-scripts
   generate-docs:
     main: scripts.GenDocumentation
     project: typo-scripts-doc
