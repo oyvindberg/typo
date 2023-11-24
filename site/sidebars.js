@@ -76,6 +76,7 @@ const sidebars = {
             collapsed: false,
             items: [
                 {type: "doc", id: "customization/overview"},
+                {type: "doc", id: "customization/customize-selected-relations"},
                 {type: "doc", id: "customization/customize-sql-files"},
                 {type: "doc", id: "customization/customize-naming"},
                 {type: "doc", id: "customization/customize-nullability"},
