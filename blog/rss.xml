@@ -4,7 +4,7 @@
         <title>Typo Blog</title>
         <link>https://oyvindberg.github.io/typo/blog</link>
         <description>Typo Blog</description>
-        <lastBuildDate>Thu, 16 Nov 2023 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 24 Nov 2023 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
@@ -12,7 +12,7 @@
             <title><![CDATA[Hello, ZIO]]></title>
             <link>https://oyvindberg.github.io/typo/blog/hello-zio</link>
             <guid>https://oyvindberg.github.io/typo/blog/hello-zio</guid>
-            <pubDate>Thu, 16 Nov 2023 00:00:00 GMT</pubDate>
+            <pubDate>Fri, 24 Nov 2023 00:00:00 GMT</pubDate>
             <description><![CDATA[Typo ported to ZIO]]></description>
             <content:encoded><![CDATA[<p>Thanks to the efforts of Jules Ivanic in <a href="https://github.com/oyvindberg/typo/pull/57" target="_blank" rel="noopener noreferrer">PR #57</a>,
 Typo now supports using <code>zio-jdbc</code> as a database library.</p><h3 class="anchor anchorWithStickyNavbar_LWe7" id="never-heard-of-typo">Never heard of Typo?<a href="#never-heard-of-typo" class="hash-link" aria-label="Direct link to Never heard of Typo?" title="Direct link to Never heard of Typo?">​</a></h3><p>You can check out the <a href="https://oyvindberg.github.io/typo/docs/" target="_blank" rel="noopener noreferrer">introduction</a>.
