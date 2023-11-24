@@ -58,6 +58,7 @@ const config = {
             position: "left",
             label: "Documentation",
           },
+          {to: 'blog', label: 'Blog', position: 'left'}, // or position: 'right'
           {
             href: "https://github.com/oyvindberg/typo",
             label: "GitHub",
