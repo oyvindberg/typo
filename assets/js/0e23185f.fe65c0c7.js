@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksite=self.webpackChunksite||[]).push([[285],{417:t=>{t.exports=JSON.parse('{"label":"typo","permalink":"/typo/blog/tags/typo","allTagsPath":"/typo/blog/tags","count":1}')}}]);
