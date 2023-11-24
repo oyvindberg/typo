@@ -62,13 +62,18 @@ val targetDir = location.resolve("myproject/src/main/scala/org/foo/generated")
 // where Typo will look for sql files
 val scriptsFolder = location.resolve("sql")
 
-generateFromDb(options, scriptsPaths = List(scriptsFolder))
+// you can use this to customize which relations you want to generate code for, see below
+val selector = Selector.ExcludePostgresInternal
+
+generateFromDb(options, selector = selector, scriptsPaths = List(scriptsFolder))
   .overwriteFolder(folder = targetDir)
 
 // add changed files to git, so you can keep them under control
 //scala.sys.process.Process(List("git", "add", targetDir.toString)).!!
 ```
 
+## `selector`
+You can customize which relations you generate code for, see [customize selected relations](customization/customize-selected-relations.md)
 ## sbt plugin
 
 It's natural to think an sbt plugin would be a good match for Typo. This will likely be added in the future.
