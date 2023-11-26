@@ -79,6 +79,7 @@ object sc {
     case object Wildcard extends Type
     case class TApply(underlying: Type, targs: List[Type]) extends Type
     case class Qualified(value: QIdent) extends Type {
+      lazy val dotName = value.idents.map(_.value).mkString(".")
       def name = value.name
     }
     case class Abstract(value: Ident) extends Type
@@ -87,7 +88,7 @@ object sc {
     case class ByName(underlying: Type) extends Type
 
     object Qualified {
-      implicit val ordering: Ordering[Qualified] = scala.Ordering.by(renderTree)
+      implicit val ordering: Ordering[Qualified] = scala.Ordering.by(x => x.dotName)
 
       def apply(str: String): Qualified =
         Qualified(QIdent(str))
