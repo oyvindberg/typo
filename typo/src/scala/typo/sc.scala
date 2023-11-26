@@ -414,7 +414,16 @@ object sc {
           s"val $renderedName: $renderedTpe = $renderedBody"
         else {
           val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
-          val renderedParams = if (params.isEmpty) "" else params.map(renderTree).mkString("(", ", ", ")")
+          val init = s"def $renderedName$renderedTparams"
+          val renderedParams =
+            params match {
+              case Nil            => ""
+              case List(one)      => s"(${renderTree(one)})"
+              case List(one, two) => s"(${renderTree(one)}, ${renderTree(two)})"
+              case more =>
+                val indent = " " * (init.length + 1)
+                more.zipWithIndex.map { case (p, idx) => (if (idx == 0) "" else indent) + renderTree(p) }.mkString("(", ",\n", s"\n${" " * init.length})")
+            }
           val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
           s"def $renderedName$renderedTparams$renderedParams$renderedImplicitParams: $renderedTpe = $renderedBody"
         }
