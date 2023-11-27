@@ -26,16 +26,16 @@ case class WorkorderRow(
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** Product quantity to build.
-      Constraint CK_WorkOrder_OrderQty affecting columns "orderqty":  ((orderqty > 0)) */
+      Constraint CK_WorkOrder_OrderQty affecting columns orderqty: ((orderqty > 0)) */
   orderqty: Int,
   /** Quantity that failed inspection.
-      Constraint CK_WorkOrder_ScrappedQty affecting columns "scrappedqty":  ((scrappedqty >= 0)) */
+      Constraint CK_WorkOrder_ScrappedQty affecting columns scrappedqty: ((scrappedqty >= 0)) */
   scrappedqty: TypoShort,
   /** Work order start date.
-      Constraint CK_WorkOrder_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_WorkOrder_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
   /** Work order end date.
-      Constraint CK_WorkOrder_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_WorkOrder_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
   /** Work order due date. */
   duedate: TypoLocalDateTime,

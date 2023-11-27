@@ -31,10 +31,10 @@ case class EmployeedepartmenthistoryRow(
       Points to [[shift.ShiftRow.shiftid]] */
   shiftid: ShiftId,
   /** Date the employee started work in the department.
-      Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDate,
   /** Date the employee left the department. NULL = Current department.
-      Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDate],
   modifieddate: TypoLocalDateTime
 ){

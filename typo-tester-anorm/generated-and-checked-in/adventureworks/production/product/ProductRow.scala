@@ -42,16 +42,16 @@ case class ProductRow(
   /** Product color. */
   color: Option[/* max 15 chars */ String],
   /** Minimum inventory quantity.
-      Constraint CK_Product_SafetyStockLevel affecting columns "safetystocklevel":  ((safetystocklevel > 0)) */
+      Constraint CK_Product_SafetyStockLevel affecting columns safetystocklevel: ((safetystocklevel > 0)) */
   safetystocklevel: TypoShort,
   /** Inventory level that triggers a purchase order or work order.
-      Constraint CK_Product_ReorderPoint affecting columns "reorderpoint":  ((reorderpoint > 0)) */
+      Constraint CK_Product_ReorderPoint affecting columns reorderpoint: ((reorderpoint > 0)) */
   reorderpoint: TypoShort,
   /** Standard cost of the product.
-      Constraint CK_Product_StandardCost affecting columns "standardcost":  ((standardcost >= 0.00)) */
+      Constraint CK_Product_StandardCost affecting columns standardcost: ((standardcost >= 0.00)) */
   standardcost: BigDecimal,
   /** Selling price.
-      Constraint CK_Product_ListPrice affecting columns "listprice":  ((listprice >= 0.00)) */
+      Constraint CK_Product_ListPrice affecting columns listprice: ((listprice >= 0.00)) */
   listprice: BigDecimal,
   /** Product size. */
   size: Option[/* max 5 chars */ String],
@@ -62,19 +62,19 @@ case class ProductRow(
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   weightunitmeasurecode: Option[UnitmeasureId],
   /** Product weight.
-      Constraint CK_Product_Weight affecting columns "weight":  ((weight > 0.00)) */
+      Constraint CK_Product_Weight affecting columns weight: ((weight > 0.00)) */
   weight: Option[BigDecimal],
   /** Number of days required to manufacture the product.
-      Constraint CK_Product_DaysToManufacture affecting columns "daystomanufacture":  ((daystomanufacture >= 0)) */
+      Constraint CK_Product_DaysToManufacture affecting columns daystomanufacture: ((daystomanufacture >= 0)) */
   daystomanufacture: Int,
   /** R = Road, M = Mountain, T = Touring, S = Standard
-      Constraint CK_Product_ProductLine affecting columns "productline":  (((upper((productline)::text) = ANY (ARRAY['S'::text, 'T'::text, 'M'::text, 'R'::text])) OR (productline IS NULL))) */
+      Constraint CK_Product_ProductLine affecting columns productline: (((upper((productline)::text) = ANY (ARRAY['S'::text, 'T'::text, 'M'::text, 'R'::text])) OR (productline IS NULL))) */
   productline: Option[/* bpchar, max 2 chars */ String],
   /** H = High, M = Medium, L = Low
-      Constraint CK_Product_Class affecting columns "class":  (((upper((class)::text) = ANY (ARRAY['L'::text, 'M'::text, 'H'::text])) OR (class IS NULL))) */
+      Constraint CK_Product_Class affecting columns class: (((upper((class)::text) = ANY (ARRAY['L'::text, 'M'::text, 'H'::text])) OR (class IS NULL))) */
   `class`: Option[/* bpchar, max 2 chars */ String],
   /** W = Womens, M = Mens, U = Universal
-      Constraint CK_Product_Style affecting columns "style":  (((upper((style)::text) = ANY (ARRAY['W'::text, 'M'::text, 'U'::text])) OR (style IS NULL))) */
+      Constraint CK_Product_Style affecting columns style: (((upper((style)::text) = ANY (ARRAY['W'::text, 'M'::text, 'U'::text])) OR (style IS NULL))) */
   style: Option[/* bpchar, max 2 chars */ String],
   /** Product is a member of this product subcategory. Foreign key to ProductSubCategory.ProductSubCategoryID.
       Points to [[productsubcategory.ProductsubcategoryRow.productsubcategoryid]] */
@@ -83,10 +83,10 @@ case class ProductRow(
       Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: Option[ProductmodelId],
   /** Date the product was available for sale.
-      Constraint CK_Product_SellEndDate affecting columns "sellenddate", "sellstartdate":  (((sellenddate >= sellstartdate) OR (sellenddate IS NULL))) */
+      Constraint CK_Product_SellEndDate affecting columns sellenddate, sellstartdate: (((sellenddate >= sellstartdate) OR (sellenddate IS NULL))) */
   sellstartdate: TypoLocalDateTime,
   /** Date the product was no longer available for sale.
-      Constraint CK_Product_SellEndDate affecting columns "sellenddate", "sellstartdate":  (((sellenddate >= sellstartdate) OR (sellenddate IS NULL))) */
+      Constraint CK_Product_SellEndDate affecting columns sellenddate, sellstartdate: (((sellenddate >= sellstartdate) OR (sellenddate IS NULL))) */
   sellenddate: Option[TypoLocalDateTime],
   /** Date the product was discontinued. */
   discontinueddate: Option[TypoLocalDateTime],

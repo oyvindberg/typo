@@ -31,24 +31,24 @@ case class ProductvendorRowUnsaved(
       Points to [[vendor.VendorRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** The average span of time (in days) between placing an order with the vendor and receiving the purchased product.
-      Constraint CK_ProductVendor_AverageLeadTime affecting columns "averageleadtime":  ((averageleadtime >= 1)) */
+      Constraint CK_ProductVendor_AverageLeadTime affecting columns a, v, e, r, a, g, e, l, e, a, d, t, i, m, e:  ((averageleadtime >= 1)) */
   averageleadtime: Int,
   /** The vendor's usual selling price.
-      Constraint CK_ProductVendor_StandardPrice affecting columns "standardprice":  ((standardprice > 0.00)) */
+      Constraint CK_ProductVendor_StandardPrice affecting columns s, t, a, n, d, a, r, d, p, r, i, c, e:  ((standardprice > 0.00)) */
   standardprice: BigDecimal,
   /** The selling price when last purchased.
-      Constraint CK_ProductVendor_LastReceiptCost affecting columns "lastreceiptcost":  ((lastreceiptcost > 0.00)) */
+      Constraint CK_ProductVendor_LastReceiptCost affecting columns l, a, s, t, r, e, c, e, i, p, t, c, o, s, t:  ((lastreceiptcost > 0.00)) */
   lastreceiptcost: Option[BigDecimal],
   /** Date the product was last received by the vendor. */
   lastreceiptdate: Option[TypoLocalDateTime],
   /** The maximum quantity that should be ordered.
-      Constraint CK_ProductVendor_MinOrderQty affecting columns "minorderqty":  ((minorderqty >= 1)) */
+      Constraint CK_ProductVendor_MinOrderQty affecting columns m, i, n, o, r, d, e, r, q, t, y:  ((minorderqty >= 1)) */
   minorderqty: Int,
   /** The minimum quantity that should be ordered.
-      Constraint CK_ProductVendor_MaxOrderQty affecting columns "maxorderqty":  ((maxorderqty >= 1)) */
+      Constraint CK_ProductVendor_MaxOrderQty affecting columns m, a, x, o, r, d, e, r, q, t, y:  ((maxorderqty >= 1)) */
   maxorderqty: Int,
   /** The quantity currently on order.
-      Constraint CK_ProductVendor_OnOrderQty affecting columns "onorderqty":  ((onorderqty >= 0)) */
+      Constraint CK_ProductVendor_OnOrderQty affecting columns o, n, o, r, d, e, r, q, t, y:  ((onorderqty >= 0)) */
   onorderqty: Option[Int],
   /** The product's unit of measure.
       Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */

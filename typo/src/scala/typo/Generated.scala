@@ -23,7 +23,7 @@ object Generated {
       files.map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), code, _) =>
         val path = idents.init
         val name = idents.last
-        val relPath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
+        val relPath = RelPath(path.map(_.value) :+ s"${name.value}.scala")
         relPath -> code
       }.toMap
     new Generated(asRelativePaths)

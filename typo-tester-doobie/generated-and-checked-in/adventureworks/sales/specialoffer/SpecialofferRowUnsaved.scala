@@ -23,24 +23,24 @@ case class SpecialofferRowUnsaved(
   /** Group the discount applies to such as Reseller or Customer. */
   category: /* max 50 chars */ String,
   /** Discount start date.
-      Constraint CK_SpecialOffer_EndDate affecting columns "enddate", "startdate":  ((enddate >= startdate)) */
+      Constraint CK_SpecialOffer_EndDate affecting columns e, n, d, d, a, t, e, ,,  , s, t, a, r, t, d, a, t, e:  ((enddate >= startdate)) */
   startdate: TypoLocalDateTime,
   /** Discount end date.
-      Constraint CK_SpecialOffer_EndDate affecting columns "enddate", "startdate":  ((enddate >= startdate)) */
+      Constraint CK_SpecialOffer_EndDate affecting columns e, n, d, d, a, t, e, ,,  , s, t, a, r, t, d, a, t, e:  ((enddate >= startdate)) */
   enddate: TypoLocalDateTime,
   /** Maximum discount percent allowed.
-      Constraint CK_SpecialOffer_MaxQty affecting columns "maxqty":  ((maxqty >= 0)) */
+      Constraint CK_SpecialOffer_MaxQty affecting columns m, a, x, q, t, y:  ((maxqty >= 0)) */
   maxqty: Option[Int],
   /** Default: nextval('sales.specialoffer_specialofferid_seq'::regclass)
       Primary key for SpecialOffer records. */
   specialofferid: Defaulted[SpecialofferId] = Defaulted.UseDefault,
   /** Default: 0.00
       Discount precentage.
-      Constraint CK_SpecialOffer_DiscountPct affecting columns "discountpct":  ((discountpct >= 0.00)) */
+      Constraint CK_SpecialOffer_DiscountPct affecting columns d, i, s, c, o, u, n, t, p, c, t:  ((discountpct >= 0.00)) */
   discountpct: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0
       Minimum discount percent allowed.
-      Constraint CK_SpecialOffer_MinQty affecting columns "minqty":  ((minqty >= 0)) */
+      Constraint CK_SpecialOffer_MinQty affecting columns m, i, n, q, t, y:  ((minqty >= 0)) */
   minqty: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

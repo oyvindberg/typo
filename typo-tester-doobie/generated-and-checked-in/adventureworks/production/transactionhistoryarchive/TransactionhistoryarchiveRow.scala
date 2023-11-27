@@ -28,7 +28,7 @@ case class TransactionhistoryarchiveRow(
   /** Date and time of the transaction. */
   transactiondate: TypoLocalDateTime,
   /** W = Work Order, S = Sales Order, P = Purchase Order
-      Constraint CK_TransactionHistoryArchive_TransactionType affecting columns "transactiontype":  ((upper((transactiontype)::text) = ANY (ARRAY['W'::text, 'S'::text, 'P'::text]))) */
+      Constraint CK_TransactionHistoryArchive_TransactionType affecting columns transactiontype: ((upper((transactiontype)::text) = ANY (ARRAY['W'::text, 'S'::text, 'P'::text]))) */
   transactiontype: /* bpchar, max 1 chars */ String,
   /** Product quantity. */
   quantity: Int,

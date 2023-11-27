@@ -31,10 +31,10 @@ case class SalesterritoryhistoryRowUnsaved(
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
   /** Primary key. Date the sales representive started work in the territory.
-      Constraint CK_SalesTerritoryHistory_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_SalesTerritoryHistory_EndDate affecting columns e, n, d, d, a, t, e, ,,  , s, t, a, r, t, d, a, t, e:  (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
   /** Date the sales representative left work in the territory.
-      Constraint CK_SalesTerritoryHistory_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_SalesTerritoryHistory_EndDate affecting columns e, n, d, d, a, t, e, ,,  , s, t, a, r, t, d, a, t, e:  (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

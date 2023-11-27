@@ -55,9 +55,9 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
           col.dbCol.comment,
           col.pointsTo map { case (relationName, columnName) =>
             val shortened = sc.QIdent(relation.dropCommonPrefix(table.naming.rowName(relationName).idents, rowFile.tpe.value.idents))
-            s"Points to [[${sc.renderTree(shortened)}.${table.naming.field(columnName).value}]]"
+            s"Points to [[${shortened.dotName}.${table.naming.field(columnName).value}]]"
           },
-          col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.code.render.asString).mkString(", ")}:  ${c.checkClause}"),
+          col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.value).mkString(", ").mkString(", ")}:  ${c.checkClause}"),
           if (options.debugTypes)
             col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
           else None

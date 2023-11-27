@@ -34,7 +34,7 @@ case class VendorRowUnsaved(
   /** Company name. */
   name: Name,
   /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average
-      Constraint CK_Vendor_CreditRating affecting columns "creditrating":  (((creditrating >= 1) AND (creditrating <= 5))) */
+      Constraint CK_Vendor_CreditRating affecting columns c, r, e, d, i, t, r, a, t, i, n, g:  (((creditrating >= 1) AND (creditrating <= 5))) */
   creditrating: TypoShort,
   /** Vendor URL. */
   purchasingwebserviceurl: Option[/* max 1024 chars */ String],

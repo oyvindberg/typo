@@ -34,7 +34,7 @@ case class PurchaseorderheaderRowUnsaved(
       Points to [[shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
   /** Estimated shipment date from the vendor.
-      Constraint CK_PurchaseOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
+      Constraint CK_PurchaseOrderHeader_ShipDate affecting columns o, r, d, e, r, d, a, t, e, ,,  , s, h, i, p, d, a, t, e:  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   shipdate: Option[TypoLocalDateTime],
   /** Default: nextval('purchasing.purchaseorderheader_purchaseorderid_seq'::regclass)
       Primary key. */
@@ -44,23 +44,23 @@ case class PurchaseorderheaderRowUnsaved(
   revisionnumber: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: 1
       Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete
-      Constraint CK_PurchaseOrderHeader_Status affecting columns "status":  (((status >= 1) AND (status <= 4))) */
+      Constraint CK_PurchaseOrderHeader_Status affecting columns s, t, a, t, u, s:  (((status >= 1) AND (status <= 4))) */
   status: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: now()
       Purchase order creation date.
-      Constraint CK_PurchaseOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
+      Constraint CK_PurchaseOrderHeader_ShipDate affecting columns o, r, d, e, r, d, a, t, e, ,,  , s, h, i, p, d, a, t, e:  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 0.00
       Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID.
-      Constraint CK_PurchaseOrderHeader_SubTotal affecting columns "subtotal":  ((subtotal >= 0.00)) */
+      Constraint CK_PurchaseOrderHeader_SubTotal affecting columns s, u, b, t, o, t, a, l:  ((subtotal >= 0.00)) */
   subtotal: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Tax amount.
-      Constraint CK_PurchaseOrderHeader_TaxAmt affecting columns "taxamt":  ((taxamt >= 0.00)) */
+      Constraint CK_PurchaseOrderHeader_TaxAmt affecting columns t, a, x, a, m, t:  ((taxamt >= 0.00)) */
   taxamt: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Shipping cost.
-      Constraint CK_PurchaseOrderHeader_Freight affecting columns "freight":  ((freight >= 0.00)) */
+      Constraint CK_PurchaseOrderHeader_Freight affecting columns f, r, e, i, g, h, t:  ((freight >= 0.00)) */
   freight: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault

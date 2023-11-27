@@ -27,13 +27,13 @@ case class ProductlistpricehistoryRow(
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** List price start date.
-      Constraint CK_ProductListPriceHistory_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_ProductListPriceHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
   /** List price end date
-      Constraint CK_ProductListPriceHistory_EndDate affecting columns "enddate", "startdate":  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_ProductListPriceHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
   /** Product list price.
-      Constraint CK_ProductListPriceHistory_ListPrice affecting columns "listprice":  ((listprice > 0.00)) */
+      Constraint CK_ProductListPriceHistory_ListPrice affecting columns listprice: ((listprice > 0.00)) */
   listprice: BigDecimal,
   modifieddate: TypoLocalDateTime
 ){

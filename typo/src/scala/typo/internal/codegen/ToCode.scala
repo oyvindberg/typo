@@ -17,9 +17,5 @@ object ToCode {
   implicit val code: ToCode[sc.Code] = identity
   implicit val dbColName: ToCode[db.ColName] = colName => sc.StrLit(colName.value)
 
-  implicit val tableName: ToCode[db.RelationName] = {
-    case db.RelationName(Some(schema), name) => code"${schema}.$name"
-    case db.RelationName(None, name)         => name.code
-  }
-
+  implicit val tableName: ToCode[db.RelationName] = name => sc.Code.Str(name.value)
 }

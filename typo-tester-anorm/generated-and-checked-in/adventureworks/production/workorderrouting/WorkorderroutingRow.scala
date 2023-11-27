@@ -36,25 +36,25 @@ case class WorkorderroutingRow(
       Points to [[location.LocationRow.locationid]] */
   locationid: LocationId,
   /** Planned manufacturing start date.
-      Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns "scheduledenddate", "scheduledstartdate":  ((scheduledenddate >= scheduledstartdate)) */
+      Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns scheduledenddate, scheduledstartdate: ((scheduledenddate >= scheduledstartdate)) */
   scheduledstartdate: TypoLocalDateTime,
   /** Planned manufacturing end date.
-      Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns "scheduledenddate", "scheduledstartdate":  ((scheduledenddate >= scheduledstartdate)) */
+      Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns scheduledenddate, scheduledstartdate: ((scheduledenddate >= scheduledstartdate)) */
   scheduledenddate: TypoLocalDateTime,
   /** Actual start date.
-      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns "actualenddate", "actualstartdate":  (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
+      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns actualenddate, actualstartdate: (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
   actualstartdate: Option[TypoLocalDateTime],
   /** Actual end date.
-      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns "actualenddate", "actualstartdate":  (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
+      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns actualenddate, actualstartdate: (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
   actualenddate: Option[TypoLocalDateTime],
   /** Number of manufacturing hours used.
-      Constraint CK_WorkOrderRouting_ActualResourceHrs affecting columns "actualresourcehrs":  ((actualresourcehrs >= 0.0000)) */
+      Constraint CK_WorkOrderRouting_ActualResourceHrs affecting columns actualresourcehrs: ((actualresourcehrs >= 0.0000)) */
   actualresourcehrs: Option[BigDecimal],
   /** Estimated manufacturing cost.
-      Constraint CK_WorkOrderRouting_PlannedCost affecting columns "plannedcost":  ((plannedcost > 0.00)) */
+      Constraint CK_WorkOrderRouting_PlannedCost affecting columns plannedcost: ((plannedcost > 0.00)) */
   plannedcost: BigDecimal,
   /** Actual manufacturing cost.
-      Constraint CK_WorkOrderRouting_ActualCost affecting columns "actualcost":  ((actualcost > 0.00)) */
+      Constraint CK_WorkOrderRouting_ActualCost affecting columns actualcost: ((actualcost > 0.00)) */
   actualcost: Option[BigDecimal],
   modifieddate: TypoLocalDateTime
 ){

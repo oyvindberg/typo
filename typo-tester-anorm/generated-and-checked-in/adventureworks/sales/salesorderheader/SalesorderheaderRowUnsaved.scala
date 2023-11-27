@@ -34,10 +34,10 @@ import scala.util.Try
 /** This class corresponds to a row in table `sales.salesorderheader` which has not been persisted yet */
 case class SalesorderheaderRowUnsaved(
   /** Date the order is due to the customer.
-      Constraint CK_SalesOrderHeader_DueDate affecting columns "duedate", "orderdate":  ((duedate >= orderdate)) */
+      Constraint CK_SalesOrderHeader_DueDate affecting columns d, u, e, d, a, t, e, ,,  , o, r, d, e, r, d, a, t, e:  ((duedate >= orderdate)) */
   duedate: TypoLocalDateTime,
   /** Date the order was shipped to the customer.
-      Constraint CK_SalesOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
+      Constraint CK_SalesOrderHeader_ShipDate affecting columns o, r, d, e, r, d, a, t, e, ,,  , s, h, i, p, d, a, t, e:  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   shipdate: Option[TypoLocalDateTime],
   /** Customer purchase order number reference. */
   purchaseordernumber: Option[OrderNumber],
@@ -81,27 +81,27 @@ case class SalesorderheaderRowUnsaved(
   revisionnumber: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: now()
       Dates the sales order was created.
-      Constraint CK_SalesOrderHeader_DueDate affecting columns "duedate", "orderdate":  ((duedate >= orderdate))
-      Constraint CK_SalesOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
+      Constraint CK_SalesOrderHeader_DueDate affecting columns d, u, e, d, a, t, e, ,,  , o, r, d, e, r, d, a, t, e:  ((duedate >= orderdate))
+      Constraint CK_SalesOrderHeader_ShipDate affecting columns o, r, d, e, r, d, a, t, e, ,,  , s, h, i, p, d, a, t, e:  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 1
       Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled
-      Constraint CK_SalesOrderHeader_Status affecting columns "status":  (((status >= 0) AND (status <= 8))) */
+      Constraint CK_SalesOrderHeader_Status affecting columns s, t, a, t, u, s:  (((status >= 0) AND (status <= 8))) */
   status: Defaulted[TypoShort] = Defaulted.UseDefault,
   /** Default: true
       0 = Order placed by sales person. 1 = Order placed online by customer. */
   onlineorderflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales subtotal. Computed as SUM(SalesOrderDetail.LineTotal)for the appropriate SalesOrderID.
-      Constraint CK_SalesOrderHeader_SubTotal affecting columns "subtotal":  ((subtotal >= 0.00)) */
+      Constraint CK_SalesOrderHeader_SubTotal affecting columns s, u, b, t, o, t, a, l:  ((subtotal >= 0.00)) */
   subtotal: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Tax amount.
-      Constraint CK_SalesOrderHeader_TaxAmt affecting columns "taxamt":  ((taxamt >= 0.00)) */
+      Constraint CK_SalesOrderHeader_TaxAmt affecting columns t, a, x, a, m, t:  ((taxamt >= 0.00)) */
   taxamt: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Shipping cost.
-      Constraint CK_SalesOrderHeader_Freight affecting columns "freight":  ((freight >= 0.00)) */
+      Constraint CK_SalesOrderHeader_Freight affecting columns f, r, e, i, g, h, t:  ((freight >= 0.00)) */
   freight: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

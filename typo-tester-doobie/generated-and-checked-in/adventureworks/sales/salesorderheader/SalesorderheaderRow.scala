@@ -38,17 +38,17 @@ case class SalesorderheaderRow(
   /** Incremental number to track changes to the sales order over time. */
   revisionnumber: TypoShort,
   /** Dates the sales order was created.
-      Constraint CK_SalesOrderHeader_DueDate affecting columns "duedate", "orderdate":  ((duedate >= orderdate))
-      Constraint CK_SalesOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
+      Constraint CK_SalesOrderHeader_DueDate affecting columns duedate, orderdate: ((duedate >= orderdate))
+      Constraint CK_SalesOrderHeader_ShipDate affecting columns orderdate, shipdate: (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   orderdate: TypoLocalDateTime,
   /** Date the order is due to the customer.
-      Constraint CK_SalesOrderHeader_DueDate affecting columns "duedate", "orderdate":  ((duedate >= orderdate)) */
+      Constraint CK_SalesOrderHeader_DueDate affecting columns duedate, orderdate: ((duedate >= orderdate)) */
   duedate: TypoLocalDateTime,
   /** Date the order was shipped to the customer.
-      Constraint CK_SalesOrderHeader_ShipDate affecting columns "orderdate", "shipdate":  (((shipdate >= orderdate) OR (shipdate IS NULL))) */
+      Constraint CK_SalesOrderHeader_ShipDate affecting columns orderdate, shipdate: (((shipdate >= orderdate) OR (shipdate IS NULL))) */
   shipdate: Option[TypoLocalDateTime],
   /** Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled
-      Constraint CK_SalesOrderHeader_Status affecting columns "status":  (((status >= 0) AND (status <= 8))) */
+      Constraint CK_SalesOrderHeader_Status affecting columns status: (((status >= 0) AND (status <= 8))) */
   status: TypoShort,
   /** 0 = Order placed by sales person. 1 = Order placed online by customer. */
   onlineorderflag: Flag,
@@ -83,13 +83,13 @@ case class SalesorderheaderRow(
       Points to [[currencyrate.CurrencyrateRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
   /** Sales subtotal. Computed as SUM(SalesOrderDetail.LineTotal)for the appropriate SalesOrderID.
-      Constraint CK_SalesOrderHeader_SubTotal affecting columns "subtotal":  ((subtotal >= 0.00)) */
+      Constraint CK_SalesOrderHeader_SubTotal affecting columns subtotal: ((subtotal >= 0.00)) */
   subtotal: BigDecimal,
   /** Tax amount.
-      Constraint CK_SalesOrderHeader_TaxAmt affecting columns "taxamt":  ((taxamt >= 0.00)) */
+      Constraint CK_SalesOrderHeader_TaxAmt affecting columns taxamt: ((taxamt >= 0.00)) */
   taxamt: BigDecimal,
   /** Shipping cost.
-      Constraint CK_SalesOrderHeader_Freight affecting columns "freight":  ((freight >= 0.00)) */
+      Constraint CK_SalesOrderHeader_Freight affecting columns freight: ((freight >= 0.00)) */
   freight: BigDecimal,
   /** Total due from customer. Computed as Subtotal + TaxAmt + Freight. */
   totaldue: Option[BigDecimal],

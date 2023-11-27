@@ -21,6 +21,7 @@ object sc {
   }
 
   case class QIdent(idents: List[Ident]) extends Tree {
+    lazy val dotName = idents.map(_.value).mkString(".")
     require(idents.nonEmpty)
     def /(ident: Ident): QIdent = QIdent(idents :+ ident)
     def /(newIdents: List[Ident]): QIdent = QIdent(idents ++ newIdents)
@@ -79,7 +80,7 @@ object sc {
     case object Wildcard extends Type
     case class TApply(underlying: Type, targs: List[Type]) extends Type
     case class Qualified(value: QIdent) extends Type {
-      lazy val dotName = value.idents.map(_.value).mkString(".")
+      lazy val dotName = value.dotName
       def name = value.name
     }
     case class Abstract(value: Ident) extends Type
@@ -354,24 +355,26 @@ object sc {
     tree match {
       case Ident(value) =>
         def isValidId(str: String) = str.head.isUnicodeIdentifierStart && str.drop(1).forall(_.isUnicodeIdentifierPart)
+
         def escape(str: String) = s"`$str`"
+
         if (isScalaKeyword(value) || !isValidId(value)) escape(value) else value
-      case QIdent(value)                      => value.map(renderTree).mkString(".")
-      case Param(name, tpe, Some(default))    => renderTree(name) + ": " + renderTree(tpe) + " = " + default.render
-      case Param(name, tpe, None)             => renderTree(name) + ": " + renderTree(tpe)
-      case Params(params)                     => params.map(renderTree).mkString("(", ", ", ")")
+      case QIdent(value) => value.map(renderTree).mkString(".")
+      case Param(name, tpe, Some(default)) => renderTree(name) + ": " + renderTree(tpe) + " = " + default.render
+      case Param(name, tpe, None) => renderTree(name) + ": " + renderTree(tpe)
+      case Params(params) => params.map(renderTree).mkString("(", ", ", ")")
       case StrLit(str) if str.contains(Quote) => TripleQuote + str + TripleQuote
-      case StrLit(str)                        => Quote + str + Quote
-      case Summon(tpe)                        => s"implicitly[${renderTree(tpe)}]"
+      case StrLit(str) => Quote + str + Quote
+      case Summon(tpe) => s"implicitly[${renderTree(tpe)}]"
       case tpe: Type =>
         tpe match {
-          case Type.Abstract(value)                => renderTree(value)
-          case Type.Wildcard                       => "?"
-          case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
-          case Type.Qualified(value)               => renderTree(value)
+          case Type.Abstract(value) => renderTree(value)
+          case Type.Wildcard => "?"
+          case Type.TApply(underlying, targs) => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
+          case Type.Qualified(value) => renderTree(value)
           case Type.Commented(underlying, comment) => s"$comment ${renderTree(underlying)}"
-          case Type.ByName(underlying)             => s"=> ${renderTree(underlying)}"
-          case Type.UserDefined(underlying)        => s"/* user-picked */ ${renderTree(underlying)}"
+          case Type.ByName(underlying) => s"=> ${renderTree(underlying)}"
+          case Type.UserDefined(underlying) => s"/* user-picked */ ${renderTree(underlying)}"
         }
       case StringInterpolate(_, prefix, content) =>
         content.render.lines match {
@@ -418,8 +421,8 @@ object sc {
           val init = s"def $renderedName$renderedTparams"
           val renderedParams =
             params match {
-              case Nil            => ""
-              case List(one)      => s"(${renderTree(one)})"
+              case Nil => ""
+              case List(one) => s"(${renderTree(one)})"
               case List(one, two) => s"(${renderTree(one)}, ${renderTree(two)})"
               case more =>
                 val indent = " " * (init.length + 1)
@@ -460,7 +463,7 @@ object sc {
       }
 
     // render tree as a string in such a way that newlines inside interpolated strings preserves outer indentation
-    lazy val render: Lines =
+    def render: Lines =
       this match {
         case Code.Interpolated(parts, args) =>
           val lines = Array.newBuilder[String]

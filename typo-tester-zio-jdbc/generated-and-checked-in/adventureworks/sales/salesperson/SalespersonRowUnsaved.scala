@@ -27,23 +27,23 @@ case class SalespersonRowUnsaved(
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
   /** Projected yearly sales.
-      Constraint CK_SalesPerson_SalesQuota affecting columns "salesquota":  ((salesquota > 0.00)) */
+      Constraint CK_SalesPerson_SalesQuota affecting columns s, a, l, e, s, q, u, o, t, a:  ((salesquota > 0.00)) */
   salesquota: Option[BigDecimal],
   /** Default: 0.00
       Bonus due if quota is met.
-      Constraint CK_SalesPerson_Bonus affecting columns "bonus":  ((bonus >= 0.00)) */
+      Constraint CK_SalesPerson_Bonus affecting columns b, o, n, u, s:  ((bonus >= 0.00)) */
   bonus: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Commision percent received per sale.
-      Constraint CK_SalesPerson_CommissionPct affecting columns "commissionpct":  ((commissionpct >= 0.00)) */
+      Constraint CK_SalesPerson_CommissionPct affecting columns c, o, m, m, i, s, s, i, o, n, p, c, t:  ((commissionpct >= 0.00)) */
   commissionpct: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales total year to date.
-      Constraint CK_SalesPerson_SalesYTD affecting columns "salesytd":  ((salesytd >= 0.00)) */
+      Constraint CK_SalesPerson_SalesYTD affecting columns s, a, l, e, s, y, t, d:  ((salesytd >= 0.00)) */
   salesytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales total of previous year.
-      Constraint CK_SalesPerson_SalesLastYear affecting columns "saleslastyear":  ((saleslastyear >= 0.00)) */
+      Constraint CK_SalesPerson_SalesLastYear affecting columns s, a, l, e, s, l, a, s, t, y, e, a, r:  ((saleslastyear >= 0.00)) */
   saleslastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

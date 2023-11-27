@@ -35,7 +35,7 @@ case class SalesorderdetailRow(
   /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[/* max 25 chars */ String],
   /** Quantity ordered per product.
-      Constraint CK_SalesOrderDetail_OrderQty affecting columns "orderqty":  ((orderqty > 0)) */
+      Constraint CK_SalesOrderDetail_OrderQty affecting columns orderqty: ((orderqty > 0)) */
   orderqty: TypoShort,
   /** Product sold to customer. Foreign key to Product.ProductID.
       Points to [[specialofferproduct.SpecialofferproductRow.productid]] */
@@ -44,10 +44,10 @@ case class SalesorderdetailRow(
       Points to [[specialofferproduct.SpecialofferproductRow.specialofferid]] */
   specialofferid: SpecialofferId,
   /** Selling price of a single product.
-      Constraint CK_SalesOrderDetail_UnitPrice affecting columns "unitprice":  ((unitprice >= 0.00)) */
+      Constraint CK_SalesOrderDetail_UnitPrice affecting columns unitprice: ((unitprice >= 0.00)) */
   unitprice: BigDecimal,
   /** Discount amount.
-      Constraint CK_SalesOrderDetail_UnitPriceDiscount affecting columns "unitpricediscount":  ((unitpricediscount >= 0.00)) */
+      Constraint CK_SalesOrderDetail_UnitPriceDiscount affecting columns unitpricediscount: ((unitpricediscount >= 0.00)) */
   unitpricediscount: BigDecimal,
   rowguid: TypoUUID,
   modifieddate: TypoLocalDateTime

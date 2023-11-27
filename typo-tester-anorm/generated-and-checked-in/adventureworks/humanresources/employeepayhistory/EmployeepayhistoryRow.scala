@@ -30,10 +30,10 @@ case class EmployeepayhistoryRow(
   /** Date the change in pay is effective */
   ratechangedate: TypoLocalDateTime,
   /** Salary hourly rate.
-      Constraint CK_EmployeePayHistory_Rate affecting columns "rate":  (((rate >= 6.50) AND (rate <= 200.00))) */
+      Constraint CK_EmployeePayHistory_Rate affecting columns rate: (((rate >= 6.50) AND (rate <= 200.00))) */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly
-      Constraint CK_EmployeePayHistory_PayFrequency affecting columns "payfrequency":  ((payfrequency = ANY (ARRAY[1, 2]))) */
+      Constraint CK_EmployeePayHistory_PayFrequency affecting columns payfrequency: ((payfrequency = ANY (ARRAY[1, 2]))) */
   payfrequency: TypoShort,
   modifieddate: TypoLocalDateTime
 ){

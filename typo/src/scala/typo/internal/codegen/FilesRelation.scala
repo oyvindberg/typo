@@ -19,9 +19,9 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
         col.dbCol.comment,
         col.pointsTo.map { case (relationName, columnName) =>
           val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, names.RowName.value.idents))
-          s"Points to [[${sc.renderTree(shortened)}.${naming.field(columnName).value}]]"
+          s"Points to [[${shortened.dotName}.${naming.field(columnName).value}]]"
         },
-        col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.code.render.asString).mkString(", ")}:  ${c.checkClause}"),
+        col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.value).mkString(", ")}: ${c.checkClause}"),
         if (options.debugTypes)
           col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
         else None
@@ -125,13 +125,13 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
                   case _                            => (sc.Type.dsl.Field, col.tpe)
                 }
 
-            val readSqlCast = sqlCast.fromPg(col.dbCol) match {
-              case Some(value) => code"${sc.Type.Some}(${sc.StrLit(value)})"
-              case None        => sc.Type.None.code
+            val readSqlCast = SqlCast.fromPg(col.dbCol) match {
+              case Some(sqlCast) => code"${sc.Type.Some}(${sc.StrLit(sqlCast.typeName)})"
+              case None          => sc.Type.None.code
             }
-            val writeSqlCast = sqlCast.toPg(col.dbCol) match {
-              case Some(value) => code"${sc.Type.Some}(${sc.StrLit(value)})"
-              case None        => sc.Type.None.code
+            val writeSqlCast = SqlCast.toPg(col.dbCol) match {
+              case Some(sqlCast) => code"${sc.Type.Some}(${sc.StrLit(sqlCast.typeName)})"
+              case None          => sc.Type.None.code
             }
             code"override val ${col.name} = new ${cls.of(tpe, Row)}(prefix, ${sc
                 .StrLit(col.dbName.value)}, $readSqlCast, $writeSqlCast)(x => extract(x).${col.name}, (row, value) => merge(row, extract(row).copy(${col.name} = value)))"

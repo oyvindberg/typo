@@ -25,7 +25,7 @@ case class SalestaxrateRowUnsaved(
       Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,
   /** 1 = Tax applied to retail transactions, 2 = Tax applied to wholesale transactions, 3 = Tax applied to all sales (retail and wholesale) transactions.
-      Constraint CK_SalesTaxRate_TaxType affecting columns "taxtype":  (((taxtype >= 1) AND (taxtype <= 3))) */
+      Constraint CK_SalesTaxRate_TaxType affecting columns t, a, x, t, y, p, e:  (((taxtype >= 1) AND (taxtype <= 3))) */
   taxtype: TypoShort,
   /** Tax rate description. */
   name: Name,
