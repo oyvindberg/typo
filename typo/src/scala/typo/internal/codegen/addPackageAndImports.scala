@@ -7,7 +7,7 @@ import scala.collection.mutable
 /** imports are automatically written based on the qualified idents found in the code
   */
 object addPackageAndImports {
-  def apply(knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]], file: sc.File): sc.File = {
+  def apply(language: Language, knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]], file: sc.File): sc.File = {
     val newImports = mutable.Map.empty[sc.Ident, sc.Type.Qualified]
 
     val contents = file.contents
@@ -19,7 +19,7 @@ object addPackageAndImports {
           case currentQName =>
             val currentName = currentQName.value.name
             val shortenedQName = sc.Type.Qualified(currentName)
-            knownNamesByPkg.get(file.pkg).flatMap(_.get(currentName)).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
+            knownNamesByPkg.get(file.pkg).flatMap(_.get(currentName)).orElse(language.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
               case Some(alreadyAvailable) =>
                 if (alreadyAvailable == currentQName) shortenedQName else currentQName
               case None =>

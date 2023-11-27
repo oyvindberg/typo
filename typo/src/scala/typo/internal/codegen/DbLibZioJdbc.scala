@@ -818,7 +818,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     )
 
     val jdbcDecoder = {
-      val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
+      val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render(Language.Scala).asString)
       val body =
         code"""|${JdbcDecoder.of(ct.typoType)}(
                |  (rs: ${TypesJava.ResultSet}) => (i: ${TypesScala.Int}) => {
@@ -867,7 +867,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     )
 
     val jdbcDecoder = {
-      val expectedType = sc.StrLit(TypesScala.Array.of(ct.fromTypo.jdbcType).render.asString)
+      val expectedType = sc.StrLit(TypesScala.Array.of(ct.fromTypo.jdbcType).render(Language.Scala).asString)
       val body =
         code"""|${JdbcDecoder.of(TypesScala.Array.of(ct.typoType))}((rs: ${TypesJava.ResultSet}) => (i: ${TypesScala.Int}) =>
                |  rs.getArray(i) match {

@@ -127,12 +127,14 @@ object generate {
             case _ => None
           }
 
+        val language = Language.Scala
+
         val allFiles: Iterator[sc.File] = {
           val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =
             keptMostFiles.groupBy(_.pkg).map { case (pkg, files) =>
               (pkg, files.flatMap(f => (f.name, f.tpe) :: f.secondaryTypes.map(tpe => (tpe.value.name, tpe))).toMap)
             }
-          val withImports = (testInsertsDataFile.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkg, file))
+          val withImports = (testInsertsDataFile.iterator ++ keptMostFiles).map(file => addPackageAndImports(language, knownNamesByPkg, file))
           val all = withImports ++ pkgObject.iterator
           all.map(file => file.copy(contents = options.fileHeader.code ++ file.contents))
         }
@@ -147,7 +149,7 @@ object generate {
       }
 
     val deduplicated = deduplicate(projectsWithFiles)
-    deduplicated.toList.map { p => Generated(p.target, p.value.valuesIterator ++ p.scripts) }
+    deduplicated.toList.map { p => Generated(Language.Scala, p.target, p.value.valuesIterator ++ p.scripts) }
   }
 
   // projects in graph will have duplicated files, this will pull the files up until they are no longer duplicated
