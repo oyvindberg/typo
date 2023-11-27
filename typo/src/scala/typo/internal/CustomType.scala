@@ -31,7 +31,7 @@ object CustomType {
   )
   object Text {
     def string(toTextType: sc.Code => sc.Code): Text =
-      Text(sc.Type.String, toTextType)
+      Text(TypesJava.String, toTextType)
   }
 
   case class ToTypo(

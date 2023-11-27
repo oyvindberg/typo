@@ -146,13 +146,13 @@ case class ComputedTable(
         maybeId.collect {
           // todo: support composite ids
           case unary: IdComputed.Unary =>
-            RepoMethod.SelectAllByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.Array.of(unary.tpe), None), names.RowName)
+            RepoMethod.SelectAllByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), TypesScala.Array.of(unary.tpe), None), names.RowName)
         },
         for {
           name <- names.FieldOrIdValueName
           fieldValueName <- names.FieldValueName
         } yield {
-          val fieldValueOrIdsParam = sc.Param(sc.Ident("fieldValues"), sc.Type.List.of(name.of(sc.Type.Wildcard)), None)
+          val fieldValueOrIdsParam = sc.Param(sc.Ident("fieldValues"), TypesScala.List.of(name.of(sc.Type.Wildcard)), None)
           RepoMethod.SelectByFieldValues(dbTable.name, cols, fieldValueName, fieldValueOrIdsParam, names.RowName)
         },
         for {
@@ -164,7 +164,7 @@ case class ComputedTable(
           id,
           sc.Param(
             sc.Ident("fieldValues"),
-            sc.Type.List.of(fieldValueName.of(sc.Type.Wildcard)),
+            TypesScala.List.of(fieldValueName.of(sc.Type.Wildcard)),
             None
           ),
           fieldValueName,

@@ -97,83 +97,6 @@ object sc {
         Qualified(QIdent(scala.List(value)))
     }
 
-    val JavaBigDecimal = Qualified("java.math.BigDecimal")
-    val JavaCharacter = Qualified("java.lang.Character")
-    val JavaBoolean = Qualified("java.lang.Boolean")
-    val JavaDouble = Qualified("java.lang.Double")
-    val JavaInteger = Qualified("java.lang.Integer")
-    val JavaLong = Qualified("java.lang.Long")
-    val JavaFloat = Qualified("java.lang.Float")
-    val JavaShort = Qualified("java.lang.Short")
-
-    val String = Qualified("java.lang.String")
-    val StringBuilder = Qualified("scala.collection.mutable.StringBuilder")
-    val Connection = Qualified("java.sql.Connection")
-    val PreparedStatement = Qualified("java.sql.PreparedStatement")
-    val ResultSet = sc.Type.Qualified("java.sql.ResultSet")
-    val JavaSqlTime = Qualified("java.sql.Time")
-    val Types = Qualified("java.sql.Types")
-    val Instant = Qualified("java.time.Instant")
-    val LocalDate = Qualified("java.time.LocalDate")
-    val LocalDateTime = Qualified("java.time.LocalDateTime")
-    val LocalTime = Qualified("java.time.LocalTime")
-    val OffsetDateTime = Qualified("java.time.OffsetDateTime")
-    val OffsetTime = Qualified("java.time.OffsetTime")
-    val ZoneOffset = Qualified("java.time.ZoneOffset")
-    val DateTimeParseException = Qualified("java.time.format.DateTimeParseException")
-    val JavaHashMap = Qualified("java.util.HashMap")
-    val JavaMap = Qualified("java.util.Map")
-    val UUID = Qualified("java.util.UUID")
-    val PgArray = Qualified("org.postgresql.jdbc.PgArray")
-    val PGbox = Qualified("org.postgresql.geometric.PGbox")
-    val PGcircle = Qualified("org.postgresql.geometric.PGcircle")
-    val PGline = Qualified("org.postgresql.geometric.PGline")
-    val PGlseg = Qualified("org.postgresql.geometric.PGlseg")
-    val PGpath = Qualified("org.postgresql.geometric.PGpath")
-    val PGpoint = Qualified("org.postgresql.geometric.PGpoint")
-    val PGpolygon = Qualified("org.postgresql.geometric.PGpolygon")
-    val PgSQLXML = Qualified("org.postgresql.jdbc.PgSQLXML")
-    val PGInterval = Qualified("org.postgresql.util.PGInterval")
-    val PGmoney = Qualified("org.postgresql.util.PGmoney")
-    val PGobject = Qualified("org.postgresql.util.PGobject")
-    val Any = Qualified("scala.Any")
-    val AnyRef = Qualified("scala.AnyRef")
-    val AnyVal = Qualified("scala.AnyVal")
-    val Array = Qualified("scala.Array")
-    val Boolean = Qualified("scala.Boolean")
-    val Byte = Qualified("scala.Byte")
-    val Char = Qualified("scala.Char")
-    val Double = Qualified("scala.Double")
-    val Either = Qualified("scala.Either")
-    val Float = Qualified("scala.Float")
-    val Function1 = Qualified("scala.Function1")
-    val Int = Qualified("scala.Int")
-    val Iterator = Qualified("scala.collection.Iterator")
-    val Left = Qualified("scala.Left")
-    val List = Qualified("scala.List")
-    val Long = Qualified("scala.Long")
-    val None = Qualified("scala.None")
-    val Option = Qualified("scala.Option")
-    val Random = Qualified("scala.util.Random")
-    val Right = Qualified("scala.Right")
-    val Short = Qualified("scala.Short")
-    val Some = Qualified("scala.Some")
-    val StringContext = Qualified("scala.StringContext")
-    val Unit = Qualified("scala.Unit")
-    val Map = Qualified("scala.collection.immutable.Map")
-    val ListMap = Qualified("scala.collection.immutable.ListMap")
-    val mutableMap = Qualified("scala.collection.mutable.Map")
-    val BigDecimal = Qualified("scala.math.BigDecimal")
-    val Ordering = Qualified("scala.math.Ordering")
-    val Try = Qualified("scala.util.Try")
-    val DateTimeFormatter = Qualified("java.time.format.DateTimeFormatter")
-    val DateTimeFormatterBuilder = Qualified("java.time.format.DateTimeFormatterBuilder")
-    val ChronoField = Qualified("java.time.temporal.ChronoField")
-    val ChronoUnit = Qualified("java.time.temporal.ChronoUnit")
-    val Numeric = Qualified("scala.math.Numeric")
-    val nowarn = Qualified("scala.annotation.nowarn")
-    val Throwable = sc.Type.Qualified("java.lang.Throwable")
-
     object dsl {
       val Bijection = Qualified("typo.dsl.Bijection")
       val DeleteBuilder = Qualified("typo.dsl.DeleteBuilder")
@@ -198,72 +121,39 @@ object sc {
     // don't generate imports for these
     val BuiltIn: Map[Ident, Type.Qualified] =
       Set(
-        Any,
-        AnyRef,
-        AnyVal,
-        Array,
-        BigDecimal,
-        Boolean,
-        Byte,
-        Double,
-        Either,
-        Float,
-        Function1,
-        Int,
-        Iterator,
-        JavaCharacter,
-        JavaInteger,
-        Left,
-        List,
-        Long,
-        Map,
-        None,
-        Option,
-        Ordering,
-        Right,
-        Short,
-        Some,
-        String,
-        StringBuilder,
-        StringContext,
-        Unit,
-        Throwable
+        TypesScala.Any,
+        TypesScala.AnyRef,
+        TypesScala.AnyVal,
+        TypesScala.Array,
+        TypesScala.BigDecimal,
+        TypesScala.Boolean,
+        TypesScala.Byte,
+        TypesScala.Double,
+        TypesScala.Either,
+        TypesScala.Float,
+        TypesScala.Function1,
+        TypesScala.Int,
+        TypesScala.Iterator,
+        TypesJava.Character,
+        TypesJava.Integer,
+        TypesScala.Left,
+        TypesScala.List,
+        TypesScala.Long,
+        TypesScala.Map,
+        TypesScala.None,
+        TypesScala.Option,
+        TypesScala.Ordering,
+        TypesScala.Right,
+        TypesScala.Short,
+        TypesScala.Some,
+        TypesJava.String,
+        TypesJava.StringBuilder,
+        TypesScala.StringContext,
+        TypesScala.Unit,
+        TypesJava.Throwable
       )
         .map(x => (x.value.name, x))
         .toMap
-
-    /* also in scala 2.12 */
-    val HasOrdering: Set[Type] =
-      Set(BigDecimal, Boolean, Byte, Double, Float, Int, Long, Short, String)
-
-    object Optional {
-      def unapply(tpe: sc.Type): Option[sc.Type] = tpe match {
-        case Wildcard                        => scala.None
-        case TApply(Option, scala.List(one)) => scala.Some(one)
-        case TApply(underlying, _)           => unapply(underlying)
-        case Qualified(_)                    => scala.None
-        case Abstract(_)                     => scala.None
-        case Commented(underlying, _)        => unapply(underlying)
-        case ByName(underlying)              => unapply(underlying)
-        case UserDefined(underlying)         => unapply(underlying)
-      }
-    }
-
-    def boxedType(tpe: sc.Type): Option[Qualified] =
-      tpe match {
-        case Int                      => scala.Some(JavaInteger)
-        case Long                     => scala.Some(JavaLong)
-        case Float                    => scala.Some(Qualified("java.lang.Float"))
-        case Double                   => scala.Some(JavaDouble)
-        case Boolean                  => scala.Some(JavaBoolean)
-        case Short                    => scala.Some(Qualified("java.lang.Short"))
-        case Byte                     => scala.Some(Qualified("java.lang.Byte"))
-        case Char                     => scala.Some(JavaCharacter)
-        case Commented(underlying, _) => boxedType(underlying)
-        case ByName(underlying)       => boxedType(underlying)
-        case UserDefined(underlying)  => boxedType(underlying)
-        case _                        => scala.None
-      }
 
     def containsUserDefined(tpe: sc.Type): Boolean = tpe match {
       case Wildcard                  => false
@@ -359,22 +249,22 @@ object sc {
         def escape(str: String) = s"`$str`"
 
         if (isScalaKeyword(value) || !isValidId(value)) escape(value) else value
-      case QIdent(value) => value.map(renderTree).mkString(".")
-      case Param(name, tpe, Some(default)) => renderTree(name) + ": " + renderTree(tpe) + " = " + default.render
-      case Param(name, tpe, None) => renderTree(name) + ": " + renderTree(tpe)
-      case Params(params) => params.map(renderTree).mkString("(", ", ", ")")
+      case QIdent(value)                      => value.map(renderTree).mkString(".")
+      case Param(name, tpe, Some(default))    => renderTree(name) + ": " + renderTree(tpe) + " = " + default.render
+      case Param(name, tpe, None)             => renderTree(name) + ": " + renderTree(tpe)
+      case Params(params)                     => params.map(renderTree).mkString("(", ", ", ")")
       case StrLit(str) if str.contains(Quote) => TripleQuote + str + TripleQuote
-      case StrLit(str) => Quote + str + Quote
-      case Summon(tpe) => s"implicitly[${renderTree(tpe)}]"
+      case StrLit(str)                        => Quote + str + Quote
+      case Summon(tpe)                        => s"implicitly[${renderTree(tpe)}]"
       case tpe: Type =>
         tpe match {
-          case Type.Abstract(value) => renderTree(value)
-          case Type.Wildcard => "?"
-          case Type.TApply(underlying, targs) => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
-          case Type.Qualified(value) => renderTree(value)
+          case Type.Abstract(value)                => renderTree(value)
+          case Type.Wildcard                       => "?"
+          case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
+          case Type.Qualified(value)               => renderTree(value)
           case Type.Commented(underlying, comment) => s"$comment ${renderTree(underlying)}"
-          case Type.ByName(underlying) => s"=> ${renderTree(underlying)}"
-          case Type.UserDefined(underlying) => s"/* user-picked */ ${renderTree(underlying)}"
+          case Type.ByName(underlying)             => s"=> ${renderTree(underlying)}"
+          case Type.UserDefined(underlying)        => s"/* user-picked */ ${renderTree(underlying)}"
         }
       case StringInterpolate(_, prefix, content) =>
         content.render.lines match {
@@ -421,8 +311,8 @@ object sc {
           val init = s"def $renderedName$renderedTparams"
           val renderedParams =
             params match {
-              case Nil => ""
-              case List(one) => s"(${renderTree(one)})"
+              case Nil            => ""
+              case List(one)      => s"(${renderTree(one)})"
               case List(one, two) => s"(${renderTree(one)}, ${renderTree(two)})"
               case more =>
                 val indent = " " * (init.length + 1)
@@ -553,5 +443,5 @@ object sc {
 
   // `s"..." interpolator
   def s(content: sc.Code) =
-    sc.StringInterpolate(Type.StringContext, sc.Ident("s"), content)
+    sc.StringInterpolate(TypesScala.StringContext, sc.Ident("s"), content)
 }

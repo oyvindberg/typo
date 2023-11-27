@@ -43,7 +43,7 @@ case class ComputedView(
     } yield {
       val fieldValuesParam = sc.Param(
         sc.Ident("fieldValues"),
-        sc.Type.List.of(fieldOrIdValueName.of(sc.Type.Wildcard)),
+        TypesScala.List.of(fieldOrIdValueName.of(sc.Type.Wildcard)),
         None
       )
       RepoMethod.SelectByFieldValues(view.name, cols, fieldValueName, fieldValuesParam, names.RowName)

@@ -66,17 +66,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     if (!inlineImplicits) JdbcDecoder.of(tpe)
     else
       sc.Type.base(tpe) match {
-        case sc.Type.BigDecimal                                => code"$JdbcDecoder.bigDecimalDecoderScala"
-        case sc.Type.Boolean                                   => code"$JdbcDecoder.booleanDecoder"
-        case sc.Type.Byte                                      => code"$JdbcDecoder.byteDecoder"
-        case sc.Type.Double                                    => code"$JdbcDecoder.doubleDecoder"
-        case sc.Type.Float                                     => code"$JdbcDecoder.floatDecoder"
-        case sc.Type.Int                                       => code"$JdbcDecoder.intDecoder"
-        case sc.Type.Long                                      => code"$JdbcDecoder.longDecoder"
-        case sc.Type.String                                    => code"$JdbcDecoder.stringDecoder"
-        case sc.Type.UUID                                      => code"$JdbcDecoder.uuidDecoder"
-        case sc.Type.Optional(targ)                            => code"$JdbcDecoder.optionDecoder(${lookupJdbcDecoder(targ)})"
-        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcDecoder.byteArrayDecoder"
+        case TypesScala.BigDecimal                                   => code"$JdbcDecoder.bigDecimalDecoderScala"
+        case TypesScala.Boolean                                      => code"$JdbcDecoder.booleanDecoder"
+        case TypesScala.Byte                                         => code"$JdbcDecoder.byteDecoder"
+        case TypesScala.Double                                       => code"$JdbcDecoder.doubleDecoder"
+        case TypesScala.Float                                        => code"$JdbcDecoder.floatDecoder"
+        case TypesScala.Int                                          => code"$JdbcDecoder.intDecoder"
+        case TypesScala.Long                                         => code"$JdbcDecoder.longDecoder"
+        case TypesJava.String                                        => code"$JdbcDecoder.stringDecoder"
+        case TypesJava.UUID                                          => code"$JdbcDecoder.uuidDecoder"
+        case TypesScala.Optional(targ)                               => code"$JdbcDecoder.optionDecoder(${lookupJdbcDecoder(targ)})"
+        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) => code"$JdbcDecoder.byteArrayDecoder"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$x.$jdbcDecoderName"
@@ -91,17 +91,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     if (!inlineImplicits) JdbcEncoder.of(tpe)
     else
       sc.Type.base(tpe) match {
-        case sc.Type.BigDecimal                                => code"$JdbcEncoder.bigDecimalEncoderScala"
-        case sc.Type.Boolean                                   => code"$JdbcEncoder.booleanEncoder"
-        case sc.Type.Byte                                      => code"$JdbcEncoder.byteEncoder"
-        case sc.Type.Double                                    => code"$JdbcEncoder.doubleEncoder"
-        case sc.Type.Float                                     => code"$JdbcEncoder.floatEncoder"
-        case sc.Type.Int                                       => code"$JdbcEncoder.intEncoder"
-        case sc.Type.Long                                      => code"$JdbcEncoder.longEncoder"
-        case sc.Type.String                                    => code"$JdbcEncoder.stringEncoder"
-        case sc.Type.UUID                                      => code"$JdbcEncoder.uuidEncoder"
-        case sc.Type.Optional(targ)                            => code"$JdbcEncoder.optionEncoder(${lookupJdbcEncoder(targ)})"
-        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$JdbcEncoder.byteArrayEncoder"
+        case TypesScala.BigDecimal                                   => code"$JdbcEncoder.bigDecimalEncoderScala"
+        case TypesScala.Boolean                                      => code"$JdbcEncoder.booleanEncoder"
+        case TypesScala.Byte                                         => code"$JdbcEncoder.byteEncoder"
+        case TypesScala.Double                                       => code"$JdbcEncoder.doubleEncoder"
+        case TypesScala.Float                                        => code"$JdbcEncoder.floatEncoder"
+        case TypesScala.Int                                          => code"$JdbcEncoder.intEncoder"
+        case TypesScala.Long                                         => code"$JdbcEncoder.longEncoder"
+        case TypesJava.String                                        => code"$JdbcEncoder.stringEncoder"
+        case TypesJava.UUID                                          => code"$JdbcEncoder.uuidEncoder"
+        case TypesScala.Optional(targ)                               => code"$JdbcEncoder.optionEncoder(${lookupJdbcEncoder(targ)})"
+        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) => code"$JdbcEncoder.byteArrayEncoder"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$x.$jdbcEncoderName"
@@ -116,21 +116,21 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     if (!inlineImplicits) Setter.of(tpe)
     else
       sc.Type.base(tpe) match {
-        case sc.Type.BigDecimal                                => code"$Setter.bigDecimalScalaSetter"
-        case sc.Type.Boolean                                   => code"$Setter.booleanSetter"
-        case sc.Type.Byte                                      => code"$Setter.byteSetter"
-        case sc.Type.Double                                    => code"$Setter.doubleSetter"
-        case sc.Type.Float                                     => code"$Setter.floatSetter"
-        case sc.Type.Int                                       => code"$Setter.intSetter"
-        case sc.Type.Long                                      => code"$Setter.longSetter"
-        case sc.Type.String                                    => code"$Setter.stringSetter"
-        case sc.Type.UUID                                      => code"$Setter.uuidParamSetter"
-        case sc.Type.Optional(targ)                            => code"$Setter.optionParamSetter(${lookupSetter(targ)})"
-        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$Setter.byteArraySetter"
+        case TypesScala.BigDecimal                                   => code"$Setter.bigDecimalScalaSetter"
+        case TypesScala.Boolean                                      => code"$Setter.booleanSetter"
+        case TypesScala.Byte                                         => code"$Setter.byteSetter"
+        case TypesScala.Double                                       => code"$Setter.doubleSetter"
+        case TypesScala.Float                                        => code"$Setter.floatSetter"
+        case TypesScala.Int                                          => code"$Setter.intSetter"
+        case TypesScala.Long                                         => code"$Setter.longSetter"
+        case TypesJava.String                                        => code"$Setter.stringSetter"
+        case TypesJava.UUID                                          => code"$Setter.uuidParamSetter"
+        case TypesScala.Optional(targ)                               => code"$Setter.optionParamSetter(${lookupSetter(targ)})"
+        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) => code"$Setter.byteArraySetter"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$setterName"
-        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+        case sc.Type.TApply(TypesScala.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
           code"$targ.$arraySetterName"
         case x if missingInstancesByType.contains(Setter.of(x)) =>
           code"${missingInstancesByType(Setter.of(x))}"
@@ -143,26 +143,26 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     if (!inlineImplicits) sc.Summon(ParameterMetaData.of(tpe)).code
     else
       sc.Type.base(tpe) match {
-        case sc.Type.BigDecimal => code"$ParameterMetaData.BigDecimalParameterMetaData"
-        case sc.Type.Boolean    => code"$ParameterMetaData.BooleanParameterMetaData"
-        case sc.Type.Byte       => code"$ParameterMetaData.ByteParameterMetaData"
-        case sc.Type.Double     => code"$ParameterMetaData.DoubleParameterMetaData"
-        case sc.Type.Float      => code"$ParameterMetaData.FloatParameterMetaData"
-        case sc.Type.Int        => code"$ParameterMetaData.IntParameterMetaData"
-        case sc.Type.Long       => code"$ParameterMetaData.LongParameterMetaData"
-        case sc.Type.String     => code"$ParameterMetaData.StringParameterMetaData"
-        case sc.Type.UUID       => code"$ParameterMetaData.UUIDParameterMetaData"
-        //        case sc.Type.Optional(targ) => lookupParameterMetaDataFor(targ)
+        case TypesScala.BigDecimal => code"$ParameterMetaData.BigDecimalParameterMetaData"
+        case TypesScala.Boolean    => code"$ParameterMetaData.BooleanParameterMetaData"
+        case TypesScala.Byte       => code"$ParameterMetaData.ByteParameterMetaData"
+        case TypesScala.Double     => code"$ParameterMetaData.DoubleParameterMetaData"
+        case TypesScala.Float      => code"$ParameterMetaData.FloatParameterMetaData"
+        case TypesScala.Int        => code"$ParameterMetaData.IntParameterMetaData"
+        case TypesScala.Long       => code"$ParameterMetaData.LongParameterMetaData"
+        case TypesJava.String      => code"$ParameterMetaData.StringParameterMetaData"
+        case TypesJava.UUID        => code"$ParameterMetaData.UUIDParameterMetaData"
+        //        case ScalaTypes.Optional(targ) => lookupParameterMetaDataFor(targ)
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$parameterMetadataName"
         // customized type mapping
         case x if missingInstancesByType.contains(ParameterMetaData.of(x)) =>
           code"${missingInstancesByType(ParameterMetaData.of(x))}"
-        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$ParameterMetaData.ByteArrayParameterMetaData"
+        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) => code"$ParameterMetaData.ByteArrayParameterMetaData"
         // fallback array case.
-        case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$ParameterMetaData.arrayParameterMetaData(${lookupParameterMetaDataFor(targ)})"
-        case other                                     => sc.Summon(ParameterMetaData.of(other)).code
+        case sc.Type.TApply(TypesScala.Array, List(targ)) => code"$ParameterMetaData.arrayParameterMetaData(${lookupParameterMetaDataFor(targ)})"
+        case other                                        => sc.Summon(ParameterMetaData.of(other)).code
       }
 
   private def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code = {
@@ -185,48 +185,48 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     case RepoMethod.SelectAll(_, _, rowType) =>
       code"def selectAll: ${ZStream.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.SelectById(_, _, id, rowType) =>
-      code"def selectById(${id.param}): ${ZIO.of(ZConnection, Throwable, sc.Type.Option.of(rowType))}"
+      code"def selectById(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
     case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
       unaryId match {
         case IdComputed.UnaryUserSpecified(_, tpe) =>
-          code"def selectByIds($idsParam)(implicit encoder: ${JdbcEncoder.of(sc.Type.Array.of(tpe))}): ${ZStream.of(ZConnection, Throwable, rowType)}"
+          code"def selectByIds($idsParam)(implicit encoder: ${JdbcEncoder.of(TypesScala.Array.of(tpe))}): ${ZStream.of(ZConnection, Throwable, rowType)}"
         case _ =>
           code"def selectByIds($idsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
       }
     case RepoMethod.SelectByUnique(_, params, rowType) =>
-      code"def selectByUnique(${params.map(_.param.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, sc.Type.Option.of(rowType))}"
+      code"def selectByUnique(${params.map(_.param.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
       code"def update: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}"
     case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
-      code"def updateFieldValues(${id.param}, $varargs): ${ZIO.of(ZConnection, Throwable, sc.Type.Boolean)}"
+      code"def updateFieldValues(${id.param}, $varargs): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
     case RepoMethod.Update(_, _, _, param, _) =>
-      code"def update($param): ${ZIO.of(ZConnection, Throwable, sc.Type.Boolean)}"
+      code"def update($param): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
     case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
       code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
       code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.InsertStreaming(_, _, rowType) =>
-      val in = ZStream.of(ZConnection, sc.Type.Throwable, rowType)
-      val out = ZIO.of(ZConnection, sc.Type.Throwable, sc.Type.Long)
+      val in = ZStream.of(ZConnection, TypesJava.Throwable, rowType)
+      val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
       code"def insertStreaming(unsaved: $in, batchSize: Int): $out"
     case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
       code"def upsert($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
     case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
-      val in = ZStream.of(ZConnection, sc.Type.Throwable, unsaved.tpe)
-      val out = ZIO.of(ZConnection, sc.Type.Throwable, sc.Type.Long)
+      val in = ZStream.of(ZConnection, TypesJava.Throwable, unsaved.tpe)
+      val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
       code"def insertUnsavedStreaming(unsaved: $in, batchSize: Int): $out"
     case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
       code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
     case RepoMethod.Delete(_, id) =>
-      code"def delete(${id.param}): ${ZIO.of(ZConnection, Throwable, sc.Type.Boolean)}"
+      code"def delete(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
     case RepoMethod.SqlFile(sqlScript) =>
       val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
 
       val retType = sqlScript.maybeRowName match {
         case MaybeReturnsRows.Query(rowName) => ZStream.of(ZConnection, Throwable, rowName)
-        case MaybeReturnsRows.Update         => ZIO.of(ZConnection, Throwable, sc.Type.Long)
+        case MaybeReturnsRows.Update         => ZIO.of(ZConnection, Throwable, TypesScala.Long)
       }
 
       code"def apply$params: $retType"
@@ -471,27 +471,27 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
 
         code"""|$ZIO.succeed {
                |  map.get(${id.paramName}) match {
-               |    case ${sc.Type.Some}(oldRow) =>
+               |    case ${TypesScala.Some}(oldRow) =>
                |      val updatedRow = ${varargs.name}.foldLeft(oldRow) {
                |        ${cases.mkCode("\n")}
                |      }
                |      if (updatedRow != oldRow) {
-               |        map.put(${id.paramName}, updatedRow): @${sc.Type.nowarn}
+               |        map.put(${id.paramName}, updatedRow): @${TypesScala.nowarn}
                |        true
                |      } else {
                |        false
                |      }
-               |    case ${sc.Type.None} => false
+               |    case ${TypesScala.None} => false
                |  }
                |}""".stripMargin
       case RepoMethod.Update(_, _, _, param, _) =>
         code"""$ZIO.succeed {
               |  map.get(${param.name}.${id.paramName}) match {
-              |    case ${sc.Type.Some}(`${param.name}`) => false
-              |    case ${sc.Type.Some}(_) =>
-              |      map.put(${param.name}.${id.paramName}, ${param.name}): @${sc.Type.nowarn}
+              |    case ${TypesScala.Some}(`${param.name}`) => false
+              |    case ${TypesScala.Some}(_) =>
+              |      map.put(${param.name}.${id.paramName}, ${param.name}): @${TypesScala.nowarn}
               |      true
-              |    case ${sc.Type.None} => false
+              |    case ${TypesScala.None} => false
               |  }
               |}""".stripMargin
       case RepoMethod.Insert(_, _, unsavedParam, _) =>
@@ -506,7 +506,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |}"""
       case RepoMethod.Upsert(_, _, _, unsavedParam, _) =>
         code"""|$ZIO.succeed {
-               |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${sc.Type.nowarn}
+               |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${TypesScala.nowarn}
                |  $UpdateResult(1, $Chunk.single(${unsavedParam.name}))
                |}""".stripMargin
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
@@ -554,21 +554,21 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       tparams = Nil,
       name = arraySetterName,
       implicitParams = Nil,
-      tpe = Setter.of(sc.Type.Array.of(wrapperType)),
-      body = code"""${lookupSetter(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
+      tpe = Setter.of(TypesScala.Array.of(wrapperType)),
+      body = code"""${lookupSetter(TypesScala.Array.of(underlying))}.contramap(_.map(_.value))"""
     )
     val arrayJdbcDecoder = sc.Given(
       tparams = Nil,
       name = arrayJdbcDecoderName,
       implicitParams = Nil,
-      tpe = JdbcDecoder.of(sc.Type.Array.of(wrapperType)),
-      body = code"""${lookupJdbcDecoder(sc.Type.Array.of(underlying))}.map(a => if (a == null) null else a.map(force))"""
+      tpe = JdbcDecoder.of(TypesScala.Array.of(wrapperType)),
+      body = code"""${lookupJdbcDecoder(TypesScala.Array.of(underlying))}.map(a => if (a == null) null else a.map(force))"""
     )
     val arrayJdbcEncoder = sc.Given(
       tparams = Nil,
       name = arrayJdbcEncoderName,
       implicitParams = Nil,
-      tpe = JdbcEncoder.of(sc.Type.Array.of(wrapperType)),
+      tpe = JdbcEncoder.of(TypesScala.Array.of(wrapperType)),
       // JdbcEncoder for unary types defined in terms of `Setter`
       body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
     )
@@ -583,8 +583,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       val body =
         code"""|${lookupJdbcDecoder(underlying)}.flatMap { s =>
                |  new ${JdbcDecoder.of(wrapperType)} {
-               |    override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $wrapperType) = {
-               |      def error(msg: ${sc.Type.String}): $JdbcDecoderError =
+               |    override def unsafeDecode(columIndex: ${TypesScala.Int}, rs: ${TypesJava.ResultSet}): (${TypesScala.Int}, $wrapperType) = {
+               |      def error(msg: ${TypesJava.String}): $JdbcDecoderError =
                |        $JdbcDecoderError(
                |          message = s"Error decoding $wrapperType from ResultSet",
                |          cause = new RuntimeException(msg),
@@ -661,8 +661,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           tparams = Nil,
           name = arraySetterName,
           implicitParams = Nil,
-          tpe = Setter.of(sc.Type.Array.of(wrapperType)),
-          body = code"""${lookupSetter(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
+          tpe = Setter.of(TypesScala.Array.of(wrapperType)),
+          body = code"""${lookupSetter(TypesScala.Array.of(underlying))}.contramap(_.map(_.value))"""
         )
       ),
       ifDsl(
@@ -685,8 +685,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       */
     def primitiveArrayDecoder(T: sc.Type.Qualified) = {
       val body =
-        code"""|new ${JdbcDecoder.of(sc.Type.Array.of(T))} {
-               |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, ${sc.Type.Array.of(T)}) = {
+        code"""|new ${JdbcDecoder.of(TypesScala.Array.of(T))} {
+               |  override def unsafeDecode(columIndex: ${TypesScala.Int}, rs: ${TypesJava.ResultSet}): (${TypesScala.Int}, ${TypesScala.Array.of(T)}) = {
                |    val arr = rs.getArray(columIndex)
                |    if (arr eq null) columIndex -> null
                |    else {
@@ -699,7 +699,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |            case (b, x: java.lang.Number) => b += x.asInstanceOf[${T.value}]
                |            case (_, x) =>
                |              throw $JdbcDecoderError(
-               |                message = s"Error decoding ${sc.Type.Array}(${T.value}) from ResultSet",
+               |                message = s"Error decoding ${TypesScala.Array}(${T.value}) from ResultSet",
                |                cause = new IllegalStateException(
                |                  s"Retrieved $${x.getClass.getCanonicalName} type from JDBC array, but expected (${T.value}). Re-check your decoder implementation"
                |                ),
@@ -711,19 +711,19 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |    }
                |  }
                |}""".stripMargin
-      sc.Given(tparams = Nil, name = sc.Ident(s"${T.name.value}ArrayDecoder"), implicitParams = Nil, tpe = JdbcDecoder.of(sc.Type.Array.of(T)), body = body)
+      sc.Given(tparams = Nil, name = sc.Ident(s"${T.name.value}ArrayDecoder"), implicitParams = Nil, tpe = JdbcDecoder.of(TypesScala.Array.of(T)), body = body)
     }
 
     def primitiveArraySetter(T: sc.Type.Qualified, sqlType: sc.StrLit, asAnyRef: sc.Code => sc.Code) = {
       val v = sc.Ident("v")
       val body =
-        code"""|$Setter.forSqlType[${sc.Type.Array.of(T)}](
+        code"""|$Setter.forSqlType[${TypesScala.Array.of(T)}](
                |  (ps, i, $v) => {
                |    ps.setArray(i, ps.getConnection.createArrayOf($sqlType, ${asAnyRef(v)}))
                |  },
-               |  ${sc.Type.Types}.ARRAY
+               |  ${TypesJava.SqlTypes}.ARRAY
                |)""".stripMargin
-      sc.Given(tparams = Nil, name = sc.Ident(s"${T.name.value}ArraySetter"), implicitParams = Nil, tpe = Setter.of(sc.Type.Array.of(T)), body = body)
+      sc.Given(tparams = Nil, name = sc.Ident(s"${T.name.value}ArraySetter"), implicitParams = Nil, tpe = Setter.of(TypesScala.Array.of(T)), body = body)
     }
 
     def primitiveArrayEncoder(T: sc.Type.Qualified) = {
@@ -731,7 +731,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         tparams = Nil,
         name = sc.Ident(s"${T.name.value}ArrayEncoder"),
         implicitParams = Nil,
-        tpe = JdbcEncoder.of(sc.Type.Array.of(T)),
+        tpe = JdbcEncoder.of(TypesScala.Array.of(T)),
         body = code"""$JdbcEncoder.singleParamEncoder(${T.name.value}ArraySetter)"""
       )
     }
@@ -742,21 +742,21 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           tparams = Nil,
           name = sc.Ident("ScalaBigDecimalArrayEncoder"),
           implicitParams = Nil,
-          tpe = JdbcEncoder.of(sc.Type.Array.of(sc.Type.BigDecimal)),
+          tpe = JdbcEncoder.of(TypesScala.Array.of(TypesScala.BigDecimal)),
           body = code"""BigDecimalArrayEncoder.contramap(_.map(_.bigDecimal))"""
         ),
         sc.Given(
           tparams = Nil,
           name = sc.Ident("ScalaBigDecimalArrayDecoder"),
           implicitParams = Nil,
-          tpe = JdbcDecoder.of(sc.Type.Array.of(sc.Type.BigDecimal)),
-          body = code"""BigDecimalArrayDecoder.map(v => if (v eq null) null else v.map(${sc.Type.BigDecimal}.apply))"""
+          tpe = JdbcDecoder.of(TypesScala.Array.of(TypesScala.BigDecimal)),
+          body = code"""BigDecimalArrayDecoder.map(v => if (v eq null) null else v.map(${TypesScala.BigDecimal}.apply))"""
         ),
         sc.Given(
           tparams = Nil,
           name = sc.Ident("ScalaBigDecimalArraySetter"),
           implicitParams = Nil,
-          tpe = Setter.of(sc.Type.Array.of(sc.Type.BigDecimal)),
+          tpe = Setter.of(TypesScala.Array.of(TypesScala.BigDecimal)),
           body = code"""BigDecimalArraySetter.contramap(_.map(_.bigDecimal))"""
         )
       )
@@ -765,14 +765,14 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       List(primitiveArrayDecoder(T), primitiveArraySetter(T, sc.StrLit(sqlType), asAnyRef), primitiveArrayEncoder(T))
     }
 
-    all(sc.Type.String, "varchar", array => code"$array.map(x => x: ${sc.Type.AnyRef})") ++
-      all(sc.Type.Int, "int4", array => code"$array.map(x => int2Integer(x): ${sc.Type.AnyRef})") ++
-      all(sc.Type.Long, "int8", array => code"$array.map(x => long2Long(x): ${sc.Type.AnyRef})") ++
-      all(sc.Type.Float, "float4", array => code"$array.map(x => float2Float(x): ${sc.Type.AnyRef})") ++
-      all(sc.Type.Double, "float8", array => code"$array.map(x => double2Double(x): ${sc.Type.AnyRef})") ++
-      all(sc.Type.JavaBigDecimal, "numeric", array => code"$array.map(x => x: ${sc.Type.AnyRef})") ++
+    all(TypesJava.String, "varchar", array => code"$array.map(x => x: ${TypesScala.AnyRef})") ++
+      all(TypesScala.Int, "int4", array => code"$array.map(x => int2Integer(x): ${TypesScala.AnyRef})") ++
+      all(TypesScala.Long, "int8", array => code"$array.map(x => long2Long(x): ${TypesScala.AnyRef})") ++
+      all(TypesScala.Float, "float4", array => code"$array.map(x => float2Float(x): ${TypesScala.AnyRef})") ++
+      all(TypesScala.Double, "float8", array => code"$array.map(x => double2Double(x): ${TypesScala.AnyRef})") ++
+      all(TypesJava.BigDecimal, "numeric", array => code"$array.map(x => x: ${TypesScala.AnyRef})") ++
       ScalaBigDecimal ++
-      all(sc.Type.Boolean, "bool", array => code"$array.map(x => boolean2Boolean(x): ${sc.Type.AnyRef})")
+      all(TypesScala.Boolean, "bool", array => code"$array.map(x => boolean2Boolean(x): ${TypesScala.AnyRef})")
   }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn], rowType: DbLib.RowType): List[sc.ClassMember] = {
@@ -787,7 +787,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           }
 
           code"""|new ${JdbcDecoder.of(tpe)} {
-                 |  override def unsafeDecode(columIndex: ${sc.Type.Int}, rs: ${sc.Type.ResultSet}): (${sc.Type.Int}, $tpe) =
+                 |  override def unsafeDecode(columIndex: ${TypesScala.Int}, rs: ${TypesJava.ResultSet}): (${TypesScala.Int}, $tpe) =
                  |    columIndex + ${cols.length - 1} ->
                  |      $tpe(
                  |        ${namedParams.mkCode(",\n")}
@@ -821,7 +821,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       val expectedType = sc.StrLit(ct.fromTypo.jdbcType.render.asString)
       val body =
         code"""|${JdbcDecoder.of(ct.typoType)}(
-               |  (rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) => {
+               |  (rs: ${TypesJava.ResultSet}) => (i: ${TypesScala.Int}) => {
                |    val v = rs.getObject(i)
                |    if (v eq null) null else ${ct.toTypo0(code"v.asInstanceOf[${ct.toTypo.jdbcType}]")}
                |  },
@@ -846,7 +846,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     }
 
     val parameterMetadata = {
-      val body = code"$ParameterMetaData.instance[${ct.typoType}](${sc.StrLit(ct.sqlType)}, ${sc.Type.Types}.OTHER)"
+      val body = code"$ParameterMetaData.instance[${ct.typoType}](${sc.StrLit(ct.sqlType)}, ${TypesJava.SqlTypes}.OTHER)"
       sc.Given(Nil, parameterMetadataName, Nil, ParameterMetaData.of(ct.typoType), body)
     }
     val text = textSupport.map(_.customTypeInstance(ct))
@@ -861,22 +861,22 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       tparams = Nil,
       name = arrayJdbcEncoderName,
       implicitParams = Nil,
-      tpe = JdbcEncoder.of(sc.Type.Array.of(ct.typoType)),
+      tpe = JdbcEncoder.of(TypesScala.Array.of(ct.typoType)),
       // JdbcEncoder for unary types defined in terms of `Setter`
       body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
     )
 
     val jdbcDecoder = {
-      val expectedType = sc.StrLit(sc.Type.Array.of(ct.fromTypo.jdbcType).render.asString)
+      val expectedType = sc.StrLit(TypesScala.Array.of(ct.fromTypo.jdbcType).render.asString)
       val body =
-        code"""|${JdbcDecoder.of(sc.Type.Array.of(ct.typoType))}((rs: ${sc.Type.ResultSet}) => (i: ${sc.Type.Int}) =>
+        code"""|${JdbcDecoder.of(TypesScala.Array.of(ct.typoType))}((rs: ${TypesJava.ResultSet}) => (i: ${TypesScala.Int}) =>
                |  rs.getArray(i) match {
                |    case null => null
                |    case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => ${toTypo.toTypo(code"x.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)})
                |  },
                |  $expectedType
                |)""".stripMargin
-      sc.Given(tparams = Nil, name = arrayJdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(sc.Type.Array.of(ct.typoType)), body = body)
+      sc.Given(tparams = Nil, name = arrayJdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(TypesScala.Array.of(ct.typoType)), body = body)
     }
 
     val setter = {
@@ -893,10 +893,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |      }
                |    )
                |  ),
-               |  ${sc.Type.Types}.ARRAY
+               |  ${TypesJava.SqlTypes}.ARRAY
                |)""".stripMargin
 
-      sc.Given(tparams = Nil, name = arraySetterName, implicitParams = Nil, tpe = Setter.of(sc.Type.Array.of(ct.typoType)), body = body)
+      sc.Given(tparams = Nil, name = arraySetterName, implicitParams = Nil, tpe = Setter.of(TypesScala.Array.of(ct.typoType)), body = body)
     }
 
     List(jdbcEncoder, jdbcDecoder, setter)

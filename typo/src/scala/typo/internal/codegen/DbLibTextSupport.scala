@@ -17,19 +17,19 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
     if (!inlineImplicits) Text.of(tpe).code
     else
       sc.Type.base(tpe) match {
-        case sc.Type.BigDecimal                                            => code"$Text.bigDecimalInstance"
-        case sc.Type.Boolean                                               => code"$Text.booleanInstance"
-        case sc.Type.Double                                                => code"$Text.doubleInstance"
-        case sc.Type.Float                                                 => code"$Text.floatInstance"
-        case sc.Type.Int                                                   => code"$Text.intInstance"
-        case sc.Type.Long                                                  => code"$Text.longInstance"
-        case sc.Type.String                                                => code"$Text.stringInstance"
-        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte))             => code"$Text.byteArrayInstance"
-        case sc.Type.Optional(targ)                                        => code"$Text.option(${lookupTextFor(targ)})"
+        case TypesScala.BigDecimal                                         => code"$Text.bigDecimalInstance"
+        case TypesScala.Boolean                                            => code"$Text.booleanInstance"
+        case TypesScala.Double                                             => code"$Text.doubleInstance"
+        case TypesScala.Float                                              => code"$Text.floatInstance"
+        case TypesScala.Int                                                => code"$Text.intInstance"
+        case TypesScala.Long                                               => code"$Text.longInstance"
+        case TypesJava.String                                              => code"$Text.stringInstance"
+        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte))       => code"$Text.byteArrayInstance"
+        case TypesScala.Optional(targ)                                     => code"$Text.option(${lookupTextFor(targ)})"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$textName(${lookupTextFor(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$textName"
-        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
-          code"$Text.iterableInstance[${sc.Type.Array}, $targ](${lookupTextFor(targ)}, implicitly)"
+        case sc.Type.TApply(TypesScala.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+          code"$Text.iterableInstance[${TypesScala.Array}, $targ](${lookupTextFor(targ)}, implicitly)"
         case other => code"${Text.of(other)}"
       }
 
@@ -60,8 +60,8 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
         val underlyingText = lookupTextFor(underlying)
         val v = sc.Ident("v")
         code"""|new ${Text.of(wrapperType)} {
-               |  override def unsafeEncode($v: $wrapperType, sb: ${sc.Type.StringBuilder}) = $underlyingText.unsafeEncode($v.value, sb)
-               |  override def unsafeArrayEncode($v: $wrapperType, sb: ${sc.Type.StringBuilder}) = $underlyingText.unsafeArrayEncode($v.value, sb)
+               |  override def unsafeEncode($v: $wrapperType, sb: ${TypesJava.StringBuilder}) = $underlyingText.unsafeEncode($v.value, sb)
+               |  override def unsafeArrayEncode($v: $wrapperType, sb: ${TypesJava.StringBuilder}) = $underlyingText.unsafeArrayEncode($v.value, sb)
                |}""".stripMargin
       }
     )
@@ -87,8 +87,8 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
         val underlying = lookupTextFor(ct.toText.textType)
         val v = sc.Ident("v")
         code"""|new ${Text.of(ct.typoType)} {
-               |  override def unsafeEncode($v: ${ct.typoType}, sb: ${sc.Type.StringBuilder}) = $underlying.unsafeEncode(${ct.toText.toTextType(v)}, sb)
-               |  override def unsafeArrayEncode($v: ${ct.typoType}, sb: ${sc.Type.StringBuilder}) = $underlying.unsafeArrayEncode(${ct.toText.toTextType(v)}, sb)
+               |  override def unsafeEncode($v: ${ct.typoType}, sb: ${TypesJava.StringBuilder}) = $underlying.unsafeEncode(${ct.toText.toTextType(v)}, sb)
+               |  override def unsafeArrayEncode($v: ${ct.typoType}, sb: ${TypesJava.StringBuilder}) = $underlying.unsafeArrayEncode(${ct.toText.toTextType(v)}, sb)
                |}""".stripMargin
       }
     )

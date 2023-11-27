@@ -17,7 +17,7 @@ case class TypeMapperScala(
 
     val baseTpe = col.tpe match {
       case db.Type.Array(tpe) =>
-        sc.Type.Array.of(go(tpe))
+        TypesScala.Array.of(go(tpe))
       case other =>
         go(other)
     }
@@ -31,7 +31,7 @@ case class TypeMapperScala(
 
     val base = dbType match {
       case db.Type.Array(tpe) =>
-        sc.Type.Array.of(go(tpe))
+        TypesScala.Array.of(go(tpe))
       case other =>
         go(other)
     }
@@ -44,7 +44,7 @@ case class TypeMapperScala(
   def domain(dbType: db.Type): sc.Type =
     dbType match {
       case db.Type.Array(tpe) =>
-        sc.Type.Array.of(baseType(tpe))
+        TypesScala.Array.of(baseType(tpe))
       case other =>
         baseType(other)
     }
@@ -52,34 +52,34 @@ case class TypeMapperScala(
   private def baseType(tpe: db.Type): sc.Type = {
     tpe match {
       case db.Type.Array(_) => sys.error("no idea what to do with nested array types")
-      case db.Type.Boolean  => sc.Type.Boolean
+      case db.Type.Boolean  => TypesScala.Boolean
       case db.Type.Bytea    => customTypes.TypoBytea.typoType
       case db.Type.Bpchar(maybeN) =>
         maybeN match {
-          case Some(n) if n != 2147483647 => sc.Type.String.withComment(s"bpchar, max $n chars")
-          case _                          => sc.Type.String.withComment(s"bpchar")
+          case Some(n) if n != 2147483647 => TypesJava.String.withComment(s"bpchar, max $n chars")
+          case _                          => TypesJava.String.withComment(s"bpchar")
         }
-      case db.Type.Char            => sc.Type.String
+      case db.Type.Char            => TypesJava.String
       case db.Type.Date            => customTypes.TypoLocalDate.typoType
       case db.Type.DomainRef(name) => sc.Type.Qualified(naming.domainName(name))
-      case db.Type.Float4          => sc.Type.Float
-      case db.Type.Float8          => sc.Type.Double
+      case db.Type.Float4          => TypesScala.Float
+      case db.Type.Float8          => TypesScala.Double
       case db.Type.Hstore          => customTypes.TypoHStore.typoType
       case db.Type.Inet            => customTypes.TypoInet.typoType
       case db.Type.Int2            => customTypes.TypoShort.typoType
-      case db.Type.Int4            => sc.Type.Int
-      case db.Type.Int8            => sc.Type.Long
+      case db.Type.Int4            => TypesScala.Int
+      case db.Type.Int8            => TypesScala.Long
       case db.Type.Json            => customTypes.TypoJson.typoType
       case db.Type.Jsonb           => customTypes.TypoJsonb.typoType
-      case db.Type.Name            => sc.Type.String
-      case db.Type.Numeric         => sc.Type.BigDecimal
-      case db.Type.Oid             => sc.Type.Long.withComment("oid")
+      case db.Type.Name            => TypesJava.String
+      case db.Type.Numeric         => TypesScala.BigDecimal
+      case db.Type.Oid             => TypesScala.Long.withComment("oid")
       case db.Type.PGInterval      => customTypes.TypoInterval.typoType
       case db.Type.PGbox           => customTypes.TypoBox.typoType
       case db.Type.PGcircle        => customTypes.TypoCircle.typoType
       case db.Type.PGline          => customTypes.TypoLine.typoType
       case db.Type.PGlseg          => customTypes.TypoLineSegment.typoType
-      case db.Type.PGlsn           => sc.Type.Long.withComment("pg_lsn")
+      case db.Type.PGlsn           => TypesScala.Long.withComment("pg_lsn")
       case db.Type.PGmoney         => customTypes.TypoMoney.typoType
       case db.Type.PGpath          => customTypes.TypoPath.typoType
       case db.Type.PGpoint         => customTypes.TypoPoint.typoType
@@ -102,7 +102,7 @@ case class TypeMapperScala(
       case db.Type.regtype         => customTypes.TypoRegtype.typoType
       case db.Type.xid             => customTypes.TypoXid.typoType
       case db.Type.EnumRef(name)   => sc.Type.Qualified(naming.enumName(name))
-      case db.Type.Text            => sc.Type.String
+      case db.Type.Text            => TypesJava.String
       case db.Type.Time            => customTypes.TypoLocalTime.typoType
       case db.Type.TimeTz          => customTypes.TypoOffsetTime.typoType
       case db.Type.Timestamp       => customTypes.TypoLocalDateTime.typoType
@@ -111,8 +111,8 @@ case class TypeMapperScala(
       case db.Type.Xml             => customTypes.TypoXml.typoType
       case db.Type.VarChar(maybeN) =>
         maybeN match {
-          case Some(n) if n != 2147483647 => sc.Type.String.withComment(s"max $n chars")
-          case _                          => sc.Type.String
+          case Some(n) if n != 2147483647 => TypesJava.String.withComment(s"max $n chars")
+          case _                          => TypesJava.String
         }
       case db.Type.Vector           => customTypes.TypoVector.typoType
       case db.Type.Unknown(sqlType) => customTypes.TypoUnknown(sqlType).typoType
@@ -122,13 +122,13 @@ case class TypeMapperScala(
   def withNullability(tpe: sc.Type, nullability: Nullability): sc.Type =
     nullability match {
       case Nullability.NoNulls         => tpe
-      case Nullability.Nullable        => sc.Type.Option.of(tpe)
-      case Nullability.NullableUnknown => sc.Type.Option.of(tpe).withComment("nullability unknown")
+      case Nullability.Nullable        => TypesScala.Option.of(tpe)
+      case Nullability.NullableUnknown => TypesScala.Option.of(tpe).withComment("nullability unknown")
     }
 
   def stripOptionAndArray(tpe: sc.Type): sc.Type =
     tpe match {
-      case sc.Type.TApply(sc.Type.Option | sc.Type.Array, List(tpe)) =>
+      case sc.Type.TApply(TypesScala.Option | TypesScala.Array, List(tpe)) =>
         stripOptionAndArray(tpe)
       case sc.Type.TApply(other, targs) =>
         sc.Type.TApply(stripOptionAndArray(other), targs.map(stripOptionAndArray))

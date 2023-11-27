@@ -88,8 +88,8 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
               if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
               else
                 col.tpe match {
-                  case sc.Type.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
-                  case _                            => (sc.Type.dsl.Field, col.tpe)
+                  case TypesScala.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
+                  case _                               => (sc.Type.dsl.Field, col.tpe)
                 }
             code"val ${col.name}: ${cls.of(tpe, Row)}"
           }
@@ -121,26 +121,26 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
               if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
               else
                 col.tpe match {
-                  case sc.Type.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
-                  case _                            => (sc.Type.dsl.Field, col.tpe)
+                  case TypesScala.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
+                  case _                               => (sc.Type.dsl.Field, col.tpe)
                 }
 
             val readSqlCast = SqlCast.fromPg(col.dbCol) match {
-              case Some(sqlCast) => code"${sc.Type.Some}(${sc.StrLit(sqlCast.typeName)})"
-              case None          => sc.Type.None.code
+              case Some(sqlCast) => code"${TypesScala.Some}(${sc.StrLit(sqlCast.typeName)})"
+              case None          => TypesScala.None.code
             }
             val writeSqlCast = SqlCast.toPg(col.dbCol) match {
-              case Some(sqlCast) => code"${sc.Type.Some}(${sc.StrLit(sqlCast.typeName)})"
-              case None          => sc.Type.None.code
+              case Some(sqlCast) => code"${TypesScala.Some}(${sc.StrLit(sqlCast.typeName)})"
+              case None          => TypesScala.None.code
             }
             code"override val ${col.name} = new ${cls.of(tpe, Row)}(prefix, ${sc
                 .StrLit(col.dbName.value)}, $readSqlCast, $writeSqlCast)(x => extract(x).${col.name}, (row, value) => merge(row, extract(row).copy(${col.name} = value)))"
           }
           .mkCode("\n")
 
-      val optString = sc.Type.Option.of(sc.Type.String)
+      val optString = TypesScala.Option.of(TypesJava.String)
       val generalizedColumn = sc.Type.dsl.FieldLikeNoHkt.of(sc.Type.Wildcard, Row)
-      val columnsList = sc.Type.List.of(generalizedColumn)
+      val columnsList = TypesScala.List.of(generalizedColumn)
       val str =
         code"""class ${structureName.name}[$Row](val prefix: $optString, val extract: $Row => ${names.RowName}, val merge: ($Row, ${names.RowName}) => $Row)
             |  extends ${sc.Type.dsl.StructureRelation.of(fieldsName, names.RowName, Row)}
@@ -190,7 +190,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
   def RepoMockFile(dbLib: DbLib, idComputed: IdComputed, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val maybeToRowParam: Option[sc.Param] =
       repoMethods.toList.collectFirst { case RepoMethod.InsertUnsaved(_, _, unsaved, _, _, _) =>
-        sc.Param(sc.Ident("toRow"), sc.Type.Function1.of(unsaved.tpe, names.RowName), None)
+        sc.Param(sc.Ident("toRow"), TypesScala.Function1.of(unsaved.tpe, names.RowName), None)
       }
 
     val methods: NonEmptyList[sc.Code] =
@@ -205,8 +205,8 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
       Some(
         sc.Param(
           sc.Ident("map"),
-          sc.Type.mutableMap.of(idComputed.tpe, names.RowName),
-          Some(code"${sc.Type.mutableMap}.empty")
+          TypesScala.mutableMap.of(idComputed.tpe, names.RowName),
+          Some(code"${TypesScala.mutableMap}.empty")
         )
       )
     ).flatten
