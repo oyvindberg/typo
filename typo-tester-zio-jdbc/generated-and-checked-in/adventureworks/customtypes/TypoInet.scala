@@ -27,7 +27,7 @@ object TypoInet {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoInet(x.asInstanceOf[PGobject].getValue))
     },
-    "scala.Array[org.postgresql.util.PGobject]"
+    "Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInet]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInet]] = Setter.forSqlType((ps, i, v) =>

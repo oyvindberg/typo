@@ -26,7 +26,7 @@ object TypoMoney {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoMoney(BigDecimal(x.asInstanceOf[java.math.BigDecimal])))
     },
-    "scala.Array[java.math.BigDecimal]"
+    "Array[java.math.BigDecimal]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoMoney]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoMoney]] = Setter.forSqlType((ps, i, v) =>

@@ -66,6 +66,7 @@ object Language {
         case Summon(tpe)                        => s"implicitly[${renderTree(tpe)}]"
         case tpe: Type =>
           tpe match {
+            case Type.ArrayOf(value)                 => s"Array[${renderTree(value)}]"
             case Type.Abstract(value)                => renderTree(value)
             case Type.Wildcard                       => "?"
             case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")

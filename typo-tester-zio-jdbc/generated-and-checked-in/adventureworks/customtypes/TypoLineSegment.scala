@@ -29,7 +29,7 @@ object TypoLineSegment {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoLineSegment(TypoPoint(x.asInstanceOf[PGlseg].point(0).x, x.asInstanceOf[PGlseg].point(0).y), TypoPoint(x.asInstanceOf[PGlseg].point(1).x, x.asInstanceOf[PGlseg].point(1).y)))
     },
-    "scala.Array[org.postgresql.geometric.PGlseg]"
+    "Array[org.postgresql.geometric.PGlseg]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLineSegment]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLineSegment]] = Setter.forSqlType((ps, i, v) =>

@@ -70,7 +70,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
     case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
       unaryId match {
         case IdComputed.UnaryUserSpecified(_, tpe) =>
-          code"def selectByIds($idsParam)(implicit puts: ${Put.of(TypesScala.Array.of(tpe))}): ${fs2Stream.of(ConnectionIO, rowType)}"
+          code"def selectByIds($idsParam)(implicit puts: ${Put.of(sc.Type.ArrayOf(tpe))}): ${fs2Stream.of(ConnectionIO, rowType)}"
         case _ =>
           code"def selectByIds($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
       }
@@ -452,8 +452,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           tparams = Nil,
           name = arrayPutName,
           implicitParams = Nil,
-          tpe = Put.of(TypesScala.Array.of(wrapperType)),
-          body = code"""${lookupPutFor(TypesScala.Array.of(underlying))}.contramap(_.map(_.value))"""
+          tpe = Put.of(sc.Type.ArrayOf(wrapperType)),
+          body = code"""${lookupPutFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"""
         )
       ),
       Some(
@@ -470,8 +470,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           tparams = Nil,
           name = arrayGetName,
           implicitParams = Nil,
-          tpe = Get.of(TypesScala.Array.of(wrapperType)),
-          body = code"""${lookupGetFor(TypesScala.Array.of(underlying))}.map(_.map(force))"""
+          tpe = Get.of(sc.Type.ArrayOf(wrapperType)),
+          body = code"""${lookupGetFor(sc.Type.ArrayOf(underlying))}.map(_.map(force))"""
         )
       ),
       Some(
@@ -520,8 +520,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           tparams = Nil,
           name = arrayPutName,
           implicitParams = Nil,
-          tpe = Put.of(TypesScala.Array.of(wrapperType)),
-          body = code"${lookupPutFor(TypesScala.Array.of(underlying))}.contramap(_.map(_.value))"
+          tpe = Put.of(sc.Type.ArrayOf(wrapperType)),
+          body = code"${lookupPutFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
         )
       ),
       Some(
@@ -529,8 +529,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           tparams = Nil,
           name = arrayGetName,
           implicitParams = Nil,
-          tpe = Get.of(TypesScala.Array.of(wrapperType)),
-          body = code"${lookupGetFor(TypesScala.Array.of(underlying))}.map(_.map($wrapperType.apply))"
+          tpe = Get.of(sc.Type.ArrayOf(wrapperType)),
+          body = code"${lookupGetFor(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.apply))"
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
@@ -542,14 +542,14 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
 
     List(
       i("UUIDMeta", TypesJava.UUID, "doobie.postgres.implicits.UuidType"),
-      i("UUIDArrayMeta", TypesScala.Array.of(TypesJava.UUID), "doobie.postgres.implicits.unliftedUUIDArrayType"),
-      i("StringArrayMeta", TypesScala.Array.of(TypesJava.String), "doobie.postgres.implicits.unliftedStringArrayType"),
-      i("BooleanArrayMeta", TypesScala.Array.of(TypesScala.Boolean), "doobie.postgres.implicits.unliftedUnboxedBooleanArrayType"),
-      i("IntegerArrayMeta", TypesScala.Array.of(TypesScala.Int), "doobie.postgres.implicits.unliftedUnboxedIntegerArrayType"),
-      i("LongArrayMeta", TypesScala.Array.of(TypesScala.Long), "doobie.postgres.implicits.unliftedUnboxedLongArrayType"),
-      i("FloatArrayMeta", TypesScala.Array.of(TypesScala.Float), "doobie.postgres.implicits.unliftedUnboxedFloatArrayType"),
-      i("DoubleArrayMeta", TypesScala.Array.of(TypesScala.Double), "doobie.postgres.implicits.unliftedUnboxedDoubleArrayType"),
-      i("BigDecimalMeta", TypesScala.Array.of(TypesScala.BigDecimal), "doobie.postgres.implicits.bigDecimalMeta")
+      i("UUIDArrayMeta", sc.Type.ArrayOf(TypesJava.UUID), "doobie.postgres.implicits.unliftedUUIDArrayType"),
+      i("StringArrayMeta", sc.Type.ArrayOf(TypesJava.String), "doobie.postgres.implicits.unliftedStringArrayType"),
+      i("BooleanArrayMeta", sc.Type.ArrayOf(TypesScala.Boolean), "doobie.postgres.implicits.unliftedUnboxedBooleanArrayType"),
+      i("IntegerArrayMeta", sc.Type.ArrayOf(TypesScala.Int), "doobie.postgres.implicits.unliftedUnboxedIntegerArrayType"),
+      i("LongArrayMeta", sc.Type.ArrayOf(TypesScala.Long), "doobie.postgres.implicits.unliftedUnboxedLongArrayType"),
+      i("FloatArrayMeta", sc.Type.ArrayOf(TypesScala.Float), "doobie.postgres.implicits.unliftedUnboxedFloatArrayType"),
+      i("DoubleArrayMeta", sc.Type.ArrayOf(TypesScala.Double), "doobie.postgres.implicits.unliftedUnboxedDoubleArrayType"),
+      i("BigDecimalMeta", sc.Type.ArrayOf(TypesScala.BigDecimal), "doobie.postgres.implicits.bigDecimalMeta")
     )
   }
 
@@ -569,11 +569,11 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         case TypesScala.Int        => code"$Meta.IntMeta.get"
         case TypesScala.Long       => code"$Meta.LongMeta.get"
         case TypesJava.String      => code"$Meta.StringMeta.get"
-        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) =>
+        case sc.Type.ArrayOf(TypesScala.Byte) =>
           code"$Meta.ByteArrayMeta.get"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$getName"
-        case sc.Type.TApply(TypesScala.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+        case sc.Type.ArrayOf(targ: sc.Type.Qualified) if targ.value.idents.startsWith(pkg.idents) =>
           code"$targ.$arrayGetName"
         case x if missingInstancesByType.contains(Meta.of(x)) =>
           code"${missingInstancesByType(Meta.of(x))}.get"
@@ -594,11 +594,11 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         case TypesScala.Int        => code"$Meta.IntMeta.put"
         case TypesScala.Long       => code"$Meta.LongMeta.put"
         case TypesJava.String      => code"$Meta.StringMeta.put"
-        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) =>
+        case sc.Type.ArrayOf(TypesScala.Byte) =>
           code"$Meta.ByteArrayMeta.put"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$putName"
-        case sc.Type.TApply(TypesScala.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+        case sc.Type.ArrayOf(targ: sc.Type.Qualified) if targ.value.idents.startsWith(pkg.idents) =>
           code"$targ.$arrayPutName"
         case x if missingInstancesByType.contains(Meta.of(x)) =>
           code"${missingInstancesByType(Meta.of(x))}.put"
@@ -680,7 +680,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
         val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
         val sqlArrayTypeLit = sc.StrLit("_" + ct.sqlType)
-        val arrayType = TypesScala.Array.of(ct.typoType)
+        val arrayType = sc.Type.ArrayOf(ct.typoType)
         List(
           sc.Given(
             tparams = Nil,

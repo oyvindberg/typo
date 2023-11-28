@@ -29,7 +29,7 @@ object TypoPath {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoPath(x.asInstanceOf[PGpath].isOpen, x.asInstanceOf[PGpath].points.map(p => TypoPoint(p.x, p.y)).toList))
     },
-    "scala.Array[org.postgresql.geometric.PGpath]"
+    "Array[org.postgresql.geometric.PGpath]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPath]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoPath]] = Setter.forSqlType((ps, i, v) =>

@@ -28,7 +28,7 @@ object TypoCircle {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoCircle(TypoPoint(x.asInstanceOf[PGcircle].center.x, x.asInstanceOf[PGcircle].center.y), x.asInstanceOf[PGcircle].radius))
     },
-    "scala.Array[org.postgresql.geometric.PGcircle]"
+    "Array[org.postgresql.geometric.PGcircle]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoCircle]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoCircle]] = Setter.forSqlType((ps, i, v) =>

@@ -86,12 +86,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         case x if missingInstancesByType.contains(Column.of(x)) =>
           code"${missingInstancesByType(Column.of(x))}"
         // generated array type
-        case sc.Type.TApply(TypesScala.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+        case sc.Type.ArrayOf(targ: sc.Type.Qualified) if targ.value.idents.startsWith(pkg.idents) =>
           code"$targ.$arrayColumnName"
-        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) => code"$Column.columnToByteArray"
+        case sc.Type.ArrayOf(TypesScala.Byte) => code"$Column.columnToByteArray"
         // fallback array case. implementation looks loco, but I guess it works
-        case sc.Type.TApply(TypesScala.Array, List(targ)) => code"$Column.columnToArray[$targ](${lookupColumnFor(targ)}, implicitly)"
-        case other                                        => sc.Summon(Column.of(other)).code
+        case sc.Type.ArrayOf(targ) => code"$Column.columnToArray[$targ](${lookupColumnFor(targ)}, implicitly)"
+        case other                 => sc.Summon(Column.of(other)).code
       }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
@@ -118,10 +118,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         // generated array type
 //        case sc.Type.TApply(ScalaTypes.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
 //          code"$targ.$arrayColumnName"
-        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) => code"$ParameterMetaData.ByteArrayParameterMetaData"
+        case sc.Type.ArrayOf(TypesScala.Byte) => code"$ParameterMetaData.ByteArrayParameterMetaData"
         // fallback array case.
-        case sc.Type.TApply(TypesScala.Array, List(targ)) => code"${pkg / arrayParameterMetaDataName}(${lookupParameterMetaDataFor(targ)})"
-        case other                                        => sc.Summon(ParameterMetaData.of(other)).code
+        case sc.Type.ArrayOf(targ) => code"${pkg / arrayParameterMetaDataName}(${lookupParameterMetaDataFor(targ)})"
+        case other                 => sc.Summon(ParameterMetaData.of(other)).code
       }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
@@ -145,12 +145,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         // customized type mapping
         case x if missingInstancesByType.contains(ToStatement.of(x)) =>
           code"${missingInstancesByType(ToStatement.of(x))}"
-        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte)) => code"$ToStatement.byteArrayToStatement"
+        case sc.Type.ArrayOf(TypesScala.Byte) => code"$ToStatement.byteArrayToStatement"
         // generated array type
-        case sc.Type.TApply(TypesScala.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+        case sc.Type.ArrayOf(targ: sc.Type.Qualified) if targ.value.idents.startsWith(pkg.idents) =>
           code"$targ.$arrayToStatementName"
         // fallback array case.
-        case sc.Type.TApply(TypesScala.Array, List(targ)) =>
+        case sc.Type.ArrayOf(targ) =>
           // `ToStatement.arrayToParameter` does not work for arbitrary types. if it's a user-defined type, user needs to provide this too
           if (sc.Type.containsUserDefined(tpe)) // should be `targ`, but this information is stripped in `sc.Type.base` above
             code"$targ.arrayToStatement"
@@ -168,7 +168,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
     case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
       unaryId match {
         case IdComputed.UnaryUserSpecified(_, tpe) =>
-          code"def selectByIds($idsParam)(implicit c: ${TypesJava.Connection}, toStatement: ${ToStatement.of(TypesScala.Array.of(tpe))}): ${TypesScala.List.of(rowType)}"
+          code"def selectByIds($idsParam)(implicit c: ${TypesJava.Connection}, toStatement: ${ToStatement.of(sc.Type.ArrayOf(tpe))}): ${TypesScala.List.of(rowType)}"
         case _ =>
           code"def selectByIds($idsParam)(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}"
       }
@@ -556,7 +556,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tparams = Nil,
           name = arrayColumnName,
           implicitParams = Nil,
-          tpe = Column.of(TypesScala.Array.of(wrapperType)),
+          tpe = Column.of(sc.Type.ArrayOf(wrapperType)),
           body = code"""$Column.columnToArray($columnName, implicitly)"""
         )
       ),
@@ -583,8 +583,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tparams = Nil,
           name = arrayToStatementName,
           implicitParams = Nil,
-          tpe = ToStatement.of(TypesScala.Array.of(wrapperType)),
-          body = code"${lookupToStatementFor(TypesScala.Array.of(underlying))}.contramap(_.map(_.value))"
+          tpe = ToStatement.of(sc.Type.ArrayOf(wrapperType)),
+          body = code"${lookupToStatementFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
         )
       ),
       Some(
@@ -618,8 +618,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tparams = Nil,
           name = arrayToStatementName,
           implicitParams = Nil,
-          tpe = ToStatement.of(TypesScala.Array.of(wrapperType)),
-          body = code"${lookupToStatementFor(TypesScala.Array.of(underlying))}.contramap(_.map(_.value))"
+          tpe = ToStatement.of(sc.Type.ArrayOf(wrapperType)),
+          body = code"${lookupToStatementFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
         )
       ),
       Some(
@@ -627,7 +627,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tparams = Nil,
           name = arrayColumnName,
           implicitParams = Nil,
-          tpe = Column.of(TypesScala.Array.of(wrapperType)),
+          tpe = Column.of(sc.Type.ArrayOf(wrapperType)),
           body = code"$Column.columnToArray($columnName, implicitly)"
         )
       ),
@@ -664,7 +664,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       (TypesScala.Boolean, sc.StrLit("bool")),
       (TypesScala.Double, sc.StrLit("float8"))
     ).flatMap { case (tpe, elemType) =>
-      val arrayType = TypesScala.Array.of(tpe)
+      val arrayType = sc.Type.ArrayOf(tpe)
       val boxedType = TypesScala.boxedType(tpe).getOrElse(TypesScala.AnyRef)
       List(
         sc.Given(
@@ -681,8 +681,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         Nil,
         sc.Ident("BigDecimalArrayToStatement"),
         Nil,
-        ToStatement.of(TypesScala.Array.of(TypesScala.BigDecimal)),
-        code"${ToStatement.of(TypesScala.Array.of(TypesScala.BigDecimal))}((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf(${sc.StrLit("numeric")}, v.map(v => v.bigDecimal))))"
+        ToStatement.of(sc.Type.ArrayOf(TypesScala.BigDecimal)),
+        code"${ToStatement.of(sc.Type.ArrayOf(TypesScala.BigDecimal))}((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf(${sc.StrLit("numeric")}, v.map(v => v.bigDecimal))))"
       )
 
     val arrayParameterMetaData = {
@@ -691,8 +691,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         List(T),
         arrayParameterMetaDataName,
         List(sc.Param(T.value, ParameterMetaData.of(T), None)),
-        ParameterMetaData.of(TypesScala.Array.of(T)),
-        code"""|new ${ParameterMetaData.of(TypesScala.Array.of(T))} {
+        ParameterMetaData.of(sc.Type.ArrayOf(T)),
+        code"""|new ${ParameterMetaData.of(sc.Type.ArrayOf(T))} {
                |  override def sqlType: ${TypesJava.String} = ${sc.StrLit("_")} + $T.sqlType
                |  override def jdbcType: ${TypesScala.Int} = ${TypesJava.SqlTypes}.ARRAY
                |}""".stripMargin
@@ -784,19 +784,19 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
             Nil,
             arrayToStatementName,
             Nil,
-            ToStatement.of(TypesScala.Array.of(tpe)),
-            code"${ToStatement.of(TypesScala.Array.of(tpe))}((s, index, v) => s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(ct.sqlType)}, $v.map(v => ${fromTypo.fromTypo0(v)}))))"
+            ToStatement.of(sc.Type.ArrayOf(tpe)),
+            code"${ToStatement.of(sc.Type.ArrayOf(tpe))}((s, index, v) => s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(ct.sqlType)}, $v.map(v => ${fromTypo.fromTypo0(v)}))))"
           ),
           sc.Given(
             Nil,
             arrayColumnName,
             Nil,
-            Column.of(TypesScala.Array.of(tpe)),
-            code"""|$Column.nonNull[${TypesScala.Array.of(tpe)}]((v1: ${TypesScala.Any}, _) =>
+            Column.of(sc.Type.ArrayOf(tpe)),
+            code"""|$Column.nonNull[${sc.Type.ArrayOf(tpe)}]((v1: ${TypesScala.Any}, _) =>
                  |  v1 match {
                  |      case $v: ${TypesJava.PgArray} =>
                  |       $v.getArray match {
-                 |         case $v: ${TypesScala.Array.of(sc.Type.Wildcard)} =>
+                 |         case $v: ${sc.Type.ArrayOf(sc.Type.Wildcard)} =>
                  |           ${TypesScala.Right}($v.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))
                  |         case other => ${TypesScala.Left}($TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of ${ct.typoType}, got $${other.getClass.getName}"))
                  |       }

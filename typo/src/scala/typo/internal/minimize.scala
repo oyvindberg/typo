@@ -52,6 +52,7 @@ object minimize {
             case sc.Type.TApply(underlying, targs) =>
               goTree(underlying)
               targs.foreach(goTree)
+            case sc.Type.ArrayOf(value)           => goTree(value)
             case sc.Type.Qualified(value)         => goTree(value)
             case sc.Type.Abstract(_)              => ()
             case sc.Type.Commented(underlying, _) => goTree(underlying)

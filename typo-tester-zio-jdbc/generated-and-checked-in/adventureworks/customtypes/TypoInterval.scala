@@ -28,7 +28,7 @@ object TypoInterval {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoInterval(x.asInstanceOf[PGInterval].getYears, x.asInstanceOf[PGInterval].getMonths, x.asInstanceOf[PGInterval].getDays, x.asInstanceOf[PGInterval].getHours, x.asInstanceOf[PGInterval].getMinutes, x.asInstanceOf[PGInterval].getSeconds))
     },
-    "scala.Array[org.postgresql.util.PGInterval]"
+    "Array[org.postgresql.util.PGInterval]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInterval]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInterval]] = Setter.forSqlType((ps, i, v) =>

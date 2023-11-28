@@ -40,7 +40,7 @@ object TypoShort {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoShort(x.asInstanceOf[java.lang.Short]))
     },
-    "scala.Array[java.lang.Integer]"
+    "Array[java.lang.Integer]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoShort]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoShort]] = Setter.forSqlType((ps, i, v) =>
