@@ -28,7 +28,7 @@ object TypoPoint {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoPoint(x.asInstanceOf[PGpoint].x, x.asInstanceOf[PGpoint].y))
     },
-    "scala.Array[org.postgresql.geometric.PGpoint]"
+    "Array[org.postgresql.geometric.PGpoint]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPoint]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoPoint]] = Setter.forSqlType((ps, i, v) =>

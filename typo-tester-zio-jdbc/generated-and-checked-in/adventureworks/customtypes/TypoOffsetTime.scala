@@ -35,7 +35,7 @@ object TypoOffsetTime {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoOffsetTime(OffsetTime.parse(x.asInstanceOf[String], parser)))
     },
-    "scala.Array[java.lang.String]"
+    "Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoOffsetTime]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoOffsetTime]] = Setter.forSqlType((ps, i, v) =>

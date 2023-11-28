@@ -33,18 +33,18 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "bytea",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoBytea")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesScala.Array.of(TypesScala.Byte), None)
+      sc.Param(sc.Ident("value"), sc.Type.ArrayOf(TypesScala.Byte), None)
     ),
     toTypo = CustomType.ToTypo(
-      jdbcType = TypesScala.Array.of(TypesScala.Byte),
+      jdbcType = sc.Type.ArrayOf(TypesScala.Byte),
       toTypo = (expr, target) => code"$target($expr)"
     ),
     fromTypo = CustomType.FromTypo(
-      jdbcType = TypesScala.Array.of(TypesScala.Byte),
+      jdbcType = sc.Type.ArrayOf(TypesScala.Byte),
       fromTypo = (expr, _) => code"$expr.value"
     ),
     forbidArray = true,
-    toText = CustomType.Text(TypesScala.Array.of(TypesScala.Byte), expr => code"$expr.value")
+    toText = CustomType.Text(sc.Type.ArrayOf(TypesScala.Byte), expr => code"$expr.value")
   )
 
   lazy val TypoLocalDate = CustomType(
@@ -436,14 +436,14 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "vector",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoVector")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesScala.Array.of(TypesScala.Float), None)
+      sc.Param(sc.Ident("value"), sc.Type.ArrayOf(TypesScala.Float), None)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PgArray,
-      toTypo = (expr, target) => code"$target($expr.getArray.asInstanceOf[${TypesScala.Array.of(TypesJava.Float)}].map(Float2float))"
+      toTypo = (expr, target) => code"$target($expr.getArray.asInstanceOf[${sc.Type.ArrayOf(TypesJava.Float)}].map(Float2float))"
     ),
     fromTypo = CustomType.FromTypo(
-      jdbcType = TypesScala.Array.of(TypesJava.Float),
+      jdbcType = sc.Type.ArrayOf(TypesJava.Float),
       fromTypo = (expr, _) => code"$expr.value.map(x => x: ${TypesJava.Float})"
     ),
     forbidArray = true,

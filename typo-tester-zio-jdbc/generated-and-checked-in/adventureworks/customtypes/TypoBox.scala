@@ -28,7 +28,7 @@ object TypoBox {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoBox(x.asInstanceOf[PGbox].point(0).x, x.asInstanceOf[PGbox].point(0).y, x.asInstanceOf[PGbox].point(1).x, x.asInstanceOf[PGbox].point(1).y))
     },
-    "scala.Array[org.postgresql.geometric.PGbox]"
+    "Array[org.postgresql.geometric.PGbox]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoBox]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoBox]] = Setter.forSqlType((ps, i, v) =>

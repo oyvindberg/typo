@@ -17,7 +17,7 @@ case class TypeMapperScala(
 
     val baseTpe = col.tpe match {
       case db.Type.Array(tpe) =>
-        TypesScala.Array.of(go(tpe))
+        sc.Type.ArrayOf(go(tpe))
       case other =>
         go(other)
     }
@@ -31,7 +31,7 @@ case class TypeMapperScala(
 
     val base = dbType match {
       case db.Type.Array(tpe) =>
-        TypesScala.Array.of(go(tpe))
+        sc.Type.ArrayOf(go(tpe))
       case other =>
         go(other)
     }
@@ -44,7 +44,7 @@ case class TypeMapperScala(
   def domain(dbType: db.Type): sc.Type =
     dbType match {
       case db.Type.Array(tpe) =>
-        TypesScala.Array.of(baseType(tpe))
+        sc.Type.ArrayOf(baseType(tpe))
       case other =>
         baseType(other)
     }
@@ -128,7 +128,9 @@ case class TypeMapperScala(
 
   def stripOptionAndArray(tpe: sc.Type): sc.Type =
     tpe match {
-      case sc.Type.TApply(TypesScala.Option | TypesScala.Array, List(tpe)) =>
+      case sc.Type.ArrayOf(tpe) =>
+        stripOptionAndArray(tpe)
+      case sc.Type.TApply(TypesScala.Option, List(tpe)) =>
         stripOptionAndArray(tpe)
       case sc.Type.TApply(other, targs) =>
         sc.Type.TApply(stripOptionAndArray(other), targs.map(stripOptionAndArray))

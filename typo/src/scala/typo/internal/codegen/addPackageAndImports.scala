@@ -86,6 +86,7 @@ object addPackageAndImports {
   // traverse type tree and rewrite qualified names
   def shortenNamesType(tpe: sc.Type, f: sc.Type.Qualified => sc.Type.Qualified): sc.Type =
     tpe match {
+      case sc.Type.ArrayOf(value)                 => sc.Type.ArrayOf(shortenNamesType(value, f))
       case sc.Type.Abstract(value)                => sc.Type.Abstract(value)
       case sc.Type.Wildcard                       => sc.Type.Wildcard
       case sc.Type.TApply(underlying, targs)      => sc.Type.TApply(shortenNamesType(underlying, f), targs.map(targ => shortenNamesType(targ, f)))

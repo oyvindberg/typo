@@ -24,11 +24,11 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
         case TypesScala.Int                                                => code"$Text.intInstance"
         case TypesScala.Long                                               => code"$Text.longInstance"
         case TypesJava.String                                              => code"$Text.stringInstance"
-        case sc.Type.TApply(TypesScala.Array, List(TypesScala.Byte))       => code"$Text.byteArrayInstance"
+        case sc.Type.ArrayOf(TypesScala.Byte)                              => code"$Text.byteArrayInstance"
         case TypesScala.Optional(targ)                                     => code"$Text.option(${lookupTextFor(targ)})"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$textName(${lookupTextFor(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$textName"
-        case sc.Type.TApply(TypesScala.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+        case sc.Type.ArrayOf(targ: sc.Type.Qualified) if targ.value.idents.startsWith(pkg.idents) =>
           code"$Text.iterableInstance[${TypesScala.Array}, $targ](${lookupTextFor(targ)}, implicitly)"
         case other => code"${Text.of(other)}"
       }

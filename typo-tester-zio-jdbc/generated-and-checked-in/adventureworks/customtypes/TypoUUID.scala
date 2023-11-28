@@ -29,7 +29,7 @@ object TypoUUID {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoUUID(x.asInstanceOf[UUID]))
     },
-    "scala.Array[java.util.UUID]"
+    "Array[java.util.UUID]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUUID]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoUUID]] = Setter.forSqlType((ps, i, v) =>

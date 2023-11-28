@@ -27,7 +27,7 @@ object TypoBytea {
       val v = rs.getObject(i)
       if (v eq null) null else TypoBytea(v.asInstanceOf[Array[Byte]])
     },
-    "scala.Array[scala.Byte]"
+    "Array[scala.Byte]"
   )
   implicit lazy val jdbcEncoder: JdbcEncoder[TypoBytea] = JdbcEncoder.singleParamEncoder(setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoBytea] = JsonDecoder.array[Byte](JsonDecoder.byte, implicitly).map(TypoBytea.apply)

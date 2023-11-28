@@ -29,7 +29,7 @@ object TypoLocalDate {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoLocalDate(LocalDate.parse(x.asInstanceOf[String])))
     },
-    "scala.Array[java.lang.String]"
+    "Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLocalDate]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLocalDate]] = Setter.forSqlType((ps, i, v) =>

@@ -36,6 +36,7 @@ object TypesScala {
 
   object Optional {
     def unapply(tpe: sc.Type): Option[sc.Type] = tpe match {
+      case sc.Type.ArrayOf(_)                      => scala.None
       case sc.Type.Wildcard                        => scala.None
       case sc.Type.TApply(Option, scala.List(one)) => scala.Some(one)
       case sc.Type.TApply(underlying, _)           => unapply(underlying)

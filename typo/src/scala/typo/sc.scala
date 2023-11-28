@@ -36,9 +36,7 @@ object sc {
   case class Param(name: Ident, tpe: Type, default: Option[sc.Code]) extends Tree
   case class Params(params: List[Param]) extends Tree
 
-  case class StrLit(str: String) extends Tree {
-    def prefixed(prefix: String) = StrLit(prefix + str)
-  }
+  case class StrLit(str: String) extends Tree
 
   case class StringInterpolate(`import`: sc.Type, prefix: sc.Ident, content: sc.Code) extends Tree
 
@@ -87,6 +85,7 @@ object sc {
     case class Commented(underlying: Type, comment: String) extends Type
     case class UserDefined(underlying: Type) extends Type
     case class ByName(underlying: Type) extends Type
+    case class ArrayOf(underlying: Type) extends Type
 
     object Qualified {
       implicit val ordering: Ordering[Qualified] = scala.Ordering.by(x => x.dotName)
@@ -156,6 +155,7 @@ object sc {
         .toMap
 
     def containsUserDefined(tpe: sc.Type): Boolean = tpe match {
+      case ArrayOf(targ)             => containsUserDefined(targ)
       case Wildcard                  => false
       case TApply(underlying, targs) => containsUserDefined(underlying) || targs.exists(containsUserDefined)
       case Qualified(_)              => false
@@ -168,6 +168,7 @@ object sc {
     def base(tpe: sc.Type): sc.Type = tpe match {
       case Wildcard                  => tpe
       case TApply(underlying, targs) => TApply(base(underlying), targs.map(base))
+      case ArrayOf(targ)             => sc.Type.ArrayOf(base(targ))
       case Qualified(_)              => tpe
       case Abstract(_)               => tpe
       case Commented(underlying, _)  => base(underlying)
@@ -258,6 +259,7 @@ object sc {
       case Summon(tpe)                        => s"implicitly[${renderTree(tpe)}]"
       case tpe: Type =>
         tpe match {
+          case Type.ArrayOf(value)                 => s"Array[${renderTree(value)}]"
           case Type.Abstract(value)                => renderTree(value)
           case Type.Wildcard                       => "?"
           case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
