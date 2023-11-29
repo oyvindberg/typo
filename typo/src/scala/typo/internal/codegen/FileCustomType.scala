@@ -23,13 +23,8 @@ object FileCustomType {
         options.jsonLibs.flatMap(_.customTypeInstances(ct)) ++
         options.dbLib.toList.flatMap(_.customTypeInstances(ct))
 
-    val str =
-      code"""$comments
-            |case class ${ct.typoType.name}(${ct.params.map(_.code).mkCode(", ")})
-            |
-            |${sc.Obj(ct.typoType.value, instances, ct.objBody0)}
-""".stripMargin
+    val cls = sc.Class(ct.typoType, sc.ClassType.Record).copy(params = ct.params.toList, staticBody = ct.objBody0, staticMembers = instances)
 
-    sc.File(ct.typoType, str, secondaryTypes = Nil)
+    sc.File(ct.typoType, cls, secondaryTypes = Nil)
   }
 }

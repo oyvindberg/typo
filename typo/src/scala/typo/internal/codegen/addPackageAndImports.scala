@@ -63,6 +63,19 @@ object addPackageAndImports {
         shortenNamesClassMember(x, f)
       case sc.Obj(name, members, body) =>
         sc.Obj(name, members.map(cm => shortenNamesClassMember(cm, f)), body.map(_.mapTrees(t => shortenNames(t, f))))
+      case sc.Class(comments, classType, name, tparams, params, implicitParams, extends_, implements, staticBody, staticMembers) =>
+        sc.Class(
+          comments,
+          classType,
+          name,
+          tparams,
+          params.map(shortenNamesParam(_, f)),
+          implicitParams.map(shortenNamesParam(_, f)),
+          extends_.map(shortenNamesType(_, f)),
+          implements.map(shortenNamesType(_, f)),
+          staticBody.map(_.mapTrees(shortenNames(_, f))),
+          staticMembers.map(shortenNamesClassMember(_, f)),
+        )
     }
 
   def shortenNamesParam(param: sc.Param, f: sc.Type.Qualified => sc.Type.Qualified): sc.Param =

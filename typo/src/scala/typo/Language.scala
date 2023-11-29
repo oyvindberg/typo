@@ -140,6 +140,49 @@ object Language {
                 |${codeMembers.flatMap(_.linesIterator).map("  " + _).mkString("\n")}
                 |}""".stripMargin
           }
+        case cls: Class =>
+          List[Option[String]](
+            cls.comments.lines match {
+              case Nil => None
+              case title :: Nil =>
+                Some(s"""/** $title */\n""")
+              case title :: rest =>
+                Some(s"""|/** $title
+                         |${rest.flatMap(_.linesIterator).map(line => s"  * $line").mkString("\n")}
+                         |  */\n""".stripMargin)
+            },
+            cls.classType match {
+              case ClassType.Record => Some("case class ")
+              case ClassType.Class  => Some("class ")
+              case ClassType.Trait  => Some("trait ")
+            },
+            Some(cls.name.name.value),
+            cls.tparams match {
+              case Nil      => None
+              case nonEmpty => Some(nonEmpty.map(renderTree).mkString("[", ", ", "]"))
+            },
+            cls.params match {
+              case Nil      => None
+              case nonEmpty => Some(nonEmpty.map(renderTree).mkString("(", ", ", ")"))
+            },
+            cls.implicitParams match {
+              case Nil      => None
+              case nonEmpty => Some(nonEmpty.map(renderTree).mkString("(implicit ", ", ", ")"))
+            },
+            cls.`extends`.map(x => s"extends ${renderTree(x)}"),
+            cls.implements match {
+              case Nil => None
+              case nonEmpty => Some(nonEmpty.map(x => s"with ${renderTree(x)}").mkString(" "))
+            },
+            (cls.staticMembers.map(renderTree) ::: cls.staticBody.map(_.render(this)).toList) match {
+              case Nil => None
+              case nonEmpty =>
+                Some(
+                  s"""|object ${cls.name.name.value}
+                      |${nonEmpty.map(x => s"  $x")}
+                      |}""".stripMargin)
+            }
+          ).flatten.mkString("")
       }
   }
 }

@@ -28,11 +28,15 @@ object FileDomain {
       options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = domain.tpe, underlying = domain.underlyingType))
     ).flatten
 
-    val str =
-      code"""|$comments
-             |case class ${domain.tpe.name}($value: ${domain.underlyingType}) extends AnyVal
-             |${genObject(domain.tpe.value, instances)}""".stripMargin
+    val cls = sc
+      .Class(domain.tpe, sc.ClassType.Record)
+      .copy(
+        comments = comments,
+        params = List(sc.Param(value, domain.underlyingType, None)),
+        `extends` = Some(TypesScala.AnyVal),
+        staticMembers = instances
+      )
 
-    sc.File(domain.tpe, str, secondaryTypes = Nil)
+    sc.File(domain.tpe, cls, secondaryTypes = Nil)
   }
 }

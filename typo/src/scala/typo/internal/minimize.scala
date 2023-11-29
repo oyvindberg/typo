@@ -43,6 +43,14 @@ object minimize {
               implicitParams.foreach(goTree)
               goTree(tpe)
               go(body)
+            case sc.Class(_, _, _, tparams, params, implicitParams, extends_, implements, staticBody, staticMembers) =>
+              tparams.foreach(goTree)
+              params.foreach(goTree)
+              implicitParams.foreach(goTree)
+              extends_.foreach(goTree)
+              implements.foreach(goTree)
+              staticBody.foreach(go)
+              staticMembers.foreach(goTree)
             case sc.Obj(name, members, body) =>
               goTree(name)
               members.foreach(goTree)

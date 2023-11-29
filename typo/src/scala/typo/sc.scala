@@ -54,6 +54,47 @@ object sc {
       body: sc.Code
   ) extends ClassMember
 
+  case class Comments(lines: List[String])
+  object Comments {
+    val Empty = Comments(Nil)
+  }
+
+  sealed trait ClassType
+  object ClassType {
+    case object Record extends ClassType
+    case object Class extends ClassType
+    case object Trait extends ClassType
+  }
+
+  case class Class(
+      comments: Comments,
+      classType: ClassType,
+      name: sc.Type.Qualified,
+      tparams: List[Type.Abstract],
+      params: List[Param],
+      implicitParams: List[Param],
+      `extends`: Option[sc.Type],
+      implements: List[sc.Type],
+      staticBody: Option[sc.Code],
+      staticMembers: List[sc.ClassMember]
+  ) extends Tree
+
+  object Class {
+    def apply(name: sc.Type.Qualified, classType: ClassType) =
+      new Class(
+        comments = Comments.Empty,
+        classType = classType,
+        name = name,
+        tparams = Nil,
+        params = Nil,
+        implicitParams = Nil,
+        `extends` = None,
+        implements = Nil,
+        staticBody = None,
+        staticMembers = Nil
+      )
+  }
+
   case class Value(
       tparams: List[Type.Abstract],
       name: sc.Ident,
