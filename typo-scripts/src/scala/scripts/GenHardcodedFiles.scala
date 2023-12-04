@@ -143,7 +143,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         TypeMapperDb(enums, domains)
       )
 
-      val generated: Generated =
+      val generated: List[Generated] =
         generate(
           Options(
             pkg = "testdb.hardcoded",
@@ -160,14 +160,14 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
             silentBanner = true
           ),
           metaDb,
-          sqlFiles = Nil,
-          Selector.All
+          ProjectGraph(name = "", target.sources, Selector.All, scripts = Nil, Nil)
         )
 
-      generated.overwriteFolder(
-        target.sources,
-        // todo: bleep should use something better than timestamps
-        softWrite = SoftWrite.No
+      generated.foreach(
+        _.overwriteFolder(
+          // todo: bleep should use something better than timestamps
+          softWrite = SoftWrite.No
+        )
       )
       cli("add to git", target.sources, List("git", "add", "-f", target.sources.toString), Logger.DevNull, cli.Out.Raw)
     }

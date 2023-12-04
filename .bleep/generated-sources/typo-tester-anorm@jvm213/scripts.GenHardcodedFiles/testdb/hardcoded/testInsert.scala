@@ -22,7 +22,7 @@ import testdb.hardcoded.myschema.marital_status.MaritalStatusRepoImpl
 import testdb.hardcoded.myschema.marital_status.MaritalStatusRow
 import testdb.hardcoded.myschema.person.PersonId
 
-class testInsert(random: Random) {
+class TestInsert(random: Random) {
   def compositepkPerson(name: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                         one: Defaulted[Long] = Defaulted.UseDefault,
                         two: Defaulted[Option[String]] = Defaulted.UseDefault

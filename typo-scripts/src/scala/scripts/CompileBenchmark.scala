@@ -63,9 +63,14 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
               enableStreamingInserts = false
             ),
             metadb,
-            readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql")),
-            Selector.ExcludePostgresInternal // All
-          ).overwriteFolder(targetSources)
+            ProjectGraph(
+              name = "",
+              targetSources,
+              Selector.ExcludePostgresInternal, // All
+              readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql")),
+              Nil
+            )
+          ).foreach(_.overwriteFolder())
 
           crossIds.map { crossId =>
             started.projectPaths(CrossProjectName(ProjectName(projectName), Some(crossId))).sourcesDirs.fromSourceLayout.foreach { p =>

@@ -7,7 +7,7 @@ import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
 import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
-import adventureworks.{testInsert, withConnection}
+import adventureworks.{TestInsert, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
@@ -30,7 +30,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
   test("foo") {
     withConnection { implicit c =>
-      val testInsert = new testInsert(new Random(0))
+      val testInsert = new TestInsert(new Random(0))
       val unitmeasure = testInsert.productionUnitmeasure(UnitmeasureId("kgg"))
       val productCategory = testInsert.productionProductcategory()
       val productSubcategory = testInsert.productionProductsubcategory(productCategory.productcategoryid)

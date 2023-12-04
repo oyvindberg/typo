@@ -14,7 +14,7 @@ class RecordTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
   test("works") {
     withConnection { implicit c =>
-      val testInsert = new testInsert(new Random(0))
+      val testInsert = new TestInsert(new Random(0))
       val businessentityRow = testInsert.personBusinessentity()
       val personRow = testInsert.personPerson(businessentityRow.businessentityid, FirstName("a"), persontype = "EM")
       testInsert.personEmailaddress(personRow.businessentityid, Some("a@b.c")): @nowarn
