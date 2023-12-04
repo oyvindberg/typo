@@ -55,16 +55,19 @@ object readSqlFileDirectories {
   }
 
   def findSqlFilesUnder(scriptsPath: Path): List[Path] = {
-    val found = List.newBuilder[Path]
-    Files.walkFileTree(
-      scriptsPath,
-      new SimpleFileVisitor[Path] {
-        override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
-          if (file.toString.endsWith(".sql")) found += file
-          FileVisitResult.CONTINUE
+    if (!Files.exists(scriptsPath)) Nil
+    else {
+      val found = List.newBuilder[Path]
+      Files.walkFileTree(
+        scriptsPath,
+        new SimpleFileVisitor[Path] {
+          override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
+            if (file.toString.endsWith(".sql")) found += file
+            FileVisitResult.CONTINUE
+          }
         }
-      }
-    )
-    found.result()
+      )
+      found.result()
+    }
   }
 }
