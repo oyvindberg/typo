@@ -22,6 +22,7 @@ You can pick relations by expressing with `Selector` what you want:
 ```scala mdoc:silent
 import typo.*
 
+val personAndPet0 = Selector.fullRelationNames("myschema.person", "myschemapet") // picks exactly these tables
 val personAndPet = Selector.relationNames("person", "pet") // picks these regardless of schema
 val mySchema = Selector.schemas("myschema") // picks all relations in schema
 
