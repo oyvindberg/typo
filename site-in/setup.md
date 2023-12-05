@@ -65,8 +65,8 @@ val scriptsFolder = location.resolve("sql")
 // you can use this to customize which relations you want to generate code for, see below
 val selector = Selector.ExcludePostgresInternal
 
-generateFromDb(options, selector = selector, scriptsPaths = List(scriptsFolder))
-  .overwriteFolder(folder = targetDir)
+generateFromDb(options, folder = targetDir, selector = selector, scriptsPaths = List(scriptsFolder))
+  .overwriteFolder()
 
 // add changed files to git, so you can keep them under control
 //scala.sys.process.Process(List("git", "add", targetDir.toString)).!!
@@ -74,6 +74,9 @@ generateFromDb(options, selector = selector, scriptsPaths = List(scriptsFolder))
 
 ## `selector`
 You can customize which relations you generate code for, see [customize selected relations](customization/customize-selected-relations.md)
-## sbt plugin
 
+## `ProjectGraph`
+If you want to split the generated code across multiple projects in your build, have a look at [Generate code into multiple projects](other-features/generate-into-multiple-projects.md)
+
+## sbt plugin
 It's natural to think an sbt plugin would be a good match for Typo. This will likely be added in the future.

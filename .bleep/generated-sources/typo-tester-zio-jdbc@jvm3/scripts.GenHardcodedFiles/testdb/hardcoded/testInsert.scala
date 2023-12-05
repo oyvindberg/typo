@@ -23,7 +23,7 @@ import testdb.hardcoded.myschema.person.PersonId
 import zio.ZIO
 import zio.jdbc.ZConnection
 
-class testInsert(random: Random) {
+class TestInsert(random: Random) {
   def compositepkPerson(name: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                         one: Defaulted[Long] = Defaulted.UseDefault,
                         two: Defaulted[Option[String]] = Defaulted.UseDefault

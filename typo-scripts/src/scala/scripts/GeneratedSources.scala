@@ -38,6 +38,7 @@ object GeneratedSources {
         fileHeader = header,
         debugTypes = true
       ),
+      typoSources,
       Selector.relationNames(
         "columns",
         "key_column_usage",
@@ -51,7 +52,7 @@ object GeneratedSources {
       List(buildDir.resolve("sql"))
     )
 
-    files.overwriteFolder(typoSources)
+    files.overwriteFolder()
 
     import scala.sys.process.*
     List("git", "add", "-f", typoSources.toString).!!

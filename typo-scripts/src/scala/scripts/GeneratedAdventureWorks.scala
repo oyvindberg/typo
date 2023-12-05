@@ -53,7 +53,7 @@ object GeneratedAdventureWorks {
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
             val newFiles: Generated =
-              generate(options, metadb, newSqlScripts, Selector.ExcludePostgresInternal)
+              generate(options, metadb, ProjectGraph(name = "", targetSources, Selector.ExcludePostgresInternal, newSqlScripts, Nil)).head
 
             val knownUnchanged: Set[RelPath] = {
               val oldFiles = oldFilesRef.get()
@@ -62,7 +62,7 @@ object GeneratedAdventureWorks {
             oldFilesRef.set(newFiles.files)
 
             newFiles
-              .overwriteFolder(targetSources, softWrite = FileSync.SoftWrite.Yes(knownUnchanged))
+              .overwriteFolder(softWrite = FileSync.SoftWrite.Yes(knownUnchanged))
               .filter { case (_, synced) => synced != FileSync.Synced.Unchanged }
               .foreach { case (path, synced) => logger.withContext(path).warn(synced.toString) }
 

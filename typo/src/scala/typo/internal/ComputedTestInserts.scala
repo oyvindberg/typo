@@ -7,7 +7,7 @@ case class ComputedTestInserts(tpe: sc.Type.Qualified, methods: List[ComputedTes
 
 object ComputedTestInserts {
   val random: sc.Ident = sc.Ident("random")
-  def apply(options: InternalOptions, customTypes: CustomTypes, domains: List[ComputedDomain], enums: List[ComputedStringEnum], computedTables: Iterable[ComputedTable]) = {
+  def apply(projectName: String, options: InternalOptions, customTypes: CustomTypes, domains: List[ComputedDomain], enums: List[ComputedStringEnum], computedTables: Iterable[ComputedTable]) = {
     val domainsByName: Map[sc.Type, ComputedDomain] =
       domains.iterator.map(x => x.tpe -> x).toMap
     val enumsByName: Map[sc.Type, ComputedStringEnum] =
@@ -84,7 +84,7 @@ object ComputedTestInserts {
     }
 
     new ComputedTestInserts(
-      sc.Type.Qualified(options.pkg / sc.Ident("testInsert")),
+      sc.Type.Qualified(options.pkg / sc.Ident(s"${Naming.titleCase(projectName)}TestInsert")),
       computedTables.collect {
         case table if !options.readonlyRepo.include(table.dbTable.name) =>
           val cols: NonEmptyList[ComputedColumn] =

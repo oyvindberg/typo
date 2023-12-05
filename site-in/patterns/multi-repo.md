@@ -123,12 +123,12 @@ Here is example usage:
 
 Note that we can easily create a deep dependency graph with random data due to [testInsert](other-features/testing-with-random-values.md).
 ```scala mdoc:silent
-import adventureworks.{testInsert, withConnection}
+import adventureworks.{TestInsert, withConnection}
 import adventureworks.userdefined.FirstName
 import scala.util.Random
 
 // set a fixed seed to get consistent values
-val testInsert = new testInsert(new Random(1))
+val testInsert = new TestInsert(new Random(1))
 
 val businessentityRow = testInsert.personBusinessentity()
 val personRow = testInsert.personPerson(businessentityRow.businessentityid, FirstName("name"), persontype = "SC")

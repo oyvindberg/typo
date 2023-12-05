@@ -4,7 +4,7 @@ title: Testing with random values
 
 This covers a lot of interesting ground, test-wise.
 
-If you enable `enableTestInserts` in `typo.Options` you now get an `testInsert` class, with a method to insert a row for each table Typo knows about. 
+If you enable `enableTestInserts` in `typo.Options` you now get an `TestInsert` class, with a method to insert a row for each table Typo knows about. 
 All values except ids, foreign keys and so on are *randomly generated*, but you can override them with named parameters.
 
 The idea is that you:
@@ -13,7 +13,7 @@ The idea is that you:
 - will get random values for the rest
 - are still forced to follow FKs to setup the data graph correctly
 - it's easy to follow those FKs, because after inserting a row you get the persisted version back, including generated IDs
-- can get the same values each time by hard coding the seed `new testInsert(new scala.util.Random(0L))`, or you can run it multiple times with different seeds to see that the random values really do not matter
+- can get the same values each time by hard coding the seed `new TestInsert(new scala.util.Random(0L))`, or you can run it multiple times with different seeds to see that the random values really do not matter
 - do not need to write *any* code to get all this available to you, like the rest of Typo.
 
 In summary, this is a fantastic way of setting up complex test scenarios in the database!
@@ -30,11 +30,11 @@ c.setAutoCommit(false)
 ```scala mdoc
 import adventureworks.customtypes.{Defaulted, TypoXml}
 import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.testInsert
+import adventureworks.TestInsert
 
 import scala.util.Random
 
-val testInsert = new testInsert(new Random(0))
+val testInsert = new TestInsert(new Random(0))
 
 val unitmeasure = testInsert.productionUnitmeasure(UnitmeasureId("kgg"))
 val productCategory = testInsert.productionProductcategory()

@@ -297,7 +297,7 @@ import scala.util.Random
 import zio.ZIO
 import zio.jdbc.ZConnection
 
-class testInsert(random: Random) {
+class TestInsert(random: Random) {
   def humanresourcesDepartment(name: Name = Name(random.alphanumeric.take(20).mkString),
                                groupname: Name = Name(random.alphanumeric.take(20).mkString),
                                departmentid: Defaulted[DepartmentId] = Defaulted.UseDefault,
