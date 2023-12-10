@@ -164,7 +164,7 @@ object MetaDb {
       input.tables.flatMap { relation =>
         val relationName = db.RelationName(schema = relation.tableSchema, name = relation.tableName.get)
 
-        NonEmptyList.fromList(columnsByTable(relationName).sortBy(_.ordinalPosition)) map { columns =>
+        NonEmptyList.fromList(columnsByTable.getOrElse(relationName, Nil).sortBy(_.ordinalPosition)) map { columns =>
           val lazyAnalysis = Lazy {
             val fks: List[db.ForeignKey] = foreignKeys.getOrElse(relationName, List.empty)
 
