@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunksite=self.webpackChunksite||[]).push([[2457],{1164:e=>{e.exports=JSON.parse('[{"label":"typo","permalink":"/typo/blog/tags/typo","count":1},{"label":"zio","permalink":"/typo/blog/tags/zio","count":1}]')}}]);
