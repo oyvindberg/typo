@@ -1,26 +1,28 @@
-// all from chatgpt, don't judge this :D
-
 import React from 'react';
+import {useColorMode} from '@docusaurus/theme-common';
 
 const KeyTakeaway = ({ children:text }) => {
+    const { isDarkTheme } = useColorMode();
+
+    const containerStyle = {
+        backgroundColor: isDarkTheme ? '#333' : '#f0f0f0', // Dark or light background color
+        color: isDarkTheme ? '#fff' : '#000', // Text color based on mode
+        padding: '20px',
+        borderRadius: '8px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    };
+
     return (
-        <div
-            style={{
-                backgroundColor: '#f0f0f0', // Subtle background color
-                padding: '20px',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}
-        >
+        <div style={containerStyle}>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="currentColor"
+                stroke={isDarkTheme ? '#fff' : 'currentColor'}
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
