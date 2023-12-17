@@ -78,23 +78,17 @@ const ScalaCompileTimesChart = ({id, children: csvData}) => {
                                 : 'Minimum Compile Times (Seconds)',
                     },
                     scales: {
-                        xAxes: [
-                            {
-                                stacked: true,
-                                ticks: {
-                                    autoSkip: false,
-                                },
+                        y:  {
+                            stacked: false,
+                            ticks: {
+                                beginAtZero: true,
+                                // callback: value => value + 's',
                             },
-                        ],
-                        yAxes: [
-                            {
-                                stacked: false,
-                                ticks: {
-                                    beginAtZero: true,
-                                    callback: value => value + 's',
-                                },
+                            title: {
+                                display: true,
+                                text: 'Milliseconds',
                             },
-                        ],
+                        },
                     },
                 },
             });

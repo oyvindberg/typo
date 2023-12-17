@@ -28,7 +28,7 @@ for having a codebase full of implicits which need to be resolved. Read on to se
 Typo is a code-generation library for working with PostgreSQL in Scala.
 You can read more in the [introduction](https://oyvindberg.github.io/typo/docs/).
 
-It was built to replace huge swatches of boilerplate in applications,
+It was built to replace huge swathes of boilerplate in applications,
 as well as to provide sorely needed type-safety to avoid having to test everything.
 
 A crucial design goal was to fit into your system such as it is.
@@ -72,6 +72,15 @@ import EmailaddressRowUnsaved from '!!raw-loader!@site/blog/emailaddress/Emailad
 <details><summary>EmailaddressRepoMock.scala</summary><CodeBlock language="yaml" children={EmailaddressRepoMock}/></details>
 <details><summary>EmailaddressRow.scala</summary><CodeBlock language="yaml" children={EmailaddressRow}/></details>
 <details><summary>EmailaddressRowUnsaved.scala</summary><CodeBlock language="yaml" children={EmailaddressRowUnsaved}/></details>
+
+In total it's about this much:
+```
+--------------------------------------------------------------------------------
+ Language             Files        Lines        Blank      Comment         Code
+--------------------------------------------------------------------------------
+ Scala                 1052        47011         3215         7436        36360
+--------------------------------------------------------------------------------
+```
 
 ## Initial comparison of compile times
 
@@ -227,9 +236,13 @@ anorm,scala213,true,7622,7593
 anorm,scala3,true,7050,6948
 `}</ScalaCompileTimesChart>
 
-This brings the compile time for doobie down to about the same as for anorm and zio-jdbc.
+### Observations
 
-Great! So what is going on?
+- This brings the compile time for doobie down to about the same as for anorm and zio-jdbc!
+- We lose a handsome amount of compile time for zio-jdbc and anorm. But it's less clear that it's enough to be worth inlining manually.
+It's a great conclusion actually, resolving implicits is fast as long as it's a straightforward process.
+
+### Great! So what is going on with doobie then?
 
 I honestly haven't dug into all the details, but I have a guess which looks obvious.
 In order to interpolate values into an SQL query, doobie needs to resolve a chain of implicits instead of just one.
@@ -310,7 +323,7 @@ I excluded them for the text above since there was nothing interesting to say ab
 You can see how "inline implicits" mode also speeds up compilation of these JSON codecs.
 
 ### Benchmark limitations
-I think part of this improvement from "inlined implicits" is due to the fact that the compiler is a bit warmer the second time around.
+I think part of this improvement from "inlined implicits" is due to the fact that the compiler is a bit warmer since it will just have finished compiling without inlined implicits.
 
 Note specifically that we get faster compiles for "baseline" with "inlined implicits" mode, although the generated code is the same.
 
