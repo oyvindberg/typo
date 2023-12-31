@@ -70,7 +70,7 @@ object Naming {
     sc.Ident(camelCase(strings))
 
   def splitOnSymbol(str: String): Array[String] =
-    str.split("[\\-_]")
+    str.split("[\\-_.]")
 
   def camelCase(strings: Array[String]): String =
     strings

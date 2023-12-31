@@ -19,21 +19,21 @@ class VjobcandidateeducationViewStructure[Row](val prefix: Option[String], val e
     with VjobcandidateeducationViewFields[Row] { outer =>
 
   override val jobcandidateid = new Field[JobcandidateId, Row](prefix, "jobcandidateid", None, None)(x => extract(x).jobcandidateid, (row, value) => merge(row, extract(row).copy(jobcandidateid = value)))
-  override val `Edu.Level` = new OptField[/* max 50 chars */ String, Row](prefix, "Edu.Level", None, None)(x => extract(x).`Edu.Level`, (row, value) => merge(row, extract(row).copy(`Edu.Level` = value)))
-  override val `Edu.StartDate` = new OptField[TypoLocalDate, Row](prefix, "Edu.StartDate", Some("text"), None)(x => extract(x).`Edu.StartDate`, (row, value) => merge(row, extract(row).copy(`Edu.StartDate` = value)))
-  override val `Edu.EndDate` = new OptField[TypoLocalDate, Row](prefix, "Edu.EndDate", Some("text"), None)(x => extract(x).`Edu.EndDate`, (row, value) => merge(row, extract(row).copy(`Edu.EndDate` = value)))
-  override val `Edu.Degree` = new OptField[/* max 50 chars */ String, Row](prefix, "Edu.Degree", None, None)(x => extract(x).`Edu.Degree`, (row, value) => merge(row, extract(row).copy(`Edu.Degree` = value)))
-  override val `Edu.Major` = new OptField[/* max 50 chars */ String, Row](prefix, "Edu.Major", None, None)(x => extract(x).`Edu.Major`, (row, value) => merge(row, extract(row).copy(`Edu.Major` = value)))
-  override val `Edu.Minor` = new OptField[/* max 50 chars */ String, Row](prefix, "Edu.Minor", None, None)(x => extract(x).`Edu.Minor`, (row, value) => merge(row, extract(row).copy(`Edu.Minor` = value)))
-  override val `Edu.GPA` = new OptField[/* max 5 chars */ String, Row](prefix, "Edu.GPA", None, None)(x => extract(x).`Edu.GPA`, (row, value) => merge(row, extract(row).copy(`Edu.GPA` = value)))
-  override val `Edu.GPAScale` = new OptField[/* max 5 chars */ String, Row](prefix, "Edu.GPAScale", None, None)(x => extract(x).`Edu.GPAScale`, (row, value) => merge(row, extract(row).copy(`Edu.GPAScale` = value)))
-  override val `Edu.School` = new OptField[/* max 100 chars */ String, Row](prefix, "Edu.School", None, None)(x => extract(x).`Edu.School`, (row, value) => merge(row, extract(row).copy(`Edu.School` = value)))
-  override val `Edu.Loc.CountryRegion` = new OptField[/* max 100 chars */ String, Row](prefix, "Edu.Loc.CountryRegion", None, None)(x => extract(x).`Edu.Loc.CountryRegion`, (row, value) => merge(row, extract(row).copy(`Edu.Loc.CountryRegion` = value)))
-  override val `Edu.Loc.State` = new OptField[/* max 100 chars */ String, Row](prefix, "Edu.Loc.State", None, None)(x => extract(x).`Edu.Loc.State`, (row, value) => merge(row, extract(row).copy(`Edu.Loc.State` = value)))
-  override val `Edu.Loc.City` = new OptField[/* max 100 chars */ String, Row](prefix, "Edu.Loc.City", None, None)(x => extract(x).`Edu.Loc.City`, (row, value) => merge(row, extract(row).copy(`Edu.Loc.City` = value)))
+  override val EduLevel = new OptField[/* max 50 chars */ String, Row](prefix, "Edu.Level", None, None)(x => extract(x).EduLevel, (row, value) => merge(row, extract(row).copy(EduLevel = value)))
+  override val EduStartDate = new OptField[TypoLocalDate, Row](prefix, "Edu.StartDate", Some("text"), None)(x => extract(x).EduStartDate, (row, value) => merge(row, extract(row).copy(EduStartDate = value)))
+  override val EduEndDate = new OptField[TypoLocalDate, Row](prefix, "Edu.EndDate", Some("text"), None)(x => extract(x).EduEndDate, (row, value) => merge(row, extract(row).copy(EduEndDate = value)))
+  override val EduDegree = new OptField[/* max 50 chars */ String, Row](prefix, "Edu.Degree", None, None)(x => extract(x).EduDegree, (row, value) => merge(row, extract(row).copy(EduDegree = value)))
+  override val EduMajor = new OptField[/* max 50 chars */ String, Row](prefix, "Edu.Major", None, None)(x => extract(x).EduMajor, (row, value) => merge(row, extract(row).copy(EduMajor = value)))
+  override val EduMinor = new OptField[/* max 50 chars */ String, Row](prefix, "Edu.Minor", None, None)(x => extract(x).EduMinor, (row, value) => merge(row, extract(row).copy(EduMinor = value)))
+  override val EduGPA = new OptField[/* max 5 chars */ String, Row](prefix, "Edu.GPA", None, None)(x => extract(x).EduGPA, (row, value) => merge(row, extract(row).copy(EduGPA = value)))
+  override val EduGPAScale = new OptField[/* max 5 chars */ String, Row](prefix, "Edu.GPAScale", None, None)(x => extract(x).EduGPAScale, (row, value) => merge(row, extract(row).copy(EduGPAScale = value)))
+  override val EduSchool = new OptField[/* max 100 chars */ String, Row](prefix, "Edu.School", None, None)(x => extract(x).EduSchool, (row, value) => merge(row, extract(row).copy(EduSchool = value)))
+  override val EduLocCountryRegion = new OptField[/* max 100 chars */ String, Row](prefix, "Edu.Loc.CountryRegion", None, None)(x => extract(x).EduLocCountryRegion, (row, value) => merge(row, extract(row).copy(EduLocCountryRegion = value)))
+  override val EduLocState = new OptField[/* max 100 chars */ String, Row](prefix, "Edu.Loc.State", None, None)(x => extract(x).EduLocState, (row, value) => merge(row, extract(row).copy(EduLocState = value)))
+  override val EduLocCity = new OptField[/* max 100 chars */ String, Row](prefix, "Edu.Loc.City", None, None)(x => extract(x).EduLocCity, (row, value) => merge(row, extract(row).copy(EduLocCity = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
-    List[FieldLikeNoHkt[?, Row]](jobcandidateid, `Edu.Level`, `Edu.StartDate`, `Edu.EndDate`, `Edu.Degree`, `Edu.Major`, `Edu.Minor`, `Edu.GPA`, `Edu.GPAScale`, `Edu.School`, `Edu.Loc.CountryRegion`, `Edu.Loc.State`, `Edu.Loc.City`)
+    List[FieldLikeNoHkt[?, Row]](jobcandidateid, EduLevel, EduStartDate, EduEndDate, EduDegree, EduMajor, EduMinor, EduGPA, EduGPAScale, EduSchool, EduLocCountryRegion, EduLocState, EduLocCity)
 
   override def copy[NewRow](prefix: Option[String], extract: NewRow => VjobcandidateeducationViewRow, merge: (NewRow, VjobcandidateeducationViewRow) => NewRow): VjobcandidateeducationViewStructure[NewRow] =
     new VjobcandidateeducationViewStructure(prefix, extract, merge)

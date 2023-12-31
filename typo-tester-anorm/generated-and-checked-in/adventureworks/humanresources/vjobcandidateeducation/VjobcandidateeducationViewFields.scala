@@ -14,18 +14,18 @@ import typo.dsl.SqlExpr.OptField
 
 trait VjobcandidateeducationViewFields[Row] {
   val jobcandidateid: Field[JobcandidateId, Row]
-  val `Edu.Level`: OptField[/* max 50 chars */ String, Row]
-  val `Edu.StartDate`: OptField[TypoLocalDate, Row]
-  val `Edu.EndDate`: OptField[TypoLocalDate, Row]
-  val `Edu.Degree`: OptField[/* max 50 chars */ String, Row]
-  val `Edu.Major`: OptField[/* max 50 chars */ String, Row]
-  val `Edu.Minor`: OptField[/* max 50 chars */ String, Row]
-  val `Edu.GPA`: OptField[/* max 5 chars */ String, Row]
-  val `Edu.GPAScale`: OptField[/* max 5 chars */ String, Row]
-  val `Edu.School`: OptField[/* max 100 chars */ String, Row]
-  val `Edu.Loc.CountryRegion`: OptField[/* max 100 chars */ String, Row]
-  val `Edu.Loc.State`: OptField[/* max 100 chars */ String, Row]
-  val `Edu.Loc.City`: OptField[/* max 100 chars */ String, Row]
+  val EduLevel: OptField[/* max 50 chars */ String, Row]
+  val EduStartDate: OptField[TypoLocalDate, Row]
+  val EduEndDate: OptField[TypoLocalDate, Row]
+  val EduDegree: OptField[/* max 50 chars */ String, Row]
+  val EduMajor: OptField[/* max 50 chars */ String, Row]
+  val EduMinor: OptField[/* max 50 chars */ String, Row]
+  val EduGPA: OptField[/* max 5 chars */ String, Row]
+  val EduGPAScale: OptField[/* max 5 chars */ String, Row]
+  val EduSchool: OptField[/* max 100 chars */ String, Row]
+  val EduLocCountryRegion: OptField[/* max 100 chars */ String, Row]
+  val EduLocState: OptField[/* max 100 chars */ String, Row]
+  val EduLocCity: OptField[/* max 100 chars */ String, Row]
 }
 object VjobcandidateeducationViewFields extends VjobcandidateeducationViewStructure[VjobcandidateeducationViewRow](None, identity, (_, x) => x)
 

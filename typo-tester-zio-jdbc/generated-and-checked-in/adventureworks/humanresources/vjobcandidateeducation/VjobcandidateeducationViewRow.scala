@@ -19,18 +19,18 @@ import zio.json.internal.Write
 case class VjobcandidateeducationViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: JobcandidateId,
-  `Edu.Level`: /* nullability unknown */ Option[/* max 50 chars */ String],
-  `Edu.StartDate`: /* nullability unknown */ Option[TypoLocalDate],
-  `Edu.EndDate`: /* nullability unknown */ Option[TypoLocalDate],
-  `Edu.Degree`: /* nullability unknown */ Option[/* max 50 chars */ String],
-  `Edu.Major`: /* nullability unknown */ Option[/* max 50 chars */ String],
-  `Edu.Minor`: /* nullability unknown */ Option[/* max 50 chars */ String],
-  `Edu.GPA`: /* nullability unknown */ Option[/* max 5 chars */ String],
-  `Edu.GPAScale`: /* nullability unknown */ Option[/* max 5 chars */ String],
-  `Edu.School`: /* nullability unknown */ Option[/* max 100 chars */ String],
-  `Edu.Loc.CountryRegion`: /* nullability unknown */ Option[/* max 100 chars */ String],
-  `Edu.Loc.State`: /* nullability unknown */ Option[/* max 100 chars */ String],
-  `Edu.Loc.City`: /* nullability unknown */ Option[/* max 100 chars */ String]
+  EduLevel: /* nullability unknown */ Option[/* max 50 chars */ String],
+  EduStartDate: /* nullability unknown */ Option[TypoLocalDate],
+  EduEndDate: /* nullability unknown */ Option[TypoLocalDate],
+  EduDegree: /* nullability unknown */ Option[/* max 50 chars */ String],
+  EduMajor: /* nullability unknown */ Option[/* max 50 chars */ String],
+  EduMinor: /* nullability unknown */ Option[/* max 50 chars */ String],
+  EduGPA: /* nullability unknown */ Option[/* max 5 chars */ String],
+  EduGPAScale: /* nullability unknown */ Option[/* max 5 chars */ String],
+  EduSchool: /* nullability unknown */ Option[/* max 100 chars */ String],
+  EduLocCountryRegion: /* nullability unknown */ Option[/* max 100 chars */ String],
+  EduLocState: /* nullability unknown */ Option[/* max 100 chars */ String],
+  EduLocCity: /* nullability unknown */ Option[/* max 100 chars */ String]
 )
 
 object VjobcandidateeducationViewRow {
@@ -39,37 +39,37 @@ object VjobcandidateeducationViewRow {
       columIndex + 12 ->
         VjobcandidateeducationViewRow(
           jobcandidateid = JobcandidateId.jdbcDecoder.unsafeDecode(columIndex + 0, rs)._2,
-          `Edu.Level` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 1, rs)._2,
-          `Edu.StartDate` = JdbcDecoder.optionDecoder(TypoLocalDate.jdbcDecoder).unsafeDecode(columIndex + 2, rs)._2,
-          `Edu.EndDate` = JdbcDecoder.optionDecoder(TypoLocalDate.jdbcDecoder).unsafeDecode(columIndex + 3, rs)._2,
-          `Edu.Degree` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 4, rs)._2,
-          `Edu.Major` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 5, rs)._2,
-          `Edu.Minor` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 6, rs)._2,
-          `Edu.GPA` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 7, rs)._2,
-          `Edu.GPAScale` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 8, rs)._2,
-          `Edu.School` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 9, rs)._2,
-          `Edu.Loc.CountryRegion` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 10, rs)._2,
-          `Edu.Loc.State` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 11, rs)._2,
-          `Edu.Loc.City` = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 12, rs)._2
+          EduLevel = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 1, rs)._2,
+          EduStartDate = JdbcDecoder.optionDecoder(TypoLocalDate.jdbcDecoder).unsafeDecode(columIndex + 2, rs)._2,
+          EduEndDate = JdbcDecoder.optionDecoder(TypoLocalDate.jdbcDecoder).unsafeDecode(columIndex + 3, rs)._2,
+          EduDegree = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 4, rs)._2,
+          EduMajor = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 5, rs)._2,
+          EduMinor = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 6, rs)._2,
+          EduGPA = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 7, rs)._2,
+          EduGPAScale = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 8, rs)._2,
+          EduSchool = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 9, rs)._2,
+          EduLocCountryRegion = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 10, rs)._2,
+          EduLocState = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 11, rs)._2,
+          EduLocCity = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 12, rs)._2
         )
   }
   implicit lazy val jsonDecoder: JsonDecoder[VjobcandidateeducationViewRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val jobcandidateid = jsonObj.get("jobcandidateid").toRight("Missing field 'jobcandidateid'").flatMap(_.as(JobcandidateId.jsonDecoder))
-    val `Edu.Level` = jsonObj.get("Edu.Level").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.StartDate` = jsonObj.get("Edu.StartDate").fold[Either[String, Option[TypoLocalDate]]](Right(None))(_.as(JsonDecoder.option(TypoLocalDate.jsonDecoder)))
-    val `Edu.EndDate` = jsonObj.get("Edu.EndDate").fold[Either[String, Option[TypoLocalDate]]](Right(None))(_.as(JsonDecoder.option(TypoLocalDate.jsonDecoder)))
-    val `Edu.Degree` = jsonObj.get("Edu.Degree").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.Major` = jsonObj.get("Edu.Major").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.Minor` = jsonObj.get("Edu.Minor").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.GPA` = jsonObj.get("Edu.GPA").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.GPAScale` = jsonObj.get("Edu.GPAScale").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.School` = jsonObj.get("Edu.School").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.Loc.CountryRegion` = jsonObj.get("Edu.Loc.CountryRegion").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.Loc.State` = jsonObj.get("Edu.Loc.State").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    val `Edu.Loc.City` = jsonObj.get("Edu.Loc.City").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
-    if (jobcandidateid.isRight && `Edu.Level`.isRight && `Edu.StartDate`.isRight && `Edu.EndDate`.isRight && `Edu.Degree`.isRight && `Edu.Major`.isRight && `Edu.Minor`.isRight && `Edu.GPA`.isRight && `Edu.GPAScale`.isRight && `Edu.School`.isRight && `Edu.Loc.CountryRegion`.isRight && `Edu.Loc.State`.isRight && `Edu.Loc.City`.isRight)
-      Right(VjobcandidateeducationViewRow(jobcandidateid = jobcandidateid.toOption.get, `Edu.Level` = `Edu.Level`.toOption.get, `Edu.StartDate` = `Edu.StartDate`.toOption.get, `Edu.EndDate` = `Edu.EndDate`.toOption.get, `Edu.Degree` = `Edu.Degree`.toOption.get, `Edu.Major` = `Edu.Major`.toOption.get, `Edu.Minor` = `Edu.Minor`.toOption.get, `Edu.GPA` = `Edu.GPA`.toOption.get, `Edu.GPAScale` = `Edu.GPAScale`.toOption.get, `Edu.School` = `Edu.School`.toOption.get, `Edu.Loc.CountryRegion` = `Edu.Loc.CountryRegion`.toOption.get, `Edu.Loc.State` = `Edu.Loc.State`.toOption.get, `Edu.Loc.City` = `Edu.Loc.City`.toOption.get))
-    else Left(List[Either[String, Any]](jobcandidateid, `Edu.Level`, `Edu.StartDate`, `Edu.EndDate`, `Edu.Degree`, `Edu.Major`, `Edu.Minor`, `Edu.GPA`, `Edu.GPAScale`, `Edu.School`, `Edu.Loc.CountryRegion`, `Edu.Loc.State`, `Edu.Loc.City`).flatMap(_.left.toOption).mkString(", "))
+    val EduLevel = jsonObj.get("Edu.Level").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduStartDate = jsonObj.get("Edu.StartDate").fold[Either[String, Option[TypoLocalDate]]](Right(None))(_.as(JsonDecoder.option(TypoLocalDate.jsonDecoder)))
+    val EduEndDate = jsonObj.get("Edu.EndDate").fold[Either[String, Option[TypoLocalDate]]](Right(None))(_.as(JsonDecoder.option(TypoLocalDate.jsonDecoder)))
+    val EduDegree = jsonObj.get("Edu.Degree").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduMajor = jsonObj.get("Edu.Major").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduMinor = jsonObj.get("Edu.Minor").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduGPA = jsonObj.get("Edu.GPA").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduGPAScale = jsonObj.get("Edu.GPAScale").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduSchool = jsonObj.get("Edu.School").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduLocCountryRegion = jsonObj.get("Edu.Loc.CountryRegion").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduLocState = jsonObj.get("Edu.Loc.State").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val EduLocCity = jsonObj.get("Edu.Loc.City").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    if (jobcandidateid.isRight && EduLevel.isRight && EduStartDate.isRight && EduEndDate.isRight && EduDegree.isRight && EduMajor.isRight && EduMinor.isRight && EduGPA.isRight && EduGPAScale.isRight && EduSchool.isRight && EduLocCountryRegion.isRight && EduLocState.isRight && EduLocCity.isRight)
+      Right(VjobcandidateeducationViewRow(jobcandidateid = jobcandidateid.toOption.get, EduLevel = EduLevel.toOption.get, EduStartDate = EduStartDate.toOption.get, EduEndDate = EduEndDate.toOption.get, EduDegree = EduDegree.toOption.get, EduMajor = EduMajor.toOption.get, EduMinor = EduMinor.toOption.get, EduGPA = EduGPA.toOption.get, EduGPAScale = EduGPAScale.toOption.get, EduSchool = EduSchool.toOption.get, EduLocCountryRegion = EduLocCountryRegion.toOption.get, EduLocState = EduLocState.toOption.get, EduLocCity = EduLocCity.toOption.get))
+    else Left(List[Either[String, Any]](jobcandidateid, EduLevel, EduStartDate, EduEndDate, EduDegree, EduMajor, EduMinor, EduGPA, EduGPAScale, EduSchool, EduLocCountryRegion, EduLocState, EduLocCity).flatMap(_.left.toOption).mkString(", "))
   }
   implicit lazy val jsonEncoder: JsonEncoder[VjobcandidateeducationViewRow] = new JsonEncoder[VjobcandidateeducationViewRow] {
     override def unsafeEncode(a: VjobcandidateeducationViewRow, indent: Option[Int], out: Write): Unit = {
@@ -78,40 +78,40 @@ object VjobcandidateeducationViewRow {
       JobcandidateId.jsonEncoder.unsafeEncode(a.jobcandidateid, indent, out)
       out.write(",")
       out.write(""""Edu.Level":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.Level`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduLevel, indent, out)
       out.write(",")
       out.write(""""Edu.StartDate":""")
-      JsonEncoder.option(TypoLocalDate.jsonEncoder).unsafeEncode(a.`Edu.StartDate`, indent, out)
+      JsonEncoder.option(TypoLocalDate.jsonEncoder).unsafeEncode(a.EduStartDate, indent, out)
       out.write(",")
       out.write(""""Edu.EndDate":""")
-      JsonEncoder.option(TypoLocalDate.jsonEncoder).unsafeEncode(a.`Edu.EndDate`, indent, out)
+      JsonEncoder.option(TypoLocalDate.jsonEncoder).unsafeEncode(a.EduEndDate, indent, out)
       out.write(",")
       out.write(""""Edu.Degree":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.Degree`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduDegree, indent, out)
       out.write(",")
       out.write(""""Edu.Major":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.Major`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduMajor, indent, out)
       out.write(",")
       out.write(""""Edu.Minor":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.Minor`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduMinor, indent, out)
       out.write(",")
       out.write(""""Edu.GPA":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.GPA`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduGPA, indent, out)
       out.write(",")
       out.write(""""Edu.GPAScale":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.GPAScale`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduGPAScale, indent, out)
       out.write(",")
       out.write(""""Edu.School":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.School`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduSchool, indent, out)
       out.write(",")
       out.write(""""Edu.Loc.CountryRegion":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.Loc.CountryRegion`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduLocCountryRegion, indent, out)
       out.write(",")
       out.write(""""Edu.Loc.State":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.Loc.State`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduLocState, indent, out)
       out.write(",")
       out.write(""""Edu.Loc.City":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.`Edu.Loc.City`, indent, out)
+      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.EduLocCity, indent, out)
       out.write("}")
     }
   }
