@@ -4,16 +4,19 @@ class Naming(val pkg: sc.QIdent) {
   protected def fragments(source: Source): (sc.QIdent, String) = {
     def forRelPath(relPath: RelPath): (sc.QIdent, String) =
       (
-        pkg / relPath.segments.init.map(sc.Ident.apply),
+        pkg / relPath.segments.init.map(pkgSafe),
         relPath.segments.last.replace(".sql", "")
       )
 
     source match {
       case relation: Source.Relation =>
-        (pkg / relation.name.schema.toList.map(sc.Ident.apply), relation.name.name)
+        (pkg / relation.name.schema.toList.map(pkgSafe), relation.name.name)
       case Source.SqlFile(relPath) => forRelPath(relPath)
     }
   }
+
+  // not enough, but covers a common case
+  def pkgSafe(str: String): sc.Ident = sc.Ident(str.replace('-', '_'))
 
   def suffixFor(source: Source): String =
     source match {
@@ -26,7 +29,7 @@ class Naming(val pkg: sc.QIdent) {
   protected def relation(source: Source, suffix: String): sc.QIdent = {
     val (init, name) = fragments(source)
     val suffix0 = suffixFor(source)
-    init / sc.Ident(name) / sc.Ident(Naming.titleCase(name)).appended(suffix0 + suffix)
+    init / pkgSafe(name) / sc.Ident(Naming.titleCase(name)).appended(suffix0 + suffix)
   }
 
   protected def tpe(name: db.RelationName, suffix: String): sc.QIdent =
