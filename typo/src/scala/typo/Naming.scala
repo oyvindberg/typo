@@ -66,8 +66,13 @@ object Naming {
   def camelCaseIdent(strings: Array[String]): sc.Ident =
     sc.Ident(camelCase(strings))
 
+  def splitOnSymbol(str: String): Array[String] =
+    str.split("[\\-_]")
+
   def camelCase(strings: Array[String]): String =
-    strings.zipWithIndex
+    strings
+      .flatMap(splitOnSymbol)
+      .zipWithIndex
       .map {
         case (s, 0) => s
         case (s, _) => s.capitalize
@@ -81,5 +86,5 @@ object Naming {
     titleCase(name.split('_'))
 
   def titleCase(strings: Array[String]): String =
-    strings.map(_.capitalize).mkString("")
+    strings.flatMap(splitOnSymbol).map(_.capitalize).mkString("")
 }
