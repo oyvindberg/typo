@@ -22,7 +22,9 @@ import scala.util.Try
 import testdb.hardcoded.Text
 
 case class PersonRow(
+  /** Default: auto-increment */
   one: Long,
+  /** Default: auto-increment */
   two: Option[String],
   name: Option[String]
 ){

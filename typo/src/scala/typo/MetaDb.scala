@@ -143,6 +143,7 @@ object MetaDb {
                       tpe = dbType,
                       udtName = None,
                       columnDefault = None,
+                      identity = None,
                       comment = comments.get(coord),
                       jsonDescription = DebugJson(mdCol),
                       nullability = nullability,
@@ -187,19 +188,31 @@ object MetaDb {
                     case None        => Nullability.NullableUnknown
                     case other       => throw new Exception(s"Unknown nullability: $other")
                   }
+
                 val tpe = typeMapperDb.col(c) { () =>
                   logger.warn(s"Couldn't translate type from table ${relationName.value} column ${parsedName.name.value} with type ${c.udtName}. Falling back to text")
+                }
+
+                val identity = c.identityGeneration.map { value =>
+                  db.Identity(
+                    identityGeneration = value,
+                    identityStart = c.identityStart,
+                    identityIncrement = c.identityIncrement,
+                    identityMaximum = c.identityMaximum,
+                    identityMinimum = c.identityMinimum
+                  )
                 }
                 val coord = (relationName, parsedName.name)
                 db.Col(
                   parsedName = parsedName,
-                  columnDefault = c.columnDefault,
-                  nullability = nullability,
                   tpe = tpe,
                   udtName = c.udtName,
+                  nullability = nullability,
+                  columnDefault = c.columnDefault,
+                  identity = identity,
                   comment = comments.get(coord),
-                  jsonDescription = jsonDescription,
-                  constraints = constraints.getOrElse(coord, Nil) ++ deps.get(parsedName.name).flatMap(otherCoord => constraints.get(otherCoord)).getOrElse(Nil)
+                  constraints = constraints.getOrElse(coord, Nil) ++ deps.get(parsedName.name).flatMap(otherCoord => constraints.get(otherCoord)).getOrElse(Nil),
+                  jsonDescription = jsonDescription
                 )
               }
 

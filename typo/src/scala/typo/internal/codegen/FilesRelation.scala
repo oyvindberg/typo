@@ -18,6 +18,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
       val commentPieces = List[Iterable[String]](
         col.dbCol.comment,
         col.dbCol.columnDefault.map(x => s"Default: $x"),
+        col.dbCol.identity.map(_.asString),
         col.pointsTo.map { case (relationName, columnName) =>
           val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, names.RowName.value.idents))
           s"Points to [[${shortened.dotName}.${naming.field(columnName).value}]]"

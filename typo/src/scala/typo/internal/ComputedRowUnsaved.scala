@@ -3,7 +3,8 @@ package internal
 
 object ComputedRowUnsaved {
   def apply(source: Source, cols: NonEmptyList[ComputedColumn], default: ComputedDefault, naming: Naming): Option[ComputedRowUnsaved] = {
-    val (defaultCols, restCols) = cols.toList.partition(_.dbCol.columnDefault.nonEmpty)
+    val (alwaysGenerated, notAlwaysGenerated) = cols.toList.partition(c => c.dbCol.identity.exists(_.ALWAYS))
+    val (defaultCols, restCols) = notAlwaysGenerated.partition(c => c.dbCol.columnDefault.nonEmpty || c.dbCol.identity.exists(_.`BY DEFAULT`))
 
     NonEmptyList.fromList(defaultCols).map { nonEmpty =>
       val defaultCols = nonEmpty.map { col =>
@@ -13,6 +14,7 @@ object ComputedRowUnsaved {
       new ComputedRowUnsaved(
         defaultCols = defaultCols,
         restCols = restCols,
+        alwaysGeneratedCols = alwaysGenerated,
         tpe = sc.Type.Qualified(naming.rowUnsaved(source))
       )
     }
@@ -22,6 +24,7 @@ object ComputedRowUnsaved {
 case class ComputedRowUnsaved(
     defaultCols: NonEmptyList[(ComputedColumn, sc.Type)],
     restCols: List[ComputedColumn],
+    alwaysGeneratedCols: List[ComputedColumn],
     tpe: sc.Type.Qualified
 ) {
   def allCols: NonEmptyList[ComputedColumn] =
