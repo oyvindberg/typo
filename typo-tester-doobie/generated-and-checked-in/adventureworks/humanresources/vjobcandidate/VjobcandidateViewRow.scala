@@ -22,17 +22,17 @@ case class VjobcandidateViewRow(
   jobcandidateid: JobcandidateId,
   /** Points to [[jobcandidate.JobcandidateRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
-  `Name.Prefix`: /* nullability unknown */ Option[/* max 30 chars */ String],
-  `Name.First`: /* nullability unknown */ Option[/* max 30 chars */ String],
-  `Name.Middle`: /* nullability unknown */ Option[/* max 30 chars */ String],
-  `Name.Last`: /* nullability unknown */ Option[/* max 30 chars */ String],
-  `Name.Suffix`: /* nullability unknown */ Option[/* max 30 chars */ String],
+  NamePrefix: /* nullability unknown */ Option[/* max 30 chars */ String],
+  NameFirst: /* nullability unknown */ Option[/* max 30 chars */ String],
+  NameMiddle: /* nullability unknown */ Option[/* max 30 chars */ String],
+  NameLast: /* nullability unknown */ Option[/* max 30 chars */ String],
+  NameSuffix: /* nullability unknown */ Option[/* max 30 chars */ String],
   Skills: /* nullability unknown */ Option[String],
-  `Addr.Type`: /* nullability unknown */ Option[/* max 30 chars */ String],
-  `Addr.Loc.CountryRegion`: /* nullability unknown */ Option[/* max 100 chars */ String],
-  `Addr.Loc.State`: /* nullability unknown */ Option[/* max 100 chars */ String],
-  `Addr.Loc.City`: /* nullability unknown */ Option[/* max 100 chars */ String],
-  `Addr.PostalCode`: /* nullability unknown */ Option[/* max 20 chars */ String],
+  AddrType: /* nullability unknown */ Option[/* max 30 chars */ String],
+  AddrLocCountryRegion: /* nullability unknown */ Option[/* max 100 chars */ String],
+  AddrLocState: /* nullability unknown */ Option[/* max 100 chars */ String],
+  AddrLocCity: /* nullability unknown */ Option[/* max 100 chars */ String],
+  AddrPostalCode: /* nullability unknown */ Option[/* max 20 chars */ String],
   EMail: /* nullability unknown */ Option[String],
   WebSite: /* nullability unknown */ Option[String],
   /** Points to [[jobcandidate.JobcandidateRow.modifieddate]] */
@@ -41,7 +41,7 @@ case class VjobcandidateViewRow(
 
 object VjobcandidateViewRow {
   implicit lazy val decoder: Decoder[VjobcandidateViewRow] = Decoder.forProduct16[VjobcandidateViewRow, JobcandidateId, Option[BusinessentityId], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 20 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], TypoLocalDateTime]("jobcandidateid", "businessentityid", "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", "Skills", "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", "EMail", "WebSite", "modifieddate")(VjobcandidateViewRow.apply)(JobcandidateId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[VjobcandidateViewRow] = Encoder.forProduct16[VjobcandidateViewRow, JobcandidateId, Option[BusinessentityId], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 20 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], TypoLocalDateTime]("jobcandidateid", "businessentityid", "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", "Skills", "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", "EMail", "WebSite", "modifieddate")(x => (x.jobcandidateid, x.businessentityid, x.`Name.Prefix`, x.`Name.First`, x.`Name.Middle`, x.`Name.Last`, x.`Name.Suffix`, x.Skills, x.`Addr.Type`, x.`Addr.Loc.CountryRegion`, x.`Addr.Loc.State`, x.`Addr.Loc.City`, x.`Addr.PostalCode`, x.EMail, x.WebSite, x.modifieddate))(JobcandidateId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
+  implicit lazy val encoder: Encoder[VjobcandidateViewRow] = Encoder.forProduct16[VjobcandidateViewRow, JobcandidateId, Option[BusinessentityId], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 20 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], TypoLocalDateTime]("jobcandidateid", "businessentityid", "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", "Skills", "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", "EMail", "WebSite", "modifieddate")(x => (x.jobcandidateid, x.businessentityid, x.NamePrefix, x.NameFirst, x.NameMiddle, x.NameLast, x.NameSuffix, x.Skills, x.AddrType, x.AddrLocCountryRegion, x.AddrLocState, x.AddrLocCity, x.AddrPostalCode, x.EMail, x.WebSite, x.modifieddate))(JobcandidateId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
   implicit lazy val read: Read[VjobcandidateViewRow] = new Read[VjobcandidateViewRow](
     gets = List(
       (JobcandidateId.get, Nullability.NoNulls),
@@ -64,17 +64,17 @@ object VjobcandidateViewRow {
     unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateViewRow(
       jobcandidateid = JobcandidateId.get.unsafeGetNonNullable(rs, i + 0),
       businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      `Name.Prefix` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      `Name.First` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      `Name.Middle` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      `Name.Last` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      `Name.Suffix` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      NamePrefix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      NameFirst = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      NameMiddle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      NameLast = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      NameSuffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
       Skills = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      `Addr.Type` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      `Addr.Loc.CountryRegion` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
-      `Addr.Loc.State` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
-      `Addr.Loc.City` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11),
-      `Addr.PostalCode` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
+      AddrType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      AddrLocCountryRegion = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      AddrLocState = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
+      AddrLocCity = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11),
+      AddrPostalCode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
       EMail = Meta.StringMeta.get.unsafeGetNullable(rs, i + 13),
       WebSite = Meta.StringMeta.get.unsafeGetNullable(rs, i + 14),
       modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 15)

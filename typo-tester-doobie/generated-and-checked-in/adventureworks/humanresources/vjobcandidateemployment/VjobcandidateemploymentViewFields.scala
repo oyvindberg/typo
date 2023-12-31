@@ -14,16 +14,16 @@ import typo.dsl.SqlExpr.OptField
 
 trait VjobcandidateemploymentViewFields[Row] {
   val jobcandidateid: Field[JobcandidateId, Row]
-  val `Emp.StartDate`: OptField[TypoLocalDate, Row]
-  val `Emp.EndDate`: OptField[TypoLocalDate, Row]
-  val `Emp.OrgName`: OptField[/* max 100 chars */ String, Row]
-  val `Emp.JobTitle`: OptField[/* max 100 chars */ String, Row]
-  val `Emp.Responsibility`: OptField[String, Row]
-  val `Emp.FunctionCategory`: OptField[String, Row]
-  val `Emp.IndustryCategory`: OptField[String, Row]
-  val `Emp.Loc.CountryRegion`: OptField[String, Row]
-  val `Emp.Loc.State`: OptField[String, Row]
-  val `Emp.Loc.City`: OptField[String, Row]
+  val EmpStartDate: OptField[TypoLocalDate, Row]
+  val EmpEndDate: OptField[TypoLocalDate, Row]
+  val EmpOrgName: OptField[/* max 100 chars */ String, Row]
+  val EmpJobTitle: OptField[/* max 100 chars */ String, Row]
+  val EmpResponsibility: OptField[String, Row]
+  val EmpFunctionCategory: OptField[String, Row]
+  val EmpIndustryCategory: OptField[String, Row]
+  val EmpLocCountryRegion: OptField[String, Row]
+  val EmpLocState: OptField[String, Row]
+  val EmpLocCity: OptField[String, Row]
 }
 object VjobcandidateemploymentViewFields extends VjobcandidateemploymentViewStructure[VjobcandidateemploymentViewRow](None, identity, (_, x) => x)
 

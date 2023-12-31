@@ -19,21 +19,21 @@ import java.sql.ResultSet
 case class VjobcandidateemploymentViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: JobcandidateId,
-  `Emp.StartDate`: /* nullability unknown */ Option[TypoLocalDate],
-  `Emp.EndDate`: /* nullability unknown */ Option[TypoLocalDate],
-  `Emp.OrgName`: /* nullability unknown */ Option[/* max 100 chars */ String],
-  `Emp.JobTitle`: /* nullability unknown */ Option[/* max 100 chars */ String],
-  `Emp.Responsibility`: /* nullability unknown */ Option[String],
-  `Emp.FunctionCategory`: /* nullability unknown */ Option[String],
-  `Emp.IndustryCategory`: /* nullability unknown */ Option[String],
-  `Emp.Loc.CountryRegion`: /* nullability unknown */ Option[String],
-  `Emp.Loc.State`: /* nullability unknown */ Option[String],
-  `Emp.Loc.City`: /* nullability unknown */ Option[String]
+  EmpStartDate: /* nullability unknown */ Option[TypoLocalDate],
+  EmpEndDate: /* nullability unknown */ Option[TypoLocalDate],
+  EmpOrgName: /* nullability unknown */ Option[/* max 100 chars */ String],
+  EmpJobTitle: /* nullability unknown */ Option[/* max 100 chars */ String],
+  EmpResponsibility: /* nullability unknown */ Option[String],
+  EmpFunctionCategory: /* nullability unknown */ Option[String],
+  EmpIndustryCategory: /* nullability unknown */ Option[String],
+  EmpLocCountryRegion: /* nullability unknown */ Option[String],
+  EmpLocState: /* nullability unknown */ Option[String],
+  EmpLocCity: /* nullability unknown */ Option[String]
 )
 
 object VjobcandidateemploymentViewRow {
   implicit lazy val decoder: Decoder[VjobcandidateemploymentViewRow] = Decoder.forProduct11[VjobcandidateemploymentViewRow, JobcandidateId, /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("jobcandidateid", "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City")(VjobcandidateemploymentViewRow.apply)(JobcandidateId.decoder, Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit lazy val encoder: Encoder[VjobcandidateemploymentViewRow] = Encoder.forProduct11[VjobcandidateemploymentViewRow, JobcandidateId, /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("jobcandidateid", "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City")(x => (x.jobcandidateid, x.`Emp.StartDate`, x.`Emp.EndDate`, x.`Emp.OrgName`, x.`Emp.JobTitle`, x.`Emp.Responsibility`, x.`Emp.FunctionCategory`, x.`Emp.IndustryCategory`, x.`Emp.Loc.CountryRegion`, x.`Emp.Loc.State`, x.`Emp.Loc.City`))(JobcandidateId.encoder, Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val encoder: Encoder[VjobcandidateemploymentViewRow] = Encoder.forProduct11[VjobcandidateemploymentViewRow, JobcandidateId, /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[TypoLocalDate], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String]]("jobcandidateid", "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City")(x => (x.jobcandidateid, x.EmpStartDate, x.EmpEndDate, x.EmpOrgName, x.EmpJobTitle, x.EmpResponsibility, x.EmpFunctionCategory, x.EmpIndustryCategory, x.EmpLocCountryRegion, x.EmpLocState, x.EmpLocCity))(JobcandidateId.encoder, Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit lazy val read: Read[VjobcandidateemploymentViewRow] = new Read[VjobcandidateemploymentViewRow](
     gets = List(
       (JobcandidateId.get, Nullability.NoNulls),
@@ -50,16 +50,16 @@ object VjobcandidateemploymentViewRow {
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateemploymentViewRow(
       jobcandidateid = JobcandidateId.get.unsafeGetNonNullable(rs, i + 0),
-      `Emp.StartDate` = TypoLocalDate.get.unsafeGetNullable(rs, i + 1),
-      `Emp.EndDate` = TypoLocalDate.get.unsafeGetNullable(rs, i + 2),
-      `Emp.OrgName` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      `Emp.JobTitle` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      `Emp.Responsibility` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      `Emp.FunctionCategory` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      `Emp.IndustryCategory` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      `Emp.Loc.CountryRegion` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      `Emp.Loc.State` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
-      `Emp.Loc.City` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10)
+      EmpStartDate = TypoLocalDate.get.unsafeGetNullable(rs, i + 1),
+      EmpEndDate = TypoLocalDate.get.unsafeGetNullable(rs, i + 2),
+      EmpOrgName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      EmpJobTitle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      EmpResponsibility = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      EmpFunctionCategory = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      EmpIndustryCategory = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+      EmpLocCountryRegion = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      EmpLocState = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      EmpLocCity = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }
