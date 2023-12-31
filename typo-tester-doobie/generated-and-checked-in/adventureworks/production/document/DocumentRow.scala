@@ -27,7 +27,8 @@ case class DocumentRow(
   /** Employee who controls the document.  Foreign key to Employee.BusinessEntityID
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   owner: BusinessentityId,
-  /** 0 = This is a folder, 1 = This is a document. */
+  /** 0 = This is a folder, 1 = This is a document.
+      Default: false */
   folderflag: Flag,
   /** File name of the document */
   filename: /* max 400 chars */ String,
@@ -35,7 +36,8 @@ case class DocumentRow(
   fileextension: Option[/* max 8 chars */ String],
   /** Revision number of the document. */
   revision: /* bpchar, max 5 chars */ String,
-  /** Engineering change approval number. */
+  /** Engineering change approval number.
+      Default: 0 */
   changenumber: Int,
   /** 1 = Pending approval, 2 = Approved, 3 = Obsolete
       Constraint CK_Document_Status affecting columns status: (((status >= 1) AND (status <= 3))) */
@@ -44,10 +46,13 @@ case class DocumentRow(
   documentsummary: Option[String],
   /** Complete document. */
   document: Option[TypoBytea],
-  /** ROWGUIDCOL number uniquely identifying the record. Required for FileStream. */
+  /** ROWGUIDCOL number uniquely identifying the record. Required for FileStream.
+      Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime,
-  /** Primary key for Document records. */
+  /** Primary key for Document records.
+      Default: '/'::character varying */
   documentnode: DocumentId
 )
 

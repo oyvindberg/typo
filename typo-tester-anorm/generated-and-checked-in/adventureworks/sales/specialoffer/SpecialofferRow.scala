@@ -23,11 +23,13 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpecialofferRow(
-  /** Primary key for SpecialOffer records. */
+  /** Primary key for SpecialOffer records.
+      Default: nextval('sales.specialoffer_specialofferid_seq'::regclass) */
   specialofferid: SpecialofferId,
   /** Discount description. */
   description: /* max 255 chars */ String,
   /** Discount precentage.
+      Default: 0.00
       Constraint CK_SpecialOffer_DiscountPct affecting columns discountpct: ((discountpct >= 0.00)) */
   discountpct: BigDecimal,
   /** Discount type category. */
@@ -41,12 +43,15 @@ case class SpecialofferRow(
       Constraint CK_SpecialOffer_EndDate affecting columns enddate, startdate: ((enddate >= startdate)) */
   enddate: TypoLocalDateTime,
   /** Minimum discount percent allowed.
+      Default: 0
       Constraint CK_SpecialOffer_MinQty affecting columns minqty: ((minqty >= 0)) */
   minqty: Int,
   /** Maximum discount percent allowed.
       Constraint CK_SpecialOffer_MaxQty affecting columns maxqty: ((maxqty >= 0)) */
   maxqty: Option[Int],
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

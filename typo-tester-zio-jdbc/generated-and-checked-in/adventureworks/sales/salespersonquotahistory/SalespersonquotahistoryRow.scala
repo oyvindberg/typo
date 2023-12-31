@@ -27,7 +27,9 @@ case class SalespersonquotahistoryRow(
   /** Sales quota amount.
       Constraint CK_SalesPersonQuotaHistory_SalesQuota affecting columns salesquota: ((salesquota > 0.00)) */
   salesquota: BigDecimal,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalespersonquotahistoryId = SalespersonquotahistoryId(businessentityid, quotadate)

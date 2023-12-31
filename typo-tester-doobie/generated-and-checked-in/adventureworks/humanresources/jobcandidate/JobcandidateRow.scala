@@ -18,13 +18,15 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class JobcandidateRow(
-  /** Primary key for JobCandidate records. */
+  /** Primary key for JobCandidate records.
+      Default: nextval('humanresources.jobcandidate_jobcandidateid_seq'::regclass) */
   jobcandidateid: JobcandidateId,
   /** Employee identification number if applicant was hired. Foreign key to Employee.BusinessEntityID.
       Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
   resume: Option[TypoXml],
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

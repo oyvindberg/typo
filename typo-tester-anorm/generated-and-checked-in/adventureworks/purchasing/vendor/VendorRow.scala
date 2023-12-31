@@ -37,12 +37,15 @@ case class VendorRow(
   /** 1 = Superior, 2 = Excellent, 3 = Above average, 4 = Average, 5 = Below average
       Constraint CK_Vendor_CreditRating affecting columns creditrating: (((creditrating >= 1) AND (creditrating <= 5))) */
   creditrating: TypoShort,
-  /** 0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product. */
+  /** 0 = Do not use if another vendor is available. 1 = Preferred over other vendors supplying the same product.
+      Default: true */
   preferredvendorstatus: Flag,
-  /** 0 = Vendor no longer used. 1 = Vendor is actively used. */
+  /** 0 = Vendor no longer used. 1 = Vendor is actively used.
+      Default: true */
   activeflag: Flag,
   /** Vendor URL. */
   purchasingwebserviceurl: Option[/* max 1024 chars */ String],
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

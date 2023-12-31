@@ -35,6 +35,7 @@ case class ProductcosthistoryRow(
   /** Standard cost of the product.
       Constraint CK_ProductCostHistory_StandardCost affecting columns standardcost: ((standardcost >= 0.00)) */
   standardcost: BigDecimal,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductcosthistoryId = ProductcosthistoryId(productid, startdate)

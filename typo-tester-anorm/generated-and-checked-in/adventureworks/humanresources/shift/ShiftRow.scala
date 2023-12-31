@@ -22,7 +22,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ShiftRow(
-  /** Primary key for Shift records. */
+  /** Primary key for Shift records.
+      Default: nextval('humanresources.shift_shiftid_seq'::regclass) */
   shiftid: ShiftId,
   /** Shift description. */
   name: Name,
@@ -30,6 +31,7 @@ case class ShiftRow(
   starttime: TypoLocalTime,
   /** Shift end time. */
   endtime: TypoLocalTime,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

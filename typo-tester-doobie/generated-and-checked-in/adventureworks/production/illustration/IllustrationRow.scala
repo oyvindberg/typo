@@ -17,10 +17,12 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class IllustrationRow(
-  /** Primary key for Illustration records. */
+  /** Primary key for Illustration records.
+      Default: nextval('production.illustration_illustrationid_seq'::regclass) */
   illustrationid: IllustrationId,
   /** Illustrations used in manufacturing instructions. Stored as XML. */
   diagram: Option[TypoXml],
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

@@ -26,8 +26,10 @@ case class ProductproductphotoRow(
   /** Product photo identification number. Foreign key to ProductPhoto.ProductPhotoID.
       Points to [[productphoto.ProductphotoRow.productphotoid]] */
   productphotoid: ProductphotoId,
-  /** 0 = Photo is not the principal image. 1 = Photo is the principal image. */
+  /** 0 = Photo is not the principal image. 1 = Photo is the principal image.
+      Default: false */
   primary: Flag,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductproductphotoId = ProductproductphotoId(productid, productphotoid)

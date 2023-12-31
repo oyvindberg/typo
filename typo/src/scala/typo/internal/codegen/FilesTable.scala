@@ -21,9 +21,8 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
           sc.Ident(col.name.value).appended("Default")
 
         val params: NonEmptyList[sc.Param] =
-          unsaved.defaultCols.map { case (col, originalType) =>
-            sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType), None)
-          }
+          unsaved.defaultCols.map { case (col, originalType) => sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType), None) } ++
+            unsaved.alwaysGeneratedCols.map(col => sc.Param(mkDefaultParamName(col), sc.Type.ByName(col.tpe), None))
 
         val keyValues1 =
           unsaved.defaultCols.map { case (col, _) =>
@@ -33,7 +32,11 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
                    |  case ${table.default.Defaulted}.${table.default.Provided}(value) => value
                    |}""".stripMargin
             (col.name, impl)
-          }
+          } ++
+            unsaved.alwaysGeneratedCols.map { col =>
+              val defaultParamName = mkDefaultParamName(col)
+              (col.name, defaultParamName.code)
+            }
 
         val keyValues2 =
           unsaved.restCols.map { col =>
@@ -52,6 +55,7 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
       val formattedCols = unsaved.allCols.map { col =>
         val commentPieces = List[Iterable[String]](
           col.dbCol.columnDefault.map(x => s"Default: $x"),
+          col.dbCol.identity.map(_.asString),
           col.dbCol.comment,
           col.pointsTo map { case (relationName, columnName) =>
             val shortened = sc.QIdent(relation.dropCommonPrefix(table.naming.rowName(relationName).idents, rowFile.tpe.value.idents))

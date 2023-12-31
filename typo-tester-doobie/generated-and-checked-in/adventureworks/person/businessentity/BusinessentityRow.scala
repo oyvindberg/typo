@@ -17,9 +17,12 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class BusinessentityRow(
-  /** Primary key for all customers, vendors, and employees. */
+  /** Primary key for all customers, vendors, and employees.
+      Default: nextval('person.businessentity_businessentityid_seq'::regclass) */
   businessentityid: BusinessentityId,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

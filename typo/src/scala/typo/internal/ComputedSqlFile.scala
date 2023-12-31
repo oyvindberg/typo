@@ -60,11 +60,12 @@ case class ComputedSqlFile(
             parsedName = col.parsedColumnName,
             tpe = dbType,
             udtName = None,
-            columnDefault = None,
-            comment = None,
-            jsonDescription = DebugJson(col),
             nullability = nullability,
-            constraints = Nil
+            columnDefault = None,
+            identity = None,
+            comment = None,
+            constraints = Nil,
+            jsonDescription = DebugJson(col)
           )
         )
       }

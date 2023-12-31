@@ -18,16 +18,20 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class LocationRow(
-  /** Primary key for Location records. */
+  /** Primary key for Location records.
+      Default: nextval('production.location_locationid_seq'::regclass) */
   locationid: LocationId,
   /** Location description. */
   name: Name,
   /** Standard hourly cost of the manufacturing location.
+      Default: 0.00
       Constraint CK_Location_CostRate affecting columns costrate: ((costrate >= 0.00)) */
   costrate: BigDecimal,
   /** Work capacity (in hours) of the manufacturing location.
+      Default: 0.00
       Constraint CK_Location_Availability affecting columns availability: ((availability >= 0.00)) */
   availability: BigDecimal,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

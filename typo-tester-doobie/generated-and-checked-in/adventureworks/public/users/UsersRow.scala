@@ -23,6 +23,7 @@ case class UsersRow(
   lastName: Option[String],
   email: TypoUnknownCitext,
   password: String,
+  /** Default: now() */
   createdAt: TypoInstant,
   verifiedOn: Option[TypoInstant]
 )

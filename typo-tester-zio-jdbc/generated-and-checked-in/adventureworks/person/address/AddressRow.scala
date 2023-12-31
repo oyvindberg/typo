@@ -20,7 +20,8 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class AddressRow(
-  /** Primary key for Address records. */
+  /** Primary key for Address records.
+      Default: nextval('person.address_addressid_seq'::regclass) */
   addressid: AddressId,
   /** First street address line. */
   addressline1: /* max 60 chars */ String,
@@ -35,7 +36,9 @@ case class AddressRow(
   postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
   spatiallocation: Option[TypoBytea],
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

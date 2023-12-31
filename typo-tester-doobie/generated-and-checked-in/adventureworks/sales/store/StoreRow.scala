@@ -30,7 +30,9 @@ case class StoreRow(
   salespersonid: Option[BusinessentityId],
   /** Demographic informationg about the store such as the number of employees, annual sales and store type. */
   demographics: Option[TypoXml],
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

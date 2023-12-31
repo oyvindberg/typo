@@ -21,7 +21,8 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class SalestaxrateRow(
-  /** Primary key for SalesTaxRate records. */
+  /** Primary key for SalesTaxRate records.
+      Default: nextval('sales.salestaxrate_salestaxrateid_seq'::regclass) */
   salestaxrateid: SalestaxrateId,
   /** State, province, or country/region the sales tax applies to.
       Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
@@ -29,11 +30,14 @@ case class SalestaxrateRow(
   /** 1 = Tax applied to retail transactions, 2 = Tax applied to wholesale transactions, 3 = Tax applied to all sales (retail and wholesale) transactions.
       Constraint CK_SalesTaxRate_TaxType affecting columns taxtype: (((taxtype >= 1) AND (taxtype <= 3))) */
   taxtype: TypoShort,
-  /** Tax rate amount. */
+  /** Tax rate amount.
+      Default: 0.00 */
   taxrate: BigDecimal,
   /** Tax rate description. */
   name: Name,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

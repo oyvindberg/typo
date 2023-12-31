@@ -198,6 +198,10 @@ import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.public.OrderNumber
 import adventureworks.public.Phone
+import adventureworks.public.identity_test.IdentityTestId
+import adventureworks.public.identity_test.IdentityTestRepoImpl
+import adventureworks.public.identity_test.IdentityTestRow
+import adventureworks.public.identity_test.IdentityTestRowUnsaved
 import adventureworks.public.pgtest.PgtestRepoImpl
 import adventureworks.public.pgtest.PgtestRow
 import adventureworks.public.pgtestnull.PgtestnullRepoImpl
@@ -617,6 +621,7 @@ class TestInsert(random: Random) {
                                  actualcost: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                 )(implicit c: Connection): WorkorderroutingRow = (new WorkorderroutingRepoImpl).insert(new WorkorderroutingRowUnsaved(workorderid = workorderid, locationid = locationid, productid = productid, operationsequence = operationsequence, scheduledstartdate = scheduledstartdate, scheduledenddate = scheduledenddate, actualstartdate = actualstartdate, actualenddate = actualenddate, actualresourcehrs = actualresourcehrs, plannedcost = plannedcost, actualcost = actualcost, modifieddate = modifieddate))
+  def publicIdentityTest(name: IdentityTestId, defaultGenerated: Defaulted[Int] = Defaulted.UseDefault)(implicit c: Connection): IdentityTestRow = (new IdentityTestRepoImpl).insert(new IdentityTestRowUnsaved(name = name, defaultGenerated = defaultGenerated))
   def publicPgtest(box: TypoBox,
                    bytea: TypoBytea,
                    circle: TypoCircle,

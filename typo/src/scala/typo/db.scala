@@ -78,12 +78,32 @@ object db {
 
   case class Constraint(name: String, columns: SortedSet[ColName], checkClause: String)
 
+  case class Identity(
+      identityGeneration: String,
+      identityStart: Option[String],
+      identityIncrement: Option[String],
+      identityMaximum: Option[String],
+      identityMinimum: Option[String]
+  ) {
+    def ALWAYS = identityGeneration == "ALWAYS"
+    def `BY DEFAULT` = identityGeneration == "BY DEFAULT"
+    def asString: String =
+      List(
+        Some(s"Identity $identityGeneration"),
+        identityStart.map("identityStart: " + _),
+        identityIncrement.map("identityIncrement: " + _),
+        identityMaximum.map("identityMaximum: " + _),
+        identityMinimum.map("identityMinimum: " + _)
+      ).flatten.mkString(", ")
+  }
+
   case class Col(
       parsedName: ParsedName,
       tpe: Type,
       udtName: Option[String],
       nullability: Nullability,
       columnDefault: Option[String],
+      identity: Option[Identity],
       comment: Option[String],
       constraints: List[Constraint],
       jsonDescription: DebugJson

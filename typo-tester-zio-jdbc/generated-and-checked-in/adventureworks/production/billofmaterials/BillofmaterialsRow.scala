@@ -20,7 +20,8 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class BillofmaterialsRow(
-  /** Primary key for BillOfMaterials records. */
+  /** Primary key for BillOfMaterials records.
+      Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass) */
   billofmaterialsid: BillofmaterialsId,
   /** Parent product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]]
@@ -32,6 +33,7 @@ case class BillofmaterialsRow(
       Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns componentid, productassemblyid: ((productassemblyid <> componentid)) */
   componentid: ProductId,
   /** Date the component started being used in the assembly item.
+      Default: now()
       Constraint CK_BillOfMaterials_EndDate affecting columns enddate, startdate: (((enddate > startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
   /** Date the component stopped being used in the assembly item.
@@ -44,9 +46,11 @@ case class BillofmaterialsRow(
       Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1)))) */
   bomlevel: TypoShort,
   /** Quantity of the component needed to create the assembly.
+      Default: 1.00
       Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
       Constraint CK_BillOfMaterials_PerAssemblyQty affecting columns perassemblyqty: ((perassemblyqty >= 1.00)) */
   perassemblyqty: BigDecimal,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

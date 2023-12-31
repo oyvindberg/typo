@@ -26,7 +26,9 @@ case class SpecialofferproductRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SpecialofferproductId = SpecialofferproductId(specialofferid, productid)

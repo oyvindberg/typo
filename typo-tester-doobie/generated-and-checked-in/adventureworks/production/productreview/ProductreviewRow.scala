@@ -19,14 +19,16 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ProductreviewRow(
-  /** Primary key for ProductReview records. */
+  /** Primary key for ProductReview records.
+      Default: nextval('production.productreview_productreviewid_seq'::regclass) */
   productreviewid: ProductreviewId,
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** Name of the reviewer. */
   reviewername: Name,
-  /** Date review was submitted. */
+  /** Date review was submitted.
+      Default: now() */
   reviewdate: TypoLocalDateTime,
   /** Reviewer's e-mail address. */
   emailaddress: /* max 50 chars */ String,
@@ -35,6 +37,7 @@ case class ProductreviewRow(
   rating: Int,
   /** Reviewer's comments */
   comments: Option[/* max 3850 chars */ String],
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

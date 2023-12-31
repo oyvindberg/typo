@@ -19,7 +19,8 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class CustomerRow(
-  /** Primary key. */
+  /** Primary key.
+      Default: nextval('sales.customer_customerid_seq'::regclass) */
   customerid: CustomerId,
   /** Foreign key to Person.BusinessEntityID
       Points to [[person.person.PersonRow.businessentityid]] */
@@ -30,7 +31,9 @@ case class CustomerRow(
   /** ID of the territory in which the customer is located. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

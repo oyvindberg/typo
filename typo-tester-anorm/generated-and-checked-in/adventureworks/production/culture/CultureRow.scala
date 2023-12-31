@@ -25,6 +25,7 @@ case class CultureRow(
   cultureid: CultureId,
   /** Culture description. */
   name: Name,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

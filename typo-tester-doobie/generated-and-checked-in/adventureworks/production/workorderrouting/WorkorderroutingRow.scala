@@ -51,6 +51,7 @@ case class WorkorderroutingRow(
   /** Actual manufacturing cost.
       Constraint CK_WorkOrderRouting_ActualCost affecting columns actualcost: ((actualcost > 0.00)) */
   actualcost: Option[BigDecimal],
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: WorkorderroutingId = WorkorderroutingId(workorderid, productid, operationsequence)

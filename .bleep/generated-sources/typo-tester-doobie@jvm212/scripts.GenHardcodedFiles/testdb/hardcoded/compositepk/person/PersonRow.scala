@@ -17,7 +17,9 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class PersonRow(
+  /** Default: auto-increment */
   one: Long,
+  /** Default: auto-increment */
   two: Option[String],
   name: Option[String]
 ){

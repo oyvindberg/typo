@@ -18,53 +18,57 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val person = db.Table(
     name = db.RelationName(Some("myschema"), "person"),
     cols = NonEmptyList(
-      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, None, Nil, DebugJson.Empty),
       db.Col(
-        ParsedName.of("favourite_football_club_id"),
-        db.Type.VarChar(Some(50)),
-        Some("varchar"),
-        Nullability.NoNulls,
+        parsedName = ParsedName.of("favourite_football_club_id"),
+        tpe = db.Type.VarChar(Some(50)),
+        udtName = Some("varchar"),
+        nullability = Nullability.NoNulls,
         columnDefault = None,
-        None,
-        Nil,
-        DebugJson.Empty
+        identity = None,
+        comment = None,
+        constraints = Nil,
+        jsonDescription = DebugJson.Empty
       ),
-      db.Col(ParsedName.of("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(ParsedName.of("nick_name"), db.Type.VarChar(Some(30)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(ParsedName.of("blog_url"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(ParsedName.of("email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(ParsedName.of("phone"), db.Type.VarChar(Some(8)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(ParsedName.of("likes_pizza"), db.Type.Boolean, Some("bool"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("nick_name"), db.Type.VarChar(Some(30)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("blog_url"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("phone"), db.Type.VarChar(Some(8)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("likes_pizza"), db.Type.Boolean, Some("bool"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty),
       db.Col(
-        ParsedName.of("marital_status_id"),
-        db.Type.VarChar(Some(50)),
-        Some("varchar"),
-        Nullability.NoNulls,
+        parsedName = ParsedName.of("marital_status_id"),
+        tpe = db.Type.VarChar(Some(50)),
+        udtName = Some("varchar"),
+        nullability = Nullability.NoNulls,
         columnDefault = Some("some-value"),
-        None,
-        Nil,
-        DebugJson.Empty
+        identity = None,
+        comment = None,
+        constraints = Nil,
+        jsonDescription = DebugJson.Empty
       ),
-      db.Col(ParsedName.of("work_email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("work_email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, None, Nil, DebugJson.Empty),
       db.Col(
-        ParsedName.of("sector"),
-        db.Type.EnumRef(db.RelationName(Some("myschema"), "sector")),
-        Some("myschema.sector"),
-        Nullability.NoNulls,
+        parsedName = ParsedName.of("sector"),
+        tpe = db.Type.EnumRef(db.RelationName(Some("myschema"), "sector")),
+        udtName = Some("myschema.sector"),
+        nullability = Nullability.NoNulls,
         columnDefault = Some("PUBLIC"),
-        None,
-        Nil,
-        DebugJson.Empty
+        identity = None,
+        comment = None,
+        constraints = Nil,
+        jsonDescription = DebugJson.Empty
       ),
       db.Col(
-        ParsedName.of("favorite_number"),
-        db.Type.EnumRef(db.RelationName(Some("myschema"), "number")),
-        Some("myschema.number"),
-        Nullability.NoNulls,
+        parsedName = ParsedName.of("favorite_number"),
+        tpe = db.Type.EnumRef(db.RelationName(Some("myschema"), "number")),
+        udtName = Some("myschema.number"),
+        nullability = Nullability.NoNulls,
         columnDefault = Some("one"),
-        None,
-        Nil,
-        DebugJson.Empty
+        identity = None,
+        comment = None,
+        constraints = Nil,
+        jsonDescription = DebugJson.Empty
       )
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "person_pkey"))),
@@ -87,8 +91,8 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val football_club = db.Table(
     name = db.RelationName(Some("myschema"), "football_club"),
     cols = NonEmptyList(
-      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty),
-      db.Col(ParsedName.of("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty)
+      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "football_club_pkey"))),
     Nil,
@@ -97,7 +101,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val marital_status = db.Table(
     name = db.RelationName(Some("myschema"), "marital_status"),
     cols = NonEmptyList(
-      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, Nil, DebugJson.Empty)
+      db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("id")), db.RelationName(Some("myschema"), "marital_status_pkey"))),
     Nil,
@@ -107,9 +111,9 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val cpk_person = db.Table(
     name = db.RelationName(Some("compositepk"), "person"), // name clash to ensure we handle it
     cols = NonEmptyList(
-      db.Col(ParsedName.of("one"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
-      db.Col(ParsedName.of("two"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = Some("auto-increment"), None, Nil, DebugJson.Empty),
-      db.Col(ParsedName.of("name"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = None, None, Nil, DebugJson.Empty)
+      db.Col(ParsedName.of("one"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("two"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = Some("auto-increment"), None, None, Nil, DebugJson.Empty),
+      db.Col(ParsedName.of("name"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = None, None, None, Nil, DebugJson.Empty)
     ),
     Some(db.PrimaryKey(NonEmptyList(db.ColName("one"), db.ColName("two")), db.RelationName(Some("compositepk"), "person_pkey"))),
     Nil,

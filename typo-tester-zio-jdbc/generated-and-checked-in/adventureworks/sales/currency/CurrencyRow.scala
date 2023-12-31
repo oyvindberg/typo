@@ -22,6 +22,7 @@ case class CurrencyRow(
   currencycode: CurrencyId,
   /** Currency name. */
   name: Name,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

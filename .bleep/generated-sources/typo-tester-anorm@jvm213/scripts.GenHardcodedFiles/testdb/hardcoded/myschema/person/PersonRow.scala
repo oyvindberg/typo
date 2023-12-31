@@ -26,6 +26,7 @@ import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 case class PersonRow(
+  /** Default: auto-increment */
   id: PersonId,
   /** Points to [[football_club.FootballClubRow.id]] */
   favouriteFootballClubId: FootballClubId,
@@ -35,10 +36,13 @@ case class PersonRow(
   email: /* max 254 chars */ String,
   phone: /* max 8 chars */ String,
   likesPizza: Boolean,
-  /** Points to [[marital_status.MaritalStatusRow.id]] */
+  /** Default: some-value
+      Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
   workEmail: Option[/* max 254 chars */ String],
+  /** Default: PUBLIC */
   sector: Sector,
+  /** Default: one */
   favoriteNumber: Number
 )
 

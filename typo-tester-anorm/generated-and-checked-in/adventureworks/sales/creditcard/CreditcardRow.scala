@@ -24,7 +24,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CreditcardRow(
-  /** Primary key for CreditCard records. */
+  /** Primary key for CreditCard records.
+      Default: nextval('sales.creditcard_creditcardid_seq'::regclass) */
   creditcardid: /* user-picked */ CustomCreditcardId,
   /** Credit card name. */
   cardtype: /* max 50 chars */ String,
@@ -34,6 +35,7 @@ case class CreditcardRow(
   expmonth: TypoShort,
   /** Credit card expiration year. */
   expyear: TypoShort,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

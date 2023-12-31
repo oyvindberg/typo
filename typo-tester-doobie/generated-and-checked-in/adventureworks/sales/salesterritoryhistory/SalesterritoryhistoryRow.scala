@@ -31,7 +31,9 @@ case class SalesterritoryhistoryRow(
   /** Date the sales representative left work in the territory.
       Constraint CK_SalesTerritoryHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesterritoryhistoryId = SalesterritoryhistoryId(businessentityid, startdate, territoryid)

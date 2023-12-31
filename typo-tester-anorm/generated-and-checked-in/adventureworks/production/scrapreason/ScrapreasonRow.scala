@@ -21,10 +21,12 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ScrapreasonRow(
-  /** Primary key for ScrapReason records. */
+  /** Primary key for ScrapReason records.
+      Default: nextval('production.scrapreason_scrapreasonid_seq'::regclass) */
   scrapreasonid: ScrapreasonId,
   /** Failure description. */
   name: Name,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

@@ -28,6 +28,7 @@ case class PersoncreditcardRow(
   /** Credit card identification number. Foreign key to CreditCard.CreditCardID.
       Points to [[creditcard.CreditcardRow.creditcardid]] */
   creditcardid: /* user-picked */ CustomCreditcardId,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersoncreditcardId = PersoncreditcardId(businessentityid, creditcardid)

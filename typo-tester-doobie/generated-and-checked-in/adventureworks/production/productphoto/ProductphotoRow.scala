@@ -18,7 +18,8 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ProductphotoRow(
-  /** Primary key for ProductPhoto records. */
+  /** Primary key for ProductPhoto records.
+      Default: nextval('production.productphoto_productphotoid_seq'::regclass) */
   productphotoid: ProductphotoId,
   /** Small image of the product. */
   thumbnailphoto: Option[TypoBytea],
@@ -28,6 +29,7 @@ case class ProductphotoRow(
   largephoto: Option[TypoBytea],
   /** Large image file name. */
   largephotofilename: Option[/* max 50 chars */ String],
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

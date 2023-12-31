@@ -49,6 +49,7 @@ case class ProductvendorRow(
   /** The product's unit of measure.
       Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductvendorId = ProductvendorId(productid, businessentityid)

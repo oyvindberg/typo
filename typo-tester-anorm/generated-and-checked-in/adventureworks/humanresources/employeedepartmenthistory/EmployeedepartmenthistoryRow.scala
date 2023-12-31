@@ -41,6 +41,7 @@ case class EmployeedepartmenthistoryRow(
   /** Date the employee left the department. NULL = Current department.
       Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDate],
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmployeedepartmenthistoryId = EmployeedepartmenthistoryId(businessentityid, startdate, departmentid, shiftid)

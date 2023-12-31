@@ -30,18 +30,24 @@ case class SalespersonRow(
       Constraint CK_SalesPerson_SalesQuota affecting columns salesquota: ((salesquota > 0.00)) */
   salesquota: Option[BigDecimal],
   /** Bonus due if quota is met.
+      Default: 0.00
       Constraint CK_SalesPerson_Bonus affecting columns bonus: ((bonus >= 0.00)) */
   bonus: BigDecimal,
   /** Commision percent received per sale.
+      Default: 0.00
       Constraint CK_SalesPerson_CommissionPct affecting columns commissionpct: ((commissionpct >= 0.00)) */
   commissionpct: BigDecimal,
   /** Sales total year to date.
+      Default: 0.00
       Constraint CK_SalesPerson_SalesYTD affecting columns salesytd: ((salesytd >= 0.00)) */
   salesytd: BigDecimal,
   /** Sales total of previous year.
+      Default: 0.00
       Constraint CK_SalesPerson_SalesLastYear affecting columns saleslastyear: ((saleslastyear >= 0.00)) */
   saleslastyear: BigDecimal,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

@@ -24,6 +24,7 @@ case class CountryregioncurrencyRow(
   /** ISO standard currency code. Foreign key to Currency.CurrencyCode.
       Points to [[currency.CurrencyRow.currencycode]] */
   currencycode: CurrencyId,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: CountryregioncurrencyId = CountryregioncurrencyId(countryregioncode, currencycode)

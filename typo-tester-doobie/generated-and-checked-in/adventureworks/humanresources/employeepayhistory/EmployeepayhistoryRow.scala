@@ -30,6 +30,7 @@ case class EmployeepayhistoryRow(
   /** 1 = Salary received monthly, 2 = Salary received biweekly
       Constraint CK_EmployeePayHistory_PayFrequency affecting columns payfrequency: ((payfrequency = ANY (ARRAY[1, 2]))) */
   payfrequency: TypoShort,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmployeepayhistoryId = EmployeepayhistoryId(businessentityid, ratechangedate)

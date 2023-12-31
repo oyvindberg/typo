@@ -17,7 +17,9 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class PersonRow(
+  /** Default: auto-increment */
   one: Long,
+  /** Default: auto-increment */
   two: Option[String],
   name: Option[String]
 ){

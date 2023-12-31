@@ -18,11 +18,14 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ProductdescriptionRow(
-  /** Primary key for ProductDescription records. */
+  /** Primary key for ProductDescription records.
+      Default: nextval('production.productdescription_productdescriptionid_seq'::regclass) */
   productdescriptionid: ProductdescriptionId,
   /** Description of the product. */
   description: /* max 400 chars */ String,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

@@ -17,12 +17,14 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class DepartmentRow(
-  /** Primary key for Department records. */
+  /** Primary key for Department records.
+      Default: nextval('humanresources.department_departmentid_seq'::regclass) */
   departmentid: DepartmentId,
   /** Name of the department. */
   name: Name,
   /** Name of the group to which the department belongs. */
   groupname: Name,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 
