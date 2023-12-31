@@ -31,6 +31,7 @@ case class PersonphoneRow(
   /** Kind of phone number. Foreign key to PhoneNumberType.PhoneNumberTypeID.
       Points to [[phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
   phonenumbertypeid: PhonenumbertypeId,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersonphoneId = PersonphoneId(businessentityid, phonenumber, phonenumbertypeid)

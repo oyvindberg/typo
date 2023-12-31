@@ -28,7 +28,8 @@ case class PurchaseorderdetailRow(
   /** Primary key. Foreign key to PurchaseOrderHeader.PurchaseOrderID.
       Points to [[purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
   purchaseorderid: PurchaseorderheaderId,
-  /** Primary key. One line number per purchased product. */
+  /** Primary key. One line number per purchased product.
+      Default: nextval('purchasing.purchaseorderdetail_purchaseorderdetailid_seq'::regclass) */
   purchaseorderdetailid: Int,
   /** Date the product is expected to be received. */
   duedate: TypoLocalDateTime,
@@ -47,6 +48,7 @@ case class PurchaseorderdetailRow(
   /** Quantity rejected during inspection.
       Constraint CK_PurchaseOrderDetail_RejectedQty affecting columns rejectedqty: ((rejectedqty >= 0.00)) */
   rejectedqty: BigDecimal,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PurchaseorderdetailId = PurchaseorderdetailId(purchaseorderid, purchaseorderdetailid)

@@ -22,6 +22,7 @@ case class CountryregionRow(
   countryregioncode: CountryregionId,
   /** Country or region name. */
   name: Name,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

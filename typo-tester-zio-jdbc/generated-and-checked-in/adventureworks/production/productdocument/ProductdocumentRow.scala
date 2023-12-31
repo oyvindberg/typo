@@ -22,8 +22,10 @@ case class ProductdocumentRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime,
   /** Document identification number. Foreign key to Document.DocumentNode.
+      Default: '/'::character varying
       Points to [[document.DocumentRow.documentnode]] */
   documentnode: DocumentId
 ){

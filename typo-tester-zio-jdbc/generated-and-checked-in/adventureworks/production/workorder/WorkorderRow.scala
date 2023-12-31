@@ -20,7 +20,8 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class WorkorderRow(
-  /** Primary key for WorkOrder records. */
+  /** Primary key for WorkOrder records.
+      Default: nextval('production.workorder_workorderid_seq'::regclass) */
   workorderid: WorkorderId,
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */
@@ -42,6 +43,7 @@ case class WorkorderRow(
   /** Reason for inspection failure.
       Points to [[scrapreason.ScrapreasonRow.scrapreasonid]] */
   scrapreasonid: Option[ScrapreasonId],
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

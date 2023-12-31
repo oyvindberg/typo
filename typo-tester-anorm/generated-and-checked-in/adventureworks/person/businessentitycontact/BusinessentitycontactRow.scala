@@ -32,7 +32,9 @@ case class BusinessentitycontactRow(
   /** Primary key.  Foreign key to ContactType.ContactTypeID.
       Points to [[contacttype.ContacttypeRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: BusinessentitycontactId = BusinessentitycontactId(businessentityid, personid, contacttypeid)

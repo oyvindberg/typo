@@ -22,21 +22,25 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class StateprovinceRow(
-  /** Primary key for StateProvince records. */
+  /** Primary key for StateProvince records.
+      Default: nextval('person.stateprovince_stateprovinceid_seq'::regclass) */
   stateprovinceid: StateprovinceId,
   /** ISO standard state or province code. */
   stateprovincecode: /* bpchar, max 3 chars */ String,
   /** ISO standard country or region code. Foreign key to CountryRegion.CountryRegionCode.
       Points to [[countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
-  /** 0 = StateProvinceCode exists. 1 = StateProvinceCode unavailable, using CountryRegionCode. */
+  /** 0 = StateProvinceCode exists. 1 = StateProvinceCode unavailable, using CountryRegionCode.
+      Default: true */
   isonlystateprovinceflag: Flag,
   /** State or province description. */
   name: Name,
   /** ID of the territory in which the state or province is located. Foreign key to SalesTerritory.SalesTerritoryID.
       Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

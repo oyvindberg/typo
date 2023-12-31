@@ -18,11 +18,14 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ProductcategoryRow(
-  /** Primary key for ProductCategory records. */
+  /** Primary key for ProductCategory records.
+      Default: nextval('production.productcategory_productcategoryid_seq'::regclass) */
   productcategoryid: ProductcategoryId,
   /** Category description. */
   name: Name,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

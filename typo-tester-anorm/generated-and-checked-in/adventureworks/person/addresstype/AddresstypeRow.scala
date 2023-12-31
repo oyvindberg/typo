@@ -22,11 +22,14 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class AddresstypeRow(
-  /** Primary key for AddressType records. */
+  /** Primary key for AddressType records.
+      Default: nextval('person.addresstype_addresstypeid_seq'::regclass) */
   addresstypeid: AddresstypeId,
   /** Address type description. For example, Billing, Home, or Shipping. */
   name: Name,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

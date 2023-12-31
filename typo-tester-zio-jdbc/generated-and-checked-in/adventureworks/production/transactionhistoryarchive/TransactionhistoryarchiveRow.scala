@@ -23,9 +23,11 @@ case class TransactionhistoryarchiveRow(
   productid: Int,
   /** Purchase order, sales order, or work order identification number. */
   referenceorderid: Int,
-  /** Line number associated with the purchase order, sales order, or work order. */
+  /** Line number associated with the purchase order, sales order, or work order.
+      Default: 0 */
   referenceorderlineid: Int,
-  /** Date and time of the transaction. */
+  /** Date and time of the transaction.
+      Default: now() */
   transactiondate: TypoLocalDateTime,
   /** W = Work Order, S = Sales Order, P = Purchase Order
       Constraint CK_TransactionHistoryArchive_TransactionType affecting columns transactiontype: ((upper((transactiontype)::text) = ANY (ARRAY['W'::text, 'S'::text, 'P'::text]))) */
@@ -34,6 +36,7 @@ case class TransactionhistoryarchiveRow(
   quantity: Int,
   /** Product cost. */
   actualcost: BigDecimal,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

@@ -30,6 +30,7 @@ case class ProductlistpricehistoryRow(
   /** Product list price.
       Constraint CK_ProductListPriceHistory_ListPrice affecting columns listprice: ((listprice > 0.00)) */
   listprice: BigDecimal,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductlistpricehistoryId = ProductlistpricehistoryId(productid, startdate)

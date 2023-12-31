@@ -29,7 +29,9 @@ case class BusinessentityaddressRow(
   /** Primary key. Foreign key to AddressType.AddressTypeID.
       Points to [[addresstype.AddresstypeRow.addresstypeid]] */
   addresstypeid: AddresstypeId,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: BusinessentityaddressId = BusinessentityaddressId(businessentityid, addressid, addresstypeid)

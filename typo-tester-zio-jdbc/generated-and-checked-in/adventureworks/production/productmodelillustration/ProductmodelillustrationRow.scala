@@ -25,6 +25,7 @@ case class ProductmodelillustrationRow(
   /** Primary key. Foreign key to Illustration.IllustrationID.
       Points to [[illustration.IllustrationRow.illustrationid]] */
   illustrationid: IllustrationId,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductmodelillustrationId = ProductmodelillustrationId(productmodelid, illustrationid)

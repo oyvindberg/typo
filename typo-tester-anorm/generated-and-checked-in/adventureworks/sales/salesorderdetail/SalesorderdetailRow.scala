@@ -30,7 +30,8 @@ case class SalesorderdetailRow(
   /** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
       Points to [[salesorderheader.SalesorderheaderRow.salesorderid]] */
   salesorderid: SalesorderheaderId,
-  /** Primary key. One incremental unique number per product sold. */
+  /** Primary key. One incremental unique number per product sold.
+      Default: nextval('sales.salesorderdetail_salesorderdetailid_seq'::regclass) */
   salesorderdetailid: Int,
   /** Shipment tracking number supplied by the shipper. */
   carriertrackingnumber: Option[/* max 25 chars */ String],
@@ -47,9 +48,12 @@ case class SalesorderdetailRow(
       Constraint CK_SalesOrderDetail_UnitPrice affecting columns unitprice: ((unitprice >= 0.00)) */
   unitprice: BigDecimal,
   /** Discount amount.
+      Default: 0.0
       Constraint CK_SalesOrderDetail_UnitPriceDiscount affecting columns unitpricediscount: ((unitpricediscount >= 0.00)) */
   unitpricediscount: BigDecimal,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesorderdetailId = SalesorderdetailId(salesorderid, salesorderdetailid)

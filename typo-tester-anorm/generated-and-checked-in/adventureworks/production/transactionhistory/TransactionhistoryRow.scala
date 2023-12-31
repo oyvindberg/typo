@@ -23,16 +23,19 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TransactionhistoryRow(
-  /** Primary key for TransactionHistory records. */
+  /** Primary key for TransactionHistory records.
+      Default: nextval('production.transactionhistory_transactionid_seq'::regclass) */
   transactionid: TransactionhistoryId,
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** Purchase order, sales order, or work order identification number. */
   referenceorderid: Int,
-  /** Line number associated with the purchase order, sales order, or work order. */
+  /** Line number associated with the purchase order, sales order, or work order.
+      Default: 0 */
   referenceorderlineid: Int,
-  /** Date and time of the transaction. */
+  /** Date and time of the transaction.
+      Default: now() */
   transactiondate: TypoLocalDateTime,
   /** W = WorkOrder, S = SalesOrder, P = PurchaseOrder
       Constraint CK_TransactionHistory_TransactionType affecting columns transactiontype: ((upper((transactiontype)::text) = ANY (ARRAY['W'::text, 'S'::text, 'P'::text]))) */
@@ -41,6 +44,7 @@ case class TransactionhistoryRow(
   quantity: Int,
   /** Product cost. */
   actualcost: BigDecimal,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

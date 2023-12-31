@@ -19,17 +19,22 @@ import io.circe.Encoder
 import java.sql.ResultSet
 
 case class ShipmethodRow(
-  /** Primary key for ShipMethod records. */
+  /** Primary key for ShipMethod records.
+      Default: nextval('purchasing.shipmethod_shipmethodid_seq'::regclass) */
   shipmethodid: ShipmethodId,
   /** Shipping company name. */
   name: Name,
   /** Minimum shipping charge.
+      Default: 0.00
       Constraint CK_ShipMethod_ShipBase affecting columns shipbase: ((shipbase > 0.00)) */
   shipbase: BigDecimal,
   /** Shipping charge per pound.
+      Default: 0.00
       Constraint CK_ShipMethod_ShipRate affecting columns shiprate: ((shiprate > 0.00)) */
   shiprate: BigDecimal,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

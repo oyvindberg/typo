@@ -25,6 +25,7 @@ case class SalesorderheadersalesreasonRow(
   /** Primary key. Foreign key to SalesReason.SalesReasonID.
       Points to [[salesreason.SalesreasonRow.salesreasonid]] */
   salesreasonid: SalesreasonId,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesorderheadersalesreasonId = SalesorderheadersalesreasonId(salesorderid, salesreasonid)

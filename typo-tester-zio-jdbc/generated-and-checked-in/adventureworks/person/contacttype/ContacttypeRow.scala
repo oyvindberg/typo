@@ -18,10 +18,12 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class ContacttypeRow(
-  /** Primary key for ContactType records. */
+  /** Primary key for ContactType records.
+      Default: nextval('person.contacttype_contacttypeid_seq'::regclass) */
   contacttypeid: ContacttypeId,
   /** Contact type description. */
   name: Name,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

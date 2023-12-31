@@ -30,7 +30,9 @@ case class PasswordRow(
   passwordhash: /* max 128 chars */ String,
   /** Random value concatenated with the password string before the password is hashed. */
   passwordsalt: /* max 10 chars */ String,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

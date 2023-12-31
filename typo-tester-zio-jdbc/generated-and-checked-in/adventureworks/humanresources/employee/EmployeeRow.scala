@@ -43,19 +43,26 @@ case class EmployeeRow(
   /** Employee hired on this date.
       Constraint CK_Employee_HireDate affecting columns hiredate: (((hiredate >= '1996-07-01'::date) AND (hiredate <= (now() + '1 day'::interval)))) */
   hiredate: TypoLocalDate,
-  /** Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
+  /** Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining.
+      Default: true */
   salariedflag: Flag,
   /** Number of available vacation hours.
+      Default: 0
       Constraint CK_Employee_VacationHours affecting columns vacationhours: (((vacationhours >= '-40'::integer) AND (vacationhours <= 240))) */
   vacationhours: TypoShort,
   /** Number of available sick leave hours.
+      Default: 0
       Constraint CK_Employee_SickLeaveHours affecting columns sickleavehours: (((sickleavehours >= 0) AND (sickleavehours <= 120))) */
   sickleavehours: TypoShort,
-  /** 0 = Inactive, 1 = Active */
+  /** 0 = Inactive, 1 = Active
+      Default: true */
   currentflag: Flag,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime,
-  /** Where the employee is located in corporate hierarchy. */
+  /** Where the employee is located in corporate hierarchy.
+      Default: '/'::character varying */
   organizationnode: Option[String]
 )
 

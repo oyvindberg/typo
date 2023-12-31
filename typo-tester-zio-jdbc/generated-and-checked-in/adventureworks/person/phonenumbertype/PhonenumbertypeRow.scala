@@ -18,10 +18,12 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class PhonenumbertypeRow(
-  /** Primary key for telephone number type records. */
+  /** Primary key for telephone number type records.
+      Default: nextval('person.phonenumbertype_phonenumbertypeid_seq'::regclass) */
   phonenumbertypeid: PhonenumbertypeId,
   /** Name of the telephone number type */
   name: Name,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

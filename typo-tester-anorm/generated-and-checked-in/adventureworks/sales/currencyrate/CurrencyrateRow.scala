@@ -23,7 +23,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CurrencyrateRow(
-  /** Primary key for CurrencyRate records. */
+  /** Primary key for CurrencyRate records.
+      Default: nextval('sales.currencyrate_currencyrateid_seq'::regclass) */
   currencyrateid: CurrencyrateId,
   /** Date and time the exchange rate was obtained. */
   currencyratedate: TypoLocalDateTime,
@@ -37,6 +38,7 @@ case class CurrencyrateRow(
   averagerate: BigDecimal,
   /** Final exchange rate for the day. */
   endofdayrate: BigDecimal,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

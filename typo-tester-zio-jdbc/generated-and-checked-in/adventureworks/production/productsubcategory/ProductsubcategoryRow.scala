@@ -20,14 +20,17 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class ProductsubcategoryRow(
-  /** Primary key for ProductSubcategory records. */
+  /** Primary key for ProductSubcategory records.
+      Default: nextval('production.productsubcategory_productsubcategoryid_seq'::regclass) */
   productsubcategoryid: ProductsubcategoryId,
   /** Product category identification number. Foreign key to ProductCategory.ProductCategoryID.
       Points to [[productcategory.ProductcategoryRow.productcategoryid]] */
   productcategoryid: ProductcategoryId,
   /** Subcategory description. */
   name: Name,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

@@ -32,9 +32,12 @@ case class ProductinventoryRow(
   /** Storage container on a shelf in an inventory location.
       Constraint CK_ProductInventory_Bin affecting columns bin: (((bin >= 0) AND (bin <= 100))) */
   bin: TypoShort,
-  /** Quantity of products in the inventory location. */
+  /** Quantity of products in the inventory location.
+      Default: 0 */
   quantity: TypoShort,
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductinventoryId = ProductinventoryId(productid, locationid)

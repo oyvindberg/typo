@@ -25,6 +25,7 @@ case class UnitmeasureRow(
   unitmeasurecode: UnitmeasureId,
   /** Unit of measure description. */
   name: Name,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

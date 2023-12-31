@@ -28,15 +28,18 @@ import java.sql.ResultSet
 import scala.util.Try
 
 case class ProductRow(
-  /** Primary key for Product records. */
+  /** Primary key for Product records.
+      Default: nextval('production.product_productid_seq'::regclass) */
   productid: ProductId,
   /** Name of the product. */
   name: Name,
   /** Unique product identification number. */
   productnumber: /* max 25 chars */ String,
-  /** 0 = Product is purchased, 1 = Product is manufactured in-house. */
+  /** 0 = Product is purchased, 1 = Product is manufactured in-house.
+      Default: true */
   makeflag: Flag,
-  /** 0 = Product is not a salable item. 1 = Product is salable. */
+  /** 0 = Product is not a salable item. 1 = Product is salable.
+      Default: true */
   finishedgoodsflag: Flag,
   /** Product color. */
   color: Option[/* max 15 chars */ String],
@@ -89,7 +92,9 @@ case class ProductRow(
   sellenddate: Option[TypoLocalDateTime],
   /** Date the product was discontinued. */
   discontinueddate: Option[TypoLocalDateTime],
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

@@ -20,7 +20,8 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class ProductmodelRow(
-  /** Primary key for ProductModel records. */
+  /** Primary key for ProductModel records.
+      Default: nextval('production.productmodel_productmodelid_seq'::regclass) */
   productmodelid: ProductmodelId,
   /** Product model description. */
   name: Name,
@@ -28,7 +29,9 @@ case class ProductmodelRow(
   catalogdescription: Option[TypoXml],
   /** Manufacturing instructions in xml format. */
   instructions: Option[TypoXml],
+  /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 

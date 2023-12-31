@@ -28,6 +28,7 @@ case class ProductmodelproductdescriptioncultureRow(
   /** Culture identification number. Foreign key to Culture.CultureID.
       Points to [[culture.CultureRow.cultureid]] */
   cultureid: CultureId,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductmodelproductdescriptioncultureId = ProductmodelproductdescriptioncultureId(productmodelid, productdescriptionid, cultureid)

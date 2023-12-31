@@ -18,18 +18,22 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 case class ShoppingcartitemRow(
-  /** Primary key for ShoppingCartItem records. */
+  /** Primary key for ShoppingCartItem records.
+      Default: nextval('sales.shoppingcartitem_shoppingcartitemid_seq'::regclass) */
   shoppingcartitemid: ShoppingcartitemId,
   /** Shopping cart identification number. */
   shoppingcartid: /* max 50 chars */ String,
   /** Product quantity ordered.
+      Default: 1
       Constraint CK_ShoppingCartItem_Quantity affecting columns quantity: ((quantity >= 1)) */
   quantity: Int,
   /** Product ordered. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
-  /** Date the time the record was created. */
+  /** Date the time the record was created.
+      Default: now() */
   datecreated: TypoLocalDateTime,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
 )
 
