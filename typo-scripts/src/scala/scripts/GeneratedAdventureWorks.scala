@@ -46,10 +46,11 @@ object GeneratedAdventureWorks {
                 case (_, "firstname")                     => "adventureworks.userdefined.FirstName"
                 case ("sales.creditcard", "creditcardid") => "adventureworks.userdefined.CustomCreditcardId"
               },
-              enableDsl = true,
-              enableTestInserts = Selector.All,
               generateMockRepos = !Selector.relationNames("purchaseorderdetail"),
-              readonlyRepo = Selector.relationNames("purchaseorderdetail")
+              enablePrimaryKeyType = !Selector.relationNames("billofmaterials"),
+              enableTestInserts = Selector.All,
+              readonlyRepo = Selector.relationNames("purchaseorderdetail"),
+              enableDsl = true
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 

@@ -53,6 +53,8 @@ case class ComputedTable(
             case None =>
               if (sc.Type.containsUserDefined(underlying))
                 Some(IdComputed.UnaryUserSpecified(col, underlying))
+              else if (!options.enablePrimaryKeyType.include(dbTable.name))
+                Some(IdComputed.UnaryNoIdType(col, underlying))
               else
                 Some(IdComputed.UnaryNormal(col, tpe))
 

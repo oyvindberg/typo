@@ -9,15 +9,14 @@ package bom
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
-import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.OptField
 
 trait BomViewFields[Row] {
-  val id: Field[BillofmaterialsId, Row]
-  val billofmaterialsid: Field[BillofmaterialsId, Row]
+  val id: Field[Int, Row]
+  val billofmaterialsid: Field[Int, Row]
   val productassemblyid: OptField[ProductId, Row]
   val componentid: Field[ProductId, Row]
   val startdate: Field[TypoLocalDateTime, Row]

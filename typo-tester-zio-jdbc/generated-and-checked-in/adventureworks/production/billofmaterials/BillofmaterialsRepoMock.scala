@@ -24,8 +24,8 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, BillofmaterialsRow],
-                              map: scala.collection.mutable.Map[BillofmaterialsId, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
-  override def delete(billofmaterialsid: BillofmaterialsId): ZIO[ZConnection, Throwable, Boolean] = {
+                              map: scala.collection.mutable.Map[Int, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
+  override def delete(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(billofmaterialsid).isDefined)
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
@@ -69,10 +69,10 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def selectAll: ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
     ZStream.fromIterable(map.values)
   }
-  override def selectById(billofmaterialsid: BillofmaterialsId): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]] = {
+  override def selectById(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]] = {
     ZIO.succeed(map.get(billofmaterialsid))
   }
-  override def selectByIds(billofmaterialsids: Array[BillofmaterialsId]): ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
+  override def selectByIds(billofmaterialsids: Array[Int]): ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
     ZStream.fromIterable(billofmaterialsids.flatMap(map.get))
   }
   override def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean] = {

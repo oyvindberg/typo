@@ -44,7 +44,7 @@ case class BillofmaterialsRowUnsaved(
   bomlevel: TypoShort,
   /** Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass)
       Primary key for BillOfMaterials records. */
-  billofmaterialsid: Defaulted[BillofmaterialsId] = Defaulted.UseDefault,
+  billofmaterialsid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Date the component started being used in the assembly item.
       Constraint CK_BillOfMaterials_EndDate affecting columns e, n, d, d, a, t, e, ,,  , s, t, a, r, t, d, a, t, e:  (((enddate > startdate) OR (enddate IS NULL))) */
@@ -57,7 +57,7 @@ case class BillofmaterialsRowUnsaved(
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(billofmaterialsidDefault: => BillofmaterialsId, startdateDefault: => TypoLocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): BillofmaterialsRow =
+  def toRow(billofmaterialsidDefault: => Int, startdateDefault: => TypoLocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): BillofmaterialsRow =
     BillofmaterialsRow(
       productassemblyid = productassemblyid,
       componentid = componentid,
@@ -91,7 +91,7 @@ object BillofmaterialsRowUnsaved {
           enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
           unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
           bomlevel = json.\("bomlevel").as(TypoShort.reads),
-          billofmaterialsid = json.\("billofmaterialsid").as(Defaulted.reads(BillofmaterialsId.reads)),
+          billofmaterialsid = json.\("billofmaterialsid").as(Defaulted.reads(Reads.IntReads)),
           startdate = json.\("startdate").as(Defaulted.reads(TypoLocalDateTime.reads)),
           perassemblyqty = json.\("perassemblyqty").as(Defaulted.reads(Reads.bigDecReads)),
           modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
@@ -110,7 +110,7 @@ object BillofmaterialsRowUnsaved {
     sb.append(Text.DELIMETER)
     TypoShort.text.unsafeEncode(row.bomlevel, sb)
     sb.append(Text.DELIMETER)
-    Defaulted.text(BillofmaterialsId.text).unsafeEncode(row.billofmaterialsid, sb)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.billofmaterialsid, sb)
     sb.append(Text.DELIMETER)
     Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.startdate, sb)
     sb.append(Text.DELIMETER)
@@ -125,7 +125,7 @@ object BillofmaterialsRowUnsaved {
       "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
       "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
       "bomlevel" -> TypoShort.writes.writes(o.bomlevel),
-      "billofmaterialsid" -> Defaulted.writes(BillofmaterialsId.writes).writes(o.billofmaterialsid),
+      "billofmaterialsid" -> Defaulted.writes(Writes.IntWrites).writes(o.billofmaterialsid),
       "startdate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.startdate),
       "perassemblyqty" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.perassemblyqty),
       "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)

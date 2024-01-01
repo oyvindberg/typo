@@ -9,7 +9,6 @@ package bom
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
-import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import java.sql.ResultSet
@@ -21,9 +20,9 @@ import zio.json.internal.Write
 
 case class BomViewRow(
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
-  id: BillofmaterialsId,
+  id: Int,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
-  billofmaterialsid: BillofmaterialsId,
+  billofmaterialsid: Int,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.productassemblyid]] */
   productassemblyid: Option[ProductId],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.componentid]] */
@@ -47,8 +46,8 @@ object BomViewRow {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, BomViewRow) =
       columIndex + 9 ->
         BomViewRow(
-          id = BillofmaterialsId.jdbcDecoder.unsafeDecode(columIndex + 0, rs)._2,
-          billofmaterialsid = BillofmaterialsId.jdbcDecoder.unsafeDecode(columIndex + 1, rs)._2,
+          id = JdbcDecoder.intDecoder.unsafeDecode(columIndex + 0, rs)._2,
+          billofmaterialsid = JdbcDecoder.intDecoder.unsafeDecode(columIndex + 1, rs)._2,
           productassemblyid = JdbcDecoder.optionDecoder(ProductId.jdbcDecoder).unsafeDecode(columIndex + 2, rs)._2,
           componentid = ProductId.jdbcDecoder.unsafeDecode(columIndex + 3, rs)._2,
           startdate = TypoLocalDateTime.jdbcDecoder.unsafeDecode(columIndex + 4, rs)._2,
@@ -60,8 +59,8 @@ object BomViewRow {
         )
   }
   implicit lazy val jsonDecoder: JsonDecoder[BomViewRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val id = jsonObj.get("id").toRight("Missing field 'id'").flatMap(_.as(BillofmaterialsId.jsonDecoder))
-    val billofmaterialsid = jsonObj.get("billofmaterialsid").toRight("Missing field 'billofmaterialsid'").flatMap(_.as(BillofmaterialsId.jsonDecoder))
+    val id = jsonObj.get("id").toRight("Missing field 'id'").flatMap(_.as(JsonDecoder.int))
+    val billofmaterialsid = jsonObj.get("billofmaterialsid").toRight("Missing field 'billofmaterialsid'").flatMap(_.as(JsonDecoder.int))
     val productassemblyid = jsonObj.get("productassemblyid").fold[Either[String, Option[ProductId]]](Right(None))(_.as(JsonDecoder.option(ProductId.jsonDecoder)))
     val componentid = jsonObj.get("componentid").toRight("Missing field 'componentid'").flatMap(_.as(ProductId.jsonDecoder))
     val startdate = jsonObj.get("startdate").toRight("Missing field 'startdate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
@@ -78,10 +77,10 @@ object BomViewRow {
     override def unsafeEncode(a: BomViewRow, indent: Option[Int], out: Write): Unit = {
       out.write("{")
       out.write(""""id":""")
-      BillofmaterialsId.jsonEncoder.unsafeEncode(a.id, indent, out)
+      JsonEncoder.int.unsafeEncode(a.id, indent, out)
       out.write(",")
       out.write(""""billofmaterialsid":""")
-      BillofmaterialsId.jsonEncoder.unsafeEncode(a.billofmaterialsid, indent, out)
+      JsonEncoder.int.unsafeEncode(a.billofmaterialsid, indent, out)
       out.write(",")
       out.write(""""productassemblyid":""")
       JsonEncoder.option(ProductId.jsonEncoder).unsafeEncode(a.productassemblyid, indent, out)

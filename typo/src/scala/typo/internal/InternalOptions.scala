@@ -12,6 +12,7 @@ case class InternalOptions(
     enableTestInserts: Selector,
     fileHeader: String,
     generateMockRepos: Selector,
+    enablePrimaryKeyType: Selector,
     jsonLibs: List[JsonLib],
     keepDependencies: Boolean,
     logger: TypoLogger,

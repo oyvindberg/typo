@@ -11,6 +11,7 @@ case class Options(
     typeOverride: TypeOverride = TypeOverride.Empty,
     nullabilityOverride: NullabilityOverride = NullabilityOverride.Empty,
     generateMockRepos: Selector = Selector.All,
+    enablePrimaryKeyType: Selector = Selector.All,
     enableFieldValue: Selector = Selector.None,
     enableTestInserts: Selector = Selector.None,
     readonlyRepo: Selector = Selector.None,

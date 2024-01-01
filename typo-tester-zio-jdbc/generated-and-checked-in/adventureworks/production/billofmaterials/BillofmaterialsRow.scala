@@ -22,7 +22,7 @@ import zio.json.internal.Write
 case class BillofmaterialsRow(
   /** Primary key for BillOfMaterials records.
       Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass) */
-  billofmaterialsid: BillofmaterialsId,
+  billofmaterialsid: Int,
   /** Parent product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]]
       Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
@@ -59,7 +59,7 @@ object BillofmaterialsRow {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, BillofmaterialsRow) =
       columIndex + 8 ->
         BillofmaterialsRow(
-          billofmaterialsid = BillofmaterialsId.jdbcDecoder.unsafeDecode(columIndex + 0, rs)._2,
+          billofmaterialsid = JdbcDecoder.intDecoder.unsafeDecode(columIndex + 0, rs)._2,
           productassemblyid = JdbcDecoder.optionDecoder(ProductId.jdbcDecoder).unsafeDecode(columIndex + 1, rs)._2,
           componentid = ProductId.jdbcDecoder.unsafeDecode(columIndex + 2, rs)._2,
           startdate = TypoLocalDateTime.jdbcDecoder.unsafeDecode(columIndex + 3, rs)._2,
@@ -71,7 +71,7 @@ object BillofmaterialsRow {
         )
   }
   implicit lazy val jsonDecoder: JsonDecoder[BillofmaterialsRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val billofmaterialsid = jsonObj.get("billofmaterialsid").toRight("Missing field 'billofmaterialsid'").flatMap(_.as(BillofmaterialsId.jsonDecoder))
+    val billofmaterialsid = jsonObj.get("billofmaterialsid").toRight("Missing field 'billofmaterialsid'").flatMap(_.as(JsonDecoder.int))
     val productassemblyid = jsonObj.get("productassemblyid").fold[Either[String, Option[ProductId]]](Right(None))(_.as(JsonDecoder.option(ProductId.jsonDecoder)))
     val componentid = jsonObj.get("componentid").toRight("Missing field 'componentid'").flatMap(_.as(ProductId.jsonDecoder))
     val startdate = jsonObj.get("startdate").toRight("Missing field 'startdate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
@@ -88,7 +88,7 @@ object BillofmaterialsRow {
     override def unsafeEncode(a: BillofmaterialsRow, indent: Option[Int], out: Write): Unit = {
       out.write("{")
       out.write(""""billofmaterialsid":""")
-      BillofmaterialsId.jsonEncoder.unsafeEncode(a.billofmaterialsid, indent, out)
+      JsonEncoder.int.unsafeEncode(a.billofmaterialsid, indent, out)
       out.write(",")
       out.write(""""productassemblyid":""")
       JsonEncoder.option(ProductId.jsonEncoder).unsafeEncode(a.productassemblyid, indent, out)
@@ -117,7 +117,7 @@ object BillofmaterialsRow {
     }
   }
   implicit lazy val text: Text[BillofmaterialsRow] = Text.instance[BillofmaterialsRow]{ (row, sb) =>
-    BillofmaterialsId.text.unsafeEncode(row.billofmaterialsid, sb)
+    Text.intInstance.unsafeEncode(row.billofmaterialsid, sb)
     sb.append(Text.DELIMETER)
     Text.option(ProductId.text).unsafeEncode(row.productassemblyid, sb)
     sb.append(Text.DELIMETER)

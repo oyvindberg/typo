@@ -9,6 +9,7 @@ Maybe you're generating code for just a part of the system, not the whole thing.
 Typo has a mechanism by which you can choose which relations to generate code for.
 
 among the arguments to `generateFromDb` is `selector`, which by default picks all relations except those in the postgres schemas.
+See [Selector](customization/selector.md)
 
 ```scala
 import typo.*
@@ -16,35 +17,6 @@ import typo.*
 generateFromDb(options, selector = Selector.ExcludePostgresInternal)
 ```
 
-## `Selector`
-
-You can pick relations by expressing with `Selector` what you want:
-```scala mdoc:silent
-import typo.*
-
-val personAndPet0 = Selector.fullRelationNames("myschema.person", "myschemapet") // picks exactly these tables
-val personAndPet = Selector.relationNames("person", "pet") // picks these regardless of schema
-val mySchema = Selector.schemas("myschema") // picks all relations in schema
-
-// heaviest syntax, but most flexible
-val custom: Selector = relName => relName.schema.exists(_.contains("foo")) && relName.name.contains("bar")
-
-// can also invert the selector
-!Selector.schemas("myschema") // matches everything except schema "myschema"
-```
-
-Selectors are also composable:
-
-```scala mdoc:silent
-// picks relations which are called `person` or `pet` AND are in the `myschema` schema
-personAndPet and mySchema
-
-// picks those who are *both* called `person` or `pet` OR are in the `myschema` schema. 
-// This will typically select more relations
-personAndPet or mySchema 
-```
-
-The and/or names follows boolean logic, and may actually be a bit counter-intuitive in this particular context. Suggestions welcome to improve naming
 
 ## Transitive relations
 

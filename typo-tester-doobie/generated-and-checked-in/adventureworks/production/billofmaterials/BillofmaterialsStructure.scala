@@ -21,7 +21,7 @@ class BillofmaterialsStructure[Row](val prefix: Option[String], val extract: Row
   extends Relation[BillofmaterialsFields, BillofmaterialsRow, Row]
     with BillofmaterialsFields[Row] { outer =>
 
-  override val billofmaterialsid = new IdField[BillofmaterialsId, Row](prefix, "billofmaterialsid", None, Some("int4"))(x => extract(x).billofmaterialsid, (row, value) => merge(row, extract(row).copy(billofmaterialsid = value)))
+  override val billofmaterialsid = new IdField[Int, Row](prefix, "billofmaterialsid", None, Some("int4"))(x => extract(x).billofmaterialsid, (row, value) => merge(row, extract(row).copy(billofmaterialsid = value)))
   override val productassemblyid = new OptField[ProductId, Row](prefix, "productassemblyid", None, Some("int4"))(x => extract(x).productassemblyid, (row, value) => merge(row, extract(row).copy(productassemblyid = value)))
   override val componentid = new Field[ProductId, Row](prefix, "componentid", None, Some("int4"))(x => extract(x).componentid, (row, value) => merge(row, extract(row).copy(componentid = value)))
   override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), Some("timestamp"))(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))

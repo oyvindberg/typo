@@ -98,7 +98,6 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.person.stateprovince.StateprovinceRepoImpl
 import adventureworks.person.stateprovince.StateprovinceRow
 import adventureworks.person.stateprovince.StateprovinceRowUnsaved
-import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.billofmaterials.BillofmaterialsRepoImpl
 import adventureworks.production.billofmaterials.BillofmaterialsRow
 import adventureworks.production.billofmaterials.BillofmaterialsRowUnsaved
@@ -435,7 +434,7 @@ class TestInsert(random: Random) {
                                 productassemblyid: Option[ProductId] = None,
                                 enddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
                                 bomlevel: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
-                                billofmaterialsid: Defaulted[BillofmaterialsId] = Defaulted.UseDefault,
+                                billofmaterialsid: Defaulted[Int] = Defaulted.UseDefault,
                                 startdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                                 perassemblyqty: Defaulted[BigDecimal] = Defaulted.UseDefault,
                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault

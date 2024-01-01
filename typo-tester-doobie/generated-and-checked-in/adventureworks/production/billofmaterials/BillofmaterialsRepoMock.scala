@@ -22,8 +22,8 @@ import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import typo.dsl.UpdateParams
 
 class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, BillofmaterialsRow],
-                              map: scala.collection.mutable.Map[BillofmaterialsId, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
-  override def delete(billofmaterialsid: BillofmaterialsId): ConnectionIO[Boolean] = {
+                              map: scala.collection.mutable.Map[Int, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
+  override def delete(billofmaterialsid: Int): ConnectionIO[Boolean] = {
     delay(map.remove(billofmaterialsid).isDefined)
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
@@ -70,10 +70,10 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectById(billofmaterialsid: BillofmaterialsId): ConnectionIO[Option[BillofmaterialsRow]] = {
+  override def selectById(billofmaterialsid: Int): ConnectionIO[Option[BillofmaterialsRow]] = {
     delay(map.get(billofmaterialsid))
   }
-  override def selectByIds(billofmaterialsids: Array[BillofmaterialsId]): Stream[ConnectionIO, BillofmaterialsRow] = {
+  override def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow] = {
     Stream.emits(billofmaterialsids.flatMap(map.get).toList)
   }
   override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {

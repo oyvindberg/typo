@@ -26,15 +26,15 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
-  override def delete(billofmaterialsid: BillofmaterialsId): ConnectionIO[Boolean] = {
-    sql"""delete from production.billofmaterials where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}""".update.run.map(_ > 0)
+  override def delete(billofmaterialsid: Int): ConnectionIO[Boolean] = {
+    sql"""delete from production.billofmaterials where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     DeleteBuilder("production.billofmaterials", BillofmaterialsFields)
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
-          values (${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}::int4, ${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4, ${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4, ${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
        """.query(BillofmaterialsRow.read).unique
   }
@@ -50,7 +50,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       Some((Fragment.const(s""""bomlevel""""), fr"${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2")),
       unsaved.billofmaterialsid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""billofmaterialsid""""), fr"${fromWrite(value: BillofmaterialsId)(Write.fromPut(BillofmaterialsId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""billofmaterialsid""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
       },
       unsaved.startdate match {
         case Defaulted.UseDefault => None
@@ -90,10 +90,10 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
     sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials""".query(BillofmaterialsRow.read).stream
   }
-  override def selectById(billofmaterialsid: BillofmaterialsId): ConnectionIO[Option[BillofmaterialsRow]] = {
-    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}""".query(BillofmaterialsRow.read).option
+  override def selectById(billofmaterialsid: Int): ConnectionIO[Option[BillofmaterialsRow]] = {
+    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}""".query(BillofmaterialsRow.read).option
   }
-  override def selectByIds(billofmaterialsids: Array[BillofmaterialsId]): Stream[ConnectionIO, BillofmaterialsRow] = {
+  override def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow] = {
     sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ANY(${billofmaterialsids})""".query(BillofmaterialsRow.read).stream
   }
   override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {
@@ -107,7 +107,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               "bomlevel" = ${fromWrite(row.bomlevel)(Write.fromPut(TypoShort.put))}::int2,
               "perassemblyqty" = ${fromWrite(row.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}"""
+          where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -118,7 +118,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
           values (
-            ${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}::int4,
+            ${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}::int4,
             ${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4,
             ${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,

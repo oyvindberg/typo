@@ -27,7 +27,7 @@ import scala.util.Try
 case class BillofmaterialsRow(
   /** Primary key for BillOfMaterials records.
       Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass) */
-  billofmaterialsid: BillofmaterialsId,
+  billofmaterialsid: Int,
   /** Parent product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]]
       Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
@@ -63,7 +63,7 @@ object BillofmaterialsRow {
   implicit lazy val reads: Reads[BillofmaterialsRow] = Reads[BillofmaterialsRow](json => JsResult.fromTry(
       Try(
         BillofmaterialsRow(
-          billofmaterialsid = json.\("billofmaterialsid").as(BillofmaterialsId.reads),
+          billofmaterialsid = json.\("billofmaterialsid").as(Reads.IntReads),
           productassemblyid = json.\("productassemblyid").toOption.map(_.as(ProductId.reads)),
           componentid = json.\("componentid").as(ProductId.reads),
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
@@ -79,7 +79,7 @@ object BillofmaterialsRow {
   def rowParser(idx: Int): RowParser[BillofmaterialsRow] = RowParser[BillofmaterialsRow] { row =>
     Success(
       BillofmaterialsRow(
-        billofmaterialsid = row(idx + 0)(BillofmaterialsId.column),
+        billofmaterialsid = row(idx + 0)(Column.columnToInt),
         productassemblyid = row(idx + 1)(Column.columnToOption(ProductId.column)),
         componentid = row(idx + 2)(ProductId.column),
         startdate = row(idx + 3)(TypoLocalDateTime.column),
@@ -92,7 +92,7 @@ object BillofmaterialsRow {
     )
   }
   implicit lazy val text: Text[BillofmaterialsRow] = Text.instance[BillofmaterialsRow]{ (row, sb) =>
-    BillofmaterialsId.text.unsafeEncode(row.billofmaterialsid, sb)
+    Text.intInstance.unsafeEncode(row.billofmaterialsid, sb)
     sb.append(Text.DELIMETER)
     Text.option(ProductId.text).unsafeEncode(row.productassemblyid, sb)
     sb.append(Text.DELIMETER)
@@ -112,7 +112,7 @@ object BillofmaterialsRow {
   }
   implicit lazy val writes: OWrites[BillofmaterialsRow] = OWrites[BillofmaterialsRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "billofmaterialsid" -> BillofmaterialsId.writes.writes(o.billofmaterialsid),
+      "billofmaterialsid" -> Writes.IntWrites.writes(o.billofmaterialsid),
       "productassemblyid" -> Writes.OptionWrites(ProductId.writes).writes(o.productassemblyid),
       "componentid" -> ProductId.writes.writes(o.componentid),
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),

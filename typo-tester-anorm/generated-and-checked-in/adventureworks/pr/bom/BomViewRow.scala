@@ -9,7 +9,6 @@ package bom
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
-import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import anorm.Column
@@ -26,9 +25,9 @@ import scala.util.Try
 
 case class BomViewRow(
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
-  id: BillofmaterialsId,
+  id: Int,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
-  billofmaterialsid: BillofmaterialsId,
+  billofmaterialsid: Int,
   /** Points to [[production.billofmaterials.BillofmaterialsRow.productassemblyid]] */
   productassemblyid: Option[ProductId],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.componentid]] */
@@ -51,8 +50,8 @@ object BomViewRow {
   implicit lazy val reads: Reads[BomViewRow] = Reads[BomViewRow](json => JsResult.fromTry(
       Try(
         BomViewRow(
-          id = json.\("id").as(BillofmaterialsId.reads),
-          billofmaterialsid = json.\("billofmaterialsid").as(BillofmaterialsId.reads),
+          id = json.\("id").as(Reads.IntReads),
+          billofmaterialsid = json.\("billofmaterialsid").as(Reads.IntReads),
           productassemblyid = json.\("productassemblyid").toOption.map(_.as(ProductId.reads)),
           componentid = json.\("componentid").as(ProductId.reads),
           startdate = json.\("startdate").as(TypoLocalDateTime.reads),
@@ -68,8 +67,8 @@ object BomViewRow {
   def rowParser(idx: Int): RowParser[BomViewRow] = RowParser[BomViewRow] { row =>
     Success(
       BomViewRow(
-        id = row(idx + 0)(BillofmaterialsId.column),
-        billofmaterialsid = row(idx + 1)(BillofmaterialsId.column),
+        id = row(idx + 0)(Column.columnToInt),
+        billofmaterialsid = row(idx + 1)(Column.columnToInt),
         productassemblyid = row(idx + 2)(Column.columnToOption(ProductId.column)),
         componentid = row(idx + 3)(ProductId.column),
         startdate = row(idx + 4)(TypoLocalDateTime.column),
@@ -83,8 +82,8 @@ object BomViewRow {
   }
   implicit lazy val writes: OWrites[BomViewRow] = OWrites[BomViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> BillofmaterialsId.writes.writes(o.id),
-      "billofmaterialsid" -> BillofmaterialsId.writes.writes(o.billofmaterialsid),
+      "id" -> Writes.IntWrites.writes(o.id),
+      "billofmaterialsid" -> Writes.IntWrites.writes(o.billofmaterialsid),
       "productassemblyid" -> Writes.OptionWrites(ProductId.writes).writes(o.productassemblyid),
       "componentid" -> ProductId.writes.writes(o.componentid),
       "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
