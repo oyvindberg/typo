@@ -48,6 +48,7 @@ object GeneratedAdventureWorks {
               },
               enableDsl = true,
               enableTestInserts = Selector.All,
+              generateMockRepos = !Selector.relationNames("purchaseorderdetail"),
               readonlyRepo = Selector.relationNames("purchaseorderdetail")
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")

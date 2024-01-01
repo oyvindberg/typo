@@ -28,6 +28,9 @@ val mySchema = Selector.schemas("myschema") // picks all relations in schema
 
 // heaviest syntax, but most flexible
 val custom: Selector = relName => relName.schema.exists(_.contains("foo")) && relName.name.contains("bar")
+
+// can also invert the selector
+!Selector.schemas("myschema") // matches everything except schema "myschema"
 ```
 
 Selectors are also composable:

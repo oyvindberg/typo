@@ -156,11 +156,13 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
   }
 
   private val maybeMockRepo: Option[sc.File] =
-    for {
-      id <- table.maybeId
-      repoMethods <- table.repoMethods
-      dbLib <- options.dbLib
-    } yield relation.RepoMockFile(dbLib, id, repoMethods)
+    if (options.generateMockRepos.include(table.dbTable.name))
+      for {
+        id <- table.maybeId
+        repoMethods <- table.repoMethods
+        dbLib <- options.dbLib
+      } yield relation.RepoMockFile(dbLib, id, repoMethods)
+    else None
 
   val all: List[sc.File] = List(
     RowFile,

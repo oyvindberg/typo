@@ -7,6 +7,8 @@ trait Selector {
   final def or(other: Selector): Selector = rel => include(rel) || other.include(rel)
 
   final def and(other: Selector): Selector = rel => include(rel) && other.include(rel)
+
+  final def unary_! : Selector = rel => !include(rel)
 }
 
 object Selector {
