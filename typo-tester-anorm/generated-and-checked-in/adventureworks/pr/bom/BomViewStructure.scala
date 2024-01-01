@@ -9,7 +9,6 @@ package bom
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
-import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import typo.dsl.SqlExpr.Field
@@ -21,8 +20,8 @@ class BomViewStructure[Row](val prefix: Option[String], val extract: Row => BomV
   extends Relation[BomViewFields, BomViewRow, Row]
     with BomViewFields[Row] { outer =>
 
-  override val id = new Field[BillofmaterialsId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-  override val billofmaterialsid = new Field[BillofmaterialsId, Row](prefix, "billofmaterialsid", None, None)(x => extract(x).billofmaterialsid, (row, value) => merge(row, extract(row).copy(billofmaterialsid = value)))
+  override val id = new Field[Int, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val billofmaterialsid = new Field[Int, Row](prefix, "billofmaterialsid", None, None)(x => extract(x).billofmaterialsid, (row, value) => merge(row, extract(row).copy(billofmaterialsid = value)))
   override val productassemblyid = new OptField[ProductId, Row](prefix, "productassemblyid", None, None)(x => extract(x).productassemblyid, (row, value) => merge(row, extract(row).copy(productassemblyid = value)))
   override val componentid = new Field[ProductId, Row](prefix, "componentid", None, None)(x => extract(x).componentid, (row, value) => merge(row, extract(row).copy(componentid = value)))
   override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))

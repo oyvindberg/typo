@@ -22,7 +22,7 @@ import java.sql.ResultSet
 case class BillofmaterialsRow(
   /** Primary key for BillOfMaterials records.
       Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass) */
-  billofmaterialsid: BillofmaterialsId,
+  billofmaterialsid: Int,
   /** Parent product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]]
       Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
@@ -55,11 +55,11 @@ case class BillofmaterialsRow(
 )
 
 object BillofmaterialsRow {
-  implicit lazy val decoder: Decoder[BillofmaterialsRow] = Decoder.forProduct9[BillofmaterialsRow, BillofmaterialsId, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BillofmaterialsRow.apply)(BillofmaterialsId.decoder, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[BillofmaterialsRow] = Encoder.forProduct9[BillofmaterialsRow, BillofmaterialsId, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(BillofmaterialsId.encoder, Encoder.encodeOption(ProductId.encoder), ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, TypoShort.encoder, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[BillofmaterialsRow] = Decoder.forProduct9[BillofmaterialsRow, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BillofmaterialsRow.apply)(Decoder.decodeInt, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BillofmaterialsRow] = Encoder.forProduct9[BillofmaterialsRow, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(Encoder.encodeInt, Encoder.encodeOption(ProductId.encoder), ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, TypoShort.encoder, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BillofmaterialsRow] = new Read[BillofmaterialsRow](
     gets = List(
-      (BillofmaterialsId.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
       (ProductId.get, Nullability.Nullable),
       (ProductId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),
@@ -70,7 +70,7 @@ object BillofmaterialsRow {
       (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BillofmaterialsRow(
-      billofmaterialsid = BillofmaterialsId.get.unsafeGetNonNullable(rs, i + 0),
+      billofmaterialsid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
       productassemblyid = ProductId.get.unsafeGetNullable(rs, i + 1),
       componentid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
       startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
@@ -82,7 +82,7 @@ object BillofmaterialsRow {
     )
   )
   implicit lazy val text: Text[BillofmaterialsRow] = Text.instance[BillofmaterialsRow]{ (row, sb) =>
-    BillofmaterialsId.text.unsafeEncode(row.billofmaterialsid, sb)
+    Text.intInstance.unsafeEncode(row.billofmaterialsid, sb)
     sb.append(Text.DELIMETER)
     Text.option(ProductId.text).unsafeEncode(row.productassemblyid, sb)
     sb.append(Text.DELIMETER)

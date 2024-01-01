@@ -16,7 +16,7 @@ import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 
 trait BillofmaterialsFields[Row] {
-  val billofmaterialsid: IdField[BillofmaterialsId, Row]
+  val billofmaterialsid: IdField[Int, Row]
   val productassemblyid: OptField[ProductId, Row]
   val componentid: Field[ProductId, Row]
   val startdate: Field[TypoLocalDateTime, Row]

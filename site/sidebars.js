@@ -82,6 +82,7 @@ const sidebars = {
                 {type: "doc", id: "customization/customize-naming"},
                 {type: "doc", id: "customization/customize-nullability"},
                 {type: "doc", id: "customization/customize-types"},
+                {type: "doc", id: "customization/selector"},
             ],
         },
     ]

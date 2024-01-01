@@ -40,7 +40,7 @@ case class BillofmaterialsRowUnsaved(
   bomlevel: TypoShort,
   /** Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass)
       Primary key for BillOfMaterials records. */
-  billofmaterialsid: Defaulted[BillofmaterialsId] = Defaulted.UseDefault,
+  billofmaterialsid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Date the component started being used in the assembly item.
       Constraint CK_BillOfMaterials_EndDate affecting columns e, n, d, d, a, t, e, ,,  , s, t, a, r, t, d, a, t, e:  (((enddate > startdate) OR (enddate IS NULL))) */
@@ -53,7 +53,7 @@ case class BillofmaterialsRowUnsaved(
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(billofmaterialsidDefault: => BillofmaterialsId, startdateDefault: => TypoLocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): BillofmaterialsRow =
+  def toRow(billofmaterialsidDefault: => Int, startdateDefault: => TypoLocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): BillofmaterialsRow =
     BillofmaterialsRow(
       productassemblyid = productassemblyid,
       componentid = componentid,
@@ -85,7 +85,7 @@ object BillofmaterialsRowUnsaved {
     val enddate = jsonObj.get("enddate").fold[Either[String, Option[TypoLocalDateTime]]](Right(None))(_.as(JsonDecoder.option(TypoLocalDateTime.jsonDecoder)))
     val unitmeasurecode = jsonObj.get("unitmeasurecode").toRight("Missing field 'unitmeasurecode'").flatMap(_.as(UnitmeasureId.jsonDecoder))
     val bomlevel = jsonObj.get("bomlevel").toRight("Missing field 'bomlevel'").flatMap(_.as(TypoShort.jsonDecoder))
-    val billofmaterialsid = jsonObj.get("billofmaterialsid").toRight("Missing field 'billofmaterialsid'").flatMap(_.as(Defaulted.jsonDecoder(BillofmaterialsId.jsonDecoder)))
+    val billofmaterialsid = jsonObj.get("billofmaterialsid").toRight("Missing field 'billofmaterialsid'").flatMap(_.as(Defaulted.jsonDecoder(JsonDecoder.int)))
     val startdate = jsonObj.get("startdate").toRight("Missing field 'startdate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
     val perassemblyqty = jsonObj.get("perassemblyqty").toRight("Missing field 'perassemblyqty'").flatMap(_.as(Defaulted.jsonDecoder(JsonDecoder.scalaBigDecimal)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
@@ -112,7 +112,7 @@ object BillofmaterialsRowUnsaved {
       TypoShort.jsonEncoder.unsafeEncode(a.bomlevel, indent, out)
       out.write(",")
       out.write(""""billofmaterialsid":""")
-      Defaulted.jsonEncoder(BillofmaterialsId.jsonEncoder).unsafeEncode(a.billofmaterialsid, indent, out)
+      Defaulted.jsonEncoder(JsonEncoder.int).unsafeEncode(a.billofmaterialsid, indent, out)
       out.write(",")
       out.write(""""startdate":""")
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.startdate, indent, out)
@@ -136,7 +136,7 @@ object BillofmaterialsRowUnsaved {
     sb.append(Text.DELIMETER)
     TypoShort.text.unsafeEncode(row.bomlevel, sb)
     sb.append(Text.DELIMETER)
-    Defaulted.text(BillofmaterialsId.text).unsafeEncode(row.billofmaterialsid, sb)
+    Defaulted.text(Text.intInstance).unsafeEncode(row.billofmaterialsid, sb)
     sb.append(Text.DELIMETER)
     Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.startdate, sb)
     sb.append(Text.DELIMETER)

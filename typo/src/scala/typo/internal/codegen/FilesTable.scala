@@ -132,9 +132,7 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
           )
         )
 
-      case _: IdComputed.UnaryUserSpecified =>
-        None
-      case _: IdComputed.UnaryInherited =>
+      case _: IdComputed.UnaryUserSpecified | _: IdComputed.UnaryNoIdType | _: IdComputed.UnaryInherited =>
         None
       case id @ IdComputed.Composite(cols, qident, _) =>
         val comments = scaladoc(s"Type for the composite primary key of table `${table.dbTable.name.value}`")(Nil)

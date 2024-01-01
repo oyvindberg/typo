@@ -35,6 +35,7 @@ object generate {
       enableTestInserts = publicOptions.enableTestInserts,
       fileHeader = publicOptions.fileHeader,
       generateMockRepos = publicOptions.generateMockRepos,
+      enablePrimaryKeyType = publicOptions.enablePrimaryKeyType,
       jsonLibs = publicOptions.jsonLibs.map {
         case JsonLibName.Circe    => JsonLibCirce(pkg, default, publicOptions.inlineImplicits)
         case JsonLibName.PlayJson => JsonLibPlay(pkg, default, publicOptions.inlineImplicits)

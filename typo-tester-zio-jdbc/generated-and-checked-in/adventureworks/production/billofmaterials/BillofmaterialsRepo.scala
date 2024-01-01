@@ -16,7 +16,7 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait BillofmaterialsRepo {
-  def delete(billofmaterialsid: BillofmaterialsId): ZIO[ZConnection, Throwable, Boolean]
+  def delete(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Boolean]
   def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def insert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, BillofmaterialsRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -25,8 +25,8 @@ trait BillofmaterialsRepo {
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def selectAll: ZStream[ZConnection, Throwable, BillofmaterialsRow]
-  def selectById(billofmaterialsid: BillofmaterialsId): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]]
-  def selectByIds(billofmaterialsids: Array[BillofmaterialsId]): ZStream[ZConnection, Throwable, BillofmaterialsRow]
+  def selectById(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]]
+  def selectByIds(billofmaterialsids: Array[Int]): ZStream[ZConnection, Throwable, BillofmaterialsRow]
   def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def upsert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, UpdateResult[BillofmaterialsRow]]

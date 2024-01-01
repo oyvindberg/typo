@@ -21,8 +21,13 @@ object IdComputed {
     def underlying: sc.Type = col.tpe
   }
 
-  // normal generated code for a normal single-column id
+  // normal generated code for a normal single-column id, we won't generate extra code for this usage of it
   case class UnaryInherited(col: ComputedColumn, tpe: sc.Type) extends Unary {
+    def underlying: sc.Type = col.tpe
+  }
+
+  // // user specified they don't want a primary key type for this
+  case class UnaryNoIdType(col: ComputedColumn, tpe: sc.Type) extends Unary {
     def underlying: sc.Type = col.tpe
   }
 
