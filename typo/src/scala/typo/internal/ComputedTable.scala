@@ -194,9 +194,14 @@ case class ComputedTable(
       ).flatten,
       dbTable.uniqueKeys
         .map { uk =>
-          RepoMethod.SelectByUnique(dbTable.name, uk.cols.map(colName => cols.find(_.dbName == colName).get), names.RowName)
+          RepoMethod.SelectByUnique(
+            dbTable.name,
+            keyColumns = uk.cols.map(colName => cols.find(_.dbName == colName).get),
+            allColumns = cols,
+            rowType = names.RowName
+          )
         }
-        .distinctByCompat(x => x.params.map(_.tpe)) // avoid erasure clashes
+        .distinctByCompat(x => x.keyColumns.map(_.tpe)) // avoid erasure clashes
     )
     val valid = maybeMethods.flatten.filter {
       case _: RepoMethod.Mutator => !options.readonlyRepo.include(dbTable.name)

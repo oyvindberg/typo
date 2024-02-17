@@ -38,7 +38,8 @@ object RepoMethod {
 
   case class SelectByUnique(
       relName: db.RelationName,
-      params: NonEmptyList[ComputedColumn],
+      keyColumns: NonEmptyList[ComputedColumn],
+      allColumns: NonEmptyList[ComputedColumn],
       rowType: sc.Type
   ) extends Selector
 
@@ -128,7 +129,7 @@ object RepoMethod {
     case _: SelectAll              => "Select2"
     case _: SelectById             => "Select3"
     case _: SelectAllByIds         => "Select4"
-    case x: SelectByUnique         => s"SelectByUnique(${x.params.map(_.name.value).mkString(", ")})"
+    case x: SelectByUnique         => s"SelectByUnique(${x.keyColumns.map(_.name.value).mkString(", ")})"
     case _: SelectByFieldValues    => "SelectByFieldValues"
     case _: UpdateFieldValues      => "UpdateFieldValues"
     case _: Update                 => "Update1"

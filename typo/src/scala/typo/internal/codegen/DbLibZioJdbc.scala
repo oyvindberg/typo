@@ -193,8 +193,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         case _ =>
           code"def selectByIds($idsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
       }
-    case RepoMethod.SelectByUnique(_, params, rowType) =>
-      code"def selectByUnique(${params.map(_.param.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
+    case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
+      code"def selectByUnique(${keyColumns.map(_.param.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
@@ -254,11 +254,11 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           code"""select $joinedColNames from $relName where ${unaryId.col.dbName} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"""
         )
         code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectStream"""
-      case RepoMethod.SelectByUnique(relName, cols, rowType) =>
+      case RepoMethod.SelectByUnique(relName, keyColumns, allCols, rowType) =>
         val sql = SQL {
-          code"""|select ${dbNames(cols, isRead = true)}
+          code"""|select ${dbNames(allCols, isRead = true)}
                  |from $relName
-                 |where ${cols.map(c => code"${c.dbName} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
+                 |where ${keyColumns.map(c => code"${c.dbName} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
         code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectOne"""
@@ -450,8 +450,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"$ZIO.succeed(map.get(${id.paramName}))"
       case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
         code"$ZStream.fromIterable(${idsParam.name}.flatMap(map.get))"
-      case RepoMethod.SelectByUnique(_, cols, _) =>
-        code"$ZIO.succeed(map.values.find(v => ${cols.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
+      case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
+        code"$ZIO.succeed(map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
 
       case RepoMethod.SelectByFieldValues(_, cols, fieldValue, fieldValueOrIdsParam, _) =>
         val cases = cols.map { col =>

@@ -83,7 +83,7 @@ class UsersRepoImpl extends UsersRepo {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".query(UsersRow.jdbcDecoder).selectStream
   }
   override def selectByUnique(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
-    sql"""select "email"::text
+    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
           where "email" = ${Segment.paramSegment(email)(TypoUnknownCitext.setter)}
        """.query(UsersRow.jdbcDecoder).selectOne

@@ -105,7 +105,7 @@ class DocumentRepoImpl extends DocumentRepo {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ANY(${Segment.paramSegment(documentnodes)(DocumentId.arraySetter)})""".query(DocumentRow.jdbcDecoder).selectStream
   }
   override def selectByUnique(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {
-    sql"""select "rowguid"
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
           from production.document
           where "rowguid" = ${Segment.paramSegment(rowguid)(TypoUUID.setter)}
        """.query(DocumentRow.jdbcDecoder).selectOne

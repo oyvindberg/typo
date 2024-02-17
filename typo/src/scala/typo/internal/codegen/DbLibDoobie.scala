@@ -74,8 +74,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         case _ =>
           code"def selectByIds($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
       }
-    case RepoMethod.SelectByUnique(_, params, rowType) =>
-      code"def selectByUnique(${params.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
+    case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
+      code"def selectByUnique(${keyColumns.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
     case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
@@ -135,11 +135,11 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           code"""select $joinedColNames from $relName where ${code"${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
         )
         code"""${query(sql, rowType)}.stream"""
-      case RepoMethod.SelectByUnique(relName, cols, rowType) =>
+      case RepoMethod.SelectByUnique(relName, keyColumns, allColumns, rowType) =>
         val sql = SQL {
-          code"""|select ${dbNames(cols, isRead = true)}
+          code"""|select ${dbNames(allColumns, isRead = true)}
                  |from $relName
-                 |where ${cols.map(c => code"${c.dbName.code} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
+                 |where ${keyColumns.map(c => code"${c.dbName.code} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
         code"""${query(sql, rowType)}.option"""
@@ -333,8 +333,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"$delayCIO(map.get(${id.paramName}))"
       case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
         code"$fs2Stream.emits(${idsParam.name}.flatMap(map.get).toList)"
-      case RepoMethod.SelectByUnique(_, cols, _) =>
-        code"${delayCIO}(map.values.find(v => ${cols.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
+      case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
+        code"${delayCIO}(map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
 
       case RepoMethod.SelectByFieldValues(_, cols, fieldValue, fieldValueOrIdsParam, _) =>
         val cases = cols.map { col =>

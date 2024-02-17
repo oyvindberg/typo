@@ -106,7 +106,7 @@ class DocumentRepoImpl extends DocumentRepo {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ANY(${documentnodes})""".query(DocumentRow.read).stream
   }
   override def selectByUnique(rowguid: TypoUUID): ConnectionIO[Option[DocumentRow]] = {
-    sql"""select "rowguid"
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
           from production.document
           where "rowguid" = ${fromWrite(rowguid)(Write.fromPut(TypoUUID.put))}
        """.query(DocumentRow.read).option

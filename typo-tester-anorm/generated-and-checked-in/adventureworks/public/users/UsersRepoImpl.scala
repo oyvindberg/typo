@@ -98,7 +98,7 @@ class UsersRepoImpl extends UsersRepo {
     
   }
   override def selectByUnique(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow] = {
-    SQL"""select "email"::text
+    SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
           where "email" = ${ParameterValue(email, null, TypoUnknownCitext.toStatement)}
        """.as(UsersRow.rowParser(1).singleOpt)

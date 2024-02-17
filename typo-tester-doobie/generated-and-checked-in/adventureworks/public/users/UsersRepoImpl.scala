@@ -84,7 +84,7 @@ class UsersRepoImpl extends UsersRepo {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${userIds})""".query(UsersRow.read).stream
   }
   override def selectByUnique(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]] = {
-    sql"""select "email"::text
+    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
           where "email" = ${fromWrite(email)(Write.fromPut(TypoUnknownCitext.put))}
        """.query(UsersRow.read).option

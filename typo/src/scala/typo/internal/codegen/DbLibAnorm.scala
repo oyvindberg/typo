@@ -172,8 +172,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         case _ =>
           code"def selectByIds($idsParam)(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}"
       }
-    case RepoMethod.SelectByUnique(_, cols, rowType) =>
-      code"def selectByUnique(${cols.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}"
+    case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
+      code"def selectByUnique(${keyColumns.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam)(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}"
     case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
@@ -240,11 +240,11 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
         code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.rowParser)"
 
-      case RepoMethod.SelectByUnique(relName, cols, rowType) =>
+      case RepoMethod.SelectByUnique(relName, keyColumns, allCols, rowType) =>
         val sql = SQL {
-          code"""|select ${dbNames(cols, isRead = true)}
+          code"""|select ${dbNames(allCols, isRead = true)}
                  |from $relName
-                 |where ${cols.map(c => code"${c.dbName.code} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
+                 |where ${keyColumns.map(c => code"${c.dbName.code} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
 
@@ -466,8 +466,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"map.get(${id.paramName})"
       case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
         code"${idsParam.name}.flatMap(map.get).toList"
-      case RepoMethod.SelectByUnique(_, cols, _) =>
-        code"map.values.find(v => ${cols.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")})"
+      case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
+        code"map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")})"
 
       case RepoMethod.SelectByFieldValues(_, cols, fieldValue, fieldValueOrIdsParam, _) =>
         val cases = cols.map { col =>
