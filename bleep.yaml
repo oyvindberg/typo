@@ -9,6 +9,21 @@ projects:
     dependsOn: typo
     extends: template-nocross
     isTestProject: true
+  typo-data:
+    extends: template-cross
+    dependencies:
+    - org.postgresql:postgresql:42.6.0
+    platform:
+      name: jvm
+  typo-data-test:
+    dependsOn: typo-data
+    extends: template-cross
+    isTestProject: true
+    dependencies:
+      - org.scalameta::munit:0.7.29
+      - org.playframework.anorm::anorm:2.7.0
+
+  #    testFrameworks: munit.Framework
   # main project
   typo:
     dependencies:
@@ -66,6 +81,8 @@ projects:
     - com.typesafe.play::play-json:2.10.3
     - org.postgresql:postgresql:42.6.0
     - org.scalatest::scalatest:3.3.0-SNAP4
+    - dev.zio::zio-query:0.6.0
+    - dev.zio::zio-opentelemetry:3.0.0-RC15
     dependsOn: typo-dsl-anorm
     extends: template-cross
     isTestProject: true
