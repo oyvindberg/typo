@@ -27,7 +27,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
     sql"""delete from humanresources.department where "departmentid" = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilder("humanresources.department", DepartmentFields)
+    DeleteBuilder("humanresources.department", DepartmentFields.structure)
   }
   override def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
@@ -71,7 +71,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
     new FragmentOps(sql"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(DepartmentRowUnsaved.text)
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
-    SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.read)
+    SelectBuilderSql("humanresources.department", DepartmentFields.structure, DepartmentRow.read)
   }
   override def selectAll: Stream[ConnectionIO, DepartmentRow] = {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department""".query(DepartmentRow.read).stream
@@ -94,7 +94,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilder("humanresources.department", DepartmentFields, DepartmentRow.read)
+    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.read)
   }
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")

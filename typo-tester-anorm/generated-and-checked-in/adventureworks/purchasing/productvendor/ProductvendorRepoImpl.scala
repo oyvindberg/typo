@@ -32,7 +32,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     SQL"""delete from purchasing.productvendor where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
-    DeleteBuilder("purchasing.productvendor", ProductvendorFields)
+    DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
   }
   override def insert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     SQL"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
@@ -83,7 +83,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductvendorRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
-    SelectBuilderSql("purchasing.productvendor", ProductvendorFields, ProductvendorRow.rowParser)
+    SelectBuilderSql("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductvendorRow] = {
     SQL"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
@@ -112,7 +112,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
-    UpdateBuilder("purchasing.productvendor", ProductvendorFields, ProductvendorRow.rowParser)
+    UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.rowParser)
   }
   override def upsert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     SQL"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")

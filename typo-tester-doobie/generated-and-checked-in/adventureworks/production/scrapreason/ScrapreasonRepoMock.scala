@@ -27,7 +27,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     delay(map.remove(scrapreasonid).isDefined)
   }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     delay {
@@ -65,7 +65,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     }
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    SelectBuilderMock(ScrapreasonFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(ScrapreasonFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     }
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure.fields, map)
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     delay {

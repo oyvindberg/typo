@@ -32,7 +32,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     sql"""delete from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    DeleteBuilder("production.productinventory", ProductinventoryFields)
+    DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
   }
   override def insert(unsaved: ProductinventoryRow): ZIO[ZConnection, Throwable, ProductinventoryRow] = {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
@@ -80,7 +80,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     streamingInsert(s"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductinventoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    SelectBuilderSql("production.productinventory", ProductinventoryFields, ProductinventoryRow.jdbcDecoder)
+    SelectBuilderSql("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductinventoryRow] = {
     sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory""".query(ProductinventoryRow.jdbcDecoder).selectStream
@@ -99,7 +99,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
           where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    UpdateBuilder("production.productinventory", ProductinventoryFields, ProductinventoryRow.jdbcDecoder)
+    UpdateBuilder("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductinventoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductinventoryRow]] = {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")

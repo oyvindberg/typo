@@ -27,7 +27,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     delay(map.remove(unitmeasurecode).isDefined)
   }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields, map)
+    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields.structure.fields, map)
   }
   override def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     delay {
@@ -65,7 +65,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     }
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    SelectBuilderMock(UnitmeasureFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(UnitmeasureFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     }
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields, map)
+    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure.fields, map)
   }
   override def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     delay {

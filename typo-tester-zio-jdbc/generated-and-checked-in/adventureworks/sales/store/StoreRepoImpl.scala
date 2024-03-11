@@ -32,7 +32,7 @@ class StoreRepoImpl extends StoreRepo {
     sql"""delete from sales.store where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[StoreFields, StoreRow] = {
-    DeleteBuilder("sales.store", StoreFields)
+    DeleteBuilder("sales.store", StoreFields.structure)
   }
   override def insert(unsaved: StoreRow): ZIO[ZConnection, Throwable, StoreRow] = {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
@@ -76,7 +76,7 @@ class StoreRepoImpl extends StoreRepo {
     streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StoreRowUnsaved.text)
   }
   override def select: SelectBuilder[StoreFields, StoreRow] = {
-    SelectBuilderSql("sales.store", StoreFields, StoreRow.jdbcDecoder)
+    SelectBuilderSql("sales.store", StoreFields.structure, StoreRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, StoreRow] = {
     sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store""".query(StoreRow.jdbcDecoder).selectStream
@@ -98,7 +98,7 @@ class StoreRepoImpl extends StoreRepo {
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
-    UpdateBuilder("sales.store", StoreFields, StoreRow.jdbcDecoder)
+    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.jdbcDecoder)
   }
   override def upsert(unsaved: StoreRow): ZIO[ZConnection, Throwable, UpdateResult[StoreRow]] = {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

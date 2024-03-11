@@ -30,7 +30,7 @@ class UsersRepoImpl extends UsersRepo {
     SQL"""delete from public.users where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
-    DeleteBuilder("public.users", UsersFields)
+    DeleteBuilder("public.users", UsersFields.structure)
   }
   override def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
@@ -77,7 +77,7 @@ class UsersRepoImpl extends UsersRepo {
     streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UsersRowUnsaved.text, c)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
-    SelectBuilderSql("public.users", UsersFields, UsersRow.rowParser)
+    SelectBuilderSql("public.users", UsersFields.structure, UsersRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
@@ -117,7 +117,7 @@ class UsersRepoImpl extends UsersRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
-    UpdateBuilder("public.users", UsersFields, UsersRow.rowParser)
+    UpdateBuilder("public.users", UsersFields.structure, UsersRow.rowParser)
   }
   override def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

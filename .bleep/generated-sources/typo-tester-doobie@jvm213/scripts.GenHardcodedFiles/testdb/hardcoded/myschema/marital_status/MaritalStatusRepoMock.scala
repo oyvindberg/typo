@@ -27,7 +27,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     delay(map.remove(id).isDefined)
   }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields, map)
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     delay {
@@ -50,7 +50,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     }
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    SelectBuilderMock(MaritalStatusFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(MaritalStatusFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
     Stream.emits(map.values.toList)
@@ -69,7 +69,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields, map)
+    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     delay {

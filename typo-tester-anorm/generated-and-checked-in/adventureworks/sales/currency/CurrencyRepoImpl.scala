@@ -28,7 +28,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
     SQL"""delete from sales.currency where "currencycode" = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilder("sales.currency", CurrencyFields)
+    DeleteBuilder("sales.currency", CurrencyFields.structure)
   }
   override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency("currencycode", "name", "modifieddate")
@@ -71,7 +71,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
     streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
-    SelectBuilderSql("sales.currency", CurrencyFields, CurrencyRow.rowParser)
+    SelectBuilderSql("sales.currency", CurrencyFields.structure, CurrencyRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
     SQL"""select "currencycode", "name", "modifieddate"::text
@@ -100,7 +100,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilder("sales.currency", CurrencyFields, CurrencyRow.rowParser)
+    UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.rowParser)
   }
   override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency("currencycode", "name", "modifieddate")

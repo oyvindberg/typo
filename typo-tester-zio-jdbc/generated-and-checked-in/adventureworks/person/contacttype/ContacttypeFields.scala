@@ -10,12 +10,34 @@ package contacttype
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait ContacttypeFields[Row] {
   val contacttypeid: IdField[ContacttypeId, Row]
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object ContacttypeFields extends ContacttypeStructure[ContacttypeRow](None, identity, (_, x) => x)
 
+object ContacttypeFields {
+  val structure: Relation[ContacttypeFields, ContacttypeRow, ContacttypeRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => ContacttypeRow, val merge: (Row, ContacttypeRow) => Row)
+    extends Relation[ContacttypeFields, ContacttypeRow, Row] { 
+  
+    override val fields: ContacttypeFields[Row] = new ContacttypeFields[Row] {
+      override val contacttypeid = new IdField[ContacttypeId, Row](prefix, "contacttypeid", None, Some("int4"))(x => extract(x).contacttypeid, (row, value) => merge(row, extract(row).copy(contacttypeid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.contacttypeid, fields.name, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => ContacttypeRow, merge: (NewRow, ContacttypeRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

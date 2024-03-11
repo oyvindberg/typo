@@ -11,11 +11,33 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait PmiViewFields[Row] {
   val productmodelid: Field[ProductmodelId, Row]
   val illustrationid: Field[IllustrationId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object PmiViewFields extends PmiViewStructure[PmiViewRow](None, identity, (_, x) => x)
 
+object PmiViewFields {
+  val structure: Relation[PmiViewFields, PmiViewRow, PmiViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => PmiViewRow, val merge: (Row, PmiViewRow) => Row)
+    extends Relation[PmiViewFields, PmiViewRow, Row] { 
+  
+    override val fields: PmiViewFields[Row] = new PmiViewFields[Row] {
+      override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, None)(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
+      override val illustrationid = new Field[IllustrationId, Row](prefix, "illustrationid", None, None)(x => extract(x).illustrationid, (row, value) => merge(row, extract(row).copy(illustrationid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.productmodelid, fields.illustrationid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => PmiViewRow, merge: (NewRow, PmiViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

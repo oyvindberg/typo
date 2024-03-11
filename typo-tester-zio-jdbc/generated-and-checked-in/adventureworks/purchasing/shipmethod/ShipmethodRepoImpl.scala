@@ -30,7 +30,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""delete from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilder("purchasing.shipmethod", ShipmethodFields)
+    DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
   }
   override def insert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
@@ -83,7 +83,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     streamingInsert(s"""COPY purchasing.shipmethod("name", "shipmethodid", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShipmethodRowUnsaved.text)
   }
   override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
-    SelectBuilderSql("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.jdbcDecoder)
+    SelectBuilderSql("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShipmethodRow] = {
     sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod""".query(ShipmethodRow.jdbcDecoder).selectStream
@@ -105,7 +105,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
           where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilder("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.jdbcDecoder)
+    UpdateBuilder("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.jdbcDecoder)
   }
   override def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]] = {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")

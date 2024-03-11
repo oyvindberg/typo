@@ -30,7 +30,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     sql"""delete from production.workorderrouting where "workorderid" = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND "operationsequence" = ${fromWrite(compositeId.operationsequence)(Write.fromPut(TypoShort.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    DeleteBuilder("production.workorderrouting", WorkorderroutingFields)
+    DeleteBuilder("production.workorderrouting", WorkorderroutingFields.structure)
   }
   override def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
@@ -79,7 +79,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     new FragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderroutingRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    SelectBuilderSql("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.read)
+    SelectBuilderSql("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.read)
   }
   override def selectAll: Stream[ConnectionIO, WorkorderroutingRow] = {
     sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting""".query(WorkorderroutingRow.read).stream
@@ -105,7 +105,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    UpdateBuilder("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.read)
+    UpdateBuilder("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.read)
   }
   override def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")

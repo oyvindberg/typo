@@ -27,7 +27,7 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BusinessentityaddressFields, map)
+    DeleteBuilderMock(DeleteParams.empty, BusinessentityaddressFields.structure.fields, map)
   }
   override def insert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     delay {
@@ -65,7 +65,7 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
     }
   }
   override def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    SelectBuilderMock(BusinessentityaddressFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(BusinessentityaddressFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityaddressRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
     }
   }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields, map)
+    UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields.structure.fields, map)
   }
   override def upsert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     delay {

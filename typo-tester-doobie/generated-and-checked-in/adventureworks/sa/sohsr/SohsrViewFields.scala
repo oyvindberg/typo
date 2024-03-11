@@ -11,11 +11,33 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait SohsrViewFields[Row] {
   val salesorderid: Field[SalesorderheaderId, Row]
   val salesreasonid: Field[SalesreasonId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object SohsrViewFields extends SohsrViewStructure[SohsrViewRow](None, identity, (_, x) => x)
 
+object SohsrViewFields {
+  val structure: Relation[SohsrViewFields, SohsrViewRow, SohsrViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => SohsrViewRow, val merge: (Row, SohsrViewRow) => Row)
+    extends Relation[SohsrViewFields, SohsrViewRow, Row] { 
+  
+    override val fields: SohsrViewFields[Row] = new SohsrViewFields[Row] {
+      override val salesorderid = new Field[SalesorderheaderId, Row](prefix, "salesorderid", None, None)(x => extract(x).salesorderid, (row, value) => merge(row, extract(row).copy(salesorderid = value)))
+      override val salesreasonid = new Field[SalesreasonId, Row](prefix, "salesreasonid", None, None)(x => extract(x).salesreasonid, (row, value) => merge(row, extract(row).copy(salesreasonid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.salesorderid, fields.salesreasonid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => SohsrViewRow, merge: (NewRow, SohsrViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

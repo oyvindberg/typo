@@ -27,7 +27,7 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields, map)
+    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields.structure.fields, map)
   }
   override def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     delay {
@@ -65,7 +65,7 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
     }
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
-    SelectBuilderMock(EmailaddressFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(EmailaddressFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
     }
   }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields, map)
+    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields.structure.fields, map)
   }
   override def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     delay {

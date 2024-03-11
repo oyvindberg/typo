@@ -30,7 +30,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     sql"""delete from production.productproductphoto where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "productphotoid" = ${Segment.paramSegment(compositeId.productphotoid)(ProductphotoId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    DeleteBuilder("production.productproductphoto", ProductproductphotoFields)
+    DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
   }
   override def insert(unsaved: ProductproductphotoRow): ZIO[ZConnection, Throwable, ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
@@ -72,7 +72,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     streamingInsert(s"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductproductphotoRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.jdbcDecoder)
+    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductproductphotoRow] = {
     sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto""".query(ProductproductphotoRow.jdbcDecoder).selectStream
@@ -88,7 +88,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "productphotoid" = ${Segment.paramSegment(compositeId.productphotoid)(ProductphotoId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    UpdateBuilder("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.jdbcDecoder)
+    UpdateBuilder("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductproductphotoRow): ZIO[ZConnection, Throwable, UpdateResult[ProductproductphotoRow]] = {
     sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")

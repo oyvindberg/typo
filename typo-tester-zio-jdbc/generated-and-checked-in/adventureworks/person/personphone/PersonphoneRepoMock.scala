@@ -29,7 +29,7 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PersonphoneFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PersonphoneFields.structure.fields, map)
   }
   override def insert(unsaved: PersonphoneRow): ZIO[ZConnection, Throwable, PersonphoneRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
-    SelectBuilderMock(PersonphoneFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(PersonphoneFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonphoneRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
     }
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersonphoneFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PersonphoneFields.structure.fields, map)
   }
   override def upsert(unsaved: PersonphoneRow): ZIO[ZConnection, Throwable, UpdateResult[PersonphoneRow]] = {
     ZIO.succeed {

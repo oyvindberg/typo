@@ -30,7 +30,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     SQL"""delete from person.personphone where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilder("person.personphone", PersonphoneFields)
+    DeleteBuilder("person.personphone", PersonphoneFields.structure)
   }
   override def insert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
@@ -74,7 +74,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonphoneRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
-    SelectBuilderSql("person.personphone", PersonphoneFields, PersonphoneRow.rowParser)
+    SelectBuilderSql("person.personphone", PersonphoneFields.structure, PersonphoneRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
     SQL"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
@@ -95,7 +95,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilder("person.personphone", PersonphoneFields, PersonphoneRow.rowParser)
+    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.rowParser)
   }
   override def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")

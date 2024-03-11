@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class WViewRepoImpl extends WViewRepo {
   override def select: SelectBuilder[WViewFields, WViewRow] = {
-    SelectBuilderSql("pr.w", WViewFields, WViewRow.rowParser)
+    SelectBuilderSql("pr.w", WViewFields.structure, WViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[WViewRow] = {
     SQL"""select "id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text

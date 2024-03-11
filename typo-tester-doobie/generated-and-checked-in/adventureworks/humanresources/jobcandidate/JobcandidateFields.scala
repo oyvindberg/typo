@@ -11,8 +11,10 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait JobcandidateFields[Row] {
   val jobcandidateid: IdField[JobcandidateId, Row]
@@ -20,5 +22,26 @@ trait JobcandidateFields[Row] {
   val resume: OptField[TypoXml, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object JobcandidateFields extends JobcandidateStructure[JobcandidateRow](None, identity, (_, x) => x)
 
+object JobcandidateFields {
+  val structure: Relation[JobcandidateFields, JobcandidateRow, JobcandidateRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => JobcandidateRow, val merge: (Row, JobcandidateRow) => Row)
+    extends Relation[JobcandidateFields, JobcandidateRow, Row] { 
+  
+    override val fields: JobcandidateFields[Row] = new JobcandidateFields[Row] {
+      override val jobcandidateid = new IdField[JobcandidateId, Row](prefix, "jobcandidateid", None, Some("int4"))(x => extract(x).jobcandidateid, (row, value) => merge(row, extract(row).copy(jobcandidateid = value)))
+      override val businessentityid = new OptField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+      override val resume = new OptField[TypoXml, Row](prefix, "resume", None, Some("xml"))(x => extract(x).resume, (row, value) => merge(row, extract(row).copy(resume = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.jobcandidateid, fields.businessentityid, fields.resume, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => JobcandidateRow, merge: (NewRow, JobcandidateRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

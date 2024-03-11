@@ -235,7 +235,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectBuilder(relName, fieldsType, rowType) =>
-        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType, ${lookupJdbcDecoder(rowType)})"""
+        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType.structure, ${lookupJdbcDecoder(rowType)})"""
 
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
@@ -303,7 +303,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
               |}""".stripMargin
 
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
-        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType, ${lookupJdbcDecoder(rowType)})"
+        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure, ${lookupJdbcDecoder(rowType)})"
 
       case RepoMethod.Update(relName, _, id, param, colsNotId) =>
         val sql = SQL(
@@ -402,7 +402,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(unsaved.tpe)})"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
-        code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
+        code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure)"
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
         code"$sql.delete.map(_ > 0)"
@@ -443,7 +443,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
   override def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code =
     repoMethod match {
       case RepoMethod.SelectBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.SelectBuilderMock}($fieldsType, $ZIO.succeed($Chunk.fromIterable(map.values)), ${sc.Type.dsl.SelectParams}.empty)"
+        code"${sc.Type.dsl.SelectBuilderMock}($fieldsType.structure, $ZIO.succeed($Chunk.fromIterable(map.values)), ${sc.Type.dsl.SelectParams}.empty)"
       case RepoMethod.SelectAll(_, _, _) =>
         code"$ZStream.fromIterable(map.values)"
       case RepoMethod.SelectById(_, _, id, _) =>
@@ -463,7 +463,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
               |  }
               |}""".stripMargin
       case RepoMethod.UpdateBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType, map)"
+        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType.structure.fields, map)"
       case RepoMethod.UpdateFieldValues(_, id, varargs, fieldValue, cases0, _) =>
         val cases = cases0.map { col =>
           code"case (acc, $fieldValue.${col.name}(value)) => acc.copy(${col.name} = value)"
@@ -513,7 +513,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
 
       case RepoMethod.DeleteBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType, map)"
+        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure.fields, map)"
       case RepoMethod.Delete(_, id) =>
         code"$ZIO.succeed(map.remove(${id.paramName}).isDefined)"
       case RepoMethod.InsertStreaming(_, _, _) =>

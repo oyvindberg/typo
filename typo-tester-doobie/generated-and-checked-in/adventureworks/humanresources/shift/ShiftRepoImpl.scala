@@ -28,7 +28,7 @@ class ShiftRepoImpl extends ShiftRepo {
     sql"""delete from humanresources.shift where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilder("humanresources.shift", ShiftFields)
+    DeleteBuilder("humanresources.shift", ShiftFields.structure)
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
@@ -73,7 +73,7 @@ class ShiftRepoImpl extends ShiftRepo {
     new FragmentOps(sql"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ShiftRowUnsaved.text)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderSql("humanresources.shift", ShiftFields, ShiftRow.read)
+    SelectBuilderSql("humanresources.shift", ShiftFields.structure, ShiftRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
     sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(ShiftRow.read).stream
@@ -97,7 +97,7 @@ class ShiftRepoImpl extends ShiftRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilder("humanresources.shift", ShiftFields, ShiftRow.read)
+    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.read)
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")

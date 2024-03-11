@@ -29,7 +29,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     ZIO.succeed(map.remove(countryregioncode).isDefined)
   }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CountryregionFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CountryregionFields.structure.fields, map)
   }
   override def insert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, CountryregionRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderMock(CountryregionFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(CountryregionFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CountryregionRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     }
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CountryregionFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure.fields, map)
   }
   override def upsert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregionRow]] = {
     ZIO.succeed {

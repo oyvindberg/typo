@@ -28,7 +28,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""delete from production.unitmeasure where "unitmeasurecode" = ${Segment.paramSegment(unitmeasurecode)(UnitmeasureId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilder("production.unitmeasure", UnitmeasureFields)
+    DeleteBuilder("production.unitmeasure", UnitmeasureFields.structure)
   }
   override def insert(unsaved: UnitmeasureRow): ZIO[ZConnection, Throwable, UnitmeasureRow] = {
     sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
@@ -66,7 +66,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UnitmeasureRowUnsaved.text)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.jdbcDecoder)
+    SelectBuilderSql("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, UnitmeasureRow] = {
     sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure""".query(UnitmeasureRow.jdbcDecoder).selectStream
@@ -85,7 +85,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
           where "unitmeasurecode" = ${Segment.paramSegment(unitmeasurecode)(UnitmeasureId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilder("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.jdbcDecoder)
+    UpdateBuilder("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.jdbcDecoder)
   }
   override def upsert(unsaved: UnitmeasureRow): ZIO[ZConnection, Throwable, UpdateResult[UnitmeasureRow]] = {
     sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")

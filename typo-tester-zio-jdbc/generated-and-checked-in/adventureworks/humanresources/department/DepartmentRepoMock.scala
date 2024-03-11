@@ -29,7 +29,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     ZIO.succeed(map.remove(departmentid).isDefined)
   }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DepartmentFields, map)
+    DeleteBuilderMock(DeleteParams.empty, DepartmentFields.structure.fields, map)
   }
   override def insert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, DepartmentRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
-    SelectBuilderMock(DepartmentFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(DepartmentFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, DepartmentRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     }
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DepartmentFields, map)
+    UpdateBuilderMock(UpdateParams.empty, DepartmentFields.structure.fields, map)
   }
   override def upsert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, UpdateResult[DepartmentRow]] = {
     ZIO.succeed {

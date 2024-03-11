@@ -31,7 +31,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     sql"""delete from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    DeleteBuilder("production.workorderrouting", WorkorderroutingFields)
+    DeleteBuilder("production.workorderrouting", WorkorderroutingFields.structure)
   }
   override def insert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, WorkorderroutingRow] = {
     sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
@@ -78,7 +78,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     streamingInsert(s"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderroutingRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    SelectBuilderSql("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.jdbcDecoder)
+    SelectBuilderSql("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, WorkorderroutingRow] = {
     sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting""".query(WorkorderroutingRow.jdbcDecoder).selectStream
@@ -101,7 +101,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    UpdateBuilder("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.jdbcDecoder)
+    UpdateBuilder("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.jdbcDecoder)
   }
   override def upsert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderroutingRow]] = {
     sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")

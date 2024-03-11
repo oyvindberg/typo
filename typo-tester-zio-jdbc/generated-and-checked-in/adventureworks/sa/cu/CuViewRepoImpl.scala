@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class CuViewRepoImpl extends CuViewRepo {
   override def select: SelectBuilder[CuViewFields, CuViewRow] = {
-    SelectBuilderSql("sa.cu", CuViewFields, CuViewRow.jdbcDecoder)
+    SelectBuilderSql("sa.cu", CuViewFields.structure, CuViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CuViewRow] = {
     sql"""select "id", "currencycode", "name", "modifieddate"::text from sa.cu""".query(CuViewRow.jdbcDecoder).selectStream

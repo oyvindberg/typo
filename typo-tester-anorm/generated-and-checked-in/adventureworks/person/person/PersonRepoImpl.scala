@@ -35,7 +35,7 @@ class PersonRepoImpl extends PersonRepo {
     SQL"""delete from person.person where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("person.person", PersonFields)
+    DeleteBuilder("person.person", PersonFields.structure)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
@@ -97,7 +97,7 @@ class PersonRepoImpl extends PersonRepo {
     streamingInsert(s"""COPY person.person("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("person.person", PersonFields, PersonRow.rowParser)
+    SelectBuilderSql("person.person", PersonFields.structure, PersonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
@@ -136,7 +136,7 @@ class PersonRepoImpl extends PersonRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("person.person", PersonFields, PersonRow.rowParser)
+    UpdateBuilder("person.person", PersonFields.structure, PersonRow.rowParser)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")

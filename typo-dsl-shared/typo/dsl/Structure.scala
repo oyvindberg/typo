@@ -23,9 +23,7 @@ trait Structure[Fields[_], Row] {
 }
 
 object Structure {
-  trait Relation[Fields[_], OriginalRow, Row] extends Structure[Fields, Row] { outer: Fields[Row] =>
-
-    override val fields: Fields[Row] = this
+  trait Relation[Fields[_], OriginalRow, Row] extends Structure[Fields, Row] { outer =>
 
     val prefix: Option[String]
     val extract: Row => OriginalRow

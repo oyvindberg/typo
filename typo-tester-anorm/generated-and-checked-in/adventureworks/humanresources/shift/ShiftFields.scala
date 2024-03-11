@@ -11,7 +11,9 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait ShiftFields[Row] {
   val shiftid: IdField[ShiftId, Row]
@@ -20,5 +22,27 @@ trait ShiftFields[Row] {
   val endtime: Field[TypoLocalTime, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object ShiftFields extends ShiftStructure[ShiftRow](None, identity, (_, x) => x)
 
+object ShiftFields {
+  val structure: Relation[ShiftFields, ShiftRow, ShiftRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => ShiftRow, val merge: (Row, ShiftRow) => Row)
+    extends Relation[ShiftFields, ShiftRow, Row] { 
+  
+    override val fields: ShiftFields[Row] = new ShiftFields[Row] {
+      override val shiftid = new IdField[ShiftId, Row](prefix, "shiftid", None, Some("int4"))(x => extract(x).shiftid, (row, value) => merge(row, extract(row).copy(shiftid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val starttime = new Field[TypoLocalTime, Row](prefix, "starttime", Some("text"), Some("time"))(x => extract(x).starttime, (row, value) => merge(row, extract(row).copy(starttime = value)))
+      override val endtime = new Field[TypoLocalTime, Row](prefix, "endtime", Some("text"), Some("time"))(x => extract(x).endtime, (row, value) => merge(row, extract(row).copy(endtime = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.shiftid, fields.name, fields.starttime, fields.endtime, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => ShiftRow, merge: (NewRow, ShiftRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

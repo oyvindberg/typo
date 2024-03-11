@@ -31,7 +31,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     SQL"""delete from person.emailaddress where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "emailaddressid" = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
-    DeleteBuilder("person.emailaddress", EmailaddressFields)
+    DeleteBuilder("person.emailaddress", EmailaddressFields.structure)
   }
   override def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
     SQL"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
@@ -82,7 +82,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmailaddressRowUnsaved.text, c)
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
-    SelectBuilderSql("person.emailaddress", EmailaddressFields, EmailaddressRow.rowParser)
+    SelectBuilderSql("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
     SQL"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
@@ -105,7 +105,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
-    UpdateBuilder("person.emailaddress", EmailaddressFields, EmailaddressRow.rowParser)
+    UpdateBuilder("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.rowParser)
   }
   override def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
     SQL"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")

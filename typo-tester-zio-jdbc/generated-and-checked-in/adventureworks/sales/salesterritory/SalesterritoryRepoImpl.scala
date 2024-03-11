@@ -31,7 +31,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""delete from sales.salesterritory where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilder("sales.salesterritory", SalesterritoryFields)
+    DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
   }
   override def insert(unsaved: SalesterritoryRow): ZIO[ZConnection, Throwable, SalesterritoryRow] = {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
@@ -94,7 +94,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     streamingInsert(s"""COPY sales.salesterritory("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesterritoryRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    SelectBuilderSql("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.jdbcDecoder)
+    SelectBuilderSql("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesterritoryRow] = {
     sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory""".query(SalesterritoryRow.jdbcDecoder).selectStream
@@ -120,7 +120,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
           where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilder("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.jdbcDecoder)
+    UpdateBuilder("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.jdbcDecoder)
   }
   override def upsert(unsaved: SalesterritoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalesterritoryRow]] = {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")

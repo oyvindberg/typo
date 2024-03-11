@@ -29,7 +29,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     sql"""delete from production.productphoto where "productphotoid" = ${Segment.paramSegment(productphotoid)(ProductphotoId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
-    DeleteBuilder("production.productphoto", ProductphotoFields)
+    DeleteBuilder("production.productphoto", ProductphotoFields.structure)
   }
   override def insert(unsaved: ProductphotoRow): ZIO[ZConnection, Throwable, ProductphotoRow] = {
     sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
@@ -73,7 +73,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     streamingInsert(s"""COPY production.productphoto("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductphotoRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductphotoFields, ProductphotoRow] = {
-    SelectBuilderSql("production.productphoto", ProductphotoFields, ProductphotoRow.jdbcDecoder)
+    SelectBuilderSql("production.productphoto", ProductphotoFields.structure, ProductphotoRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductphotoRow] = {
     sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto""".query(ProductphotoRow.jdbcDecoder).selectStream
@@ -95,7 +95,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
           where "productphotoid" = ${Segment.paramSegment(productphotoid)(ProductphotoId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
-    UpdateBuilder("production.productphoto", ProductphotoFields, ProductphotoRow.jdbcDecoder)
+    UpdateBuilder("production.productphoto", ProductphotoFields.structure, ProductphotoRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductphotoRow): ZIO[ZConnection, Throwable, UpdateResult[ProductphotoRow]] = {
     sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")

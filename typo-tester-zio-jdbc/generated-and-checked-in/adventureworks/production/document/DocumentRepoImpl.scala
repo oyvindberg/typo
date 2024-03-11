@@ -33,7 +33,7 @@ class DocumentRepoImpl extends DocumentRepo {
     sql"""delete from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilder("production.document", DocumentFields)
+    DeleteBuilder("production.document", DocumentFields.structure)
   }
   override def insert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, DocumentRow] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
@@ -93,7 +93,7 @@ class DocumentRepoImpl extends DocumentRepo {
     streamingInsert(s"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
-    SelectBuilderSql("production.document", DocumentFields, DocumentRow.jdbcDecoder)
+    SelectBuilderSql("production.document", DocumentFields.structure, DocumentRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, DocumentRow] = {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document""".query(DocumentRow.jdbcDecoder).selectStream
@@ -128,7 +128,7 @@ class DocumentRepoImpl extends DocumentRepo {
           where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilder("production.document", DocumentFields, DocumentRow.jdbcDecoder)
+    UpdateBuilder("production.document", DocumentFields.structure, DocumentRow.jdbcDecoder)
   }
   override def upsert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, UpdateResult[DocumentRow]] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")

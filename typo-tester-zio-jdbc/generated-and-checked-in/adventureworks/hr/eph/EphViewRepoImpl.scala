@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class EphViewRepoImpl extends EphViewRepo {
   override def select: SelectBuilder[EphViewFields, EphViewRow] = {
-    SelectBuilderSql("hr.eph", EphViewFields, EphViewRow.jdbcDecoder)
+    SelectBuilderSql("hr.eph", EphViewFields.structure, EphViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EphViewRow] = {
     sql"""select "id", "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from hr.eph""".query(EphViewRow.jdbcDecoder).selectStream

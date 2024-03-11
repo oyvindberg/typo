@@ -27,7 +27,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     delay(map.remove(shipmethodid).isDefined)
   }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     delay {
@@ -65,7 +65,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     }
   }
   override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
-    SelectBuilderMock(ShipmethodFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(ShipmethodFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     }
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
   }
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     delay {

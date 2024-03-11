@@ -30,7 +30,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     SQL"""delete from sales.specialoffer where "specialofferid" = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
-    DeleteBuilder("sales.specialoffer", SpecialofferFields)
+    DeleteBuilder("sales.specialoffer", SpecialofferFields.structure)
   }
   override def insert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     SQL"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
@@ -93,7 +93,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     streamingInsert(s"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
-    SelectBuilderSql("sales.specialoffer", SpecialofferFields, SpecialofferRow.rowParser)
+    SelectBuilderSql("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
     SQL"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
@@ -130,7 +130,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
-    UpdateBuilder("sales.specialoffer", SpecialofferFields, SpecialofferRow.rowParser)
+    UpdateBuilder("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.rowParser)
   }
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     SQL"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")

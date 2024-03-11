@@ -30,7 +30,7 @@ class AddressRepoImpl extends AddressRepo {
     sql"""delete from person.address where "addressid" = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilder("person.address", AddressFields)
+    DeleteBuilder("person.address", AddressFields.structure)
   }
   override def insert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
@@ -82,7 +82,7 @@ class AddressRepoImpl extends AddressRepo {
     new FragmentOps(sql"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(AddressRowUnsaved.text)
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
-    SelectBuilderSql("person.address", AddressFields, AddressRow.read)
+    SelectBuilderSql("person.address", AddressFields.structure, AddressRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
     sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address""".query(AddressRow.read).stream
@@ -110,7 +110,7 @@ class AddressRepoImpl extends AddressRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilder("person.address", AddressFields, AddressRow.read)
+    UpdateBuilder("person.address", AddressFields.structure, AddressRow.read)
   }
   override def upsert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")

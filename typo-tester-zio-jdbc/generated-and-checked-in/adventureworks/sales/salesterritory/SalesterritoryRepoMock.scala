@@ -29,7 +29,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     ZIO.succeed(map.remove(territoryid).isDefined)
   }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure.fields, map)
   }
   override def insert(unsaved: SalesterritoryRow): ZIO[ZConnection, Throwable, SalesterritoryRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    SelectBuilderMock(SalesterritoryFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(SalesterritoryFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesterritoryRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     }
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesterritoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalesterritoryRow]] = {
     ZIO.succeed {

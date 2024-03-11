@@ -27,7 +27,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     sql"""delete from person.businessentity where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilder("person.businessentity", BusinessentityFields)
+    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
   }
   override def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
@@ -73,7 +73,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BusinessentityRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
-    SelectBuilderSql("person.businessentity", BusinessentityFields, BusinessentityRow.read)
+    SelectBuilderSql("person.businessentity", BusinessentityFields.structure, BusinessentityRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
     sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity""".query(BusinessentityRow.read).stream
@@ -95,7 +95,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilder("person.businessentity", BusinessentityFields, BusinessentityRow.read)
+    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.read)
   }
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")

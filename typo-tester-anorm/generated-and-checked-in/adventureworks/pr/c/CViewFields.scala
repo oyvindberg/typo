@@ -11,6 +11,8 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait CViewFields[Row] {
   val id: Field[CultureId, Row]
@@ -18,5 +20,26 @@ trait CViewFields[Row] {
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object CViewFields extends CViewStructure[CViewRow](None, identity, (_, x) => x)
 
+object CViewFields {
+  val structure: Relation[CViewFields, CViewRow, CViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => CViewRow, val merge: (Row, CViewRow) => Row)
+    extends Relation[CViewFields, CViewRow, Row] { 
+  
+    override val fields: CViewFields[Row] = new CViewFields[Row] {
+      override val id = new Field[CultureId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val cultureid = new Field[CultureId, Row](prefix, "cultureid", None, None)(x => extract(x).cultureid, (row, value) => merge(row, extract(row).copy(cultureid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.cultureid, fields.name, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => CViewRow, merge: (NewRow, CViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

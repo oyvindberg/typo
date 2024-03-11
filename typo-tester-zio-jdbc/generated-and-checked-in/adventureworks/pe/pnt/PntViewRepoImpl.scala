@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class PntViewRepoImpl extends PntViewRepo {
   override def select: SelectBuilder[PntViewFields, PntViewRow] = {
-    SelectBuilderSql("pe.pnt", PntViewFields, PntViewRow.jdbcDecoder)
+    SelectBuilderSql("pe.pnt", PntViewFields.structure, PntViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PntViewRow] = {
     sql"""select "id", "phonenumbertypeid", "name", "modifieddate"::text from pe.pnt""".query(PntViewRow.jdbcDecoder).selectStream

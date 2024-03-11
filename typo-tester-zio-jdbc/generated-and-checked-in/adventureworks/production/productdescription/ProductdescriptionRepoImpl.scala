@@ -29,7 +29,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     sql"""delete from production.productdescription where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
-    DeleteBuilder("production.productdescription", ProductdescriptionFields)
+    DeleteBuilder("production.productdescription", ProductdescriptionFields.structure)
   }
   override def insert(unsaved: ProductdescriptionRow): ZIO[ZConnection, Throwable, ProductdescriptionRow] = {
     sql"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")
@@ -74,7 +74,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     streamingInsert(s"""COPY production.productdescription("description", "productdescriptionid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdescriptionRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
-    SelectBuilderSql("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.jdbcDecoder)
+    SelectBuilderSql("production.productdescription", ProductdescriptionFields.structure, ProductdescriptionRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductdescriptionRow] = {
     sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription""".query(ProductdescriptionRow.jdbcDecoder).selectStream
@@ -94,7 +94,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
-    UpdateBuilder("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.jdbcDecoder)
+    UpdateBuilder("production.productdescription", ProductdescriptionFields.structure, ProductdescriptionRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductdescriptionRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdescriptionRow]] = {
     sql"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")

@@ -28,7 +28,7 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
     delay(map.remove(businessentityid).isDefined)
   }
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
-    DeleteBuilderMock(DeleteParams.empty, VendorFields, map)
+    DeleteBuilderMock(DeleteParams.empty, VendorFields.structure.fields, map)
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     delay {
@@ -66,7 +66,7 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
     }
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
-    SelectBuilderMock(VendorFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(VendorFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
     Stream.emits(map.values.toList)
@@ -89,7 +89,7 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
     }
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
-    UpdateBuilderMock(UpdateParams.empty, VendorFields, map)
+    UpdateBuilderMock(UpdateParams.empty, VendorFields.structure.fields, map)
   }
   override def upsert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     delay {

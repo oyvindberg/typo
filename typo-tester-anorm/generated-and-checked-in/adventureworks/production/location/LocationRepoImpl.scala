@@ -29,7 +29,7 @@ class LocationRepoImpl extends LocationRepo {
     SQL"""delete from production.location where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields)
+    DeleteBuilder("production.location", LocationFields.structure)
   }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
@@ -83,7 +83,7 @@ class LocationRepoImpl extends LocationRepo {
     streamingInsert(s"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(LocationRowUnsaved.text, c)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderSql("production.location", LocationFields, LocationRow.rowParser)
+    SelectBuilderSql("production.location", LocationFields.structure, LocationRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
     SQL"""select "locationid", "name", "costrate", "availability", "modifieddate"::text
@@ -114,7 +114,7 @@ class LocationRepoImpl extends LocationRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields, LocationRow.rowParser)
+    UpdateBuilder("production.location", LocationFields.structure, LocationRow.rowParser)
   }
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")

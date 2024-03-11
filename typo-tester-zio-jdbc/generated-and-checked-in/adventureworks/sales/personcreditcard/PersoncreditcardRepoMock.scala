@@ -29,7 +29,7 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields.structure.fields, map)
   }
   override def insert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, PersoncreditcardRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    SelectBuilderMock(PersoncreditcardFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(PersoncreditcardFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersoncreditcardRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
     }
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields.structure.fields, map)
   }
   override def upsert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[PersoncreditcardRow]] = {
     ZIO.succeed {

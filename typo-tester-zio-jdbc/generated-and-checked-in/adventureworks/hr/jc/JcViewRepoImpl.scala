@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class JcViewRepoImpl extends JcViewRepo {
   override def select: SelectBuilder[JcViewFields, JcViewRow] = {
-    SelectBuilderSql("hr.jc", JcViewFields, JcViewRow.jdbcDecoder)
+    SelectBuilderSql("hr.jc", JcViewFields.structure, JcViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, JcViewRow] = {
     sql"""select "id", "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from hr.jc""".query(JcViewRow.jdbcDecoder).selectStream

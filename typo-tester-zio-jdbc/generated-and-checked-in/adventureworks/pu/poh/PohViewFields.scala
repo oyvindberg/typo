@@ -13,7 +13,9 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait PohViewFields[Row] {
   val id: Field[PurchaseorderheaderId, Row]
@@ -30,5 +32,35 @@ trait PohViewFields[Row] {
   val freight: Field[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object PohViewFields extends PohViewStructure[PohViewRow](None, identity, (_, x) => x)
 
+object PohViewFields {
+  val structure: Relation[PohViewFields, PohViewRow, PohViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => PohViewRow, val merge: (Row, PohViewRow) => Row)
+    extends Relation[PohViewFields, PohViewRow, Row] { 
+  
+    override val fields: PohViewFields[Row] = new PohViewFields[Row] {
+      override val id = new Field[PurchaseorderheaderId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val purchaseorderid = new Field[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, None)(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
+      override val revisionnumber = new Field[TypoShort, Row](prefix, "revisionnumber", None, None)(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
+      override val status = new Field[TypoShort, Row](prefix, "status", None, None)(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
+      override val employeeid = new Field[BusinessentityId, Row](prefix, "employeeid", None, None)(x => extract(x).employeeid, (row, value) => merge(row, extract(row).copy(employeeid = value)))
+      override val vendorid = new Field[BusinessentityId, Row](prefix, "vendorid", None, None)(x => extract(x).vendorid, (row, value) => merge(row, extract(row).copy(vendorid = value)))
+      override val shipmethodid = new Field[ShipmethodId, Row](prefix, "shipmethodid", None, None)(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))
+      override val orderdate = new Field[TypoLocalDateTime, Row](prefix, "orderdate", Some("text"), None)(x => extract(x).orderdate, (row, value) => merge(row, extract(row).copy(orderdate = value)))
+      override val shipdate = new OptField[TypoLocalDateTime, Row](prefix, "shipdate", Some("text"), None)(x => extract(x).shipdate, (row, value) => merge(row, extract(row).copy(shipdate = value)))
+      override val subtotal = new Field[BigDecimal, Row](prefix, "subtotal", None, None)(x => extract(x).subtotal, (row, value) => merge(row, extract(row).copy(subtotal = value)))
+      override val taxamt = new Field[BigDecimal, Row](prefix, "taxamt", None, None)(x => extract(x).taxamt, (row, value) => merge(row, extract(row).copy(taxamt = value)))
+      override val freight = new Field[BigDecimal, Row](prefix, "freight", None, None)(x => extract(x).freight, (row, value) => merge(row, extract(row).copy(freight = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => PohViewRow, merge: (NewRow, PohViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

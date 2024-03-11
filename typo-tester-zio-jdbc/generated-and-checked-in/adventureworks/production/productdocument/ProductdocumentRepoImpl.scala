@@ -29,7 +29,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     sql"""delete from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    DeleteBuilder("production.productdocument", ProductdocumentFields)
+    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
   }
   override def insert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
@@ -70,7 +70,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    SelectBuilderSql("production.productdocument", ProductdocumentFields, ProductdocumentRow.jdbcDecoder)
+    SelectBuilderSql("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductdocumentRow] = {
     sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument""".query(ProductdocumentRow.jdbcDecoder).selectStream
@@ -85,7 +85,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
           where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    UpdateBuilder("production.productdocument", ProductdocumentFields, ProductdocumentRow.jdbcDecoder)
+    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdocumentRow]] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")

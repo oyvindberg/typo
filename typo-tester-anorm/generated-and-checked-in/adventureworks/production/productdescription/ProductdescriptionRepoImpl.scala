@@ -29,7 +29,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     SQL"""delete from production.productdescription where "productdescriptionid" = ${ParameterValue(productdescriptionid, null, ProductdescriptionId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
-    DeleteBuilder("production.productdescription", ProductdescriptionFields)
+    DeleteBuilder("production.productdescription", ProductdescriptionFields.structure)
   }
   override def insert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
     SQL"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")
@@ -79,7 +79,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     streamingInsert(s"""COPY production.productdescription("description", "productdescriptionid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdescriptionRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
-    SelectBuilderSql("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.rowParser)
+    SelectBuilderSql("production.productdescription", ProductdescriptionFields.structure, ProductdescriptionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductdescriptionRow] = {
     SQL"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text
@@ -109,7 +109,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
-    UpdateBuilder("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.rowParser)
+    UpdateBuilder("production.productdescription", ProductdescriptionFields.structure, ProductdescriptionRow.rowParser)
   }
   override def upsert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
     SQL"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")

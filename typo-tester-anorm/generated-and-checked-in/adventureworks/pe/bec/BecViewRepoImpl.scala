@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class BecViewRepoImpl extends BecViewRepo {
   override def select: SelectBuilder[BecViewFields, BecViewRow] = {
-    SelectBuilderSql("pe.bec", BecViewFields, BecViewRow.rowParser)
+    SelectBuilderSql("pe.bec", BecViewFields.structure, BecViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[BecViewRow] = {
     SQL"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text

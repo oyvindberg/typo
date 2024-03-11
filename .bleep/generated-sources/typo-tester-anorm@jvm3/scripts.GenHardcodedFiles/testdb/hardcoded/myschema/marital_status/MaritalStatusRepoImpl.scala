@@ -26,7 +26,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     SQL"""delete from myschema.marital_status where "id" = ${ParameterValue(id, null, MaritalStatusId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilder("myschema.marital_status", MaritalStatusFields)
+    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
   }
   override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     SQL"""insert into myschema.marital_status("id")
@@ -40,7 +40,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     streamingInsert(s"""COPY myschema.marital_status("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text, c)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    SelectBuilderSql("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.rowParser)
+    SelectBuilderSql("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select "id"
@@ -78,7 +78,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilder("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.rowParser)
+    UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.rowParser)
   }
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     SQL"""insert into myschema.marital_status("id")

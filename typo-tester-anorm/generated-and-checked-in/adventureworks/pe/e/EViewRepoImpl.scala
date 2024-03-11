@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class EViewRepoImpl extends EViewRepo {
   override def select: SelectBuilder[EViewFields, EViewRow] = {
-    SelectBuilderSql("pe.e", EViewFields, EViewRow.rowParser)
+    SelectBuilderSql("pe.e", EViewFields.structure, EViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EViewRow] = {
     SQL"""select "id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text

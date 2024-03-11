@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class EdhViewRepoImpl extends EdhViewRepo {
   override def select: SelectBuilder[EdhViewFields, EdhViewRow] = {
-    SelectBuilderSql("hr.edh", EdhViewFields, EdhViewRow.read)
+    SelectBuilderSql("hr.edh", EdhViewFields.structure, EdhViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EdhViewRow] = {
     sql"""select "id", "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from hr.edh""".query(EdhViewRow.read).stream

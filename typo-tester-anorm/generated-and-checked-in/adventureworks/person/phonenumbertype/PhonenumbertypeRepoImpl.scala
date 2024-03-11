@@ -28,7 +28,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     SQL"""delete from person.phonenumbertype where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields)
+    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
   }
   override def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
@@ -74,7 +74,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     streamingInsert(s"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PhonenumbertypeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.rowParser)
+    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
     SQL"""select "phonenumbertypeid", "name", "modifieddate"::text
@@ -103,7 +103,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.rowParser)
+    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
   }
   override def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")

@@ -25,7 +25,7 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
     map.remove(salestaxrateid).isDefined
   }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields.structure.fields, map)
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     val _ = if (map.contains(unsaved.salestaxrateid))
@@ -53,7 +53,7 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
     unsaved.size.toLong
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    SelectBuilderMock(SalestaxrateFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(SalestaxrateFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
     }
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields.structure.fields, map)
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     map.put(unsaved.salestaxrateid, unsaved): @nowarn

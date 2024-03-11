@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class VViewRepoImpl extends VViewRepo {
   override def select: SelectBuilder[VViewFields, VViewRow] = {
-    SelectBuilderSql("pu.v", VViewFields, VViewRow.rowParser)
+    SelectBuilderSql("pu.v", VViewFields.structure, VViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VViewRow] = {
     SQL"""select "id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text

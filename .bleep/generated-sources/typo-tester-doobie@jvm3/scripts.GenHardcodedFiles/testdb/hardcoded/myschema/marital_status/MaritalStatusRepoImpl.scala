@@ -25,7 +25,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     sql"""delete from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilder("myschema.marital_status", MaritalStatusFields)
+    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
   }
   override def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")
@@ -37,7 +37,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     new FragmentOps(sql"""COPY myschema.marital_status("id") FROM STDIN""").copyIn(unsaved, batchSize)(MaritalStatusRow.text)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    SelectBuilderSql("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.read)
+    SelectBuilderSql("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.read)
   }
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status""".query(MaritalStatusRow.read).stream
@@ -57,7 +57,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     sql"""select "id" from myschema.marital_status $where""".query(MaritalStatusRow.read).stream
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilder("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.read)
+    UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.read)
   }
   override def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")

@@ -27,7 +27,7 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     delay(map.remove(name).isDefined)
   }
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields, map)
+    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure.fields, map)
   }
   override def insert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     delay {
@@ -65,7 +65,7 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     }
   }
   override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
-    SelectBuilderMock(IdentityTestFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(IdentityTestFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, IdentityTestRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     }
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields, map)
+    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure.fields, map)
   }
   override def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     delay {

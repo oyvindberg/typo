@@ -29,7 +29,7 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     ZIO.succeed(map.remove(transactionid).isDefined)
   }
   override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryarchiveFields, map)
+    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
   }
   override def insert(unsaved: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, TransactionhistoryarchiveRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    SelectBuilderMock(TransactionhistoryarchiveFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(TransactionhistoryarchiveFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     }
   }
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields, map)
+    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryarchiveRow]] = {
     ZIO.succeed {

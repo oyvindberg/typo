@@ -25,7 +25,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     map.remove(addressid).isDefined
   }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, AddressFields, map)
+    DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
   }
   override def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     val _ = if (map.contains(unsaved.addressid))
@@ -53,7 +53,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
-    SelectBuilderMock(AddressFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(AddressFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     }
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, AddressFields, map)
+    UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
   }
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     map.put(unsaved.addressid, unsaved): @nowarn

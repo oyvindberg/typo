@@ -29,7 +29,7 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
     ZIO.succeed(map.remove(specialofferid).isDefined)
   }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferFields.structure.fields, map)
   }
   override def insert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, SpecialofferRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
-    SelectBuilderMock(SpecialofferFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(SpecialofferFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SpecialofferRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
     }
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure.fields, map)
   }
   override def upsert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferRow]] = {
     ZIO.succeed {

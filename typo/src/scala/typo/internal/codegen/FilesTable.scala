@@ -165,7 +165,6 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
   val all: List[sc.File] = List(
     RowFile,
     relation.FieldsFile,
-    relation.StructureFile,
     UnsavedRowFile,
     for {
       repoMethods <- table.repoMethods

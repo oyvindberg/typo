@@ -28,7 +28,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""delete from person.contacttype where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilder("person.contacttype", ContacttypeFields)
+    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
   }
   override def insert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, ContacttypeRow] = {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
@@ -69,7 +69,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     streamingInsert(s"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ContacttypeRowUnsaved.text)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
-    SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.jdbcDecoder)
+    SelectBuilderSql("person.contacttype", ContacttypeFields.structure, ContacttypeRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ContacttypeRow] = {
     sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype""".query(ContacttypeRow.jdbcDecoder).selectStream
@@ -88,7 +88,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
           where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilder("person.contacttype", ContacttypeFields, ContacttypeRow.jdbcDecoder)
+    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.jdbcDecoder)
   }
   override def upsert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, UpdateResult[ContacttypeRow]] = {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")

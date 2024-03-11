@@ -11,6 +11,8 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait PccViewFields[Row] {
   val id: Field[BusinessentityId, Row]
@@ -18,5 +20,26 @@ trait PccViewFields[Row] {
   val creditcardid: Field[/* user-picked */ CustomCreditcardId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object PccViewFields extends PccViewStructure[PccViewRow](None, identity, (_, x) => x)
 
+object PccViewFields {
+  val structure: Relation[PccViewFields, PccViewRow, PccViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => PccViewRow, val merge: (Row, PccViewRow) => Row)
+    extends Relation[PccViewFields, PccViewRow, Row] { 
+  
+    override val fields: PccViewFields[Row] = new PccViewFields[Row] {
+      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+      override val creditcardid = new Field[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, None)(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.creditcardid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => PccViewRow, merge: (NewRow, PccViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

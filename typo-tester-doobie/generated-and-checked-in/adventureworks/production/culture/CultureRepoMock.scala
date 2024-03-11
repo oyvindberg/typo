@@ -27,7 +27,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     delay(map.remove(cultureid).isDefined)
   }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CultureFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
   }
   override def insert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     delay {
@@ -65,7 +65,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     }
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
-    SelectBuilderMock(CultureFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(CultureFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     }
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CultureFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
   }
   override def upsert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     delay {

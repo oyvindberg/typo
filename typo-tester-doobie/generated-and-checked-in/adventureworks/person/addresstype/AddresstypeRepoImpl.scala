@@ -28,7 +28,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""delete from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
-    DeleteBuilder("person.addresstype", AddresstypeFields)
+    DeleteBuilder("person.addresstype", AddresstypeFields.structure)
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
@@ -75,7 +75,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     new FragmentOps(sql"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(AddresstypeRowUnsaved.text)
   }
   override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
-    SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.read)
+    SelectBuilderSql("person.addresstype", AddresstypeFields.structure, AddresstypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
     sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype""".query(AddresstypeRow.read).stream
@@ -98,7 +98,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
-    UpdateBuilder("person.addresstype", AddresstypeFields, AddresstypeRow.read)
+    UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.read)
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")

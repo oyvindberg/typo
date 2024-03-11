@@ -27,7 +27,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     delay(map.remove(currencyrateid).isDefined)
   }
   override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields.structure.fields, map)
   }
   override def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     delay {
@@ -65,7 +65,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     }
   }
   override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    SelectBuilderMock(CurrencyrateFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(CurrencyrateFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CurrencyrateRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     }
   }
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields.structure.fields, map)
   }
   override def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     delay {

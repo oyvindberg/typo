@@ -29,7 +29,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     SQL"""delete from person.addresstype where "addresstypeid" = ${ParameterValue(addresstypeid, null, AddresstypeId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
-    DeleteBuilder("person.addresstype", AddresstypeFields)
+    DeleteBuilder("person.addresstype", AddresstypeFields.structure)
   }
   override def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
@@ -79,7 +79,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     streamingInsert(s"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddresstypeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
-    SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.rowParser)
+    SelectBuilderSql("person.addresstype", AddresstypeFields.structure, AddresstypeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
     SQL"""select "addresstypeid", "name", "rowguid", "modifieddate"::text
@@ -109,7 +109,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
-    UpdateBuilder("person.addresstype", AddresstypeFields, AddresstypeRow.rowParser)
+    UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.rowParser)
   }
   override def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")

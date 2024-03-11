@@ -13,6 +13,8 @@ import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait VstateprovincecountryregionMVFields[Row] {
   val stateprovinceid: Field[StateprovinceId, Row]
@@ -23,5 +25,29 @@ trait VstateprovincecountryregionMVFields[Row] {
   val countryregioncode: Field[CountryregionId, Row]
   val countryregionname: Field[Name, Row]
 }
-object VstateprovincecountryregionMVFields extends VstateprovincecountryregionMVStructure[VstateprovincecountryregionMVRow](None, identity, (_, x) => x)
 
+object VstateprovincecountryregionMVFields {
+  val structure: Relation[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow, VstateprovincecountryregionMVRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => VstateprovincecountryregionMVRow, val merge: (Row, VstateprovincecountryregionMVRow) => Row)
+    extends Relation[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow, Row] { 
+  
+    override val fields: VstateprovincecountryregionMVFields[Row] = new VstateprovincecountryregionMVFields[Row] {
+      override val stateprovinceid = new Field[StateprovinceId, Row](prefix, "stateprovinceid", None, None)(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
+      override val stateprovincecode = new Field[/* bpchar, max 3 chars */ String, Row](prefix, "stateprovincecode", None, None)(x => extract(x).stateprovincecode, (row, value) => merge(row, extract(row).copy(stateprovincecode = value)))
+      override val isonlystateprovinceflag = new Field[Flag, Row](prefix, "isonlystateprovinceflag", None, None)(x => extract(x).isonlystateprovinceflag, (row, value) => merge(row, extract(row).copy(isonlystateprovinceflag = value)))
+      override val stateprovincename = new Field[Name, Row](prefix, "stateprovincename", None, None)(x => extract(x).stateprovincename, (row, value) => merge(row, extract(row).copy(stateprovincename = value)))
+      override val territoryid = new Field[SalesterritoryId, Row](prefix, "territoryid", None, None)(x => extract(x).territoryid, (row, value) => merge(row, extract(row).copy(territoryid = value)))
+      override val countryregioncode = new Field[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
+      override val countryregionname = new Field[Name, Row](prefix, "countryregionname", None, None)(x => extract(x).countryregionname, (row, value) => merge(row, extract(row).copy(countryregionname = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.stateprovinceid, fields.stateprovincecode, fields.isonlystateprovinceflag, fields.stateprovincename, fields.territoryid, fields.countryregioncode, fields.countryregionname)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => VstateprovincecountryregionMVRow, merge: (NewRow, VstateprovincecountryregionMVRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

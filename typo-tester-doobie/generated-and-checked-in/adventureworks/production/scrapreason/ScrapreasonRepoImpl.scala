@@ -27,7 +27,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""delete from production.scrapreason where "scrapreasonid" = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilder("production.scrapreason", ScrapreasonFields)
+    DeleteBuilder("production.scrapreason", ScrapreasonFields.structure)
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
@@ -70,7 +70,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     new FragmentOps(sql"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ScrapreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.read)
+    SelectBuilderSql("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
     sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason""".query(ScrapreasonRow.read).stream
@@ -92,7 +92,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilder("production.scrapreason", ScrapreasonFields, ScrapreasonRow.read)
+    UpdateBuilder("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.read)
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")

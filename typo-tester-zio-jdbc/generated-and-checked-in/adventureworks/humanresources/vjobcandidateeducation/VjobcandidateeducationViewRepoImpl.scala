@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo {
   override def select: SelectBuilder[VjobcandidateeducationViewFields, VjobcandidateeducationViewRow] = {
-    SelectBuilderSql("humanresources.vjobcandidateeducation", VjobcandidateeducationViewFields, VjobcandidateeducationViewRow.jdbcDecoder)
+    SelectBuilderSql("humanresources.vjobcandidateeducation", VjobcandidateeducationViewFields.structure, VjobcandidateeducationViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VjobcandidateeducationViewRow] = {
     sql"""select "jobcandidateid", "Edu.Level", "Edu.StartDate"::text, "Edu.EndDate"::text, "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City" from humanresources.vjobcandidateeducation""".query(VjobcandidateeducationViewRow.jdbcDecoder).selectStream

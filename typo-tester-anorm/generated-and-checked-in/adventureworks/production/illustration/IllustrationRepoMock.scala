@@ -25,7 +25,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     map.remove(illustrationid).isDefined
   }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IllustrationFields, map)
+    DeleteBuilderMock(DeleteParams.empty, IllustrationFields.structure.fields, map)
   }
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     val _ = if (map.contains(unsaved.illustrationid))
@@ -53,7 +53,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     unsaved.size.toLong
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
-    SelectBuilderMock(IllustrationFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(IllustrationFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     }
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IllustrationFields, map)
+    UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure.fields, map)
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     map.put(unsaved.illustrationid, unsaved): @nowarn

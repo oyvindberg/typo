@@ -25,7 +25,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     map.remove(currencyrateid).isDefined
   }
   override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields.structure.fields, map)
   }
   override def insert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     val _ = if (map.contains(unsaved.currencyrateid))
@@ -53,7 +53,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     unsaved.size.toLong
   }
   override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    SelectBuilderMock(CurrencyrateFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(CurrencyrateFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     }
   }
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields.structure.fields, map)
   }
   override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     map.put(unsaved.currencyrateid, unsaved): @nowarn

@@ -29,7 +29,7 @@ class CustomerRepoImpl extends CustomerRepo {
     sql"""delete from sales.customer where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilder("sales.customer", CustomerFields)
+    DeleteBuilder("sales.customer", CustomerFields.structure)
   }
   override def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
@@ -78,7 +78,7 @@ class CustomerRepoImpl extends CustomerRepo {
     new FragmentOps(sql"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CustomerRowUnsaved.text)
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
-    SelectBuilderSql("sales.customer", CustomerFields, CustomerRow.read)
+    SelectBuilderSql("sales.customer", CustomerFields.structure, CustomerRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
     sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer""".query(CustomerRow.read).stream
@@ -103,7 +103,7 @@ class CustomerRepoImpl extends CustomerRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilder("sales.customer", CustomerFields, CustomerRow.read)
+    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.read)
   }
   override def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

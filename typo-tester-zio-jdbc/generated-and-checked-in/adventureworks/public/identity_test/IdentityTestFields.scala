@@ -8,12 +8,34 @@ package public
 package identity_test
 
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait IdentityTestFields[Row] {
   val alwaysGenerated: Field[Int, Row]
   val defaultGenerated: Field[Int, Row]
   val name: IdField[IdentityTestId, Row]
 }
-object IdentityTestFields extends IdentityTestStructure[IdentityTestRow](None, identity, (_, x) => x)
 
+object IdentityTestFields {
+  val structure: Relation[IdentityTestFields, IdentityTestRow, IdentityTestRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => IdentityTestRow, val merge: (Row, IdentityTestRow) => Row)
+    extends Relation[IdentityTestFields, IdentityTestRow, Row] { 
+  
+    override val fields: IdentityTestFields[Row] = new IdentityTestFields[Row] {
+      override val alwaysGenerated = new Field[Int, Row](prefix, "always_generated", None, Some("int4"))(x => extract(x).alwaysGenerated, (row, value) => merge(row, extract(row).copy(alwaysGenerated = value)))
+      override val defaultGenerated = new Field[Int, Row](prefix, "default_generated", None, Some("int4"))(x => extract(x).defaultGenerated, (row, value) => merge(row, extract(row).copy(defaultGenerated = value)))
+      override val name = new IdField[IdentityTestId, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.alwaysGenerated, fields.defaultGenerated, fields.name)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => IdentityTestRow, merge: (NewRow, IdentityTestRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

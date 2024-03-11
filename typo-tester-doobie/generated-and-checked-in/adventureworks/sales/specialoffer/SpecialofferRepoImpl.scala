@@ -28,7 +28,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     sql"""delete from sales.specialoffer where "specialofferid" = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
-    DeleteBuilder("sales.specialoffer", SpecialofferFields)
+    DeleteBuilder("sales.specialoffer", SpecialofferFields.structure)
   }
   override def insert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
@@ -88,7 +88,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     new FragmentOps(sql"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SpecialofferRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
-    SelectBuilderSql("sales.specialoffer", SpecialofferFields, SpecialofferRow.read)
+    SelectBuilderSql("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferRow] = {
     sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer""".query(SpecialofferRow.read).stream
@@ -118,7 +118,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
-    UpdateBuilder("sales.specialoffer", SpecialofferFields, SpecialofferRow.read)
+    UpdateBuilder("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.read)
   }
   override def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")

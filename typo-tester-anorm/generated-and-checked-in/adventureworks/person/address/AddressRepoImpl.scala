@@ -32,7 +32,7 @@ class AddressRepoImpl extends AddressRepo {
     SQL"""delete from person.address where "addressid" = ${ParameterValue(addressid, null, AddressId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilder("person.address", AddressFields)
+    DeleteBuilder("person.address", AddressFields.structure)
   }
   override def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
@@ -87,7 +87,7 @@ class AddressRepoImpl extends AddressRepo {
     streamingInsert(s"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddressRowUnsaved.text, c)
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
-    SelectBuilderSql("person.address", AddressFields, AddressRow.rowParser)
+    SelectBuilderSql("person.address", AddressFields.structure, AddressRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
     SQL"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
@@ -122,7 +122,7 @@ class AddressRepoImpl extends AddressRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilder("person.address", AddressFields, AddressRow.rowParser)
+    UpdateBuilder("person.address", AddressFields.structure, AddressRow.rowParser)
   }
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")

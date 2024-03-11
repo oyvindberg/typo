@@ -28,7 +28,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     delay(map.remove(businessentityid).isDefined)
   }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PasswordFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     delay {
@@ -66,7 +66,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     }
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
-    SelectBuilderMock(PasswordFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(PasswordFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
     Stream.emits(map.values.toList)
@@ -89,7 +89,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     }
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PasswordFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure.fields, map)
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     delay {

@@ -28,7 +28,7 @@ class LocationRepoImpl extends LocationRepo {
     sql"""delete from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields)
+    DeleteBuilder("production.location", LocationFields.structure)
   }
   override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
@@ -79,7 +79,7 @@ class LocationRepoImpl extends LocationRepo {
     new FragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(LocationRowUnsaved.text)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderSql("production.location", LocationFields, LocationRow.read)
+    SelectBuilderSql("production.location", LocationFields.structure, LocationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
     sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(LocationRow.read).stream
@@ -103,7 +103,7 @@ class LocationRepoImpl extends LocationRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields, LocationRow.read)
+    UpdateBuilder("production.location", LocationFields.structure, LocationRow.read)
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")

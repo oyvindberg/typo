@@ -30,7 +30,7 @@ class PasswordRepoImpl extends PasswordRepo {
     SQL"""delete from person.password where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilder("person.password", PasswordFields)
+    DeleteBuilder("person.password", PasswordFields.structure)
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
@@ -78,7 +78,7 @@ class PasswordRepoImpl extends PasswordRepo {
     streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PasswordRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
-    SelectBuilderSql("person.password", PasswordFields, PasswordRow.rowParser)
+    SelectBuilderSql("person.password", PasswordFields.structure, PasswordRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     SQL"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
@@ -109,7 +109,7 @@ class PasswordRepoImpl extends PasswordRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilder("person.password", PasswordFields, PasswordRow.rowParser)
+    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.rowParser)
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")

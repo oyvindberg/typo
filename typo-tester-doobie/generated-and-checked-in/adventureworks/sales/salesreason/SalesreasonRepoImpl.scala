@@ -27,7 +27,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""delete from sales.salesreason where "salesreasonid" = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
-    DeleteBuilder("sales.salesreason", SalesreasonFields)
+    DeleteBuilder("sales.salesreason", SalesreasonFields.structure)
   }
   override def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
@@ -71,7 +71,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     new FragmentOps(sql"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
-    SelectBuilderSql("sales.salesreason", SalesreasonFields, SalesreasonRow.read)
+    SelectBuilderSql("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
     sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason""".query(SalesreasonRow.read).stream
@@ -94,7 +94,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
-    UpdateBuilder("sales.salesreason", SalesreasonFields, SalesreasonRow.read)
+    UpdateBuilder("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.read)
   }
   override def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")

@@ -12,7 +12,9 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait BomViewFields[Row] {
   val id: Field[Int, Row]
@@ -26,5 +28,32 @@ trait BomViewFields[Row] {
   val perassemblyqty: Field[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object BomViewFields extends BomViewStructure[BomViewRow](None, identity, (_, x) => x)
 
+object BomViewFields {
+  val structure: Relation[BomViewFields, BomViewRow, BomViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => BomViewRow, val merge: (Row, BomViewRow) => Row)
+    extends Relation[BomViewFields, BomViewRow, Row] { 
+  
+    override val fields: BomViewFields[Row] = new BomViewFields[Row] {
+      override val id = new Field[Int, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val billofmaterialsid = new Field[Int, Row](prefix, "billofmaterialsid", None, None)(x => extract(x).billofmaterialsid, (row, value) => merge(row, extract(row).copy(billofmaterialsid = value)))
+      override val productassemblyid = new OptField[ProductId, Row](prefix, "productassemblyid", None, None)(x => extract(x).productassemblyid, (row, value) => merge(row, extract(row).copy(productassemblyid = value)))
+      override val componentid = new Field[ProductId, Row](prefix, "componentid", None, None)(x => extract(x).componentid, (row, value) => merge(row, extract(row).copy(componentid = value)))
+      override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
+      override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
+      override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, None)(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
+      override val bomlevel = new Field[TypoShort, Row](prefix, "bomlevel", None, None)(x => extract(x).bomlevel, (row, value) => merge(row, extract(row).copy(bomlevel = value)))
+      override val perassemblyqty = new Field[BigDecimal, Row](prefix, "perassemblyqty", None, None)(x => extract(x).perassemblyqty, (row, value) => merge(row, extract(row).copy(perassemblyqty = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.billofmaterialsid, fields.productassemblyid, fields.componentid, fields.startdate, fields.enddate, fields.unitmeasurecode, fields.bomlevel, fields.perassemblyqty, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => BomViewRow, merge: (NewRow, BomViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

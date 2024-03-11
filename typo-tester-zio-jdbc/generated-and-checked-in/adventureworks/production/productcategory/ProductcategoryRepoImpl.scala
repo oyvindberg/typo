@@ -29,7 +29,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""delete from production.productcategory where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    DeleteBuilder("production.productcategory", ProductcategoryFields)
+    DeleteBuilder("production.productcategory", ProductcategoryFields.structure)
   }
   override def insert(unsaved: ProductcategoryRow): ZIO[ZConnection, Throwable, ProductcategoryRow] = {
     sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
@@ -74,7 +74,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     streamingInsert(s"""COPY production.productcategory("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    SelectBuilderSql("production.productcategory", ProductcategoryFields, ProductcategoryRow.jdbcDecoder)
+    SelectBuilderSql("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductcategoryRow] = {
     sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory""".query(ProductcategoryRow.jdbcDecoder).selectStream
@@ -94,7 +94,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
           where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    UpdateBuilder("production.productcategory", ProductcategoryFields, ProductcategoryRow.jdbcDecoder)
+    UpdateBuilder("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductcategoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductcategoryRow]] = {
     sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")

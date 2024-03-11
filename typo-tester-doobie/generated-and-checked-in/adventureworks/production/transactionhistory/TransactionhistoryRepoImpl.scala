@@ -28,7 +28,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"""delete from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilder("production.transactionhistory", TransactionhistoryFields)
+    DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
   }
   override def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
@@ -83,7 +83,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     new FragmentOps(sql"""COPY production.transactionhistory("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(TransactionhistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    SelectBuilderSql("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.read)
+    SelectBuilderSql("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryRow] = {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(TransactionhistoryRow.read).stream
@@ -111,7 +111,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilder("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.read)
+    UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
   }
   override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")

@@ -25,7 +25,7 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     map.remove(productreviewid).isDefined
   }
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     val _ = if (map.contains(unsaved.productreviewid))
@@ -53,7 +53,7 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     unsaved.size.toLong
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
-    SelectBuilderMock(ProductreviewFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(ProductreviewFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     }
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     map.put(unsaved.productreviewid, unsaved): @nowarn

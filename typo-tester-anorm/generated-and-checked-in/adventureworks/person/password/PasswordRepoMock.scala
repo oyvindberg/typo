@@ -26,7 +26,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     map.remove(businessentityid).isDefined
   }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PasswordFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     val _ = if (map.contains(unsaved.businessentityid))
@@ -54,7 +54,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
-    SelectBuilderMock(PasswordFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(PasswordFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     map.values.toList
@@ -75,7 +75,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     }
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PasswordFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure.fields, map)
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     map.put(unsaved.businessentityid, unsaved): @nowarn

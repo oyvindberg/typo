@@ -26,7 +26,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     map.remove(documentnode).isDefined
   }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DocumentFields, map)
+    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
   }
   override def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     val _ = if (map.contains(unsaved.documentnode))
@@ -54,7 +54,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
-    SelectBuilderMock(DocumentFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(DocumentFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
     map.values.toList
@@ -78,7 +78,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     }
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DocumentFields, map)
+    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure.fields, map)
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     map.put(unsaved.documentnode, unsaved): @nowarn

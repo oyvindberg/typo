@@ -28,7 +28,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     sql"""delete from production.productmodelillustration where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "illustrationid" = ${fromWrite(compositeId.illustrationid)(Write.fromPut(IllustrationId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields)
+    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
   }
   override def insert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
@@ -68,7 +68,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     new FragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelillustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.read)
+    SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
     sql"""select "productmodelid", "illustrationid", "modifieddate"::text from production.productmodelillustration""".query(ProductmodelillustrationRow.read).stream
@@ -86,7 +86,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.read)
+    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.read)
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")

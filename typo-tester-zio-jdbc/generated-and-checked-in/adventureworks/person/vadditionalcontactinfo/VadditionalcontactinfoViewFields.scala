@@ -14,7 +14,9 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait VadditionalcontactinfoViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
@@ -35,5 +37,39 @@ trait VadditionalcontactinfoViewFields[Row] {
   val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object VadditionalcontactinfoViewFields extends VadditionalcontactinfoViewStructure[VadditionalcontactinfoViewRow](None, identity, (_, x) => x)
 
+object VadditionalcontactinfoViewFields {
+  val structure: Relation[VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow, VadditionalcontactinfoViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => VadditionalcontactinfoViewRow, val merge: (Row, VadditionalcontactinfoViewRow) => Row)
+    extends Relation[VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow, Row] { 
+  
+    override val fields: VadditionalcontactinfoViewFields[Row] = new VadditionalcontactinfoViewFields[Row] {
+      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+      override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, None)(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
+      override val middlename = new OptField[Name, Row](prefix, "middlename", None, None)(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
+      override val lastname = new Field[Name, Row](prefix, "lastname", None, None)(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
+      override val telephonenumber = new OptField[TypoXml, Row](prefix, "telephonenumber", None, None)(x => extract(x).telephonenumber, (row, value) => merge(row, extract(row).copy(telephonenumber = value)))
+      override val telephonespecialinstructions = new OptField[String, Row](prefix, "telephonespecialinstructions", None, None)(x => extract(x).telephonespecialinstructions, (row, value) => merge(row, extract(row).copy(telephonespecialinstructions = value)))
+      override val street = new OptField[TypoXml, Row](prefix, "street", None, None)(x => extract(x).street, (row, value) => merge(row, extract(row).copy(street = value)))
+      override val city = new OptField[TypoXml, Row](prefix, "city", None, None)(x => extract(x).city, (row, value) => merge(row, extract(row).copy(city = value)))
+      override val stateprovince = new OptField[TypoXml, Row](prefix, "stateprovince", None, None)(x => extract(x).stateprovince, (row, value) => merge(row, extract(row).copy(stateprovince = value)))
+      override val postalcode = new OptField[TypoXml, Row](prefix, "postalcode", None, None)(x => extract(x).postalcode, (row, value) => merge(row, extract(row).copy(postalcode = value)))
+      override val countryregion = new OptField[TypoXml, Row](prefix, "countryregion", None, None)(x => extract(x).countryregion, (row, value) => merge(row, extract(row).copy(countryregion = value)))
+      override val homeaddressspecialinstructions = new OptField[TypoXml, Row](prefix, "homeaddressspecialinstructions", None, None)(x => extract(x).homeaddressspecialinstructions, (row, value) => merge(row, extract(row).copy(homeaddressspecialinstructions = value)))
+      override val emailaddress = new OptField[TypoXml, Row](prefix, "emailaddress", None, None)(x => extract(x).emailaddress, (row, value) => merge(row, extract(row).copy(emailaddress = value)))
+      override val emailspecialinstructions = new OptField[String, Row](prefix, "emailspecialinstructions", None, None)(x => extract(x).emailspecialinstructions, (row, value) => merge(row, extract(row).copy(emailspecialinstructions = value)))
+      override val emailtelephonenumber = new OptField[TypoXml, Row](prefix, "emailtelephonenumber", None, None)(x => extract(x).emailtelephonenumber, (row, value) => merge(row, extract(row).copy(emailtelephonenumber = value)))
+      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.firstname, fields.middlename, fields.lastname, fields.telephonenumber, fields.telephonespecialinstructions, fields.street, fields.city, fields.stateprovince, fields.postalcode, fields.countryregion, fields.homeaddressspecialinstructions, fields.emailaddress, fields.emailspecialinstructions, fields.emailtelephonenumber, fields.rowguid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => VadditionalcontactinfoViewRow, merge: (NewRow, VadditionalcontactinfoViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

@@ -12,7 +12,9 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait WrViewFields[Row] {
   val id: Field[WorkorderId, Row]
@@ -29,5 +31,35 @@ trait WrViewFields[Row] {
   val actualcost: OptField[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object WrViewFields extends WrViewStructure[WrViewRow](None, identity, (_, x) => x)
 
+object WrViewFields {
+  val structure: Relation[WrViewFields, WrViewRow, WrViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => WrViewRow, val merge: (Row, WrViewRow) => Row)
+    extends Relation[WrViewFields, WrViewRow, Row] { 
+  
+    override val fields: WrViewFields[Row] = new WrViewFields[Row] {
+      override val id = new Field[WorkorderId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val workorderid = new Field[WorkorderId, Row](prefix, "workorderid", None, None)(x => extract(x).workorderid, (row, value) => merge(row, extract(row).copy(workorderid = value)))
+      override val productid = new Field[Int, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+      override val operationsequence = new Field[TypoShort, Row](prefix, "operationsequence", None, None)(x => extract(x).operationsequence, (row, value) => merge(row, extract(row).copy(operationsequence = value)))
+      override val locationid = new Field[LocationId, Row](prefix, "locationid", None, None)(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
+      override val scheduledstartdate = new Field[TypoLocalDateTime, Row](prefix, "scheduledstartdate", Some("text"), None)(x => extract(x).scheduledstartdate, (row, value) => merge(row, extract(row).copy(scheduledstartdate = value)))
+      override val scheduledenddate = new Field[TypoLocalDateTime, Row](prefix, "scheduledenddate", Some("text"), None)(x => extract(x).scheduledenddate, (row, value) => merge(row, extract(row).copy(scheduledenddate = value)))
+      override val actualstartdate = new OptField[TypoLocalDateTime, Row](prefix, "actualstartdate", Some("text"), None)(x => extract(x).actualstartdate, (row, value) => merge(row, extract(row).copy(actualstartdate = value)))
+      override val actualenddate = new OptField[TypoLocalDateTime, Row](prefix, "actualenddate", Some("text"), None)(x => extract(x).actualenddate, (row, value) => merge(row, extract(row).copy(actualenddate = value)))
+      override val actualresourcehrs = new OptField[BigDecimal, Row](prefix, "actualresourcehrs", None, None)(x => extract(x).actualresourcehrs, (row, value) => merge(row, extract(row).copy(actualresourcehrs = value)))
+      override val plannedcost = new Field[BigDecimal, Row](prefix, "plannedcost", None, None)(x => extract(x).plannedcost, (row, value) => merge(row, extract(row).copy(plannedcost = value)))
+      override val actualcost = new OptField[BigDecimal, Row](prefix, "actualcost", None, None)(x => extract(x).actualcost, (row, value) => merge(row, extract(row).copy(actualcost = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.workorderid, fields.productid, fields.operationsequence, fields.locationid, fields.scheduledstartdate, fields.scheduledenddate, fields.actualstartdate, fields.actualenddate, fields.actualresourcehrs, fields.plannedcost, fields.actualcost, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => WrViewRow, merge: (NewRow, WrViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

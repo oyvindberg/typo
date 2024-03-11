@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class CrViewRepoImpl extends CrViewRepo {
   override def select: SelectBuilder[CrViewFields, CrViewRow] = {
-    SelectBuilderSql("sa.cr", CrViewFields, CrViewRow.jdbcDecoder)
+    SelectBuilderSql("sa.cr", CrViewFields.structure, CrViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CrViewRow] = {
     sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sa.cr""".query(CrViewRow.jdbcDecoder).selectStream

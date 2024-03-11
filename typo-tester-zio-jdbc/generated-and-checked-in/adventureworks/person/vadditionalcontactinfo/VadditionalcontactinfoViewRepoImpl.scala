@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
   override def select: SelectBuilder[VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow] = {
-    SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow.jdbcDecoder)
+    SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields.structure, VadditionalcontactinfoViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VadditionalcontactinfoViewRow] = {
     sql"""select "businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate"::text from person.vadditionalcontactinfo""".query(VadditionalcontactinfoViewRow.jdbcDecoder).selectStream

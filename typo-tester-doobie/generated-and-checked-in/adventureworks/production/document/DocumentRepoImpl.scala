@@ -32,7 +32,7 @@ class DocumentRepoImpl extends DocumentRepo {
     sql"""delete from production.document where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilder("production.document", DocumentFields)
+    DeleteBuilder("production.document", DocumentFields.structure)
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
@@ -94,7 +94,7 @@ class DocumentRepoImpl extends DocumentRepo {
     new FragmentOps(sql"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(DocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
-    SelectBuilderSql("production.document", DocumentFields, DocumentRow.read)
+    SelectBuilderSql("production.document", DocumentFields.structure, DocumentRow.read)
   }
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document""".query(DocumentRow.read).stream
@@ -132,7 +132,7 @@ class DocumentRepoImpl extends DocumentRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilder("production.document", DocumentFields, DocumentRow.read)
+    UpdateBuilder("production.document", DocumentFields.structure, DocumentRow.read)
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")

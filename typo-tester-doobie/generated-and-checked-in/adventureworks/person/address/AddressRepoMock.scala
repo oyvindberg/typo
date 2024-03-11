@@ -27,7 +27,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     delay(map.remove(addressid).isDefined)
   }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, AddressFields, map)
+    DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
   }
   override def insert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     delay {
@@ -65,7 +65,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     }
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
-    SelectBuilderMock(AddressFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(AddressFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     }
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, AddressFields, map)
+    UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
   }
   override def upsert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     delay {

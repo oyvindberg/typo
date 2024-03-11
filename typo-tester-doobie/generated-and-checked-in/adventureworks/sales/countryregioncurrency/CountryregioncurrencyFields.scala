@@ -11,12 +11,34 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait CountryregioncurrencyFields[Row] {
   val countryregioncode: IdField[CountryregionId, Row]
   val currencycode: IdField[CurrencyId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object CountryregioncurrencyFields extends CountryregioncurrencyStructure[CountryregioncurrencyRow](None, identity, (_, x) => x)
 
+object CountryregioncurrencyFields {
+  val structure: Relation[CountryregioncurrencyFields, CountryregioncurrencyRow, CountryregioncurrencyRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => CountryregioncurrencyRow, val merge: (Row, CountryregioncurrencyRow) => Row)
+    extends Relation[CountryregioncurrencyFields, CountryregioncurrencyRow, Row] { 
+  
+    override val fields: CountryregioncurrencyFields[Row] = new CountryregioncurrencyFields[Row] {
+      override val countryregioncode = new IdField[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
+      override val currencycode = new IdField[CurrencyId, Row](prefix, "currencycode", None, Some("bpchar"))(x => extract(x).currencycode, (row, value) => merge(row, extract(row).copy(currencycode = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.countryregioncode, fields.currencycode, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => CountryregioncurrencyRow, merge: (NewRow, CountryregioncurrencyRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

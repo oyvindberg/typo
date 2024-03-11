@@ -27,7 +27,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     delay(map.remove(illustrationid).isDefined)
   }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IllustrationFields, map)
+    DeleteBuilderMock(DeleteParams.empty, IllustrationFields.structure.fields, map)
   }
   override def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     delay {
@@ -65,7 +65,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     }
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
-    SelectBuilderMock(IllustrationFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(IllustrationFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     }
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IllustrationFields, map)
+    UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure.fields, map)
   }
   override def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     delay {

@@ -29,7 +29,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     sql"""delete from person.emailaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
-    DeleteBuilder("person.emailaddress", EmailaddressFields)
+    DeleteBuilder("person.emailaddress", EmailaddressFields.structure)
   }
   override def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
@@ -77,7 +77,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     new FragmentOps(sql"""COPY person.emailaddress("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(EmailaddressRowUnsaved.text)
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
-    SelectBuilderSql("person.emailaddress", EmailaddressFields, EmailaddressRow.read)
+    SelectBuilderSql("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
     sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress""".query(EmailaddressRow.read).stream
@@ -97,7 +97,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
-    UpdateBuilder("person.emailaddress", EmailaddressFields, EmailaddressRow.read)
+    UpdateBuilder("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.read)
   }
   override def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")

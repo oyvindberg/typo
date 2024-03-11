@@ -30,7 +30,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     sql"""delete from production.billofmaterials where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilder("production.billofmaterials", BillofmaterialsFields)
+    DeleteBuilder("production.billofmaterials", BillofmaterialsFields.structure)
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
@@ -85,7 +85,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     new FragmentOps(sql"""COPY production.billofmaterials("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BillofmaterialsRowUnsaved.text)
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    SelectBuilderSql("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.read)
+    SelectBuilderSql("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
     sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials""".query(BillofmaterialsRow.read).stream
@@ -113,7 +113,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilder("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.read)
+    UpdateBuilder("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.read)
   }
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")

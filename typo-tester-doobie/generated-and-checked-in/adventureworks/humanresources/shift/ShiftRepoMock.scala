@@ -27,7 +27,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     delay(map.remove(shiftid).isDefined)
   }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShiftFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     delay {
@@ -65,7 +65,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     }
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderMock(ShiftFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(ShiftFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     }
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShiftFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     delay {

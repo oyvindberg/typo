@@ -31,7 +31,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     SQL"""delete from production.productmodel where "productmodelid" = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
-    DeleteBuilder("production.productmodel", ProductmodelFields)
+    DeleteBuilder("production.productmodel", ProductmodelFields.structure)
   }
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
@@ -83,7 +83,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     streamingInsert(s"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
-    SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.rowParser)
+    SelectBuilderSql("production.productmodel", ProductmodelFields.structure, ProductmodelRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
     SQL"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
@@ -115,7 +115,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
-    UpdateBuilder("production.productmodel", ProductmodelFields, ProductmodelRow.rowParser)
+    UpdateBuilder("production.productmodel", ProductmodelFields.structure, ProductmodelRow.rowParser)
   }
   override def upsert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")

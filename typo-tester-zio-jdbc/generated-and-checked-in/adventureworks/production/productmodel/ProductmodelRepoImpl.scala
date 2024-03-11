@@ -31,7 +31,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""delete from production.productmodel where "productmodelid" = ${Segment.paramSegment(productmodelid)(ProductmodelId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
-    DeleteBuilder("production.productmodel", ProductmodelFields)
+    DeleteBuilder("production.productmodel", ProductmodelFields.structure)
   }
   override def insert(unsaved: ProductmodelRow): ZIO[ZConnection, Throwable, ProductmodelRow] = {
     sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
@@ -78,7 +78,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     streamingInsert(s"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
-    SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.jdbcDecoder)
+    SelectBuilderSql("production.productmodel", ProductmodelFields.structure, ProductmodelRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductmodelRow] = {
     sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel""".query(ProductmodelRow.jdbcDecoder).selectStream
@@ -100,7 +100,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
           where "productmodelid" = ${Segment.paramSegment(productmodelid)(ProductmodelId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
-    UpdateBuilder("production.productmodel", ProductmodelFields, ProductmodelRow.jdbcDecoder)
+    UpdateBuilder("production.productmodel", ProductmodelFields.structure, ProductmodelRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductmodelRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelRow]] = {
     sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")

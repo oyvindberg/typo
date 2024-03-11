@@ -25,7 +25,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     map.remove(id).isDefined
   }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields, map)
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     val _ = if (map.contains(unsaved.id))
@@ -42,7 +42,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     unsaved.size.toLong
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    SelectBuilderMock(MaritalStatusFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(MaritalStatusFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     map.values.toList
@@ -59,7 +59,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     }.toList
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields, map)
+    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     map.put(unsaved.id, unsaved): @nowarn

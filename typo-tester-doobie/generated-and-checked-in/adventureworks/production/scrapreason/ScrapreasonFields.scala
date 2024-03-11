@@ -10,12 +10,34 @@ package scrapreason
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait ScrapreasonFields[Row] {
   val scrapreasonid: IdField[ScrapreasonId, Row]
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object ScrapreasonFields extends ScrapreasonStructure[ScrapreasonRow](None, identity, (_, x) => x)
 
+object ScrapreasonFields {
+  val structure: Relation[ScrapreasonFields, ScrapreasonRow, ScrapreasonRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => ScrapreasonRow, val merge: (Row, ScrapreasonRow) => Row)
+    extends Relation[ScrapreasonFields, ScrapreasonRow, Row] { 
+  
+    override val fields: ScrapreasonFields[Row] = new ScrapreasonFields[Row] {
+      override val scrapreasonid = new IdField[ScrapreasonId, Row](prefix, "scrapreasonid", None, Some("int4"))(x => extract(x).scrapreasonid, (row, value) => merge(row, extract(row).copy(scrapreasonid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.scrapreasonid, fields.name, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => ScrapreasonRow, merge: (NewRow, ScrapreasonRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

@@ -29,7 +29,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     sql"""delete from sales.personcreditcard where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields)
+    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
   }
   override def insert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
@@ -67,7 +67,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     streamingInsert(s"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersoncreditcardRowUnsaved.text)
   }
   override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.jdbcDecoder)
+    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersoncreditcardRow] = {
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard""".query(PersoncreditcardRow.jdbcDecoder).selectStream
@@ -82,7 +82,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.jdbcDecoder)
+    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.jdbcDecoder)
   }
   override def upsert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[PersoncreditcardRow]] = {
     sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")

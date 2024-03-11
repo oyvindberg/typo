@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class SpqhViewRepoImpl extends SpqhViewRepo {
   override def select: SelectBuilder[SpqhViewFields, SpqhViewRow] = {
-    SelectBuilderSql("sa.spqh", SpqhViewFields, SpqhViewRow.jdbcDecoder)
+    SelectBuilderSql("sa.spqh", SpqhViewFields.structure, SpqhViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SpqhViewRow] = {
     sql"""select "id", "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sa.spqh""".query(SpqhViewRow.jdbcDecoder).selectStream

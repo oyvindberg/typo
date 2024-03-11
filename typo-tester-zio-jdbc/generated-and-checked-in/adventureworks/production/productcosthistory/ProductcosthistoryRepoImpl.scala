@@ -29,7 +29,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     sql"""delete from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields)
+    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
   }
   override def insert(unsaved: ProductcosthistoryRow): ZIO[ZConnection, Throwable, ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
@@ -69,7 +69,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     streamingInsert(s"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcosthistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.jdbcDecoder)
+    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductcosthistoryRow] = {
     sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory""".query(ProductcosthistoryRow.jdbcDecoder).selectStream
@@ -86,7 +86,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.jdbcDecoder)
+    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductcosthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductcosthistoryRow]] = {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")

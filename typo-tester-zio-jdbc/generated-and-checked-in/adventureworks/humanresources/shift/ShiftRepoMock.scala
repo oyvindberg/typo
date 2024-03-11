@@ -29,7 +29,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     ZIO.succeed(map.remove(shiftid).isDefined)
   }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShiftFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
   }
   override def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderMock(ShiftFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(ShiftFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShiftRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     }
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShiftFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
   }
   override def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]] = {
     ZIO.succeed {

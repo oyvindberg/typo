@@ -31,7 +31,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
     sql"""delete from sales.salesperson where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
-    DeleteBuilder("sales.salesperson", SalespersonFields)
+    DeleteBuilder("sales.salesperson", SalespersonFields.structure)
   }
   override def insert(unsaved: SalespersonRow): ZIO[ZConnection, Throwable, SalespersonRow] = {
     sql"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
@@ -90,7 +90,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
     streamingInsert(s"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalespersonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
-    SelectBuilderSql("sales.salesperson", SalespersonFields, SalespersonRow.jdbcDecoder)
+    SelectBuilderSql("sales.salesperson", SalespersonFields.structure, SalespersonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalespersonRow] = {
     sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson""".query(SalespersonRow.jdbcDecoder).selectStream
@@ -115,7 +115,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
-    UpdateBuilder("sales.salesperson", SalespersonFields, SalespersonRow.jdbcDecoder)
+    UpdateBuilder("sales.salesperson", SalespersonFields.structure, SalespersonRow.jdbcDecoder)
   }
   override def upsert(unsaved: SalespersonRow): ZIO[ZConnection, Throwable, UpdateResult[SalespersonRow]] = {
     sql"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")

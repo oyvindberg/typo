@@ -29,7 +29,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields)
+    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
   }
   override def insert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
@@ -79,7 +79,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShoppingcartitemRowUnsaved.text)
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.jdbcDecoder)
+    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShoppingcartitemRow] = {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem""".query(ShoppingcartitemRow.jdbcDecoder).selectStream
@@ -101,7 +101,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.jdbcDecoder)
+    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.jdbcDecoder)
   }
   override def upsert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, UpdateResult[ShoppingcartitemRow]] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")

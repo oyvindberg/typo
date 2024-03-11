@@ -25,7 +25,7 @@ class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[Productmode
     map.remove(compositeId).isDefined
   }
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductmodelproductdescriptioncultureFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductmodelproductdescriptioncultureFields.structure.fields, map)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -53,7 +53,7 @@ class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[Productmode
     unsaved.size.toLong
   }
   override def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    SelectBuilderMock(ProductmodelproductdescriptioncultureFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(ProductmodelproductdescriptioncultureFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     map.values.toList
@@ -71,7 +71,7 @@ class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[Productmode
     }
   }
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductmodelproductdescriptioncultureFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductmodelproductdescriptioncultureFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

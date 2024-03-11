@@ -28,7 +28,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     sql"""delete from production.productlistpricehistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    DeleteBuilder("production.productlistpricehistory", ProductlistpricehistoryFields)
+    DeleteBuilder("production.productlistpricehistory", ProductlistpricehistoryFields.structure)
   }
   override def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")
@@ -70,7 +70,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     new FragmentOps(sql"""COPY production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductlistpricehistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    SelectBuilderSql("production.productlistpricehistory", ProductlistpricehistoryFields, ProductlistpricehistoryRow.read)
+    SelectBuilderSql("production.productlistpricehistory", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow] = {
     sql"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from production.productlistpricehistory""".query(ProductlistpricehistoryRow.read).stream
@@ -90,7 +90,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    UpdateBuilder("production.productlistpricehistory", ProductlistpricehistoryFields, ProductlistpricehistoryRow.read)
+    UpdateBuilder("production.productlistpricehistory", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.read)
   }
   override def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")

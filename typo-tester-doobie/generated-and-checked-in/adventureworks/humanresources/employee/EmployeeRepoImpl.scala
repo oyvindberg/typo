@@ -32,7 +32,7 @@ class EmployeeRepoImpl extends EmployeeRepo {
     sql"""delete from humanresources.employee where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
-    DeleteBuilder("humanresources.employee", EmployeeFields)
+    DeleteBuilder("humanresources.employee", EmployeeFields.structure)
   }
   override def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
@@ -102,7 +102,7 @@ class EmployeeRepoImpl extends EmployeeRepo {
     new FragmentOps(sql"""COPY humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(EmployeeRowUnsaved.text)
   }
   override def select: SelectBuilder[EmployeeFields, EmployeeRow] = {
-    SelectBuilderSql("humanresources.employee", EmployeeFields, EmployeeRow.read)
+    SelectBuilderSql("humanresources.employee", EmployeeFields.structure, EmployeeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EmployeeRow] = {
     sql"""select "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode" from humanresources.employee""".query(EmployeeRow.read).stream
@@ -136,7 +136,7 @@ class EmployeeRepoImpl extends EmployeeRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
-    UpdateBuilder("humanresources.employee", EmployeeFields, EmployeeRow.read)
+    UpdateBuilder("humanresources.employee", EmployeeFields.structure, EmployeeRow.read)
   }
   override def upsert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")

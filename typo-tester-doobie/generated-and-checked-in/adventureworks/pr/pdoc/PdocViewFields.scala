@@ -11,6 +11,8 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait PdocViewFields[Row] {
   val id: Field[ProductId, Row]
@@ -18,5 +20,26 @@ trait PdocViewFields[Row] {
   val modifieddate: Field[TypoLocalDateTime, Row]
   val documentnode: Field[DocumentId, Row]
 }
-object PdocViewFields extends PdocViewStructure[PdocViewRow](None, identity, (_, x) => x)
 
+object PdocViewFields {
+  val structure: Relation[PdocViewFields, PdocViewRow, PdocViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => PdocViewRow, val merge: (Row, PdocViewRow) => Row)
+    extends Relation[PdocViewFields, PdocViewRow, Row] { 
+  
+    override val fields: PdocViewFields[Row] = new PdocViewFields[Row] {
+      override val id = new Field[ProductId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+      override val documentnode = new Field[DocumentId, Row](prefix, "documentnode", None, None)(x => extract(x).documentnode, (row, value) => merge(row, extract(row).copy(documentnode = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.productid, fields.modifieddate, fields.documentnode)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => PdocViewRow, merge: (NewRow, PdocViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

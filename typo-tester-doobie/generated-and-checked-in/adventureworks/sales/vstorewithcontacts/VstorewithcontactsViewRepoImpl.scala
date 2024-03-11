@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class VstorewithcontactsViewRepoImpl extends VstorewithcontactsViewRepo {
   override def select: SelectBuilder[VstorewithcontactsViewFields, VstorewithcontactsViewRow] = {
-    SelectBuilderSql("sales.vstorewithcontacts", VstorewithcontactsViewFields, VstorewithcontactsViewRow.read)
+    SelectBuilderSql("sales.vstorewithcontacts", VstorewithcontactsViewFields.structure, VstorewithcontactsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VstorewithcontactsViewRow] = {
     sql"""select "businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion" from sales.vstorewithcontacts""".query(VstorewithcontactsViewRow.read).stream

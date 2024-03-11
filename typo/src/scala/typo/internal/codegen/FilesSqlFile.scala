@@ -9,7 +9,6 @@ case class FilesSqlFile(script: ComputedSqlFile, naming: Naming, options: Intern
   val all: List[sc.File] = List(
     relation.RowFile(RowType.Readable),
     relation.FieldsFile,
-    relation.StructureFile,
     for {
       dbLib <- options.dbLib
     } yield relation.RepoTraitFile(dbLib, script.repoMethods),

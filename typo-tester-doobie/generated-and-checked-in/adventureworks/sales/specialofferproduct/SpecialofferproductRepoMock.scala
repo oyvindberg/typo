@@ -27,7 +27,7 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure.fields, map)
   }
   override def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     delay {
@@ -65,7 +65,7 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     }
   }
   override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    SelectBuilderMock(SpecialofferproductFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(SpecialofferproductFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     }
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure.fields, map)
   }
   override def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     delay {

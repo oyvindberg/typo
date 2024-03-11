@@ -29,7 +29,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     SQL"""delete from production.productcosthistory where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields)
+    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
   }
   override def insert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
     SQL"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
@@ -74,7 +74,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     streamingInsert(s"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcosthistoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.rowParser)
+    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
     SQL"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
@@ -97,7 +97,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.rowParser)
+    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.rowParser)
   }
   override def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
     SQL"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")

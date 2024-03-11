@@ -30,7 +30,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     ZIO.succeed(map.remove(documentnode).isDefined)
   }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DocumentFields, map)
+    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
   }
   override def insert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, DocumentRow] = {
     ZIO.succeed {
@@ -65,7 +65,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
-    SelectBuilderMock(DocumentFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(DocumentFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, DocumentRow] = {
     ZStream.fromIterable(map.values)
@@ -91,7 +91,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     }
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DocumentFields, map)
+    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure.fields, map)
   }
   override def upsert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, UpdateResult[DocumentRow]] = {
     ZIO.succeed {

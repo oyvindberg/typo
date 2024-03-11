@@ -46,7 +46,7 @@ import typo.dsl.UpdateBuilder
 
 class PgtestnullRepoImpl extends PgtestnullRepo {
   override def delete: DeleteBuilder[PgtestnullFields, PgtestnullRow] = {
-    DeleteBuilder("public.pgtestnull", PgtestnullFields)
+    DeleteBuilder("public.pgtestnull", PgtestnullFields.structure)
   }
   override def insert(unsaved: PgtestnullRow)(implicit c: Connection): PgtestnullRow = {
     SQL"""insert into public.pgtestnull("bool", "box", "bpchar", "bytea", "char", "circle", "date", "float4", "float8", "hstore", "inet", "int2", "int2vector", "int4", "int8", "interval", "json", "jsonb", "line", "lseg", "money", "mydomain", "myenum", "name", "numeric", "path", "point", "polygon", "text", "time", "timestamp", "timestampz", "timez", "uuid", "varchar", "vector", "xml", "boxes", "bpchares", "chares", "circlees", "datees", "float4es", "float8es", "inetes", "int2es", "int2vectores", "int4es", "int8es", "intervales", "jsones", "jsonbes", "linees", "lseges", "moneyes", "myenumes", "namees", "numerices", "pathes", "pointes", "polygones", "textes", "timees", "timestampes", "timestampzes", "timezes", "uuides", "varchares", "xmles")
@@ -60,7 +60,7 @@ class PgtestnullRepoImpl extends PgtestnullRepo {
     streamingInsert(s"""COPY public.pgtestnull("bool", "box", "bpchar", "bytea", "char", "circle", "date", "float4", "float8", "hstore", "inet", "int2", "int2vector", "int4", "int8", "interval", "json", "jsonb", "line", "lseg", "money", "mydomain", "myenum", "name", "numeric", "path", "point", "polygon", "text", "time", "timestamp", "timestampz", "timez", "uuid", "varchar", "vector", "xml", "boxes", "bpchares", "chares", "circlees", "datees", "float4es", "float8es", "inetes", "int2es", "int2vectores", "int4es", "int8es", "intervales", "jsones", "jsonbes", "linees", "lseges", "moneyes", "myenumes", "namees", "numerices", "pathes", "pointes", "polygones", "textes", "timees", "timestampes", "timestampzes", "timezes", "uuides", "varchares", "xmles") FROM STDIN""", batchSize, unsaved)(PgtestnullRow.text, c)
   }
   override def select: SelectBuilder[PgtestnullFields, PgtestnullRow] = {
-    SelectBuilderSql("public.pgtestnull", PgtestnullFields, PgtestnullRow.rowParser)
+    SelectBuilderSql("public.pgtestnull", PgtestnullFields.structure, PgtestnullRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgtestnullRow] = {
     SQL"""select "bool", "box", "bpchar", "bytea", "char", "circle", "date"::text, "float4", "float8", "hstore", "inet", "int2", "int2vector", "int4", "int8", "interval", "json", "jsonb", "line", "lseg", "money"::numeric, "mydomain", "myenum", "name", "numeric", "path", "point", "polygon", "text", "time"::text, "timestamp"::text, "timestampz"::text, "timez"::text, "uuid", "varchar", "vector"::float4[], "xml", "boxes", "bpchares", "chares", "circlees", "datees"::text[], "float4es", "float8es", "inetes", "int2es", "int2vectores", "int4es", "int8es", "intervales", "jsones", "jsonbes", "linees", "lseges", "moneyes"::numeric[], "myenumes", "namees", "numerices", "pathes", "pointes", "polygones", "textes", "timees"::text[], "timestampes"::text[], "timestampzes"::text[], "timezes"::text[], "uuides", "varchares", "xmles"
@@ -68,6 +68,6 @@ class PgtestnullRepoImpl extends PgtestnullRepo {
        """.as(PgtestnullRow.rowParser(1).*)
   }
   override def update: UpdateBuilder[PgtestnullFields, PgtestnullRow] = {
-    UpdateBuilder("public.pgtestnull", PgtestnullFields, PgtestnullRow.rowParser)
+    UpdateBuilder("public.pgtestnull", PgtestnullFields.structure, PgtestnullRow.rowParser)
   }
 }

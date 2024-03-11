@@ -32,7 +32,7 @@ class StoreRepoImpl extends StoreRepo {
     SQL"""delete from sales.store where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[StoreFields, StoreRow] = {
-    DeleteBuilder("sales.store", StoreFields)
+    DeleteBuilder("sales.store", StoreFields.structure)
   }
   override def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
@@ -81,7 +81,7 @@ class StoreRepoImpl extends StoreRepo {
     streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StoreRowUnsaved.text, c)
   }
   override def select: SelectBuilder[StoreFields, StoreRow] = {
-    SelectBuilderSql("sales.store", StoreFields, StoreRow.rowParser)
+    SelectBuilderSql("sales.store", StoreFields.structure, StoreRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
     SQL"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
@@ -113,7 +113,7 @@ class StoreRepoImpl extends StoreRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
-    UpdateBuilder("sales.store", StoreFields, StoreRow.rowParser)
+    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.rowParser)
   }
   override def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

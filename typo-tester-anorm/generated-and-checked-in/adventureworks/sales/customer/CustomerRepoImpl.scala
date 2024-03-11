@@ -31,7 +31,7 @@ class CustomerRepoImpl extends CustomerRepo {
     SQL"""delete from sales.customer where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilder("sales.customer", CustomerFields)
+    DeleteBuilder("sales.customer", CustomerFields.structure)
   }
   override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
@@ -83,7 +83,7 @@ class CustomerRepoImpl extends CustomerRepo {
     streamingInsert(s"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CustomerRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
-    SelectBuilderSql("sales.customer", CustomerFields, CustomerRow.rowParser)
+    SelectBuilderSql("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
     SQL"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
@@ -115,7 +115,7 @@ class CustomerRepoImpl extends CustomerRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilder("sales.customer", CustomerFields, CustomerRow.rowParser)
+    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
   }
   override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

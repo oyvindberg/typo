@@ -19,7 +19,7 @@ import zio.stream.ZStream
 
 class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.jdbcDecoder)
+    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PurchaseorderdetailRow] = {
     sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail""".query(PurchaseorderdetailRow.jdbcDecoder).selectStream

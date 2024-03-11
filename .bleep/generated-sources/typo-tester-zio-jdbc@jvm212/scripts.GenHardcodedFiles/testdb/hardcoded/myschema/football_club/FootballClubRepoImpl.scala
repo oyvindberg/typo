@@ -28,7 +28,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     sql"""delete from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilder("myschema.football_club", FootballClubFields)
+    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
   }
   override def insert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
@@ -40,7 +40,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     streamingInsert(s"""COPY myschema.football_club("id", "name") FROM STDIN""", batchSize, unsaved)(FootballClubRow.text)
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
-    SelectBuilderSql("myschema.football_club", FootballClubFields, FootballClubRow.jdbcDecoder)
+    SelectBuilderSql("myschema.football_club", FootballClubFields.structure, FootballClubRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club""".query(FootballClubRow.jdbcDecoder).selectStream
@@ -71,7 +71,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
           where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilder("myschema.football_club", FootballClubFields, FootballClubRow.jdbcDecoder)
+    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.jdbcDecoder)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean] = {
     NonEmptyChunk.fromIterableOption(fieldValues) match {

@@ -12,7 +12,9 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait BusinessentitycontactFields[Row] {
   val businessentityid: IdField[BusinessentityId, Row]
@@ -21,5 +23,27 @@ trait BusinessentitycontactFields[Row] {
   val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object BusinessentitycontactFields extends BusinessentitycontactStructure[BusinessentitycontactRow](None, identity, (_, x) => x)
 
+object BusinessentitycontactFields {
+  val structure: Relation[BusinessentitycontactFields, BusinessentitycontactRow, BusinessentitycontactRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => BusinessentitycontactRow, val merge: (Row, BusinessentitycontactRow) => Row)
+    extends Relation[BusinessentitycontactFields, BusinessentitycontactRow, Row] { 
+  
+    override val fields: BusinessentitycontactFields[Row] = new BusinessentitycontactFields[Row] {
+      override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+      override val personid = new IdField[BusinessentityId, Row](prefix, "personid", None, Some("int4"))(x => extract(x).personid, (row, value) => merge(row, extract(row).copy(personid = value)))
+      override val contacttypeid = new IdField[ContacttypeId, Row](prefix, "contacttypeid", None, Some("int4"))(x => extract(x).contacttypeid, (row, value) => merge(row, extract(row).copy(contacttypeid = value)))
+      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.personid, fields.contacttypeid, fields.rowguid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => BusinessentitycontactRow, merge: (NewRow, BusinessentitycontactRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

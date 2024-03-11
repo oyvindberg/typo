@@ -29,7 +29,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""delete from person.addresstype where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(AddresstypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
-    DeleteBuilder("person.addresstype", AddresstypeFields)
+    DeleteBuilder("person.addresstype", AddresstypeFields.structure)
   }
   override def insert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, AddresstypeRow] = {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
@@ -74,7 +74,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     streamingInsert(s"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddresstypeRowUnsaved.text)
   }
   override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
-    SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.jdbcDecoder)
+    SelectBuilderSql("person.addresstype", AddresstypeFields.structure, AddresstypeRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, AddresstypeRow] = {
     sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype""".query(AddresstypeRow.jdbcDecoder).selectStream
@@ -94,7 +94,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
           where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(AddresstypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
-    UpdateBuilder("person.addresstype", AddresstypeFields, AddresstypeRow.jdbcDecoder)
+    UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.jdbcDecoder)
   }
   override def upsert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, UpdateResult[AddresstypeRow]] = {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")

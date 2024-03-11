@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class VstateprovincecountryregionMVRepoImpl extends VstateprovincecountryregionMVRepo {
   override def select: SelectBuilder[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow] = {
-    SelectBuilderSql("person.vstateprovincecountryregion", VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow.read)
+    SelectBuilderSql("person.vstateprovincecountryregion", VstateprovincecountryregionMVFields.structure, VstateprovincecountryregionMVRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VstateprovincecountryregionMVRow] = {
     sql"""select "stateprovinceid", "stateprovincecode", "isonlystateprovinceflag", "stateprovincename", "territoryid", "countryregioncode", "countryregionname" from person.vstateprovincecountryregion""".query(VstateprovincecountryregionMVRow.read).stream

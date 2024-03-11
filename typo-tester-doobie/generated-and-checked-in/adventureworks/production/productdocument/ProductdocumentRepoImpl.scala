@@ -28,7 +28,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     sql"""delete from production.productdocument where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "documentnode" = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    DeleteBuilder("production.productdocument", ProductdocumentFields)
+    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
   }
   override def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
@@ -71,7 +71,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     new FragmentOps(sql"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductdocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    SelectBuilderSql("production.productdocument", ProductdocumentFields, ProductdocumentRow.read)
+    SelectBuilderSql("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
     sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument""".query(ProductdocumentRow.read).stream
@@ -89,7 +89,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    UpdateBuilder("production.productdocument", ProductdocumentFields, ProductdocumentRow.read)
+    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.read)
   }
   override def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")

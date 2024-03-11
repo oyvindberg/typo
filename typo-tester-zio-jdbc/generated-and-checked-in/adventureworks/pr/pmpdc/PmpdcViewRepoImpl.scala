@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class PmpdcViewRepoImpl extends PmpdcViewRepo {
   override def select: SelectBuilder[PmpdcViewFields, PmpdcViewRow] = {
-    SelectBuilderSql("pr.pmpdc", PmpdcViewFields, PmpdcViewRow.jdbcDecoder)
+    SelectBuilderSql("pr.pmpdc", PmpdcViewFields.structure, PmpdcViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PmpdcViewRow] = {
     sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from pr.pmpdc""".query(PmpdcViewRow.jdbcDecoder).selectStream

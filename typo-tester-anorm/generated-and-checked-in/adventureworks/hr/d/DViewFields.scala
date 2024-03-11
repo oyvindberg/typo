@@ -11,6 +11,8 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait DViewFields[Row] {
   val id: Field[DepartmentId, Row]
@@ -19,5 +21,27 @@ trait DViewFields[Row] {
   val groupname: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object DViewFields extends DViewStructure[DViewRow](None, identity, (_, x) => x)
 
+object DViewFields {
+  val structure: Relation[DViewFields, DViewRow, DViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => DViewRow, val merge: (Row, DViewRow) => Row)
+    extends Relation[DViewFields, DViewRow, Row] { 
+  
+    override val fields: DViewFields[Row] = new DViewFields[Row] {
+      override val id = new Field[DepartmentId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val departmentid = new Field[DepartmentId, Row](prefix, "departmentid", None, None)(x => extract(x).departmentid, (row, value) => merge(row, extract(row).copy(departmentid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val groupname = new Field[Name, Row](prefix, "groupname", None, None)(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.departmentid, fields.name, fields.groupname, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => DViewRow, merge: (NewRow, DViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

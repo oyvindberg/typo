@@ -10,7 +10,9 @@ package department
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait DepartmentFields[Row] {
   val departmentid: IdField[DepartmentId, Row]
@@ -18,5 +20,26 @@ trait DepartmentFields[Row] {
   val groupname: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object DepartmentFields extends DepartmentStructure[DepartmentRow](None, identity, (_, x) => x)
 
+object DepartmentFields {
+  val structure: Relation[DepartmentFields, DepartmentRow, DepartmentRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => DepartmentRow, val merge: (Row, DepartmentRow) => Row)
+    extends Relation[DepartmentFields, DepartmentRow, Row] { 
+  
+    override val fields: DepartmentFields[Row] = new DepartmentFields[Row] {
+      override val departmentid = new IdField[DepartmentId, Row](prefix, "departmentid", None, Some("int4"))(x => extract(x).departmentid, (row, value) => merge(row, extract(row).copy(departmentid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val groupname = new Field[Name, Row](prefix, "groupname", None, Some("varchar"))(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.departmentid, fields.name, fields.groupname, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => DepartmentRow, merge: (NewRow, DepartmentRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

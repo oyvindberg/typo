@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class PppViewRepoImpl extends PppViewRepo {
   override def select: SelectBuilder[PppViewFields, PppViewRow] = {
-    SelectBuilderSql("pr.ppp", PppViewFields, PppViewRow.jdbcDecoder)
+    SelectBuilderSql("pr.ppp", PppViewFields.structure, PppViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PppViewRow] = {
     sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from pr.ppp""".query(PppViewRow.jdbcDecoder).selectStream

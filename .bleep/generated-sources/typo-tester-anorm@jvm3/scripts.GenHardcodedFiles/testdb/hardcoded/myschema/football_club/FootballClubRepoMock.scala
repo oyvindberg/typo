@@ -25,7 +25,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     map.remove(id).isDefined
   }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FootballClubFields, map)
+    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
   }
   override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     val _ = if (map.contains(unsaved.id))
@@ -42,7 +42,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     unsaved.size.toLong
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
-    SelectBuilderMock(FootballClubFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(FootballClubFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     map.values.toList
@@ -69,7 +69,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     }
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FootballClubFields, map)
+    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean = {
     map.get(id) match {

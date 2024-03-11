@@ -11,6 +11,8 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait SrViewFields[Row] {
   val id: Field[ScrapreasonId, Row]
@@ -18,5 +20,26 @@ trait SrViewFields[Row] {
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object SrViewFields extends SrViewStructure[SrViewRow](None, identity, (_, x) => x)
 
+object SrViewFields {
+  val structure: Relation[SrViewFields, SrViewRow, SrViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => SrViewRow, val merge: (Row, SrViewRow) => Row)
+    extends Relation[SrViewFields, SrViewRow, Row] { 
+  
+    override val fields: SrViewFields[Row] = new SrViewFields[Row] {
+      override val id = new Field[ScrapreasonId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val scrapreasonid = new Field[ScrapreasonId, Row](prefix, "scrapreasonid", None, None)(x => extract(x).scrapreasonid, (row, value) => merge(row, extract(row).copy(scrapreasonid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.scrapreasonid, fields.name, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => SrViewRow, merge: (NewRow, SrViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

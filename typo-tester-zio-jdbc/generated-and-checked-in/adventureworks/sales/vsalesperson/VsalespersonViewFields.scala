@@ -12,7 +12,9 @@ import adventureworks.public.Name
 import adventureworks.public.Phone
 import adventureworks.userdefined.FirstName
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait VsalespersonViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
@@ -38,5 +40,44 @@ trait VsalespersonViewFields[Row] {
   val salesytd: Field[BigDecimal, Row]
   val saleslastyear: Field[BigDecimal, Row]
 }
-object VsalespersonViewFields extends VsalespersonViewStructure[VsalespersonViewRow](None, identity, (_, x) => x)
 
+object VsalespersonViewFields {
+  val structure: Relation[VsalespersonViewFields, VsalespersonViewRow, VsalespersonViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => VsalespersonViewRow, val merge: (Row, VsalespersonViewRow) => Row)
+    extends Relation[VsalespersonViewFields, VsalespersonViewRow, Row] { 
+  
+    override val fields: VsalespersonViewFields[Row] = new VsalespersonViewFields[Row] {
+      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+      override val title = new OptField[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
+      override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, None)(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
+      override val middlename = new OptField[Name, Row](prefix, "middlename", None, None)(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
+      override val lastname = new Field[Name, Row](prefix, "lastname", None, None)(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
+      override val suffix = new OptField[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
+      override val jobtitle = new Field[/* max 50 chars */ String, Row](prefix, "jobtitle", None, None)(x => extract(x).jobtitle, (row, value) => merge(row, extract(row).copy(jobtitle = value)))
+      override val phonenumber = new OptField[Phone, Row](prefix, "phonenumber", None, None)(x => extract(x).phonenumber, (row, value) => merge(row, extract(row).copy(phonenumber = value)))
+      override val phonenumbertype = new OptField[Name, Row](prefix, "phonenumbertype", None, None)(x => extract(x).phonenumbertype, (row, value) => merge(row, extract(row).copy(phonenumbertype = value)))
+      override val emailaddress = new OptField[/* max 50 chars */ String, Row](prefix, "emailaddress", None, None)(x => extract(x).emailaddress, (row, value) => merge(row, extract(row).copy(emailaddress = value)))
+      override val emailpromotion = new Field[Int, Row](prefix, "emailpromotion", None, None)(x => extract(x).emailpromotion, (row, value) => merge(row, extract(row).copy(emailpromotion = value)))
+      override val addressline1 = new Field[/* max 60 chars */ String, Row](prefix, "addressline1", None, None)(x => extract(x).addressline1, (row, value) => merge(row, extract(row).copy(addressline1 = value)))
+      override val addressline2 = new OptField[/* max 60 chars */ String, Row](prefix, "addressline2", None, None)(x => extract(x).addressline2, (row, value) => merge(row, extract(row).copy(addressline2 = value)))
+      override val city = new Field[/* max 30 chars */ String, Row](prefix, "city", None, None)(x => extract(x).city, (row, value) => merge(row, extract(row).copy(city = value)))
+      override val stateprovincename = new Field[Name, Row](prefix, "stateprovincename", None, None)(x => extract(x).stateprovincename, (row, value) => merge(row, extract(row).copy(stateprovincename = value)))
+      override val postalcode = new Field[/* max 15 chars */ String, Row](prefix, "postalcode", None, None)(x => extract(x).postalcode, (row, value) => merge(row, extract(row).copy(postalcode = value)))
+      override val countryregionname = new Field[Name, Row](prefix, "countryregionname", None, None)(x => extract(x).countryregionname, (row, value) => merge(row, extract(row).copy(countryregionname = value)))
+      override val territoryname = new OptField[Name, Row](prefix, "territoryname", None, None)(x => extract(x).territoryname, (row, value) => merge(row, extract(row).copy(territoryname = value)))
+      override val territorygroup = new OptField[/* max 50 chars */ String, Row](prefix, "territorygroup", None, None)(x => extract(x).territorygroup, (row, value) => merge(row, extract(row).copy(territorygroup = value)))
+      override val salesquota = new OptField[BigDecimal, Row](prefix, "salesquota", None, None)(x => extract(x).salesquota, (row, value) => merge(row, extract(row).copy(salesquota = value)))
+      override val salesytd = new Field[BigDecimal, Row](prefix, "salesytd", None, None)(x => extract(x).salesytd, (row, value) => merge(row, extract(row).copy(salesytd = value)))
+      override val saleslastyear = new Field[BigDecimal, Row](prefix, "saleslastyear", None, None)(x => extract(x).saleslastyear, (row, value) => merge(row, extract(row).copy(saleslastyear = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.jobtitle, fields.phonenumber, fields.phonenumbertype, fields.emailaddress, fields.emailpromotion, fields.addressline1, fields.addressline2, fields.city, fields.stateprovincename, fields.postalcode, fields.countryregionname, fields.territoryname, fields.territorygroup, fields.salesquota, fields.salesytd, fields.saleslastyear)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => VsalespersonViewRow, merge: (NewRow, VsalespersonViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

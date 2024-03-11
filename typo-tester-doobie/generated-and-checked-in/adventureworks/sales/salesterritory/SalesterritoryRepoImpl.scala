@@ -30,7 +30,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""delete from sales.salesterritory where "territoryid" = ${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilder("sales.salesterritory", SalesterritoryFields)
+    DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
   }
   override def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
@@ -95,7 +95,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     new FragmentOps(sql"""COPY sales.salesterritory("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesterritoryRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    SelectBuilderSql("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.read)
+    SelectBuilderSql("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalesterritoryRow] = {
     sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory""".query(SalesterritoryRow.read).stream
@@ -124,7 +124,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilder("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.read)
+    UpdateBuilder("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.read)
   }
   override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")

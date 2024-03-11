@@ -116,7 +116,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectBuilder(relName, fieldsType, rowType) =>
-        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.read)"""
+        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType.structure, $rowType.read)"""
 
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
@@ -184,7 +184,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
               |}""".stripMargin
 
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
-        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.read)"
+        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure, $rowType.read)"
 
       case RepoMethod.Update(relName, _, id, param, colsNotId) =>
         val sql = SQL(
@@ -284,7 +284,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"${query(sql, rowType)}.unique"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
-        code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
+        code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure)"
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
         code"$sql.update.run.map(_ > 0)"
@@ -326,7 +326,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   override def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code = {
     repoMethod match {
       case RepoMethod.SelectBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.SelectBuilderMock}($fieldsType, $delayCIO(map.values.toList), ${sc.Type.dsl.SelectParams}.empty)"
+        code"${sc.Type.dsl.SelectBuilderMock}($fieldsType.structure, $delayCIO(map.values.toList), ${sc.Type.dsl.SelectParams}.empty)"
       case RepoMethod.SelectAll(_, _, _) =>
         code"$fs2Stream.emits(map.values.toList)"
       case RepoMethod.SelectById(_, _, id, _) =>
@@ -346,7 +346,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
               |  }.toList
               |}""".stripMargin
       case RepoMethod.UpdateBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType, map)"
+        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType.structure.fields, map)"
       case RepoMethod.UpdateFieldValues(_, id, varargs, fieldValue, cases0, _) =>
         val cases = cases0.map { col =>
           code"case (acc, $fieldValue.${col.name}(value)) => acc.copy(${col.name} = value)"
@@ -414,7 +414,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                |}""".stripMargin
 
       case RepoMethod.DeleteBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType, map)"
+        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure.fields, map)"
       case RepoMethod.Delete(_, id) =>
         code"$delayCIO(map.remove(${id.paramName}).isDefined)"
       case RepoMethod.SqlFile(_) =>

@@ -29,7 +29,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     sql"""delete from production.productproductphoto where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    DeleteBuilder("production.productproductphoto", ProductproductphotoFields)
+    DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
   }
   override def insert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
@@ -73,7 +73,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductproductphotoRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.read)
+    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductproductphotoRow] = {
     sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto""".query(ProductproductphotoRow.read).stream
@@ -92,7 +92,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    UpdateBuilder("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.read)
+    UpdateBuilder("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.read)
   }
   override def upsert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")

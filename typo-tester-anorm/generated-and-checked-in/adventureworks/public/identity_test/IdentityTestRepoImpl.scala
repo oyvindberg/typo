@@ -27,7 +27,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     SQL"""delete from public.identity-test where "name" = ${ParameterValue(name, null, IdentityTestId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilder("public.identity-test", IdentityTestFields)
+    DeleteBuilder("public.identity-test", IdentityTestFields.structure)
   }
   override def insert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
     SQL"""insert into public.identity-test("always_generated", "default_generated", "name")
@@ -69,7 +69,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     streamingInsert(s"""COPY public.identity-test("name", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IdentityTestRowUnsaved.text, c)
   }
   override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
-    SelectBuilderSql("public.identity-test", IdentityTestFields, IdentityTestRow.rowParser)
+    SelectBuilderSql("public.identity-test", IdentityTestFields.structure, IdentityTestRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[IdentityTestRow] = {
     SQL"""select "always_generated", "default_generated", "name"
@@ -98,7 +98,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilder("public.identity-test", IdentityTestFields, IdentityTestRow.rowParser)
+    UpdateBuilder("public.identity-test", IdentityTestFields.structure, IdentityTestRow.rowParser)
   }
   override def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
     SQL"""insert into public.identity-test("always_generated", "default_generated", "name")

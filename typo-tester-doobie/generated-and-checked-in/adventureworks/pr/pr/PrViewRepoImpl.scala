@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class PrViewRepoImpl extends PrViewRepo {
   override def select: SelectBuilder[PrViewFields, PrViewRow] = {
-    SelectBuilderSql("pr.pr", PrViewFields, PrViewRow.read)
+    SelectBuilderSql("pr.pr", PrViewFields.structure, PrViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PrViewRow] = {
     sql"""select "id", "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from pr.pr""".query(PrViewRow.read).stream

@@ -30,7 +30,7 @@ class PersonRepoImpl extends PersonRepo {
     sql"""delete from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("compositepk.person", PersonFields)
+    DeleteBuilder("compositepk.person", PersonFields.structure)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into compositepk.person("one", "two", "name")
@@ -73,7 +73,7 @@ class PersonRepoImpl extends PersonRepo {
     new FragmentOps(sql"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("compositepk.person", PersonFields, PersonRow.read)
+    SelectBuilderSql("compositepk.person", PersonFields.structure, PersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"""select "one", "two", "name" from compositepk.person""".query(PersonRow.read).stream
@@ -101,7 +101,7 @@ class PersonRepoImpl extends PersonRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("compositepk.person", PersonFields, PersonRow.read)
+    UpdateBuilder("compositepk.person", PersonFields.structure, PersonRow.read)
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean] = {
     NonEmptyList.fromList(fieldValues) match {

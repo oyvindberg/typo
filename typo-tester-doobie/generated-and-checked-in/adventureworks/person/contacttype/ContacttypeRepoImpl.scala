@@ -27,7 +27,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""delete from person.contacttype where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilder("person.contacttype", ContacttypeFields)
+    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
@@ -70,7 +70,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     new FragmentOps(sql"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ContacttypeRowUnsaved.text)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
-    SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.read)
+    SelectBuilderSql("person.contacttype", ContacttypeFields.structure, ContacttypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
     sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype""".query(ContacttypeRow.read).stream
@@ -92,7 +92,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilder("person.contacttype", ContacttypeFields, ContacttypeRow.read)
+    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.read)
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")

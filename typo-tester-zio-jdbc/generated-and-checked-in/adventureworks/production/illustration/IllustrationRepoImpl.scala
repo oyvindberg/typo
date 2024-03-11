@@ -29,7 +29,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
     sql"""delete from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilder("production.illustration", IllustrationFields)
+    DeleteBuilder("production.illustration", IllustrationFields.structure)
   }
   override def insert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, IllustrationRow] = {
     sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
@@ -70,7 +70,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
     streamingInsert(s"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IllustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
-    SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.jdbcDecoder)
+    SelectBuilderSql("production.illustration", IllustrationFields.structure, IllustrationRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, IllustrationRow] = {
     sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration""".query(IllustrationRow.jdbcDecoder).selectStream
@@ -89,7 +89,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
           where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilder("production.illustration", IllustrationFields, IllustrationRow.jdbcDecoder)
+    UpdateBuilder("production.illustration", IllustrationFields.structure, IllustrationRow.jdbcDecoder)
   }
   override def upsert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, UpdateResult[IllustrationRow]] = {
     sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")

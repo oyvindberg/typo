@@ -27,7 +27,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""delete from person.phonenumbertype where "phonenumbertypeid" = ${fromWrite(phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields)
+    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
   }
   override def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
@@ -70,7 +70,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     new FragmentOps(sql"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PhonenumbertypeRowUnsaved.text)
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.read)
+    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PhonenumbertypeRow] = {
     sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype""".query(PhonenumbertypeRow.read).stream
@@ -92,7 +92,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.read)
+    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.read)
   }
   override def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")

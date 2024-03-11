@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class UmViewRepoImpl extends UmViewRepo {
   override def select: SelectBuilder[UmViewFields, UmViewRow] = {
-    SelectBuilderSql("pr.um", UmViewFields, UmViewRow.read)
+    SelectBuilderSql("pr.um", UmViewFields.structure, UmViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, UmViewRow] = {
     sql"""select "id", "unitmeasurecode", "name", "modifieddate"::text from pr.um""".query(UmViewRow.read).stream

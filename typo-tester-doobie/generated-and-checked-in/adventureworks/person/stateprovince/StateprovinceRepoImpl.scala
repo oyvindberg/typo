@@ -32,7 +32,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""delete from person.stateprovince where "stateprovinceid" = ${fromWrite(stateprovinceid)(Write.fromPut(StateprovinceId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilder("person.stateprovince", StateprovinceFields)
+    DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
   }
   override def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
@@ -86,7 +86,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     new FragmentOps(sql"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(StateprovinceRowUnsaved.text)
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
-    SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.read)
+    SelectBuilderSql("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.read)
   }
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
     sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(StateprovinceRow.read).stream
@@ -113,7 +113,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilder("person.stateprovince", StateprovinceFields, StateprovinceRow.read)
+    UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.read)
   }
   override def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")

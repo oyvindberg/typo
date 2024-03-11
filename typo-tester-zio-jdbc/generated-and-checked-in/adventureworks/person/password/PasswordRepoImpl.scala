@@ -30,7 +30,7 @@ class PasswordRepoImpl extends PasswordRepo {
     sql"""delete from person.password where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilder("person.password", PasswordFields)
+    DeleteBuilder("person.password", PasswordFields.structure)
   }
   override def insert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, PasswordRow] = {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
@@ -73,7 +73,7 @@ class PasswordRepoImpl extends PasswordRepo {
     streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PasswordRowUnsaved.text)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
-    SelectBuilderSql("person.password", PasswordFields, PasswordRow.jdbcDecoder)
+    SelectBuilderSql("person.password", PasswordFields.structure, PasswordRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PasswordRow] = {
     sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password""".query(PasswordRow.jdbcDecoder).selectStream
@@ -94,7 +94,7 @@ class PasswordRepoImpl extends PasswordRepo {
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilder("person.password", PasswordFields, PasswordRow.jdbcDecoder)
+    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.jdbcDecoder)
   }
   override def upsert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, UpdateResult[PasswordRow]] = {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")

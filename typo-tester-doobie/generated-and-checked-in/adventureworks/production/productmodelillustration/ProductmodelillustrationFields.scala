@@ -11,12 +11,34 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait ProductmodelillustrationFields[Row] {
   val productmodelid: IdField[ProductmodelId, Row]
   val illustrationid: IdField[IllustrationId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object ProductmodelillustrationFields extends ProductmodelillustrationStructure[ProductmodelillustrationRow](None, identity, (_, x) => x)
 
+object ProductmodelillustrationFields {
+  val structure: Relation[ProductmodelillustrationFields, ProductmodelillustrationRow, ProductmodelillustrationRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductmodelillustrationRow, val merge: (Row, ProductmodelillustrationRow) => Row)
+    extends Relation[ProductmodelillustrationFields, ProductmodelillustrationRow, Row] { 
+  
+    override val fields: ProductmodelillustrationFields[Row] = new ProductmodelillustrationFields[Row] {
+      override val productmodelid = new IdField[ProductmodelId, Row](prefix, "productmodelid", None, Some("int4"))(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
+      override val illustrationid = new IdField[IllustrationId, Row](prefix, "illustrationid", None, Some("int4"))(x => extract(x).illustrationid, (row, value) => merge(row, extract(row).copy(illustrationid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.productmodelid, fields.illustrationid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductmodelillustrationRow, merge: (NewRow, ProductmodelillustrationRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

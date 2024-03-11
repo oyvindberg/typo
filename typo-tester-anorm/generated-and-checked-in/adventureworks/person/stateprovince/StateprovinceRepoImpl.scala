@@ -33,7 +33,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     SQL"""delete from person.stateprovince where "stateprovinceid" = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilder("person.stateprovince", StateprovinceFields)
+    DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
   }
   override def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
@@ -90,7 +90,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     streamingInsert(s"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text, c)
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
-    SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.rowParser)
+    SelectBuilderSql("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
     SQL"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
@@ -124,7 +124,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilder("person.stateprovince", StateprovinceFields, StateprovinceRow.rowParser)
+    UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.rowParser)
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")

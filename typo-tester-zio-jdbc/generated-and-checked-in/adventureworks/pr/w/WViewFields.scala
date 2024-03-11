@@ -13,7 +13,9 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait WViewFields[Row] {
   val id: Field[WorkorderId, Row]
@@ -27,5 +29,32 @@ trait WViewFields[Row] {
   val scrapreasonid: OptField[ScrapreasonId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object WViewFields extends WViewStructure[WViewRow](None, identity, (_, x) => x)
 
+object WViewFields {
+  val structure: Relation[WViewFields, WViewRow, WViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => WViewRow, val merge: (Row, WViewRow) => Row)
+    extends Relation[WViewFields, WViewRow, Row] { 
+  
+    override val fields: WViewFields[Row] = new WViewFields[Row] {
+      override val id = new Field[WorkorderId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val workorderid = new Field[WorkorderId, Row](prefix, "workorderid", None, None)(x => extract(x).workorderid, (row, value) => merge(row, extract(row).copy(workorderid = value)))
+      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+      override val orderqty = new Field[Int, Row](prefix, "orderqty", None, None)(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
+      override val scrappedqty = new Field[TypoShort, Row](prefix, "scrappedqty", None, None)(x => extract(x).scrappedqty, (row, value) => merge(row, extract(row).copy(scrappedqty = value)))
+      override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
+      override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
+      override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), None)(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
+      override val scrapreasonid = new OptField[ScrapreasonId, Row](prefix, "scrapreasonid", None, None)(x => extract(x).scrapreasonid, (row, value) => merge(row, extract(row).copy(scrapreasonid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.workorderid, fields.productid, fields.orderqty, fields.scrappedqty, fields.startdate, fields.enddate, fields.duedate, fields.scrapreasonid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => WViewRow, merge: (NewRow, WViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

@@ -30,7 +30,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
     sql"""delete from production.workorder where "workorderid" = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilder("production.workorder", WorkorderFields)
+    DeleteBuilder("production.workorder", WorkorderFields.structure)
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
@@ -79,7 +79,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
     new FragmentOps(sql"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
-    SelectBuilderSql("production.workorder", WorkorderFields, WorkorderRow.read)
+    SelectBuilderSql("production.workorder", WorkorderFields.structure, WorkorderRow.read)
   }
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder""".query(WorkorderRow.read).stream
@@ -107,7 +107,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilder("production.workorder", WorkorderFields, WorkorderRow.read)
+    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.read)
   }
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

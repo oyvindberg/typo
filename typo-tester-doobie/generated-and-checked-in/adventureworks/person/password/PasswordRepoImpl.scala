@@ -29,7 +29,7 @@ class PasswordRepoImpl extends PasswordRepo {
     sql"""delete from person.password where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilder("person.password", PasswordFields)
+    DeleteBuilder("person.password", PasswordFields.structure)
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
@@ -74,7 +74,7 @@ class PasswordRepoImpl extends PasswordRepo {
     new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PasswordRowUnsaved.text)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
-    SelectBuilderSql("person.password", PasswordFields, PasswordRow.read)
+    SelectBuilderSql("person.password", PasswordFields.structure, PasswordRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
     sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password""".query(PasswordRow.read).stream
@@ -98,7 +98,7 @@ class PasswordRepoImpl extends PasswordRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilder("person.password", PasswordFields, PasswordRow.read)
+    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.read)
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")

@@ -29,7 +29,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     sql"""delete from sales.specialoffer where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
-    DeleteBuilder("sales.specialoffer", SpecialofferFields)
+    DeleteBuilder("sales.specialoffer", SpecialofferFields.structure)
   }
   override def insert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, SpecialofferRow] = {
     sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
@@ -87,7 +87,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     streamingInsert(s"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
-    SelectBuilderSql("sales.specialoffer", SpecialofferFields, SpecialofferRow.jdbcDecoder)
+    SelectBuilderSql("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SpecialofferRow] = {
     sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer""".query(SpecialofferRow.jdbcDecoder).selectStream
@@ -114,7 +114,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
           where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
-    UpdateBuilder("sales.specialoffer", SpecialofferFields, SpecialofferRow.jdbcDecoder)
+    UpdateBuilder("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.jdbcDecoder)
   }
   override def upsert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferRow]] = {
     sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")

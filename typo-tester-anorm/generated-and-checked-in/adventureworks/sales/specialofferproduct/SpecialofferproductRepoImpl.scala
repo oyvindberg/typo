@@ -30,7 +30,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     SQL"""delete from sales.specialofferproduct where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields)
+    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields.structure)
   }
   override def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     SQL"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
@@ -77,7 +77,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     streamingInsert(s"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferproductRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.rowParser)
+    SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
     SQL"""select "specialofferid", "productid", "rowguid", "modifieddate"::text
@@ -99,7 +99,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.rowParser)
+    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.rowParser)
   }
   override def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     SQL"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")

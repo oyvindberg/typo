@@ -31,7 +31,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     SQL"""delete from production.productreview where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilder("production.productreview", ProductreviewFields)
+    DeleteBuilder("production.productreview", ProductreviewFields.structure)
   }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
@@ -85,7 +85,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     streamingInsert(s"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductreviewRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
-    SelectBuilderSql("production.productreview", ProductreviewFields, ProductreviewRow.rowParser)
+    SelectBuilderSql("production.productreview", ProductreviewFields.structure, ProductreviewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
     SQL"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
@@ -119,7 +119,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilder("production.productreview", ProductreviewFields, ProductreviewRow.rowParser)
+    UpdateBuilder("production.productreview", ProductreviewFields.structure, ProductreviewRow.rowParser)
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")

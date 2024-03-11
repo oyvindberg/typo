@@ -28,7 +28,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     SQL"""delete from sales.salesreason where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
-    DeleteBuilder("sales.salesreason", SalesreasonFields)
+    DeleteBuilder("sales.salesreason", SalesreasonFields.structure)
   }
   override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
@@ -75,7 +75,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     streamingInsert(s"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesreasonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
-    SelectBuilderSql("sales.salesreason", SalesreasonFields, SalesreasonRow.rowParser)
+    SelectBuilderSql("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
     SQL"""select "salesreasonid", "name", "reasontype", "modifieddate"::text
@@ -105,7 +105,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
-    UpdateBuilder("sales.salesreason", SalesreasonFields, SalesreasonRow.rowParser)
+    UpdateBuilder("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.rowParser)
   }
   override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")

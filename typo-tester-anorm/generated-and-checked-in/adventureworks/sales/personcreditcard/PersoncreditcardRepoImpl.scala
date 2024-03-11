@@ -29,7 +29,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     SQL"""delete from sales.personcreditcard where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "creditcardid" = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields)
+    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
   }
   override def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     SQL"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
@@ -72,7 +72,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     streamingInsert(s"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersoncreditcardRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.rowParser)
+    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
     SQL"""select "businessentityid", "creditcardid", "modifieddate"::text
@@ -93,7 +93,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.rowParser)
+    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.rowParser)
   }
   override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     SQL"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
