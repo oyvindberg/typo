@@ -29,7 +29,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     ZIO.succeed(map.remove(cultureid).isDefined)
   }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CultureFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
   }
   override def insert(unsaved: CultureRow): ZIO[ZConnection, Throwable, CultureRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
-    SelectBuilderMock(CultureFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(CultureFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CultureRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     }
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CultureFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
   }
   override def upsert(unsaved: CultureRow): ZIO[ZConnection, Throwable, UpdateResult[CultureRow]] = {
     ZIO.succeed {

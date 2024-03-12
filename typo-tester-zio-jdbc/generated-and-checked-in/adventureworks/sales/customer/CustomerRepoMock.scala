@@ -29,7 +29,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     ZIO.succeed(map.remove(customerid).isDefined)
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CustomerFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CustomerFields.structure.fields, map)
   }
   override def insert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, CustomerRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
-    SelectBuilderMock(CustomerFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(CustomerFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CustomerRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     }
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CustomerFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CustomerFields.structure.fields, map)
   }
   override def upsert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, UpdateResult[CustomerRow]] = {
     ZIO.succeed {

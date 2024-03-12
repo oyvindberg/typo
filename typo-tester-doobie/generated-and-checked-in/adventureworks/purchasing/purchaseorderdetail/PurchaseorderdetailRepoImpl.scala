@@ -19,7 +19,7 @@ import typo.dsl.SelectBuilderSql
 
 class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.read)
+    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
     sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail""".query(PurchaseorderdetailRow.read).stream

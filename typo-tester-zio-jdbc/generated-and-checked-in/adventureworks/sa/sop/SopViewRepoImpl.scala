@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class SopViewRepoImpl extends SopViewRepo {
   override def select: SelectBuilder[SopViewFields, SopViewRow] = {
-    SelectBuilderSql("sa.sop", SopViewFields, SopViewRow.jdbcDecoder)
+    SelectBuilderSql("sa.sop", SopViewFields.structure, SopViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SopViewRow] = {
     sql"""select "id", "specialofferid", "productid", "rowguid", "modifieddate"::text from sa.sop""".query(SopViewRow.jdbcDecoder).selectStream

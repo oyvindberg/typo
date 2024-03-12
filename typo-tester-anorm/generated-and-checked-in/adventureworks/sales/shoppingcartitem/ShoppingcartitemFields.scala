@@ -10,7 +10,9 @@ package shoppingcartitem
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait ShoppingcartitemFields[Row] {
   val shoppingcartitemid: IdField[ShoppingcartitemId, Row]
@@ -20,5 +22,28 @@ trait ShoppingcartitemFields[Row] {
   val datecreated: Field[TypoLocalDateTime, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object ShoppingcartitemFields extends ShoppingcartitemStructure[ShoppingcartitemRow](None, identity, (_, x) => x)
 
+object ShoppingcartitemFields {
+  val structure: Relation[ShoppingcartitemFields, ShoppingcartitemRow, ShoppingcartitemRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => ShoppingcartitemRow, val merge: (Row, ShoppingcartitemRow) => Row)
+    extends Relation[ShoppingcartitemFields, ShoppingcartitemRow, Row] { 
+  
+    override val fields: ShoppingcartitemFields[Row] = new ShoppingcartitemFields[Row] {
+      override val shoppingcartitemid = new IdField[ShoppingcartitemId, Row](prefix, "shoppingcartitemid", None, Some("int4"))(x => extract(x).shoppingcartitemid, (row, value) => merge(row, extract(row).copy(shoppingcartitemid = value)))
+      override val shoppingcartid = new Field[/* max 50 chars */ String, Row](prefix, "shoppingcartid", None, None)(x => extract(x).shoppingcartid, (row, value) => merge(row, extract(row).copy(shoppingcartid = value)))
+      override val quantity = new Field[Int, Row](prefix, "quantity", None, Some("int4"))(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
+      override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+      override val datecreated = new Field[TypoLocalDateTime, Row](prefix, "datecreated", Some("text"), Some("timestamp"))(x => extract(x).datecreated, (row, value) => merge(row, extract(row).copy(datecreated = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.shoppingcartitemid, fields.shoppingcartid, fields.quantity, fields.productid, fields.datecreated, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => ShoppingcartitemRow, merge: (NewRow, ShoppingcartitemRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

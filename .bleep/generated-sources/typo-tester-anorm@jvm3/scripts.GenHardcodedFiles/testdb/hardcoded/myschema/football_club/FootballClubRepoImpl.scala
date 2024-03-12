@@ -27,7 +27,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     SQL"""delete from myschema.football_club where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilder("myschema.football_club", FootballClubFields)
+    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
   }
   override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     SQL"""insert into myschema.football_club("id", "name")
@@ -41,7 +41,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     streamingInsert(s"""COPY myschema.football_club("id", "name") FROM STDIN""", batchSize, unsaved)(FootballClubRow.text, c)
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
-    SelectBuilderSql("myschema.football_club", FootballClubFields, FootballClubRow.rowParser)
+    SelectBuilderSql("myschema.football_club", FootballClubFields.structure, FootballClubRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select "id", "name"
@@ -87,7 +87,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilder("myschema.football_club", FootballClubFields, FootballClubRow.rowParser)
+    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.rowParser)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean = {
     fieldValues match {

@@ -12,6 +12,8 @@ import adventureworks.customtypes.TypoLocalTime
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait SViewFields[Row] {
   val id: Field[ShiftId, Row]
@@ -21,5 +23,28 @@ trait SViewFields[Row] {
   val endtime: Field[TypoLocalTime, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object SViewFields extends SViewStructure[SViewRow](None, identity, (_, x) => x)
 
+object SViewFields {
+  val structure: Relation[SViewFields, SViewRow, SViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => SViewRow, val merge: (Row, SViewRow) => Row)
+    extends Relation[SViewFields, SViewRow, Row] { 
+  
+    override val fields: SViewFields[Row] = new SViewFields[Row] {
+      override val id = new Field[ShiftId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val shiftid = new Field[ShiftId, Row](prefix, "shiftid", None, None)(x => extract(x).shiftid, (row, value) => merge(row, extract(row).copy(shiftid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val starttime = new Field[TypoLocalTime, Row](prefix, "starttime", Some("text"), None)(x => extract(x).starttime, (row, value) => merge(row, extract(row).copy(starttime = value)))
+      override val endtime = new Field[TypoLocalTime, Row](prefix, "endtime", Some("text"), None)(x => extract(x).endtime, (row, value) => merge(row, extract(row).copy(endtime = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.shiftid, fields.name, fields.starttime, fields.endtime, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => SViewRow, merge: (NewRow, SViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

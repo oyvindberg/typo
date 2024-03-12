@@ -29,7 +29,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     ZIO.succeed(map.remove(purchaseorderid).isDefined)
   }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PurchaseorderheaderFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PurchaseorderheaderFields.structure.fields, map)
   }
   override def insert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, PurchaseorderheaderRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    SelectBuilderMock(PurchaseorderheaderFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(PurchaseorderheaderFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PurchaseorderheaderRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     }
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields.structure.fields, map)
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[PurchaseorderheaderRow]] = {
     ZIO.succeed {

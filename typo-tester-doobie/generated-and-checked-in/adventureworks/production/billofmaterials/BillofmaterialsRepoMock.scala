@@ -27,7 +27,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     delay(map.remove(billofmaterialsid).isDefined)
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields, map)
+    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure.fields, map)
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     delay {
@@ -65,7 +65,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     }
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    SelectBuilderMock(BillofmaterialsFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(BillofmaterialsFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     }
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields, map)
+    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure.fields, map)
   }
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     delay {

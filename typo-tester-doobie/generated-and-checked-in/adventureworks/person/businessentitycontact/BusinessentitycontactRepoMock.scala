@@ -27,7 +27,7 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BusinessentitycontactFields, map)
+    DeleteBuilderMock(DeleteParams.empty, BusinessentitycontactFields.structure.fields, map)
   }
   override def insert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow] = {
     delay {
@@ -65,7 +65,7 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
     }
   }
   override def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    SelectBuilderMock(BusinessentitycontactFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(BusinessentitycontactFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentitycontactRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
     }
   }
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BusinessentitycontactFields, map)
+    UpdateBuilderMock(UpdateParams.empty, BusinessentitycontactFields.structure.fields, map)
   }
   override def upsert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow] = {
     delay {

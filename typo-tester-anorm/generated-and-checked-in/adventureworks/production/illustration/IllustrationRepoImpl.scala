@@ -29,7 +29,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
     SQL"""delete from production.illustration where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilder("production.illustration", IllustrationFields)
+    DeleteBuilder("production.illustration", IllustrationFields.structure)
   }
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
@@ -75,7 +75,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
     streamingInsert(s"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IllustrationRowUnsaved.text, c)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
-    SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.rowParser)
+    SelectBuilderSql("production.illustration", IllustrationFields.structure, IllustrationRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
     SQL"""select "illustrationid", "diagram", "modifieddate"::text
@@ -104,7 +104,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilder("production.illustration", IllustrationFields, IllustrationRow.rowParser)
+    UpdateBuilder("production.illustration", IllustrationFields.structure, IllustrationRow.rowParser)
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")

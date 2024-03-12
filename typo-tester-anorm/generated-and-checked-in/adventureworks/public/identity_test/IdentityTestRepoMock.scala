@@ -25,7 +25,7 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     map.remove(name).isDefined
   }
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields, map)
+    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure.fields, map)
   }
   override def insert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
     val _ = if (map.contains(unsaved.name))
@@ -53,7 +53,7 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     unsaved.size.toLong
   }
   override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
-    SelectBuilderMock(IdentityTestFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(IdentityTestFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[IdentityTestRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     }
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields, map)
+    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure.fields, map)
   }
   override def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
     map.put(unsaved.name, unsaved): @nowarn

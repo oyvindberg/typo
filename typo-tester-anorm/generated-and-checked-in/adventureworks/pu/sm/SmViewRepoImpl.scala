@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class SmViewRepoImpl extends SmViewRepo {
   override def select: SelectBuilder[SmViewFields, SmViewRow] = {
-    SelectBuilderSql("pu.sm", SmViewFields, SmViewRow.rowParser)
+    SelectBuilderSql("pu.sm", SmViewFields.structure, SmViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SmViewRow] = {
     SQL"""select "id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text

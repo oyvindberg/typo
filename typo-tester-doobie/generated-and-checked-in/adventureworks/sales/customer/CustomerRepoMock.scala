@@ -27,7 +27,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     delay(map.remove(customerid).isDefined)
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CustomerFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CustomerFields.structure.fields, map)
   }
   override def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     delay {
@@ -65,7 +65,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     }
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
-    SelectBuilderMock(CustomerFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(CustomerFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     }
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CustomerFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CustomerFields.structure.fields, map)
   }
   override def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     delay {

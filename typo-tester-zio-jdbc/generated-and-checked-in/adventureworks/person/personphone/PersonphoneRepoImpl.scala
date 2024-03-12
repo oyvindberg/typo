@@ -30,7 +30,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""delete from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilder("person.personphone", PersonphoneFields)
+    DeleteBuilder("person.personphone", PersonphoneFields.structure)
   }
   override def insert(unsaved: PersonphoneRow): ZIO[ZConnection, Throwable, PersonphoneRow] = {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
@@ -69,7 +69,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonphoneRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
-    SelectBuilderSql("person.personphone", PersonphoneFields, PersonphoneRow.jdbcDecoder)
+    SelectBuilderSql("person.personphone", PersonphoneFields.structure, PersonphoneRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonphoneRow] = {
     sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone""".query(PersonphoneRow.jdbcDecoder).selectStream
@@ -84,7 +84,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
           where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilder("person.personphone", PersonphoneFields, PersonphoneRow.jdbcDecoder)
+    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.jdbcDecoder)
   }
   override def upsert(unsaved: PersonphoneRow): ZIO[ZConnection, Throwable, UpdateResult[PersonphoneRow]] = {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")

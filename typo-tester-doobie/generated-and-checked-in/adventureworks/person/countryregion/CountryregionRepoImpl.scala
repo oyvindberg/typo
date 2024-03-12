@@ -27,7 +27,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
     sql"""delete from person.countryregion where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilder("person.countryregion", CountryregionFields)
+    DeleteBuilder("person.countryregion", CountryregionFields.structure)
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
@@ -67,7 +67,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
     new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CountryregionRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.read)
+    SelectBuilderSql("person.countryregion", CountryregionFields.structure, CountryregionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
     sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion""".query(CountryregionRow.read).stream
@@ -89,7 +89,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilder("person.countryregion", CountryregionFields, CountryregionRow.read)
+    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.read)
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")

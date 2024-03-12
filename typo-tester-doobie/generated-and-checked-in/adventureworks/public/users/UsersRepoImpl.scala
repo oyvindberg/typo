@@ -28,7 +28,7 @@ class UsersRepoImpl extends UsersRepo {
     sql"""delete from public.users where "user_id" = ${fromWrite(userId)(Write.fromPut(UsersId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
-    DeleteBuilder("public.users", UsersFields)
+    DeleteBuilder("public.users", UsersFields.structure)
   }
   override def insert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
@@ -72,7 +72,7 @@ class UsersRepoImpl extends UsersRepo {
     new FragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UsersRowUnsaved.text)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
-    SelectBuilderSql("public.users", UsersFields, UsersRow.read)
+    SelectBuilderSql("public.users", UsersFields.structure, UsersRow.read)
   }
   override def selectAll: Stream[ConnectionIO, UsersRow] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users""".query(UsersRow.read).stream
@@ -104,7 +104,7 @@ class UsersRepoImpl extends UsersRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
-    UpdateBuilder("public.users", UsersFields, UsersRow.read)
+    UpdateBuilder("public.users", UsersFields.structure, UsersRow.read)
   }
   override def upsert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

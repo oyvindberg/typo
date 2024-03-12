@@ -27,7 +27,7 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    DeleteBuilderMock(DeleteParams.empty, WorkorderroutingFields, map)
+    DeleteBuilderMock(DeleteParams.empty, WorkorderroutingFields.structure.fields, map)
   }
   override def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     delay {
@@ -65,7 +65,7 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
     }
   }
   override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    SelectBuilderMock(WorkorderroutingFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(WorkorderroutingFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, WorkorderroutingRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
     }
   }
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    UpdateBuilderMock(UpdateParams.empty, WorkorderroutingFields, map)
+    UpdateBuilderMock(UpdateParams.empty, WorkorderroutingFields.structure.fields, map)
   }
   override def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     delay {

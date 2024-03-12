@@ -29,7 +29,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     SQL"""delete from production.productlistpricehistory where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    DeleteBuilder("production.productlistpricehistory", ProductlistpricehistoryFields)
+    DeleteBuilder("production.productlistpricehistory", ProductlistpricehistoryFields.structure)
   }
   override def insert(unsaved: ProductlistpricehistoryRow)(implicit c: Connection): ProductlistpricehistoryRow = {
     SQL"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")
@@ -74,7 +74,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     streamingInsert(s"""COPY production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductlistpricehistoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    SelectBuilderSql("production.productlistpricehistory", ProductlistpricehistoryFields, ProductlistpricehistoryRow.rowParser)
+    SelectBuilderSql("production.productlistpricehistory", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductlistpricehistoryRow] = {
     SQL"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
@@ -97,7 +97,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    UpdateBuilder("production.productlistpricehistory", ProductlistpricehistoryFields, ProductlistpricehistoryRow.rowParser)
+    UpdateBuilder("production.productlistpricehistory", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.rowParser)
   }
   override def upsert(unsaved: ProductlistpricehistoryRow)(implicit c: Connection): ProductlistpricehistoryRow = {
     SQL"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")

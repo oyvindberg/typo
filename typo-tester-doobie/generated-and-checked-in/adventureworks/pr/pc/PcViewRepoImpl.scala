@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class PcViewRepoImpl extends PcViewRepo {
   override def select: SelectBuilder[PcViewFields, PcViewRow] = {
-    SelectBuilderSql("pr.pc", PcViewFields, PcViewRow.read)
+    SelectBuilderSql("pr.pc", PcViewFields.structure, PcViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PcViewRow] = {
     sql"""select "id", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.pc""".query(PcViewRow.read).stream

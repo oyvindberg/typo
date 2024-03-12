@@ -29,7 +29,7 @@ class ShiftRepoImpl extends ShiftRepo {
     sql"""delete from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilder("humanresources.shift", ShiftFields)
+    DeleteBuilder("humanresources.shift", ShiftFields.structure)
   }
   override def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
@@ -72,7 +72,7 @@ class ShiftRepoImpl extends ShiftRepo {
     streamingInsert(s"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShiftRowUnsaved.text)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderSql("humanresources.shift", ShiftFields, ShiftRow.jdbcDecoder)
+    SelectBuilderSql("humanresources.shift", ShiftFields.structure, ShiftRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShiftRow] = {
     sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(ShiftRow.jdbcDecoder).selectStream
@@ -93,7 +93,7 @@ class ShiftRepoImpl extends ShiftRepo {
           where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilder("humanresources.shift", ShiftFields, ShiftRow.jdbcDecoder)
+    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.jdbcDecoder)
   }
   override def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")

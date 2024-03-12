@@ -12,7 +12,9 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait ProductproductphotoFields[Row] {
   val productid: IdField[ProductId, Row]
@@ -20,5 +22,26 @@ trait ProductproductphotoFields[Row] {
   val primary: Field[Flag, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object ProductproductphotoFields extends ProductproductphotoStructure[ProductproductphotoRow](None, identity, (_, x) => x)
 
+object ProductproductphotoFields {
+  val structure: Relation[ProductproductphotoFields, ProductproductphotoRow, ProductproductphotoRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductproductphotoRow, val merge: (Row, ProductproductphotoRow) => Row)
+    extends Relation[ProductproductphotoFields, ProductproductphotoRow, Row] { 
+  
+    override val fields: ProductproductphotoFields[Row] = new ProductproductphotoFields[Row] {
+      override val productid = new IdField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+      override val productphotoid = new IdField[ProductphotoId, Row](prefix, "productphotoid", None, Some("int4"))(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
+      override val primary = new Field[Flag, Row](prefix, "primary", None, Some("bool"))(x => extract(x).primary, (row, value) => merge(row, extract(row).copy(primary = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.productid, fields.productphotoid, fields.primary, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductproductphotoRow, merge: (NewRow, ProductproductphotoRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

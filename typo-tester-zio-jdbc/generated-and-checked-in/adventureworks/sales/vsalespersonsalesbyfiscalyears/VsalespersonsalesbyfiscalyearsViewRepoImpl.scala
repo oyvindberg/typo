@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class VsalespersonsalesbyfiscalyearsViewRepoImpl extends VsalespersonsalesbyfiscalyearsViewRepo {
   override def select: SelectBuilder[VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow] = {
-    SelectBuilderSql("sales.vsalespersonsalesbyfiscalyears", VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow.jdbcDecoder)
+    SelectBuilderSql("sales.vsalespersonsalesbyfiscalyears", VsalespersonsalesbyfiscalyearsViewFields.structure, VsalespersonsalesbyfiscalyearsViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VsalespersonsalesbyfiscalyearsViewRow] = {
     sql"""select "SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014" from sales.vsalespersonsalesbyfiscalyears""".query(VsalespersonsalesbyfiscalyearsViewRow.jdbcDecoder).selectStream

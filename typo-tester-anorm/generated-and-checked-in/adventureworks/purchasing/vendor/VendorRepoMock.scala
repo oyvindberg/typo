@@ -26,7 +26,7 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
     map.remove(businessentityid).isDefined
   }
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
-    DeleteBuilderMock(DeleteParams.empty, VendorFields, map)
+    DeleteBuilderMock(DeleteParams.empty, VendorFields.structure.fields, map)
   }
   override def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     val _ = if (map.contains(unsaved.businessentityid))
@@ -54,7 +54,7 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
-    SelectBuilderMock(VendorFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(VendorFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
     map.values.toList
@@ -75,7 +75,7 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
     }
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
-    UpdateBuilderMock(UpdateParams.empty, VendorFields, map)
+    UpdateBuilderMock(UpdateParams.empty, VendorFields.structure.fields, map)
   }
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     map.put(unsaved.businessentityid, unsaved): @nowarn

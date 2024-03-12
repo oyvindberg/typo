@@ -11,6 +11,8 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait CcViewFields[Row] {
   val id: Field[/* user-picked */ CustomCreditcardId, Row]
@@ -21,5 +23,29 @@ trait CcViewFields[Row] {
   val expyear: Field[TypoShort, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object CcViewFields extends CcViewStructure[CcViewRow](None, identity, (_, x) => x)
 
+object CcViewFields {
+  val structure: Relation[CcViewFields, CcViewRow, CcViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => CcViewRow, val merge: (Row, CcViewRow) => Row)
+    extends Relation[CcViewFields, CcViewRow, Row] { 
+  
+    override val fields: CcViewFields[Row] = new CcViewFields[Row] {
+      override val id = new Field[/* user-picked */ CustomCreditcardId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val creditcardid = new Field[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, None)(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
+      override val cardtype = new Field[/* max 50 chars */ String, Row](prefix, "cardtype", None, None)(x => extract(x).cardtype, (row, value) => merge(row, extract(row).copy(cardtype = value)))
+      override val cardnumber = new Field[/* max 25 chars */ String, Row](prefix, "cardnumber", None, None)(x => extract(x).cardnumber, (row, value) => merge(row, extract(row).copy(cardnumber = value)))
+      override val expmonth = new Field[TypoShort, Row](prefix, "expmonth", None, None)(x => extract(x).expmonth, (row, value) => merge(row, extract(row).copy(expmonth = value)))
+      override val expyear = new Field[TypoShort, Row](prefix, "expyear", None, None)(x => extract(x).expyear, (row, value) => merge(row, extract(row).copy(expyear = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.creditcardid, fields.cardtype, fields.cardnumber, fields.expmonth, fields.expyear, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => CcViewRow, merge: (NewRow, CcViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

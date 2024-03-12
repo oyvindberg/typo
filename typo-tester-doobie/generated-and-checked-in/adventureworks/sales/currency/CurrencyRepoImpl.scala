@@ -27,7 +27,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
     sql"""delete from sales.currency where "currencycode" = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilder("sales.currency", CurrencyFields)
+    DeleteBuilder("sales.currency", CurrencyFields.structure)
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")
@@ -67,7 +67,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
     new FragmentOps(sql"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
-    SelectBuilderSql("sales.currency", CurrencyFields, CurrencyRow.read)
+    SelectBuilderSql("sales.currency", CurrencyFields.structure, CurrencyRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CurrencyRow] = {
     sql"""select "currencycode", "name", "modifieddate"::text from sales.currency""".query(CurrencyRow.read).stream
@@ -89,7 +89,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilder("sales.currency", CurrencyFields, CurrencyRow.read)
+    UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.read)
   }
   override def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")

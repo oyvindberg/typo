@@ -28,7 +28,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""delete from person.phonenumbertype where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields)
+    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
   }
   override def insert(unsaved: PhonenumbertypeRow): ZIO[ZConnection, Throwable, PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
@@ -69,7 +69,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     streamingInsert(s"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PhonenumbertypeRowUnsaved.text)
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.jdbcDecoder)
+    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PhonenumbertypeRow] = {
     sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype""".query(PhonenumbertypeRow.jdbcDecoder).selectStream
@@ -88,7 +88,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
           where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.jdbcDecoder)
+    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.jdbcDecoder)
   }
   override def upsert(unsaved: PhonenumbertypeRow): ZIO[ZConnection, Throwable, UpdateResult[PhonenumbertypeRow]] = {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")

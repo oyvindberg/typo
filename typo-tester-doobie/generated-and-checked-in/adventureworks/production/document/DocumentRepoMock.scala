@@ -28,7 +28,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     delay(map.remove(documentnode).isDefined)
   }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DocumentFields, map)
+    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     delay {
@@ -66,7 +66,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     }
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
-    SelectBuilderMock(DocumentFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(DocumentFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
     Stream.emits(map.values.toList)
@@ -92,7 +92,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     }
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DocumentFields, map)
+    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure.fields, map)
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     delay {

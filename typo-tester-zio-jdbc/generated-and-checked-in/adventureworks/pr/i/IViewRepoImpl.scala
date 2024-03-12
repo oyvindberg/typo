@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class IViewRepoImpl extends IViewRepo {
   override def select: SelectBuilder[IViewFields, IViewRow] = {
-    SelectBuilderSql("pr.i", IViewFields, IViewRow.jdbcDecoder)
+    SelectBuilderSql("pr.i", IViewFields.structure, IViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, IViewRow] = {
     sql"""select "id", "illustrationid", "diagram", "modifieddate"::text from pr.i""".query(IViewRow.jdbcDecoder).selectStream

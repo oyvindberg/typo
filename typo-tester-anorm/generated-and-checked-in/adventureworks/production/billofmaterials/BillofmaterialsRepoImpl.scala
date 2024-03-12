@@ -31,7 +31,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     SQL"""delete from production.billofmaterials where "billofmaterialsid" = ${ParameterValue(billofmaterialsid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilder("production.billofmaterials", BillofmaterialsFields)
+    DeleteBuilder("production.billofmaterials", BillofmaterialsFields.structure)
   }
   override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
@@ -89,7 +89,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     streamingInsert(s"""COPY production.billofmaterials("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BillofmaterialsRowUnsaved.text, c)
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    SelectBuilderSql("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.rowParser)
+    SelectBuilderSql("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
     SQL"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
@@ -124,7 +124,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilder("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.rowParser)
+    UpdateBuilder("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.rowParser)
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")

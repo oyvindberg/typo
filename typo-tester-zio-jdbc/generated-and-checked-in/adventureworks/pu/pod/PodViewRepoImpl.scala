@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class PodViewRepoImpl extends PodViewRepo {
   override def select: SelectBuilder[PodViewFields, PodViewRow] = {
-    SelectBuilderSql("pu.pod", PodViewFields, PodViewRow.jdbcDecoder)
+    SelectBuilderSql("pu.pod", PodViewFields.structure, PodViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PodViewRow] = {
     sql"""select "id", "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from pu.pod""".query(PodViewRow.jdbcDecoder).selectStream

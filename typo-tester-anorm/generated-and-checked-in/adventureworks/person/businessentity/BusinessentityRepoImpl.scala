@@ -28,7 +28,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     SQL"""delete from person.businessentity where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilder("person.businessentity", BusinessentityFields)
+    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
   }
   override def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     SQL"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
@@ -77,7 +77,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityRowUnsaved.text, c)
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
-    SelectBuilderSql("person.businessentity", BusinessentityFields, BusinessentityRow.rowParser)
+    SelectBuilderSql("person.businessentity", BusinessentityFields.structure, BusinessentityRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
     SQL"""select "businessentityid", "rowguid", "modifieddate"::text
@@ -106,7 +106,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilder("person.businessentity", BusinessentityFields, BusinessentityRow.rowParser)
+    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.rowParser)
   }
   override def upsert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     SQL"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")

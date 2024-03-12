@@ -25,7 +25,7 @@ class ProductRepoMock(toRow: Function1[ProductRowUnsaved, ProductRow],
     map.remove(productid).isDefined
   }
   override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductFields.structure.fields, map)
   }
   override def insert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     val _ = if (map.contains(unsaved.productid))
@@ -53,7 +53,7 @@ class ProductRepoMock(toRow: Function1[ProductRowUnsaved, ProductRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[ProductFields, ProductRow] = {
-    SelectBuilderMock(ProductFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(ProductFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class ProductRepoMock(toRow: Function1[ProductRowUnsaved, ProductRow],
     }
   }
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     map.put(unsaved.productid, unsaved): @nowarn

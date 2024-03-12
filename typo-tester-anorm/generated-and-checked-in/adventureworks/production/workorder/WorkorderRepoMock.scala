@@ -25,7 +25,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     map.remove(workorderid).isDefined
   }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, WorkorderFields, map)
+    DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure.fields, map)
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     val _ = if (map.contains(unsaved.workorderid))
@@ -53,7 +53,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
-    SelectBuilderMock(WorkorderFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(WorkorderFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     }
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, WorkorderFields, map)
+    UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure.fields, map)
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     map.put(unsaved.workorderid, unsaved): @nowarn

@@ -29,7 +29,7 @@ class ShiftRepoImpl extends ShiftRepo {
     SQL"""delete from humanresources.shift where "shiftid" = ${ParameterValue(shiftid, null, ShiftId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilder("humanresources.shift", ShiftFields)
+    DeleteBuilder("humanresources.shift", ShiftFields.structure)
   }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
@@ -77,7 +77,7 @@ class ShiftRepoImpl extends ShiftRepo {
     streamingInsert(s"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShiftRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderSql("humanresources.shift", ShiftFields, ShiftRow.rowParser)
+    SelectBuilderSql("humanresources.shift", ShiftFields.structure, ShiftRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
     SQL"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
@@ -108,7 +108,7 @@ class ShiftRepoImpl extends ShiftRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilder("humanresources.shift", ShiftFields, ShiftRow.rowParser)
+    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.rowParser)
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")

@@ -29,7 +29,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     SQL"""delete from sales.countryregioncurrency where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields)
+    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
   }
   override def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
@@ -72,7 +72,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     streamingInsert(s"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregioncurrencyRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.rowParser)
+    SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
     SQL"""select "countryregioncode", "currencycode", "modifieddate"::text
@@ -93,7 +93,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.rowParser)
+    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.rowParser)
   }
   override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")

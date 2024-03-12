@@ -28,7 +28,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     sql"""delete from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields)
+    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
   }
   override def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
@@ -68,7 +68,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     new FragmentOps(sql"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersoncreditcardRowUnsaved.text)
   }
   override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.read)
+    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard""".query(PersoncreditcardRow.read).stream
@@ -86,7 +86,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.read)
+    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.read)
   }
   override def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")

@@ -29,7 +29,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     sql"""delete from production.productmodelillustration where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "illustrationid" = ${Segment.paramSegment(compositeId.illustrationid)(IllustrationId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields)
+    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
   }
   override def insert(unsaved: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
@@ -67,7 +67,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     streamingInsert(s"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelillustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.jdbcDecoder)
+    SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductmodelillustrationRow] = {
     sql"""select "productmodelid", "illustrationid", "modifieddate"::text from production.productmodelillustration""".query(ProductmodelillustrationRow.jdbcDecoder).selectStream
@@ -82,7 +82,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "illustrationid" = ${Segment.paramSegment(compositeId.illustrationid)(IllustrationId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.jdbcDecoder)
+    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelillustrationRow]] = {
     sql"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")

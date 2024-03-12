@@ -28,7 +28,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""delete from production.productcategory where "productcategoryid" = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    DeleteBuilder("production.productcategory", ProductcategoryFields)
+    DeleteBuilder("production.productcategory", ProductcategoryFields.structure)
   }
   override def insert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
@@ -75,7 +75,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     new FragmentOps(sql"""COPY production.productcategory("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    SelectBuilderSql("production.productcategory", ProductcategoryFields, ProductcategoryRow.read)
+    SelectBuilderSql("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductcategoryRow] = {
     sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory""".query(ProductcategoryRow.read).stream
@@ -98,7 +98,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    UpdateBuilder("production.productcategory", ProductcategoryFields, ProductcategoryRow.read)
+    UpdateBuilder("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.read)
   }
   override def upsert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")

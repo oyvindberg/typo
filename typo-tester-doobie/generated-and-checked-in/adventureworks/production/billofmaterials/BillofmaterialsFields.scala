@@ -12,8 +12,10 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait BillofmaterialsFields[Row] {
   val billofmaterialsid: IdField[Int, Row]
@@ -26,5 +28,31 @@ trait BillofmaterialsFields[Row] {
   val perassemblyqty: Field[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object BillofmaterialsFields extends BillofmaterialsStructure[BillofmaterialsRow](None, identity, (_, x) => x)
 
+object BillofmaterialsFields {
+  val structure: Relation[BillofmaterialsFields, BillofmaterialsRow, BillofmaterialsRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => BillofmaterialsRow, val merge: (Row, BillofmaterialsRow) => Row)
+    extends Relation[BillofmaterialsFields, BillofmaterialsRow, Row] { 
+  
+    override val fields: BillofmaterialsFields[Row] = new BillofmaterialsFields[Row] {
+      override val billofmaterialsid = new IdField[Int, Row](prefix, "billofmaterialsid", None, Some("int4"))(x => extract(x).billofmaterialsid, (row, value) => merge(row, extract(row).copy(billofmaterialsid = value)))
+      override val productassemblyid = new OptField[ProductId, Row](prefix, "productassemblyid", None, Some("int4"))(x => extract(x).productassemblyid, (row, value) => merge(row, extract(row).copy(productassemblyid = value)))
+      override val componentid = new Field[ProductId, Row](prefix, "componentid", None, Some("int4"))(x => extract(x).componentid, (row, value) => merge(row, extract(row).copy(componentid = value)))
+      override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), Some("timestamp"))(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
+      override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), Some("timestamp"))(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
+      override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, Some("bpchar"))(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
+      override val bomlevel = new Field[TypoShort, Row](prefix, "bomlevel", None, Some("int2"))(x => extract(x).bomlevel, (row, value) => merge(row, extract(row).copy(bomlevel = value)))
+      override val perassemblyqty = new Field[BigDecimal, Row](prefix, "perassemblyqty", None, Some("numeric"))(x => extract(x).perassemblyqty, (row, value) => merge(row, extract(row).copy(perassemblyqty = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.billofmaterialsid, fields.productassemblyid, fields.componentid, fields.startdate, fields.enddate, fields.unitmeasurecode, fields.bomlevel, fields.perassemblyqty, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => BillofmaterialsRow, merge: (NewRow, BillofmaterialsRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

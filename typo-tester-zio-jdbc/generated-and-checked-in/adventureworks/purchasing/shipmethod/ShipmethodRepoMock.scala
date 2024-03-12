@@ -29,7 +29,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     ZIO.succeed(map.remove(shipmethodid).isDefined)
   }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
   }
   override def insert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, ShipmethodRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
-    SelectBuilderMock(ShipmethodFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(ShipmethodFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShipmethodRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     }
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
   }
   override def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]] = {
     ZIO.succeed {

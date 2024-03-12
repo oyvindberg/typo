@@ -28,7 +28,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields)
+    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
   }
   override def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
@@ -80,7 +80,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     new FragmentOps(sql"""COPY sales.shoppingcartitem("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ShoppingcartitemRowUnsaved.text)
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.read)
+    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem""".query(ShoppingcartitemRow.read).stream
@@ -105,7 +105,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.read)
+    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
   }
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")

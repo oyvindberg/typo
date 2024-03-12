@@ -27,7 +27,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     delay(map.remove(workorderid).isDefined)
   }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, WorkorderFields, map)
+    DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure.fields, map)
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     delay {
@@ -65,7 +65,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     }
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
-    SelectBuilderMock(WorkorderFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(WorkorderFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     }
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, WorkorderFields, map)
+    UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure.fields, map)
   }
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     delay {

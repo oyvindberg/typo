@@ -25,7 +25,7 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     map.remove(compositeId).isDefined
   }
   override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalespersonquotahistoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalespersonquotahistoryFields.structure.fields, map)
   }
   override def insert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -53,7 +53,7 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     unsaved.size.toLong
   }
   override def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    SelectBuilderMock(SalespersonquotahistoryFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(SalespersonquotahistoryFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     map.values.toList
@@ -71,7 +71,7 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     }
   }
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalespersonquotahistoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalespersonquotahistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

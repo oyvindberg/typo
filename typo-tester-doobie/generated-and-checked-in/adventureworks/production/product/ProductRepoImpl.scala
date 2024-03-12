@@ -34,7 +34,7 @@ class ProductRepoImpl extends ProductRepo {
     sql"""delete from production.product where "productid" = ${fromWrite(productid)(Write.fromPut(ProductId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilder("production.product", ProductFields)
+    DeleteBuilder("production.product", ProductFields.structure)
   }
   override def insert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
@@ -108,7 +108,7 @@ class ProductRepoImpl extends ProductRepo {
     new FragmentOps(sql"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductFields, ProductRow] = {
-    SelectBuilderSql("production.product", ProductFields, ProductRow.read)
+    SelectBuilderSql("production.product", ProductFields.structure, ProductRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductRow] = {
     sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product""".query(ProductRow.read).stream
@@ -152,7 +152,7 @@ class ProductRepoImpl extends ProductRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilder("production.product", ProductFields, ProductRow.read)
+    UpdateBuilder("production.product", ProductFields.structure, ProductRow.read)
   }
   override def upsert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

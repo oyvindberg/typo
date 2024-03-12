@@ -28,7 +28,7 @@ class CultureRepoImpl extends CultureRepo {
     sql"""delete from production.culture where "cultureid" = ${Segment.paramSegment(cultureid)(CultureId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilder("production.culture", CultureFields)
+    DeleteBuilder("production.culture", CultureFields.structure)
   }
   override def insert(unsaved: CultureRow): ZIO[ZConnection, Throwable, CultureRow] = {
     sql"""insert into production.culture("cultureid", "name", "modifieddate")
@@ -66,7 +66,7 @@ class CultureRepoImpl extends CultureRepo {
     streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CultureRowUnsaved.text)
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
-    SelectBuilderSql("production.culture", CultureFields, CultureRow.jdbcDecoder)
+    SelectBuilderSql("production.culture", CultureFields.structure, CultureRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CultureRow] = {
     sql"""select "cultureid", "name", "modifieddate"::text from production.culture""".query(CultureRow.jdbcDecoder).selectStream
@@ -85,7 +85,7 @@ class CultureRepoImpl extends CultureRepo {
           where "cultureid" = ${Segment.paramSegment(cultureid)(CultureId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilder("production.culture", CultureFields, CultureRow.jdbcDecoder)
+    UpdateBuilder("production.culture", CultureFields.structure, CultureRow.jdbcDecoder)
   }
   override def upsert(unsaved: CultureRow): ZIO[ZConnection, Throwable, UpdateResult[CultureRow]] = {
     sql"""insert into production.culture("cultureid", "name", "modifieddate")

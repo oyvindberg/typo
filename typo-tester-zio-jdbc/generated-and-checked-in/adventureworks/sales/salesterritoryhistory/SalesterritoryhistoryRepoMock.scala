@@ -29,7 +29,7 @@ class SalesterritoryhistoryRepoMock(toRow: Function1[SalesterritoryhistoryRowUns
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesterritoryhistoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesterritoryhistoryFields.structure.fields, map)
   }
   override def insert(unsaved: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, SalesterritoryhistoryRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class SalesterritoryhistoryRepoMock(toRow: Function1[SalesterritoryhistoryRowUns
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    SelectBuilderMock(SalesterritoryhistoryFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(SalesterritoryhistoryFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class SalesterritoryhistoryRepoMock(toRow: Function1[SalesterritoryhistoryRowUns
     }
   }
   override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesterritoryhistoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesterritoryhistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalesterritoryhistoryRow]] = {
     ZIO.succeed {

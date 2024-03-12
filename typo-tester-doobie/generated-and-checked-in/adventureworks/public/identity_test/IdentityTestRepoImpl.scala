@@ -26,7 +26,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     sql"""delete from public.identity-test where "name" = ${fromWrite(name)(Write.fromPut(IdentityTestId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilder("public.identity-test", IdentityTestFields)
+    DeleteBuilder("public.identity-test", IdentityTestFields.structure)
   }
   override def insert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     sql"""insert into public.identity-test("always_generated", "default_generated", "name")
@@ -65,7 +65,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     new FragmentOps(sql"""COPY public.identity-test("name", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(IdentityTestRowUnsaved.text)
   }
   override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
-    SelectBuilderSql("public.identity-test", IdentityTestFields, IdentityTestRow.read)
+    SelectBuilderSql("public.identity-test", IdentityTestFields.structure, IdentityTestRow.read)
   }
   override def selectAll: Stream[ConnectionIO, IdentityTestRow] = {
     sql"""select "always_generated", "default_generated", "name" from public.identity-test""".query(IdentityTestRow.read).stream
@@ -87,7 +87,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilder("public.identity-test", IdentityTestFields, IdentityTestRow.read)
+    UpdateBuilder("public.identity-test", IdentityTestFields.structure, IdentityTestRow.read)
   }
   override def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     sql"""insert into public.identity-test("always_generated", "default_generated", "name")

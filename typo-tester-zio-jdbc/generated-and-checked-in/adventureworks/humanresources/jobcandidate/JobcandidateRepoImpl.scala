@@ -30,7 +30,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields)
+    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
   }
   override def insert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
@@ -72,7 +72,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     streamingInsert(s"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(JobcandidateRowUnsaved.text)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
-    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.jdbcDecoder)
+    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, JobcandidateRow] = {
     sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(JobcandidateRow.jdbcDecoder).selectStream
@@ -92,7 +92,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
           where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.jdbcDecoder)
+    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
   }
   override def upsert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, UpdateResult[JobcandidateRow]] = {
     sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")

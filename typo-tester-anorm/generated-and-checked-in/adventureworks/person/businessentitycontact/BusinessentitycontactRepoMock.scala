@@ -25,7 +25,7 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
     map.remove(compositeId).isDefined
   }
   override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BusinessentitycontactFields, map)
+    DeleteBuilderMock(DeleteParams.empty, BusinessentitycontactFields.structure.fields, map)
   }
   override def insert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -53,7 +53,7 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
     unsaved.size.toLong
   }
   override def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    SelectBuilderMock(BusinessentitycontactFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(BusinessentitycontactFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[BusinessentitycontactRow] = {
     map.values.toList
@@ -71,7 +71,7 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
     }
   }
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BusinessentitycontactFields, map)
+    UpdateBuilderMock(UpdateParams.empty, BusinessentitycontactFields.structure.fields, map)
   }
   override def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

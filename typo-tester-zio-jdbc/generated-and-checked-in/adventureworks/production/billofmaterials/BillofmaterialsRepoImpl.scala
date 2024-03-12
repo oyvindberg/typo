@@ -31,7 +31,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     sql"""delete from production.billofmaterials where "billofmaterialsid" = ${Segment.paramSegment(billofmaterialsid)(Setter.intSetter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilder("production.billofmaterials", BillofmaterialsFields)
+    DeleteBuilder("production.billofmaterials", BillofmaterialsFields.structure)
   }
   override def insert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
@@ -84,7 +84,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     streamingInsert(s"""COPY production.billofmaterials("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BillofmaterialsRowUnsaved.text)
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    SelectBuilderSql("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.jdbcDecoder)
+    SelectBuilderSql("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
     sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials""".query(BillofmaterialsRow.jdbcDecoder).selectStream
@@ -109,7 +109,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           where "billofmaterialsid" = ${Segment.paramSegment(billofmaterialsid)(Setter.intSetter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilder("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.jdbcDecoder)
+    UpdateBuilder("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.jdbcDecoder)
   }
   override def upsert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, UpdateResult[BillofmaterialsRow]] = {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")

@@ -32,7 +32,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
     SQL"""delete from sales.salesperson where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
-    DeleteBuilder("sales.salesperson", SalespersonFields)
+    DeleteBuilder("sales.salesperson", SalespersonFields.structure)
   }
   override def insert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     SQL"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
@@ -96,7 +96,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
     streamingInsert(s"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalespersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
-    SelectBuilderSql("sales.salesperson", SalespersonFields, SalespersonRow.rowParser)
+    SelectBuilderSql("sales.salesperson", SalespersonFields.structure, SalespersonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
     SQL"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
@@ -131,7 +131,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
-    UpdateBuilder("sales.salesperson", SalespersonFields, SalespersonRow.rowParser)
+    UpdateBuilder("sales.salesperson", SalespersonFields.structure, SalespersonRow.rowParser)
   }
   override def upsert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     SQL"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")

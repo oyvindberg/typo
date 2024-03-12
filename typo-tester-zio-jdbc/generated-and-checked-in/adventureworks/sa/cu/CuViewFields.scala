@@ -11,6 +11,8 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait CuViewFields[Row] {
   val id: Field[CurrencyId, Row]
@@ -18,5 +20,26 @@ trait CuViewFields[Row] {
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object CuViewFields extends CuViewStructure[CuViewRow](None, identity, (_, x) => x)
 
+object CuViewFields {
+  val structure: Relation[CuViewFields, CuViewRow, CuViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => CuViewRow, val merge: (Row, CuViewRow) => Row)
+    extends Relation[CuViewFields, CuViewRow, Row] { 
+  
+    override val fields: CuViewFields[Row] = new CuViewFields[Row] {
+      override val id = new Field[CurrencyId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val currencycode = new Field[CurrencyId, Row](prefix, "currencycode", None, None)(x => extract(x).currencycode, (row, value) => merge(row, extract(row).copy(currencycode = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.currencycode, fields.name, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => CuViewRow, merge: (NewRow, CuViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

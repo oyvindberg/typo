@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class WrViewRepoImpl extends WrViewRepo {
   override def select: SelectBuilder[WrViewFields, WrViewRow] = {
-    SelectBuilderSql("pr.wr", WrViewFields, WrViewRow.jdbcDecoder)
+    SelectBuilderSql("pr.wr", WrViewFields.structure, WrViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, WrViewRow] = {
     sql"""select "id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from pr.wr""".query(WrViewRow.jdbcDecoder).selectStream

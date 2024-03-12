@@ -29,7 +29,7 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     ZIO.succeed(map.remove(productreviewid).isDefined)
   }
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def insert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, ProductreviewRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
-    SelectBuilderMock(ProductreviewFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(ProductreviewFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductreviewRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     }
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, UpdateResult[ProductreviewRow]] = {
     ZIO.succeed {

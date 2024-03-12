@@ -31,7 +31,7 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     SQL"""delete from sales.salesterritoryhistory where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)} AND "territoryid" = ${ParameterValue(compositeId.territoryid, null, SalesterritoryId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields)
+    DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure)
   }
   override def insert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {
     SQL"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
@@ -80,7 +80,7 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     streamingInsert(s"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesterritoryhistoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    SelectBuilderSql("sales.salesterritoryhistory", SalesterritoryhistoryFields, SalesterritoryhistoryRow.rowParser)
+    SelectBuilderSql("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow] = {
     SQL"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
@@ -103,7 +103,7 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields, SalesterritoryhistoryRow.rowParser)
+    UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.rowParser)
   }
   override def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {
     SQL"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")

@@ -36,7 +36,7 @@ class ProductRepoImpl extends ProductRepo {
     SQL"""delete from production.product where "productid" = ${ParameterValue(productid, null, ProductId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilder("production.product", ProductFields)
+    DeleteBuilder("production.product", ProductFields.structure)
   }
   override def insert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
@@ -113,7 +113,7 @@ class ProductRepoImpl extends ProductRepo {
     streamingInsert(s"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductFields, ProductRow] = {
-    SelectBuilderSql("production.product", ProductFields, ProductRow.rowParser)
+    SelectBuilderSql("production.product", ProductFields.structure, ProductRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductRow] = {
     SQL"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
@@ -164,7 +164,7 @@ class ProductRepoImpl extends ProductRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilder("production.product", ProductFields, ProductRow.rowParser)
+    UpdateBuilder("production.product", ProductFields.structure, ProductRow.rowParser)
   }
   override def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

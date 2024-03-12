@@ -29,7 +29,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     sql"""delete from production.productmodelproductdescriptionculture where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(Write.fromPut(CultureId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields)
+    DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     sql"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
@@ -70,7 +70,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     new FragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelproductdescriptioncultureRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow.read)
+    SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
     sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture""".query(ProductmodelproductdescriptioncultureRow.read).stream
@@ -88,7 +88,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow.read)
+    UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.read)
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     sql"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")

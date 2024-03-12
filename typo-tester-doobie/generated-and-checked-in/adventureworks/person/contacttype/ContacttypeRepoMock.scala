@@ -27,7 +27,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     delay(map.remove(contacttypeid).isDefined)
   }
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure.fields, map)
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     delay {
@@ -65,7 +65,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     }
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
-    SelectBuilderMock(ContacttypeFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(ContacttypeFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     }
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure.fields, map)
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     delay {

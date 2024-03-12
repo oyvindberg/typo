@@ -27,7 +27,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""delete from production.unitmeasure where "unitmeasurecode" = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilder("production.unitmeasure", UnitmeasureFields)
+    DeleteBuilder("production.unitmeasure", UnitmeasureFields.structure)
   }
   override def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
@@ -67,7 +67,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UnitmeasureRowUnsaved.text)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.read)
+    SelectBuilderSql("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.read)
   }
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
     sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure""".query(UnitmeasureRow.read).stream
@@ -89,7 +89,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilder("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.read)
+    UpdateBuilder("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.read)
   }
   override def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")

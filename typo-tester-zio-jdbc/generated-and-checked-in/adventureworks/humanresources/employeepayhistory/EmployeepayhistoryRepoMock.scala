@@ -29,7 +29,7 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, EmployeepayhistoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, EmployeepayhistoryFields.structure.fields, map)
   }
   override def insert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, EmployeepayhistoryRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    SelectBuilderMock(EmployeepayhistoryFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(EmployeepayhistoryFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EmployeepayhistoryRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
     }
   }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, EmployeepayhistoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, EmployeepayhistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeepayhistoryRow]] = {
     ZIO.succeed {

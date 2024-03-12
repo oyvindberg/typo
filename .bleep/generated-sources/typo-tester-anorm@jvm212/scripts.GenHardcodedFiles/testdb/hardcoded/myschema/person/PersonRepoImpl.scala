@@ -33,7 +33,7 @@ class PersonRepoImpl extends PersonRepo {
     SQL"""delete from myschema.person where "id" = ${ParameterValue(id, null, PersonId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("myschema.person", PersonFields)
+    DeleteBuilder("myschema.person", PersonFields.structure)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
@@ -94,7 +94,7 @@ class PersonRepoImpl extends PersonRepo {
     streamingInsert(s"""COPY myschema.person("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("myschema.person", PersonFields, PersonRow.rowParser)
+    SelectBuilderSql("myschema.person", PersonFields.structure, PersonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
@@ -160,7 +160,7 @@ class PersonRepoImpl extends PersonRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("myschema.person", PersonFields, PersonRow.rowParser)
+    UpdateBuilder("myschema.person", PersonFields.structure, PersonRow.rowParser)
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {
     fieldValues match {

@@ -25,7 +25,7 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     map.remove(compositeId).isDefined
   }
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure.fields, map)
   }
   override def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -53,7 +53,7 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     unsaved.size.toLong
   }
   override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    SelectBuilderMock(SpecialofferproductFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(SpecialofferproductFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
     map.values.toList
@@ -71,7 +71,7 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     }
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure.fields, map)
   }
   override def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

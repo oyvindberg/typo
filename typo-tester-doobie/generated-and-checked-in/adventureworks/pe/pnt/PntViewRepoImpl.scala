@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class PntViewRepoImpl extends PntViewRepo {
   override def select: SelectBuilder[PntViewFields, PntViewRow] = {
-    SelectBuilderSql("pe.pnt", PntViewFields, PntViewRow.read)
+    SelectBuilderSql("pe.pnt", PntViewFields.structure, PntViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PntViewRow] = {
     sql"""select "id", "phonenumbertypeid", "name", "modifieddate"::text from pe.pnt""".query(PntViewRow.read).stream

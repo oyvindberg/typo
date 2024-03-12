@@ -28,7 +28,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     SQL"""delete from person.contacttype where "contacttypeid" = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilder("person.contacttype", ContacttypeFields)
+    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
   }
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
@@ -74,7 +74,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     streamingInsert(s"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ContacttypeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
-    SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.rowParser)
+    SelectBuilderSql("person.contacttype", ContacttypeFields.structure, ContacttypeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
     SQL"""select "contacttypeid", "name", "modifieddate"::text
@@ -103,7 +103,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilder("person.contacttype", ContacttypeFields, ContacttypeRow.rowParser)
+    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.rowParser)
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype("contacttypeid", "name", "modifieddate")

@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRepo {
   override def select: SelectBuilder[VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow] = {
-    SelectBuilderSql("humanresources.vjobcandidateemployment", VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow.rowParser)
+    SelectBuilderSql("humanresources.vjobcandidateemployment", VjobcandidateemploymentViewFields.structure, VjobcandidateemploymentViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VjobcandidateemploymentViewRow] = {
     SQL"""select "jobcandidateid", "Emp.StartDate"::text, "Emp.EndDate"::text, "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City"

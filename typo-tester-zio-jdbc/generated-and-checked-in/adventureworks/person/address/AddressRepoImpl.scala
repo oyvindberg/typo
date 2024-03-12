@@ -31,7 +31,7 @@ class AddressRepoImpl extends AddressRepo {
     sql"""delete from person.address where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilder("person.address", AddressFields)
+    DeleteBuilder("person.address", AddressFields.structure)
   }
   override def insert(unsaved: AddressRow): ZIO[ZConnection, Throwable, AddressRow] = {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
@@ -81,7 +81,7 @@ class AddressRepoImpl extends AddressRepo {
     streamingInsert(s"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddressRowUnsaved.text)
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
-    SelectBuilderSql("person.address", AddressFields, AddressRow.jdbcDecoder)
+    SelectBuilderSql("person.address", AddressFields.structure, AddressRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, AddressRow] = {
     sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address""".query(AddressRow.jdbcDecoder).selectStream
@@ -106,7 +106,7 @@ class AddressRepoImpl extends AddressRepo {
           where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilder("person.address", AddressFields, AddressRow.jdbcDecoder)
+    UpdateBuilder("person.address", AddressFields.structure, AddressRow.jdbcDecoder)
   }
   override def upsert(unsaved: AddressRow): ZIO[ZConnection, Throwable, UpdateResult[AddressRow]] = {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")

@@ -27,7 +27,7 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
   override def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     delay {
@@ -65,7 +65,7 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
     }
   }
   override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    SelectBuilderMock(CountryregioncurrencyFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(CountryregioncurrencyFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
     }
   }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     delay {

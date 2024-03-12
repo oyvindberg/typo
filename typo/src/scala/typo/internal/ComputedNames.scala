@@ -9,7 +9,6 @@ case class ComputedNames(naming: Naming, source: Source, maybeId: Option[IdCompu
   val FieldValueName: Option[sc.Type.Qualified] = if (enableFieldValue) Some(sc.Type.Qualified(naming.fieldValueName(source))) else None
   val FieldOrIdValueName: Option[sc.Type.Qualified] = if (enableFieldValue) Some(sc.Type.Qualified(naming.fieldOrIdValueName(source))) else None
   val FieldsName: Option[sc.Type.Qualified] = if (enableDsl) Some(sc.Type.Qualified(naming.fieldsName(source))) else None
-  val StructureName: Option[sc.Type.Qualified] = if (enableDsl) Some(sc.Type.Qualified(naming.structureName(source))) else None
 
   def isIdColumn(colName: db.ColName): Boolean =
     maybeId.exists(_.cols.exists(_.dbName == colName))

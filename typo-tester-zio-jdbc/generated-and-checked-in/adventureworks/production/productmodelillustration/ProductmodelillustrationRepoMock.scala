@@ -29,7 +29,7 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields.structure.fields, map)
   }
   override def insert(unsaved: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, ProductmodelillustrationRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    SelectBuilderMock(ProductmodelillustrationFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(ProductmodelillustrationFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductmodelillustrationRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
     }
   }
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductmodelillustrationFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductmodelillustrationFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelillustrationRow]] = {
     ZIO.succeed {

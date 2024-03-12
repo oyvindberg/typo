@@ -32,7 +32,7 @@ class VendorRepoImpl extends VendorRepo {
     sql"""delete from purchasing.vendor where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
-    DeleteBuilder("purchasing.vendor", VendorFields)
+    DeleteBuilder("purchasing.vendor", VendorFields.structure)
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
@@ -83,7 +83,7 @@ class VendorRepoImpl extends VendorRepo {
     new FragmentOps(sql"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(VendorRowUnsaved.text)
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
-    SelectBuilderSql("purchasing.vendor", VendorFields, VendorRow.read)
+    SelectBuilderSql("purchasing.vendor", VendorFields.structure, VendorRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
     sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor""".query(VendorRow.read).stream
@@ -110,7 +110,7 @@ class VendorRepoImpl extends VendorRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
-    UpdateBuilder("purchasing.vendor", VendorFields, VendorRow.read)
+    UpdateBuilder("purchasing.vendor", VendorFields.structure, VendorRow.read)
   }
   override def upsert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")

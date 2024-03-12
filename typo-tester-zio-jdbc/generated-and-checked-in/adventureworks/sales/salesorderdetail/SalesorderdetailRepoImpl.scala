@@ -33,7 +33,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     sql"""delete from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields)
+    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields.structure)
   }
   override def insert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
@@ -87,7 +87,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderdetailRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.jdbcDecoder)
+    SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesorderdetailRow] = {
     sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail""".query(SalesorderdetailRow.jdbcDecoder).selectStream
@@ -109,7 +109,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.jdbcDecoder)
+    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.jdbcDecoder)
   }
   override def upsert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderdetailRow]] = {
     sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")

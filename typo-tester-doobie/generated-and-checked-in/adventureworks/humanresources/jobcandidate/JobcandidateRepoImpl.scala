@@ -28,7 +28,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields)
+    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
   }
   override def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
@@ -72,7 +72,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     new FragmentOps(sql"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(JobcandidateRowUnsaved.text)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
-    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.read)
+    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.read)
   }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
     sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(JobcandidateRow.read).stream
@@ -95,7 +95,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.read)
+    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.read)
   }
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")

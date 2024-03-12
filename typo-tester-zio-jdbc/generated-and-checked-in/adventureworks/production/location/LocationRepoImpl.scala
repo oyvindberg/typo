@@ -29,7 +29,7 @@ class LocationRepoImpl extends LocationRepo {
     sql"""delete from production.location where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields)
+    DeleteBuilder("production.location", LocationFields.structure)
   }
   override def insert(unsaved: LocationRow): ZIO[ZConnection, Throwable, LocationRow] = {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
@@ -78,7 +78,7 @@ class LocationRepoImpl extends LocationRepo {
     streamingInsert(s"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(LocationRowUnsaved.text)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderSql("production.location", LocationFields, LocationRow.jdbcDecoder)
+    SelectBuilderSql("production.location", LocationFields.structure, LocationRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, LocationRow] = {
     sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(LocationRow.jdbcDecoder).selectStream
@@ -99,7 +99,7 @@ class LocationRepoImpl extends LocationRepo {
           where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields, LocationRow.jdbcDecoder)
+    UpdateBuilder("production.location", LocationFields.structure, LocationRow.jdbcDecoder)
   }
   override def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]] = {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")

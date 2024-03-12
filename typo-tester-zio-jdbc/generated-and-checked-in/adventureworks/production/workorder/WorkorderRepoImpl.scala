@@ -31,7 +31,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
     sql"""delete from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilder("production.workorder", WorkorderFields)
+    DeleteBuilder("production.workorder", WorkorderFields.structure)
   }
   override def insert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, WorkorderRow] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
@@ -78,7 +78,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
     streamingInsert(s"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
-    SelectBuilderSql("production.workorder", WorkorderFields, WorkorderRow.jdbcDecoder)
+    SelectBuilderSql("production.workorder", WorkorderFields.structure, WorkorderRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, WorkorderRow] = {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder""".query(WorkorderRow.jdbcDecoder).selectStream
@@ -103,7 +103,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
           where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilder("production.workorder", WorkorderFields, WorkorderRow.jdbcDecoder)
+    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.jdbcDecoder)
   }
   override def upsert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderRow]] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

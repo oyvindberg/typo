@@ -29,7 +29,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     sql"""delete from production.productsubcategory where "productsubcategoryid" = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields)
+    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields.structure)
   }
   override def insert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
@@ -77,7 +77,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     new FragmentOps(sql"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductsubcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.read)
+    SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductsubcategoryRow] = {
     sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory""".query(ProductsubcategoryRow.read).stream
@@ -101,7 +101,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.read)
+    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
   }
   override def upsert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")

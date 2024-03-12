@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class PodViewRepoImpl extends PodViewRepo {
   override def select: SelectBuilder[PodViewFields, PodViewRow] = {
-    SelectBuilderSql("pu.pod", PodViewFields, PodViewRow.rowParser)
+    SelectBuilderSql("pu.pod", PodViewFields.structure, PodViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PodViewRow] = {
     SQL"""select "id", "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text

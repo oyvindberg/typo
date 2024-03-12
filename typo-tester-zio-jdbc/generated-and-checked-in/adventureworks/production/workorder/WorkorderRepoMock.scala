@@ -29,7 +29,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     ZIO.succeed(map.remove(workorderid).isDefined)
   }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, WorkorderFields, map)
+    DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure.fields, map)
   }
   override def insert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, WorkorderRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
-    SelectBuilderMock(WorkorderFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(WorkorderFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, WorkorderRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     }
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, WorkorderFields, map)
+    UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure.fields, map)
   }
   override def upsert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderRow]] = {
     ZIO.succeed {

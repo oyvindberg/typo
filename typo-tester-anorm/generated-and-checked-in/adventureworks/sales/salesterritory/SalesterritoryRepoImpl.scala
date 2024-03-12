@@ -31,7 +31,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     SQL"""delete from sales.salesterritory where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilder("sales.salesterritory", SalesterritoryFields)
+    DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
   }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
@@ -99,7 +99,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     streamingInsert(s"""COPY sales.salesterritory("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesterritoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    SelectBuilderSql("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.rowParser)
+    SelectBuilderSql("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
     SQL"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
@@ -135,7 +135,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilder("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.rowParser)
+    UpdateBuilder("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")

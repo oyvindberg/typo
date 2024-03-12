@@ -25,7 +25,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     map.remove(contacttypeid).isDefined
   }
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure.fields, map)
   }
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     val _ = if (map.contains(unsaved.contacttypeid))
@@ -53,7 +53,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     unsaved.size.toLong
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
-    SelectBuilderMock(ContacttypeFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(ContacttypeFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     }
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure.fields, map)
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     map.put(unsaved.contacttypeid, unsaved): @nowarn

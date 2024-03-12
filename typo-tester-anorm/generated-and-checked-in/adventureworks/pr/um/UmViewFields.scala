@@ -11,6 +11,8 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait UmViewFields[Row] {
   val id: Field[UnitmeasureId, Row]
@@ -18,5 +20,26 @@ trait UmViewFields[Row] {
   val name: Field[Name, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object UmViewFields extends UmViewStructure[UmViewRow](None, identity, (_, x) => x)
 
+object UmViewFields {
+  val structure: Relation[UmViewFields, UmViewRow, UmViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => UmViewRow, val merge: (Row, UmViewRow) => Row)
+    extends Relation[UmViewFields, UmViewRow, Row] { 
+  
+    override val fields: UmViewFields[Row] = new UmViewFields[Row] {
+      override val id = new Field[UnitmeasureId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, None)(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.unitmeasurecode, fields.name, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => UmViewRow, merge: (NewRow, UmViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

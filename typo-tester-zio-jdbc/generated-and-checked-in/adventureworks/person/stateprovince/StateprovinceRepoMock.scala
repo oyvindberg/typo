@@ -29,7 +29,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     ZIO.succeed(map.remove(stateprovinceid).isDefined)
   }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields, map)
+    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure.fields, map)
   }
   override def insert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, StateprovinceRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
-    SelectBuilderMock(StateprovinceFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(StateprovinceFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     }
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields, map)
+    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure.fields, map)
   }
   override def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]] = {
     ZIO.succeed {

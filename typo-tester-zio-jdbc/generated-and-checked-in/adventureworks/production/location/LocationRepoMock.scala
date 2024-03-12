@@ -29,7 +29,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     ZIO.succeed(map.remove(locationid).isDefined)
   }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, LocationFields, map)
+    DeleteBuilderMock(DeleteParams.empty, LocationFields.structure.fields, map)
   }
   override def insert(unsaved: LocationRow): ZIO[ZConnection, Throwable, LocationRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderMock(LocationFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(LocationFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, LocationRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     }
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, LocationFields, map)
+    UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
   }
   override def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]] = {
     ZIO.succeed {

@@ -31,7 +31,7 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     sql"""delete from person.businessentityaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(AddressId.setter)} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(AddresstypeId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    DeleteBuilder("person.businessentityaddress", BusinessentityaddressFields)
+    DeleteBuilder("person.businessentityaddress", BusinessentityaddressFields.structure)
   }
   override def insert(unsaved: BusinessentityaddressRow): ZIO[ZConnection, Throwable, BusinessentityaddressRow] = {
     sql"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
@@ -74,7 +74,7 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     streamingInsert(s"""COPY person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityaddressRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    SelectBuilderSql("person.businessentityaddress", BusinessentityaddressFields, BusinessentityaddressRow.jdbcDecoder)
+    SelectBuilderSql("person.businessentityaddress", BusinessentityaddressFields.structure, BusinessentityaddressRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BusinessentityaddressRow] = {
     sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress""".query(BusinessentityaddressRow.jdbcDecoder).selectStream
@@ -90,7 +90,7 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
           where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(AddressId.setter)} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(AddresstypeId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    UpdateBuilder("person.businessentityaddress", BusinessentityaddressFields, BusinessentityaddressRow.jdbcDecoder)
+    UpdateBuilder("person.businessentityaddress", BusinessentityaddressFields.structure, BusinessentityaddressRow.jdbcDecoder)
   }
   override def upsert(unsaved: BusinessentityaddressRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentityaddressRow]] = {
     sql"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")

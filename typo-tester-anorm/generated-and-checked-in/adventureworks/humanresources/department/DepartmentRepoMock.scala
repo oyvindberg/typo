@@ -25,7 +25,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     map.remove(departmentid).isDefined
   }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DepartmentFields, map)
+    DeleteBuilderMock(DeleteParams.empty, DepartmentFields.structure.fields, map)
   }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     val _ = if (map.contains(unsaved.departmentid))
@@ -53,7 +53,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
-    SelectBuilderMock(DepartmentFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(DepartmentFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
     }
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DepartmentFields, map)
+    UpdateBuilderMock(UpdateParams.empty, DepartmentFields.structure.fields, map)
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     map.put(unsaved.departmentid, unsaved): @nowarn

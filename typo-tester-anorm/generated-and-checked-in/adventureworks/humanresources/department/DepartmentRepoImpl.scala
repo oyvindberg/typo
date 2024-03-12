@@ -28,7 +28,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
     SQL"""delete from humanresources.department where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilder("humanresources.department", DepartmentFields)
+    DeleteBuilder("humanresources.department", DepartmentFields.structure)
   }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
@@ -75,7 +75,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
     streamingInsert(s"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DepartmentRowUnsaved.text, c)
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
-    SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.rowParser)
+    SelectBuilderSql("humanresources.department", DepartmentFields.structure, DepartmentRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select "departmentid", "name", "groupname", "modifieddate"::text
@@ -105,7 +105,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilder("humanresources.department", DepartmentFields, DepartmentRow.rowParser)
+    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.rowParser)
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")

@@ -27,7 +27,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     delay(map.remove(locationid).isDefined)
   }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, LocationFields, map)
+    DeleteBuilderMock(DeleteParams.empty, LocationFields.structure.fields, map)
   }
   override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     delay {
@@ -65,7 +65,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     }
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderMock(LocationFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(LocationFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     }
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, LocationFields, map)
+    UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     delay {

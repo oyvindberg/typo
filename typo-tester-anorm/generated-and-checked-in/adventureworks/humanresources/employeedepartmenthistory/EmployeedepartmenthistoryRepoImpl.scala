@@ -32,7 +32,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     SQL"""delete from humanresources.employeedepartmenthistory where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDate.toStatement)} AND "departmentid" = ${ParameterValue(compositeId.departmentid, null, DepartmentId.toStatement)} AND "shiftid" = ${ParameterValue(compositeId.shiftid, null, ShiftId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields)
+    DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     SQL"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
@@ -78,7 +78,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     streamingInsert(s"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeedepartmenthistoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    SelectBuilderSql("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.rowParser)
+    SelectBuilderSql("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     SQL"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
@@ -100,7 +100,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.rowParser)
+    UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.rowParser)
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     SQL"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")

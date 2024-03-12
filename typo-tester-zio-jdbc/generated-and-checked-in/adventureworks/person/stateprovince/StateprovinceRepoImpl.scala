@@ -33,7 +33,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""delete from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilder("person.stateprovince", StateprovinceFields)
+    DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
   }
   override def insert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, StateprovinceRow] = {
     sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
@@ -85,7 +85,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     streamingInsert(s"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text)
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
-    SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.jdbcDecoder)
+    SelectBuilderSql("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow] = {
     sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(StateprovinceRow.jdbcDecoder).selectStream
@@ -109,7 +109,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
           where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilder("person.stateprovince", StateprovinceFields, StateprovinceRow.jdbcDecoder)
+    UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
   }
   override def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]] = {
     sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")

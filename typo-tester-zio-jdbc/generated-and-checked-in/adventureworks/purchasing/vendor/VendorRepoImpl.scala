@@ -33,7 +33,7 @@ class VendorRepoImpl extends VendorRepo {
     sql"""delete from purchasing.vendor where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
-    DeleteBuilder("purchasing.vendor", VendorFields)
+    DeleteBuilder("purchasing.vendor", VendorFields.structure)
   }
   override def insert(unsaved: VendorRow): ZIO[ZConnection, Throwable, VendorRow] = {
     sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
@@ -82,7 +82,7 @@ class VendorRepoImpl extends VendorRepo {
     streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(VendorRowUnsaved.text)
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
-    SelectBuilderSql("purchasing.vendor", VendorFields, VendorRow.jdbcDecoder)
+    SelectBuilderSql("purchasing.vendor", VendorFields.structure, VendorRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VendorRow] = {
     sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor""".query(VendorRow.jdbcDecoder).selectStream
@@ -106,7 +106,7 @@ class VendorRepoImpl extends VendorRepo {
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
-    UpdateBuilder("purchasing.vendor", VendorFields, VendorRow.jdbcDecoder)
+    UpdateBuilder("purchasing.vendor", VendorFields.structure, VendorRow.jdbcDecoder)
   }
   override def upsert(unsaved: VendorRow): ZIO[ZConnection, Throwable, UpdateResult[VendorRow]] = {
     sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")

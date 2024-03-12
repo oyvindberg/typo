@@ -28,7 +28,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     sql"""delete from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilder("myschema.football_club", FootballClubFields)
+    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
   }
   override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
@@ -40,7 +40,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     new FragmentOps(sql"""COPY myschema.football_club("id", "name") FROM STDIN""").copyIn(unsaved, batchSize)(FootballClubRow.text)
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
-    SelectBuilderSql("myschema.football_club", FootballClubFields, FootballClubRow.read)
+    SelectBuilderSql("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
   }
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club""".query(FootballClubRow.read).stream
@@ -70,7 +70,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilder("myschema.football_club", FootballClubFields, FootballClubRow.read)
+    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean] = {
     NonEmptyList.fromList(fieldValues) match {

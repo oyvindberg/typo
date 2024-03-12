@@ -32,7 +32,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     sql"""delete from sales.salesorderdetail where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields)
+    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields.structure)
   }
   override def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
@@ -88,7 +88,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     new FragmentOps(sql"""COPY sales.salesorderdetail("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderdetailRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.read)
+    SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalesorderdetailRow] = {
     sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail""".query(SalesorderdetailRow.read).stream
@@ -113,7 +113,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.read)
+    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.read)
   }
   override def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")

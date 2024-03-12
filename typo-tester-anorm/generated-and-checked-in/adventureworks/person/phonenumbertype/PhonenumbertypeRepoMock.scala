@@ -25,7 +25,7 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
     map.remove(phonenumbertypeid).isDefined
   }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PhonenumbertypeFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PhonenumbertypeFields.structure.fields, map)
   }
   override def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     val _ = if (map.contains(unsaved.phonenumbertypeid))
@@ -53,7 +53,7 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
     unsaved.size.toLong
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    SelectBuilderMock(PhonenumbertypeFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(PhonenumbertypeFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
     }
   }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields.structure.fields, map)
   }
   override def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     map.put(unsaved.phonenumbertypeid, unsaved): @nowarn

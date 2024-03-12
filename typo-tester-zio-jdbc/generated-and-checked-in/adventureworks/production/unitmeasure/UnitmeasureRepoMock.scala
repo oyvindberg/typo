@@ -29,7 +29,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     ZIO.succeed(map.remove(unitmeasurecode).isDefined)
   }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields, map)
+    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields.structure.fields, map)
   }
   override def insert(unsaved: UnitmeasureRow): ZIO[ZConnection, Throwable, UnitmeasureRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    SelectBuilderMock(UnitmeasureFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(UnitmeasureFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, UnitmeasureRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     }
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields, map)
+    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure.fields, map)
   }
   override def upsert(unsaved: UnitmeasureRow): ZIO[ZConnection, Throwable, UpdateResult[UnitmeasureRow]] = {
     ZIO.succeed {

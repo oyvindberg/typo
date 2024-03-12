@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class SohViewRepoImpl extends SohViewRepo {
   override def select: SelectBuilder[SohViewFields, SohViewRow] = {
-    SelectBuilderSql("sa.soh", SohViewFields, SohViewRow.read)
+    SelectBuilderSql("sa.soh", SohViewFields.structure, SohViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SohViewRow] = {
     sql"""select "id", "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from sa.soh""".query(SohViewRow.read).stream

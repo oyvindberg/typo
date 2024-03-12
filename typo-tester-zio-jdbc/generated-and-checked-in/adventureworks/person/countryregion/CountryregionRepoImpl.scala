@@ -28,7 +28,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
     sql"""delete from person.countryregion where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilder("person.countryregion", CountryregionFields)
+    DeleteBuilder("person.countryregion", CountryregionFields.structure)
   }
   override def insert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, CountryregionRow] = {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
@@ -66,7 +66,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
     streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.jdbcDecoder)
+    SelectBuilderSql("person.countryregion", CountryregionFields.structure, CountryregionRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CountryregionRow] = {
     sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion""".query(CountryregionRow.jdbcDecoder).selectStream
@@ -85,7 +85,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
           where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilder("person.countryregion", CountryregionFields, CountryregionRow.jdbcDecoder)
+    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.jdbcDecoder)
   }
   override def upsert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregionRow]] = {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")

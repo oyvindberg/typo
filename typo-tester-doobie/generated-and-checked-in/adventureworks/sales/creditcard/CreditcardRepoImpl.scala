@@ -30,7 +30,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
     sql"""delete from sales.creditcard where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
-    DeleteBuilder("sales.creditcard", CreditcardFields)
+    DeleteBuilder("sales.creditcard", CreditcardFields.structure)
   }
   override def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
@@ -76,7 +76,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
     new FragmentOps(sql"""COPY sales.creditcard("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CreditcardRowUnsaved.text)
   }
   override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
-    SelectBuilderSql("sales.creditcard", CreditcardFields, CreditcardRow.read)
+    SelectBuilderSql("sales.creditcard", CreditcardFields.structure, CreditcardRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard""".query(CreditcardRow.read).stream
@@ -101,7 +101,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
-    UpdateBuilder("sales.creditcard", CreditcardFields, CreditcardRow.read)
+    UpdateBuilder("sales.creditcard", CreditcardFields.structure, CreditcardRow.read)
   }
   override def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")

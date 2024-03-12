@@ -27,7 +27,7 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
     delay(map.remove(jobcandidateid).isDefined)
   }
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, JobcandidateFields, map)
+    DeleteBuilderMock(DeleteParams.empty, JobcandidateFields.structure.fields, map)
   }
   override def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     delay {
@@ -65,7 +65,7 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
     }
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
-    SelectBuilderMock(JobcandidateFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(JobcandidateFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
     }
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, JobcandidateFields, map)
+    UpdateBuilderMock(UpdateParams.empty, JobcandidateFields.structure.fields, map)
   }
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     delay {

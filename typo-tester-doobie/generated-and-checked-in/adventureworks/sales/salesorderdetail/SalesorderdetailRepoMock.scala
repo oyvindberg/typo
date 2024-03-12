@@ -27,7 +27,7 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesorderdetailFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesorderdetailFields.structure.fields, map)
   }
   override def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     delay {
@@ -65,7 +65,7 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
     }
   }
   override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    SelectBuilderMock(SalesorderdetailFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(SalesorderdetailFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, SalesorderdetailRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
     }
   }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesorderdetailFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesorderdetailFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     delay {

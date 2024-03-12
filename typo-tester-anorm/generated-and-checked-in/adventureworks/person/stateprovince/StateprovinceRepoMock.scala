@@ -25,7 +25,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     map.remove(stateprovinceid).isDefined
   }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields, map)
+    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure.fields, map)
   }
   override def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     val _ = if (map.contains(unsaved.stateprovinceid))
@@ -53,7 +53,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     unsaved.size.toLong
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
-    SelectBuilderMock(StateprovinceFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(StateprovinceFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     }
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields, map)
+    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure.fields, map)
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     map.put(unsaved.stateprovinceid, unsaved): @nowarn

@@ -29,7 +29,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     ZIO.succeed(map.remove(id).isDefined)
   }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FootballClubFields, map)
+    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
   }
   override def insert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, FootballClubRow] = {
     ZIO.succeed {
@@ -51,7 +51,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
-    SelectBuilderMock(FootballClubFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(FootballClubFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, FootballClubRow] = {
     ZStream.fromIterable(map.values)
@@ -82,7 +82,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     }
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FootballClubFields, map)
+    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

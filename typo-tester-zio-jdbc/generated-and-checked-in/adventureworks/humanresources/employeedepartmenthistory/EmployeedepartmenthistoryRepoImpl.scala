@@ -32,7 +32,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""delete from humanresources.employeedepartmenthistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDate.setter)} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(DepartmentId.setter)} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields)
+    DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, EmployeedepartmenthistoryRow] = {
     sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
@@ -73,7 +73,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     streamingInsert(s"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeedepartmenthistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    SelectBuilderSql("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.jdbcDecoder)
+    SelectBuilderSql("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow] = {
     sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory""".query(EmployeedepartmenthistoryRow.jdbcDecoder).selectStream
@@ -89,7 +89,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
           where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDate.setter)} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(DepartmentId.setter)} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(ShiftId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.jdbcDecoder)
+    UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.jdbcDecoder)
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeedepartmenthistoryRow]] = {
     sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")

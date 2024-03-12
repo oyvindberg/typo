@@ -25,7 +25,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     map.remove(countryregioncode).isDefined
   }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CountryregionFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CountryregionFields.structure.fields, map)
   }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     val _ = if (map.contains(unsaved.countryregioncode))
@@ -53,7 +53,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     unsaved.size.toLong
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderMock(CountryregionFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(CountryregionFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     }
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CountryregionFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure.fields, map)
   }
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     map.put(unsaved.countryregioncode, unsaved): @nowarn

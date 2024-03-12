@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class VsalespersonsalesbyfiscalyearsViewRepoImpl extends VsalespersonsalesbyfiscalyearsViewRepo {
   override def select: SelectBuilder[VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow] = {
-    SelectBuilderSql("sales.vsalespersonsalesbyfiscalyears", VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow.read)
+    SelectBuilderSql("sales.vsalespersonsalesbyfiscalyears", VsalespersonsalesbyfiscalyearsViewFields.structure, VsalespersonsalesbyfiscalyearsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VsalespersonsalesbyfiscalyearsViewRow] = {
     sql"""select "SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014" from sales.vsalespersonsalesbyfiscalyears""".query(VsalespersonsalesbyfiscalyearsViewRow.read).stream

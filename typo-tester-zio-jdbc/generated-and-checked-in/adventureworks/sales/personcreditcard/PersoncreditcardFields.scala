@@ -11,12 +11,34 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait PersoncreditcardFields[Row] {
   val businessentityid: IdField[BusinessentityId, Row]
   val creditcardid: IdField[/* user-picked */ CustomCreditcardId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object PersoncreditcardFields extends PersoncreditcardStructure[PersoncreditcardRow](None, identity, (_, x) => x)
 
+object PersoncreditcardFields {
+  val structure: Relation[PersoncreditcardFields, PersoncreditcardRow, PersoncreditcardRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => PersoncreditcardRow, val merge: (Row, PersoncreditcardRow) => Row)
+    extends Relation[PersoncreditcardFields, PersoncreditcardRow, Row] { 
+  
+    override val fields: PersoncreditcardFields[Row] = new PersoncreditcardFields[Row] {
+      override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+      override val creditcardid = new IdField[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, Some("int4"))(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.creditcardid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => PersoncreditcardRow, merge: (NewRow, PersoncreditcardRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

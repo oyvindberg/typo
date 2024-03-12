@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class PchViewRepoImpl extends PchViewRepo {
   override def select: SelectBuilder[PchViewFields, PchViewRow] = {
-    SelectBuilderSql("pr.pch", PchViewFields, PchViewRow.rowParser)
+    SelectBuilderSql("pr.pch", PchViewFields.structure, PchViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PchViewRow] = {
     SQL"""select "id", "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text

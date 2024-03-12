@@ -29,7 +29,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     ZIO.succeed(map.remove(illustrationid).isDefined)
   }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IllustrationFields, map)
+    DeleteBuilderMock(DeleteParams.empty, IllustrationFields.structure.fields, map)
   }
   override def insert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, IllustrationRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
-    SelectBuilderMock(IllustrationFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(IllustrationFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, IllustrationRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
     }
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IllustrationFields, map)
+    UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure.fields, map)
   }
   override def upsert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, UpdateResult[IllustrationRow]] = {
     ZIO.succeed {

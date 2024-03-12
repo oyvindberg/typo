@@ -25,7 +25,7 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
     map.remove(compositeId).isDefined
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields.structure.fields, map)
   }
   override def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -53,7 +53,7 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
     unsaved.size.toLong
   }
   override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    SelectBuilderMock(PersoncreditcardFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(PersoncreditcardFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
     map.values.toList
@@ -71,7 +71,7 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
     }
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields.structure.fields, map)
   }
   override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

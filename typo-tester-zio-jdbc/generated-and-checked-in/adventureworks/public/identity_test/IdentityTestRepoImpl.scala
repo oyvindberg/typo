@@ -27,7 +27,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     sql"""delete from public.identity-test where "name" = ${Segment.paramSegment(name)(IdentityTestId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilder("public.identity-test", IdentityTestFields)
+    DeleteBuilder("public.identity-test", IdentityTestFields.structure)
   }
   override def insert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, IdentityTestRow] = {
     sql"""insert into public.identity-test("always_generated", "default_generated", "name")
@@ -64,7 +64,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     streamingInsert(s"""COPY public.identity-test("name", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IdentityTestRowUnsaved.text)
   }
   override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
-    SelectBuilderSql("public.identity-test", IdentityTestFields, IdentityTestRow.jdbcDecoder)
+    SelectBuilderSql("public.identity-test", IdentityTestFields.structure, IdentityTestRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, IdentityTestRow] = {
     sql"""select "always_generated", "default_generated", "name" from public.identity-test""".query(IdentityTestRow.jdbcDecoder).selectStream
@@ -83,7 +83,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
           where "name" = ${Segment.paramSegment(name)(IdentityTestId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilder("public.identity-test", IdentityTestFields, IdentityTestRow.jdbcDecoder)
+    UpdateBuilder("public.identity-test", IdentityTestFields.structure, IdentityTestRow.jdbcDecoder)
   }
   override def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]] = {
     sql"""insert into public.identity-test("always_generated", "default_generated", "name")

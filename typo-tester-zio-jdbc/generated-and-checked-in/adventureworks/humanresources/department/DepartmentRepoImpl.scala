@@ -28,7 +28,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
     sql"""delete from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilder("humanresources.department", DepartmentFields)
+    DeleteBuilder("humanresources.department", DepartmentFields.structure)
   }
   override def insert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, DepartmentRow] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
@@ -70,7 +70,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
     streamingInsert(s"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DepartmentRowUnsaved.text)
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
-    SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.jdbcDecoder)
+    SelectBuilderSql("humanresources.department", DepartmentFields.structure, DepartmentRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, DepartmentRow] = {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department""".query(DepartmentRow.jdbcDecoder).selectStream
@@ -90,7 +90,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
           where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilder("humanresources.department", DepartmentFields, DepartmentRow.jdbcDecoder)
+    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.jdbcDecoder)
   }
   override def upsert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, UpdateResult[DepartmentRow]] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")

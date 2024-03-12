@@ -27,7 +27,7 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields.structure.fields, map)
   }
   override def insert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     delay {
@@ -65,7 +65,7 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
     }
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    SelectBuilderMock(ProductmodelillustrationFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(ProductmodelillustrationFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
     }
   }
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductmodelillustrationFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductmodelillustrationFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     delay {

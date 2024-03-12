@@ -28,7 +28,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
     SQL"""delete from person.countryregion where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilder("person.countryregion", CountryregionFields)
+    DeleteBuilder("person.countryregion", CountryregionFields.structure)
   }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
@@ -71,7 +71,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
     streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.rowParser)
+    SelectBuilderSql("person.countryregion", CountryregionFields.structure, CountryregionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
     SQL"""select "countryregioncode", "name", "modifieddate"::text
@@ -100,7 +100,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilder("person.countryregion", CountryregionFields, CountryregionRow.rowParser)
+    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.rowParser)
   }
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion("countryregioncode", "name", "modifieddate")

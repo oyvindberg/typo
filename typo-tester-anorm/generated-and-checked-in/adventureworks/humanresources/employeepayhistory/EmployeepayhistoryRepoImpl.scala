@@ -30,7 +30,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     SQL"""delete from humanresources.employeepayhistory where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields)
+    DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure)
   }
   override def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
     SQL"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
@@ -75,7 +75,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     streamingInsert(s"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeepayhistoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    SelectBuilderSql("humanresources.employeepayhistory", EmployeepayhistoryFields, EmployeepayhistoryRow.rowParser)
+    SelectBuilderSql("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
     SQL"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
@@ -98,7 +98,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields, EmployeepayhistoryRow.rowParser)
+    UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.rowParser)
   }
   override def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
     SQL"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")

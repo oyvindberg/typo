@@ -25,7 +25,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     map.remove(territoryid).isDefined
   }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure.fields, map)
   }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     val _ = if (map.contains(unsaved.territoryid))
@@ -53,7 +53,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     unsaved.size.toLong
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    SelectBuilderMock(SalesterritoryFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(SalesterritoryFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     }
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     map.put(unsaved.territoryid, unsaved): @nowarn

@@ -30,7 +30,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     SQL"""delete from person.businessentitycontact where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "personid" = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND "contacttypeid" = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    DeleteBuilder("person.businessentitycontact", BusinessentitycontactFields)
+    DeleteBuilder("person.businessentitycontact", BusinessentitycontactFields.structure)
   }
   override def insert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
     SQL"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")
@@ -78,7 +78,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     streamingInsert(s"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentitycontactRowUnsaved.text, c)
   }
   override def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    SelectBuilderSql("person.businessentitycontact", BusinessentitycontactFields, BusinessentitycontactRow.rowParser)
+    SelectBuilderSql("person.businessentitycontact", BusinessentitycontactFields.structure, BusinessentitycontactRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[BusinessentitycontactRow] = {
     SQL"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
@@ -100,7 +100,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    UpdateBuilder("person.businessentitycontact", BusinessentitycontactFields, BusinessentitycontactRow.rowParser)
+    UpdateBuilder("person.businessentitycontact", BusinessentitycontactFields.structure, BusinessentitycontactRow.rowParser)
   }
   override def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
     SQL"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")

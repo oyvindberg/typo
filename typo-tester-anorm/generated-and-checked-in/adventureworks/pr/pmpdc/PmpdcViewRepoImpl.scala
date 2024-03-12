@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class PmpdcViewRepoImpl extends PmpdcViewRepo {
   override def select: SelectBuilder[PmpdcViewFields, PmpdcViewRow] = {
-    SelectBuilderSql("pr.pmpdc", PmpdcViewFields, PmpdcViewRow.rowParser)
+    SelectBuilderSql("pr.pmpdc", PmpdcViewFields.structure, PmpdcViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PmpdcViewRow] = {
     SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text

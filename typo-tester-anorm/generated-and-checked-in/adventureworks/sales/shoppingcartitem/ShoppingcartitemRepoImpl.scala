@@ -29,7 +29,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     SQL"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields)
+    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
   }
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     SQL"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
@@ -84,7 +84,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShoppingcartitemRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.rowParser)
+    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
     SQL"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
@@ -116,7 +116,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.rowParser)
+    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.rowParser)
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     SQL"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")

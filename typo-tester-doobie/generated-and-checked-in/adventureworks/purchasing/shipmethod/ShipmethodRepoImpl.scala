@@ -29,7 +29,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""delete from purchasing.shipmethod where "shipmethodid" = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilder("purchasing.shipmethod", ShipmethodFields)
+    DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
@@ -84,7 +84,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     new FragmentOps(sql"""COPY purchasing.shipmethod("name", "shipmethodid", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ShipmethodRowUnsaved.text)
   }
   override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
-    SelectBuilderSql("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.read)
+    SelectBuilderSql("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
     sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod""".query(ShipmethodRow.read).stream
@@ -109,7 +109,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilder("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.read)
+    UpdateBuilder("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.read)
   }
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")

@@ -11,7 +11,9 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait AddresstypeFields[Row] {
   val addresstypeid: IdField[AddresstypeId, Row]
@@ -19,5 +21,26 @@ trait AddresstypeFields[Row] {
   val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object AddresstypeFields extends AddresstypeStructure[AddresstypeRow](None, identity, (_, x) => x)
 
+object AddresstypeFields {
+  val structure: Relation[AddresstypeFields, AddresstypeRow, AddresstypeRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => AddresstypeRow, val merge: (Row, AddresstypeRow) => Row)
+    extends Relation[AddresstypeFields, AddresstypeRow, Row] { 
+  
+    override val fields: AddresstypeFields[Row] = new AddresstypeFields[Row] {
+      override val addresstypeid = new IdField[AddresstypeId, Row](prefix, "addresstypeid", None, Some("int4"))(x => extract(x).addresstypeid, (row, value) => merge(row, extract(row).copy(addresstypeid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.addresstypeid, fields.name, fields.rowguid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => AddresstypeRow, merge: (NewRow, AddresstypeRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

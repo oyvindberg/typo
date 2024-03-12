@@ -29,7 +29,7 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
     ZIO.succeed(map.remove(currencycode).isDefined)
   }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CurrencyFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
   }
   override def insert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, CurrencyRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
-    SelectBuilderMock(CurrencyFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(CurrencyFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CurrencyRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
     }
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CurrencyFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure.fields, map)
   }
   override def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]] = {
     ZIO.succeed {

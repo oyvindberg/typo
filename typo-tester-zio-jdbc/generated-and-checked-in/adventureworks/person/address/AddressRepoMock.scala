@@ -29,7 +29,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     ZIO.succeed(map.remove(addressid).isDefined)
   }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, AddressFields, map)
+    DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
   }
   override def insert(unsaved: AddressRow): ZIO[ZConnection, Throwable, AddressRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
-    SelectBuilderMock(AddressFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(AddressFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, AddressRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     }
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, AddressFields, map)
+    UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
   }
   override def upsert(unsaved: AddressRow): ZIO[ZConnection, Throwable, UpdateResult[AddressRow]] = {
     ZIO.succeed {

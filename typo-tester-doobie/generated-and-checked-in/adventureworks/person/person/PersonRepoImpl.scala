@@ -33,7 +33,7 @@ class PersonRepoImpl extends PersonRepo {
     sql"""delete from person.person where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("person.person", PersonFields)
+    DeleteBuilder("person.person", PersonFields.structure)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
@@ -92,7 +92,7 @@ class PersonRepoImpl extends PersonRepo {
     new FragmentOps(sql"""COPY person.person("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("person.person", PersonFields, PersonRow.read)
+    SelectBuilderSql("person.person", PersonFields.structure, PersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person""".query(PersonRow.read).stream
@@ -124,7 +124,7 @@ class PersonRepoImpl extends PersonRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("person.person", PersonFields, PersonRow.read)
+    UpdateBuilder("person.person", PersonFields.structure, PersonRow.read)
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")

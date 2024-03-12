@@ -12,7 +12,9 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait PersonphoneFields[Row] {
   val businessentityid: IdField[BusinessentityId, Row]
@@ -20,5 +22,26 @@ trait PersonphoneFields[Row] {
   val phonenumbertypeid: IdField[PhonenumbertypeId, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object PersonphoneFields extends PersonphoneStructure[PersonphoneRow](None, identity, (_, x) => x)
 
+object PersonphoneFields {
+  val structure: Relation[PersonphoneFields, PersonphoneRow, PersonphoneRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => PersonphoneRow, val merge: (Row, PersonphoneRow) => Row)
+    extends Relation[PersonphoneFields, PersonphoneRow, Row] { 
+  
+    override val fields: PersonphoneFields[Row] = new PersonphoneFields[Row] {
+      override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+      override val phonenumber = new IdField[Phone, Row](prefix, "phonenumber", None, Some("varchar"))(x => extract(x).phonenumber, (row, value) => merge(row, extract(row).copy(phonenumber = value)))
+      override val phonenumbertypeid = new IdField[PhonenumbertypeId, Row](prefix, "phonenumbertypeid", None, Some("int4"))(x => extract(x).phonenumbertypeid, (row, value) => merge(row, extract(row).copy(phonenumbertypeid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.phonenumber, fields.phonenumbertypeid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => PersonphoneRow, merge: (NewRow, PersonphoneRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

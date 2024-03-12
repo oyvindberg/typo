@@ -28,7 +28,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""delete from sales.salesreason where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(SalesreasonId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
-    DeleteBuilder("sales.salesreason", SalesreasonFields)
+    DeleteBuilder("sales.salesreason", SalesreasonFields.structure)
   }
   override def insert(unsaved: SalesreasonRow): ZIO[ZConnection, Throwable, SalesreasonRow] = {
     sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
@@ -70,7 +70,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     streamingInsert(s"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
-    SelectBuilderSql("sales.salesreason", SalesreasonFields, SalesreasonRow.jdbcDecoder)
+    SelectBuilderSql("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesreasonRow] = {
     sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason""".query(SalesreasonRow.jdbcDecoder).selectStream
@@ -90,7 +90,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
           where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(SalesreasonId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
-    UpdateBuilder("sales.salesreason", SalesreasonFields, SalesreasonRow.jdbcDecoder)
+    UpdateBuilder("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.jdbcDecoder)
   }
   override def upsert(unsaved: SalesreasonRow): ZIO[ZConnection, Throwable, UpdateResult[SalesreasonRow]] = {
     sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")

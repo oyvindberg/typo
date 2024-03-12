@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class CrcViewRepoImpl extends CrcViewRepo {
   override def select: SelectBuilder[CrcViewFields, CrcViewRow] = {
-    SelectBuilderSql("sa.crc", CrcViewFields, CrcViewRow.jdbcDecoder)
+    SelectBuilderSql("sa.crc", CrcViewFields.structure, CrcViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CrcViewRow] = {
     sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sa.crc""".query(CrcViewRow.jdbcDecoder).selectStream

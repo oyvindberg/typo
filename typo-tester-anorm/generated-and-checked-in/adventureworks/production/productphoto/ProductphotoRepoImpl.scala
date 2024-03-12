@@ -30,7 +30,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     SQL"""delete from production.productphoto where "productphotoid" = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
-    DeleteBuilder("production.productphoto", ProductphotoFields)
+    DeleteBuilder("production.productphoto", ProductphotoFields.structure)
   }
   override def insert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
@@ -79,7 +79,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     streamingInsert(s"""COPY production.productphoto("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductphotoRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductphotoFields, ProductphotoRow] = {
-    SelectBuilderSql("production.productphoto", ProductphotoFields, ProductphotoRow.rowParser)
+    SelectBuilderSql("production.productphoto", ProductphotoFields.structure, ProductphotoRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
@@ -111,7 +111,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
-    UpdateBuilder("production.productphoto", ProductphotoFields, ProductphotoRow.rowParser)
+    UpdateBuilder("production.productphoto", ProductphotoFields.structure, ProductphotoRow.rowParser)
   }
   override def upsert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")

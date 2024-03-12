@@ -28,7 +28,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
     sql"""delete from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilder("sales.currency", CurrencyFields)
+    DeleteBuilder("sales.currency", CurrencyFields.structure)
   }
   override def insert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, CurrencyRow] = {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")
@@ -66,7 +66,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
     streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
-    SelectBuilderSql("sales.currency", CurrencyFields, CurrencyRow.jdbcDecoder)
+    SelectBuilderSql("sales.currency", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CurrencyRow] = {
     sql"""select "currencycode", "name", "modifieddate"::text from sales.currency""".query(CurrencyRow.jdbcDecoder).selectStream
@@ -85,7 +85,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
           where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilder("sales.currency", CurrencyFields, CurrencyRow.jdbcDecoder)
+    UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
   }
   override def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]] = {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")

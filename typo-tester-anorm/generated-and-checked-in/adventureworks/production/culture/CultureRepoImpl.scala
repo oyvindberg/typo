@@ -28,7 +28,7 @@ class CultureRepoImpl extends CultureRepo {
     SQL"""delete from production.culture where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilder("production.culture", CultureFields)
+    DeleteBuilder("production.culture", CultureFields.structure)
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture("cultureid", "name", "modifieddate")
@@ -71,7 +71,7 @@ class CultureRepoImpl extends CultureRepo {
     streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CultureRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
-    SelectBuilderSql("production.culture", CultureFields, CultureRow.rowParser)
+    SelectBuilderSql("production.culture", CultureFields.structure, CultureRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
     SQL"""select "cultureid", "name", "modifieddate"::text
@@ -100,7 +100,7 @@ class CultureRepoImpl extends CultureRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilder("production.culture", CultureFields, CultureRow.rowParser)
+    UpdateBuilder("production.culture", CultureFields.structure, CultureRow.rowParser)
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture("cultureid", "name", "modifieddate")

@@ -27,7 +27,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     delay(map.remove(countryregioncode).isDefined)
   }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CountryregionFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CountryregionFields.structure.fields, map)
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     delay {
@@ -65,7 +65,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     }
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderMock(CountryregionFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(CountryregionFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
     }
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CountryregionFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure.fields, map)
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     delay {

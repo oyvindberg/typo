@@ -30,7 +30,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     SQL"""delete from humanresources.jobcandidate where "jobcandidateid" = ${ParameterValue(jobcandidateid, null, JobcandidateId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields)
+    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
   }
   override def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
@@ -77,7 +77,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     streamingInsert(s"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(JobcandidateRowUnsaved.text, c)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
-    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.rowParser)
+    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
     SQL"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
@@ -107,7 +107,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.rowParser)
+    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.rowParser)
   }
   override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")

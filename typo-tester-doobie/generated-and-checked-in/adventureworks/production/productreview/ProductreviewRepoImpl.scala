@@ -29,7 +29,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     sql"""delete from production.productreview where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilder("production.productreview", ProductreviewFields)
+    DeleteBuilder("production.productreview", ProductreviewFields.structure)
   }
   override def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
@@ -80,7 +80,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     new FragmentOps(sql"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductreviewRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
-    SelectBuilderSql("production.productreview", ProductreviewFields, ProductreviewRow.read)
+    SelectBuilderSql("production.productreview", ProductreviewFields.structure, ProductreviewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
     sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview""".query(ProductreviewRow.read).stream
@@ -107,7 +107,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilder("production.productreview", ProductreviewFields, ProductreviewRow.read)
+    UpdateBuilder("production.productreview", ProductreviewFields.structure, ProductreviewRow.read)
   }
   override def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")

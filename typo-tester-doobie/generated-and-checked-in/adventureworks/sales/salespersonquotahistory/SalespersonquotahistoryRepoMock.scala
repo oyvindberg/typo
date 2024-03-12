@@ -27,7 +27,7 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalespersonquotahistoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalespersonquotahistoryFields.structure.fields, map)
   }
   override def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     delay {
@@ -65,7 +65,7 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     }
   }
   override def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    SelectBuilderMock(SalespersonquotahistoryFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(SalespersonquotahistoryFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
     }
   }
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalespersonquotahistoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalespersonquotahistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     delay {

@@ -9,11 +9,32 @@ package myschema
 package football_club
 
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait FootballClubFields[Row] {
   val id: IdField[FootballClubId, Row]
   val name: Field[/* max 100 chars */ String, Row]
 }
-object FootballClubFields extends FootballClubStructure[FootballClubRow](None, identity, (_, x) => x)
 
+object FootballClubFields {
+  val structure: Relation[FootballClubFields, FootballClubRow, FootballClubRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => FootballClubRow, val merge: (Row, FootballClubRow) => Row)
+    extends Relation[FootballClubFields, FootballClubRow, Row] { 
+  
+    override val fields: FootballClubFields[Row] = new FootballClubFields[Row] {
+      override val id = new IdField[FootballClubId, Row](prefix, "id", None, Some("int8"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val name = new Field[/* max 100 chars */ String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.name)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => FootballClubRow, merge: (NewRow, FootballClubRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

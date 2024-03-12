@@ -3,6 +3,7 @@ package internal
 package codegen
 
 import play.api.libs.json.Json
+import typo.sc.Type
 
 case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions) {
   def RowFile(rowType: DbLib.RowType): Option[sc.File] = maybeCols.map { cols =>
@@ -78,11 +79,11 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
 
   val FieldsFile: Option[sc.File] =
     for {
-      structureName <- names.StructureName
       fieldsName <- names.FieldsName
       cols <- maybeCols
     } yield {
       val Row = sc.Type.Abstract(sc.Ident("Row"))
+
       val members =
         cols
           .map { col =>
@@ -97,69 +98,69 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
           }
           .mkCode("\n")
 
+      val ImplName = sc.Ident("Impl")
       val str =
         code"""trait ${fieldsName.name}[$Row] {
             |  $members
             |}
-            |object ${fieldsName.name} extends ${structureName.of(names.RowName)}(None, identity, (_, x) => x)
             |
+            |object ${fieldsName.name} {
+            |  val structure: ${sc.Type.dsl.StructureRelation}[$fieldsName, ${names.RowName}, ${names.RowName}] = 
+            |    new $ImplName(None, identity, (_, x) => x)
+            |    
+            |  ${structureFile(ImplName, fieldsName, cols)}
+            |}
             |""".stripMargin
 
       sc.File(fieldsName, str, Nil)
     }
 
-  val StructureFile: Option[sc.File] =
-    for {
-      structureName <- names.StructureName
-      fieldsName <- names.FieldsName
-      cols <- maybeCols
-    } yield {
-      val Row = sc.Type.Abstract(sc.Ident("Row"))
-      val NewRow = sc.Type.Abstract(sc.Ident("NewRow"))
-      val members =
-        cols
-          .map { col =>
-            val (cls, tpe) =
-              if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
-              else
-                col.tpe match {
-                  case TypesScala.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
-                  case _                               => (sc.Type.dsl.Field, col.tpe)
-                }
+  def structureFile(implName: sc.Ident, fieldsName: Type.Qualified, cols: NonEmptyList[ComputedColumn]) = {
+    val Row = sc.Type.Abstract(sc.Ident("Row"))
+    val NewRow = sc.Type.Abstract(sc.Ident("NewRow"))
 
-            val readSqlCast = SqlCast.fromPg(col.dbCol) match {
-              case Some(sqlCast) => code"${TypesScala.Some}(${sc.StrLit(sqlCast.typeName)})"
-              case None          => TypesScala.None.code
-            }
-            val writeSqlCast = SqlCast.toPg(col.dbCol) match {
-              case Some(sqlCast) => code"${TypesScala.Some}(${sc.StrLit(sqlCast.typeName)})"
-              case None          => TypesScala.None.code
-            }
-            code"override val ${col.name} = new ${cls.of(tpe, Row)}(prefix, ${sc
-                .StrLit(col.dbName.value)}, $readSqlCast, $writeSqlCast)(x => extract(x).${col.name}, (row, value) => merge(row, extract(row).copy(${col.name} = value)))"
+    val members =
+      cols
+        .map { col =>
+          val (cls, tpe) =
+            if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
+            else
+              col.tpe match {
+                case TypesScala.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
+                case _                               => (sc.Type.dsl.Field, col.tpe)
+              }
+
+          val readSqlCast = SqlCast.fromPg(col.dbCol) match {
+            case Some(sqlCast) => code"${TypesScala.Some}(${sc.StrLit(sqlCast.typeName)})"
+            case None          => TypesScala.None.code
           }
-          .mkCode("\n")
+          val writeSqlCast = SqlCast.toPg(col.dbCol) match {
+            case Some(sqlCast) => code"${TypesScala.Some}(${sc.StrLit(sqlCast.typeName)})"
+            case None          => TypesScala.None.code
+          }
+          code"override val ${col.name} = new ${cls.of(tpe, Row)}(prefix, ${sc
+              .StrLit(col.dbName.value)}, $readSqlCast, $writeSqlCast)(x => extract(x).${col.name}, (row, value) => merge(row, extract(row).copy(${col.name} = value)))"
+        }
+        .mkCode("\n")
 
-      val optString = TypesScala.Option.of(TypesJava.String)
-      val generalizedColumn = sc.Type.dsl.FieldLikeNoHkt.of(sc.Type.Wildcard, Row)
-      val columnsList = TypesScala.List.of(generalizedColumn)
-      val str =
-        code"""class ${structureName.name}[$Row](val prefix: $optString, val extract: $Row => ${names.RowName}, val merge: ($Row, ${names.RowName}) => $Row)
-            |  extends ${sc.Type.dsl.StructureRelation.of(fieldsName, names.RowName, Row)}
-            |    with ${fieldsName.of(Row)} { outer =>
-            |
-            |  $members
-            |
-            |  override val columns: $columnsList =
-            |    $columnsList(${cols.map(x => x.name.code).mkCode(", ")})
-            |
-            |  override def copy[$NewRow](prefix: $optString, extract: $NewRow => ${names.RowName}, merge: ($NewRow, ${names.RowName}) => $NewRow): ${structureName.of(NewRow)} =
-            |    new ${structureName.name}(prefix, extract, merge)
-            |}
-              |""".stripMargin
-
-      sc.File(structureName, str, Nil)
-    }
+    val optString = TypesScala.Option.of(TypesJava.String)
+    val generalizedColumn = sc.Type.dsl.FieldLikeNoHkt.of(sc.Type.Wildcard, Row)
+    val columnsList = TypesScala.List.of(generalizedColumn)
+    code"""private final class $implName[$Row](val prefix: $optString, val extract: $Row => ${names.RowName}, val merge: ($Row, ${names.RowName}) => $Row)
+          |  extends ${sc.Type.dsl.StructureRelation.of(fieldsName, names.RowName, Row)} { 
+          |
+          |  override val fields: ${fieldsName.name}[$Row] = new ${fieldsName.name}[$Row] {
+          |    $members
+          |  }
+          |
+          |  override val columns: $columnsList =
+          |    $columnsList(${cols.map(x => code"fields.${x.name}").mkCode(", ")})
+          |
+          |  override def copy[$NewRow](prefix: $optString, extract: $NewRow => ${names.RowName}, merge: ($NewRow, ${names.RowName}) => $NewRow): $implName[$NewRow] =
+          |    new $implName(prefix, extract, merge)
+          |}
+          |""".stripMargin
+  }
 
   def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val renderedMethods = repoMethods.map { repoMethod =>

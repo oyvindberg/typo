@@ -12,7 +12,9 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait VemployeedepartmenthistoryViewFields[Row] {
   val businessentityid: Field[BusinessentityId, Row]
@@ -27,5 +29,33 @@ trait VemployeedepartmenthistoryViewFields[Row] {
   val startdate: Field[TypoLocalDate, Row]
   val enddate: OptField[TypoLocalDate, Row]
 }
-object VemployeedepartmenthistoryViewFields extends VemployeedepartmenthistoryViewStructure[VemployeedepartmenthistoryViewRow](None, identity, (_, x) => x)
 
+object VemployeedepartmenthistoryViewFields {
+  val structure: Relation[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow, VemployeedepartmenthistoryViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => VemployeedepartmenthistoryViewRow, val merge: (Row, VemployeedepartmenthistoryViewRow) => Row)
+    extends Relation[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow, Row] { 
+  
+    override val fields: VemployeedepartmenthistoryViewFields[Row] = new VemployeedepartmenthistoryViewFields[Row] {
+      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
+      override val title = new OptField[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
+      override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, None)(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
+      override val middlename = new OptField[Name, Row](prefix, "middlename", None, None)(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
+      override val lastname = new Field[Name, Row](prefix, "lastname", None, None)(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
+      override val suffix = new OptField[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
+      override val shift = new Field[Name, Row](prefix, "shift", None, None)(x => extract(x).shift, (row, value) => merge(row, extract(row).copy(shift = value)))
+      override val department = new Field[Name, Row](prefix, "department", None, None)(x => extract(x).department, (row, value) => merge(row, extract(row).copy(department = value)))
+      override val groupname = new Field[Name, Row](prefix, "groupname", None, None)(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
+      override val startdate = new Field[TypoLocalDate, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
+      override val enddate = new OptField[TypoLocalDate, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.shift, fields.department, fields.groupname, fields.startdate, fields.enddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => VemployeedepartmenthistoryViewRow, merge: (NewRow, VemployeedepartmenthistoryViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

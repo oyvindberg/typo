@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def select: SelectBuilder[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow] = {
-    SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow.read)
+    SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields.structure, VproductmodelinstructionsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VproductmodelinstructionsViewRow] = {
     sql"""select "productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate"::text from production.vproductmodelinstructions""".query(VproductmodelinstructionsViewRow.read).stream

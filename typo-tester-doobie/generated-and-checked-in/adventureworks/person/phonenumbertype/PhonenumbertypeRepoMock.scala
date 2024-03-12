@@ -27,7 +27,7 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
     delay(map.remove(phonenumbertypeid).isDefined)
   }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PhonenumbertypeFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PhonenumbertypeFields.structure.fields, map)
   }
   override def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     delay {
@@ -65,7 +65,7 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
     }
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    SelectBuilderMock(PhonenumbertypeFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(PhonenumbertypeFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PhonenumbertypeRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
     }
   }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields.structure.fields, map)
   }
   override def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     delay {

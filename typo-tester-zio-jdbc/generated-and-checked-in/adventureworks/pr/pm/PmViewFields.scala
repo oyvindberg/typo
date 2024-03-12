@@ -13,7 +13,9 @@ import adventureworks.customtypes.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait PmViewFields[Row] {
   val id: Field[ProductmodelId, Row]
@@ -24,5 +26,29 @@ trait PmViewFields[Row] {
   val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object PmViewFields extends PmViewStructure[PmViewRow](None, identity, (_, x) => x)
 
+object PmViewFields {
+  val structure: Relation[PmViewFields, PmViewRow, PmViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => PmViewRow, val merge: (Row, PmViewRow) => Row)
+    extends Relation[PmViewFields, PmViewRow, Row] { 
+  
+    override val fields: PmViewFields[Row] = new PmViewFields[Row] {
+      override val id = new Field[ProductmodelId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, None)(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val catalogdescription = new OptField[TypoXml, Row](prefix, "catalogdescription", None, None)(x => extract(x).catalogdescription, (row, value) => merge(row, extract(row).copy(catalogdescription = value)))
+      override val instructions = new OptField[TypoXml, Row](prefix, "instructions", None, None)(x => extract(x).instructions, (row, value) => merge(row, extract(row).copy(instructions = value)))
+      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.productmodelid, fields.name, fields.catalogdescription, fields.instructions, fields.rowguid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => PmViewRow, merge: (NewRow, PmViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

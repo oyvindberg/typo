@@ -29,7 +29,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"""delete from production.transactionhistory where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilder("production.transactionhistory", TransactionhistoryFields)
+    DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
   }
   override def insert(unsaved: TransactionhistoryRow): ZIO[ZConnection, Throwable, TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
@@ -82,7 +82,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     streamingInsert(s"""COPY production.transactionhistory("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(TransactionhistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    SelectBuilderSql("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.jdbcDecoder)
+    SelectBuilderSql("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, TransactionhistoryRow] = {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(TransactionhistoryRow.jdbcDecoder).selectStream
@@ -107,7 +107,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilder("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.jdbcDecoder)
+    UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.jdbcDecoder)
   }
   override def upsert(unsaved: TransactionhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryRow]] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")

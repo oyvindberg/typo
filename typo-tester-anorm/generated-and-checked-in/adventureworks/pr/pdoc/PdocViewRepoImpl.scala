@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class PdocViewRepoImpl extends PdocViewRepo {
   override def select: SelectBuilder[PdocViewFields, PdocViewRow] = {
-    SelectBuilderSql("pr.pdoc", PdocViewFields, PdocViewRow.rowParser)
+    SelectBuilderSql("pr.pdoc", PdocViewFields.structure, PdocViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PdocViewRow] = {
     SQL"""select "id", "productid", "modifieddate"::text, "documentnode"

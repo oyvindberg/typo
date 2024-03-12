@@ -34,7 +34,7 @@ class DocumentRepoImpl extends DocumentRepo {
     SQL"""delete from production.document where "documentnode" = ${ParameterValue(documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilder("production.document", DocumentFields)
+    DeleteBuilder("production.document", DocumentFields.structure)
   }
   override def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     SQL"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
@@ -99,7 +99,7 @@ class DocumentRepoImpl extends DocumentRepo {
     streamingInsert(s"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DocumentRowUnsaved.text, c)
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
-    SelectBuilderSql("production.document", DocumentFields, DocumentRow.rowParser)
+    SelectBuilderSql("production.document", DocumentFields.structure, DocumentRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
     SQL"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
@@ -145,7 +145,7 @@ class DocumentRepoImpl extends DocumentRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilder("production.document", DocumentFields, DocumentRow.rowParser)
+    UpdateBuilder("production.document", DocumentFields.structure, DocumentRow.rowParser)
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     SQL"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")

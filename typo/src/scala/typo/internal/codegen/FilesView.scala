@@ -9,7 +9,6 @@ case class FilesView(view: ComputedView, options: InternalOptions) {
   val all: List[sc.File] = List(
     relation.RowFile(RowType.Readable),
     relation.FieldsFile,
-    relation.StructureFile,
     for {
       dbLib <- options.dbLib
     } yield relation.RepoTraitFile(dbLib, view.repoMethods),

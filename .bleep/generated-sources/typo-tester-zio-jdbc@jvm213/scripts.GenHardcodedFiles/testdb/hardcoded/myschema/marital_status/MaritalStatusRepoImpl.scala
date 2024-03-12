@@ -26,7 +26,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     sql"""delete from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilder("myschema.marital_status", MaritalStatusFields)
+    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
   }
   override def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")
@@ -38,7 +38,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     streamingInsert(s"""COPY myschema.marital_status("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    SelectBuilderSql("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.jdbcDecoder)
+    SelectBuilderSql("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status""".query(MaritalStatusRow.jdbcDecoder).selectStream
@@ -62,7 +62,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilder("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.jdbcDecoder)
+    UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.jdbcDecoder)
   }
   override def upsert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, UpdateResult[MaritalStatusRow]] = {
     sql"""insert into myschema.marital_status("id")

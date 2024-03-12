@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class CrViewRepoImpl extends CrViewRepo {
   override def select: SelectBuilder[CrViewFields, CrViewRow] = {
-    SelectBuilderSql("sa.cr", CrViewFields, CrViewRow.rowParser)
+    SelectBuilderSql("sa.cr", CrViewFields.structure, CrViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CrViewRow] = {
     SQL"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text

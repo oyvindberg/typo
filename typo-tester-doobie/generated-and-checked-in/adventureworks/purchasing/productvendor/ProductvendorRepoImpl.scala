@@ -30,7 +30,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     sql"""delete from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
-    DeleteBuilder("purchasing.productvendor", ProductvendorFields)
+    DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
   }
   override def insert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
@@ -78,7 +78,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductvendorRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
-    SelectBuilderSql("purchasing.productvendor", ProductvendorFields, ProductvendorRow.read)
+    SelectBuilderSql("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
     sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor""".query(ProductvendorRow.read).stream
@@ -104,7 +104,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
-    UpdateBuilder("purchasing.productvendor", ProductvendorFields, ProductvendorRow.read)
+    UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.read)
   }
   override def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")

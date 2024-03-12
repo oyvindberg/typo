@@ -34,7 +34,7 @@ class PersonRepoImpl extends PersonRepo {
     sql"""delete from person.person where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("person.person", PersonFields)
+    DeleteBuilder("person.person", PersonFields.structure)
   }
   override def insert(unsaved: PersonRow): ZIO[ZConnection, Throwable, PersonRow] = {
     sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
@@ -91,7 +91,7 @@ class PersonRepoImpl extends PersonRepo {
     streamingInsert(s"""COPY person.person("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("person.person", PersonFields, PersonRow.jdbcDecoder)
+    SelectBuilderSql("person.person", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonRow] = {
     sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person""".query(PersonRow.jdbcDecoder).selectStream
@@ -120,7 +120,7 @@ class PersonRepoImpl extends PersonRepo {
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("person.person", PersonFields, PersonRow.jdbcDecoder)
+    UpdateBuilder("person.person", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]] = {
     sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")

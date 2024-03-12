@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo {
   override def select: SelectBuilder[VstorewithdemographicsViewFields, VstorewithdemographicsViewRow] = {
-    SelectBuilderSql("sales.vstorewithdemographics", VstorewithdemographicsViewFields, VstorewithdemographicsViewRow.jdbcDecoder)
+    SelectBuilderSql("sales.vstorewithdemographics", VstorewithdemographicsViewFields.structure, VstorewithdemographicsViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VstorewithdemographicsViewRow] = {
     sql"""select "businessentityid", "name", "AnnualSales"::numeric, "AnnualRevenue"::numeric, "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees" from sales.vstorewithdemographics""".query(VstorewithdemographicsViewRow.jdbcDecoder).selectStream

@@ -30,7 +30,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     SQL"""delete from purchasing.shipmethod where "shipmethodid" = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilder("purchasing.shipmethod", ShipmethodFields)
+    DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
   }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
@@ -88,7 +88,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     streamingInsert(s"""COPY purchasing.shipmethod("name", "shipmethodid", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShipmethodRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
-    SelectBuilderSql("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.rowParser)
+    SelectBuilderSql("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
     SQL"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
@@ -120,7 +120,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilder("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.rowParser)
+    UpdateBuilder("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.rowParser)
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")

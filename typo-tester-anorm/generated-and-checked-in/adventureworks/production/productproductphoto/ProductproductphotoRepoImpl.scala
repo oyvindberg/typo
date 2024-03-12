@@ -30,7 +30,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     SQL"""delete from production.productproductphoto where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "productphotoid" = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    DeleteBuilder("production.productproductphoto", ProductproductphotoFields)
+    DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
   }
   override def insert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
@@ -77,7 +77,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     streamingInsert(s"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductproductphotoRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.rowParser)
+    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductproductphotoRow] = {
     SQL"""select "productid", "productphotoid", "primary", "modifieddate"::text
@@ -99,7 +99,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    UpdateBuilder("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.rowParser)
+    UpdateBuilder("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.rowParser)
   }
   override def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")

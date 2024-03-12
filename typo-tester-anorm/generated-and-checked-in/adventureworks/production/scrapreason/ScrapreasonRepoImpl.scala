@@ -28,7 +28,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     SQL"""delete from production.scrapreason where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilder("production.scrapreason", ScrapreasonFields)
+    DeleteBuilder("production.scrapreason", ScrapreasonFields.structure)
   }
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
@@ -74,7 +74,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     streamingInsert(s"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ScrapreasonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.rowParser)
+    SelectBuilderSql("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
     SQL"""select "scrapreasonid", "name", "modifieddate"::text
@@ -103,7 +103,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilder("production.scrapreason", ScrapreasonFields, ScrapreasonRow.rowParser)
+    UpdateBuilder("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.rowParser)
   }
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")

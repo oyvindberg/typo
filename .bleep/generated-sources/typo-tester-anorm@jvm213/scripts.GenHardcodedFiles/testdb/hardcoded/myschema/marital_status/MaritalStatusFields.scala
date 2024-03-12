@@ -8,10 +8,30 @@ package hardcoded
 package myschema
 package marital_status
 
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait MaritalStatusFields[Row] {
   val id: IdField[MaritalStatusId, Row]
 }
-object MaritalStatusFields extends MaritalStatusStructure[MaritalStatusRow](None, identity, (_, x) => x)
 
+object MaritalStatusFields {
+  val structure: Relation[MaritalStatusFields, MaritalStatusRow, MaritalStatusRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => MaritalStatusRow, val merge: (Row, MaritalStatusRow) => Row)
+    extends Relation[MaritalStatusFields, MaritalStatusRow, Row] { 
+  
+    override val fields: MaritalStatusFields[Row] = new MaritalStatusFields[Row] {
+      override val id = new IdField[MaritalStatusId, Row](prefix, "id", None, Some("int8"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => MaritalStatusRow, merge: (NewRow, MaritalStatusRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

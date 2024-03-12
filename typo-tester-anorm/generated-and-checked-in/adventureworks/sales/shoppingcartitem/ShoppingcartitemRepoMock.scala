@@ -25,7 +25,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     map.remove(shoppingcartitemid).isDefined
   }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields.structure.fields, map)
   }
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     val _ = if (map.contains(unsaved.shoppingcartitemid))
@@ -53,7 +53,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     unsaved.size.toLong
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    SelectBuilderMock(ShoppingcartitemFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(ShoppingcartitemFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     }
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields.structure.fields, map)
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     map.put(unsaved.shoppingcartitemid, unsaved): @nowarn

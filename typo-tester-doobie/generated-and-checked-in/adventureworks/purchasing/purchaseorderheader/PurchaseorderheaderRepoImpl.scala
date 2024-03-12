@@ -30,7 +30,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields)
+    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure)
   }
   override def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
@@ -100,7 +100,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     new FragmentOps(sql"""COPY purchasing.purchaseorderheader("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PurchaseorderheaderRowUnsaved.text)
   }
   override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.read)
+    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow] = {
     sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader""".query(PurchaseorderheaderRow.read).stream
@@ -131,7 +131,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.read)
+    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.read)
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")

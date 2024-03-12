@@ -15,7 +15,7 @@ import zio.stream.ZStream
 
 class PdocViewRepoImpl extends PdocViewRepo {
   override def select: SelectBuilder[PdocViewFields, PdocViewRow] = {
-    SelectBuilderSql("pr.pdoc", PdocViewFields, PdocViewRow.jdbcDecoder)
+    SelectBuilderSql("pr.pdoc", PdocViewFields.structure, PdocViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PdocViewRow] = {
     sql"""select "id", "productid", "modifieddate"::text, "documentnode" from pr.pdoc""".query(PdocViewRow.jdbcDecoder).selectStream

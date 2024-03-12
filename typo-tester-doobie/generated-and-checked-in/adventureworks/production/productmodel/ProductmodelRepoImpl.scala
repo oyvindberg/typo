@@ -29,7 +29,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""delete from production.productmodel where "productmodelid" = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
-    DeleteBuilder("production.productmodel", ProductmodelFields)
+    DeleteBuilder("production.productmodel", ProductmodelFields.structure)
   }
   override def insert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
     sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
@@ -78,7 +78,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     new FragmentOps(sql"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
-    SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.read)
+    SelectBuilderSql("production.productmodel", ProductmodelFields.structure, ProductmodelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelRow] = {
     sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel""".query(ProductmodelRow.read).stream
@@ -103,7 +103,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
-    UpdateBuilder("production.productmodel", ProductmodelFields, ProductmodelRow.read)
+    UpdateBuilder("production.productmodel", ProductmodelFields.structure, ProductmodelRow.read)
   }
   override def upsert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
     sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")

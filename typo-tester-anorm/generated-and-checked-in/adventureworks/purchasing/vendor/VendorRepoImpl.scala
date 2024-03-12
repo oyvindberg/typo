@@ -34,7 +34,7 @@ class VendorRepoImpl extends VendorRepo {
     SQL"""delete from purchasing.vendor where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
-    DeleteBuilder("purchasing.vendor", VendorFields)
+    DeleteBuilder("purchasing.vendor", VendorFields.structure)
   }
   override def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
@@ -88,7 +88,7 @@ class VendorRepoImpl extends VendorRepo {
     streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(VendorRowUnsaved.text, c)
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
-    SelectBuilderSql("purchasing.vendor", VendorFields, VendorRow.rowParser)
+    SelectBuilderSql("purchasing.vendor", VendorFields.structure, VendorRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
     SQL"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
@@ -122,7 +122,7 @@ class VendorRepoImpl extends VendorRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
-    UpdateBuilder("purchasing.vendor", VendorFields, VendorRow.rowParser)
+    UpdateBuilder("purchasing.vendor", VendorFields.structure, VendorRow.rowParser)
   }
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")

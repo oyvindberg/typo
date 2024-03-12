@@ -32,7 +32,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     SQL"""delete from production.productinventory where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "locationid" = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    DeleteBuilder("production.productinventory", ProductinventoryFields)
+    DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
   }
   override def insert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
@@ -85,7 +85,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     streamingInsert(s"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductinventoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    SelectBuilderSql("production.productinventory", ProductinventoryFields, ProductinventoryRow.rowParser)
+    SelectBuilderSql("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductinventoryRow] = {
     SQL"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
@@ -110,7 +110,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    UpdateBuilder("production.productinventory", ProductinventoryFields, ProductinventoryRow.rowParser)
+    UpdateBuilder("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.rowParser)
   }
   override def upsert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")

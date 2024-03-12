@@ -25,7 +25,7 @@ class ProductsubcategoryRepoMock(toRow: Function1[ProductsubcategoryRowUnsaved, 
     map.remove(productsubcategoryid).isDefined
   }
   override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductsubcategoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductsubcategoryFields.structure.fields, map)
   }
   override def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     val _ = if (map.contains(unsaved.productsubcategoryid))
@@ -53,7 +53,7 @@ class ProductsubcategoryRepoMock(toRow: Function1[ProductsubcategoryRowUnsaved, 
     unsaved.size.toLong
   }
   override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    SelectBuilderMock(ProductsubcategoryFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(ProductsubcategoryFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class ProductsubcategoryRepoMock(toRow: Function1[ProductsubcategoryRowUnsaved, 
     }
   }
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductsubcategoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductsubcategoryFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     map.put(unsaved.productsubcategoryid, unsaved): @nowarn

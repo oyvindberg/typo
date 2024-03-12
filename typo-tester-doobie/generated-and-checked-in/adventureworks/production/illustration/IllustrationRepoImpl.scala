@@ -27,7 +27,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
     sql"""delete from production.illustration where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilder("production.illustration", IllustrationFields)
+    DeleteBuilder("production.illustration", IllustrationFields.structure)
   }
   override def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
@@ -70,7 +70,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
     new FragmentOps(sql"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(IllustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
-    SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.read)
+    SelectBuilderSql("production.illustration", IllustrationFields.structure, IllustrationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
     sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration""".query(IllustrationRow.read).stream
@@ -92,7 +92,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilder("production.illustration", IllustrationFields, IllustrationRow.read)
+    UpdateBuilder("production.illustration", IllustrationFields.structure, IllustrationRow.read)
   }
   override def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")

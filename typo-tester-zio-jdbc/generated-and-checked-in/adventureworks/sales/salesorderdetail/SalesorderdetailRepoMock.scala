@@ -29,7 +29,7 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesorderdetailFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesorderdetailFields.structure.fields, map)
   }
   override def insert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, SalesorderdetailRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    SelectBuilderMock(SalesorderdetailFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(SalesorderdetailFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesorderdetailRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
     }
   }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesorderdetailFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesorderdetailFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderdetailRow]] = {
     ZIO.succeed {

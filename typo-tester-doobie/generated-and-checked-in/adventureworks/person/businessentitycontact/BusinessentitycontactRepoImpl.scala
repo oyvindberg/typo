@@ -29,7 +29,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     sql"""delete from person.businessentitycontact where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "personid" = ${fromWrite(compositeId.personid)(Write.fromPut(BusinessentityId.put))} AND "contacttypeid" = ${fromWrite(compositeId.contacttypeid)(Write.fromPut(ContacttypeId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    DeleteBuilder("person.businessentitycontact", BusinessentitycontactFields)
+    DeleteBuilder("person.businessentitycontact", BusinessentitycontactFields.structure)
   }
   override def insert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow] = {
     sql"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")
@@ -74,7 +74,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     new FragmentOps(sql"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BusinessentitycontactRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    SelectBuilderSql("person.businessentitycontact", BusinessentitycontactFields, BusinessentitycontactRow.read)
+    SelectBuilderSql("person.businessentitycontact", BusinessentitycontactFields.structure, BusinessentitycontactRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentitycontactRow] = {
     sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from person.businessentitycontact""".query(BusinessentitycontactRow.read).stream
@@ -93,7 +93,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    UpdateBuilder("person.businessentitycontact", BusinessentitycontactFields, BusinessentitycontactRow.read)
+    UpdateBuilder("person.businessentitycontact", BusinessentitycontactFields.structure, BusinessentitycontactRow.read)
   }
   override def upsert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow] = {
     sql"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")

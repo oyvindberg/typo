@@ -9,7 +9,9 @@ package transactionhistoryarchive
 
 import adventureworks.customtypes.TypoLocalDateTime
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
+import typo.dsl.Structure.Relation
 
 trait TransactionhistoryarchiveFields[Row] {
   val transactionid: IdField[TransactionhistoryarchiveId, Row]
@@ -22,5 +24,31 @@ trait TransactionhistoryarchiveFields[Row] {
   val actualcost: Field[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object TransactionhistoryarchiveFields extends TransactionhistoryarchiveStructure[TransactionhistoryarchiveRow](None, identity, (_, x) => x)
 
+object TransactionhistoryarchiveFields {
+  val structure: Relation[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow, TransactionhistoryarchiveRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => TransactionhistoryarchiveRow, val merge: (Row, TransactionhistoryarchiveRow) => Row)
+    extends Relation[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow, Row] { 
+  
+    override val fields: TransactionhistoryarchiveFields[Row] = new TransactionhistoryarchiveFields[Row] {
+      override val transactionid = new IdField[TransactionhistoryarchiveId, Row](prefix, "transactionid", None, Some("int4"))(x => extract(x).transactionid, (row, value) => merge(row, extract(row).copy(transactionid = value)))
+      override val productid = new Field[Int, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
+      override val referenceorderid = new Field[Int, Row](prefix, "referenceorderid", None, Some("int4"))(x => extract(x).referenceorderid, (row, value) => merge(row, extract(row).copy(referenceorderid = value)))
+      override val referenceorderlineid = new Field[Int, Row](prefix, "referenceorderlineid", None, Some("int4"))(x => extract(x).referenceorderlineid, (row, value) => merge(row, extract(row).copy(referenceorderlineid = value)))
+      override val transactiondate = new Field[TypoLocalDateTime, Row](prefix, "transactiondate", Some("text"), Some("timestamp"))(x => extract(x).transactiondate, (row, value) => merge(row, extract(row).copy(transactiondate = value)))
+      override val transactiontype = new Field[/* bpchar, max 1 chars */ String, Row](prefix, "transactiontype", None, Some("bpchar"))(x => extract(x).transactiontype, (row, value) => merge(row, extract(row).copy(transactiontype = value)))
+      override val quantity = new Field[Int, Row](prefix, "quantity", None, Some("int4"))(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
+      override val actualcost = new Field[BigDecimal, Row](prefix, "actualcost", None, Some("numeric"))(x => extract(x).actualcost, (row, value) => merge(row, extract(row).copy(actualcost = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.transactionid, fields.productid, fields.referenceorderid, fields.referenceorderlineid, fields.transactiondate, fields.transactiontype, fields.quantity, fields.actualcost, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => TransactionhistoryarchiveRow, merge: (NewRow, TransactionhistoryarchiveRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

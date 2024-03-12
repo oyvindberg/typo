@@ -12,6 +12,8 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
+import typo.dsl.Structure.Relation
 
 trait AtViewFields[Row] {
   val id: Field[AddresstypeId, Row]
@@ -20,5 +22,27 @@ trait AtViewFields[Row] {
   val rowguid: Field[TypoUUID, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object AtViewFields extends AtViewStructure[AtViewRow](None, identity, (_, x) => x)
 
+object AtViewFields {
+  val structure: Relation[AtViewFields, AtViewRow, AtViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => AtViewRow, val merge: (Row, AtViewRow) => Row)
+    extends Relation[AtViewFields, AtViewRow, Row] { 
+  
+    override val fields: AtViewFields[Row] = new AtViewFields[Row] {
+      override val id = new Field[AddresstypeId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val addresstypeid = new Field[AddresstypeId, Row](prefix, "addresstypeid", None, None)(x => extract(x).addresstypeid, (row, value) => merge(row, extract(row).copy(addresstypeid = value)))
+      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.addresstypeid, fields.name, fields.rowguid, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => AtViewRow, merge: (NewRow, AtViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

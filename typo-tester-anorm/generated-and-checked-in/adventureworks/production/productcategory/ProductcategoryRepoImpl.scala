@@ -29,7 +29,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     SQL"""delete from production.productcategory where "productcategoryid" = ${ParameterValue(productcategoryid, null, ProductcategoryId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    DeleteBuilder("production.productcategory", ProductcategoryFields)
+    DeleteBuilder("production.productcategory", ProductcategoryFields.structure)
   }
   override def insert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
@@ -79,7 +79,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     streamingInsert(s"""COPY production.productcategory("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcategoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    SelectBuilderSql("production.productcategory", ProductcategoryFields, ProductcategoryRow.rowParser)
+    SelectBuilderSql("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductcategoryRow] = {
     SQL"""select "productcategoryid", "name", "rowguid", "modifieddate"::text
@@ -109,7 +109,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    UpdateBuilder("production.productcategory", ProductcategoryFields, ProductcategoryRow.rowParser)
+    UpdateBuilder("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.rowParser)
   }
   override def upsert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")

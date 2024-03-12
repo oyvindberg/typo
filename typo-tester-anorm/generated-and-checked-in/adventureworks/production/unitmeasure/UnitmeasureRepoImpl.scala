@@ -28,7 +28,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     SQL"""delete from production.unitmeasure where "unitmeasurecode" = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilder("production.unitmeasure", UnitmeasureFields)
+    DeleteBuilder("production.unitmeasure", UnitmeasureFields.structure)
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     SQL"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
@@ -71,7 +71,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UnitmeasureRowUnsaved.text, c)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.rowParser)
+    SelectBuilderSql("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
     SQL"""select "unitmeasurecode", "name", "modifieddate"::text
@@ -100,7 +100,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilder("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.rowParser)
+    UpdateBuilder("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.rowParser)
   }
   override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     SQL"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")

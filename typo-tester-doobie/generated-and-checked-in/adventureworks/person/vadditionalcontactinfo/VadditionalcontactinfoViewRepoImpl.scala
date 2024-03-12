@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
   override def select: SelectBuilder[VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow] = {
-    SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow.read)
+    SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields.structure, VadditionalcontactinfoViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VadditionalcontactinfoViewRow] = {
     sql"""select "businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate"::text from person.vadditionalcontactinfo""".query(VadditionalcontactinfoViewRow.read).stream

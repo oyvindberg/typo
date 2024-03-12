@@ -31,7 +31,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     sql"""delete from sales.salestaxrate where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    DeleteBuilder("sales.salestaxrate", SalestaxrateFields)
+    DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
   }
   override def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
@@ -84,7 +84,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     new FragmentOps(sql"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalestaxrateRowUnsaved.text)
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    SelectBuilderSql("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.read)
+    SelectBuilderSql("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalestaxrateRow] = {
     sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate""".query(SalestaxrateRow.read).stream
@@ -110,7 +110,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    UpdateBuilder("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.read)
+    UpdateBuilder("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.read)
   }
   override def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")

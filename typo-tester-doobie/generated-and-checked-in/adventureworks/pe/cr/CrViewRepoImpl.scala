@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class CrViewRepoImpl extends CrViewRepo {
   override def select: SelectBuilder[CrViewFields, CrViewRow] = {
-    SelectBuilderSql("pe.cr", CrViewFields, CrViewRow.read)
+    SelectBuilderSql("pe.cr", CrViewFields.structure, CrViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CrViewRow] = {
     sql"""select "countryregioncode", "name", "modifieddate"::text from pe.cr""".query(CrViewRow.read).stream

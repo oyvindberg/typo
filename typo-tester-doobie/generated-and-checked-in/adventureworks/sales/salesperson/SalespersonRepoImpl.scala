@@ -30,7 +30,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
     sql"""delete from sales.salesperson where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
-    DeleteBuilder("sales.salesperson", SalespersonFields)
+    DeleteBuilder("sales.salesperson", SalespersonFields.structure)
   }
   override def insert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow] = {
     sql"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
@@ -91,7 +91,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
     new FragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalespersonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
-    SelectBuilderSql("sales.salesperson", SalespersonFields, SalespersonRow.read)
+    SelectBuilderSql("sales.salesperson", SalespersonFields.structure, SalespersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalespersonRow] = {
     sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson""".query(SalespersonRow.read).stream
@@ -119,7 +119,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
-    UpdateBuilder("sales.salesperson", SalespersonFields, SalespersonRow.read)
+    UpdateBuilder("sales.salesperson", SalespersonFields.structure, SalespersonRow.read)
   }
   override def upsert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow] = {
     sql"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")

@@ -29,7 +29,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     ZIO.succeed(map.remove(billofmaterialsid).isDefined)
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields, map)
+    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure.fields, map)
   }
   override def insert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, BillofmaterialsRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    SelectBuilderMock(BillofmaterialsFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(BillofmaterialsFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     }
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields, map)
+    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure.fields, map)
   }
   override def upsert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, UpdateResult[BillofmaterialsRow]] = {
     ZIO.succeed {

@@ -30,7 +30,7 @@ class StoreRepoImpl extends StoreRepo {
     sql"""delete from sales.store where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[StoreFields, StoreRow] = {
-    DeleteBuilder("sales.store", StoreFields)
+    DeleteBuilder("sales.store", StoreFields.structure)
   }
   override def insert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
@@ -76,7 +76,7 @@ class StoreRepoImpl extends StoreRepo {
     new FragmentOps(sql"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(StoreRowUnsaved.text)
   }
   override def select: SelectBuilder[StoreFields, StoreRow] = {
-    SelectBuilderSql("sales.store", StoreFields, StoreRow.read)
+    SelectBuilderSql("sales.store", StoreFields.structure, StoreRow.read)
   }
   override def selectAll: Stream[ConnectionIO, StoreRow] = {
     sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store""".query(StoreRow.read).stream
@@ -101,7 +101,7 @@ class StoreRepoImpl extends StoreRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
-    UpdateBuilder("sales.store", StoreFields, StoreRow.read)
+    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.read)
   }
   override def upsert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

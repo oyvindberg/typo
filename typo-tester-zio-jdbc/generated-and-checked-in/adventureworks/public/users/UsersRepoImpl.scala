@@ -29,7 +29,7 @@ class UsersRepoImpl extends UsersRepo {
     sql"""delete from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
-    DeleteBuilder("public.users", UsersFields)
+    DeleteBuilder("public.users", UsersFields.structure)
   }
   override def insert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UsersRow] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
@@ -71,7 +71,7 @@ class UsersRepoImpl extends UsersRepo {
     streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UsersRowUnsaved.text)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
-    SelectBuilderSql("public.users", UsersFields, UsersRow.jdbcDecoder)
+    SelectBuilderSql("public.users", UsersFields.structure, UsersRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, UsersRow] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users""".query(UsersRow.jdbcDecoder).selectStream
@@ -100,7 +100,7 @@ class UsersRepoImpl extends UsersRepo {
           where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
-    UpdateBuilder("public.users", UsersFields, UsersRow.jdbcDecoder)
+    UpdateBuilder("public.users", UsersFields.structure, UsersRow.jdbcDecoder)
   }
   override def upsert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UpdateResult[UsersRow]] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

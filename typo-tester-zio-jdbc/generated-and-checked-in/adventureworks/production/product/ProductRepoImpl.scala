@@ -35,7 +35,7 @@ class ProductRepoImpl extends ProductRepo {
     sql"""delete from production.product where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilder("production.product", ProductFields)
+    DeleteBuilder("production.product", ProductFields.structure)
   }
   override def insert(unsaved: ProductRow): ZIO[ZConnection, Throwable, ProductRow] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
@@ -107,7 +107,7 @@ class ProductRepoImpl extends ProductRepo {
     streamingInsert(s"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductFields, ProductRow] = {
-    SelectBuilderSql("production.product", ProductFields, ProductRow.jdbcDecoder)
+    SelectBuilderSql("production.product", ProductFields.structure, ProductRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductRow] = {
     sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product""".query(ProductRow.jdbcDecoder).selectStream
@@ -148,7 +148,7 @@ class ProductRepoImpl extends ProductRepo {
           where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilder("production.product", ProductFields, ProductRow.jdbcDecoder)
+    UpdateBuilder("production.product", ProductFields.structure, ProductRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductRow): ZIO[ZConnection, Throwable, UpdateResult[ProductRow]] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

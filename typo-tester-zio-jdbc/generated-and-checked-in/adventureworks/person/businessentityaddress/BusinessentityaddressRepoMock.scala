@@ -29,7 +29,7 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BusinessentityaddressFields, map)
+    DeleteBuilderMock(DeleteParams.empty, BusinessentityaddressFields.structure.fields, map)
   }
   override def insert(unsaved: BusinessentityaddressRow): ZIO[ZConnection, Throwable, BusinessentityaddressRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    SelectBuilderMock(BusinessentityaddressFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(BusinessentityaddressFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BusinessentityaddressRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
     }
   }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields, map)
+    UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields.structure.fields, map)
   }
   override def upsert(unsaved: BusinessentityaddressRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentityaddressRow]] = {
     ZIO.succeed {

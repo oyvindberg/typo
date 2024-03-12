@@ -29,7 +29,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     sql"""delete from sales.countryregioncurrency where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields)
+    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
   }
   override def insert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, CountryregioncurrencyRow] = {
     sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
@@ -67,7 +67,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     streamingInsert(s"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregioncurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.jdbcDecoder)
+    SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = {
     sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency""".query(CountryregioncurrencyRow.jdbcDecoder).selectStream
@@ -82,7 +82,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.jdbcDecoder)
+    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.jdbcDecoder)
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregioncurrencyRow]] = {
     sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")

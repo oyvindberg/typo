@@ -26,7 +26,7 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
     map.remove(businessentityid).isDefined
   }
   override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, EmployeeFields, map)
+    DeleteBuilderMock(DeleteParams.empty, EmployeeFields.structure.fields, map)
   }
   override def insert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     val _ = if (map.contains(unsaved.businessentityid))
@@ -54,7 +54,7 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[EmployeeFields, EmployeeRow] = {
-    SelectBuilderMock(EmployeeFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(EmployeeFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {
     map.values.toList
@@ -75,7 +75,7 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
     }
   }
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, EmployeeFields, map)
+    UpdateBuilderMock(UpdateParams.empty, EmployeeFields.structure.fields, map)
   }
   override def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     map.put(unsaved.businessentityid, unsaved): @nowarn

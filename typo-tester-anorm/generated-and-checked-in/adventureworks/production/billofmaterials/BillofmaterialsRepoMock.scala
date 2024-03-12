@@ -25,7 +25,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     map.remove(billofmaterialsid).isDefined
   }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields, map)
+    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure.fields, map)
   }
   override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     val _ = if (map.contains(unsaved.billofmaterialsid))
@@ -53,7 +53,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     unsaved.size.toLong
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    SelectBuilderMock(BillofmaterialsFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(BillofmaterialsFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     }
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields, map)
+    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure.fields, map)
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     map.put(unsaved.billofmaterialsid, unsaved): @nowarn

@@ -31,7 +31,7 @@ class CustomerRepoImpl extends CustomerRepo {
     sql"""delete from sales.customer where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilder("sales.customer", CustomerFields)
+    DeleteBuilder("sales.customer", CustomerFields.structure)
   }
   override def insert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, CustomerRow] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
@@ -78,7 +78,7 @@ class CustomerRepoImpl extends CustomerRepo {
     streamingInsert(s"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CustomerRowUnsaved.text)
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
-    SelectBuilderSql("sales.customer", CustomerFields, CustomerRow.jdbcDecoder)
+    SelectBuilderSql("sales.customer", CustomerFields.structure, CustomerRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CustomerRow] = {
     sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer""".query(CustomerRow.jdbcDecoder).selectStream
@@ -100,7 +100,7 @@ class CustomerRepoImpl extends CustomerRepo {
           where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilder("sales.customer", CustomerFields, CustomerRow.jdbcDecoder)
+    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.jdbcDecoder)
   }
   override def upsert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, UpdateResult[CustomerRow]] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

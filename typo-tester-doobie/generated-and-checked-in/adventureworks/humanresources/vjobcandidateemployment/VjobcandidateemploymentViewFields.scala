@@ -10,7 +10,9 @@ package vjobcandidateemployment
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait VjobcandidateemploymentViewFields[Row] {
   val jobcandidateid: Field[JobcandidateId, Row]
@@ -25,5 +27,33 @@ trait VjobcandidateemploymentViewFields[Row] {
   val EmpLocState: OptField[String, Row]
   val EmpLocCity: OptField[String, Row]
 }
-object VjobcandidateemploymentViewFields extends VjobcandidateemploymentViewStructure[VjobcandidateemploymentViewRow](None, identity, (_, x) => x)
 
+object VjobcandidateemploymentViewFields {
+  val structure: Relation[VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow, VjobcandidateemploymentViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => VjobcandidateemploymentViewRow, val merge: (Row, VjobcandidateemploymentViewRow) => Row)
+    extends Relation[VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow, Row] { 
+  
+    override val fields: VjobcandidateemploymentViewFields[Row] = new VjobcandidateemploymentViewFields[Row] {
+      override val jobcandidateid = new Field[JobcandidateId, Row](prefix, "jobcandidateid", None, None)(x => extract(x).jobcandidateid, (row, value) => merge(row, extract(row).copy(jobcandidateid = value)))
+      override val EmpStartDate = new OptField[TypoLocalDate, Row](prefix, "Emp.StartDate", Some("text"), None)(x => extract(x).EmpStartDate, (row, value) => merge(row, extract(row).copy(EmpStartDate = value)))
+      override val EmpEndDate = new OptField[TypoLocalDate, Row](prefix, "Emp.EndDate", Some("text"), None)(x => extract(x).EmpEndDate, (row, value) => merge(row, extract(row).copy(EmpEndDate = value)))
+      override val EmpOrgName = new OptField[/* max 100 chars */ String, Row](prefix, "Emp.OrgName", None, None)(x => extract(x).EmpOrgName, (row, value) => merge(row, extract(row).copy(EmpOrgName = value)))
+      override val EmpJobTitle = new OptField[/* max 100 chars */ String, Row](prefix, "Emp.JobTitle", None, None)(x => extract(x).EmpJobTitle, (row, value) => merge(row, extract(row).copy(EmpJobTitle = value)))
+      override val EmpResponsibility = new OptField[String, Row](prefix, "Emp.Responsibility", None, None)(x => extract(x).EmpResponsibility, (row, value) => merge(row, extract(row).copy(EmpResponsibility = value)))
+      override val EmpFunctionCategory = new OptField[String, Row](prefix, "Emp.FunctionCategory", None, None)(x => extract(x).EmpFunctionCategory, (row, value) => merge(row, extract(row).copy(EmpFunctionCategory = value)))
+      override val EmpIndustryCategory = new OptField[String, Row](prefix, "Emp.IndustryCategory", None, None)(x => extract(x).EmpIndustryCategory, (row, value) => merge(row, extract(row).copy(EmpIndustryCategory = value)))
+      override val EmpLocCountryRegion = new OptField[String, Row](prefix, "Emp.Loc.CountryRegion", None, None)(x => extract(x).EmpLocCountryRegion, (row, value) => merge(row, extract(row).copy(EmpLocCountryRegion = value)))
+      override val EmpLocState = new OptField[String, Row](prefix, "Emp.Loc.State", None, None)(x => extract(x).EmpLocState, (row, value) => merge(row, extract(row).copy(EmpLocState = value)))
+      override val EmpLocCity = new OptField[String, Row](prefix, "Emp.Loc.City", None, None)(x => extract(x).EmpLocCity, (row, value) => merge(row, extract(row).copy(EmpLocCity = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.jobcandidateid, fields.EmpStartDate, fields.EmpEndDate, fields.EmpOrgName, fields.EmpJobTitle, fields.EmpResponsibility, fields.EmpFunctionCategory, fields.EmpIndustryCategory, fields.EmpLocCountryRegion, fields.EmpLocState, fields.EmpLocCity)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => VjobcandidateemploymentViewRow, merge: (NewRow, VjobcandidateemploymentViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

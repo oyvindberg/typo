@@ -25,7 +25,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     map.remove(salesorderid).isDefined
   }
   override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields.structure.fields, map)
   }
   override def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
     val _ = if (map.contains(unsaved.salesorderid))
@@ -53,7 +53,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     unsaved.size.toLong
   }
   override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    SelectBuilderMock(SalesorderheaderFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(SalesorderheaderFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     }
   }
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
     map.put(unsaved.salesorderid, unsaved): @nowarn

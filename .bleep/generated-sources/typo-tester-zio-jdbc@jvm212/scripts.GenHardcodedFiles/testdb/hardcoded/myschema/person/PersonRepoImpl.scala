@@ -33,7 +33,7 @@ class PersonRepoImpl extends PersonRepo {
     sql"""delete from myschema.person where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("myschema.person", PersonFields)
+    DeleteBuilder("myschema.person", PersonFields.structure)
   }
   override def insert(unsaved: PersonRow): ZIO[ZConnection, Throwable, PersonRow] = {
     sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
@@ -89,7 +89,7 @@ class PersonRepoImpl extends PersonRepo {
     streamingInsert(s"""COPY myschema.person("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("myschema.person", PersonFields, PersonRow.jdbcDecoder)
+    SelectBuilderSql("myschema.person", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonRow] = {
     sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person""".query(PersonRow.jdbcDecoder).selectStream
@@ -140,7 +140,7 @@ class PersonRepoImpl extends PersonRepo {
           where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("myschema.person", PersonFields, PersonRow.jdbcDecoder)
+    UpdateBuilder("myschema.person", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean] = {
     NonEmptyChunk.fromIterableOption(fieldValues) match {

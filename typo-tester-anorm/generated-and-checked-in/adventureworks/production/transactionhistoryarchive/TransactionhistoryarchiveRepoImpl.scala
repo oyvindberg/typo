@@ -28,7 +28,7 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     SQL"""delete from production.transactionhistoryarchive where "transactionid" = ${ParameterValue(transactionid, null, TransactionhistoryarchiveId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    DeleteBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields)
+    DeleteBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields.structure)
   }
   override def insert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
     SQL"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
@@ -83,7 +83,7 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     streamingInsert(s"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(TransactionhistoryarchiveRowUnsaved.text, c)
   }
   override def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    SelectBuilderSql("production.transactionhistoryarchive", TransactionhistoryarchiveFields, TransactionhistoryarchiveRow.rowParser)
+    SelectBuilderSql("production.transactionhistoryarchive", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     SQL"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
@@ -118,7 +118,7 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    UpdateBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields, TransactionhistoryarchiveRow.rowParser)
+    UpdateBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.rowParser)
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
     SQL"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")

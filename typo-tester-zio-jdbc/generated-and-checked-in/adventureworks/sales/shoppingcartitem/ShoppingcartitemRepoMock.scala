@@ -29,7 +29,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     ZIO.succeed(map.remove(shoppingcartitemid).isDefined)
   }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields.structure.fields, map)
   }
   override def insert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, ShoppingcartitemRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    SelectBuilderMock(ShoppingcartitemFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(ShoppingcartitemFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShoppingcartitemRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     }
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields.structure.fields, map)
   }
   override def upsert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, UpdateResult[ShoppingcartitemRow]] = {
     ZIO.succeed {

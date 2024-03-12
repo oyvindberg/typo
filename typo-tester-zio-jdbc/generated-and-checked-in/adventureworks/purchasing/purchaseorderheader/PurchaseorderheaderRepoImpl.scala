@@ -31,7 +31,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields)
+    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure)
   }
   override def insert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
@@ -99,7 +99,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     streamingInsert(s"""COPY purchasing.purchaseorderheader("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PurchaseorderheaderRowUnsaved.text)
   }
   override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.jdbcDecoder)
+    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PurchaseorderheaderRow] = {
     sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader""".query(PurchaseorderheaderRow.jdbcDecoder).selectStream
@@ -127,7 +127,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.jdbcDecoder)
+    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.jdbcDecoder)
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[PurchaseorderheaderRow]] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")

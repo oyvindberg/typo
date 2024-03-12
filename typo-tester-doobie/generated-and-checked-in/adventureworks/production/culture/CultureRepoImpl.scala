@@ -27,7 +27,7 @@ class CultureRepoImpl extends CultureRepo {
     sql"""delete from production.culture where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilder("production.culture", CultureFields)
+    DeleteBuilder("production.culture", CultureFields.structure)
   }
   override def insert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture("cultureid", "name", "modifieddate")
@@ -67,7 +67,7 @@ class CultureRepoImpl extends CultureRepo {
     new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CultureRowUnsaved.text)
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
-    SelectBuilderSql("production.culture", CultureFields, CultureRow.read)
+    SelectBuilderSql("production.culture", CultureFields.structure, CultureRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
     sql"""select "cultureid", "name", "modifieddate"::text from production.culture""".query(CultureRow.read).stream
@@ -89,7 +89,7 @@ class CultureRepoImpl extends CultureRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilder("production.culture", CultureFields, CultureRow.read)
+    UpdateBuilder("production.culture", CultureFields.structure, CultureRow.read)
   }
   override def upsert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture("cultureid", "name", "modifieddate")

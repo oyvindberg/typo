@@ -27,7 +27,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     delay(map.remove(shoppingcartitemid).isDefined)
   }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields.structure.fields, map)
   }
   override def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     delay {
@@ -65,7 +65,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     }
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    SelectBuilderMock(ShoppingcartitemFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(ShoppingcartitemFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     }
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields.structure.fields, map)
   }
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     delay {

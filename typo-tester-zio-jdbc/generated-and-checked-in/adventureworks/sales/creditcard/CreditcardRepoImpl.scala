@@ -31,7 +31,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
     sql"""delete from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
-    DeleteBuilder("sales.creditcard", CreditcardFields)
+    DeleteBuilder("sales.creditcard", CreditcardFields.structure)
   }
   override def insert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, CreditcardRow] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
@@ -75,7 +75,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
     streamingInsert(s"""COPY sales.creditcard("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CreditcardRowUnsaved.text)
   }
   override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
-    SelectBuilderSql("sales.creditcard", CreditcardFields, CreditcardRow.jdbcDecoder)
+    SelectBuilderSql("sales.creditcard", CreditcardFields.structure, CreditcardRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CreditcardRow] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard""".query(CreditcardRow.jdbcDecoder).selectStream
@@ -97,7 +97,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
           where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
-    UpdateBuilder("sales.creditcard", CreditcardFields, CreditcardRow.jdbcDecoder)
+    UpdateBuilder("sales.creditcard", CreditcardFields.structure, CreditcardRow.jdbcDecoder)
   }
   override def upsert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[CreditcardRow]] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")

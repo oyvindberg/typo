@@ -27,7 +27,7 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
     delay(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, EmployeedepartmenthistoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, EmployeedepartmenthistoryFields.structure.fields, map)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     delay {
@@ -65,7 +65,7 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
     }
   }
   override def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    SelectBuilderMock(EmployeedepartmenthistoryFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(EmployeedepartmenthistoryFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
     Stream.emits(map.values.toList)
@@ -85,7 +85,7 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
     }
   }
   override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, EmployeedepartmenthistoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, EmployeedepartmenthistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     delay {

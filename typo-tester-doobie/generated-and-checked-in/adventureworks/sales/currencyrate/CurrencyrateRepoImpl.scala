@@ -28,7 +28,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
     sql"""delete from sales.currencyrate where "currencyrateid" = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    DeleteBuilder("sales.currencyrate", CurrencyrateFields)
+    DeleteBuilder("sales.currencyrate", CurrencyrateFields.structure)
   }
   override def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
@@ -75,7 +75,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
     new FragmentOps(sql"""COPY sales.currencyrate("currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "currencyrateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CurrencyrateRowUnsaved.text)
   }
   override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    SelectBuilderSql("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.read)
+    SelectBuilderSql("sales.currencyrate", CurrencyrateFields.structure, CurrencyrateRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CurrencyrateRow] = {
     sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sales.currencyrate""".query(CurrencyrateRow.read).stream
@@ -101,7 +101,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    UpdateBuilder("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.read)
+    UpdateBuilder("sales.currencyrate", CurrencyrateFields.structure, CurrencyrateRow.read)
   }
   override def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")

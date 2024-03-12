@@ -25,7 +25,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     map.remove(cultureid).isDefined
   }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CultureFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     val _ = if (map.contains(unsaved.cultureid))
@@ -53,7 +53,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
-    SelectBuilderMock(CultureFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(CultureFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     }
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CultureFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     map.put(unsaved.cultureid, unsaved): @nowarn

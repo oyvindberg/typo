@@ -28,7 +28,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     sql"""delete from person.businessentity where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilder("person.businessentity", BusinessentityFields)
+    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
   }
   override def insert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, BusinessentityRow] = {
     sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
@@ -72,7 +72,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
-    SelectBuilderSql("person.businessentity", BusinessentityFields, BusinessentityRow.jdbcDecoder)
+    SelectBuilderSql("person.businessentity", BusinessentityFields.structure, BusinessentityRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BusinessentityRow] = {
     sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity""".query(BusinessentityRow.jdbcDecoder).selectStream
@@ -91,7 +91,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilder("person.businessentity", BusinessentityFields, BusinessentityRow.jdbcDecoder)
+    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.jdbcDecoder)
   }
   override def upsert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentityRow]] = {
     sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")

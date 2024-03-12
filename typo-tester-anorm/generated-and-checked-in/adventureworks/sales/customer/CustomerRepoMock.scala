@@ -25,7 +25,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     map.remove(customerid).isDefined
   }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CustomerFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CustomerFields.structure.fields, map)
   }
   override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     val _ = if (map.contains(unsaved.customerid))
@@ -53,7 +53,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
-    SelectBuilderMock(CustomerFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(CustomerFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
     }
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CustomerFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CustomerFields.structure.fields, map)
   }
   override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     map.put(unsaved.customerid, unsaved): @nowarn

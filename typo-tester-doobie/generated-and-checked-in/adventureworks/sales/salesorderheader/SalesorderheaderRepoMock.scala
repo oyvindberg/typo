@@ -27,7 +27,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     delay(map.remove(salesorderid).isDefined)
   }
   override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields.structure.fields, map)
   }
   override def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     delay {
@@ -65,7 +65,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     }
   }
   override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    SelectBuilderMock(SalesorderheaderFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(SalesorderheaderFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheaderRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     }
   }
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     delay {

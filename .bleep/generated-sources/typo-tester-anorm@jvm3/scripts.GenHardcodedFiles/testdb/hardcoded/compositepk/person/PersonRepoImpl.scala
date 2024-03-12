@@ -29,7 +29,7 @@ class PersonRepoImpl extends PersonRepo {
     SQL"""delete from compositepk.person where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("compositepk.person", PersonFields)
+    DeleteBuilder("compositepk.person", PersonFields.structure)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into compositepk.person("one", "two", "name")
@@ -75,7 +75,7 @@ class PersonRepoImpl extends PersonRepo {
     streamingInsert(s"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("compositepk.person", PersonFields, PersonRow.rowParser)
+    SelectBuilderSql("compositepk.person", PersonFields.structure, PersonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "one", "two", "name"
@@ -115,7 +115,7 @@ class PersonRepoImpl extends PersonRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("compositepk.person", PersonFields, PersonRow.rowParser)
+    UpdateBuilder("compositepk.person", PersonFields.structure, PersonRow.rowParser)
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {
     fieldValues match {

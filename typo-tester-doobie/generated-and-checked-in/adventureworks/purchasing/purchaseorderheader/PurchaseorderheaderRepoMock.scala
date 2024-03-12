@@ -27,7 +27,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     delay(map.remove(purchaseorderid).isDefined)
   }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PurchaseorderheaderFields, map)
+    DeleteBuilderMock(DeleteParams.empty, PurchaseorderheaderFields.structure.fields, map)
   }
   override def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     delay {
@@ -65,7 +65,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     }
   }
   override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    SelectBuilderMock(PurchaseorderheaderFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(PurchaseorderheaderFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     }
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields, map)
+    UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields.structure.fields, map)
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     delay {

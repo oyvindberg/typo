@@ -30,7 +30,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     SQL"""delete from production.productsubcategory where "productsubcategoryid" = ${ParameterValue(productsubcategoryid, null, ProductsubcategoryId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields)
+    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields.structure)
   }
   override def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
@@ -81,7 +81,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     streamingInsert(s"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductsubcategoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.rowParser)
+    SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
     SQL"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
@@ -112,7 +112,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.rowParser)
+    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.rowParser)
   }
   override def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")

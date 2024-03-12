@@ -30,7 +30,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
     SQL"""delete from sales.creditcard where "creditcardid" = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
-    DeleteBuilder("sales.creditcard", CreditcardFields)
+    DeleteBuilder("sales.creditcard", CreditcardFields.structure)
   }
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
@@ -79,7 +79,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
     streamingInsert(s"""COPY sales.creditcard("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CreditcardRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
-    SelectBuilderSql("sales.creditcard", CreditcardFields, CreditcardRow.rowParser)
+    SelectBuilderSql("sales.creditcard", CreditcardFields.structure, CreditcardRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
     SQL"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
@@ -111,7 +111,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
-    UpdateBuilder("sales.creditcard", CreditcardFields, CreditcardRow.rowParser)
+    UpdateBuilder("sales.creditcard", CreditcardFields.structure, CreditcardRow.rowParser)
   }
   override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")

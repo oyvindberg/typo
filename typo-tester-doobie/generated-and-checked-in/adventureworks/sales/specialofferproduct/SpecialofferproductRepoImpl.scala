@@ -29,7 +29,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     sql"""delete from sales.specialofferproduct where "specialofferid" = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields)
+    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields.structure)
   }
   override def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
@@ -73,7 +73,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     new FragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SpecialofferproductRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.read)
+    SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
     sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from sales.specialofferproduct""".query(SpecialofferproductRow.read).stream
@@ -92,7 +92,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.read)
+    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.read)
   }
   override def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")

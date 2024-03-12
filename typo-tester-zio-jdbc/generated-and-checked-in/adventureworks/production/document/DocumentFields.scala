@@ -14,8 +14,10 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait DocumentFields[Row] {
   val title: Field[/* max 50 chars */ String, Row]
@@ -32,5 +34,35 @@ trait DocumentFields[Row] {
   val modifieddate: Field[TypoLocalDateTime, Row]
   val documentnode: IdField[DocumentId, Row]
 }
-object DocumentFields extends DocumentStructure[DocumentRow](None, identity, (_, x) => x)
 
+object DocumentFields {
+  val structure: Relation[DocumentFields, DocumentRow, DocumentRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => DocumentRow, val merge: (Row, DocumentRow) => Row)
+    extends Relation[DocumentFields, DocumentRow, Row] { 
+  
+    override val fields: DocumentFields[Row] = new DocumentFields[Row] {
+      override val title = new Field[/* max 50 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
+      override val owner = new Field[BusinessentityId, Row](prefix, "owner", None, Some("int4"))(x => extract(x).owner, (row, value) => merge(row, extract(row).copy(owner = value)))
+      override val folderflag = new Field[Flag, Row](prefix, "folderflag", None, Some("bool"))(x => extract(x).folderflag, (row, value) => merge(row, extract(row).copy(folderflag = value)))
+      override val filename = new Field[/* max 400 chars */ String, Row](prefix, "filename", None, None)(x => extract(x).filename, (row, value) => merge(row, extract(row).copy(filename = value)))
+      override val fileextension = new OptField[/* max 8 chars */ String, Row](prefix, "fileextension", None, None)(x => extract(x).fileextension, (row, value) => merge(row, extract(row).copy(fileextension = value)))
+      override val revision = new Field[/* bpchar, max 5 chars */ String, Row](prefix, "revision", None, Some("bpchar"))(x => extract(x).revision, (row, value) => merge(row, extract(row).copy(revision = value)))
+      override val changenumber = new Field[Int, Row](prefix, "changenumber", None, Some("int4"))(x => extract(x).changenumber, (row, value) => merge(row, extract(row).copy(changenumber = value)))
+      override val status = new Field[TypoShort, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
+      override val documentsummary = new OptField[String, Row](prefix, "documentsummary", None, None)(x => extract(x).documentsummary, (row, value) => merge(row, extract(row).copy(documentsummary = value)))
+      override val document = new OptField[TypoBytea, Row](prefix, "document", None, Some("bytea"))(x => extract(x).document, (row, value) => merge(row, extract(row).copy(document = value)))
+      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+      override val documentnode = new IdField[DocumentId, Row](prefix, "documentnode", None, None)(x => extract(x).documentnode, (row, value) => merge(row, extract(row).copy(documentnode = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.title, fields.owner, fields.folderflag, fields.filename, fields.fileextension, fields.revision, fields.changenumber, fields.status, fields.documentsummary, fields.document, fields.rowguid, fields.modifieddate, fields.documentnode)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => DocumentRow, merge: (NewRow, DocumentRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

@@ -25,7 +25,7 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     map.remove(transactionid).isDefined
   }
   override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryarchiveFields, map)
+    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
   }
   override def insert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
     val _ = if (map.contains(unsaved.transactionid))
@@ -53,7 +53,7 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     unsaved.size.toLong
   }
   override def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    SelectBuilderMock(TransactionhistoryarchiveFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(TransactionhistoryarchiveFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     }
   }
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields, map)
+    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
     map.put(unsaved.transactionid, unsaved): @nowarn

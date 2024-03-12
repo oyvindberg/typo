@@ -29,7 +29,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     ZIO.succeed(map.remove(id).isDefined)
   }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields, map)
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow] = {
     ZIO.succeed {
@@ -51,7 +51,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    SelectBuilderMock(MaritalStatusFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(MaritalStatusFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     ZStream.fromIterable(map.values)
@@ -70,7 +70,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields, map)
+    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def upsert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, UpdateResult[MaritalStatusRow]] = {
     ZIO.succeed {

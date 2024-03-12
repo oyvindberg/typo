@@ -29,7 +29,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     ZIO.succeed(map.remove(scrapreasonid).isDefined)
   }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
   }
   override def insert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, ScrapreasonRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    SelectBuilderMock(ScrapreasonFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(ScrapreasonFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ScrapreasonRow] = {
     ZStream.fromIterable(map.values)
@@ -87,7 +87,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     }
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure.fields, map)
   }
   override def upsert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, UpdateResult[ScrapreasonRow]] = {
     ZIO.succeed {

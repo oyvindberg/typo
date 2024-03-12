@@ -14,7 +14,7 @@ import typo.dsl.SelectBuilderSql
 
 class CcViewRepoImpl extends CcViewRepo {
   override def select: SelectBuilder[CcViewFields, CcViewRow] = {
-    SelectBuilderSql("sa.cc", CcViewFields, CcViewRow.rowParser)
+    SelectBuilderSql("sa.cc", CcViewFields.structure, CcViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CcViewRow] = {
     SQL"""select "id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text

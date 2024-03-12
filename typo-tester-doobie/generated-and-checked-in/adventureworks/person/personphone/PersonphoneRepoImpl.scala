@@ -29,7 +29,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""delete from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilder("person.personphone", PersonphoneFields)
+    DeleteBuilder("person.personphone", PersonphoneFields.structure)
   }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
@@ -70,7 +70,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonphoneRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
-    SelectBuilderSql("person.personphone", PersonphoneFields, PersonphoneRow.read)
+    SelectBuilderSql("person.personphone", PersonphoneFields.structure, PersonphoneRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
     sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone""".query(PersonphoneRow.read).stream
@@ -88,7 +88,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilder("person.personphone", PersonphoneFields, PersonphoneRow.read)
+    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.read)
   }
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")

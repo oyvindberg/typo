@@ -31,7 +31,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
     SQL"""delete from production.workorder where "workorderid" = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilder("production.workorder", WorkorderFields)
+    DeleteBuilder("production.workorder", WorkorderFields.structure)
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
@@ -83,7 +83,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
     streamingInsert(s"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderRowUnsaved.text, c)
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
-    SelectBuilderSql("production.workorder", WorkorderFields, WorkorderRow.rowParser)
+    SelectBuilderSql("production.workorder", WorkorderFields.structure, WorkorderRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
@@ -118,7 +118,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilder("production.workorder", WorkorderFields, WorkorderRow.rowParser)
+    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.rowParser)
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

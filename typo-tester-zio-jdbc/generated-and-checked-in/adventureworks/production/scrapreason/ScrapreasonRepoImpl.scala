@@ -28,7 +28,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""delete from production.scrapreason where "scrapreasonid" = ${Segment.paramSegment(scrapreasonid)(ScrapreasonId.setter)}""".delete.map(_ > 0)
   }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilder("production.scrapreason", ScrapreasonFields)
+    DeleteBuilder("production.scrapreason", ScrapreasonFields.structure)
   }
   override def insert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, ScrapreasonRow] = {
     sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
@@ -69,7 +69,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     streamingInsert(s"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ScrapreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.jdbcDecoder)
+    SelectBuilderSql("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ScrapreasonRow] = {
     sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason""".query(ScrapreasonRow.jdbcDecoder).selectStream
@@ -88,7 +88,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
           where "scrapreasonid" = ${Segment.paramSegment(scrapreasonid)(ScrapreasonId.setter)}""".update.map(_ > 0)
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilder("production.scrapreason", ScrapreasonFields, ScrapreasonRow.jdbcDecoder)
+    UpdateBuilder("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.jdbcDecoder)
   }
   override def upsert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, UpdateResult[ScrapreasonRow]] = {
     sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")

@@ -27,7 +27,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     delay(map.remove(transactionid).isDefined)
   }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields, map)
+    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields.structure.fields, map)
   }
   override def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     delay {
@@ -65,7 +65,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     }
   }
   override def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    SelectBuilderMock(TransactionhistoryFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(TransactionhistoryFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     }
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields, map)
+    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     delay {

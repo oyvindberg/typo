@@ -47,7 +47,7 @@ import zio.stream.ZStream
 
 class PgtestRepoImpl extends PgtestRepo {
   override def delete: DeleteBuilder[PgtestFields, PgtestRow] = {
-    DeleteBuilder("public.pgtest", PgtestFields)
+    DeleteBuilder("public.pgtest", PgtestFields.structure)
   }
   override def insert(unsaved: PgtestRow): ZIO[ZConnection, Throwable, PgtestRow] = {
     sql"""insert into public.pgtest("bool", "box", "bpchar", "bytea", "char", "circle", "date", "float4", "float8", "hstore", "inet", "int2", "int2vector", "int4", "int8", "interval", "json", "jsonb", "line", "lseg", "money", "mydomain", "myenum", "name", "numeric", "path", "point", "polygon", "text", "time", "timestamp", "timestampz", "timez", "uuid", "varchar", "vector", "xml", "boxes", "bpchares", "chares", "circlees", "datees", "float4es", "float8es", "inetes", "int2es", "int2vectores", "int4es", "int8es", "intervales", "jsones", "jsonbes", "linees", "lseges", "moneyes", "myenumes", "namees", "numerices", "pathes", "pointes", "polygones", "textes", "timees", "timestampes", "timestampzes", "timezes", "uuides", "varchares", "xmles")
@@ -59,12 +59,12 @@ class PgtestRepoImpl extends PgtestRepo {
     streamingInsert(s"""COPY public.pgtest("bool", "box", "bpchar", "bytea", "char", "circle", "date", "float4", "float8", "hstore", "inet", "int2", "int2vector", "int4", "int8", "interval", "json", "jsonb", "line", "lseg", "money", "mydomain", "myenum", "name", "numeric", "path", "point", "polygon", "text", "time", "timestamp", "timestampz", "timez", "uuid", "varchar", "vector", "xml", "boxes", "bpchares", "chares", "circlees", "datees", "float4es", "float8es", "inetes", "int2es", "int2vectores", "int4es", "int8es", "intervales", "jsones", "jsonbes", "linees", "lseges", "moneyes", "myenumes", "namees", "numerices", "pathes", "pointes", "polygones", "textes", "timees", "timestampes", "timestampzes", "timezes", "uuides", "varchares", "xmles") FROM STDIN""", batchSize, unsaved)(PgtestRow.text)
   }
   override def select: SelectBuilder[PgtestFields, PgtestRow] = {
-    SelectBuilderSql("public.pgtest", PgtestFields, PgtestRow.jdbcDecoder)
+    SelectBuilderSql("public.pgtest", PgtestFields.structure, PgtestRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PgtestRow] = {
     sql"""select "bool", "box", "bpchar", "bytea", "char", "circle", "date"::text, "float4", "float8", "hstore", "inet", "int2", "int2vector", "int4", "int8", "interval", "json", "jsonb", "line", "lseg", "money"::numeric, "mydomain", "myenum", "name", "numeric", "path", "point", "polygon", "text", "time"::text, "timestamp"::text, "timestampz"::text, "timez"::text, "uuid", "varchar", "vector"::float4[], "xml", "boxes", "bpchares", "chares", "circlees", "datees"::text[], "float4es", "float8es", "inetes", "int2es", "int2vectores", "int4es", "int8es", "intervales", "jsones", "jsonbes", "linees", "lseges", "moneyes"::numeric[], "myenumes", "namees", "numerices", "pathes", "pointes", "polygones", "textes", "timees"::text[], "timestampes"::text[], "timestampzes"::text[], "timezes"::text[], "uuides", "varchares", "xmles" from public.pgtest""".query(PgtestRow.jdbcDecoder).selectStream
   }
   override def update: UpdateBuilder[PgtestFields, PgtestRow] = {
-    UpdateBuilder("public.pgtest", PgtestFields, PgtestRow.jdbcDecoder)
+    UpdateBuilder("public.pgtest", PgtestFields.structure, PgtestRow.jdbcDecoder)
   }
 }

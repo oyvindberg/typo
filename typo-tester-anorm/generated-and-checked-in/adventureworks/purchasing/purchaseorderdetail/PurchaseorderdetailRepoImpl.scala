@@ -17,7 +17,7 @@ import typo.dsl.SelectBuilderSql
 
 class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.rowParser)
+    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
     SQL"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text

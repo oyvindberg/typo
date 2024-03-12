@@ -31,7 +31,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     SQL"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${ParameterValue(purchaseorderid, null, PurchaseorderheaderId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields)
+    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure)
   }
   override def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
@@ -104,7 +104,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     streamingInsert(s"""COPY purchasing.purchaseorderheader("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PurchaseorderheaderRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.rowParser)
+    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
     SQL"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
@@ -142,7 +142,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.rowParser)
+    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.rowParser)
   }
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")

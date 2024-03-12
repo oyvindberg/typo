@@ -11,7 +11,9 @@ import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
 import typo.dsl.SqlExpr.Field
+import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
+import typo.dsl.Structure.Relation
 
 trait PpViewFields[Row] {
   val id: Field[ProductphotoId, Row]
@@ -22,5 +24,29 @@ trait PpViewFields[Row] {
   val largephotofilename: OptField[/* max 50 chars */ String, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]
 }
-object PpViewFields extends PpViewStructure[PpViewRow](None, identity, (_, x) => x)
 
+object PpViewFields {
+  val structure: Relation[PpViewFields, PpViewRow, PpViewRow] = 
+    new Impl(None, identity, (_, x) => x)
+    
+  private final class Impl[Row](val prefix: Option[String], val extract: Row => PpViewRow, val merge: (Row, PpViewRow) => Row)
+    extends Relation[PpViewFields, PpViewRow, Row] { 
+  
+    override val fields: PpViewFields[Row] = new PpViewFields[Row] {
+      override val id = new Field[ProductphotoId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+      override val productphotoid = new Field[ProductphotoId, Row](prefix, "productphotoid", None, None)(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
+      override val thumbnailphoto = new OptField[TypoBytea, Row](prefix, "thumbnailphoto", None, None)(x => extract(x).thumbnailphoto, (row, value) => merge(row, extract(row).copy(thumbnailphoto = value)))
+      override val thumbnailphotofilename = new OptField[/* max 50 chars */ String, Row](prefix, "thumbnailphotofilename", None, None)(x => extract(x).thumbnailphotofilename, (row, value) => merge(row, extract(row).copy(thumbnailphotofilename = value)))
+      override val largephoto = new OptField[TypoBytea, Row](prefix, "largephoto", None, None)(x => extract(x).largephoto, (row, value) => merge(row, extract(row).copy(largephoto = value)))
+      override val largephotofilename = new OptField[/* max 50 chars */ String, Row](prefix, "largephotofilename", None, None)(x => extract(x).largephotofilename, (row, value) => merge(row, extract(row).copy(largephotofilename = value)))
+      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    }
+  
+    override val columns: List[FieldLikeNoHkt[?, Row]] =
+      List[FieldLikeNoHkt[?, Row]](fields.id, fields.productphotoid, fields.thumbnailphoto, fields.thumbnailphotofilename, fields.largephoto, fields.largephotofilename, fields.modifieddate)
+  
+    override def copy[NewRow](prefix: Option[String], extract: NewRow => PpViewRow, merge: (NewRow, PpViewRow) => NewRow): Impl[NewRow] =
+      new Impl(prefix, extract, merge)
+  }
+  
+}

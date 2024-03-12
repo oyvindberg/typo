@@ -25,7 +25,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     map.remove(shiftid).isDefined
   }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShiftFields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
   }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     val _ = if (map.contains(unsaved.shiftid))
@@ -53,7 +53,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     unsaved.size.toLong
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderMock(ShiftFields, () => map.values.toList, SelectParams.empty)
+    SelectBuilderMock(ShiftFields.structure, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
     map.values.toList
@@ -74,7 +74,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     }
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShiftFields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     map.put(unsaved.shiftid, unsaved): @nowarn

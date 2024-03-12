@@ -28,7 +28,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     sql"""delete from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields)
+    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
   }
   override def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
@@ -70,7 +70,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     new FragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductcosthistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.read)
+    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductcosthistoryRow] = {
     sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory""".query(ProductcosthistoryRow.read).stream
@@ -90,7 +90,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       .map(_ > 0)
   }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.read)
+    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.read)
   }
   override def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")

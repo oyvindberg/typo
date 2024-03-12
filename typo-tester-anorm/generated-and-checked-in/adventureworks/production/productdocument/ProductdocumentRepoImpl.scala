@@ -29,7 +29,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     SQL"""delete from production.productdocument where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    DeleteBuilder("production.productdocument", ProductdocumentFields)
+    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
   }
   override def insert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
     SQL"""insert into production.productdocument("productid", "modifieddate", "documentnode")
@@ -75,7 +75,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdocumentRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    SelectBuilderSql("production.productdocument", ProductdocumentFields, ProductdocumentRow.rowParser)
+    SelectBuilderSql("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
     SQL"""select "productid", "modifieddate"::text, "documentnode"
@@ -96,7 +96,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    UpdateBuilder("production.productdocument", ProductdocumentFields, ProductdocumentRow.rowParser)
+    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.rowParser)
   }
   override def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
     SQL"""insert into production.productdocument("productid", "modifieddate", "documentnode")

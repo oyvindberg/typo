@@ -29,7 +29,7 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields, map)
+    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields.structure.fields, map)
   }
   override def insert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, EmailaddressRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
-    SelectBuilderMock(EmailaddressFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(EmailaddressFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EmailaddressRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
     }
   }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields, map)
+    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields.structure.fields, map)
   }
   override def upsert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, UpdateResult[EmailaddressRow]] = {
     ZIO.succeed {

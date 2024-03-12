@@ -15,7 +15,7 @@ import typo.dsl.SelectBuilderSql
 
 class SpqhViewRepoImpl extends SpqhViewRepo {
   override def select: SelectBuilder[SpqhViewFields, SpqhViewRow] = {
-    SelectBuilderSql("sa.spqh", SpqhViewFields, SpqhViewRow.read)
+    SelectBuilderSql("sa.spqh", SpqhViewFields.structure, SpqhViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SpqhViewRow] = {
     sql"""select "id", "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sa.spqh""".query(SpqhViewRow.read).stream

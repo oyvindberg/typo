@@ -27,7 +27,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     delay(map.remove(stateprovinceid).isDefined)
   }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields, map)
+    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure.fields, map)
   }
   override def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     delay {
@@ -65,7 +65,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     }
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
-    SelectBuilderMock(StateprovinceFields, delay(map.values.toList), SelectParams.empty)
+    SelectBuilderMock(StateprovinceFields.structure, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
     Stream.emits(map.values.toList)
@@ -88,7 +88,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     }
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields, map)
+    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure.fields, map)
   }
   override def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     delay {

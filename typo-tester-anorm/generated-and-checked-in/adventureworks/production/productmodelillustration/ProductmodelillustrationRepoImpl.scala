@@ -29,7 +29,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     SQL"""delete from production.productmodelillustration where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "illustrationid" = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields)
+    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
   }
   override def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
@@ -72,7 +72,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     streamingInsert(s"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelillustrationRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.rowParser)
+    SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
     SQL"""select "productmodelid", "illustrationid", "modifieddate"::text
@@ -93,7 +93,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.rowParser)
+    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.rowParser)
   }
   override def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")

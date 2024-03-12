@@ -30,7 +30,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     SQL"""delete from production.productmodelproductdescriptionculture where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "productdescriptionid" = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND "cultureid" = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields)
+    DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     SQL"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
@@ -74,7 +74,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     streamingInsert(s"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelproductdescriptioncultureRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow.rowParser)
+    SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
@@ -95,7 +95,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
        """.executeUpdate() > 0
   }
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow.rowParser)
+    UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.rowParser)
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     SQL"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")

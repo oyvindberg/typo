@@ -29,7 +29,7 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields, map)
+    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
   override def insert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, CountryregioncurrencyRow] = {
     ZIO.succeed {
@@ -64,7 +64,7 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
     }.runLast.map(_.getOrElse(0L))
   }
   override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    SelectBuilderMock(CountryregioncurrencyFields, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+    SelectBuilderMock(CountryregioncurrencyFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = {
     ZStream.fromIterable(map.values)
@@ -84,7 +84,7 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
     }
   }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields, map)
+    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregioncurrencyRow]] = {
     ZIO.succeed {
