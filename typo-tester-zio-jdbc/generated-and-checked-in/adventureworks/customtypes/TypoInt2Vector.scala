@@ -27,7 +27,7 @@ object TypoInt2Vector {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoInt2Vector(x.asInstanceOf[PGobject].getValue))
     },
-    "scala.Array[org.postgresql.util.PGobject]"
+    "Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInt2Vector]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInt2Vector]] = Setter.forSqlType((ps, i, v) =>

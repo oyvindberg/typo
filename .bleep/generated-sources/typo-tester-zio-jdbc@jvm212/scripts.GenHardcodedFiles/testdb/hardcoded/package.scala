@@ -6,8 +6,8 @@
 package testdb
 
 package object hardcoded {
-  implicit lazy val BigDecimalArrayDecoder: zio.jdbc.JdbcDecoder[scala.Array[java.math.BigDecimal]] = new zio.jdbc.JdbcDecoder[scala.Array[java.math.BigDecimal]] {
-    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, scala.Array[java.math.BigDecimal]) = {
+  implicit lazy val BigDecimalArrayDecoder: zio.jdbc.JdbcDecoder[Array[java.math.BigDecimal]] = new zio.jdbc.JdbcDecoder[Array[java.math.BigDecimal]] {
+    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, Array[java.math.BigDecimal]) = {
       val arr = rs.getArray(columIndex)
       if (arr eq null) columIndex -> null
       else {
@@ -32,15 +32,15 @@ package object hardcoded {
       }
     }
   }
-  implicit lazy val BigDecimalArrayEncoder: zio.jdbc.JdbcEncoder[scala.Array[java.math.BigDecimal]] = zio.jdbc.JdbcEncoder.singleParamEncoder(BigDecimalArraySetter)
-  implicit lazy val BigDecimalArraySetter: zio.jdbc.SqlFragment.Setter[scala.Array[java.math.BigDecimal]] = zio.jdbc.SqlFragment.Setter.forSqlType[scala.Array[java.math.BigDecimal]](
+  implicit lazy val BigDecimalArrayEncoder: zio.jdbc.JdbcEncoder[Array[java.math.BigDecimal]] = zio.jdbc.JdbcEncoder.singleParamEncoder(BigDecimalArraySetter)
+  implicit lazy val BigDecimalArraySetter: zio.jdbc.SqlFragment.Setter[Array[java.math.BigDecimal]] = zio.jdbc.SqlFragment.Setter.forSqlType[Array[java.math.BigDecimal]](
     (ps, i, v) => {
       ps.setArray(i, ps.getConnection.createArrayOf("numeric", v.map(x => x: scala.AnyRef)))
     },
     java.sql.Types.ARRAY
   )
-  implicit lazy val BooleanArrayDecoder: zio.jdbc.JdbcDecoder[scala.Array[scala.Boolean]] = new zio.jdbc.JdbcDecoder[scala.Array[scala.Boolean]] {
-    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, scala.Array[scala.Boolean]) = {
+  implicit lazy val BooleanArrayDecoder: zio.jdbc.JdbcDecoder[Array[scala.Boolean]] = new zio.jdbc.JdbcDecoder[Array[scala.Boolean]] {
+    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, Array[scala.Boolean]) = {
       val arr = rs.getArray(columIndex)
       if (arr eq null) columIndex -> null
       else {
@@ -65,15 +65,15 @@ package object hardcoded {
       }
     }
   }
-  implicit lazy val BooleanArrayEncoder: zio.jdbc.JdbcEncoder[scala.Array[scala.Boolean]] = zio.jdbc.JdbcEncoder.singleParamEncoder(BooleanArraySetter)
-  implicit lazy val BooleanArraySetter: zio.jdbc.SqlFragment.Setter[scala.Array[scala.Boolean]] = zio.jdbc.SqlFragment.Setter.forSqlType[scala.Array[scala.Boolean]](
+  implicit lazy val BooleanArrayEncoder: zio.jdbc.JdbcEncoder[Array[scala.Boolean]] = zio.jdbc.JdbcEncoder.singleParamEncoder(BooleanArraySetter)
+  implicit lazy val BooleanArraySetter: zio.jdbc.SqlFragment.Setter[Array[scala.Boolean]] = zio.jdbc.SqlFragment.Setter.forSqlType[Array[scala.Boolean]](
     (ps, i, v) => {
       ps.setArray(i, ps.getConnection.createArrayOf("bool", v.map(x => boolean2Boolean(x): scala.AnyRef)))
     },
     java.sql.Types.ARRAY
   )
-  implicit lazy val DoubleArrayDecoder: zio.jdbc.JdbcDecoder[scala.Array[scala.Double]] = new zio.jdbc.JdbcDecoder[scala.Array[scala.Double]] {
-    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, scala.Array[scala.Double]) = {
+  implicit lazy val DoubleArrayDecoder: zio.jdbc.JdbcDecoder[Array[scala.Double]] = new zio.jdbc.JdbcDecoder[Array[scala.Double]] {
+    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, Array[scala.Double]) = {
       val arr = rs.getArray(columIndex)
       if (arr eq null) columIndex -> null
       else {
@@ -98,15 +98,15 @@ package object hardcoded {
       }
     }
   }
-  implicit lazy val DoubleArrayEncoder: zio.jdbc.JdbcEncoder[scala.Array[scala.Double]] = zio.jdbc.JdbcEncoder.singleParamEncoder(DoubleArraySetter)
-  implicit lazy val DoubleArraySetter: zio.jdbc.SqlFragment.Setter[scala.Array[scala.Double]] = zio.jdbc.SqlFragment.Setter.forSqlType[scala.Array[scala.Double]](
+  implicit lazy val DoubleArrayEncoder: zio.jdbc.JdbcEncoder[Array[scala.Double]] = zio.jdbc.JdbcEncoder.singleParamEncoder(DoubleArraySetter)
+  implicit lazy val DoubleArraySetter: zio.jdbc.SqlFragment.Setter[Array[scala.Double]] = zio.jdbc.SqlFragment.Setter.forSqlType[Array[scala.Double]](
     (ps, i, v) => {
       ps.setArray(i, ps.getConnection.createArrayOf("float8", v.map(x => double2Double(x): scala.AnyRef)))
     },
     java.sql.Types.ARRAY
   )
-  implicit lazy val FloatArrayDecoder: zio.jdbc.JdbcDecoder[scala.Array[scala.Float]] = new zio.jdbc.JdbcDecoder[scala.Array[scala.Float]] {
-    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, scala.Array[scala.Float]) = {
+  implicit lazy val FloatArrayDecoder: zio.jdbc.JdbcDecoder[Array[scala.Float]] = new zio.jdbc.JdbcDecoder[Array[scala.Float]] {
+    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, Array[scala.Float]) = {
       val arr = rs.getArray(columIndex)
       if (arr eq null) columIndex -> null
       else {
@@ -131,15 +131,15 @@ package object hardcoded {
       }
     }
   }
-  implicit lazy val FloatArrayEncoder: zio.jdbc.JdbcEncoder[scala.Array[scala.Float]] = zio.jdbc.JdbcEncoder.singleParamEncoder(FloatArraySetter)
-  implicit lazy val FloatArraySetter: zio.jdbc.SqlFragment.Setter[scala.Array[scala.Float]] = zio.jdbc.SqlFragment.Setter.forSqlType[scala.Array[scala.Float]](
+  implicit lazy val FloatArrayEncoder: zio.jdbc.JdbcEncoder[Array[scala.Float]] = zio.jdbc.JdbcEncoder.singleParamEncoder(FloatArraySetter)
+  implicit lazy val FloatArraySetter: zio.jdbc.SqlFragment.Setter[Array[scala.Float]] = zio.jdbc.SqlFragment.Setter.forSqlType[Array[scala.Float]](
     (ps, i, v) => {
       ps.setArray(i, ps.getConnection.createArrayOf("float4", v.map(x => float2Float(x): scala.AnyRef)))
     },
     java.sql.Types.ARRAY
   )
-  implicit lazy val IntArrayDecoder: zio.jdbc.JdbcDecoder[scala.Array[scala.Int]] = new zio.jdbc.JdbcDecoder[scala.Array[scala.Int]] {
-    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, scala.Array[scala.Int]) = {
+  implicit lazy val IntArrayDecoder: zio.jdbc.JdbcDecoder[Array[scala.Int]] = new zio.jdbc.JdbcDecoder[Array[scala.Int]] {
+    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, Array[scala.Int]) = {
       val arr = rs.getArray(columIndex)
       if (arr eq null) columIndex -> null
       else {
@@ -164,15 +164,15 @@ package object hardcoded {
       }
     }
   }
-  implicit lazy val IntArrayEncoder: zio.jdbc.JdbcEncoder[scala.Array[scala.Int]] = zio.jdbc.JdbcEncoder.singleParamEncoder(IntArraySetter)
-  implicit lazy val IntArraySetter: zio.jdbc.SqlFragment.Setter[scala.Array[scala.Int]] = zio.jdbc.SqlFragment.Setter.forSqlType[scala.Array[scala.Int]](
+  implicit lazy val IntArrayEncoder: zio.jdbc.JdbcEncoder[Array[scala.Int]] = zio.jdbc.JdbcEncoder.singleParamEncoder(IntArraySetter)
+  implicit lazy val IntArraySetter: zio.jdbc.SqlFragment.Setter[Array[scala.Int]] = zio.jdbc.SqlFragment.Setter.forSqlType[Array[scala.Int]](
     (ps, i, v) => {
       ps.setArray(i, ps.getConnection.createArrayOf("int4", v.map(x => int2Integer(x): scala.AnyRef)))
     },
     java.sql.Types.ARRAY
   )
-  implicit lazy val LongArrayDecoder: zio.jdbc.JdbcDecoder[scala.Array[scala.Long]] = new zio.jdbc.JdbcDecoder[scala.Array[scala.Long]] {
-    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, scala.Array[scala.Long]) = {
+  implicit lazy val LongArrayDecoder: zio.jdbc.JdbcDecoder[Array[scala.Long]] = new zio.jdbc.JdbcDecoder[Array[scala.Long]] {
+    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, Array[scala.Long]) = {
       val arr = rs.getArray(columIndex)
       if (arr eq null) columIndex -> null
       else {
@@ -197,18 +197,18 @@ package object hardcoded {
       }
     }
   }
-  implicit lazy val LongArrayEncoder: zio.jdbc.JdbcEncoder[scala.Array[scala.Long]] = zio.jdbc.JdbcEncoder.singleParamEncoder(LongArraySetter)
-  implicit lazy val LongArraySetter: zio.jdbc.SqlFragment.Setter[scala.Array[scala.Long]] = zio.jdbc.SqlFragment.Setter.forSqlType[scala.Array[scala.Long]](
+  implicit lazy val LongArrayEncoder: zio.jdbc.JdbcEncoder[Array[scala.Long]] = zio.jdbc.JdbcEncoder.singleParamEncoder(LongArraySetter)
+  implicit lazy val LongArraySetter: zio.jdbc.SqlFragment.Setter[Array[scala.Long]] = zio.jdbc.SqlFragment.Setter.forSqlType[Array[scala.Long]](
     (ps, i, v) => {
       ps.setArray(i, ps.getConnection.createArrayOf("int8", v.map(x => long2Long(x): scala.AnyRef)))
     },
     java.sql.Types.ARRAY
   )
-  implicit lazy val ScalaBigDecimalArrayDecoder: zio.jdbc.JdbcDecoder[scala.Array[scala.math.BigDecimal]] = BigDecimalArrayDecoder.map(v => if (v eq null) null else v.map(scala.math.BigDecimal.apply))
-  implicit lazy val ScalaBigDecimalArrayEncoder: zio.jdbc.JdbcEncoder[scala.Array[scala.math.BigDecimal]] = BigDecimalArrayEncoder.contramap(_.map(_.bigDecimal))
-  implicit lazy val ScalaBigDecimalArraySetter: zio.jdbc.SqlFragment.Setter[scala.Array[scala.math.BigDecimal]] = BigDecimalArraySetter.contramap(_.map(_.bigDecimal))
-  implicit lazy val StringArrayDecoder: zio.jdbc.JdbcDecoder[scala.Array[java.lang.String]] = new zio.jdbc.JdbcDecoder[scala.Array[java.lang.String]] {
-    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, scala.Array[java.lang.String]) = {
+  implicit lazy val ScalaBigDecimalArrayDecoder: zio.jdbc.JdbcDecoder[Array[scala.math.BigDecimal]] = BigDecimalArrayDecoder.map(v => if (v eq null) null else v.map(scala.math.BigDecimal.apply))
+  implicit lazy val ScalaBigDecimalArrayEncoder: zio.jdbc.JdbcEncoder[Array[scala.math.BigDecimal]] = BigDecimalArrayEncoder.contramap(_.map(_.bigDecimal))
+  implicit lazy val ScalaBigDecimalArraySetter: zio.jdbc.SqlFragment.Setter[Array[scala.math.BigDecimal]] = BigDecimalArraySetter.contramap(_.map(_.bigDecimal))
+  implicit lazy val StringArrayDecoder: zio.jdbc.JdbcDecoder[Array[java.lang.String]] = new zio.jdbc.JdbcDecoder[Array[java.lang.String]] {
+    override def unsafeDecode(columIndex: scala.Int, rs: java.sql.ResultSet): (scala.Int, Array[java.lang.String]) = {
       val arr = rs.getArray(columIndex)
       if (arr eq null) columIndex -> null
       else {
@@ -233,8 +233,8 @@ package object hardcoded {
       }
     }
   }
-  implicit lazy val StringArrayEncoder: zio.jdbc.JdbcEncoder[scala.Array[java.lang.String]] = zio.jdbc.JdbcEncoder.singleParamEncoder(StringArraySetter)
-  implicit lazy val StringArraySetter: zio.jdbc.SqlFragment.Setter[scala.Array[java.lang.String]] = zio.jdbc.SqlFragment.Setter.forSqlType[scala.Array[java.lang.String]](
+  implicit lazy val StringArrayEncoder: zio.jdbc.JdbcEncoder[Array[java.lang.String]] = zio.jdbc.JdbcEncoder.singleParamEncoder(StringArraySetter)
+  implicit lazy val StringArraySetter: zio.jdbc.SqlFragment.Setter[Array[java.lang.String]] = zio.jdbc.SqlFragment.Setter.forSqlType[Array[java.lang.String]](
     (ps, i, v) => {
       ps.setArray(i, ps.getConnection.createArrayOf("varchar", v.map(x => x: scala.AnyRef)))
     },

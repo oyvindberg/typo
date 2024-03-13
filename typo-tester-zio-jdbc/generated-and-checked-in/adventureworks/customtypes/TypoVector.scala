@@ -28,7 +28,7 @@ object TypoVector {
       val v = rs.getObject(i)
       if (v eq null) null else TypoVector(v.asInstanceOf[PgArray].getArray.asInstanceOf[Array[java.lang.Float]].map(Float2float))
     },
-    "scala.Array[java.lang.Float]"
+    "Array[java.lang.Float]"
   )
   implicit lazy val jdbcEncoder: JdbcEncoder[TypoVector] = JdbcEncoder.singleParamEncoder(setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoVector] = JsonDecoder.array[Float](JsonDecoder.float, implicitly).map(TypoVector.apply)

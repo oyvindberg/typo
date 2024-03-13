@@ -28,7 +28,7 @@ object TypoXml {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoXml(x.asInstanceOf[PGobject].getValue))
     },
-    "scala.Array[java.lang.String]"
+    "Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoXml]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoXml]] = Setter.forSqlType((ps, i, v) =>

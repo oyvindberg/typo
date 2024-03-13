@@ -46,6 +46,10 @@ projects:
     dependencies: dev.zio::zio-jdbc:0.1.1
     extends: template-cross
     sources: ../typo-dsl-shared
+  typo-runtime-java:
+    dependencies: org.postgresql:postgresql:42.6.0
+    platform:
+      name: jvm
   # scripts for publishing, codegen and so on
   typo-scripts:
     dependencies: build.bleep::bleep-plugin-ci-release:${BLEEP_VERSION}
@@ -85,6 +89,12 @@ projects:
       main: scripts.GenHardcodedFiles
       project: typo-scripts
     sources: ./generated-and-checked-in
+  typo-tester-java:
+    dependsOn: typo-runtime-java
+    isTestProject: true
+    platform:
+      name: jvm
+    sources: ./generated-and-checked-in
   typo-tester-none:
     extends: template-cross
     sources: ./generated-and-checked-in
@@ -101,13 +111,13 @@ projects:
       project: typo-scripts
     sources: ./generated-and-checked-in
 scripts:
+  compile-benchmarks:
+    main: scripts.CompileBenchmark
+    project: typo-scripts
   generate-adventureworks:
     main: scripts.GeneratedAdventureWorks
     project: typo-scripts
     sourceGlobs: ../adventureworks_sql
-  compile-benchmarks:
-    main: scripts.CompileBenchmark
-    project: typo-scripts
   generate-docs:
     main: scripts.GenDocumentation
     project: typo-scripts-doc

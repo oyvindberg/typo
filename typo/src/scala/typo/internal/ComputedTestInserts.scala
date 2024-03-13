@@ -49,7 +49,7 @@ object ComputedTestInserts {
               case None          => Some(TypesScala.None.code)
               case Some(default) => Some(code"if ($random.nextBoolean()) ${TypesScala.None} else ${TypesScala.Some}($default)")
             }
-          case sc.Type.TApply(TypesScala.Array, List(underlying)) =>
+          case sc.Type.ArrayOf(underlying) =>
             dbType match {
               case db.Type.Array(underlyingDb) =>
                 go(underlying, underlyingDb).map { default =>

@@ -148,7 +148,7 @@ case class ComputedTable(
         maybeId.collect {
           // todo: support composite ids
           case unary: IdComputed.Unary =>
-            RepoMethod.SelectAllByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), TypesScala.Array.of(unary.tpe), None), names.RowName)
+            RepoMethod.SelectAllByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe), None), names.RowName)
         },
         for {
           name <- names.FieldOrIdValueName

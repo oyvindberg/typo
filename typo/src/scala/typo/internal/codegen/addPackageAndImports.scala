@@ -7,7 +7,7 @@ import scala.collection.mutable
 /** imports are automatically written based on the qualified idents found in the code
   */
 object addPackageAndImports {
-  def apply(knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]], file: sc.File): sc.File = {
+  def apply(language: Language, knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]], file: sc.File): sc.File = {
     val newImports = mutable.Map.empty[sc.Ident, sc.Type.Qualified]
 
     val contents = file.contents
@@ -19,7 +19,7 @@ object addPackageAndImports {
           case currentQName =>
             val currentName = currentQName.value.name
             val shortenedQName = sc.Type.Qualified(currentName)
-            knownNamesByPkg.get(file.pkg).flatMap(_.get(currentName)).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
+            knownNamesByPkg.get(file.pkg).flatMap(_.get(currentName)).orElse(language.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
               case Some(alreadyAvailable) =>
                 if (alreadyAvailable == currentQName) shortenedQName else currentQName
               case None =>
@@ -63,6 +63,19 @@ object addPackageAndImports {
         shortenNamesClassMember(x, f)
       case sc.Obj(name, members, body) =>
         sc.Obj(name, members.map(cm => shortenNamesClassMember(cm, f)), body.map(_.mapTrees(t => shortenNames(t, f))))
+      case sc.Class(comments, classType, name, tparams, params, implicitParams, extends_, implements, staticBody, staticMembers) =>
+        sc.Class(
+          comments,
+          classType,
+          name,
+          tparams,
+          params.map(shortenNamesParam(_, f)),
+          implicitParams.map(shortenNamesParam(_, f)),
+          extends_.map(shortenNamesType(_, f)),
+          implements.map(shortenNamesType(_, f)),
+          staticBody.map(_.mapTrees(shortenNames(_, f))),
+          staticMembers.map(shortenNamesClassMember(_, f)),
+        )
     }
 
   def shortenNamesParam(param: sc.Param, f: sc.Type.Qualified => sc.Type.Qualified): sc.Param =
@@ -86,6 +99,7 @@ object addPackageAndImports {
   // traverse type tree and rewrite qualified names
   def shortenNamesType(tpe: sc.Type, f: sc.Type.Qualified => sc.Type.Qualified): sc.Type =
     tpe match {
+      case sc.Type.ArrayOf(value)                 => sc.Type.ArrayOf(shortenNamesType(value, f))
       case sc.Type.Abstract(value)                => sc.Type.Abstract(value)
       case sc.Type.Wildcard                       => sc.Type.Wildcard
       case sc.Type.TApply(underlying, targs)      => sc.Type.TApply(shortenNamesType(underlying, f), targs.map(targ => shortenNamesType(targ, f)))

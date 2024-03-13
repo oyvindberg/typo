@@ -24,7 +24,7 @@ object TypoBytea {
   implicit lazy val column: Column[TypoBytea] = Column.nonNull[TypoBytea]((v1: Any, _) =>
     v1 match {
       case v: Array[Byte] => Right(TypoBytea(v))
-      case other => Left(TypeDoesNotMatch(s"Expected instance of scala.Array[scala.Byte], got ${other.getClass.getName}"))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of Array[scala.Byte], got ${other.getClass.getName}"))
     }
   )
   implicit def ordering(implicit O0: Ordering[Array[Byte]]): Ordering[TypoBytea] = Ordering.by(_.value)

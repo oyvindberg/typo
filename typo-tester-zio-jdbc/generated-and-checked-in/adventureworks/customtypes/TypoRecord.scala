@@ -27,7 +27,7 @@ object TypoRecord {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoRecord(x.asInstanceOf[PGobject].getValue))
     },
-    "scala.Array[org.postgresql.util.PGobject]"
+    "Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoRecord]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoRecord]] = Setter.forSqlType((ps, i, v) =>

@@ -26,7 +26,7 @@ object TypoUnknownCitext {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoUnknownCitext(x.asInstanceOf[String]))
     },
-    "scala.Array[java.lang.String]"
+    "Array[java.lang.String]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUnknownCitext]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoUnknownCitext]] = Setter.forSqlType((ps, i, v) =>

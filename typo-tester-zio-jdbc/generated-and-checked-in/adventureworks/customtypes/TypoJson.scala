@@ -27,7 +27,7 @@ object TypoJson {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoJson(x.asInstanceOf[String]))
     },
-    "scala.Array[org.postgresql.util.PGobject]"
+    "Array[org.postgresql.util.PGobject]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoJson]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoJson]] = Setter.forSqlType((ps, i, v) =>

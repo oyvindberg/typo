@@ -28,7 +28,7 @@ object TypoLine {
       case null => null
       case arr => arr.getArray.asInstanceOf[Array[AnyRef]].map(x => TypoLine(x.asInstanceOf[PGline].a, x.asInstanceOf[PGline].b, x.asInstanceOf[PGline].c))
     },
-    "scala.Array[org.postgresql.geometric.PGline]"
+    "Array[org.postgresql.geometric.PGline]"
   )
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLine]] = JdbcEncoder.singleParamEncoder(arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLine]] = Setter.forSqlType((ps, i, v) =>
