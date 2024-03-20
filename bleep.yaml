@@ -12,9 +12,9 @@ projects:
   # main project
   typo:
     dependencies:
-    - com.typesafe.play::play-json:2.10.3
+    - com.typesafe.play::play-json:2.10.4
     - org.playframework.anorm::anorm:2.7.0
-    - org.postgresql:postgresql:42.6.0
+    - org.postgresql:postgresql:42.7.3
     extends: template-cross
     platform:
       mainClass: com.foo.App
@@ -34,7 +34,7 @@ projects:
         extends: template-kind-projector
       jvm213:
         extends: template-kind-projector
-    dependencies: org.tpolecat::doobie-postgres:1.0.0-RC4
+    dependencies: org.tpolecat::doobie-postgres:1.0.0-RC5
     extends: template-cross
     sources: ../typo-dsl-shared
   typo-dsl-zio-jdbc:
@@ -43,7 +43,7 @@ projects:
         extends: template-kind-projector
       jvm213:
         extends: template-kind-projector
-    dependencies: dev.zio::zio-jdbc:0.1.1
+    dependencies: dev.zio::zio-jdbc:0.1.2
     extends: template-cross
     sources: ../typo-dsl-shared
   # scripts for publishing, codegen and so on
@@ -63,8 +63,8 @@ projects:
   # scripts generate code into the tester projects, and there are hand-written tests inside as well
   typo-tester-anorm:
     dependencies:
-    - com.typesafe.play::play-json:2.10.3
-    - org.postgresql:postgresql:42.6.0
+    - com.typesafe.play::play-json:2.10.4
+    - org.postgresql:postgresql:42.7.3
     - org.scalatest::scalatest:3.3.0-SNAP4
     dependsOn: typo-dsl-anorm
     extends: template-cross
@@ -76,7 +76,7 @@ projects:
   typo-tester-doobie:
     dependencies:
     - io.circe::circe-core:0.14.4
-    - org.postgresql:postgresql:42.6.0
+    - org.postgresql:postgresql:42.7.3
     - org.scalatest::scalatest:3.3.0-SNAP4
     dependsOn: typo-dsl-doobie
     extends: template-cross
@@ -91,7 +91,7 @@ projects:
   typo-tester-zio-jdbc:
     dependencies:
     - dev.zio::zio-json:0.6.2
-    - org.postgresql:postgresql:42.6.0
+    - org.postgresql:postgresql:42.7.3
     - org.scalatest::scalatest:3.3.0-SNAP4
     dependsOn: typo-dsl-zio-jdbc
     extends: template-cross
@@ -101,13 +101,13 @@ projects:
       project: typo-scripts
     sources: ./generated-and-checked-in
 scripts:
+  compile-benchmarks:
+    main: scripts.CompileBenchmark
+    project: typo-scripts
   generate-adventureworks:
     main: scripts.GeneratedAdventureWorks
     project: typo-scripts
     sourceGlobs: ../adventureworks_sql
-  compile-benchmarks:
-    main: scripts.CompileBenchmark
-    project: typo-scripts
   generate-docs:
     main: scripts.GenDocumentation
     project: typo-scripts-doc
