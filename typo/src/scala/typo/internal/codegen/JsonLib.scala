@@ -5,14 +5,14 @@ package codegen
 trait JsonLib {
   def defaultedInstance(default: ComputedDefault): List[sc.Given]
   def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given]
-  def anyValInstances(wrapperType: sc.Type.Qualified, fieldName: sc.Ident, underlying: sc.Type): List[sc.Given]
+  def wrapperTypeInstances(wrapperType: sc.Type.Qualified, fieldName: sc.Ident, underlying: sc.Type): List[sc.Given]
   def productInstances(tpe: sc.Type, fields: NonEmptyList[JsonLib.Field]): List[sc.Given]
   def missingInstances: List[sc.ClassMember]
 
   final def customTypeInstances(ct: CustomType): List[sc.Given] =
     ct.params match {
       case NonEmptyList(param, Nil) =>
-        anyValInstances(ct.typoType, param.name, param.tpe)
+        wrapperTypeInstances(ct.typoType, param.name, param.tpe)
       case more =>
         productInstances(ct.typoType, more.map(param => JsonLib.Field(param.name, sc.StrLit(param.name.value), param.tpe)))
     }

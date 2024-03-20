@@ -17,7 +17,7 @@ import typo.dsl.Bijection
 /** Domain `public.Phone`
   * No constraint
   */
-case class Phone(value: String) extends AnyVal
+case class Phone(value: String)
 object Phone {
   implicit lazy val arrayColumn: Column[Array[Phone]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[Phone]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))

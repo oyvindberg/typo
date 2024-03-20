@@ -17,7 +17,7 @@ import typo.dsl.Bijection
 /** Domain `public.OrderNumber`
   * No constraint
   */
-case class OrderNumber(value: String) extends AnyVal
+case class OrderNumber(value: String)
 object OrderNumber {
   implicit lazy val arrayColumn: Column[Array[OrderNumber]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[OrderNumber]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))

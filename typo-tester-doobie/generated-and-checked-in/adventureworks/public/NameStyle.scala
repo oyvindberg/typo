@@ -17,7 +17,7 @@ import typo.dsl.Bijection
 /** Domain `public.NameStyle`
   * No constraint
   */
-case class NameStyle(value: Boolean) extends AnyVal
+case class NameStyle(value: Boolean)
 object NameStyle {
   implicit lazy val arrayGet: Get[Array[NameStyle]] = adventureworks.BooleanArrayMeta.get.map(_.map(NameStyle.apply))
   implicit lazy val arrayPut: Put[Array[NameStyle]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))

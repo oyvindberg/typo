@@ -17,7 +17,7 @@ import typo.dsl.Bijection
 /** Domain `public.Phone`
   * No constraint
   */
-case class Phone(value: String) extends AnyVal
+case class Phone(value: String)
 object Phone {
   implicit lazy val arrayGet: Get[Array[Phone]] = adventureworks.StringArrayMeta.get.map(_.map(Phone.apply))
   implicit lazy val arrayPut: Put[Array[Phone]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))

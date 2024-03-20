@@ -118,8 +118,8 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
             genOrdering.ordering(id.tpe, NonEmptyList(sc.Param(value, id.underlying, None)))
           ),
           bijection.toList,
-          options.jsonLibs.flatMap(_.anyValInstances(wrapperType = id.tpe, fieldName = value, underlying = id.underlying)),
-          options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying))
+          options.jsonLibs.flatMap(_.wrapperTypeInstances(wrapperType = id.tpe, fieldName = value, underlying = id.underlying)),
+          options.dbLib.toList.flatMap(_.wrapperTypeInstances(wrapperType = id.tpe, underlying = id.underlying))
         ).flatten
         Some(
           sc.File(

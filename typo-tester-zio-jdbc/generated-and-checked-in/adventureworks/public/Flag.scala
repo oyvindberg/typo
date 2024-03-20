@@ -18,7 +18,7 @@ import zio.json.JsonEncoder
 /** Domain `public.Flag`
   * No constraint
   */
-case class Flag(value: Boolean) extends AnyVal
+case class Flag(value: Boolean)
 object Flag {
   implicit lazy val arraySetter: Setter[Array[Flag]] = adventureworks.BooleanArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[Flag, Boolean] = Bijection[Flag, Boolean](_.value)(Flag.apply)

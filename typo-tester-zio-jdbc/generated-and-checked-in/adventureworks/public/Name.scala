@@ -18,7 +18,7 @@ import zio.json.JsonEncoder
 /** Domain `public.Name`
   * No constraint
   */
-case class Name(value: String) extends AnyVal
+case class Name(value: String)
 object Name {
   implicit lazy val arraySetter: Setter[Array[Name]] = adventureworks.StringArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[Name, String] = Bijection[Name, String](_.value)(Name.apply)

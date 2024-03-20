@@ -24,13 +24,13 @@ object FileDomain {
         genOrdering.ordering(domain.tpe, NonEmptyList(sc.Param(value, domain.underlyingType, None)))
       ),
       bijection.toList,
-      options.jsonLibs.flatMap(_.anyValInstances(wrapperType = domain.tpe, fieldName = value, underlying = domain.underlyingType)),
-      options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = domain.tpe, underlying = domain.underlyingType))
+      options.jsonLibs.flatMap(_.wrapperTypeInstances(wrapperType = domain.tpe, fieldName = value, underlying = domain.underlyingType)),
+      options.dbLib.toList.flatMap(_.wrapperTypeInstances(wrapperType = domain.tpe, underlying = domain.underlyingType))
     ).flatten
 
     val str =
       code"""|$comments
-             |case class ${domain.tpe.name}($value: ${domain.underlyingType}) extends AnyVal
+             |case class ${domain.tpe.name}($value: ${domain.underlyingType})
              |${genObject(domain.tpe.value, instances)}""".stripMargin
 
     sc.File(domain.tpe, str, secondaryTypes = Nil)

@@ -495,7 +495,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       textSupport.map(_.anyValInstance(wrapperType, underlying))
     ).flatten
 
-  override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Given] =
+  override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Given] =
     List(
       Some(
         sc.Given(

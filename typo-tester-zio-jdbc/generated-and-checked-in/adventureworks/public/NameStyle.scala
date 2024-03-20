@@ -18,7 +18,7 @@ import zio.json.JsonEncoder
 /** Domain `public.NameStyle`
   * No constraint
   */
-case class NameStyle(value: Boolean) extends AnyVal
+case class NameStyle(value: Boolean)
 object NameStyle {
   implicit lazy val arraySetter: Setter[Array[NameStyle]] = adventureworks.BooleanArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[NameStyle, Boolean] = Bijection[NameStyle, Boolean](_.value)(NameStyle.apply)

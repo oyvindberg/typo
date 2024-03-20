@@ -17,7 +17,7 @@ import typo.dsl.Bijection
 /** Domain `public.AccountNumber`
   * No constraint
   */
-case class AccountNumber(value: String) extends AnyVal
+case class AccountNumber(value: String)
 object AccountNumber {
   implicit lazy val arrayColumn: Column[Array[AccountNumber]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[AccountNumber]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))

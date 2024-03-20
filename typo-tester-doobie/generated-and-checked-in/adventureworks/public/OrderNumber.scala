@@ -17,7 +17,7 @@ import typo.dsl.Bijection
 /** Domain `public.OrderNumber`
   * No constraint
   */
-case class OrderNumber(value: String) extends AnyVal
+case class OrderNumber(value: String)
 object OrderNumber {
   implicit lazy val arrayGet: Get[Array[OrderNumber]] = adventureworks.StringArrayMeta.get.map(_.map(OrderNumber.apply))
   implicit lazy val arrayPut: Put[Array[OrderNumber]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))

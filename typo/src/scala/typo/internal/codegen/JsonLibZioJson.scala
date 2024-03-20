@@ -126,7 +126,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
       )
     )
 
-  override def anyValInstances(wrapperType: sc.Type.Qualified, fieldName: sc.Ident, underlying: sc.Type): List[sc.Given] =
+  override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, fieldName: sc.Ident, underlying: sc.Type): List[sc.Given] =
     List(
       sc.Given(
         tparams = Nil,

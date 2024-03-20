@@ -627,7 +627,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     ).flatten
   }
 
-  override def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.ClassMember] =
+  override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.ClassMember] =
     List(
       Option(
         sc.Given(
