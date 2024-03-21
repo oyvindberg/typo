@@ -11,18 +11,25 @@ package pg_catalog
 package pg_namespace
 
 import java.sql.Connection
+import scala.annotation.nowarn
 
 class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNamespaceRow] = scala.collection.mutable.Map.empty) extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
   }
   override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    if (map.contains(unsaved.oid))
+    val _ = if (map.contains(unsaved.oid))
       sys.error(s"id ${unsaved.oid} already exists")
-    else {
-      val _ = map.put(unsaved.oid, unsaved)
-    }
+    else
+      map.put(unsaved.oid, unsaved)
+    
     unsaved
+  }
+  override def insertStreaming(unsaved: Iterator[PgNamespaceRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.oid -> row)
+    }
+    unsaved.size.toLong
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     map.values.toList
@@ -40,13 +47,13 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
     map.get(row.oid) match {
       case Some(`row`) => false
       case Some(_) =>
-        val _ = map.put(row.oid, row)
+        map.put(row.oid, row): @nowarn
         true
       case None => false
     }
   }
   override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    val _ = map.put(unsaved.oid, unsaved)
+    map.put(unsaved.oid, unsaved): @nowarn
     unsaved
   }
 }

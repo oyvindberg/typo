@@ -14,12 +14,12 @@ class DbTest extends AnyFunSuite with TypeCheckedTripleEquals {
       "jdbc:postgresql://localhost:6432/postgres?user=postgres&password=password"
     )
 
-    println(information_schema.columns.ColumnsViewRepoImpl.selectAll.take(1))
-    println(information_schema.key_column_usage.KeyColumnUsageViewRepoImpl.selectAll.take(1))
-    println(information_schema.referential_constraints.ReferentialConstraintsViewRepoImpl.selectAll.take(1))
-    println(information_schema.table_constraints.TableConstraintsViewRepoImpl.selectAll.take(1))
-    println(information_schema.tables.TablesViewRepoImpl.selectAll.take(1))
-    println(ViewFindAllSqlRepoImpl().take(1))
-    println(DomainsSqlRepoImpl().take(1))
+    println((new information_schema.columns.ColumnsViewRepoImpl).selectAll.take(1))
+    println((new information_schema.key_column_usage.KeyColumnUsageViewRepoImpl).selectAll.take(1))
+    println((new information_schema.referential_constraints.ReferentialConstraintsViewRepoImpl).selectAll.take(1))
+    println((new information_schema.table_constraints.TableConstraintsViewRepoImpl).selectAll.take(1))
+    println((new information_schema.tables.TablesViewRepoImpl).selectAll.take(1))
+    println((new ViewFindAllSqlRepoImpl)().take(1))
+    println((new DomainsSqlRepoImpl)().take(1))
   }
 }

@@ -18,6 +18,7 @@ import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.generated.Text
 
 /** aclitem (via PGObject) */
 case class TypoAclItem(value: String)
@@ -52,6 +53,10 @@ object TypoAclItem {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoAclItem] = Reads.StringReads.map(TypoAclItem.apply)
+  implicit lazy val text: Text[TypoAclItem] = new Text[TypoAclItem] {
+    override def unsafeEncode(v: TypoAclItem, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoAclItem, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoAclItem] = ToStatement[TypoAclItem]((s, index, v) => s.setObject(index, {
                                                                  val obj = new PGobject
                                                                  obj.setType("aclitem")

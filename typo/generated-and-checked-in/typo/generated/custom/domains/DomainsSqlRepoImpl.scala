@@ -13,7 +13,7 @@ package domains
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-object DomainsSqlRepoImpl extends DomainsSqlRepo {
+class DomainsSqlRepoImpl extends DomainsSqlRepo {
   override def apply()(implicit c: Connection): List[DomainsSqlRow] = {
     val sql =
       SQL"""SELECT nsp.nspname                   as "schema",

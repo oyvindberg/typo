@@ -13,7 +13,7 @@ package constraints
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-object ConstraintsSqlRepoImpl extends ConstraintsSqlRepo {
+class ConstraintsSqlRepoImpl extends ConstraintsSqlRepo {
   override def apply()(implicit c: Connection): List[ConstraintsSqlRow] = {
     val sql =
       SQL"""with cols as (SELECT nc.nspname AS table_schema,

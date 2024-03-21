@@ -15,6 +15,7 @@ import java.sql.Connection
 trait PgNamespaceRepo {
   def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean
   def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow
+  def insertStreaming(unsaved: Iterator[PgNamespaceRow], batchSize: Int)(implicit c: Connection): Long
   def selectAll(implicit c: Connection): List[PgNamespaceRow]
   def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow]
   def selectByIds(oids: Array[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow]

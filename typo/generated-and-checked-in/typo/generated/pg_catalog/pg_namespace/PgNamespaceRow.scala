@@ -21,6 +21,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
+import typo.generated.Text
 import typo.generated.customtypes.TypoAclItem
 
 case class PgNamespaceRow(
@@ -41,7 +42,7 @@ object PgNamespaceRow {
           oid = json.\("oid").as(PgNamespaceId.reads),
           nspname = json.\("nspname").as(Reads.StringReads),
           nspowner = json.\("nspowner").as(Reads.LongReads),
-          nspacl = json.\("nspacl").toOption.map(_.as(using Reads.ArrayReads[TypoAclItem](using TypoAclItem.reads, implicitly)))
+          nspacl = json.\("nspacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](using TypoAclItem.reads, implicitly)))
         )
       )
     ),
@@ -56,12 +57,21 @@ object PgNamespaceRow {
       )
     )
   }
+  implicit lazy val text: Text[PgNamespaceRow] = Text.instance[PgNamespaceRow]{ (row, sb) =>
+    PgNamespaceId.text.unsafeEncode(row.oid, sb)
+    sb.append(Text.DELIMETER)
+    Text.stringInstance.unsafeEncode(row.nspname, sb)
+    sb.append(Text.DELIMETER)
+    Text.longInstance.unsafeEncode(row.nspowner, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.iterableInstance[Array, TypoAclItem](TypoAclItem.text, implicitly)).unsafeEncode(row.nspacl, sb)
+  }
   implicit lazy val writes: OWrites[PgNamespaceRow] = OWrites[PgNamespaceRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgNamespaceId.writes.writes(o.oid),
       "nspname" -> Writes.StringWrites.writes(o.nspname),
       "nspowner" -> Writes.LongWrites.writes(o.nspowner),
-      "nspacl" -> Writes.OptionWrites(using Writes.arrayWrites[TypoAclItem](using implicitly, TypoAclItem.writes)).writes(o.nspacl)
+      "nspacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](using implicitly, TypoAclItem.writes)).writes(o.nspacl)
     ))
   )
 }

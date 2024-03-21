@@ -13,7 +13,7 @@ package view_find_all
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-object ViewFindAllSqlRepoImpl extends ViewFindAllSqlRepo {
+class ViewFindAllSqlRepoImpl extends ViewFindAllSqlRepo {
   override def apply()(implicit c: Connection): List[ViewFindAllSqlRow] = {
     val sql =
       SQL"""SELECT nc.oid                                        as table_oid,

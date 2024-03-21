@@ -15,6 +15,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.generated.Text
 
 /** Type for the primary key of table `pg_catalog.pg_namespace` */
 case class PgNamespaceId(value: /* oid */ Long) extends AnyVal
@@ -28,6 +29,10 @@ object PgNamespaceId {
     override def jdbcType: Int = ParameterMetaData.LongParameterMetaData.jdbcType
   }
   implicit lazy val reads: Reads[PgNamespaceId] = Reads.LongReads.map(PgNamespaceId.apply)
+  implicit lazy val text: Text[PgNamespaceId] = new Text[PgNamespaceId] {
+    override def unsafeEncode(v: PgNamespaceId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: PgNamespaceId, sb: StringBuilder) = Text.longInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[PgNamespaceId] = ToStatement.longToStatement.contramap(_.value)
   implicit lazy val writes: Writes[PgNamespaceId] = Writes.LongWrites.contramap(_.value)
 }

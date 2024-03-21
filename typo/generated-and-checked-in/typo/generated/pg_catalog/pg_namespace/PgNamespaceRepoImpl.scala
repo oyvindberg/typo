@@ -15,8 +15,9 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 import typo.generated.customtypes.TypoAclItem
+import typo.generated.streamingInsert
 
-object PgNamespaceRepoImpl extends PgNamespaceRepo {
+class PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_namespace where "oid" = ${ParameterValue(oid, null, PgNamespaceId.toStatement)}""".executeUpdate() > 0
   }
@@ -27,6 +28,9 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
        """
       .executeInsert(PgNamespaceRow.rowParser(1).single)
     
+  }
+  override def insertStreaming(unsaved: Iterator[PgNamespaceRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl") FROM STDIN""", batchSize, unsaved)(PgNamespaceRow.text, c)
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     SQL"""select "oid", "nspname", "nspowner", "nspacl"
@@ -47,7 +51,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     
   }
   override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
-    SQL"""select "nspname"
+    SQL"""select "oid", "nspname", "nspowner", "nspacl"
           from pg_catalog.pg_namespace
           where "nspname" = ${ParameterValue(nspname, null, ToStatement.stringToStatement)}
        """.as(PgNamespaceRow.rowParser(1).singleOpt)

@@ -13,7 +13,7 @@ package comments
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-object CommentsSqlRepoImpl extends CommentsSqlRepo {
+class CommentsSqlRepoImpl extends CommentsSqlRepo {
   override def apply()(implicit c: Connection): List[CommentsSqlRow] = {
     val sql =
       SQL"""select c.table_schema,

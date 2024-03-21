@@ -18,6 +18,7 @@ import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.generated.Text
 
 /** regtype (via PGObject) */
 case class TypoRegtype(value: String)
@@ -52,6 +53,10 @@ object TypoRegtype {
     override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[TypoRegtype] = Reads.StringReads.map(TypoRegtype.apply)
+  implicit lazy val text: Text[TypoRegtype] = new Text[TypoRegtype] {
+    override def unsafeEncode(v: TypoRegtype, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+    override def unsafeArrayEncode(v: TypoRegtype, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  }
   implicit lazy val toStatement: ToStatement[TypoRegtype] = ToStatement[TypoRegtype]((s, index, v) => s.setObject(index, {
                                                                  val obj = new PGobject
                                                                  obj.setType("regtype")

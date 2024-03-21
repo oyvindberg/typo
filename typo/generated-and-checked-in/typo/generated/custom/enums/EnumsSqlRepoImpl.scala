@@ -13,7 +13,7 @@ package enums
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
-object EnumsSqlRepoImpl extends EnumsSqlRepo {
+class EnumsSqlRepoImpl extends EnumsSqlRepo {
   override def apply()(implicit c: Connection): List[EnumsSqlRow] = {
     val sql =
       SQL"""select n.nspname as enum_schema,

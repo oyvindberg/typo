@@ -49,16 +49,16 @@ object MetaDb {
       }
 
       Input(
-        tableConstraints = timed("tableConstraints")(TableConstraintsViewRepoImpl.selectAll),
-        keyColumnUsage = timed("keyColumnUsage")(KeyColumnUsageViewRepoImpl.selectAll),
-        referentialConstraints = timed("referentialConstraints")(ReferentialConstraintsViewRepoImpl.selectAll),
-        pgEnums = timed("pgEnums")(EnumsSqlRepoImpl()),
-        tables = timed("tables")(TablesViewRepoImpl.selectAll.filter(_.tableType.contains("BASE TABLE"))),
-        columns = timed("columns")(ColumnsViewRepoImpl.selectAll),
-        views = timed("views")(ViewFindAllSqlRepoImpl()),
-        domains = timed("domains")(DomainsSqlRepoImpl()),
-        columnComments = timed("columnComments")(CommentsSqlRepoImpl()),
-        constraints = timed("constraints")(ConstraintsSqlRepoImpl())
+        tableConstraints = timed("tableConstraints")((new TableConstraintsViewRepoImpl).selectAll),
+        keyColumnUsage = timed("keyColumnUsage")((new KeyColumnUsageViewRepoImpl).selectAll),
+        referentialConstraints = timed("referentialConstraints")((new ReferentialConstraintsViewRepoImpl).selectAll),
+        pgEnums = timed("pgEnums")((new EnumsSqlRepoImpl)()),
+        tables = timed("tables")((new TablesViewRepoImpl).selectAll.filter(_.tableType.contains("BASE TABLE"))),
+        columns = timed("columns")((new ColumnsViewRepoImpl).selectAll),
+        views = timed("views")((new ViewFindAllSqlRepoImpl)()),
+        domains = timed("domains")((new DomainsSqlRepoImpl)()),
+        columnComments = timed("columnComments")((new CommentsSqlRepoImpl)()),
+        constraints = timed("constraints")((new ConstraintsSqlRepoImpl)())
       )
     }
   }
