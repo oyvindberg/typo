@@ -18,6 +18,12 @@ trait SelectBuilder[Fields[_], Row] {
   final def where[N[_]: Nullability](v: Fields[Hidden] => SqlExpr[Boolean, N, Hidden]): SelectBuilder[Fields, Row] =
     withParams(params.where(fields => v(fields.asInstanceOf[Fields[Hidden]]).asInstanceOf[SqlExpr[Boolean, N, Row]].?))
 
+  final def maybeWhere[N[_]: Nullability, T](ot: Option[T])(v: (T, Fields[Hidden]) => SqlExpr[Boolean, N, Hidden]): SelectBuilder[Fields, Row] =
+    ot match {
+      case Some(t) => where(fields => v(t, fields))
+      case None    => this
+    }
+
   /** Same as [[where]], but requires the expression to not be nullable */
   final def whereStrict(v: Fields[Hidden] => SqlExpr[Boolean, Required, Hidden]): SelectBuilder[Fields, Row] =
     withParams(params.where(fields => v(fields.asInstanceOf[Fields[Hidden]]).asInstanceOf[SqlExpr[Boolean, Required, Row]].?))
