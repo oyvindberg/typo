@@ -42,9 +42,7 @@ case class TableConstraintsViewRow(
   /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"initially_deferred","originalName":"initially_deferred"},"columnName":"initially_deferred","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
   initiallyDeferred: /* nullability unknown */ Option[/* max 3 chars */ String],
   /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"enforced","originalName":"enforced"},"columnName":"enforced","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
-  enforced: /* nullability unknown */ Option[/* max 3 chars */ String],
-  /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":3,"parsedColumnName":{"name":"nulls_distinct","originalName":"nulls_distinct"},"columnName":"nulls_distinct","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":3,"scale":0} */
-  nullsDistinct: /* nullability unknown */ Option[/* max 3 chars */ String]
+  enforced: /* nullability unknown */ Option[/* max 3 chars */ String]
 )
 
 object TableConstraintsViewRow {
@@ -60,8 +58,7 @@ object TableConstraintsViewRow {
           constraintType = json.\("constraint_type").toOption.map(_.as(Reads.StringReads)),
           isDeferrable = json.\("is_deferrable").toOption.map(_.as(Reads.StringReads)),
           initiallyDeferred = json.\("initially_deferred").toOption.map(_.as(Reads.StringReads)),
-          enforced = json.\("enforced").toOption.map(_.as(Reads.StringReads)),
-          nullsDistinct = json.\("nulls_distinct").toOption.map(_.as(Reads.StringReads))
+          enforced = json.\("enforced").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -78,8 +75,7 @@ object TableConstraintsViewRow {
         constraintType = row(idx + 6)(Column.columnToOption(Column.columnToString)),
         isDeferrable = row(idx + 7)(Column.columnToOption(Column.columnToString)),
         initiallyDeferred = row(idx + 8)(Column.columnToOption(Column.columnToString)),
-        enforced = row(idx + 9)(Column.columnToOption(Column.columnToString)),
-        nullsDistinct = row(idx + 10)(Column.columnToOption(Column.columnToString))
+        enforced = row(idx + 9)(Column.columnToOption(Column.columnToString))
       )
     )
   }
@@ -94,8 +90,7 @@ object TableConstraintsViewRow {
       "constraint_type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintType),
       "is_deferrable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.isDeferrable),
       "initially_deferred" -> Writes.OptionWrites(Writes.StringWrites).writes(o.initiallyDeferred),
-      "enforced" -> Writes.OptionWrites(Writes.StringWrites).writes(o.enforced),
-      "nulls_distinct" -> Writes.OptionWrites(Writes.StringWrites).writes(o.nullsDistinct)
+      "enforced" -> Writes.OptionWrites(Writes.StringWrites).writes(o.enforced)
     ))
   )
 }

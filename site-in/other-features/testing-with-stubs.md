@@ -32,50 +32,70 @@ of your tests it's still very beneficial!
 ## An example of a generated `RepoMock`:
 
 ```scala mdoc:silent
+import adventureworks.person.address.*
+import typo.dsl.*
 import java.sql.Connection
-import typo.generated.pg_catalog.pg_namespace.*
+import scala.annotation.nowarn
 
-class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNamespaceRow] = scala.collection.mutable.Map.empty) extends PgNamespaceRepo {
-  override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
-    map.remove(oid).isDefined
+class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
+                      map: scala.collection.mutable.Map[AddressId, AddressRow] = scala.collection.mutable.Map.empty) extends AddressRepo {
+  override def delete(addressid: AddressId)(implicit c: Connection): Boolean = {
+    map.remove(addressid).isDefined
   }
-
-  override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    if (map.contains(unsaved.oid))
-      sys.error(s"id ${unsaved.oid} already exists")
+  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
+    DeleteBuilder.DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
+  }
+  override def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
+    val _ = if (map.contains(unsaved.addressid))
+      sys.error(s"id ${unsaved.addressid} already exists")
     else
-      map.put(unsaved.oid, unsaved)
+      map.put(unsaved.addressid, unsaved)
+
     unsaved
   }
-
-  override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
+  override def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { row =>
+      map += (row.addressid -> row)
+    }
+    unsaved.size.toLong
+  }
+  override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
+    insert(toRow(unsaved))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[AddressRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+    unsaved.foreach { unsavedRow =>
+      val row = toRow(unsavedRow)
+      map += (row.addressid -> row)
+    }
+    unsaved.size.toLong
+  }
+  override def select: SelectBuilder[AddressFields, AddressRow] = {
+    SelectBuilderMock(AddressFields.structure, () => map.values.toList, SelectParams.empty)
+  }
+  override def selectAll(implicit c: Connection): List[AddressRow] = {
     map.values.toList
   }
-
-  override def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow] = {
-    map.get(oid)
+  override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
+    map.get(addressid)
   }
-
-  override def selectByIds(oids: Array[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
-    oids.flatMap(map.get).toList
+  override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
+    addressids.flatMap(map.get).toList
   }
-
-  override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
-    map.values.find(v => nspname == v.nspname)
-  }
-
-  override def update(row: PgNamespaceRow)(implicit c: Connection): Boolean = {
-    map.get(row.oid) match {
+  override def update(row: AddressRow)(implicit c: Connection): Boolean = {
+    map.get(row.addressid) match {
       case Some(`row`) => false
       case Some(_) =>
-        map.put(row.oid, row)
+        map.put(row.addressid, row): @nowarn
         true
       case None => false
     }
   }
-
-  override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    map.put(unsaved.oid, unsaved)
+  override def update: UpdateBuilder[AddressFields, AddressRow] = {
+    UpdateBuilder.UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
+  }
+  override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
+    map.put(unsaved.addressid, unsaved): @nowarn
     unsaved
   }
 }

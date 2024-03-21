@@ -26,7 +26,7 @@ import typo.generated.customtypes.TypoAclItem
 
 case class PgNamespaceRow(
   /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_namespace","column_name":"oid","ordinal_position":1,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
-  oid: PgNamespaceId,
+  oid: /* oid */ Long,
   /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_namespace","column_name":"nspname","ordinal_position":2,"is_nullable":"NO","data_type":"name","collation_catalog":"postgres","collation_schema":"pg_catalog","collation_name":"C","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"name","dtd_identifier":"2","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
   nspname: String,
   /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_namespace","column_name":"nspowner","ordinal_position":3,"is_nullable":"NO","data_type":"oid","udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"oid","dtd_identifier":"3","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"YES"} */
@@ -39,7 +39,7 @@ object PgNamespaceRow {
   implicit lazy val reads: Reads[PgNamespaceRow] = Reads[PgNamespaceRow](json => JsResult.fromTry(
       Try(
         PgNamespaceRow(
-          oid = json.\("oid").as(PgNamespaceId.reads),
+          oid = json.\("oid").as(Reads.LongReads),
           nspname = json.\("nspname").as(Reads.StringReads),
           nspowner = json.\("nspowner").as(Reads.LongReads),
           nspacl = json.\("nspacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](using TypoAclItem.reads, implicitly)))
@@ -50,7 +50,7 @@ object PgNamespaceRow {
   def rowParser(idx: Int): RowParser[PgNamespaceRow] = RowParser[PgNamespaceRow] { row =>
     Success(
       PgNamespaceRow(
-        oid = row(idx + 0)(PgNamespaceId.column),
+        oid = row(idx + 0)(Column.columnToLong),
         nspname = row(idx + 1)(Column.columnToString),
         nspowner = row(idx + 2)(Column.columnToLong),
         nspacl = row(idx + 3)(Column.columnToOption(TypoAclItem.arrayColumn))
@@ -58,7 +58,7 @@ object PgNamespaceRow {
     )
   }
   implicit lazy val text: Text[PgNamespaceRow] = Text.instance[PgNamespaceRow]{ (row, sb) =>
-    PgNamespaceId.text.unsafeEncode(row.oid, sb)
+    Text.longInstance.unsafeEncode(row.oid, sb)
     sb.append(Text.DELIMETER)
     Text.stringInstance.unsafeEncode(row.nspname, sb)
     sb.append(Text.DELIMETER)
@@ -68,7 +68,7 @@ object PgNamespaceRow {
   }
   implicit lazy val writes: OWrites[PgNamespaceRow] = OWrites[PgNamespaceRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> PgNamespaceId.writes.writes(o.oid),
+      "oid" -> Writes.LongWrites.writes(o.oid),
       "nspname" -> Writes.StringWrites.writes(o.nspname),
       "nspowner" -> Writes.LongWrites.writes(o.nspowner),
       "nspacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](using implicitly, TypoAclItem.writes)).writes(o.nspacl)

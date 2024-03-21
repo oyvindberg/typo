@@ -4,9 +4,9 @@ package typo
 trait Selector {
   def include(relation: db.RelationName): Boolean
 
-  final def or(other: Selector): Selector = rel => include(rel) || other.include(rel)
+  final infix def or(other: Selector): Selector = rel => include(rel) || other.include(rel)
 
-  final def and(other: Selector): Selector = rel => include(rel) && other.include(rel)
+  final infix def and(other: Selector): Selector = rel => include(rel) && other.include(rel)
 
   final def unary_! : Selector = rel => !include(rel)
 }
