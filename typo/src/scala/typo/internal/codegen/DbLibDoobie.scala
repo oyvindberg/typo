@@ -75,7 +75,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           code"def selectByIds($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
       }
     case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
-      code"def selectByUnique(${keyColumns.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
+      val name = s"selectByUnique${keyColumns.map(x => Naming.titleCase(x.name.value)).mkString("And")}"
+      code"def $name(${keyColumns.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
     case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>

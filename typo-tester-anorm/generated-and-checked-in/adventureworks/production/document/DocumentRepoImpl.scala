@@ -119,7 +119,7 @@ class DocumentRepoImpl extends DocumentRepo {
        """.as(DocumentRow.rowParser(1).*)
     
   }
-  override def selectByUnique(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow] = {
+  override def selectByUniqueRowguid(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow] = {
     SQL"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
           from production.document
           where "rowguid" = ${ParameterValue(rowguid, null, TypoUUID.toStatement)}

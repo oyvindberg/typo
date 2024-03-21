@@ -26,7 +26,7 @@ trait UsersRepo {
   def selectAll: Stream[ConnectionIO, UsersRow]
   def selectById(userId: UsersId): ConnectionIO[Option[UsersRow]]
   def selectByIds(userIds: Array[UsersId]): Stream[ConnectionIO, UsersRow]
-  def selectByUnique(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]]
+  def selectByUniqueEmail(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]]
   def update(row: UsersRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[UsersFields, UsersRow]
   def upsert(unsaved: UsersRow): ConnectionIO[UsersRow]

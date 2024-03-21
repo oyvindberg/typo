@@ -65,7 +65,7 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def selectByIds(userIds: Array[UsersId])(implicit c: Connection): List[UsersRow] = {
     userIds.flatMap(map.get).toList
   }
-  override def selectByUnique(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow] = {
+  override def selectByUniqueEmail(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow] = {
     map.values.find(v => email == v.email)
   }
   override def update(row: UsersRow)(implicit c: Connection): Boolean = {

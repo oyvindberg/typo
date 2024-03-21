@@ -76,7 +76,7 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow] = {
     ZStream.fromIterable(userIds.flatMap(map.get))
   }
-  override def selectByUnique(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
+  override def selectByUniqueEmail(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
     ZIO.succeed(map.values.find(v => email == v.email))
   }
   override def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean] = {

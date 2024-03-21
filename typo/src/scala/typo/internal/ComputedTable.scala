@@ -1,7 +1,6 @@
 package typo
 package internal
 
-import typo.internal.compat.ListOps
 import typo.internal.rewriteDependentData.Eval
 
 case class ComputedTable(
@@ -201,7 +200,6 @@ case class ComputedTable(
             rowType = names.RowName
           )
         }
-        .distinctByCompat(x => x.keyColumns.map(_.tpe)) // avoid erasure clashes
     )
     val valid = maybeMethods.flatten.filter {
       case _: RepoMethod.Mutator => !options.readonlyRepo.include(dbTable.name)

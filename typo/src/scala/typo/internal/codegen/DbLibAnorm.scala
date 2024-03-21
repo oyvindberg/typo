@@ -173,7 +173,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           code"def selectByIds($idsParam)(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}"
       }
     case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
-      code"def selectByUnique(${keyColumns.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}"
+      val name = s"selectByUnique${keyColumns.map(x => Naming.titleCase(x.name.value)).mkString("And")}"
+      code"def $name(${keyColumns.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam)(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}"
     case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>

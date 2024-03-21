@@ -83,7 +83,7 @@ class UsersRepoImpl extends UsersRepo {
   override def selectByIds(userIds: Array[UsersId]): Stream[ConnectionIO, UsersRow] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${userIds})""".query(using UsersRow.read).stream
   }
-  override def selectByUnique(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]] = {
+  override def selectByUniqueEmail(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
           where "email" = ${fromWrite(email)(Write.fromPut(TypoUnknownCitext.put))}

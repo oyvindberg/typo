@@ -77,7 +77,7 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def selectByIds(userIds: Array[UsersId]): Stream[ConnectionIO, UsersRow] = {
     Stream.emits(userIds.flatMap(map.get).toList)
   }
-  override def selectByUnique(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]] = {
+  override def selectByUniqueEmail(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]] = {
     delay(map.values.find(v => email == v.email))
   }
   override def update(row: UsersRow): ConnectionIO[Boolean] = {

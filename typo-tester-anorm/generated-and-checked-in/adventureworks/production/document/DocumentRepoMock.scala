@@ -65,7 +65,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow] = {
     documentnodes.flatMap(map.get).toList
   }
-  override def selectByUnique(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow] = {
+  override def selectByUniqueRowguid(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow] = {
     map.values.find(v => rowguid == v.rowguid)
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {

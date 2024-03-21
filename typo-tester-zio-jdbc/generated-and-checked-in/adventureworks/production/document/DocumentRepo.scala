@@ -28,7 +28,7 @@ trait DocumentRepo {
   def selectAll: ZStream[ZConnection, Throwable, DocumentRow]
   def selectById(documentnode: DocumentId): ZIO[ZConnection, Throwable, Option[DocumentRow]]
   def selectByIds(documentnodes: Array[DocumentId]): ZStream[ZConnection, Throwable, DocumentRow]
-  def selectByUnique(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]]
+  def selectByUniqueRowguid(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]]
   def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[DocumentFields, DocumentRow]
   def upsert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, UpdateResult[DocumentRow]]
